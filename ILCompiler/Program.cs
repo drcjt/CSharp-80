@@ -3,15 +3,18 @@ using System.Reflection;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.Collections.Generic;
+using dnlib.DotNet;
+using System.IO;
+using dnlib.DotNet.Emit;
 
 namespace ILCompiler
 {
-    class Program
+    public class Program
     {
-        private string _outputFilePath;
-        private string _inputFilePath;
+        private FileInfo _outputFilePath;
+        private FileInfo _inputFilePath;
 
-        static int Main(string[] args)
+        public static int Main(string[] args)
         {
             try
             {
@@ -27,27 +30,79 @@ namespace ILCompiler
 
         private int Run(string[] args)
         {
-            return ParseCommandLine(args);
+            var result = ParseCommandLine(args);
+
+            if (result == 0)
+            {
+                ModuleContext modCtx = ModuleDef.CreateModuleContext();
+                ModuleDefMD module = ModuleDefMD.Load(_inputFilePath.FullName, modCtx);
+
+                Console.WriteLine("ORG 4A00H ;Start at location 4A00H");
+
+                var entryPointMethodBody = module.EntryPoint.MethodBody as CilBody;
+                foreach (var instruction in entryPointMethodBody.Instructions)
+                {
+                    var code = instruction.OpCode.Code;
+                    switch (code)
+                    {
+                        case Code.Ldc_I4_S:
+                            Console.WriteLine($"LD HL, {instruction.Operand} ; Ldc_I4_S");
+                            Console.WriteLine("PUSH HL");
+                            break;
+
+                        case Code.Add:
+                            Console.WriteLine("POP HL");
+                            Console.WriteLine("POP DE");
+                            Console.WriteLine("ADD HL, DE");
+                            Console.WriteLine("PUSH HL");
+                            break;
+
+                        case Code.Stloc_0:
+                            break;
+
+                        case Code.Stloc_1:
+                            break;
+
+                        case Code.Ldloc_0:
+                            break;
+
+                        case Code.Ldloc_1:
+                            break;
+
+                        case Code.Ret:
+                            // Convert to Z80 RET instruction
+                            Console.WriteLine("RET ; Ret");
+                            break;
+
+                        default:
+                            throw new Exception($"Cannot translate IL opcode {code}");
+                    }
+                }
+
+                Console.WriteLine("END 4A00 ;End-Start of 4A00H");
+            }
+
+            return result;
         }
 
         private int ParseCommandLine(string[] args)
         {
             var rootCommand = new RootCommand
             {
-                new Argument<string>("Input file to compile"),
-                new Option<string>(new[] { "-o", "--out" }, "Output file path") { Required = true },
+                new Option<FileInfo>(new[] { "-o", "--outputFile" }, "Output file path") { Required = true },
+                new Argument<FileInfo>("inputFilePath"),
             };
 
             rootCommand.Description = "CSharp-80 compiler from C# IL to Z80 for TRS-80 Machines";
-            rootCommand.Handler = CommandHandler.Create<string, string>(HandleCommand);
+            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo>(HandleCommand);
 
-            return rootCommand.Invoke(args);
+            return rootCommand.InvokeAsync(args).Result;
         }
 
-        private void HandleCommand(string inputFilePath, string outputFilePath)
+        private void HandleCommand(FileInfo inputFilePath, FileInfo outputFile)
         {
             _inputFilePath = inputFilePath;
-            _outputFilePath = outputFilePath;
+            _outputFilePath = outputFile;
         }
     }
 }

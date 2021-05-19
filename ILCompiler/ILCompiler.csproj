@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -6,7 +6,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="dnlib" Version="3.3.2" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20071.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="MiniBCL.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

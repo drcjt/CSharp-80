@@ -81,3 +81,17 @@ namespace Internal.Runtime.CompilerServices
 		public static extern ref T Add<T>(ref T source, int elementOffset);
 	}
 }
+
+namespace MiniBCL
+{
+	public class Program
+	{
+		public static int Main()
+        {
+			var a = 37;
+			var b = 3;
+			// Do nothing at all!!			
+			return a + b;
+        }
+	}
+}
