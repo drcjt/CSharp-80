@@ -88,10 +88,8 @@ namespace MiniBCL
 	{
 		public static int Main()
         {
-			var a = 37;
-			var b = 3;
-			// Do nothing at all!!			
-			return a + b;
+			// Very simple program!
+			return 42;
         }
 	}
 }
