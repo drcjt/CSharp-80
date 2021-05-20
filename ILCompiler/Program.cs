@@ -1,11 +1,10 @@
-﻿using System;
-using System.Reflection;
+﻿using dnlib.DotNet;
+using dnlib.DotNet.Emit;
+using ILCompiler.z80;
+using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.Collections.Generic;
-using dnlib.DotNet;
 using System.IO;
-using dnlib.DotNet.Emit;
 
 namespace ILCompiler
 {
@@ -37,24 +36,30 @@ namespace ILCompiler
                 ModuleContext modCtx = ModuleDef.CreateModuleContext();
                 ModuleDefMD module = ModuleDefMD.Load(_inputFilePath.FullName, modCtx);
 
-                Console.WriteLine("ORG 4A00H ;Start at location 4A00H");
+                var assembly = new Assembly();
 
+                assembly.LABEL("START");
+
+                var entryPointMethodName = module.EntryPoint.Name;
                 var entryPointMethodBody = module.EntryPoint.MethodBody as CilBody;
+                
+                assembly.LABEL(entryPointMethodName);
+
                 foreach (var instruction in entryPointMethodBody.Instructions)
                 {
                     var code = instruction.OpCode.Code;
                     switch (code)
                     {
                         case Code.Ldc_I4_S:
-                            Console.WriteLine($"LD HL, {instruction.Operand} ; Ldc_I4_S");
-                            Console.WriteLine("PUSH HL");
+                            assembly.LD(R16.HL, (sbyte)instruction.Operand);
+                            assembly.PUSH(R16.HL);
                             break;
 
                         case Code.Add:
-                            Console.WriteLine("POP HL");
-                            Console.WriteLine("POP DE");
-                            Console.WriteLine("ADD HL, DE");
-                            Console.WriteLine("PUSH HL");
+                            assembly.POP(R16.HL);
+                            assembly.POP(R16.DE);
+                            //assembly.Add(R16.HL, R16.DE);
+                            assembly.PUSH(R16.HL);
                             break;
 
                         case Code.Stloc_0:
@@ -70,8 +75,7 @@ namespace ILCompiler
                             break;
 
                         case Code.Ret:
-                            // Convert to Z80 RET instruction
-                            Console.WriteLine("RET ; Ret");
+                            assembly.RET();
                             break;
 
                         default:
@@ -79,7 +83,9 @@ namespace ILCompiler
                     }
                 }
 
-                Console.WriteLine("END 4A00 ;End-Start of 4A00H");
+                assembly.END("START");
+
+                assembly.Write(_outputFilePath.FullName, _inputFilePath.FullName);
             }
 
             return result;
