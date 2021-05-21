@@ -7,14 +7,17 @@
     <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-
+    
     <Optimize>true</Optimize>
+    <IncludePal>true</IncludePal>
     
     <!--Disable .NET Core SDK libs-->
     <NoStdLib>true</NoStdLib>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

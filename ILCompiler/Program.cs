@@ -37,74 +37,15 @@ namespace ILCompiler
                 ModuleDefMD module = ModuleDefMD.Load(_inputFilePath.FullName, modCtx);
 
                 var assembly = new Assembly();
+                var romRoutines = new RomRoutines(assembly);
 
-                assembly.LABEL("START");
+                assembly.Label("START");
 
-                var entryPointMethodName = module.EntryPoint.Name;
-                var entryPointMethodBody = module.EntryPoint.MethodBody as CilBody;
-                
-                assembly.LABEL(entryPointMethodName);
+                var compiler = new Compiler(assembly, romRoutines);
 
-                foreach (var instruction in entryPointMethodBody.Instructions)
-                {
-                    var code = instruction.OpCode.Code;
-                    switch (code)
-                    {
-                        case Code.Ldc_I4_S:
-                            assembly.LD(R16.HL, (sbyte)instruction.Operand);
-                            assembly.PUSH(R16.HL);
-                            break;
+                compiler.CompileMethod(module.EntryPoint.Name, module.EntryPoint.MethodBody as CilBody);
 
-                        case Code.Add:
-                            assembly.POP(R16.HL);
-                            assembly.POP(R16.DE);
-                            //assembly.Add(R16.HL, R16.DE);
-                            assembly.PUSH(R16.HL);
-                            break;
-
-                        case Code.Stloc_0:
-                            break;
-
-                        case Code.Stloc_1:
-                            break;
-
-                        case Code.Ldloc_0:
-                            break;
-
-                        case Code.Ldloc_1:
-                            break;
-
-                        case Code.Ret:
-                            assembly.RET();
-                            break;
-
-                        case Code.Call:
-                            var memberRef = instruction.Operand as MemberRef;
-                            if (memberRef.DeclaringType.FullName.StartsWith("System.Console"))
-                            {
-                                switch (memberRef.Name)
-                                {
-                                    case "Write":
-                                        // Output to current cursor position
-                                        assembly.POP(R16.HL);
-                                        assembly.LD(R8.A, R8.L);
-                                        assembly.CALL(0x0033);  // ROM routine to display character at current cursor position
-                                        break;
-                                }
-                            }
-                            else
-                            {
-                                // TODO: implement proper compilation of CIL Call instruction here
-                            }
-
-                            break;
-
-                        default:
-                            throw new Exception($"Cannot translate IL opcode {code}");
-                    }
-                }
-
-                assembly.END("START");
+                assembly.End("START");
 
                 assembly.Write(_outputFilePath.FullName, _inputFilePath.FullName);
             }

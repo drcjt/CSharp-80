@@ -21,12 +21,12 @@ namespace ILCompiler.z80
 			}
 		}
 
-		public void LABEL(string label)
+		public void Label(string label)
 		{
 			_instructions.Add(new LabelInstruction(label));
 		}
 
-		public void END(string label)
+		public void End(string label)
         {
 			_instructions.Add(new Instruction(string.Empty, "END", label)); 
         }

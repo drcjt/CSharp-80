@@ -8,7 +8,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILCompiler", "ILCompiler\IL
 		{A1841782-D78F-4A47-B38F-A26FEFF83B11} = {A1841782-D78F-4A47-B38F-A26FEFF83B11}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MiniBCL", "MiniBCL\MiniBCL.csproj", "{A1841782-D78F-4A47-B38F-A26FEFF83B11}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "Sample\Sample.csproj", "{A1841782-D78F-4A47-B38F-A26FEFF83B11}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

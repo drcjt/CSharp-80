@@ -4,12 +4,12 @@ namespace ILCompiler.z80
 {
     public partial class Assembly
     {
-        public void RET()
+        public void Ret()
         {
             _instructions.Add(new Instruction(string.Empty, "RET", string.Empty));
         }
 
-        public void POP(R16Type target)
+        public void Pop(R16Type target)
         {
             var lastInstruction = _instructions[^1];
             if (lastInstruction.Opcode == "PUSH" && lastInstruction.Operands == target.ToString())
@@ -23,29 +23,34 @@ namespace ILCompiler.z80
             }
         }
 
-        public void PUSH(R16Type target)
+        public void Push(R16Type target)
         {
             _instructions.Add(new Instruction(string.Empty, "PUSH", target.ToString()));
         }
 
-        public void LD(R16Type target, sbyte source)
+        public void Ld(R16Type target, sbyte source)
         {
             _instructions.Add(new Instruction(string.Empty, "LD", target.ToString() + ", " + string.Format("{0:X}H", source)));
         }
 
-        public void LD(R8Type target, R8Type source)
+        public void Ld(R8Type target, R8Type source)
         {
             _instructions.Add(new Instruction(string.Empty, "LD", target.ToString() + ", " + source.ToString()));
         }
 
-        public void CALL(string label)
+        public void Call(string label)
         {
             _instructions.Add(new Instruction(string.Empty, "CALL", label));
         }
 
-        public void CALL(UInt16 target)
+        public void Call(UInt16 target)
         {
             _instructions.Add(new Instruction(string.Empty, "CALL", string.Format("{0:X}H", target)));
+        }
+
+        public void Add(R16Type target, R16Type source)
+        {
+            _instructions.Add(new Instruction(string.Empty, "ADD", target.ToString() + ", " + source.ToString()));
         }
     }
 }
