@@ -31,9 +31,10 @@
 	public class Attribute { }
 
 	public class Console
-    {
+	{
 		// Stub as compiler will generate code for calls to this method
 		public static void Write(char value) { }
+		public static void Write(int value) { }
 	}
 }
 

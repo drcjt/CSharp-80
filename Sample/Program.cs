@@ -2,7 +2,7 @@
 {
     public class Program
     {
-		public static int Main()
+		public static int Main(string[] args)
 		{
 			// Very simple program!
 			System.Console.Write('H');
@@ -16,6 +16,7 @@
 			System.Console.Write('r');
 			System.Console.Write('l');
 			System.Console.Write('d');
+
 			return 42;
 		}
     }
