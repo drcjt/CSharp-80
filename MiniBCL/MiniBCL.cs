@@ -29,6 +29,12 @@
 	public abstract class ValueType { }
 	public abstract class Enum : ValueType { }
 	public class Attribute { }
+
+	public class Console
+    {
+		// Stub as compiler will generate code for calls to this method
+		public static void Write(char value) { }
+	}
 }
 
 namespace System.Runtime.CompilerServices
@@ -79,28 +85,5 @@ namespace Internal.Runtime.CompilerServices
 		// It will do what Unsafe.Add is expected to do. It's just not possible to express it in C#
 		[System.Runtime.CompilerServices.Intrinsic]
 		public static extern ref T Add<T>(ref T source, int elementOffset);
-	}
-}
-
-namespace MiniBCL
-{
-	public class Program
-	{
-		public static int Main()
-        {
-			// Very simple program!
-			System.Console.Write('H');
-			System.Console.Write('e');
-			System.Console.Write('l');
-			System.Console.Write('l');
-			System.Console.Write('o');
-			System.Console.Write(' ');
-			System.Console.Write('W');
-			System.Console.Write('o');
-			System.Console.Write('r');
-			System.Console.Write('l');
-			System.Console.Write('d');
-			return 42;
-        }
 	}
 }
