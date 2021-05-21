@@ -4,18 +4,16 @@ namespace ILCompiler.z80
 {
     public class Instruction
     {
-        public Instruction(string label, string opcode, string operands, string comment)
+        public Instruction(string label, string opcode, string operands)
         {
             this.Label = label;
             this.Opcode = opcode;
             this.Operands = operands;
-            this.Comment = comment;
         }
 
         public string Label { get; }
         public string Opcode { get; }
         public string Operands { get; }
-        public string Comment { get; }
 
 		public override string ToString()
 		{

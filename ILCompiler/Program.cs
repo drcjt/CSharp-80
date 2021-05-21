@@ -78,6 +78,27 @@ namespace ILCompiler
                             assembly.RET();
                             break;
 
+                        case Code.Call:
+                            var memberRef = instruction.Operand as MemberRef;
+                            if (memberRef.DeclaringType.FullName.StartsWith("System.Console"))
+                            {
+                                switch (memberRef.Name)
+                                {
+                                    case "Write":
+                                        // Output to current cursor position
+                                        assembly.POP(R16.HL);
+                                        assembly.LD(R8.A, R8.L);
+                                        assembly.CALL(0x0033);  // ROM routine to display character at current cursor position
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                // TODO: implement proper compilation of CIL Call instruction here
+                            }
+
+                            break;
+
                         default:
                             throw new Exception($"Cannot translate IL opcode {code}");
                     }

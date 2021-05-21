@@ -28,7 +28,7 @@ namespace ILCompiler.z80
 
 		public void END(string label)
         {
-			_instructions.Add(new Instruction(string.Empty, "END", label, string.Empty)); 
+			_instructions.Add(new Instruction(string.Empty, "END", label)); 
         }
 
 		public void Write(string filePath, string inputFilePath)
