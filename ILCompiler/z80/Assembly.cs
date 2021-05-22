@@ -5,13 +5,31 @@ using System.Text;
 
 namespace ILCompiler.z80
 {
-	public partial class Assembly : IAssembly
+	public class Assembly : IAssembly
     {
 		public Assembly()
 		{
 		}
 
 		private IList<Instruction> _instructions = new List<Instruction>();
+
+		public void Add(Instruction instruction)
+        {
+			_instructions.Add(instruction);
+        }
+
+		public void RemoveLast()
+        {
+			_instructions.RemoveAt(_instructions.Count - 1);
+		}
+
+		public Instruction Last
+        {
+			get
+            {
+				return _instructions[^1];
+            }
+        }
 
 		public Instruction this[int index]
 		{

@@ -1,4 +1,6 @@
-﻿namespace MiniBCL
+﻿using System;
+
+namespace MiniBCL
 {
     public class Program
     {
@@ -12,17 +14,25 @@
 
 		private static void HelloWorld()
 		{
-			System.Console.Write('H');
-			System.Console.Write('e');
-			System.Console.Write('l');
-			System.Console.Write('l');
-			System.Console.Write('o');
-			System.Console.Write(' ');
-			System.Console.Write('W');
-			System.Console.Write('o');
-			System.Console.Write('r');
-			System.Console.Write('l');
-			System.Console.Write('d');
+            Console.Write('H');
+            Console.Write('e');
+            Console.Write('l');
+            Console.Write('l');
+            Console.Write('o');
+
+            Display(32); // Show space
+
+            Console.Write(' ');
+            Console.Write('W');
+            Console.Write('o');
+            Console.Write('r');
+            Console.Write('l');
+            Console.Write('d');
 		}
+
+        private static void Display(short i)
+        {
+            Console.Write(i);
+        }
     }
 }

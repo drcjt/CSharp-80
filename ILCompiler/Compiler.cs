@@ -41,7 +41,7 @@ namespace ILCompiler
                     {
                         _logger.LogInformation("Compiling method {method.Name}", method.Name);
 
-                        CompileMethod(method.Name, method.MethodBody as CilBody);
+                        CompileMethod(method);
                     }
                 }
             }
@@ -53,10 +53,18 @@ namespace ILCompiler
             _assembly.Ret();
         }
 
-        public void CompileMethod(string methodName, CilBody body)
+        private void CreateStackFrame(short localsSize)
         {
-            _assembly.Label(methodName);
+            // Save IX
+            _assembly.Push(I16.IX);
 
+            // Use IX as frame pointer
+            _assembly.Ld(I16.IX, 0);
+            _assembly.Add(I16.IX, R16.SP);
+        }
+
+        private void CompileMethodInstructions(CilBody body, short stackFrameSize = 0)
+        {
             foreach (var instruction in body.Instructions)
             {
                 var code = instruction.OpCode.Code;
@@ -73,9 +81,15 @@ namespace ILCompiler
                         break;
 
                     case Code.Add:
-                        _assembly.Pop(R16.HL);                        
+                        _assembly.Pop(R16.HL);
                         _assembly.Pop(R16.DE);
                         _assembly.Add(R16.HL, R16.DE);
+                        _assembly.Push(R16.HL);
+                        break;
+
+                    case Code.Ldarg_0:
+                        _assembly.Ld(R8.H, I16.IX, 5);
+                        _assembly.Ld(R8.L, I16.IX, 4);
                         _assembly.Push(R16.HL);
                         break;
 
@@ -92,6 +106,13 @@ namespace ILCompiler
                         break;
 
                     case Code.Ret:
+
+                        // Compile code to unwind stack frame here
+                        if (stackFrameSize > 0)
+                        {
+                            _assembly.Pop(I16.IX);
+                        }
+
                         _assembly.Ret();
                         break;
 
@@ -126,6 +147,40 @@ namespace ILCompiler
                         break;
                 }
             }
+        }
+
+        public void CompileMethod(MethodDef method)
+        {
+            var methodName = method.Name;
+            var body = method.MethodBody as CilBody;
+
+            _assembly.Label(methodName);
+
+            short frameSize = 0;
+            if (method.Parameters.Count > 0)
+            {
+                foreach (var parameter in method.Parameters)
+                {
+                    var type = parameter.Type;
+                    if (type.IsCorLibType)
+                    {
+                        switch (type.TypeName)
+                        {
+                            case "Int16":
+                                frameSize += 2;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+                if (frameSize > 0)
+                {
+                    CreateStackFrame(frameSize);
+                }
+            }
+
+            CompileMethodInstructions(body, frameSize);
         }
     }
 }

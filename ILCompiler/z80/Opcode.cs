@@ -21,6 +21,7 @@ namespace ILCompiler.z80
         public static readonly Opcode Ld = new("Ld");
         public static readonly Opcode Call = new("Call");
         public static readonly Opcode Add = new("Add");
+        public static readonly Opcode Ex = new("Ex");
 
         public override string ToString()
         {

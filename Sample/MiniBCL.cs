@@ -22,7 +22,9 @@
 		}
 	}
 
+	public struct Boolean { }
 	public struct Char { }
+	public struct Int16 { }
 	public struct Int32 { }
 	public struct IntPtr { }
 

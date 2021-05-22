@@ -21,7 +21,6 @@ namespace ILCompiler.z80
             this.Operands = operands;
         }
 
-
 		public override string ToString()
 		{
 			var stringBuilder = new StringBuilder();
