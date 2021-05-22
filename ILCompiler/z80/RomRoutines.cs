@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ILCompiler.z80
+﻿namespace ILCompiler.z80
 {
-    public class RomRoutines
+    public class RomRoutines : IRomRoutines
     {
-        private readonly Assembly _assembly;
-        public RomRoutines(Assembly assembly)
+        private readonly IAssembly _assembly;
+        public RomRoutines(IAssembly assembly)
         {
             _assembly = assembly;
         }

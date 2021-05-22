@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ILCompiler.z80
 {
-	public partial class Assembly
+	public partial class Assembly : IAssembly
     {
 		public Assembly()
 		{
@@ -26,11 +26,6 @@ namespace ILCompiler.z80
 			_instructions.Add(new LabelInstruction(label));
 		}
 
-		public void End(string label)
-        {
-			_instructions.Add(new Instruction(string.Empty, "END", label)); 
-        }
-
 		public void Write(string filePath, string inputFilePath)
 		{
 			using (StreamWriter streamWriter = new StreamWriter(filePath))
@@ -39,11 +34,14 @@ namespace ILCompiler.z80
 				streamWriter.WriteLine($"; {DateTime.Now}");
 				streamWriter.WriteLine();
 				streamWriter.WriteLine("\tORG 5200H");
+				streamWriter.WriteLine("START:");
 
 				foreach (Instruction instruction in _instructions)
 				{
 					streamWriter.WriteLine(instruction.ToString());
 				}
+
+				streamWriter.WriteLine("\tEND START");
 			}
 		}
 

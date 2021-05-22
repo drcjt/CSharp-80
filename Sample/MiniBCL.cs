@@ -32,8 +32,10 @@
 
 	public class Console
 	{
-		// Stub as compiler will generate code for calls to this method
+
+		[System.Runtime.CompilerServices.Intrinsic]
 		public static void Write(char value) { }
+		[System.Runtime.CompilerServices.Intrinsic]
 		public static void Write(int value) { }
 	}
 }
