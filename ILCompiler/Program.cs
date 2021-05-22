@@ -54,7 +54,7 @@ namespace ILCompiler
             services.AddSingleton<IMethodCompiler, MethodCompiler>();
         }
 
-        private int Run(string[] args, ServiceProvider serviceProvider)
+        private void Run(string[] args, ServiceProvider serviceProvider)
         {
             var result = ParseCommandLine(args);
 
@@ -64,19 +64,12 @@ namespace ILCompiler
                 configuration.IgnoreUnknownCil = _ignoreUnknownCil;
 
                 var compiler = serviceProvider.GetService<ICilCompiler>();            
-
-                compiler.Compile(_inputFilePath.FullName);
-
-                var assembly = serviceProvider.GetService<IZ80Assembly>();
-                assembly.Write(_outputFilePath.FullName, _inputFilePath.FullName);
-                _logger.LogDebug($"Written compiled file to {_outputFilePath.FullName}");
+                compiler.Compile(_inputFilePath.FullName, _outputFilePath.FullName);
             }
             else
             {
                 _logger.LogError("Failed to parse command line");
             }
-
-            return result;
         }
 
         private int ParseCommandLine(string[] args)

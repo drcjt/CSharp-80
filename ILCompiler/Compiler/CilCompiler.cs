@@ -19,7 +19,7 @@ namespace ILCompiler.Compiler
             _methodCompiler = methodCompiler;
         }
 
-        public void Compile(string inputFilePath)
+        public void Compile(string inputFilePath, string outputFilePath = null)
         {
             ModuleContext modCtx = ModuleDef.CreateModuleContext();
             ModuleDefMD module = ModuleDefMD.Load(inputFilePath, modCtx);
@@ -41,6 +41,12 @@ namespace ILCompiler.Compiler
                         _methodCompiler.CompileMethod(method);
                     }
                 }
+            }
+
+            if (outputFilePath != null)
+            {
+                _assembly.Write(outputFilePath, inputFilePath);
+                _logger.LogDebug($"Written compiled file to {outputFilePath}");
             }
         }
 
