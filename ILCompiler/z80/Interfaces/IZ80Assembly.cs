@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ILCompiler.z80
 {
-    public interface IAssembly
+    public interface IZ80Assembly
     {
         public void Label(string label);
         public void Write(string filePath, string inputFilePath);

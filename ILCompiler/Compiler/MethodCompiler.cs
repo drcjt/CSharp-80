@@ -1,59 +1,28 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
-using dnlib.DotNet;
+﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using System;
 using ILCompiler.z80;
-using IAssembly = ILCompiler.z80.IAssembly;
+using Microsoft.Extensions.Logging;
+using ILCompiler.Interfaces;
 
-namespace ILCompiler
+namespace ILCompiler.Compiler
 {
-    public class Compiler : ICompiler
+    public class MethodCompiler : IMethodCompiler
     {
-        private readonly IAssembly _assembly;
+        private readonly IZ80Assembly _assembly;
         private readonly IRomRoutines _romRoutines;
-        private readonly ILogger<Compiler> _logger;
+        private readonly ILogger<MethodCompiler> _logger;
+        private readonly IConfiguration _configuration;
 
-        public bool IgnoreUnknownCil { get; set; } = false;
-
-        public Compiler(IAssembly assembly, IRomRoutines romRoutines, ILogger<Compiler> logger)
+        public MethodCompiler(IZ80Assembly assembly, IRomRoutines romRoutines, IConfiguration configuration, ILogger<MethodCompiler> logger)
         {
             _assembly = assembly;
             _romRoutines = romRoutines;
             _logger = logger;
+            _configuration = configuration;
         }
 
-        public void Compile(string inputFilePath)
-        {
-            ModuleContext modCtx = ModuleDef.CreateModuleContext();
-            ModuleDefMD module = ModuleDefMD.Load(inputFilePath, modCtx);
-
-            CompilePrelude(module.EntryPoint.Name);
-
-            foreach (var type in module.Types)
-            {
-                _logger.LogInformation("Compiling Type {type.Name}", type.Name);
-
-                foreach (var method in type.Methods)
-                {
-                    var isIntrinsic = method.HasCustomAttributes && method.CustomAttributes.IsDefined("System.Runtime.CompilerServices.IntrinsicAttribute");
-
-                    if (!method.IsConstructor && !isIntrinsic)
-                    {
-                        _logger.LogInformation("Compiling method {method.Name}", method.Name);
-
-                        CompileMethod(method);
-                    }
-                }
-            }
-        }
-
-        public void CompilePrelude(string entryMethodName)
-        {
-            _assembly.Call(entryMethodName);
-            _assembly.Ret();
-        }
-
-        private void CreateStackFrame(short localsSize)
+        private void CreateStackFrame()
         {
             // Save IX
             _assembly.Push(I16.IX);
@@ -70,8 +39,16 @@ namespace ILCompiler
                 var code = instruction.OpCode.Code;
                 switch (code)
                 {
+                    case Code.Ldc_I4_0:
+                    case Code.Ldc_I4_1:
                     case Code.Ldc_I4_2:
-                        _assembly.Ld(R16.HL, 0x02);
+                    case Code.Ldc_I4_3:
+                    case Code.Ldc_I4_4:
+                    case Code.Ldc_I4_5:
+                    case Code.Ldc_I4_6:
+                    case Code.Ldc_I4_7:
+                    case Code.Ldc_I4_8:
+                        _assembly.Ld(R16.HL, (short)instruction.GetLdcI4Value());
                         _assembly.Push(R16.HL);
                         break;
 
@@ -88,8 +65,10 @@ namespace ILCompiler
                         break;
 
                     case Code.Ldarg_0:
-                        _assembly.Ld(R8.H, I16.IX, 5);
-                        _assembly.Ld(R8.L, I16.IX, 4);
+                        var argumentOffset = stackFrameSize;
+                        argumentOffset += 2; // accounts for return address
+                        _assembly.Ld(R8.H, I16.IX, (short)(argumentOffset + 1));
+                        _assembly.Ld(R8.L, I16.IX, argumentOffset);
                         _assembly.Push(R16.HL);
                         break;
 
@@ -106,7 +85,6 @@ namespace ILCompiler
                         break;
 
                     case Code.Ret:
-
                         // Compile code to unwind stack frame here
                         if (stackFrameSize > 0)
                         {
@@ -136,13 +114,13 @@ namespace ILCompiler
                         break;
 
                     default:
-                        if (IgnoreUnknownCil)
+                        if (_configuration.IgnoreUnknownCil)
                         {
                             _logger.LogWarning("Unsupported IL opcode {code}", code);
                         }
                         else
                         {
-                            throw new Exception($"Cannot translate IL opcode {code}");
+                            throw new UnknownCilException($"Cannot translate IL opcode {code}");
                         }
                         break;
                 }
@@ -176,7 +154,7 @@ namespace ILCompiler
                 }
                 if (frameSize > 0)
                 {
-                    CreateStackFrame(frameSize);
+                    CreateStackFrame();
                 }
             }
 

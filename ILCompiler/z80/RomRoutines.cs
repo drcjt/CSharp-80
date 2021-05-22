@@ -2,8 +2,8 @@
 {
     public class RomRoutines : IRomRoutines
     {
-        private readonly IAssembly _assembly;
-        public RomRoutines(IAssembly assembly)
+        private readonly IZ80Assembly _assembly;
+        public RomRoutines(IZ80Assembly assembly)
         {
             _assembly = assembly;
         }

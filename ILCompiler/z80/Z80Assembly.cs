@@ -5,9 +5,9 @@ using System.Text;
 
 namespace ILCompiler.z80
 {
-	public class Assembly : IAssembly
+	public class Z80Assembly : IZ80Assembly
     {
-		public Assembly()
+		public Z80Assembly()
 		{
 		}
 

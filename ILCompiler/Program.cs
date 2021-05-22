@@ -1,10 +1,12 @@
-﻿using ILCompiler.z80;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
+using ILCompiler.z80;
+using ILCompiler.Compiler;
+using ILCompiler.Interfaces;
 
 namespace ILCompiler
 {
@@ -45,9 +47,11 @@ namespace ILCompiler
         private static void ConfigureServices(ServiceCollection services)
         {
             services.AddLogging(configure => configure.AddConsole()).AddTransient<Program>();
-            services.AddSingleton<ICompiler, Compiler>();
-            services.AddSingleton<IAssembly, Assembly>();
+            services.AddSingleton<ICilCompiler, CilCompiler>();
+            services.AddSingleton<IZ80Assembly, Z80Assembly>();
             services.AddSingleton<IRomRoutines, RomRoutines>();
+            services.AddSingleton<IConfiguration, Configuration>();
+            services.AddSingleton<IMethodCompiler, MethodCompiler>();
         }
 
         private int Run(string[] args, ServiceProvider serviceProvider)
@@ -56,12 +60,14 @@ namespace ILCompiler
 
             if (result == 0)
             {
-                var compiler = serviceProvider.GetService<ICompiler>();
-                compiler.IgnoreUnknownCil = _ignoreUnknownCil;
+                var configuration = serviceProvider.GetService<IConfiguration>();
+                configuration.IgnoreUnknownCil = _ignoreUnknownCil;
+
+                var compiler = serviceProvider.GetService<ICilCompiler>();            
 
                 compiler.Compile(_inputFilePath.FullName);
 
-                var assembly = serviceProvider.GetService<IAssembly>();
+                var assembly = serviceProvider.GetService<IZ80Assembly>();
                 assembly.Write(_outputFilePath.FullName, _inputFilePath.FullName);
                 _logger.LogDebug($"Written compiled file to {_outputFilePath.FullName}");
             }
