@@ -2,8 +2,8 @@
   "profiles": {
     "ILCompiler": {
       "commandName": "Project",
-      "commandLineArgs": "--outputFile foo.dat MiniBCL.dll",
-      "sqlDebugging": false
+      "commandLineArgs": "--ignoreUnknownCil --outputFile Sample.src Sample.dll",
+      "sqlDebugging": true
     }
   }
 }
