@@ -3,7 +3,7 @@
 namespace ILCompiler.Tests
 {
     [TestFixture]
-    public class Class1
+    public class CilCompilerTests
     {
         [Test]
         public void Test()
