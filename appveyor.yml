@@ -1,0 +1,25 @@
+version: 1.0.{build}
+image: Visual Studio 2019
+
+environment:
+    COVERALLS_REPO_TOKEN:  
+       secure: D3xk3zhufhpC3ZTVEFQT4jGsSmEWWzNJdJsAUu2wK2EARb9Z3LO4Uaubq7HM007j
+
+install:
+  # Install repo specific stuff here
+before_build:
+  # Display .NET Core version
+  - cmd: dotnet --version
+
+build_script:
+  # output will be in ./src/bin/debug/netcoreapp1.1/publish
+  - cmd: dotnet publish CSharp-80.sln
+  
+test_script:
+  - cmd: nuget install Appveyor.TestLogger -Version 2.0.0
+  - cmd: dotnet test --no-build --no-restore --test-adapter-path:. --logger:Appveyor CSharp-80.sln
+  
+after_build:
+
+  
+artifacts:
