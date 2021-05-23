@@ -17,6 +17,9 @@
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
+    <!-- Prevent .NET Core 3+ from generating exe -->
+    <UseAppHost>false</UseAppHost>
+    
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
