@@ -2,20 +2,27 @@
 
 namespace ILCompiler.z80
 {
-    public class Instruction
+    public class Z80Instruction
     {
         public string Label { get; }
         public Opcode Opcode { get; }
         public string Operands { get; }
 
+        public string Comment { get; }
+
         private readonly bool _upperCase = true;
 
-        public Instruction(string label, Opcode opcode, string operands) : this(opcode, operands)
+        public Z80Instruction(string label, Opcode opcode, string operands, string comment) : this(label, opcode, operands)
+        {
+            this.Comment = comment;
+        }
+
+        public Z80Instruction(string label, Opcode opcode, string operands) : this(opcode, operands)
         {
             this.Label = label;
         }
 
-        public Instruction(Opcode opcode, string operands)
+        public Z80Instruction(Opcode opcode, string operands)
         {
             this.Opcode = opcode;
             this.Operands = operands;
@@ -36,6 +43,11 @@ namespace ILCompiler.z80
             {
                 stringBuilder.Append((_upperCase ? Opcode.ToString().ToUpper() : Opcode) + " ");
                 stringBuilder.Append(_upperCase ? Operands.ToUpper() : Operands);
+            }
+
+            if (Comment != null)
+            {
+                stringBuilder.Append(";" + Comment);
             }
 
 			return stringBuilder.ToString();

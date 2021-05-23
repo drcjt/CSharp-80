@@ -11,8 +11,8 @@ namespace ILCompiler.z80
         public void Label(string label);
         public void Write(string filePath, string inputFilePath);
 
-        public void Add(Instruction instruction);
+        public void Add(Z80Instruction instruction);
         public void RemoveLast();
-        public Instruction Last { get; }
+        public Z80Instruction Last { get; }
     }
 }

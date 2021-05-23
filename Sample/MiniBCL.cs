@@ -9,10 +9,10 @@
 
 	public sealed class String
 	{
-		public readonly int Length;
+		public readonly short Length;
 		public char _firstChar;
 
-		public unsafe char this[int index]
+		public unsafe char this[short index]
 		{
 			[System.Runtime.CompilerServices.Intrinsic]
 			get
@@ -38,7 +38,7 @@
 		[System.Runtime.CompilerServices.Intrinsic]
 		public static void Write(char value) { }
 		[System.Runtime.CompilerServices.Intrinsic]
-		public static void Write(int value) { }
+		public static void Write(short value) { }
 	}
 }
 

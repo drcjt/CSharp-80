@@ -11,9 +11,9 @@ namespace ILCompiler.z80
 		{
 		}
 
-		private IList<Instruction> _instructions = new List<Instruction>();
+		private IList<Z80Instruction> _instructions = new List<Z80Instruction>();
 
-		public void Add(Instruction instruction)
+		public void Add(Z80Instruction instruction)
         {
 			_instructions.Add(instruction);
         }
@@ -23,7 +23,7 @@ namespace ILCompiler.z80
 			_instructions.RemoveAt(_instructions.Count - 1);
 		}
 
-		public Instruction Last
+		public Z80Instruction Last
         {
 			get
             {
@@ -31,7 +31,7 @@ namespace ILCompiler.z80
             }
         }
 
-		public Instruction this[int index]
+		public Z80Instruction this[int index]
 		{
 			get
 			{
@@ -51,15 +51,11 @@ namespace ILCompiler.z80
 				streamWriter.WriteLine($"; INPUT FILE {inputFilePath.ToUpper()}");
 				streamWriter.WriteLine($"; {DateTime.Now}");
 				streamWriter.WriteLine();
-				streamWriter.WriteLine("\tORG 5200H");
-				streamWriter.WriteLine("START:");
 
-				foreach (Instruction instruction in _instructions)
+				foreach (Z80Instruction instruction in _instructions)
 				{
 					streamWriter.WriteLine(instruction.ToString());
 				}
-
-				streamWriter.WriteLine("\tEND START");
 			}
 		}
 
@@ -67,7 +63,7 @@ namespace ILCompiler.z80
 		{
 			var stringBuilder = new StringBuilder();
 
-			foreach (Instruction instruction in _instructions)
+			foreach (Z80Instruction instruction in _instructions)
 			{
 				stringBuilder.Append(instruction.ToString());
 				stringBuilder.AppendLine();

@@ -6,12 +6,17 @@ namespace MiniBCL
     {
 		public static int Main(string[] args)
 		{
+            //Console.WriteLine("Hello World");
+
 			// Very simple program!
-			HelloWorld();
+			//HelloWorld();
+
+            Console.Write((short)(Fibonacci(0) + 48));
 
 			return 42;
 		}
 
+        /*
 		private static void HelloWorld()
 		{
             Console.Write('H');
@@ -33,6 +38,19 @@ namespace MiniBCL
         private static void Display(short i, short j)
         {
             Console.Write(i);
+        }
+        */
+
+        private static int Fibonacci(int n)
+        {
+            if (n == 0 || n == 1)
+            {
+                return 1;
+            }
+            else
+            {
+                return Fibonacci(n-1) + Fibonacci(n-2);
+            }
         }
     }
 }

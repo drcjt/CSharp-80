@@ -4,6 +4,7 @@ using System;
 using ILCompiler.z80;
 using Microsoft.Extensions.Logging;
 using ILCompiler.Interfaces;
+using System.Collections.Generic;
 
 namespace ILCompiler.Compiler
 {
@@ -34,9 +35,24 @@ namespace ILCompiler.Compiler
 
         private void CompileMethodInstructions(CilBody body, short stackFrameSize = 0)
         {
-            foreach (var instruction in body.Instructions)
+            // holds labels
+            var labels = new Dictionary<int, string>();
+
+            for (int instructionCount = 0; instructionCount < body.Instructions.Count; instructionCount++)
             {
+                var instruction = body.Instructions[instructionCount];
+                int offset = (int)instruction.Offset;
                 var code = instruction.OpCode.Code;
+
+                // Add label if necessary
+                if (labels.ContainsKey(offset))
+                {
+                    _assembly.Add(new LabelInstruction(labels[offset]));
+                }
+
+                Instruction target;
+                string label;
+
                 switch (code)
                 {
                     case Code.Ldc_I4_0:
@@ -62,6 +78,38 @@ namespace ILCompiler.Compiler
                         _assembly.Pop(R16.DE);
                         _assembly.Add(R16.HL, R16.DE);
                         _assembly.Push(R16.HL);
+                        break;
+
+                    case Code.Sub:
+                        _assembly.Pop(R16.HL);
+                        _assembly.Pop(R16.DE);
+                        _assembly.Sbc(R16.HL, R16.DE);
+                        _assembly.Push(R16.HL);
+                        break;
+
+                    case Code.Brfalse_S:
+                        target = (Instruction)instruction.Operand;
+                        label = GenerateLabel();
+                        labels[(int)target.Offset] = label;
+
+                        _assembly.Pop(R16.HL);
+                        _assembly.Ld(R8.A, R8.H);
+                        _assembly.Or(R8.L);
+                        _assembly.Jp(Condition.Zero, label);
+
+                        break;
+
+                    case Code.Bne_Un_S:
+                        target = (Instruction)instruction.Operand;
+                        label = GenerateLabel();
+                        labels[(int)target.Offset] = label;
+
+                        _assembly.Pop(R16.HL);
+                        _assembly.Pop(R16.DE);
+                        _assembly.Or(R8.A);
+                        _assembly.Sbc(R16.HL, R16.DE);
+                        _assembly.Jp(Condition.NonZero, label);
+
                         break;
 
                     case Code.Ldarg_0:
@@ -116,6 +164,7 @@ namespace ILCompiler.Compiler
                     default:
                         if (_configuration.IgnoreUnknownCil)
                         {
+                            _assembly.Add(new CommentInstruction(code.ToString()));
                             _logger.LogWarning("Unsupported IL opcode {code}", code);
                         }
                         else
@@ -159,6 +208,13 @@ namespace ILCompiler.Compiler
             }
 
             CompileMethodInstructions(body, frameSize);
+        }
+
+        private int nextLabel = 0;
+
+        private string GenerateLabel()
+        {
+            return $"LB{nextLabel++}";
         }
     }
 }
