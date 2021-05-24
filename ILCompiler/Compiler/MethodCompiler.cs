@@ -64,6 +64,13 @@ namespace ILCompiler.Compiler
                         _assembly.Push(R16.HL);
                         break;
 
+                    case Code.Sub:
+                        _assembly.Pop(R16.HL);
+                        _assembly.Pop(R16.DE);
+                        _assembly.Sbc(R16.HL, R16.DE);
+                        _assembly.Push(R16.HL);
+                        break;
+
                     case Code.Ldarg_0:
                         var argumentOffset = stackFrameSize;
                         argumentOffset += 2; // accounts for return address

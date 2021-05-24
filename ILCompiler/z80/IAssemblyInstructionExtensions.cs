@@ -66,9 +66,24 @@ namespace ILCompiler.z80
             assembly.Add(new Instruction(Opcode.Add, target.ToString() + ", " + source.ToString()));
         }
 
+        public static void Sbc(this IZ80Assembly assembly, R16Type target, R16Type source)
+        {
+            assembly.Add(new Instruction(Opcode.Sbc, target.ToString() + ", " + source.ToString()));
+        }
+
         public static void Ex(this IZ80Assembly assembly, Register target, Register source)
         {
             assembly.Add(new Instruction(Opcode.Ex, target.ToString() + ", " + source.ToString()));
+        }
+
+        public static void Or(this IZ80Assembly assembly, R8Type target)
+        {
+            assembly.Add(new Instruction(Opcode.Or, target.ToString()));
+        }
+
+        public static void Jp(this IZ80Assembly assembly, Condition condition, string label)
+        {
+            assembly.Add(new Instruction(Opcode.Jp, condition + " , " + label));
         }
 
         public static void Org(this IZ80Assembly assembly, short address)
