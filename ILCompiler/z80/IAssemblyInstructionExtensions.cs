@@ -70,5 +70,15 @@ namespace ILCompiler.z80
         {
             assembly.Add(new Instruction(Opcode.Ex, target.ToString() + ", " + source.ToString()));
         }
+
+        public static void Org(this IZ80Assembly assembly, short address)
+        {
+            assembly.Add(new Instruction(Opcode.Org, string.Format("{0:X}H", address)));
+        }
+
+        public static void End(this IZ80Assembly assembly, string label)
+        {
+            assembly.Add(new Instruction(Opcode.End, label));
+        }
     }
 }

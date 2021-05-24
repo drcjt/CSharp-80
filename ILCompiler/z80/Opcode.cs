@@ -9,10 +9,12 @@ namespace ILCompiler.z80
     public class Opcode
     {
         private readonly string _name;
+        private readonly bool _pseudo;
 
-        public Opcode(string name)
+        public Opcode(string name, bool pseudo = false)
         {
             _name = name;
+            _pseudo = pseudo;
         }
 
         public static readonly Opcode Ret = new("Ret");
@@ -23,6 +25,8 @@ namespace ILCompiler.z80
         public static readonly Opcode Add = new("Add");
         public static readonly Opcode Ex = new("Ex");
 
+        public static readonly Opcode Org = new("Org", true);
+        public static readonly Opcode End = new("End", true);
         public override string ToString()
         {
             return _name;

@@ -20,7 +20,7 @@ namespace MiniBCL
             Console.Write('l');
             Console.Write('o');
 
-            Display(32, 10); // Show space
+            //DisplayA(32, 10); // Show space
 
             Console.Write(' ');
             Console.Write('W');
@@ -30,9 +30,11 @@ namespace MiniBCL
             Console.Write('d');
 		}
 
-        private static void Display(short i, short j)
+        /*
+        private static void DisplayA(short i, short j)
         {
             Console.Write(i);
         }
+        */
     }
 }

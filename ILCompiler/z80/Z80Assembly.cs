@@ -51,15 +51,13 @@ namespace ILCompiler.z80
 				streamWriter.WriteLine($"; INPUT FILE {inputFilePath.ToUpper()}");
 				streamWriter.WriteLine($"; {DateTime.Now}");
 				streamWriter.WriteLine();
-				streamWriter.WriteLine("\tORG 5200H");
-				streamWriter.WriteLine("START:");
 
 				foreach (Instruction instruction in _instructions)
 				{
 					streamWriter.WriteLine(instruction.ToString());
 				}
 
-				streamWriter.WriteLine("\tEND START");
+				streamWriter.WriteLine();	// Z80Asm seems to need this
 			}
 		}
 
