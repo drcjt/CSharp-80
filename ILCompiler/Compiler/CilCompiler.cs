@@ -24,7 +24,7 @@ namespace ILCompiler.Compiler
             ModuleContext modCtx = ModuleDef.CreateModuleContext();
             ModuleDefMD module = ModuleDefMD.Load(inputFilePath, modCtx);
 
-            CompilePrelude(module.EntryPoint.Name);
+            GenerateProlog(module.EntryPoint.Name);
 
             foreach (var type in module.Types)
             {
@@ -43,6 +43,8 @@ namespace ILCompiler.Compiler
                 }
             }
 
+            GenerateEpilog();
+
             if (outputFilePath != null)
             {
                 _assembly.Write(outputFilePath, inputFilePath);
@@ -50,10 +52,24 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public void CompilePrelude(string entryMethodName)
+        private void GenerateProlog(string entryMethodName)
         {
+            _assembly.Org(0x5200);
+            _assembly.Label("START");
+
             _assembly.Call(entryMethodName);
+
+            _assembly.Pop(R16.BC);  // return value
+            _assembly.Pop(R16.HL);  // return address
+            _assembly.Push(R16.BC);
+            _assembly.Push(R16.HL);
+            
             _assembly.Ret();
+        }
+
+        private void GenerateEpilog()
+        {
+            _assembly.End("START");
         }
     }
 }

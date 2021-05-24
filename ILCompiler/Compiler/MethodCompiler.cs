@@ -91,6 +91,12 @@ namespace ILCompiler.Compiler
                             _assembly.Pop(I16.IX);
                         }
 
+                        // Swap return value and return address
+                        _assembly.Pop(R16.BC);
+                        _assembly.Pop(R16.HL);
+                        _assembly.Push(R16.BC);
+                        _assembly.Push(R16.HL);
+
                         _assembly.Ret();
                         break;
 
