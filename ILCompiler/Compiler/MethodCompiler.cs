@@ -32,6 +32,91 @@ namespace ILCompiler.Compiler
             _assembly.Add(I16.IX, R16.SP);
         }
 
+        private void CompileLdcI4(int value)
+        {
+            _assembly.Ld(R16.HL, (short)value);
+            _assembly.Push(R16.HL);
+        }
+
+        private void CompileLdcI4S(sbyte value)
+        {
+            _assembly.Ld(R16.HL, value);
+            _assembly.Push(R16.HL);
+        }
+
+        private void CompileAdd()
+        {
+            _assembly.Pop(R16.HL);
+            _assembly.Pop(R16.DE);
+            _assembly.Add(R16.HL, R16.DE);
+            _assembly.Push(R16.HL);
+        }
+
+        private void CompileSub()
+        {
+            _assembly.Pop(R16.HL);
+            _assembly.Pop(R16.DE);
+            _assembly.Sbc(R16.HL, R16.DE);
+            _assembly.Push(R16.HL);
+        }
+
+        private void CompileLdArg(short stackFrameSize)
+        {
+            var argumentOffset = stackFrameSize;
+            argumentOffset += 2; // accounts for return address
+            _assembly.Ld(R8.H, I16.IX, (short)(argumentOffset + 1));
+            _assembly.Ld(R8.L, I16.IX, argumentOffset);
+            _assembly.Push(R16.HL);
+        }
+
+        private void CompileRet(short stackFrameSize)
+        {
+            // Compile code to unwind stack frame here
+            if (stackFrameSize > 0)
+            {
+                _assembly.Pop(I16.IX);
+            }
+
+            // Swap return value and return address
+            _assembly.Pop(R16.BC);
+            _assembly.Pop(R16.HL);
+            _assembly.Push(R16.BC);
+            _assembly.Push(R16.HL);
+
+            _assembly.Ret();
+        }
+
+
+        private void CompileCall(MethodDef methodDef)
+        {
+            if (methodDef.DeclaringType.FullName.StartsWith("System.Console"))
+            {
+                switch (methodDef.Name)
+                {
+                    case "Write":
+                        _romRoutines.Display();
+                        break;
+                }
+            }
+            else
+            {
+                var targetMethod = methodDef.Name;
+                _assembly.Call(targetMethod);
+            }
+        }
+
+        private void ProcessUnknownCil(Code code)
+        {
+            if (_configuration.IgnoreUnknownCil)
+            {
+                _logger.LogWarning("Unsupported IL opcode {code}", code);
+            }
+            else
+            {
+                throw new UnknownCilException($"Cannot translate IL opcode {code}");
+            }
+        }
+
         private void CompileMethodInstructions(CilBody body, short stackFrameSize = 0)
         {
             foreach (var instruction in body.Instructions)
@@ -48,35 +133,23 @@ namespace ILCompiler.Compiler
                     case Code.Ldc_I4_6:
                     case Code.Ldc_I4_7:
                     case Code.Ldc_I4_8:
-                        _assembly.Ld(R16.HL, (short)instruction.GetLdcI4Value());
-                        _assembly.Push(R16.HL);
+                        CompileLdcI4(instruction.GetLdcI4Value());
                         break;
 
                     case Code.Ldc_I4_S:
-                        _assembly.Ld(R16.HL, (sbyte)instruction.Operand);
-                        _assembly.Push(R16.HL);
+                        CompileLdcI4S((sbyte)instruction.Operand);
                         break;
 
                     case Code.Add:
-                        _assembly.Pop(R16.HL);
-                        _assembly.Pop(R16.DE);
-                        _assembly.Add(R16.HL, R16.DE);
-                        _assembly.Push(R16.HL);
+                        CompileAdd();
                         break;
 
                     case Code.Sub:
-                        _assembly.Pop(R16.HL);
-                        _assembly.Pop(R16.DE);
-                        _assembly.Sbc(R16.HL, R16.DE);
-                        _assembly.Push(R16.HL);
+                        CompileSub();
                         break;
 
                     case Code.Ldarg_0:
-                        var argumentOffset = stackFrameSize;
-                        argumentOffset += 2; // accounts for return address
-                        _assembly.Ld(R8.H, I16.IX, (short)(argumentOffset + 1));
-                        _assembly.Ld(R8.L, I16.IX, argumentOffset);
-                        _assembly.Push(R16.HL);
+                        CompileLdArg(stackFrameSize);
                         break;
 
                     case Code.Stloc_0:
@@ -92,49 +165,15 @@ namespace ILCompiler.Compiler
                         break;
 
                     case Code.Ret:
-                        // Compile code to unwind stack frame here
-                        if (stackFrameSize > 0)
-                        {
-                            _assembly.Pop(I16.IX);
-                        }
-
-                        // Swap return value and return address
-                        _assembly.Pop(R16.BC);
-                        _assembly.Pop(R16.HL);
-                        _assembly.Push(R16.BC);
-                        _assembly.Push(R16.HL);
-
-                        _assembly.Ret();
+                        CompileRet(stackFrameSize);
                         break;
 
                     case Code.Call:
-                        var methodDef = instruction.Operand as MethodDef;
-                        if (methodDef.DeclaringType.FullName.StartsWith("System.Console"))
-                        {
-                            switch (methodDef.Name)
-                            {
-                                case "Write":
-                                    _romRoutines.Display();
-                                    break;
-                            }
-                        }
-                        else
-                        {
-                            var targetMethod = methodDef.Name;
-                            _assembly.Call(targetMethod);
-                        }
-
+                        CompileCall(instruction.Operand as MethodDef);
                         break;
 
                     default:
-                        if (_configuration.IgnoreUnknownCil)
-                        {
-                            _logger.LogWarning("Unsupported IL opcode {code}", code);
-                        }
-                        else
-                        {
-                            throw new UnknownCilException($"Cannot translate IL opcode {code}");
-                        }
+                        ProcessUnknownCil(code);
                         break;
                 }
             }
