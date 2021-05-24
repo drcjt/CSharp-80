@@ -13,6 +13,11 @@ namespace ILCompiler.z80
 
         public void Add(Instruction instruction);
         public void RemoveLast();
+        public void RemoveAt(int index);
         public Instruction Last { get; }
+
+        public Instruction this[int index] { get; }
+
+        public int Count { get; }
     }
 }

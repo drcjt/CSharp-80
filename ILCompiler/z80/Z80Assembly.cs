@@ -23,6 +23,11 @@ namespace ILCompiler.z80
 			_instructions.RemoveAt(_instructions.Count - 1);
 		}
 
+		public void RemoveAt(int index)
+		{
+			_instructions.RemoveAt(index);
+		}
+
 		public Instruction Last
         {
 			get
@@ -37,6 +42,14 @@ namespace ILCompiler.z80
 			{
 				return _instructions[index];
 			}
+		}
+
+		public int Count 
+		{ 
+			get 
+			{
+				return _instructions.Count;
+			} 
 		}
 
 		public void Label(string label)

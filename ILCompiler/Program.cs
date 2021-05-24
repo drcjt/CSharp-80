@@ -7,6 +7,7 @@ using System.IO;
 using ILCompiler.z80;
 using ILCompiler.Compiler;
 using ILCompiler.Interfaces;
+using ILCompiler.z80.Interfaces;
 
 namespace ILCompiler
 {
@@ -52,6 +53,7 @@ namespace ILCompiler
             services.AddSingleton<IRomRoutines, RomRoutines>();
             services.AddSingleton<IConfiguration, Configuration>();
             services.AddSingleton<IMethodCompiler, MethodCompiler>();
+            services.AddSingleton<IOptimizer, Optimizer>();
         }
 
         private void Run(string[] args, ServiceProvider serviceProvider)

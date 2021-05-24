@@ -1,6 +1,7 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Interfaces;
 using ILCompiler.z80;
+using ILCompiler.z80.Interfaces;
 using Microsoft.Extensions.Logging;
 using IZ80Assembly = ILCompiler.z80.IZ80Assembly;
 
@@ -11,12 +12,14 @@ namespace ILCompiler.Compiler
         private readonly IZ80Assembly _assembly;
         private readonly ILogger<CilCompiler> _logger;
         private readonly IMethodCompiler _methodCompiler;
+        private readonly IOptimizer _optimizer;
 
-        public CilCompiler(IZ80Assembly assembly, ILogger<CilCompiler> logger, IMethodCompiler methodCompiler)
+        public CilCompiler(IZ80Assembly assembly, ILogger<CilCompiler> logger, IMethodCompiler methodCompiler, IOptimizer optimizer)
         {
             _assembly = assembly;
             _logger = logger;
             _methodCompiler = methodCompiler;
+            _optimizer = optimizer;
         }
 
         public void Compile(string inputFilePath, string outputFilePath = null)
@@ -44,6 +47,8 @@ namespace ILCompiler.Compiler
             }
 
             GenerateEpilog();
+
+            _optimizer.Optimize(_assembly);
 
             if (outputFilePath != null)
             {

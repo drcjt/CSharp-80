@@ -14,16 +14,8 @@ namespace ILCompiler.z80
         }
         public static void Pop(this IZ80Assembly assembly, Register target)
         {
-            var lastInstruction = assembly.Last;
-            if (lastInstruction.Opcode == Opcode.Push && lastInstruction.Operands == target.ToString())
-            {
-                // Eliminate PUSH XX followed by POP XX
-                assembly.RemoveLast();
-            }
-            else
-            {
-                assembly.Add(new Instruction(Opcode.Pop, target.ToString()));
-            }
+            assembly.Add(new Instruction(Opcode.Pop, target.ToString()));
+
         }
 
         public static void Push(this IZ80Assembly assembly, Register target)
