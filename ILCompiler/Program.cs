@@ -52,7 +52,7 @@ namespace ILCompiler
             services.AddSingleton<IZ80Assembly, Z80Assembly>();
             services.AddSingleton<IRomRoutines, RomRoutines>();
             services.AddSingleton<IConfiguration, Configuration>();
-            services.AddSingleton<IMethodCompiler, MethodCompiler>();
+            services.AddSingleton<IMethodCompilerFactory, MethodCompilerFactory>();
             services.AddSingleton<IOptimizer, Optimizer>();
         }
 

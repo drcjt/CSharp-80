@@ -4,6 +4,6 @@ namespace ILCompiler.Interfaces
 {
     public interface IMethodCompiler
     {
-        public void CompileMethod(MethodDef method);
+        public void CompileMethod();
     }
 }

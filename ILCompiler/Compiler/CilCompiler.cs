@@ -11,15 +11,15 @@ namespace ILCompiler.Compiler
     {
         private readonly IZ80Assembly _assembly;
         private readonly ILogger<CilCompiler> _logger;
-        private readonly IMethodCompiler _methodCompiler;
         private readonly IOptimizer _optimizer;
+        private readonly IMethodCompilerFactory _methodCompilerFactory;
 
-        public CilCompiler(IZ80Assembly assembly, ILogger<CilCompiler> logger, IMethodCompiler methodCompiler, IOptimizer optimizer)
+        public CilCompiler(IZ80Assembly assembly, ILogger<CilCompiler> logger, IOptimizer optimizer, IMethodCompilerFactory methodCompilerFactory)
         {
             _assembly = assembly;
             _logger = logger;
-            _methodCompiler = methodCompiler;
             _optimizer = optimizer;
+            _methodCompilerFactory = methodCompilerFactory;
         }
 
         public void Compile(string inputFilePath, string outputFilePath = null)
@@ -41,7 +41,8 @@ namespace ILCompiler.Compiler
                     {
                         _logger.LogInformation("Compiling method {method.Name}", method.Name);
 
-                        _methodCompiler.CompileMethod(method);
+                        var methodCompiler = _methodCompilerFactory.Create(method);
+                        methodCompiler.CompileMethod();
                     }
                 }
             }

@@ -14,12 +14,16 @@ namespace ILCompiler.Compiler
         private readonly ILogger<MethodCompiler> _logger;
         private readonly IConfiguration _configuration;
 
-        public MethodCompiler(IZ80Assembly assembly, IRomRoutines romRoutines, IConfiguration configuration, ILogger<MethodCompiler> logger)
+        private readonly MethodDef _method;
+
+        public MethodCompiler(IZ80Assembly assembly, IRomRoutines romRoutines, IConfiguration configuration, ILogger<MethodCompiler> logger, MethodDef method)
         {
             _assembly = assembly;
             _romRoutines = romRoutines;
             _logger = logger;
             _configuration = configuration;
+
+            _method = method;
         }
 
         private void CreateStackFrame()
@@ -179,17 +183,17 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public void CompileMethod(MethodDef method)
+        public void CompileMethod()
         {
-            var methodName = method.Name;
-            var body = method.MethodBody as CilBody;
+            var methodName = _method.Name;
+            var body = _method.MethodBody as CilBody;
 
             _assembly.Label(methodName);
 
             short frameSize = 0;
-            if (method.Parameters.Count > 0)
+            if (_method.Parameters.Count > 0)
             {
-                foreach (var parameter in method.Parameters)
+                foreach (var parameter in _method.Parameters)
                 {
                     var type = parameter.Type;
                     if (type.IsCorLibType)
