@@ -48,11 +48,8 @@ namespace ILCompiler
         private static void ConfigureServices(ServiceCollection services)
         {
             services.AddLogging(configure => configure.AddConsole()).AddTransient<Program>();
-            services.AddSingleton<ICilCompiler, CilCompiler>();
-            services.AddSingleton<IZ80Assembly, Z80Assembly>();
-            services.AddSingleton<IRomRoutines, RomRoutines>();
+            services.AddSingleton<ICompilation, Compilation>();
             services.AddSingleton<IConfiguration, Configuration>();
-            services.AddSingleton<IMethodCompilerFactory, MethodCompilerFactory>();
             services.AddSingleton<IOptimizer, Optimizer>();
         }
 
@@ -65,7 +62,7 @@ namespace ILCompiler
                 var configuration = serviceProvider.GetService<IConfiguration>();
                 configuration.IgnoreUnknownCil = _ignoreUnknownCil;
 
-                var compiler = serviceProvider.GetService<ICilCompiler>();            
+                var compiler = serviceProvider.GetService<ICompilation>();            
                 compiler.Compile(_inputFilePath.FullName, _outputFilePath.FullName);
             }
             else

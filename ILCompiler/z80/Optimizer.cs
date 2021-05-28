@@ -1,5 +1,6 @@
 ﻿using ILCompiler.z80.Interfaces;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
 
 namespace ILCompiler.z80
 {
@@ -12,35 +13,32 @@ namespace ILCompiler.z80
             _logger = logger;
         }
 
-        public void Optimize(IZ80Assembly assembly)
+        public void Optimize(IList<Instruction> instructions)
         {
-            EliminatePushXXPopXX(assembly);
+            EliminatePushXXPopXX(instructions);
         }
 
-        private void EliminatePushXXPopXX(IZ80Assembly assembly)
+        private void EliminatePushXXPopXX(IList<Instruction> instructions)
         {
-            int unoptimizedInstructionCount = assembly.Count;
-            if (assembly.Count > 1)
+            int unoptimizedInstructionCount = instructions.Count;
+            Instruction lastInstruction = null;
+            var currentInstruction = instructions[0];
+            int count = 0;
+            do
             {
-                var lastInstruction = assembly[0];
-                var currentInstruction = assembly[1];
-                int count = 1;
-                do
+                if (lastInstruction?.Opcode == Opcode.Push && currentInstruction.Opcode == Opcode.Pop
+                    && lastInstruction?.Operands == currentInstruction.Operands)
                 {
-                    if (lastInstruction.Opcode == Opcode.Push && currentInstruction.Opcode == Opcode.Pop
-                        && lastInstruction.Operands == currentInstruction.Operands)
-                    {
-                        // Eliminate Push followed by Pop
-                        assembly.RemoveAt(count - 1);
-                        assembly.RemoveAt(count - 1);
-                    }
+                    // Eliminate Push followed by Pop
+                    instructions.RemoveAt(count - 1);
+                    instructions.RemoveAt(count - 1);
+                }
 
-                    lastInstruction = currentInstruction;
-                    currentInstruction = assembly[++count];
-                } while (count < assembly.Count - 1);
-            }
-            _logger.LogInformation($"Eliminated {unoptimizedInstructionCount - assembly.Count} instructions");
+                lastInstruction = currentInstruction;
+                currentInstruction = instructions[++count];
+            } while (count < instructions.Count - 1);
 
+            _logger.LogInformation($"Eliminated {unoptimizedInstructionCount - instructions.Count} instructions");
         }
     }
 }

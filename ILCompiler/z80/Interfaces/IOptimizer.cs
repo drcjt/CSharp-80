@@ -1,7 +1,9 @@
-﻿namespace ILCompiler.z80.Interfaces
+﻿using System.Collections.Generic;
+
+namespace ILCompiler.z80.Interfaces
 {
     public interface IOptimizer
     {
-        public void Optimize(IZ80Assembly assembly);
+        public void Optimize(IList<Instruction> instructions);
     }
 }
