@@ -11,130 +11,30 @@ namespace ILCompiler.Compiler
 {
     public class ILImporter
     {
-        private readonly Compilation _compilation;     // TODO: Is this required
-        private readonly Z80Writer _writer;             // TODO: Is this required
+        private readonly Compilation _compilation;
         private readonly MethodDef _method;
 
         private BasicBlock[] _basicBlocks;
 
         private BasicBlock _pendingBasicBlocks;
 
-        private class BasicBlock
-        {
-            public BasicBlock Next;
-            public int StartOffset;
-        }
+        private readonly List<Instruction> _instructions = new List<Instruction>();
 
-        private List<Instruction> _instructions = new List<Instruction>();
-
-        public ILImporter(Compilation compilation, Z80Writer writer, MethodDef method)
+        public ILImporter(Compilation compilation, MethodDef method)
         {
             _compilation = compilation;
-            _writer = writer;
             _method = method;
         }
 
         public void Compile(Z80MethodCodeNode methodCodeNodeNeedingCode)
         {
-            var offsetToIndexMap = FindBasicBlocks();    // This finds the basic blocks
+            var basicBlockAnalyser = new BasicBlockAnalyser(_method);
+            var offsetToIndexMap = basicBlockAnalyser.FindBasicBlocks();    // This finds the basic blocks
+            _basicBlocks = basicBlockAnalyser.BasicBlocks;
 
             ImportBasicBlocks(offsetToIndexMap);  // This converts IL to Z80
 
             methodCodeNodeNeedingCode.SetCode(_instructions);
-        }
-
-        private IDictionary<int, int> FindBasicBlocks()
-        {
-            var instructions = _method.Body.Instructions;
-            var lastInstruction = instructions[instructions.Count - 1];
-            var maxOffset = (int)lastInstruction.Offset + lastInstruction.GetSize();
-            _basicBlocks = new BasicBlock[maxOffset];
-
-            CreateBasicBlock(0);
-
-            return FindJumpTargets(maxOffset);
-        }
-
-        private BasicBlock CreateBasicBlock(int offset)
-        {
-            BasicBlock basicBlock = _basicBlocks[offset];
-            if (basicBlock == null)
-            {
-                basicBlock = new BasicBlock() { StartOffset = offset };
-                _basicBlocks[offset] = basicBlock;
-            }
-
-            return basicBlock;
-        }
-
-        private IDictionary<int, int> FindJumpTargets(int maxOffset)
-        {
-            var currentIndex = 0;
-            var currentOffset = 0;
-
-            var offsetToIndexMap = new Dictionary<int, int>();
-
-            while (currentIndex < _method.Body.Instructions.Count)
-            {
-                offsetToIndexMap[currentOffset] = currentIndex;
-                var currentInstruction = _method.Body.Instructions[currentIndex];
-
-                switch (currentInstruction.OpCode.Code)
-                {
-                    case Code.Blt_Un:
-                    case Code.Ble_Un:
-                    case Code.Bgt_Un:
-                    case Code.Bge_Un:
-                    case Code.Bne_Un:
-                    case Code.Blt:
-                    case Code.Ble:
-                    case Code.Bgt:
-                    case Code.Bge:
-                    case Code.Beq:
-                    case Code.Brfalse:
-                    case Code.Brtrue:
-                    case Code.Blt_Un_S:
-                    case Code.Ble_Un_S:
-                    case Code.Bgt_Un_S:
-                    case Code.Bge_Un_S:
-                    case Code.Bne_Un_S:
-                    case Code.Blt_S:
-                    case Code.Ble_S:
-                    case Code.Bgt_S:
-                    case Code.Bge_S:
-                    case Code.Beq_S:
-                    case Code.Brfalse_S:
-                    case Code.Brtrue_S:
-                        {
-                            var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
-                            var targetOffset = target.Offset;
-                            CreateBasicBlock((int)targetOffset); // target of jump                            
-                            var nextInstructionOffset = currentOffset + currentInstruction.GetSize();
-                            CreateBasicBlock(nextInstructionOffset); // instruction after jump
-                        }
-                        break;
-
-                    case Code.Br_S:
-                    case Code.Leave_S:
-                    case Code.Br:
-                    case Code.Leave:
-                        {
-                            var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
-                            var targetOffset = target.Offset;
-                            CreateBasicBlock((int)targetOffset); // target of jump
-                        }
-                        break;
-
-                    case Code.Switch:
-                        {
-                            throw new NotImplementedException();
-                        }
-                }
-                currentOffset += currentInstruction.GetSize();
-                currentIndex++;
-            }
-
-            return offsetToIndexMap;
         }
 
         private void ImportBasicBlocks(IDictionary<int, int> offsetToIndexMap)
@@ -154,7 +54,7 @@ namespace ILCompiler.Compiler
             var currentOffset = basicBlock.StartOffset;
             var currentIndex = offsetToIndexMap[currentOffset];
 
-            for (;;)
+            while (true)
             {
                 var currentInstruction = _method.Body.Instructions[currentIndex];
                 currentOffset += currentInstruction.GetSize();
@@ -269,10 +169,13 @@ namespace ILCompiler.Compiler
 
         private void ImportRet()
         {
-            Append(Instruction.Pop(R16.BC));
-            Append(Instruction.Pop(R16.HL));
-            Append(Instruction.Push(R16.BC));
-            Append(Instruction.Push(R16.HL));
+            if (_method.ReturnType.TypeName != "Void")
+            {
+                Append(Instruction.Pop(R16.BC));
+                Append(Instruction.Pop(R16.HL));
+                Append(Instruction.Push(R16.BC));
+                Append(Instruction.Push(R16.HL));
+            }
 
             Append(Instruction.Ret());
         }

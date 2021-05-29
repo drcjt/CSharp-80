@@ -31,7 +31,7 @@ namespace ILCompiler.Compiler
         {
             var method = methodCodeNodeNeedingCode.Method;
 
-            var ilImporter = new ILImporter(_compilation, this, method);
+            var ilImporter = new ILImporter(_compilation, method);
 
             ilImporter.Compile(methodCodeNodeNeedingCode);            
         }

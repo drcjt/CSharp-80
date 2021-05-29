@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ILCompiler.z80
 {
-    public class I16
+    public static class I16
     {
         public static readonly I16Type IX = new("IX");
         public static readonly I16Type IY = new("IY");

@@ -19,7 +19,7 @@ namespace MiniBCL
 			return 42;
 		}
 
-		private static int HelloWorld()
+		private static void HelloWorld()
 		{
             Console.Write('H');
             Console.Write('e');
@@ -35,8 +35,6 @@ namespace MiniBCL
             Console.Write('r');
             Console.Write('l');
             Console.Write('d');
-
-            return 0;
 		}
 
         private static void Display(short i)

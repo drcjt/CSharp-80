@@ -2,7 +2,7 @@
 {
     public abstract class Register
     {
-        public Register(string name)
+        protected Register(string name)
         {
             Name = name;
         }

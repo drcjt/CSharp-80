@@ -84,16 +84,6 @@ namespace ILCompiler.z80
             return new Instruction(Opcode.End, label);
         }
 
-        public static Instruction Ld(R8Type target, R8Type source)
-        {
-            return new Instruction(Opcode.Ld, target.ToString() + ", " + source.ToString());
-        }
-
-        public static Instruction Ld(Register target, short source)
-        {
-            return new Instruction(Opcode.Ld, target.ToString() + ", " + string.Format("{0:X}H", source));
-        }
-
         public static Instruction Add(Register target, Register source)
         {
             return new Instruction(Opcode.Add, target.ToString() + ", " + source.ToString());
@@ -102,6 +92,16 @@ namespace ILCompiler.z80
         public static Instruction Sbc(R16Type target, R16Type source)
         {
             return new Instruction(Opcode.Sbc, target.ToString() + ", " + source.ToString());
+        }
+
+        public static Instruction Ld(R8Type target, R8Type source)
+        {
+            return new Instruction(Opcode.Ld, target.ToString() + ", " + source.ToString());
+        }
+
+        public static Instruction Ld(Register target, short source)
+        {
+            return new Instruction(Opcode.Ld, target.ToString() + ", " + string.Format("{0:X}H", source));
         }
 
         public static Instruction Ld(R8Type target, I16Type source, short offset)

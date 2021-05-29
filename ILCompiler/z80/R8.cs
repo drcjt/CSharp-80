@@ -1,6 +1,6 @@
 ﻿namespace ILCompiler.z80
 {
-    public class R8
+    public static class R8
     {
         public static readonly R8Type A = new("A");
         public static readonly R8Type F = new("F");
