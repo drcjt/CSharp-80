@@ -18,7 +18,7 @@ namespace ILCompiler.Compiler
 
         private BasicBlock _pendingBasicBlocks;
 
-        private readonly List<Instruction> _instructions = new List<Instruction>();
+        private readonly List<Instruction> _instructions = new();
 
         public ILImporter(Compilation compilation, MethodDef method)
         {
