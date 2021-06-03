@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.z80;
 using Microsoft.Extensions.Logging;
@@ -17,6 +18,8 @@ namespace ILCompiler.Compiler
         private BasicBlock[] _basicBlocks;
 
         private BasicBlock _pendingBasicBlocks;
+
+        private EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
 
         private readonly List<Instruction> _instructions = new();
 
@@ -45,8 +48,16 @@ namespace ILCompiler.Compiler
                 BasicBlock basicBlock = _pendingBasicBlocks;
                 _pendingBasicBlocks = basicBlock.Next;
 
+                StartImportingBasicBlock(basicBlock);
                 ImportBasicBlock(offsetToIndexMap, basicBlock);
             }
+        }
+
+        private void StartImportingBasicBlock(BasicBlock basicBlock)
+        {
+            _stack.Clear();
+
+            // TODO: push entries from the EntryStack of the basicBlock
         }
 
         private void ImportBasicBlock(IDictionary<int, int> offsetToIndexMap, BasicBlock basicBlock)
@@ -73,19 +84,16 @@ namespace ILCompiler.Compiler
                     case Code.Ldc_I4_6:
                     case Code.Ldc_I4_7:
                     case Code.Ldc_I4_8:
-                        ImportLoadInt(opcode - Code.Ldc_I4_0);
+                        ImportLoadInt(opcode - Code.Ldc_I4_0, StackValueKind.Int16);
                         break;
 
                     case Code.Ldc_I4_S:
-                        ImportLoadInt((sbyte)currentInstruction.Operand);
+                        ImportLoadInt((sbyte)currentInstruction.Operand, StackValueKind.Int16);
                         break;
 
                     case Code.Add:
-                        ImportAdd();
-                        break;
-
                     case Code.Sub:
-                        ImportSub();
+                        ImportBinaryOperation(opcode);
                         break;
 
                     case Code.Ldarg_0:
@@ -132,6 +140,45 @@ namespace ILCompiler.Compiler
 
         private void ImportFallThrough(BasicBlock next)
         {
+            EvaluationStack<StackEntry> entryStack = next.EntryStack;
+
+            if (entryStack != null)
+            {
+                // Check the entry stack and the current stack are equivalent,
+                // i.e. have same length and elements are identical
+
+                if (entryStack.Length != _stack.Length)
+                {
+                    throw new InvalidProgramException();
+                }
+
+                for (int i = 0; i < entryStack.Length; i++)
+                {
+                    if (entryStack[i].Kind != _stack[i].Kind)
+                    {
+                        throw new InvalidProgramException();
+                    }
+
+                    // TODO: Should this compare the "Type" of the entries too??
+                }
+            }
+            else
+            {
+                if (_stack.Length > 0)
+                {
+                    entryStack = new EvaluationStack<StackEntry>(_stack.Length);
+
+                    /*
+                    // TODO: Need to understand why this is required
+                    for (int i = 0; i < _stack.Length; i++)
+                    {
+                        entryStack.Push(NewSpillSlot(_stack[i]));
+                    }
+                    */
+                }
+                next.EntryStack = entryStack;
+            }
+
             MarkBasicBlock(next);
         }
 
@@ -141,22 +188,45 @@ namespace ILCompiler.Compiler
             _pendingBasicBlocks = basicBlock;
         }
 
-        private void ImportAdd()
+        private void ImportBinaryOperation(Code opcode)
         {
+            var op1 = _stack.Pop();
+            var op2 = _stack.Pop();
+
+            // StackValueKind is carefully ordered to make this work
+            StackValueKind kind;
+            if (op1.Kind > op2.Kind)
+            {
+                kind = op1.Kind;
+            }
+            else
+            {
+                kind = op2.Kind;
+            }
+
+            if (kind != StackValueKind.Int16)
+            {
+                throw new NotSupportedException("Binary operations on types other than short not supported yet");
+            }
+
+            _stack.Push(new ExpressionEntry(kind));
+
             Append(Instruction.Pop(R16.HL));
             Append(Instruction.Pop(R16.DE));
-            Append(Instruction.Add(R16.HL, R16.DE));
+
+            switch(opcode)
+            {
+                case Code.Add:
+                    Append(Instruction.Add(R16.HL, R16.DE));
+                    break;
+
+                case Code.Sub:
+                    Append(Instruction.Sbc(R16.HL, R16.DE));
+                    break;
+            }
+
             Append(Instruction.Push(R16.HL));
         }
-
-        private void ImportSub()
-        {
-            Append(Instruction.Pop(R16.HL));
-            Append(Instruction.Pop(R16.DE));
-            Append(Instruction.Sbc(R16.HL, R16.DE));
-            Append(Instruction.Push(R16.HL));
-        }
-
         private void ImportLdArg(short stackFrameSize)
         {
             var argumentOffset = stackFrameSize;
@@ -165,7 +235,6 @@ namespace ILCompiler.Compiler
             Append(Instruction.Ld(R8.L, I16.IX, argumentOffset));
             Append(Instruction.Push(R16.HL));
         }
-
 
         private void ImportRet()
         {
@@ -200,8 +269,15 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void ImportLoadInt(int value)
+        private void ImportLoadInt(long value, StackValueKind kind)
         {
+            if (kind != StackValueKind.Int16)
+            {
+                throw new NotSupportedException("Loading anything other than Int16 not currently supported");
+            }
+
+            _stack.Push(new Int16ConstantEntry(checked((short)value)));
+
             Append(Instruction.Ld(R16.HL, (short)value));
             Append(Instruction.Push(R16.HL));
         }

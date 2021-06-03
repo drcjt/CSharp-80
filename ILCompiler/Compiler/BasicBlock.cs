@@ -10,5 +10,7 @@ namespace ILCompiler.Compiler
     {
         public BasicBlock Next { get; set; }
         public int StartOffset { get; set; }
+
+        public EvaluationStack<StackEntry> EntryStack { get; set; }
     }
 }

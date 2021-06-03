@@ -7,15 +7,20 @@ namespace MiniBCL
 		public static int Main(string[] args)
 		{
             HelloWorld();
-            /*
             // Very simple program!
-            int i = 0;
+            short a = 50;
+            short b = 3;
+            Console.Write(a + b);
+
+            /*
+            short i = 0;
             while (i < 5)
             {
                 HelloWorld();
                 i++;
             }
             */
+
 			return 42;
 		}
 
