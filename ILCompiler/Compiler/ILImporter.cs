@@ -209,7 +209,7 @@ namespace ILCompiler.Compiler
                 throw new NotSupportedException("Binary operations on types other than short not supported yet");
             }
 
-            _stack.Push(new ExpressionEntry(kind));
+            PushExpression(kind);
 
             Append(Instruction.Pop(R16.HL));
             Append(Instruction.Pop(R16.DE));
@@ -227,6 +227,12 @@ namespace ILCompiler.Compiler
 
             Append(Instruction.Push(R16.HL));
         }
+
+        private void PushExpression(StackValueKind kind)
+        {
+            _stack.Push(new ExpressionEntry(kind));
+        }
+
         private void ImportLdArg(short stackFrameSize)
         {
             var argumentOffset = stackFrameSize;
