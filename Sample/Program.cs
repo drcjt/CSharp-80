@@ -6,11 +6,19 @@ namespace MiniBCL
     {
 		public static int Main(string[] args)
 		{
+            short a = 50;
+            if (a > 30)
+            {
+                HelloWorld();
+            }
+
+            /*
             HelloWorld();
             // Very simple program!
             short a = 50;
             short b = 3;
             Console.Write(a + b);
+            */
 
             /*
             short i = 0;

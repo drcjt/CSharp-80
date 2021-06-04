@@ -21,7 +21,7 @@ namespace ILCompiler.Compiler
 
         private EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
 
-        private readonly List<Instruction> _instructions = new();
+        private List<Instruction> _instructions = new();
 
         public ILImporter(Compilation compilation, MethodDef method)
         {
@@ -37,6 +37,17 @@ namespace ILCompiler.Compiler
 
             ImportBasicBlocks(offsetToIndexMap);  // This converts IL to Z80
 
+            // Loop thru basic blocks here to generate overall code for whole method
+            for (int i = 0; i < _basicBlocks.Length; i++)
+            {
+                var basicBlock = _basicBlocks[i];
+                if (basicBlock != null)
+                {
+                    Append(new LabelInstruction($"bb{basicBlock.Id}"));
+                    Append(basicBlock.Code);
+                }
+            }
+
             methodCodeNodeNeedingCode.SetCode(_instructions);
         }
 
@@ -50,6 +61,7 @@ namespace ILCompiler.Compiler
 
                 StartImportingBasicBlock(basicBlock);
                 ImportBasicBlock(offsetToIndexMap, basicBlock);
+                EndImportingBasicBlock(basicBlock);
             }
         }
 
@@ -58,6 +70,12 @@ namespace ILCompiler.Compiler
             _stack.Clear();
 
             // TODO: push entries from the EntryStack of the basicBlock
+        }
+
+        private void EndImportingBasicBlock(BasicBlock basicBlock)
+        {
+            basicBlock.Code = _instructions;
+            _instructions = new List<Instruction>();
         }
 
         private void ImportBasicBlock(IDictionary<int, int> offsetToIndexMap, BasicBlock basicBlock)
@@ -94,6 +112,15 @@ namespace ILCompiler.Compiler
                     case Code.Add:
                     case Code.Sub:
                         ImportBinaryOperation(opcode);
+                        break;
+
+                    case Code.Br:
+                    case Code.Blt:
+                    case Code.Br_S:
+                    case Code.Blt_S:
+                        var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
+                        int delta = (int)target.Offset;
+                        ImportBranch(opcode, _basicBlocks[currentOffset + delta], (opcode != Code.Br) ? _basicBlocks[currentOffset] : null);
                         break;
 
                     case Code.Ldarg_0:
@@ -135,6 +162,25 @@ namespace ILCompiler.Compiler
                     ImportFallThrough(nextBasicBlock);
                     return;
                 }
+            }
+        }
+
+        private void ImportBranch(Code opcode, BasicBlock target, BasicBlock fallthrough)
+        {
+            if (opcode != Code.Br || opcode != Code.Br_S)
+            {
+                // Gen code here for condition comparison and if true then jump to target basic block via id
+            }
+            else
+            {
+                // Gen code here for jump to target basic block based on id of the basic block
+            }
+
+            ImportFallThrough(target);
+
+            if (fallthrough != null)
+            {
+                ImportFallThrough(fallthrough);
             }
         }
 
@@ -184,8 +230,13 @@ namespace ILCompiler.Compiler
 
         private void MarkBasicBlock(BasicBlock basicBlock)
         {
-            basicBlock.Next = _pendingBasicBlocks;
-            _pendingBasicBlocks = basicBlock;
+            if (basicBlock.State == BasicBlock.ImportState.Unmarked)
+            {
+                basicBlock.Next = _pendingBasicBlocks;
+                _pendingBasicBlocks = basicBlock;
+
+                basicBlock.State = BasicBlock.ImportState.IsPending;
+            }
         }
 
         private void ImportBinaryOperation(Code opcode)
@@ -291,6 +342,11 @@ namespace ILCompiler.Compiler
         private void Append(Instruction instruction)
         {
             _instructions.Add(instruction);
+        }
+
+        private void Append(IList<Instruction> instructions)
+        {
+            _instructions.AddRange(instructions);
         }
 
         /*
