@@ -20,13 +20,20 @@ namespace ILCompiler.Compiler
 
         public ImportState State = ImportState.Unmarked;
 
-        public int Id { get;  }
+        public string Label
+        {
+            get
+            {
+                return $"bb{_id}";
+            }
+        }
 
+        private int _id;
         private static int nextId = 0;
 
         public BasicBlock()
         {
-            Id = nextId++;
+            _id = nextId++;
         }
     }
 }

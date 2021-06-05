@@ -43,7 +43,7 @@ namespace ILCompiler.Compiler
                 var basicBlock = _basicBlocks[i];
                 if (basicBlock != null)
                 {
-                    Append(new LabelInstruction($"bb{basicBlock.Id}"));
+                    Append(new LabelInstruction(basicBlock.Label));
                     Append(basicBlock.Code);
                 }
             }
@@ -118,9 +118,12 @@ namespace ILCompiler.Compiler
                     case Code.Blt:
                     case Code.Br_S:
                     case Code.Blt_S:
+                    case Code.Brfalse:
+                    case Code.Brfalse_S:
+                    case Code.Brtrue:
+                    case Code.Brtrue_S:
                         var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
-                        int delta = (int)target.Offset;
-                        ImportBranch(opcode, _basicBlocks[currentOffset + delta], (opcode != Code.Br) ? _basicBlocks[currentOffset] : null);
+                        ImportBranch(opcode, _basicBlocks[(int)target.Offset], (opcode != Code.Br) ? _basicBlocks[currentOffset] : null);
                         break;
 
                     case Code.Ldarg_0:
@@ -170,10 +173,36 @@ namespace ILCompiler.Compiler
             if (opcode != Code.Br || opcode != Code.Br_S)
             {
                 // Gen code here for condition comparison and if true then jump to target basic block via id
+
+                // Possible comparisions are blt, ble, bgt, bge, brfalse, brtrue, beq, bne
+
+                if (opcode == Code.Brfalse || opcode == Code.Brtrue || opcode == Code.Brfalse_S || opcode == Code.Brtrue_S)
+                {
+                    // Only one argument
+                    var op = _stack.Pop();
+
+                    var condition = (opcode == Code.Brfalse || opcode == Code.Brfalse_S) ? Condition.Zero : Condition.NonZero;
+
+                    Append(Instruction.Pop(R16.HL));
+                    Append(Instruction.Ld(R16.DE, 0));
+                    Append(Instruction.Or(R8.A, R8.A));
+                    Append(Instruction.Sbc(R16.HL, R16.DE));
+                    Append(Instruction.Jp(condition, target.Label));
+                }
+                else
+                {
+                    // two arguments
+
+                    // pop into hl
+                    // pop into de
+                    // clear a
+                    // sbc hl, de
+                    // jp z or nz
+                }
             }
             else
             {
-                // Gen code here for jump to target basic block based on id of the basic block
+                Append(Instruction.Jp(target.Label));
             }
 
             ImportFallThrough(target);
@@ -188,6 +217,9 @@ namespace ILCompiler.Compiler
         {
             EvaluationStack<StackEntry> entryStack = next.EntryStack;
 
+            /*
+             * Temporarily commenting out till more instructions implemented as
+             * causing issues in interim
             if (entryStack != null)
             {
                 // Check the entry stack and the current stack are equivalent,
@@ -214,16 +246,15 @@ namespace ILCompiler.Compiler
                 {
                     entryStack = new EvaluationStack<StackEntry>(_stack.Length);
 
-                    /*
                     // TODO: Need to understand why this is required
                     for (int i = 0; i < _stack.Length; i++)
                     {
                         entryStack.Push(NewSpillSlot(_stack[i]));
                     }
-                    */
                 }
                 next.EntryStack = entryStack;
             }
+            */
 
             MarkBasicBlock(next);
         }

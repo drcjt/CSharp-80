@@ -118,14 +118,19 @@ namespace ILCompiler.z80
             return new Instruction(Opcode.Ex, target.ToString() + ", " + source.ToString());
         }
 
-        public static Instruction Or(R8Type target)
+        public static Instruction Or(R8Type target, R8Type source)
         {
-            return new Instruction(Opcode.Or, target.ToString());
+            return new Instruction(Opcode.Or, target.ToString() + ", " + source.ToString());
         }
 
         public static Instruction Jp(Condition condition, string label)
         {
             return new Instruction(Opcode.Jp, condition + " , " + label);
+        }
+
+        public static Instruction Jp(string label)
+        {
+            return new Instruction(Opcode.Jp, label);
         }
     }
 }

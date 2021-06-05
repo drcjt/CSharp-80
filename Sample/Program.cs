@@ -6,8 +6,8 @@ namespace MiniBCL
     {
 		public static int Main(string[] args)
 		{
-            short a = 50;
-            if (a > 30)
+            bool b = true;
+            if (b)
             {
                 HelloWorld();
             }
