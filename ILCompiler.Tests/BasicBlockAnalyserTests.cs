@@ -29,7 +29,7 @@ namespace ILCompiler.Tests
                 new Instruction(OpCodes.Ldc_I4_0),
                 new Instruction(OpCodes.Ldc_I4_S, 1234),
             });
-            var basicBlockAnalyser = new BasicBlockAnalyser(method);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method, null);
 
             basicBlockAnalyser.FindBasicBlocks();
 
@@ -48,7 +48,7 @@ namespace ILCompiler.Tests
             code.Add(OpCodes.Nop.ToInstruction());
             code.Add(branchTarget);
             var method = BuildMethod(code);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method, null);
 
             basicBlockAnalyser.FindBasicBlocks();
 
@@ -68,7 +68,7 @@ namespace ILCompiler.Tests
             code.Add(instructionAfterBranch);
             code.Add(branchTarget);
             var method = BuildMethod(code);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method, null);
 
             basicBlockAnalyser.FindBasicBlocks();
 
@@ -86,7 +86,7 @@ namespace ILCompiler.Tests
             code.Add(branchTarget);
             code.Add(OpCodes.Br.ToInstruction(branchTarget));
             var method = BuildMethod(code);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method, null);
 
             basicBlockAnalyser.FindBasicBlocks();
 
