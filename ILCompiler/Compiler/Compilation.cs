@@ -11,11 +11,14 @@ namespace ILCompiler.Compiler
     {
         private readonly ILogger<Compilation> _logger;
         private readonly IOptimizer _optimizer;
+        private readonly IConfiguration _configuration;
 
         public ILogger<Compilation> Logger => _logger;
+        public IConfiguration Configuration => _configuration;
 
-        public Compilation(ILogger<Compilation> logger, IOptimizer optimizer)
+        public Compilation(IConfiguration configuration, ILogger<Compilation> logger, IOptimizer optimizer)
         {
+            _configuration = configuration;
             _logger = logger;
             _optimizer = optimizer;
         }

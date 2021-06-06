@@ -150,7 +150,14 @@ namespace ILCompiler.Compiler
                         break;
 
                     default:
-                        _compilation.Logger.LogWarning($"Unsupport IL opcode {opcode}");
+                        if (_compilation.Configuration.IgnoreUnknownCil)
+                        {
+                            _compilation.Logger.LogWarning($"Unsupported IL opcode {opcode}");
+                        }
+                        else
+                        {
+                            throw new UnknownCilException($"Unsupported IL opcode {opcode}");
+                        }
                         break;
                 }
 
