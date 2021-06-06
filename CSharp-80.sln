@@ -10,7 +10,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILCompiler", "ILCompiler\IL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "Sample\Sample.csproj", "{A1841782-D78F-4A47-B38F-A26FEFF83B11}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILCompiler.Tests", "ILCompiler.Tests\ILCompiler.Tests.csproj", "{517870C5-B8AC-483E-80CC-9B0CBBFCC412}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILCompiler.Tests", "ILCompiler.Tests\ILCompiler.Tests.csproj", "{517870C5-B8AC-483E-80CC-9B0CBBFCC412}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{788056D0-345F-498A-A8D7-4373442E613F}"
+	ProjectSection(SolutionItems) = preProject
+		Documentation\csharp-80-architecture.md = Documentation\csharp-80-architecture.md
+		Documentation\intro-to-csharp-80.md = Documentation\intro-to-csharp-80.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

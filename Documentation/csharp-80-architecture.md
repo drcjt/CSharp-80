@@ -2,14 +2,14 @@
 
 CSharp-80 is a fun experiment in taking C#/DotNet to a 16-bit retro microcomputer, specifically the TRS-80 Model 1.
 
-The inspiration for this was Michal Strehovsky's C# Snake game - https://github.com/MichalStrehovsky/SeeSharpSnake
+The inspiration for this was Michal Strehovsky's [C# Snake game](https://github.com/MichalStrehovsky/SeeSharpSnake)
 
 ## Architectural Overview
 
 The main idea is to take the output from the regular Roslyn C# compiler and process that through the CSharp-80 ILCompiler which is an ahead of time compiler 
-targetting the Z80 microprocessor. The output from the ILCompiler will be a Z80 assembly language file which will be assembled using Matthew Reed's Z80Asm 
-assembler, http://www.trs-80emulators.com/z80asm/, that by default produces TRSDOS-style CMD files. These can then be used on a TRS-80 emulator or simply 
-on a real TRS-80.
+targetting the Z80 microprocessor. The output from the ILCompiler will be a Z80 assembly language file which will be assembled using Matthew Reed's 
+[Z80Asm](http://www.trs-80emulators.com/z80asm/) assembler, that by default produces TRSDOS-style CMD files. These can then be used on a TRS-80 emulator 
+or simply on a real TRS-80.
 
 ![Architecture](./Images/Architecture.svg)
 
@@ -18,7 +18,7 @@ on a real TRS-80.
 * Compile CIL and produce Z80 Assembly language
 * Investigate what a minimal .NET runtime could be for a 16-bit retro microcomputer
 * Be able to compile the C# Snake game with minimal modifications
-* Learn about AOT compilers for .NET - specifically will draw inspiration and influence from CoreRT, https://github.com/dotnet/corert
+* Learn about AOT compilers for .NET - specifically will draw inspiration and influence from [CoreRT](https://github.com/dotnet/corert)
 
 ## ILCompiler Composition
 
@@ -46,5 +46,5 @@ is composed together along with appropriate prolog/epilog code and labels for ea
 
 ## TRS-80 Emulators
 
-I have been using the SDLTRS emulator originally written by Mark Grebe, however the fork by Jens Geuther https://gitlab.com/jengun/sdltrs seems the best upto date option 
-for this emulator as per Ira Goldklang's TRS-80 Revived site http://www.trs-80.com/wordpress/emulators/.
+The [SDLTRS](https://gitlab.com/jengun/sdltrs) emulator which is a fork created by Jens Geuther of the original witten by Mark Grebe seems the best upto date option
+for emulating the TRS-80 Model 1 as per Ira Goldklang's [TRS-80 Revived site](http://www.trs-80.com/wordpress/emulators/)
