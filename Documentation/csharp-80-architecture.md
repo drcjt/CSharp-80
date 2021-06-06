@@ -7,8 +7,9 @@ The inspiration for this was Michal Strehovsky's C# Snake game - https://github.
 ## Architectural Overview
 
 The main idea is to take the output from the regular Roslyn C# compiler and process that through the CSharp-80 ILCompiler which is an ahead of time compiler 
-targetting the Z80 microprocessor. The output from the ILCompiler will be a Z80 assembly language file which will be assembled using Matthew Reed's Z80Asm assembler 
-that by default produces TRSDOS-style CMD files. These can then be used on a TRS-80 emulator or simply on a real TRS-80.
+targetting the Z80 microprocessor. The output from the ILCompiler will be a Z80 assembly language file which will be assembled using Matthew Reed's Z80Asm 
+assembler, http://www.trs-80emulators.com/z80asm/, that by default produces TRSDOS-style CMD files. These can then be used on a TRS-80 emulator or simply 
+on a real TRS-80.
 
 ![Architecture](./Images/Architecture.svg)
 
