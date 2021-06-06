@@ -1,6 +1,6 @@
 # CSharp-80 Architecture
 
-CSharp-80 is a fun experiment in seeing how far we can get in taking C#/DotNet to a 16-bit retro microcomputer, specifically the TRS-80 Model 1.
+CSharp-80 is a fun experiment in taking C#/DotNet to a 16-bit retro microcomputer, specifically the TRS-80 Model 1.
 
 The inspiration for this was Michal Strehovsky's C# Snake game - https://github.com/MichalStrehovsky/SeeSharpSnake
 
@@ -10,7 +10,7 @@ The main idea is to take the output from the regular Roslyn C# compiler and proc
 targetting the Z80 microprocessor. The output from the ILCompiler will be a Z80 assembly language file which will be assembled using Matthew Reed's Z80Asm assembler 
 that by default produces TRSDOS-style CMD files. These can then be used on a TRS-80 emulator or simply on a real TRS-80.
 
-![Architecture](./images/architecture.svg)
+![Architecture](./Images/Architecture.svg)
 
 ## Goals
 
