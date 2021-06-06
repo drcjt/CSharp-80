@@ -21,8 +21,6 @@ namespace ILCompiler.Compiler
 
         private EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
 
-        private List<Instruction> _instructions = new();
-
         public ILImporter(Compilation compilation, MethodDef method)
         {
             _compilation = compilation;
@@ -38,17 +36,18 @@ namespace ILCompiler.Compiler
             ImportBasicBlocks(offsetToIndexMap);  // This converts IL to Z80
 
             // Loop thru basic blocks here to generate overall code for whole method
+            List<Instruction> instructions = new();
             for (int i = 0; i < _basicBlocks.Length; i++)
             {
                 var basicBlock = _basicBlocks[i];
                 if (basicBlock != null)
                 {
-                    Append(new LabelInstruction(basicBlock.Label));
-                    Append(basicBlock.Code);
+                    instructions.Add(new LabelInstruction(basicBlock.Label));
+                    instructions.AddRange(basicBlock.Code);
                 }
             }
 
-            methodCodeNodeNeedingCode.SetCode(_instructions);
+            methodCodeNodeNeedingCode.SetCode(instructions);
         }
 
         private void ImportBasicBlocks(IDictionary<int, int> offsetToIndexMap)
@@ -74,13 +73,11 @@ namespace ILCompiler.Compiler
 
         private void EndImportingBasicBlock(BasicBlock basicBlock)
         {
-            basicBlock.Code = _instructions;
-            _instructions = new List<Instruction>();
         }
 
-        private void ImportBasicBlock(IDictionary<int, int> offsetToIndexMap, BasicBlock basicBlock)
+        private void ImportBasicBlock(IDictionary<int, int> offsetToIndexMap, BasicBlock block)
         {
-            var currentOffset = basicBlock.StartOffset;
+            var currentOffset = block.StartOffset;
             var currentIndex = offsetToIndexMap[currentOffset];
 
             while (true)
@@ -102,16 +99,16 @@ namespace ILCompiler.Compiler
                     case Code.Ldc_I4_6:
                     case Code.Ldc_I4_7:
                     case Code.Ldc_I4_8:
-                        ImportLoadInt(opcode - Code.Ldc_I4_0, StackValueKind.Int16);
+                        ImportLoadInt(block, opcode - Code.Ldc_I4_0, StackValueKind.Int16);
                         break;
 
                     case Code.Ldc_I4_S:
-                        ImportLoadInt((sbyte)currentInstruction.Operand, StackValueKind.Int16);
+                        ImportLoadInt(block, (sbyte)currentInstruction.Operand, StackValueKind.Int16);
                         break;
 
                     case Code.Add:
                     case Code.Sub:
-                        ImportBinaryOperation(opcode);
+                        ImportBinaryOperation(block, opcode);
                         break;
 
                     case Code.Br:
@@ -123,7 +120,7 @@ namespace ILCompiler.Compiler
                     case Code.Brtrue:
                     case Code.Brtrue_S:
                         var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
-                        ImportBranch(opcode, _basicBlocks[(int)target.Offset], (opcode != Code.Br) ? _basicBlocks[currentOffset] : null);
+                        ImportBranch(block, opcode, _basicBlocks[(int)target.Offset], (opcode != Code.Br) ? _basicBlocks[currentOffset] : null);
                         break;
 
                     case Code.Ldarg_0:
@@ -142,11 +139,11 @@ namespace ILCompiler.Compiler
                         break;
 
                     case Code.Ret:
-                        ImportRet();
+                        ImportRet(block);
                         return;
 
                     case Code.Call:
-                        ImportCall(currentInstruction.Operand as MethodDef);
+                        ImportCall(block, currentInstruction.Operand as MethodDef);
                         break;
 
                     default:
@@ -175,7 +172,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void ImportBranch(Code opcode, BasicBlock target, BasicBlock fallthrough)
+        private void ImportBranch(BasicBlock block, Code opcode, BasicBlock target, BasicBlock fallthrough)
         {
             if (opcode != Code.Br || opcode != Code.Br_S)
             {
@@ -190,11 +187,11 @@ namespace ILCompiler.Compiler
 
                     var condition = (opcode == Code.Brfalse || opcode == Code.Brfalse_S) ? Condition.Zero : Condition.NonZero;
 
-                    Append(Instruction.Pop(R16.HL));
-                    Append(Instruction.Ld(R16.DE, 0));
-                    Append(Instruction.Or(R8.A, R8.A));
-                    Append(Instruction.Sbc(R16.HL, R16.DE));
-                    Append(Instruction.Jp(condition, target.Label));
+                    block.Append(Instruction.Pop(R16.HL));
+                    block.Append(Instruction.Ld(R16.DE, 0));
+                    block.Append(Instruction.Or(R8.A, R8.A));
+                    block.Append(Instruction.Sbc(R16.HL, R16.DE));
+                    block.Append(Instruction.Jp(condition, target.Label));
                 }
                 else
                 {
@@ -209,7 +206,7 @@ namespace ILCompiler.Compiler
             }
             else
             {
-                Append(Instruction.Jp(target.Label));
+                block.Append(Instruction.Jp(target.Label));
             }
 
             ImportFallThrough(target);
@@ -277,7 +274,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void ImportBinaryOperation(Code opcode)
+        private void ImportBinaryOperation(BasicBlock block, Code opcode)
         {
             var op1 = _stack.Pop();
             var op2 = _stack.Pop();
@@ -300,21 +297,21 @@ namespace ILCompiler.Compiler
 
             PushExpression(kind);
 
-            Append(Instruction.Pop(R16.HL));
-            Append(Instruction.Pop(R16.DE));
+            block.Append(Instruction.Pop(R16.HL));
+            block.Append(Instruction.Pop(R16.DE));
 
             switch(opcode)
             {
                 case Code.Add:
-                    Append(Instruction.Add(R16.HL, R16.DE));
+                    block.Append(Instruction.Add(R16.HL, R16.DE));
                     break;
 
                 case Code.Sub:
-                    Append(Instruction.Sbc(R16.HL, R16.DE));
+                    block.Append(Instruction.Sbc(R16.HL, R16.DE));
                     break;
             }
 
-            Append(Instruction.Push(R16.HL));
+            block.Append(Instruction.Push(R16.HL));
         }
 
         private void PushExpression(StackValueKind kind)
@@ -322,49 +319,49 @@ namespace ILCompiler.Compiler
             _stack.Push(new ExpressionEntry(kind));
         }
 
-        private void ImportLdArg(short stackFrameSize)
+        private void ImportLdArg(BasicBlock block, short stackFrameSize)
         {
             var argumentOffset = stackFrameSize;
             argumentOffset += 2; // accounts for return address
-            Append(Instruction.Ld(R8.H, I16.IX, (short)(argumentOffset + 1)));
-            Append(Instruction.Ld(R8.L, I16.IX, argumentOffset));
-            Append(Instruction.Push(R16.HL));
+            block.Append(Instruction.Ld(R8.H, I16.IX, (short)(argumentOffset + 1)));
+            block.Append(Instruction.Ld(R8.L, I16.IX, argumentOffset));
+            block.Append(Instruction.Push(R16.HL));
         }
 
-        private void ImportRet()
+        private void ImportRet(BasicBlock block)
         {
             if (_method.ReturnType.TypeName != "Void")
             {
-                Append(Instruction.Pop(R16.BC));
-                Append(Instruction.Pop(R16.HL));
-                Append(Instruction.Push(R16.BC));
-                Append(Instruction.Push(R16.HL));
+                block.Append(Instruction.Pop(R16.BC));
+                block.Append(Instruction.Pop(R16.HL));
+                block.Append(Instruction.Push(R16.BC));
+                block.Append(Instruction.Push(R16.HL));
             }
 
-            Append(Instruction.Ret());
+            block.Append(Instruction.Ret());
         }
 
-        private void ImportCall(MethodDef methodToCall)
+        private void ImportCall(BasicBlock block, MethodDef methodToCall)
         {
             if (methodToCall.DeclaringType.FullName.StartsWith("System.Console"))
             {
                 switch (methodToCall.Name)
                 {
                     case "Write":
-                        Append(Instruction.Pop(R16.HL));
-                        Append(Instruction.Ld(R8.A, R8.L));
-                        Append(Instruction.Call(0x0033)); // ROM routine to display character at current cursor position
+                        block.Append(Instruction.Pop(R16.HL));
+                        block.Append(Instruction.Ld(R8.A, R8.L));
+                        block.Append(Instruction.Call(0x0033)); // ROM routine to display character at current cursor position
                         break;
                 }
             }
             else
             {
                 var targetMethod = methodToCall.Name;
-                Append(Instruction.Call(targetMethod));
+                block.Append(Instruction.Call(targetMethod));
             }
         }
 
-        private void ImportLoadInt(long value, StackValueKind kind)
+        private void ImportLoadInt(BasicBlock block, long value, StackValueKind kind)
         {
             if (kind != StackValueKind.Int16)
             {
@@ -373,57 +370,8 @@ namespace ILCompiler.Compiler
 
             _stack.Push(new Int16ConstantEntry(checked((short)value)));
 
-            Append(Instruction.Ld(R16.HL, (short)value));
-            Append(Instruction.Push(R16.HL));
+            block.Append(Instruction.Ld(R16.HL, (short)value));
+            block.Append(Instruction.Push(R16.HL));
         }
-
-        private void Append(Instruction instruction)
-        {
-            _instructions.Add(instruction);
-        }
-
-        private void Append(IList<Instruction> instructions)
-        {
-            _instructions.AddRange(instructions);
-        }
-
-        /*
-        private void CreateStackFrame()
-        {
-            // Save IX
-            _assembly.Push(I16.IX);
-
-            // Use IX as frame pointer
-            _assembly.Ld(I16.IX, 0);
-            _assembly.Add(I16.IX, R16.SP);
-        }
-        */
-
-        /* OLD CODE TO CALCULATE PARAMETER SIZE
-         
-                    short frameSize = 0;
-            if (_method.Parameters.Count > 0)
-            {
-                foreach (var parameter in _method.Parameters)
-                {
-                    var type = parameter.Type;
-                    if (type.IsCorLibType)
-                    {
-                        switch (type.TypeName)
-                        {
-                            case "Int16":
-                                frameSize += 2;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-                if (frameSize > 0)
-                {
-                    CreateStackFrame();
-                }
-            }         
-         */
     }
 }

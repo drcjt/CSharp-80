@@ -28,12 +28,18 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private int _id;
+        private readonly int _id;
         private static int nextId = 0;
 
         public BasicBlock()
         {
             _id = nextId++;
+            Code = new List<Instruction>();
+        }
+
+        public void Append(Instruction instruction)
+        {
+            Code.Add(instruction);
         }
     }
 }
