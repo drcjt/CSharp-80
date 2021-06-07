@@ -83,22 +83,19 @@ namespace ILCompiler.Compiler
         {
             EvaluationStack<StackEntry> entryStack = next.Stack;
 
-            /*
-             * Temporarily commenting out till more instructions implemented as
-             * causing issues in interim
             if (entryStack != null)
             {
                 // Check the entry stack and the current stack are equivalent,
                 // i.e. have same length and elements are identical
 
-                if (entryStack.Length != _stack.Length)
+                if (entryStack.Length != Stack.Length)
                 {
                     throw new InvalidProgramException();
                 }
 
                 for (int i = 0; i < entryStack.Length; i++)
                 {
-                    if (entryStack[i].Kind != _stack[i].Kind)
+                    if (entryStack[i].Kind != Stack[i].Kind)
                     {
                         throw new InvalidProgramException();
                     }
@@ -108,19 +105,20 @@ namespace ILCompiler.Compiler
             }
             else
             {
-                if (_stack.Length > 0)
+                /*
+                if (Stack.Length > 0)
                 {
-                    entryStack = new EvaluationStack<StackEntry>(_stack.Length);
+                    entryStack = new EvaluationStack<StackEntry>(Stack.Length);
 
                     // TODO: Need to understand why this is required
-                    for (int i = 0; i < _stack.Length; i++)
+                    for (int i = 0; i < Stack.Length; i++)
                     {
-                        entryStack.Push(NewSpillSlot(_stack[i]));
+                        entryStack.Push(NewSpillSlot(Stack[i]));
                     }
                 }
-                next.EntryStack = entryStack;
+                next.Stack = entryStack;
+                */
             }
-            */
 
             MarkBasicBlock(next);
         }
