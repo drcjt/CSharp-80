@@ -37,18 +37,18 @@ namespace ILCompiler.Compiler
 
         public void ImportBranch(Code opcode, BasicBlock target, BasicBlock fallthrough)
         {
-            if (opcode != Code.Br || opcode != Code.Br_S)
+            if (opcode != Code.Br)
             {
                 // Gen code here for condition comparison and if true then jump to target basic block via id
 
                 // Possible comparisions are blt, ble, bgt, bge, brfalse, brtrue, beq, bne
 
-                if (opcode == Code.Brfalse || opcode == Code.Brtrue || opcode == Code.Brfalse_S || opcode == Code.Brtrue_S)
+                if (opcode == Code.Brfalse || opcode == Code.Brtrue)
                 {
                     // Only one argument
                     var op = EntryStack.Pop();
 
-                    var condition = (opcode == Code.Brfalse || opcode == Code.Brfalse_S) ? Condition.Zero : Condition.NonZero;
+                    var condition = (opcode == Code.Brfalse) ? Condition.Zero : Condition.NonZero;
 
                     Append(Instruction.Pop(R16.HL));
                     Append(Instruction.Ld(R16.DE, 0));

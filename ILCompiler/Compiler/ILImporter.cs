@@ -113,17 +113,25 @@ namespace ILCompiler.Compiler
                         block.ImportBinaryOperation(opcode);
                         break;
 
-                    case Code.Br:
-                    case Code.Blt:
                     case Code.Br_S:
                     case Code.Blt_S:
-                    case Code.Brfalse:
                     case Code.Brfalse_S:
-                    case Code.Brtrue:
                     case Code.Brtrue_S:
-                        var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
-                        block.ImportBranch(opcode, _basicBlocks[(int)target.Offset], (opcode != Code.Br) ? _basicBlocks[currentOffset] : null);
-                        break;
+                        {
+                            var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
+                            block.ImportBranch(opcode + (Code.Br - Code.Br_S), _basicBlocks[(int)target.Offset], (opcode != Code.Br) ? _basicBlocks[currentOffset] : null);
+                        }
+                        return;
+
+                    case Code.Br:
+                    case Code.Blt:
+                    case Code.Brfalse:
+                    case Code.Brtrue:
+                        {
+                            var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
+                            block.ImportBranch(opcode, _basicBlocks[(int)target.Offset], (opcode != Code.Br) ? _basicBlocks[currentOffset] : null);
+                        }
+                        return;
 
                     case Code.Ldarg_0:
                         break;
