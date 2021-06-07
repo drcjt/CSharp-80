@@ -1,6 +1,6 @@
 # CSharp-80 Architecture
 
-CSharp-80 is a fun experiment in taking C#/DotNet to a 16-bit retro microcomputer, specifically the TRS-80 Model 1.
+CSharp-80 is a fun experiment in taking C#/DotNet to a 8-bit retro microcomputer, specifically the TRS-80 Model 1.
 
 The inspiration for this was Michal Strehovsky's [C# Snake game](https://github.com/MichalStrehovsky/SeeSharpSnake)
 
@@ -16,7 +16,7 @@ or simply on a real TRS-80.
 ## Goals
 
 * Compile CIL and produce Z80 Assembly language
-* Investigate what a minimal .NET runtime could be for a 16-bit retro microcomputer
+* Investigate what a minimal .NET runtime could be for a 8-bit retro microcomputer
 * Be able to compile the C# Snake game with minimal modifications
 * Learn about AOT compilers for .NET - specifically will draw inspiration and influence from [CoreRT](https://github.com/dotnet/corert)
 

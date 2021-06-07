@@ -5,7 +5,7 @@ Microsoft has experimented with Native (AOT) compilation for .NET core via a num
 main goals in this experimentation has been to see how much of the .NET runtime can be implemented in C# itself. In so doing this has opened the door for fun
 experiments such as the minimal [C# snake game](https://github.com/MichalStrehovsky/SeeSharpSnake) in 8Kb.
 
-CSharp-80 was inspired by the C# snake game and is an attempt to build a AOT compiler for .NET targetting a retro 16 bit microcomputer, specifically the TRS-80 Model 1, 
+CSharp-80 was inspired by the C# snake game and is an attempt to build a AOT compiler for .NET targetting a retro 8 bit microcomputer, specifically the TRS-80 Model 1, 
 which can compile the snake game.
 
 Architecture
