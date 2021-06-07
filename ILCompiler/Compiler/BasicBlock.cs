@@ -181,7 +181,16 @@ namespace ILCompiler.Compiler
 
         public void ImportStoreVar(int index, bool argument)
         {
-            //var value = Stack.Pop();
+            var value = Stack.Pop();
+
+            // Gen code to pop value from top of z80 stack
+            // and store into locals based on index
+        }
+
+        public void ImportLoadVar(int index, bool argument)
+        {
+            // TODO: need to actually use proper StackValueKind here!!
+            Stack.Push(new ExpressionEntry(StackValueKind.Int16));
 
             // Gen code to pop value from top of z80 stack
             // and store into locals based on index

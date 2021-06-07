@@ -112,6 +112,10 @@ namespace ILCompiler.Compiler
                         block.ImportStoreVar(opcode - Code.Stloc_0, false);
                         break;
 
+                    case Code.Ldloc_0:
+                        block.ImportLoadVar(opcode - Code.Ldloc_0, false);
+                        break;
+
                     case Code.Add:
                     case Code.Sub:
                         block.ImportBinaryOperation(opcode);
@@ -138,9 +142,6 @@ namespace ILCompiler.Compiler
                         return;
 
                     case Code.Ldarg_0:
-                        break;
-
-                    case Code.Ldloc_0:
                         break;
 
                     case Code.Ldloc_1:
