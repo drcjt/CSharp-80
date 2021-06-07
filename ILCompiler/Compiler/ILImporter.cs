@@ -108,6 +108,10 @@ namespace ILCompiler.Compiler
                         block.ImportLoadInt((sbyte)currentInstruction.Operand, StackValueKind.Int16);
                         break;
 
+                    case Code.Stloc_0:
+                        block.ImportStoreVar(opcode - Code.Stloc_0, false);
+                        break;
+
                     case Code.Add:
                     case Code.Sub:
                         block.ImportBinaryOperation(opcode);
@@ -134,12 +138,6 @@ namespace ILCompiler.Compiler
                         return;
 
                     case Code.Ldarg_0:
-                        break;
-
-                    case Code.Stloc_0:
-                        break;
-
-                    case Code.Stloc_1:
                         break;
 
                     case Code.Ldloc_0:

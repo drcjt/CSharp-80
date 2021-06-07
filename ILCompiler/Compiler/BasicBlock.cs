@@ -16,7 +16,7 @@ namespace ILCompiler.Compiler
 
         public IList<Instruction> Instructions { get; set; } = new List<Instruction>();
 
-        public EvaluationStack<StackEntry> EntryStack { get; set; } = new EvaluationStack<StackEntry>(0);
+        public EvaluationStack<StackEntry> Stack { get; set; } = new EvaluationStack<StackEntry>(0);
 
         private bool _marked = false;
 
@@ -46,7 +46,7 @@ namespace ILCompiler.Compiler
                 if (opcode == Code.Brfalse || opcode == Code.Brtrue)
                 {
                     // Only one argument
-                    var op = EntryStack.Pop();
+                    var op = Stack.Pop();
 
                     var condition = (opcode == Code.Brfalse) ? Condition.Zero : Condition.NonZero;
 
@@ -81,7 +81,7 @@ namespace ILCompiler.Compiler
         }
         public void ImportFallThrough(BasicBlock next)
         {
-            EvaluationStack<StackEntry> entryStack = next.EntryStack;
+            EvaluationStack<StackEntry> entryStack = next.Stack;
 
             /*
              * Temporarily commenting out till more instructions implemented as
@@ -136,8 +136,8 @@ namespace ILCompiler.Compiler
 
         public void ImportBinaryOperation(Code opcode)
         {
-            var op1 = EntryStack.Pop();
-            var op2 = EntryStack.Pop();
+            var op1 = Stack.Pop();
+            var op2 = Stack.Pop();
 
             // StackValueKind is carefully ordered to make this work
             StackValueKind kind;
@@ -176,7 +176,15 @@ namespace ILCompiler.Compiler
 
         private void PushExpression(StackValueKind kind)
         {
-            EntryStack.Push(new ExpressionEntry(kind));
+            Stack.Push(new ExpressionEntry(kind));
+        }
+
+        public void ImportStoreVar(int index, bool argument)
+        {
+            //var value = Stack.Pop();
+
+            // Gen code to pop value from top of z80 stack
+            // and store into locals based on index
         }
 
         public void ImportLdArg(short stackFrameSize)
@@ -228,7 +236,7 @@ namespace ILCompiler.Compiler
                 throw new NotSupportedException("Loading anything other than Int16 not currently supported");
             }
 
-            EntryStack.Push(new Int16ConstantEntry(checked((short)value)));
+            Stack.Push(new Int16ConstantEntry(checked((short)value)));
 
             Append(Instruction.Ld(R16.HL, (short)value));
             Append(Instruction.Push(R16.HL));
