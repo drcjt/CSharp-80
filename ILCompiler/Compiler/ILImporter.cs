@@ -36,8 +36,16 @@ namespace ILCompiler.Compiler
 
             ImportBasicBlocks(offsetToIndexMap);  // This converts IL to Z80
 
-            // Loop thru basic blocks here to generate overall code for whole method
             List<Instruction> instructions = new();
+
+            // Generate prolog to setup locals if we have any
+            var localsCount = methodCodeNodeNeedingCode.Method.Body.Variables.Count;
+            if (localsCount > 0)
+            {
+                GenerateProlog(instructions, (short)localsCount);
+            }
+
+            // Loop thru basic blocks here to generate overall code for whole method
             for (int i = 0; i < _basicBlocks.Length; i++)
             {
                 var basicBlock = _basicBlocks[i];
@@ -49,6 +57,21 @@ namespace ILCompiler.Compiler
             }
 
             methodCodeNodeNeedingCode.SetCode(instructions);
+        }
+
+        private void GenerateProlog(IList<Instruction> instructions, int localsCount)
+        {
+            // TODO: This assumes all locals are 16 bit in size
+
+            instructions.Add(Instruction.Push(I16.IX));
+            instructions.Add(Instruction.Ld(I16.IX, 0));
+            instructions.Add(Instruction.Add(I16.IX, R16.SP));
+
+            var localsSize = localsCount * 2;
+
+            instructions.Add(Instruction.Ld(R16.HL, (short)-localsSize));
+            instructions.Add(Instruction.Add(R16.HL, R16.SP));
+            instructions.Add(Instruction.Ld(R16.SP, R16.HL));
         }
 
         private void ImportBasicBlocks(IDictionary<int, int> offsetToIndexMap)

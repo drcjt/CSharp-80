@@ -101,7 +101,7 @@ namespace ILCompiler.z80
 
         public static Instruction Ld(Register target, short source)
         {
-            return new Instruction(Opcode.Ld, target.ToString() + ", " + string.Format("{0:X}H", source));
+            return new Instruction(Opcode.Ld, target.ToString() + ", " + source);
         }
 
         public static Instruction Ld(R8Type target, I16Type source, short offset)
@@ -109,7 +109,12 @@ namespace ILCompiler.z80
             return new Instruction(Opcode.Ld, target.ToString() + ", (" + source.ToString() + string.Format("{0:+#;-#;+0}", offset) + ")");
         }
 
-        public static Instruction Ld(R16Type target, R16Type source)
+        public static Instruction Ld(I16Type target, short offset, R8Type source)
+        {
+            return new Instruction(Opcode.Ld, "(" + target.ToString() + string.Format("{0:+#;-#;+0}", offset) + "), " + source.ToString());
+        }
+
+        public static Instruction Ld(Register target, Register source)
         {
             return new Instruction(Opcode.Ld, target.ToString() + ", " + source.ToString());
         }

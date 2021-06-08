@@ -181,8 +181,11 @@ namespace ILCompiler.Compiler
         {
             var value = Stack.Pop();
 
-            // Gen code to pop value from top of z80 stack
-            // and store into locals based on index
+            var offset = index * 2; // TODO: This needs to take into account differing sizes of local vars
+
+            Append(Instruction.Pop(R16.HL));
+            Append(Instruction.Ld(I16.IX, (short)-(offset + 1), R8.H));
+            Append(Instruction.Ld(I16.IX, (short)-(offset + 2), R8.L));
         }
 
         public void ImportLoadVar(int index, bool argument)
@@ -190,8 +193,11 @@ namespace ILCompiler.Compiler
             // TODO: need to actually use proper StackValueKind here!!
             Stack.Push(new ExpressionEntry(StackValueKind.Int16));
 
-            // Gen code to pop value from top of z80 stack
-            // and store into locals based on index
+            var offset = index * 2; // TODO: This needs to take into account differing sizes of local vars
+
+            Append(Instruction.Ld(R8.H, I16.IX, (short)-(offset + 1)));
+            Append(Instruction.Ld(R8.L, I16.IX, (short)-(offset + 2)));
+            Append(Instruction.Push(R16.HL));
         }
 
         public void ImportLdArg(short stackFrameSize)
@@ -205,9 +211,32 @@ namespace ILCompiler.Compiler
 
         public void ImportRet(MethodDef method)
         {
-            if (method.ReturnType.TypeName != "Void")
+            var hasLocals = method.Body.Variables.Count > 0;
+            var hasReturnValue = method.HasReturnType;
+
+            if (hasReturnValue)
+            {
+                var value = Stack.Pop();
+            }
+
+            if (!hasReturnValue && hasLocals)
+            {
+                Append(Instruction.Ld(R16.SP, I16.IX));
+                Append(Instruction.Pop(I16.IX));
+            }
+            else if (hasReturnValue && !hasLocals)
             {
                 Append(Instruction.Pop(R16.BC));
+                Append(Instruction.Pop(R16.HL));
+                Append(Instruction.Push(R16.BC));
+                Append(Instruction.Push(R16.HL));
+
+            }
+            else if (hasReturnValue && hasLocals)
+            {
+                Append(Instruction.Pop(R16.BC));
+                Append(Instruction.Ld(R16.SP, I16.IX));
+                Append(Instruction.Pop(I16.IX));
                 Append(Instruction.Pop(R16.HL));
                 Append(Instruction.Push(R16.BC));
                 Append(Instruction.Push(R16.HL));
