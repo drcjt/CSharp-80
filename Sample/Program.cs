@@ -6,11 +6,13 @@ namespace MiniBCL
     {
 		public static int Main(string[] args)
 		{
+            /*
             bool b = true;
             if (b)
             {
                 HelloWorld();
             }
+            */
 
             /*
             HelloWorld();
@@ -20,14 +22,12 @@ namespace MiniBCL
             Console.Write(a + b);
             */
 
-            /*
             short i = 0;
             while (i < 5)
             {
                 HelloWorld();
                 i++;
             }
-            */
 
 			return 42;
 		}
@@ -48,6 +48,7 @@ namespace MiniBCL
             Console.Write('r');
             Console.Write('l');
             Console.Write('d');
+            Console.Write('\n');
 		}
 
         private static void Display(short i)

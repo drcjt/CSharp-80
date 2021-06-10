@@ -167,7 +167,7 @@ namespace ILCompiler.Compiler
                     case Code.Ldarg_0:
                         break;
 
-                    case Code.Ldloc_1:
+                    case Code.Conv_I2:
                         break;
 
                     case Code.Ret:

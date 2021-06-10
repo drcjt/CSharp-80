@@ -59,6 +59,18 @@ namespace ILCompiler.Compiler
                 else
                 {
                     // two arguments
+                    var op1 = Stack.Pop();
+                    var op2 = Stack.Pop();
+
+                    Append(Instruction.Pop(R16.HL));
+                    Append(Instruction.Pop(R16.DE));
+                    Append(Instruction.Or(R8.A, R8.A));
+                    Append(Instruction.Sbc(R16.HL, R16.DE));
+
+                    if (opcode == Code.Blt)
+                    {
+                        Append(Instruction.Jp(Condition.NC, target.Label));
+                    }
 
                     // pop into hl
                     // pop into de

@@ -16,6 +16,7 @@ namespace ILCompiler.z80
 
         public static readonly Condition Zero = new("Z");
         public static readonly Condition NonZero = new("NZ");
+        public static readonly Condition NC = new("NC");
 
         public override string ToString()
         {
