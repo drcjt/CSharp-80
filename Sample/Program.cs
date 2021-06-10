@@ -6,41 +6,65 @@ namespace MiniBCL
     {
 		public static int Main(string[] args)
 		{
-            /*
-            bool b = true;
-            if (b)
-            {
-                HelloWorld();
-            }
-            */
-
-            /*
+            // Test subroutine call
             HelloWorld();
-            // Very simple program!
-            short a = 50;
-            short b = 3;
-            Console.Write(a + b);
-            */
 
-            short i = 0;
-            while (i < 5)
-            {
-                HelloWorld();
-                i++;
-            }
+            // Test boolean comparisons
+            TestBooleanComparison();
+
+            // Test Int16 addition
+            TestAddition();
+
+            // Test less than branching
+            TestLessThanBranching();
 
 			return 42;
 		}
 
-		private static void HelloWorld()
+        private static void TestBooleanComparison()
+        {
+            bool b = true;
+            if (b)
+            {
+                Console.Write('B');
+                Console.Write('o');
+                Console.Write('o');
+                Console.Write('l');
+                Console.Write(' ');
+                Console.Write('T');
+                Console.Write('e');
+                Console.Write('s');
+                Console.Write('t');
+                Console.Write('\n');
+            }
+        }
+
+        private static void TestAddition()
+        {
+            short a = 50;
+            short b = 3;
+            Console.Write(a + b);
+            Console.Write('\n');
+        }
+
+        private static void TestLessThanBranching()
+        {
+            short i = 0;
+            while (i < 5)
+            {
+                Console.Write(48 + i);
+                i++;
+            }
+            Console.Write('\n');
+        }
+
+        private static void HelloWorld()
 		{
             Console.Write('H');
             Console.Write('e');
             Console.Write('l');
             Console.Write('l');
             Console.Write('o');
-
-            //Display(32); // Show space
 
             Console.Write(' ');
             Console.Write('W');
@@ -50,10 +74,5 @@ namespace MiniBCL
             Console.Write('d');
             Console.Write('\n');
 		}
-
-        private static void Display(short i)
-        {
-            Console.Write(i);
-        }
     }
 }

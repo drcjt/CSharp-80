@@ -132,10 +132,16 @@ namespace ILCompiler.Compiler
                         break;
 
                     case Code.Stloc_0:
+                    case Code.Stloc_1:
+                    case Code.Stloc_2:
+                    case Code.Stloc_3:
                         block.ImportStoreVar(opcode - Code.Stloc_0, false);
                         break;
 
                     case Code.Ldloc_0:
+                    case Code.Ldloc_1:
+                    case Code.Ldloc_2:
+                    case Code.Ldloc_3:
                         block.ImportLoadVar(opcode - Code.Ldloc_0, false);
                         break;
 
@@ -165,6 +171,7 @@ namespace ILCompiler.Compiler
                         return;
 
                     case Code.Ldarg_0:
+                        block.ImportLdArg(0);
                         break;
 
                     case Code.Conv_I2:

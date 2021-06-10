@@ -64,19 +64,12 @@ namespace ILCompiler.Compiler
 
                     Append(Instruction.Pop(R16.HL));
                     Append(Instruction.Pop(R16.DE));
-                    Append(Instruction.Or(R8.A, R8.A));
-                    Append(Instruction.Sbc(R16.HL, R16.DE));
 
                     if (opcode == Code.Blt)
                     {
-                        Append(Instruction.Jp(Condition.NC, target.Label));
+                        Append(Instruction.Call("LESSTHAN"));
+                        Append(Instruction.Jp(Condition.C, target.Label));
                     }
-
-                    // pop into hl
-                    // pop into de
-                    // clear a
-                    // sbc hl, de
-                    // jp z or nz
                 }
             }
             else
@@ -214,6 +207,9 @@ namespace ILCompiler.Compiler
 
         public void ImportLdArg(short stackFrameSize)
         {
+            // TODO: need to push details of actual arg
+            Stack.Push(new ExpressionEntry(StackValueKind.Int16));
+
             var argumentOffset = stackFrameSize;
             argumentOffset += 2; // accounts for return address
             Append(Instruction.Ld(R8.H, I16.IX, (short)(argumentOffset + 1)));
@@ -264,6 +260,7 @@ namespace ILCompiler.Compiler
                 switch (methodToCall.Name)
                 {
                     case "Write":
+                        var op = Stack.Pop();
                         Append(Instruction.Pop(R16.HL));
                         Append(Instruction.Ld(R8.A, R8.L));
                         Append(Instruction.Call(0x0033)); // ROM routine to display character at current cursor position
