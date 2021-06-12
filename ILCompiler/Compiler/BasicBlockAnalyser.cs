@@ -8,7 +8,6 @@ namespace ILCompiler.Compiler
 {
     public class BasicBlockAnalyser
     {
-        private readonly IILImporter _importer;
         private readonly MethodDef _method;
         private BasicBlock[] _basicBlocks;
 
@@ -20,9 +19,8 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public BasicBlockAnalyser(MethodDef method, IILImporter importer)
+        public BasicBlockAnalyser(MethodDef method)
         {
-            _importer = importer;
             _method = method;
         }
 
@@ -43,7 +41,7 @@ namespace ILCompiler.Compiler
             var basicBlock = _basicBlocks[offset];
             if (basicBlock == null)
             {
-                basicBlock = new BasicBlock(_importer, offset);
+                basicBlock = new BasicBlock(offset);
                 _basicBlocks[offset] = basicBlock;
             }
         }

@@ -4,25 +4,23 @@ using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using ILCompiler.z80;
-using ILCompiler.z80.Interfaces;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using Instruction = ILCompiler.z80.Instruction;
 
 namespace ILCompiler.Compiler
 {
-    public class ILImporter : IILImporter
+    public partial class ILImporter
     {
         private readonly Compilation _compilation;
         private readonly MethodDef _method;
 
         private BasicBlock[] _basicBlocks;
+        private BasicBlock _currentBasicBlock;
         private BasicBlock _pendingBasicBlocks;
 
         public INameMangler NameMangler => _compilation.NameMangler;
 
-        // TODO: Is this needed anymore given that each basic block has it's own evaluation stack??
         private readonly EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
 
         public ILImporter(Compilation compilation, MethodDef method)
@@ -33,7 +31,7 @@ namespace ILCompiler.Compiler
 
         public void Compile(Z80MethodCodeNode methodCodeNodeNeedingCode)
         {
-            var basicBlockAnalyser = new BasicBlockAnalyser(_method, this);
+            var basicBlockAnalyser = new BasicBlockAnalyser(_method);
             var offsetToIndexMap = basicBlockAnalyser.FindBasicBlocks();
             _basicBlocks = basicBlockAnalyser.BasicBlocks;
 
@@ -108,6 +106,7 @@ namespace ILCompiler.Compiler
 
         private void ImportBasicBlock(IDictionary<int, int> offsetToIndexMap, BasicBlock block)
         {
+            _currentBasicBlock = block;
             var currentOffset = block.StartOffset;
             var currentIndex = offsetToIndexMap[currentOffset];
 
@@ -130,30 +129,30 @@ namespace ILCompiler.Compiler
                     case Code.Ldc_I4_6:
                     case Code.Ldc_I4_7:
                     case Code.Ldc_I4_8:
-                        block.ImportLoadInt(opcode - Code.Ldc_I4_0, StackValueKind.Int16);
+                        ImportLoadInt(opcode - Code.Ldc_I4_0, StackValueKind.Int16);
                         break;
 
                     case Code.Ldc_I4_S:
-                        block.ImportLoadInt((sbyte)currentInstruction.Operand, StackValueKind.Int16);
+                        ImportLoadInt((sbyte)currentInstruction.Operand, StackValueKind.Int16);
                         break;
 
                     case Code.Stloc_0:
                     case Code.Stloc_1:
                     case Code.Stloc_2:
                     case Code.Stloc_3:
-                        block.ImportStoreVar(opcode - Code.Stloc_0, false);
+                        ImportStoreVar(opcode - Code.Stloc_0, false);
                         break;
 
                     case Code.Ldloc_0:
                     case Code.Ldloc_1:
                     case Code.Ldloc_2:
                     case Code.Ldloc_3:
-                        block.ImportLoadVar(opcode - Code.Ldloc_0, false);
+                        ImportLoadVar(opcode - Code.Ldloc_0, false);
                         break;
 
                     case Code.Add:
                     case Code.Sub:
-                        block.ImportBinaryOperation(opcode);
+                        ImportBinaryOperation(opcode);
                         break;
 
                     case Code.Br_S:
@@ -167,7 +166,7 @@ namespace ILCompiler.Compiler
                     case Code.Brtrue_S:
                         {
                             var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
-                            block.ImportBranch(opcode + (Code.Br - Code.Br_S), _basicBlocks[(int)target.Offset], (opcode != Code.Br) ? _basicBlocks[currentOffset] : null);
+                            ImportBranch(opcode + (Code.Br - Code.Br_S), _basicBlocks[(int)target.Offset], (opcode != Code.Br) ? _basicBlocks[currentOffset] : null);
                         }
                         return;
 
@@ -182,23 +181,23 @@ namespace ILCompiler.Compiler
                     case Code.Brtrue:
                         {
                             var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
-                            block.ImportBranch(opcode, _basicBlocks[(int)target.Offset], (opcode != Code.Br) ? _basicBlocks[currentOffset] : null);
+                            ImportBranch(opcode, _basicBlocks[(int)target.Offset], (opcode != Code.Br) ? _basicBlocks[currentOffset] : null);
                         }
                         return;
 
                     case Code.Ldarg_0:
-                        block.ImportLdArg(0);
+                        ImportLdArg(0);
                         break;
 
                     case Code.Conv_I2:
                         break;
 
                     case Code.Ret:
-                        block.ImportRet(_method);
+                        ImportRet(_method);
                         return;
 
                     case Code.Call:
-                        block.ImportCall(currentInstruction.Operand as MethodDef);
+                        ImportCall(currentInstruction.Operand as MethodDef);
                         break;
 
                     default:
@@ -221,16 +220,30 @@ namespace ILCompiler.Compiler
                 var nextBasicBlock = _basicBlocks[currentOffset];
                 if (nextBasicBlock != null)
                 {
-                    block.ImportFallThrough(nextBasicBlock);
+                    ImportFallThrough(nextBasicBlock);
                     return;
                 }
             }
         }
 
-        public void AddToPendingBasicBlocks(BasicBlock block)
+        private void MarkBasicBlock(BasicBlock basicBlock)
         {
-            block.Next = _pendingBasicBlocks;
-            _pendingBasicBlocks = block;
+            if (!basicBlock.Marked)
+            {
+                basicBlock.Next = _pendingBasicBlocks;
+                _pendingBasicBlocks = basicBlock;
+                basicBlock.Marked = true;
+            }
+        }
+
+        private void PushExpression(StackValueKind kind)
+        {
+            _stack.Push(new ExpressionEntry(kind));
+        }
+
+        public void Append(Instruction instruction)
+        {
+            _currentBasicBlock.Instructions.Add(instruction);
         }
     }
 }
