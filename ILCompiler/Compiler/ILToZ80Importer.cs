@@ -1,14 +1,65 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.IL;
+using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.z80;
 using System;
+using System.Collections.Generic;
 using Instruction = ILCompiler.z80.Instruction;
 
 namespace ILCompiler.Compiler
 {
     public partial class ILImporter
     {
+        public void Compile(Z80MethodCodeNode methodCodeNodeNeedingCode)
+        {
+            var basicBlockAnalyser = new BasicBlockAnalyser(_method);
+            var offsetToIndexMap = basicBlockAnalyser.FindBasicBlocks();
+            _basicBlocks = basicBlockAnalyser.BasicBlocks;
+
+            ImportBasicBlocks(offsetToIndexMap);  // This converts IL to Z80
+
+            List<Instruction> instructions = new();
+
+            // Generate prolog to setup locals if we have any
+            var localsCount = methodCodeNodeNeedingCode.Method.Body.Variables.Count;
+            if (localsCount > 0)
+            {
+                GenerateProlog(instructions, (short)localsCount);
+            }
+
+            // Loop thru basic blocks here to generate overall code for whole method
+            for (int i = 0; i < _basicBlocks.Length; i++)
+            {
+                var basicBlock = _basicBlocks[i];
+                if (basicBlock != null)
+                {
+                    // Run optimization phases on basic blocks here
+                    _compilation.Optimizer.Optimize(basicBlock.Instructions);
+
+                    instructions.Add(new LabelInstruction(basicBlock.Label));
+                    instructions.AddRange(basicBlock.Instructions);
+                }
+            }
+
+            methodCodeNodeNeedingCode.SetCode(instructions);
+        }
+
+        private static void GenerateProlog(IList<Instruction> instructions, int localsCount)
+        {
+            // TODO: This assumes all locals are 16 bit in size
+
+            instructions.Add(Instruction.Push(I16.IX));
+            instructions.Add(Instruction.Ld(I16.IX, 0));
+            instructions.Add(Instruction.Add(I16.IX, R16.SP));
+
+            var localsSize = localsCount * 2;
+
+            instructions.Add(Instruction.Ld(R16.HL, (short)-localsSize));
+            instructions.Add(Instruction.Add(R16.HL, R16.SP));
+            instructions.Add(Instruction.Ld(R16.SP, R16.HL));
+        }
+
         private readonly string[] comparisonRoutinesByOpcode = new string[]
         {
             "EQ",               // Beq
@@ -273,6 +324,11 @@ namespace ILCompiler.Compiler
             }
 
             Append(Instruction.Ret());
+        }
+
+        public void Append(Instruction instruction)
+        {
+            _currentBasicBlock.Instructions.Add(instruction);
         }
     }
 }
