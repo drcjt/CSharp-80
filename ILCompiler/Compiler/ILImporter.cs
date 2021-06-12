@@ -134,7 +134,10 @@ namespace ILCompiler.Compiler
                         return;
 
                     case Code.Ldarg_0:
-                        ImportLdArg(0);
+                    case Code.Ldarg_1:
+                    case Code.Ldarg_2:
+                    case Code.Ldarg_3:
+                        ImportLdArg(opcode - Code.Ldarg_0);
                         break;
 
                     case Code.Conv_I2:

@@ -20,13 +20,7 @@ namespace ILCompiler.Compiler
             ImportBasicBlocks(offsetToIndexMap);  // This converts IL to Z80
 
             List<Instruction> instructions = new();
-
-            // Generate prolog to setup locals if we have any
-            var localsCount = methodCodeNodeNeedingCode.Method.Body.Variables.Count;
-            if (localsCount > 0)
-            {
-                GenerateProlog(instructions, (short)localsCount);
-            }
+            GenerateProlog(instructions, methodCodeNodeNeedingCode.Method);
 
             // Loop thru basic blocks here to generate overall code for whole method
             for (int i = 0; i < _basicBlocks.Length; i++)
@@ -45,19 +39,36 @@ namespace ILCompiler.Compiler
             methodCodeNodeNeedingCode.SetCode(instructions);
         }
 
-        private static void GenerateProlog(IList<Instruction> instructions, int localsCount)
+        private void GenerateProlog(IList<Instruction> instructions, MethodDef method)
         {
             // TODO: This assumes all locals are 16 bit in size
 
-            instructions.Add(Instruction.Push(I16.IX));
-            instructions.Add(Instruction.Ld(I16.IX, 0));
-            instructions.Add(Instruction.Add(I16.IX, R16.SP));
+            var paramsCount = method.Parameters.Count;
+            if (paramsCount > 0)
+            {
+                instructions.Add(Instruction.Push(I16.IY));
+                // Set IY to start of arguments here
+                // IY = SP - (2 * (number of params + 2))
 
-            var localsSize = localsCount * 2;
+                instructions.Add(Instruction.Ld(R16.HL, (short)(2 * (paramsCount + 2))));
+                instructions.Add(Instruction.Add(R16.HL, R16.SP));
+                instructions.Add(Instruction.Push(R16.HL));
+                instructions.Add(Instruction.Pop(I16.IY));
+            }
 
-            instructions.Add(Instruction.Ld(R16.HL, (short)-localsSize));
-            instructions.Add(Instruction.Add(R16.HL, R16.SP));
-            instructions.Add(Instruction.Ld(R16.SP, R16.HL));
+            var localsCount = method.Body.Variables.Count;
+            if (localsCount > 0)
+            {
+                instructions.Add(Instruction.Push(I16.IX));
+                instructions.Add(Instruction.Ld(I16.IX, 0));
+                instructions.Add(Instruction.Add(I16.IX, R16.SP));
+
+                var localsSize = localsCount * 2;
+
+                instructions.Add(Instruction.Ld(R16.HL, (short)-localsSize));
+                instructions.Add(Instruction.Add(R16.HL, R16.SP));
+                instructions.Add(Instruction.Ld(R16.SP, R16.HL));
+            }
         }
 
         private readonly string[] comparisonRoutinesByOpcode = new string[]
@@ -240,15 +251,15 @@ namespace ILCompiler.Compiler
             Append(Instruction.Push(R16.HL));
         }
 
-        public void ImportLdArg(short stackFrameSize)
+        public void ImportLdArg(int index)
         {
             // TODO: need to push details of actual arg
             _stack.Push(new ExpressionEntry(StackValueKind.Int16));
 
-            var argumentOffset = stackFrameSize;
-            argumentOffset += 2; // accounts for return address
-            Append(Instruction.Ld(R8.H, I16.IX, (short)(argumentOffset + 1)));
-            Append(Instruction.Ld(R8.L, I16.IX, argumentOffset));
+            var offset = index * 2; // TODO: This needs to take into account differing sizes of parameters
+
+            Append(Instruction.Ld(R8.H, I16.IY, (short)-(offset + 1)));
+            Append(Instruction.Ld(R8.L, I16.IY, (short)-(offset + 2)));
             Append(Instruction.Push(R16.HL));
         }
 
@@ -288,6 +299,7 @@ namespace ILCompiler.Compiler
 
         public void ImportRet(MethodDef method)
         {
+            var hasParameters = method.Parameters.Count > 0;
             var hasLocals = method.Body.Variables.Count > 0;
             var hasReturnValue = method.HasReturnType;
 
@@ -300,27 +312,33 @@ namespace ILCompiler.Compiler
                 }
             }
 
-            if (!hasReturnValue && hasLocals)
+            if (hasReturnValue)
             {
-                Append(Instruction.Ld(R16.SP, I16.IX));
-                Append(Instruction.Pop(I16.IX));
+                Append(Instruction.Pop(R16.BC));            // Copy return value into BC
             }
-            else if (hasReturnValue && !hasLocals)
-            {
-                Append(Instruction.Pop(R16.BC));
-                Append(Instruction.Pop(R16.HL));
-                Append(Instruction.Push(R16.BC));
-                Append(Instruction.Push(R16.HL));
 
-            }
-            else if (hasReturnValue && hasLocals)
+            if (hasLocals)
             {
-                Append(Instruction.Pop(R16.BC));
-                Append(Instruction.Ld(R16.SP, I16.IX));
-                Append(Instruction.Pop(I16.IX));
-                Append(Instruction.Pop(R16.HL));
-                Append(Instruction.Push(R16.BC));
-                Append(Instruction.Push(R16.HL));
+                Append(Instruction.Ld(R16.SP, I16.IX));     // Move SP to before locals
+                Append(Instruction.Pop(I16.IX));            // Remove IX
+            }
+
+            if (hasParameters)
+            {
+                Append(Instruction.Pop(R16.HL));            // Remove IY
+                Append(Instruction.Pop(R16.HL));            // Store return address in HL
+                Append(Instruction.Ld(R16.SP, I16.IY));     // Reset SP to before arguments
+            }
+
+            if (hasReturnValue)
+            {
+                Append(Instruction.Pop(R16.HL));            // Store return address in HL
+                Append(Instruction.Push(R16.BC));           // Push return value
+                Append(Instruction.Push(R16.HL));           // Push return address
+            }
+            else if (hasParameters)
+            {
+                Append(Instruction.Push(R16.HL));           // Push return address
             }
 
             Append(Instruction.Ret());

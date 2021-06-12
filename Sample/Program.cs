@@ -4,7 +4,7 @@ namespace MiniBCL
 {
     public static class Program
     {
-		public static int Main(string[] args)
+		public static int Main()
 		{
             // Test subroutine call
             HelloWorld();
@@ -33,8 +33,21 @@ namespace MiniBCL
             // Test not equal branching
             TestNotEqualBranching();
 
+            short a = 3;
+            short b = 4;
+            short c = 5;
+            TestArguments(a, b, c);
+
             return 42;
 		}
+
+        private static void TestArguments(short a, short b, short c)
+        {
+            Console.Write(48 + a);
+            Console.Write(48 + b);
+            Console.Write(48 + c);
+            Console.Write('\n');
+        }
 
         private static void TestBooleanComparison()
         {
@@ -119,6 +132,7 @@ namespace MiniBCL
             {
                 Console.Write('F');
             }
+            Console.Write('\n');
         }
 
         // Note Roslyn inverts the condition so this produces a bne instruction in the IL
@@ -136,7 +150,6 @@ namespace MiniBCL
             }
         }
 
-
         private static void HelloWorld()
 		{
             Console.Write('H');
@@ -144,7 +157,6 @@ namespace MiniBCL
             Console.Write('l');
             Console.Write('l');
             Console.Write('o');
-
             Console.Write(' ');
             Console.Write('W');
             Console.Write('o');
