@@ -34,6 +34,16 @@ namespace ILCompiler.Compiler
             _id = nextId++;
         }
 
+        private readonly string[] comparisonRoutinesByOpcode = new string[]
+        {
+            "EQ",               // Beq
+            "GREATERTHANEQ",    // Bge
+            "GREATERTHAN",      // Bgt
+            "LESSTHANEQ",       // Ble
+            "LESSTHAN",         // Blt
+            "NOTEQ"             // Bne
+        };
+
         public void ImportBranch(Code opcode, BasicBlock target, BasicBlock fallthrough)
         {
             if (opcode != Code.Br)
@@ -64,11 +74,8 @@ namespace ILCompiler.Compiler
                     Append(Instruction.Pop(R16.HL));
                     Append(Instruction.Pop(R16.DE));
 
-                    if (opcode == Code.Blt)
-                    {
-                        Append(Instruction.Call("LESSTHAN"));
-                        Append(Instruction.Jp(Condition.C, target.Label));
-                    }
+                    Append(Instruction.Call(comparisonRoutinesByOpcode[opcode - Code.Beq]));
+                    Append(Instruction.Jp(Condition.C, target.Label));
                 }
             }
             else
@@ -159,8 +166,8 @@ namespace ILCompiler.Compiler
 
             PushExpression(kind);
 
-            Append(Instruction.Pop(R16.HL));
             Append(Instruction.Pop(R16.DE));
+            Append(Instruction.Pop(R16.HL));
 
             switch (opcode)
             {
@@ -268,7 +275,7 @@ namespace ILCompiler.Compiler
             }
             else
             {
-                var targetMethod = methodToCall.Name;
+                var targetMethod = _importer.NameMangler.GetMangledMethodName(methodToCall);
                 Append(Instruction.Call(targetMethod));
             }
         }

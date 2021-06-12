@@ -12,16 +12,19 @@ namespace ILCompiler.Compiler
         private readonly ILogger<Compilation> _logger;
         private readonly IOptimizer _optimizer;
         private readonly IConfiguration _configuration;
+        private readonly INameMangler _nameMangler;
 
         public ILogger<Compilation> Logger => _logger;
         public IConfiguration Configuration => _configuration;
         public IOptimizer Optimizer => _optimizer;
+        public INameMangler NameMangler => _nameMangler;
 
-        public Compilation(IConfiguration configuration, ILogger<Compilation> logger, IOptimizer optimizer)
+        public Compilation(IConfiguration configuration, ILogger<Compilation> logger, IOptimizer optimizer, INameMangler nameMangler)
         {
             _configuration = configuration;
             _logger = logger;
             _optimizer = optimizer;
+            _nameMangler = nameMangler;
         }
 
         public void Compile(string inputFilePath, string outputFilePath)
@@ -53,7 +56,7 @@ namespace ILCompiler.Compiler
                 }
             }
 
-            z80Writer.OutputCode(nodes, module.EntryPoint.Name);
+            z80Writer.OutputCode(nodes, module.EntryPoint);
         }
     }
 }

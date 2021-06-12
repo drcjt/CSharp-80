@@ -20,6 +20,8 @@ namespace ILCompiler.Compiler
         private BasicBlock[] _basicBlocks;
         private BasicBlock _pendingBasicBlocks;
 
+        public INameMangler NameMangler => _compilation.NameMangler;
+
         // TODO: Is this needed anymore given that each basic block has it's own evaluation stack??
         private readonly EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
 
@@ -156,6 +158,11 @@ namespace ILCompiler.Compiler
 
                     case Code.Br_S:
                     case Code.Blt_S:
+                    case Code.Bgt_S:
+                    case Code.Ble_S:
+                    case Code.Bge_S:
+                    case Code.Beq_S:
+                    case Code.Bne_Un_S:
                     case Code.Brfalse_S:
                     case Code.Brtrue_S:
                         {
@@ -166,6 +173,11 @@ namespace ILCompiler.Compiler
 
                     case Code.Br:
                     case Code.Blt:
+                    case Code.Bgt:
+                    case Code.Ble:
+                    case Code.Bge:
+                    case Code.Beq:
+                    case Code.Bne_Un:
                     case Code.Brfalse:
                     case Code.Brtrue:
                         {

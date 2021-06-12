@@ -1,6 +1,6 @@
-﻿using ILCompiler.Compiler.DependencyAnalysis;
+﻿using dnlib.DotNet;
+using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.z80;
-using ILCompiler.z80.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -36,9 +36,7 @@ namespace ILCompiler.Compiler
 
         private void OutputMethodNode(Z80MethodCodeNode methodCodeNode)
         {
-            //_optimizer.Optimize(methodCodeNode.MethodCode);
-
-            _out.WriteLine(new LabelInstruction(methodCodeNode.Method.Name));
+            _out.WriteLine(new LabelInstruction(_compilation.NameMangler.GetMangledMethodName(methodCodeNode.Method)));
 
             foreach (var instruction in methodCodeNode.MethodCode)
             {
@@ -46,7 +44,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void OutputProlog(string entryMethodName)
+        private void OutputProlog(MethodDef entryMethod)
         {
             _out.WriteLine($"; INPUT FILE {_inputFilePath.ToUpper()}");
             _out.WriteLine($"; {DateTime.Now}");
@@ -61,7 +59,7 @@ namespace ILCompiler.Compiler
 
             _out.WriteLine(new LabelInstruction("START"));
 
-            _out.WriteLine(Instruction.Call(entryMethodName));
+            _out.WriteLine(Instruction.Call(_compilation.NameMangler.GetMangledMethodName(entryMethod)));
 
             _out.WriteLine(Instruction.Pop(R16.BC));    // return value
             _out.WriteLine(Instruction.Pop(R16.HL));    // return address
@@ -76,9 +74,9 @@ namespace ILCompiler.Compiler
             _out.WriteLine(Instruction.End("START"));
         }
 
-        public void OutputCode(IEnumerable<Z80MethodCodeNode> nodes, string entryMethodName)
+        public void OutputCode(IEnumerable<Z80MethodCodeNode> nodes, MethodDef entryMethod)
         {
-            OutputProlog(entryMethodName);
+            OutputProlog(entryMethod);
 
             foreach (var node in nodes)
             {

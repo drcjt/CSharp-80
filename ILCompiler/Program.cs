@@ -51,6 +51,7 @@ namespace ILCompiler
             services.AddSingleton<ICompilation, Compilation>();
             services.AddSingleton<IConfiguration, Configuration>();
             services.AddSingleton<IOptimizer, Optimizer>();
+            services.AddSingleton<INameMangler, NameMangler>();
         }
 
         private void Run(string[] args, ServiceProvider serviceProvider)

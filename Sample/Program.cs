@@ -18,7 +18,22 @@ namespace MiniBCL
             // Test less than branching
             TestLessThanBranching();
 
-			return 42;
+            // Test greater than branching
+            TestGreaterThanBranching();
+
+            // Test less than or equal branching
+            TestLessThanOrEqualBranching();
+
+            // Test greater than or equal branching
+            TestGreaterThanOrEqualBranching();
+
+            // Test equal branching
+            TestEqualBranching();
+
+            // Test not equal branching
+            TestNotEqualBranching();
+
+            return 42;
 		}
 
         private static void TestBooleanComparison()
@@ -57,6 +72,70 @@ namespace MiniBCL
             }
             Console.Write('\n');
         }
+
+        private static void TestGreaterThanBranching()
+        {
+            short i = 5;
+            while (i > 0)
+            {
+                Console.Write(48 + i);
+                i--;
+            }
+            Console.Write('\n');
+        }
+
+        private static void TestLessThanOrEqualBranching()
+        {
+            short i = 0;
+            while (i <= 5)
+            {
+                Console.Write(48 + i);
+                i++;
+            }
+            Console.Write('\n');
+        }
+
+        private static void TestGreaterThanOrEqualBranching()
+        {
+            short i = 5;
+            while (i >= 0)
+            {
+                Console.Write(48 + i);
+                i--;
+            }
+            Console.Write('\n');
+        }
+
+        // Note Roslyn inverts the condition so this produces a beq instruction in the IL
+        private static void TestNotEqualBranching()
+        {
+            short a = 4;
+            short b = 4;
+            if (a == b)
+            {
+                Console.Write('T');
+            }
+            else
+            {
+                Console.Write('F');
+            }
+        }
+
+        // Note Roslyn inverts the condition so this produces a bne instruction in the IL
+        private static void TestEqualBranching()
+        {
+            short a = 4;
+            short b = 5;
+            if (a != b)
+            {
+                Console.Write('T');
+            }
+            else
+            {
+                Console.Write('F');
+            }
+        }
+
 
         private static void HelloWorld()
 		{
