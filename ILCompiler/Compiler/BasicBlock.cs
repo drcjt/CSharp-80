@@ -15,7 +15,6 @@ namespace ILCompiler.Compiler
         public int StartOffset { get; set; }
 
         public IList<Instruction> Instructions { get; set; } = new List<Instruction>();
-
         public EvaluationStack<StackEntry> Stack { get; set; } = new EvaluationStack<StackEntry>(0);
 
         private bool _marked = false;

@@ -15,6 +15,7 @@ namespace ILCompiler.Compiler
 
         public ILogger<Compilation> Logger => _logger;
         public IConfiguration Configuration => _configuration;
+        public IOptimizer Optimizer => _optimizer;
 
         public Compilation(IConfiguration configuration, ILogger<Compilation> logger, IOptimizer optimizer)
         {
@@ -25,7 +26,7 @@ namespace ILCompiler.Compiler
 
         public void Compile(string inputFilePath, string outputFilePath)
         {
-            var z80Writer = new Z80Writer(this, inputFilePath, outputFilePath, _optimizer);
+            var z80Writer = new Z80Writer(this, inputFilePath, outputFilePath);
 
             ModuleContext modCtx = ModuleDef.CreateModuleContext();
             ModuleDefMD module = ModuleDefMD.Load(inputFilePath, modCtx);

@@ -32,10 +32,16 @@ namespace ILCompiler.z80
                     // Eliminate Push followed by Pop
                     instructions.RemoveAt(count - 1);
                     instructions.RemoveAt(count - 1);
-                }
 
-                lastInstruction = currentInstruction;
-                currentInstruction = instructions[++count];
+                    count--;
+                    currentInstruction = instructions[count];
+                    lastInstruction = count > 0 ? instructions[count - 1] : null;
+                }
+                else
+                {
+                    lastInstruction = currentInstruction;
+                    currentInstruction = instructions[++count];
+                }
             } while (count < instructions.Count - 1);
 
             _logger.LogInformation($"Eliminated {unoptimizedInstructionCount - instructions.Count} instructions");

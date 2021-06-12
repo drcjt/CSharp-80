@@ -4,6 +4,7 @@ using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using ILCompiler.z80;
+using ILCompiler.z80.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -51,6 +52,9 @@ namespace ILCompiler.Compiler
                 var basicBlock = _basicBlocks[i];
                 if (basicBlock != null)
                 {
+                    // Run optimization phases on basic blocks here
+                    _compilation.Optimizer.Optimize(basicBlock.Instructions);
+
                     instructions.Add(new LabelInstruction(basicBlock.Label));
                     instructions.AddRange(basicBlock.Instructions);
                 }

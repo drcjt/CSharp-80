@@ -15,14 +15,12 @@ namespace ILCompiler.Compiler
         private readonly StreamWriter _out;
         private readonly string _inputFilePath;
         private readonly string _outputFilePath;
-        private readonly IOptimizer _optimizer;
 
-        public Z80Writer(Compilation compilation, string inputFilePath, string outputFilePath, IOptimizer optimizer)
+        public Z80Writer(Compilation compilation, string inputFilePath, string outputFilePath)
         {
             _compilation = compilation;
             _inputFilePath = inputFilePath;
             _outputFilePath = outputFilePath;
-            _optimizer = optimizer;
 
             _out = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, false), Encoding.ASCII);
         }
@@ -38,7 +36,7 @@ namespace ILCompiler.Compiler
 
         private void OutputMethodNode(Z80MethodCodeNode methodCodeNode)
         {
-            _optimizer.Optimize(methodCodeNode.MethodCode);
+            //_optimizer.Optimize(methodCodeNode.MethodCode);
 
             _out.WriteLine(new LabelInstruction(methodCodeNode.Method.Name));
 
