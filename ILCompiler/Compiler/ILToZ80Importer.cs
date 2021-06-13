@@ -56,7 +56,7 @@ namespace ILCompiler.Compiler
                 {
                     instructions.Add(Instruction.Db((byte)ch));
                 }
-                instructions.Add(Instruction.Db(13));
+                instructions.Add(Instruction.Db(0));
             }
         }
 
@@ -322,9 +322,7 @@ namespace ILCompiler.Compiler
                         if (argtype.FullName == "System.String")
                         {
                             Append(Instruction.Pop(R16.HL));
-                            // TODO: This rom routine is appending a newline on the end
-                            // perhaps implement own routine using 0x33 instead?
-                            Append(Instruction.Call(0x4467)); // ROM routine to display a null terminated message
+                            Append(Instruction.Call("PRINT"));
                         }
                         else
                         {

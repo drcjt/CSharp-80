@@ -141,8 +141,7 @@ namespace MiniBCL
 
         private static void HelloWorld()
 		{
-            string s = "Hello World";
-            Console.Write(s);
+            Console.WriteLine("Hello World");
 		}
     }
 }

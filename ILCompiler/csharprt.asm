@@ -100,3 +100,13 @@ CP_RESULT:
    RET NC
    INC HL
    RET
+
+PRINT:
+   LD A, (HL)
+   CP 0
+   JR Z, PRINTEND
+   CALL 33H
+   INC HL
+   JR PRINT
+PRINTEND:
+   RET
