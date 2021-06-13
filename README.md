@@ -10,6 +10,13 @@ can be easily turned into a native Z80 binary file using an assembler such as [Z
 * Be able to compile the [C# Snake game](https://github.com/MichalStrehovsky/SeeSharpSnake) with minimal modifications
 * Learn more about AOT and the C# runtime
 
+## Demo
+
+Current implementation supports very basic console output, short arithmetic, static methods with parameters. Here is a
+simple demo showing this [C# program running](Sample/Sample.cs) in a TRS-80 emulator:
+
+[!demo](Documentation/Demo.gif)
+
 ### Continuous Integration status
 
 | | |
