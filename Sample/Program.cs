@@ -40,7 +40,6 @@ namespace MiniBCL
 
             return 42;
 		}
-
         private static void TestArguments(short a, short b, short c)
         {
             Console.Write(48 + a);
@@ -54,16 +53,7 @@ namespace MiniBCL
             bool b = true;
             if (b)
             {
-                Console.Write('B');
-                Console.Write('o');
-                Console.Write('o');
-                Console.Write('l');
-                Console.Write(' ');
-                Console.Write('T');
-                Console.Write('e');
-                Console.Write('s');
-                Console.Write('t');
-                Console.Write('\n');
+                Console.Write("Bool Test\n");
             }
         }
 
@@ -126,13 +116,12 @@ namespace MiniBCL
             short b = 4;
             if (a == b)
             {
-                Console.Write('T');
+                Console.WriteLine("True");
             }
             else
             {
-                Console.Write('F');
+                Console.WriteLine("False");
             }
-            Console.Write('\n');
         }
 
         // Note Roslyn inverts the condition so this produces a bne instruction in the IL
@@ -142,28 +131,18 @@ namespace MiniBCL
             short b = 5;
             if (a != b)
             {
-                Console.Write('T');
+                Console.WriteLine("True");
             }
             else
             {
-                Console.Write('F');
+                Console.WriteLine("False");
             }
         }
 
         private static void HelloWorld()
 		{
-            Console.Write('H');
-            Console.Write('e');
-            Console.Write('l');
-            Console.Write('l');
-            Console.Write('o');
-            Console.Write(' ');
-            Console.Write('W');
-            Console.Write('o');
-            Console.Write('r');
-            Console.Write('l');
-            Console.Write('d');
-            Console.Write('\n');
+            string s = "Hello World";
+            Console.Write(s);
 		}
     }
 }

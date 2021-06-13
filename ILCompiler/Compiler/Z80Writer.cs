@@ -36,8 +36,6 @@ namespace ILCompiler.Compiler
 
         private void OutputMethodNode(Z80MethodCodeNode methodCodeNode)
         {
-            _out.WriteLine(new LabelInstruction(_compilation.NameMangler.GetMangledMethodName(methodCodeNode.Method)));
-
             foreach (var instruction in methodCodeNode.MethodCode)
             {
                 _out.WriteLine(instruction.ToString());
@@ -80,6 +78,7 @@ namespace ILCompiler.Compiler
 
             foreach (var node in nodes)
             {
+                _out.WriteLine($"; {node.Method.FullName}");
                 OutputMethodNode(node);
             }
 

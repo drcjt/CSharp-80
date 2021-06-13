@@ -39,6 +39,10 @@
 		public static void Write(char value) { }
 		[System.Runtime.CompilerServices.Intrinsic]
 		public static void Write(int value) { }
+		[System.Runtime.CompilerServices.Intrinsic]
+		public static void Write(string str) { }
+
+		public static void WriteLine(string str) { Write(str); Write('\n'); }
 	}
 }
 

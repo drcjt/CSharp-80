@@ -30,6 +30,8 @@ namespace ILCompiler.z80
 
         public static readonly Opcode Org = new("Org", true);
         public static readonly Opcode End = new("End", true);
+        public static readonly Opcode Db = new("Db", true);
+
         public override string ToString()
         {
             return _name;
