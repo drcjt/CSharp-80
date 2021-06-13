@@ -15,7 +15,7 @@ can be easily turned into a native Z80 binary file using an assembler such as [Z
 Current implementation supports very basic console output, short arithmetic, static methods with parameters. Here is a
 simple demo showing this [C# program running](https://github.com/drcjt/CSharp-80/blob/main/Sample/Program.cs) in a TRS-80 emulator:
 
-[![demo]](https://github.com/drcjt/CSharp-80/blob/main/Documentation/demo.gif)
+![demo](/Documentation/demo.gif)
 
 ### Continuous Integration status
 
