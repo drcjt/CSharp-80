@@ -27,6 +27,7 @@
 	public struct Int16 { }
 	public struct Int32 { }
 	public struct IntPtr { }
+	public struct Byte { }
 
 	public abstract class ValueType { }
 	public abstract class Enum : ValueType { }
@@ -39,6 +40,12 @@
 		public static void Write(char value) { }
 		[System.Runtime.CompilerServices.Intrinsic]
 		public static void Write(int value) { }
+
+		// Test of using dll import to link to native assembly
+		// TODO: Consider if this is better/worse than either intrinsics or
+		// perhaps using MethodImplOptions.InternalCall
+		[System.Runtime.InteropServices.DllImport("Runtime", EntryPoint = "WRITE")]
+		public static unsafe extern bool WriteCh(char ch);
 	}
 }
 

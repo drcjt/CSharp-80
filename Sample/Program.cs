@@ -4,7 +4,7 @@ namespace MiniBCL
 {
     public static class Program
     {
-		public static int Main()
+        public static int Main()
 		{
             // Test subroutine call
             HelloWorld();
@@ -37,6 +37,12 @@ namespace MiniBCL
             short b = 4;
             short c = 5;
             TestArguments(a, b, c);
+
+            // Test calling assembly code via pinvoke
+            Console.WriteCh('Z');
+
+            // Test implementation of write char completely written in C#
+            WriteChar(0, 0, 48); // Write 0 to top left corner of screen
 
             return 42;
 		}
@@ -165,5 +171,21 @@ namespace MiniBCL
             Console.Write('d');
             Console.Write('\n');
 		}
+
+        // Experiment to see if we can write routine to update video memory completely in C#!!
+        // ...
+        // and it worked!!
+        // although codegen z80 is very inefficient
+        private unsafe static void WriteChar(short x, short y, byte ch)
+        {
+            byte* screenMemory = (byte*)0x3c00;
+            short offset = 0;
+            for (int i = 0; i < y; i++)
+            {
+                offset += 64;
+            }
+
+            screenMemory[offset + x] = ch;
+        }
     }
 }

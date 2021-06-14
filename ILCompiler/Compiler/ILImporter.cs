@@ -1,8 +1,10 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 
 namespace ILCompiler.Compiler
@@ -80,6 +82,17 @@ namespace ILCompiler.Compiler
                         ImportLoadInt(opcode - Code.Ldc_I4_0, StackValueKind.Int16);
                         break;
 
+                    case Code.Ldc_I4:
+                        {
+                            var value = (int)currentInstruction.Operand;
+                            if (value < Int16.MinValue || value > Int16.MaxValue)
+                            {
+                                throw new NotSupportedException("Cannot load I4 that is not an I2");
+                            }
+                            ImportLoadInt((int)currentInstruction.Operand, StackValueKind.Int16);
+                        }
+                        break;
+
                     case Code.Ldc_I4_S:
                         ImportLoadInt((sbyte)currentInstruction.Operand, StackValueKind.Int16);
                         break;
@@ -96,6 +109,10 @@ namespace ILCompiler.Compiler
                     case Code.Ldloc_2:
                     case Code.Ldloc_3:
                         ImportLoadVar(opcode - Code.Ldloc_0, false);
+                        break;
+
+                    case Code.Stind_I1:
+                        ImportStoreIndirect(WellKnownType.SByte);
                         break;
 
                     case Code.Add:

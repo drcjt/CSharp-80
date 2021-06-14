@@ -42,9 +42,10 @@ namespace ILCompiler.Compiler
 
                 foreach (var method in type.Methods)
                 {
+
                     var isIntrinsic = method.HasCustomAttributes && method.CustomAttributes.IsDefined("System.Runtime.CompilerServices.IntrinsicAttribute");
 
-                    if (!method.IsConstructor && !isIntrinsic)
+                    if (!method.IsConstructor && !method.IsIntrinsic() && !method.IsPinvokeImpl)
                     {
                         _logger.LogInformation("Compiling method {method.Name}", method.Name);
 

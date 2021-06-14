@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.z80;
@@ -224,6 +225,24 @@ namespace ILCompiler.Compiler
             Append(Instruction.Push(R16.HL));
         }
 
+        public void ImportStoreIndirect(WellKnownType type)
+        {
+            var value = _stack.Pop();
+            var addr = _stack.Pop();
+
+            if (type == WellKnownType.SByte && addr.Kind == StackValueKind.Int16 && value.Kind == StackValueKind.Int16)
+            {
+                Append(Instruction.Pop(R16.BC));
+                Append(Instruction.Pop(R16.HL));
+
+                Append(Instruction.LdInd(R16.HL, R8.C));
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+        }
+
         public void ImportStoreVar(int index, bool argument)
         {
             var value = _stack.Pop();
@@ -276,25 +295,57 @@ namespace ILCompiler.Compiler
             Append(Instruction.Push(R16.HL));
         }
 
-        public void ImportCall(MethodDef methodToCall)
+        private bool ImportIntrinsicCall(MethodDef methodToCall)
         {
-            if (methodToCall.DeclaringType.FullName.StartsWith("System.Console"))
+            switch (methodToCall.Name)
             {
-                switch (methodToCall.Name)
-                {
-                    case "Write":
-                        var op = _stack.Pop();
+                // TODO: Suspect this won't stay as an intrinsic but at least we have the mechanism for instrincs
+                case "Write":
+                    if (IsTypeName(methodToCall, "System", "Console"))
+                    {
                         Append(Instruction.Pop(R16.HL));
                         Append(Instruction.Ld(R8.A, R8.L));
                         Append(Instruction.Call(0x0033)); // ROM routine to display character at current cursor position
-                        break;
-                }
+
+                        return true;
+                    }
+                    break;
+                default:
+                    break;
             }
-            else
+
+            return false;
+        }
+
+        private static bool IsTypeName(MethodDef method, string typeNamespace, string typeName)
+        {
+            var metadataType = method.DeclaringType;
+            if (metadataType == null)
             {
-                var targetMethod = _compilation.NameMangler.GetMangledMethodName(methodToCall);
-                Append(Instruction.Call(targetMethod));
+                return false;
             }
+            return metadataType.Namespace == typeNamespace && metadataType.Name == typeName;
+        }
+
+        public void ImportCall(MethodDef methodToCall)
+        {
+            if (methodToCall.IsIntrinsic())
+            {
+                if (!ImportIntrinsicCall(methodToCall))
+                {
+                    throw new NotSupportedException("Unknown intrinsic");
+                }
+                return;
+            }
+
+            if (methodToCall.IsPinvokeImpl)
+            {
+                Append(Instruction.Call(methodToCall.ImplMap.Name));
+                return;
+            }
+
+            var targetMethod = _compilation.NameMangler.GetMangledMethodName(methodToCall);
+            Append(Instruction.Call(targetMethod));
         }
 
         public void ImportRet(MethodDef method)

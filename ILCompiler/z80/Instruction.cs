@@ -118,6 +118,11 @@ namespace ILCompiler.z80
         {
             return new Instruction(Opcode.Ld, target.ToString() + ", " + source.ToString());
         }
+        public static Instruction LdInd(R16Type target, R8Type source)
+        {
+            return new Instruction(Opcode.Ld, "(" + target.ToString() + "), " + source.ToString());
+        }
+
         public static Instruction Ex(Register target, Register source)
         {
             return new Instruction(Opcode.Ex, target.ToString() + ", " + source.ToString());
