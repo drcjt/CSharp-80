@@ -12,6 +12,8 @@ namespace ILCompiler.Compiler
 {
     public partial class ILImporter
     {
+        private Dictionary<string, string> _labelsToStringData = new Dictionary<string, string>();
+
         public void Compile(Z80MethodCodeNode methodCodeNodeNeedingCode)
         {
             var basicBlockAnalyser = new BasicBlockAnalyser(_method);
@@ -21,6 +23,10 @@ namespace ILCompiler.Compiler
             ImportBasicBlocks(offsetToIndexMap);  // This converts IL to Z80
 
             List<Instruction> instructions = new();
+            GenerateStringData(instructions);
+
+            instructions.Add(new LabelInstruction(_compilation.NameMangler.GetMangledMethodName(methodCodeNodeNeedingCode.Method)));
+
             GenerateProlog(instructions, methodCodeNodeNeedingCode.Method);
 
             // Loop thru basic blocks here to generate overall code for whole method
@@ -38,6 +44,21 @@ namespace ILCompiler.Compiler
             }
 
             methodCodeNodeNeedingCode.SetCode(instructions);
+        }
+
+        private void GenerateStringData(IList<Instruction> instructions)
+        {
+            // TODO: Need to eliminate duplicate strings
+
+            foreach (var keyValuePair in _labelsToStringData)
+            {
+                instructions.Add(new LabelInstruction(keyValuePair.Key));
+                foreach (var ch in keyValuePair.Value)
+                {
+                    instructions.Add(Instruction.Db((byte)ch));
+                }
+                instructions.Add(Instruction.Db(0));
+            }
         }
 
         private void GenerateProlog(IList<Instruction> instructions, MethodDef method)
@@ -246,9 +267,9 @@ namespace ILCompiler.Compiler
         public void ImportStoreVar(int index, bool argument)
         {
             var value = _stack.Pop();
-            if (value.Kind != StackValueKind.Int16)
+            if (value.Kind != StackValueKind.Int16 && value.Kind != StackValueKind.ObjRef)
             {
-                throw new NotSupportedException("Storing variables other than short not supported yet");
+                throw new NotSupportedException("Storing variables other than short or object refs not supported yet");
             }
 
             var offset = index * 2; // TODO: This needs to take into account differing sizes of local vars
@@ -295,17 +316,38 @@ namespace ILCompiler.Compiler
             Append(Instruction.Push(R16.HL));
         }
 
+        public void ImportLoadString(string str)
+        {
+            _stack.Push(new ExpressionEntry(StackValueKind.ObjRef));
+
+            var label = LabelGenerator.GetLabel(LabelType.String);
+            _labelsToStringData[label] = str;
+
+            Append(Instruction.Ld(R16.HL, label));
+            Append(Instruction.Push(R16.HL));
+        }
+
         private bool ImportIntrinsicCall(MethodDef methodToCall)
         {
+
             switch (methodToCall.Name)
             {
                 // TODO: Suspect this won't stay as an intrinsic but at least we have the mechanism for instrincs
                 case "Write":
                     if (IsTypeName(methodToCall, "System", "Console"))
                     {
-                        Append(Instruction.Pop(R16.HL));
-                        Append(Instruction.Ld(R8.A, R8.L));
-                        Append(Instruction.Call(0x0033)); // ROM routine to display character at current cursor position
+                        var argtype = methodToCall.Parameters[0].Type;
+                        if (argtype.FullName == "System.String")
+                        {
+                            Append(Instruction.Pop(R16.HL));
+                            Append(Instruction.Call("PRINT"));
+                        }
+                        else
+                        {
+                            Append(Instruction.Pop(R16.HL));
+                            Append(Instruction.Ld(R8.A, R8.L));
+                            Append(Instruction.Call(0x0033)); // ROM routine to display character at current cursor position
+                        }
 
                         return true;
                     }

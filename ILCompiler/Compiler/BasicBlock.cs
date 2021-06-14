@@ -20,14 +20,12 @@ namespace ILCompiler.Compiler
 
         public bool Marked { get; set; } = false;
 
-        public string Label => $"bb{_id}";
-        private readonly int _id;
-        private static int nextId = 0;
+        public string Label { get; private set; }
 
         public BasicBlock(int offset)
         {
             StartOffset = offset;
-            _id = nextId++;
+            Label = LabelGenerator.GetLabel(LabelType.BasicBlock);
         }
 
         public void Append(Instruction instruction)

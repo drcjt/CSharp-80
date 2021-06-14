@@ -157,6 +157,10 @@ namespace ILCompiler.Compiler
                         ImportLdArg(opcode - Code.Ldarg_0);
                         break;
 
+                    case Code.Ldstr:
+                        ImportLoadString(currentInstruction.Operand as string);
+                        break;
+
                     case Code.Conv_I2:
                         break;
 

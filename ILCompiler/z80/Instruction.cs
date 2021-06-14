@@ -118,6 +118,10 @@ namespace ILCompiler.z80
         {
             return new Instruction(Opcode.Ld, target.ToString() + ", " + source.ToString());
         }
+        public static Instruction Ld(R16Type target, string label)
+        {
+            return new Instruction(Opcode.Ld, target.ToString() + ", " + label);
+        }
         public static Instruction LdInd(R16Type target, R8Type source)
         {
             return new Instruction(Opcode.Ld, "(" + target.ToString() + "), " + source.ToString());
@@ -142,5 +146,16 @@ namespace ILCompiler.z80
         {
             return new Instruction(Opcode.Jp, label);
         }
+
+        public static Instruction Db(string data, string label)
+        {
+            return new Instruction(label, Opcode.Db, $"'{data}'");
+        }
+
+        public static Instruction Db(byte b)
+        {
+            return new Instruction(Opcode.Db, b.ToString());
+        }
+
     }
 }

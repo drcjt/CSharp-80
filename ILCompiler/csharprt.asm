@@ -101,6 +101,16 @@ CP_RESULT:
    INC HL
    RET
 
+PRINT:
+   LD A, (HL)
+   CP 0
+   JR Z, PRINTEND
+   CALL 33H
+   INC HL
+   JR PRINT
+PRINTEND:
+   RET
+
 ; Write a character to current cursor position
 ; Top of stack contains character to write (low byte)
 WRITE:
@@ -108,5 +118,5 @@ WRITE:
    POP HL
    PUSH BC	; put return address back
    LD A, L
-   CALL 33H
+   CALL 33H	; TODO - consider using JP instead
    RET
