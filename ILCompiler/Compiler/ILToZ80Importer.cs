@@ -339,13 +339,13 @@ namespace ILCompiler.Compiler
                         var argtype = methodToCall.Parameters[0].Type;
                         if (argtype.FullName == "System.String")
                         {
-                            Append(Instruction.Pop(R16.HL));
+                            Append(Instruction.Pop(R16.HL));    // put argument 1 into HL
                             Append(Instruction.Call("PRINT"));
                         }
                         else
                         {
-                            Append(Instruction.Pop(R16.HL));
-                            Append(Instruction.Ld(R8.A, R8.L));
+                            Append(Instruction.Pop(R16.HL));    // put argument 1 into HL
+                            Append(Instruction.Ld(R8.A, R8.L)); // Load low byte of argument 1 into A
                             Append(Instruction.Call(0x0033)); // ROM routine to display character at current cursor position
                         }
 
@@ -418,9 +418,12 @@ namespace ILCompiler.Compiler
 
             if (hasParameters)
             {
-                Append(Instruction.Pop(R16.HL));            // Remove IY
+                Append(Instruction.Pop(R16.BC));            // Remove IY
                 Append(Instruction.Pop(R16.HL));            // Store return address in HL
                 Append(Instruction.Ld(R16.SP, I16.IY));     // Reset SP to before arguments
+
+                Append(Instruction.Push(R16.BC));           // Restore IY
+                Append(Instruction.Pop(I16.IY)); 
             }
 
             if (hasReturnValue)

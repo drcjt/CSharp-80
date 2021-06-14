@@ -120,3 +120,20 @@ WRITE:
    LD A, L
    CALL 33H	; TODO - consider using JP instead
    RET
+
+CLS:
+   PUSH AF
+   CALL 01C9H
+   POP AF
+   RET
+
+SETXY:
+   POP HL   ; return address
+   POP BC   ; y 
+   POP DE   ; x
+   PUSH HL  ; restore return address
+   LD HL, 4020H ; 
+   LD (HL), E
+   INC HL
+   LD (HL), C
+   RET

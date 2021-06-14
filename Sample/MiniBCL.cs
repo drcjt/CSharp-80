@@ -28,6 +28,7 @@
 	public struct Int32 { }
 	public struct IntPtr { }
 	public struct Byte { }
+	public struct SByte { }
 
 	public abstract class ValueType { }
 	public abstract class Enum : ValueType { }
