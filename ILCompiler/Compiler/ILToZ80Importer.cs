@@ -208,6 +208,9 @@ namespace ILCompiler.Compiler
 
         public void ImportBinaryOperation(Code opcode)
         {
+            // review rom routines here to help with this
+            // http://www.trs-80.com/wordpress/zaps-patches-pokes-tips/rom-addresses-general/
+
             var op1 = _stack.Pop();
             var op2 = _stack.Pop();
 
@@ -356,8 +359,15 @@ namespace ILCompiler.Compiler
                             Append(Instruction.Pop(R16.HL));    // put argument 1 into HL
                             Append(Instruction.Call("PRINT"));
                         }
+                        else if (argtype.FullName == "System.Int16")
+                        {
+                            Append(Instruction.Pop(R16.HL));    // put argument 1 into HL
+                            Append(Instruction.Call("NUM2DEC"));
+                        }
                         else
                         {
+                            // TODO: Need to fix this to display number properly
+                            // rather than take low 8 bits and treat as ascii
                             Append(Instruction.Pop(R16.HL));    // put argument 1 into HL
                             Append(Instruction.Ld(R8.A, R8.L)); // Load low byte of argument 1 into A
                             Append(Instruction.Call(0x0033)); // ROM routine to display character at current cursor position

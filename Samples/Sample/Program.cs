@@ -8,6 +8,9 @@ namespace MiniBCL
 		{
             Console.Clear();
 
+            // Test output of short
+            Console.Write((short)123);
+
             // Test subroutine call
             HelloWorld();
 

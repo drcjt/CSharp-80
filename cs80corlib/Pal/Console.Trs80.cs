@@ -9,6 +9,9 @@ namespace System
 		public static void Write(Int32 value) { }
 
 		[Intrinsic]
+		public static void Write(short value) { }
+
+		[Intrinsic]
 		public static void Write(String str) { }
 
 		[DllImport("Runtime", EntryPoint="SetXY")]

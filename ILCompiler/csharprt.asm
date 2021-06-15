@@ -137,3 +137,27 @@ SETXY:
    INC HL
    LD (HL), C
    RET
+
+; display number in HL
+; includes leading zeros
+; TODO: change to remove leading zeros
+NUM2DEC:
+   LD BC,-10000
+   CALL NUM1
+   LD BC,-1000
+   CALL NUM1
+   LD BC,-100
+   CALL NUM1
+   LD C,-10
+   CALL NUM1
+   LD C, B
+NUM1:
+   LD A,'0'-1
+NUM2:
+   INC A
+   ADD HL, BC
+   JR C, NUM2
+   SBC HL, BC
+
+   CALL 33H
+   RET
