@@ -28,7 +28,7 @@
   </Target>
 
   <ItemGroup>
-    <ProjectReference Include="..\cs80corlib\cs80corlib.csproj" />
+    <ProjectReference Include="..\..\cs80corlib\cs80corlib.csproj" />
   </ItemGroup>
   
 </Project>
