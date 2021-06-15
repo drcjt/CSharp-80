@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -7,10 +7,10 @@
     <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    
+
     <Optimize>true</Optimize>
     <IncludePal>true</IncludePal>
-    
+
     <!--Disable .NET Core SDK libs-->
     <NoStdLib>true</NoStdLib>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
@@ -19,16 +19,6 @@
 
     <!-- Prevent .NET Core 3+ from generating exe -->
     <UseAppHost>false</UseAppHost>
-    
-    <OutputType>Exe</OutputType>
   </PropertyGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy $(TargetPath) $(SolutionDir)\ILCompiler\$(TargetFileName)" />
-  </Target>
-
-  <ItemGroup>
-    <ProjectReference Include="..\cs80corlib\cs80corlib.csproj" />
-  </ItemGroup>
-  
 </Project>

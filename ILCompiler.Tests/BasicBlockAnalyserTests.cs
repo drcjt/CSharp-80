@@ -3,9 +3,7 @@ using dnlib.DotNet.Emit;
 using ILCompiler.Compiler;
 using NUnit.Framework;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace ILCompiler.Tests
 {

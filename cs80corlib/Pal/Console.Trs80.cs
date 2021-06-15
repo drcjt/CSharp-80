@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace System
 {
-    static class Console
+    public static class Console
     {
 		[Intrinsic]
 		public static void Write(Int32 value) { }

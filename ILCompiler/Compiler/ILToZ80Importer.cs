@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler
 {
     public partial class ILImporter
     {
-        private Dictionary<string, string> _labelsToStringData = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _labelsToStringData = new Dictionary<string, string>();
 
         public void Compile(Z80MethodCodeNode methodCodeNodeNeedingCode)
         {
@@ -61,7 +61,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void GenerateProlog(IList<Instruction> instructions, MethodDef method)
+        private static void GenerateProlog(IList<Instruction> instructions, MethodDef method)
         {
             // TODO: This assumes all locals are 16 bit in size
 

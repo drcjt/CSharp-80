@@ -169,7 +169,9 @@ namespace ILCompiler.Compiler
                         return;
 
                     case Code.Call:
-                        ImportCall(currentInstruction.Operand as MethodDef);
+                        var methodDefOrRef = currentInstruction.Operand as IMethodDefOrRef;
+                        var methodDef = methodDefOrRef.ResolveMethodDefThrow();
+                        ImportCall(methodDef);
                         break;
 
                     default:

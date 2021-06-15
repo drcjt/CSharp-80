@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using ILCompiler.z80.Interfaces;
@@ -33,18 +34,21 @@ namespace ILCompiler.Compiler
 
             ModuleContext modCtx = ModuleDef.CreateModuleContext();
             ModuleDefMD module = ModuleDefMD.Load(inputFilePath, modCtx);
+            string corlibFilePath = "cs80corlib.dll";
+            ModuleDefMD corlibModule = ModuleDefMD.Load(corlibFilePath, modCtx);
+
+            var typesToCompile = new List<TypeDef>();
+            typesToCompile.AddRange(corlibModule.Types);
+            typesToCompile.AddRange(module.Types);
 
             var nodes = new List<Z80MethodCodeNode>();
 
-            foreach (var type in module.Types)
+            foreach (var type in typesToCompile)
             {
                 _logger.LogInformation("Compiling Type {type.Name}", type.Name);
 
                 foreach (var method in type.Methods)
                 {
-
-                    var isIntrinsic = method.HasCustomAttributes && method.CustomAttributes.IsDefined("System.Runtime.CompilerServices.IntrinsicAttribute");
-
                     if (!method.IsConstructor && !method.IsIntrinsic() && !method.IsPinvokeImpl)
                     {
                         _logger.LogInformation("Compiling method {method.Name}", method.Name);

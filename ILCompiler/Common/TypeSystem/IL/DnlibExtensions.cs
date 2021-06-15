@@ -1,8 +1,8 @@
 ﻿using dnlib.DotNet;
 
-namespace ILCompiler.Compiler
+namespace ILCompiler.Common.TypeSystem.IL
 {
-    public static class MethodDefExtensions
+    public static class DnlibExtensions
     {
         private const string CompilerIntrinsicAttribute = "System.Runtime.CompilerServices.IntrinsicAttribute";
 

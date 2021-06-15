@@ -1,10 +1,4 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.IL;
-using ILCompiler.Interfaces;
-using ILCompiler.z80;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Instruction = ILCompiler.z80.Instruction;
 
 namespace ILCompiler.Compiler
