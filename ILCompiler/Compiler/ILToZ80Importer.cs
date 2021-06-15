@@ -305,15 +305,29 @@ namespace ILCompiler.Compiler
 
         public void ImportLoadInt(long value, StackValueKind kind)
         {
-            if (kind != StackValueKind.Int16)
+            if (kind == StackValueKind.Int16)
+            {
+                _stack.Push(new Int16ConstantEntry(checked((short)value)));
+
+                Append(Instruction.Ld(R16.HL, (short)value));
+                Append(Instruction.Push(R16.HL));
+            }
+            else if (kind == StackValueKind.Int32)
+            {
+                _stack.Push(new Int32ConstantEntry(checked((int)value)));
+
+                var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
+                var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
+
+                Append(Instruction.Ld(R16.HL, low));
+                Append(Instruction.Push(R16.HL));
+                Append(Instruction.Ld(R16.HL, high));
+                Append(Instruction.Push(R16.HL));
+            }
+            else
             {
                 throw new NotSupportedException("Loading anything other than Int16 not currently supported");
             }
-
-            _stack.Push(new Int16ConstantEntry(checked((short)value)));
-
-            Append(Instruction.Ld(R16.HL, (short)value));
-            Append(Instruction.Push(R16.HL));
         }
 
         public void ImportLoadString(string str)

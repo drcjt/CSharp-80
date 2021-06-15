@@ -102,6 +102,14 @@ namespace ILCompiler.Compiler
         }
     }
 
+    public class Int32ConstantEntry : ConstantEntry<int>
+    {
+        public Int32ConstantEntry(int value) : base(StackValueKind.Int32, value)
+        {
+
+        }
+    }
+
     public class ExpressionEntry : StackEntry
     {
         public ExpressionEntry(StackValueKind kind) : base(kind)
