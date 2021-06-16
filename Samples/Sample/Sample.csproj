@@ -23,12 +23,12 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy $(TargetPath) $(SolutionDir)\ILCompiler\$(TargetFileName)" />
-  </Target>
-
   <ItemGroup>
     <ProjectReference Include="..\..\cs80corlib\cs80corlib.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy $(SolutionDir)\ILCompiler\csharprt.asm $(TargetDir)&#xD;&#xA;$(SolutionDir)\ILCompiler\$(OutDir)\ILCompiler.exe --ignoreUnknownCil --outputFile $(TargetDir)\$(TargetName).asm $(TargetPath)&#xD;&#xA;&#xD;&#xA;call $(SolutionDir)\tools\get-tools.cmd&#xD;&#xA;&#xD;&#xA;$(SolutionDir)\tools\zmac.exe --oo cmd $(TargetDir)\$(TargetName).asm&#xD;&#xA;$(SolutionDir)\tools\trswrite.exe $(SolutionDir)\Samples\Samples.dsk $(TargetDir)\zout\$(TargetName).cmd" />
+  </Target>
   
 </Project>

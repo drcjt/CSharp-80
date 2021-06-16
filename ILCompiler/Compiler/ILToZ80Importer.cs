@@ -95,7 +95,7 @@ namespace ILCompiler.Compiler
 
         private readonly string[] comparisonRoutinesByOpcode = new string[]
         {
-            "EQ",               // Beq
+            "EQL",              // Beq
             "GREATERTHANEQ",    // Bge
             "GREATERTHAN",      // Bgt
             "LESSTHANEQ",       // Ble

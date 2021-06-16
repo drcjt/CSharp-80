@@ -57,7 +57,7 @@ namespace ILCompiler.Compiler
             _out.WriteLine(Instruction.Jp("START"));
 
             // Include the runtime assembly code
-            _out.WriteLine("*include csharprt.asm");
+            _out.WriteLine("include csharprt.asm");
 
             _out.WriteLine(new LabelInstruction("START"));
 

@@ -4,6 +4,7 @@ using ILCompiler.Interfaces;
 using ILCompiler.z80.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
+using System.IO;
 
 namespace ILCompiler.Compiler
 {
@@ -33,7 +34,7 @@ namespace ILCompiler.Compiler
 
             ModuleContext modCtx = ModuleDef.CreateModuleContext();
             ModuleDefMD module = ModuleDefMD.Load(inputFilePath, modCtx);
-            string corlibFilePath = "cs80corlib.dll";
+            string corlibFilePath = Path.Combine(Path.GetDirectoryName(inputFilePath), "cs80corlib.dll");
             ModuleDefMD corlibModule = ModuleDefMD.Load(corlibFilePath, modCtx);
 
             var typesToCompile = new List<TypeDef>();
