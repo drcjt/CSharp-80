@@ -8,11 +8,16 @@ namespace MiniBCL
 		{
             Console.Clear();
 
-            // Test output of short
-            Console.Write((short)-18123);
-
             // Test subroutine call
             HelloWorld();
+
+            // Test writing int16 positive value
+            Console.Write((short)589);
+            Console.WriteLine();
+
+            // Test writing int16 negative value
+            Console.Write((short)-8537);
+            Console.WriteLine();
 
             // Test boolean comparisons
             TestBooleanComparison();

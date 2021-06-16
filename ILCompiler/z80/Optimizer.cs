@@ -40,7 +40,10 @@ namespace ILCompiler.z80
                 else
                 {
                     lastInstruction = currentInstruction;
-                    currentInstruction = instructions[++count];
+                    if (count + 1 < instructions.Count)
+                    {
+                        currentInstruction = instructions[++count];
+                    }
                 }
             } while (count < instructions.Count - 1);
 

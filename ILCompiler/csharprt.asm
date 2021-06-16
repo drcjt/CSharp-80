@@ -138,10 +138,10 @@ SETXY:
 	LD (HL), C
 	RET
 
-; display number in HL
-; includes leading zeros
-; TODO: change to remove leading zeros
+; display number in HL as ascii
 NUM2DEC:
+    push de
+	push bc
 	BIT 7, H
 	JR Z, CONV
 
@@ -156,22 +156,46 @@ NUM2DEC:
 	LD H, A
 
 CONV:
-	LD BC,-10000
-	CALL NUM1
-	LD BC,-1000
-	CALL NUM1
-	LD BC,-100
-	CALL NUM1
-	LD C,-10
-	CALL NUM1
-	LD C, B
-NUM1:
-	LD A,'0'-1
-NUM2:
-	INC A
-	ADD HL, BC
-	JR C, NUM2
-	SBC HL, BC
+	LD B, 0
+L1:	
+	LD A, 10
+	call div_hl_a
+	push af
+	inc b
+	ld a, h
+	or l
+	jr nz, L1
 
-	CALL 33H
-	RET
+L2:
+	pop af
+	or $30
+	call 33h
+	djnz L2
+
+	pop bc
+	pop de
+	ret
+
+
+; Divides HL by A, HL = HL / A, A = remainder
+div_hl_a:
+   push bc
+   ld c, a
+   xor	a
+   ld	b, 16
+
+_loop:
+   add	hl, hl
+   rla
+   jr	c, $+5
+   cp	c
+   jr	c, $+4
+
+   sub	c
+   inc	l
+   
+   djnz	_loop
+   
+   pop bc
+
+   ret

@@ -41,6 +41,11 @@ namespace System
 		[DllImport("Runtime", EntryPoint = "CLS")]
 		public static unsafe extern void Clear();
 
+		public static void WriteLine()
+        {
+			Write('\n');
+		}
+
 		public static void WriteLine(string str) 
 		{
 			Write(str); 
