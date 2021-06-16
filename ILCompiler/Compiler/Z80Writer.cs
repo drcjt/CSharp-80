@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.z80;
 using Microsoft.Extensions.Logging;
@@ -29,9 +30,12 @@ namespace ILCompiler.Compiler
         {
             var method = methodCodeNodeNeedingCode.Method;
 
-            var ilImporter = new ILImporter(_compilation, method);
+            if (!method.IsConstructor && !method.IsIntrinsic() && !method.IsPinvokeImpl)
+            {
+                var ilImporter = new ILImporter(_compilation, method);
 
-            ilImporter.Compile(methodCodeNodeNeedingCode);            
+                ilImporter.Compile(methodCodeNodeNeedingCode);
+            }
         }
 
         private void OutputMethodNode(Z80MethodCodeNode methodCodeNode)
@@ -78,8 +82,16 @@ namespace ILCompiler.Compiler
 
             foreach (var node in nodes)
             {
-                _out.WriteLine($"; {node.Method.FullName}");
-                OutputMethodNode(node);
+                if (node.Compiled)
+                {
+                    var method = node.Method;
+                    if (!method.IsConstructor && !method.IsIntrinsic() && !method.IsPinvokeImpl)
+                    {
+                        _out.WriteLine($"; {node.Method.FullName}");
+
+                        OutputMethodNode(node);
+                    }
+                }
             }
 
             OutputEpilog();

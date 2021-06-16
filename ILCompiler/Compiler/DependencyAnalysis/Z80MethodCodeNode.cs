@@ -6,33 +6,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class Z80MethodCodeNode
     {
-        private readonly MethodDef _method;
-        private IList<Instruction> _methodCode;
+        public MethodDef Method { get; }
 
         public Z80MethodCodeNode(MethodDef method)
         {
-            _method = method;
+            Method = method;
         }
 
-        public void SetCode(IList<Instruction> methodCode)
-        {
-            _methodCode = methodCode;
-        }
+        public IList<Instruction> MethodCode { get; set; }
 
-        public MethodDef Method
-        {
-            get
-            {
-                return _method;
-            }
-        }
+        public IList<MethodDef> DependsOn { get; set; }
 
-        public IList<Instruction> MethodCode
-        {
-            get
-            {
-                return _methodCode;
-            }
-        }
+        public bool Compiled { get; set; }
     }
 }

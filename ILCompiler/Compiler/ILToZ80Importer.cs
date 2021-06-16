@@ -43,7 +43,7 @@ namespace ILCompiler.Compiler
                 }
             }
 
-            methodCodeNodeNeedingCode.SetCode(instructions);
+            methodCodeNodeNeedingCode.MethodCode = instructions;
         }
 
         private void GenerateStringData(IList<Instruction> instructions)

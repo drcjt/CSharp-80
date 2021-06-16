@@ -1,5 +1,4 @@
 ﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using ILCompiler.z80.Interfaces;
@@ -41,27 +40,39 @@ namespace ILCompiler.Compiler
             typesToCompile.AddRange(corlibModule.Types);
             typesToCompile.AddRange(module.Types);
 
-            var nodes = new List<Z80MethodCodeNode>();
+            var nodesByFullMethodName = new Dictionary<string, Z80MethodCodeNode>();
 
             foreach (var type in typesToCompile)
             {
-                _logger.LogInformation("Compiling Type {type.Name}", type.Name);
+                _logger.LogInformation("Analysing dependencies for Type {type.Name}", type.Name);
 
                 foreach (var method in type.Methods)
                 {
-                    if (!method.IsConstructor && !method.IsIntrinsic() && !method.IsPinvokeImpl)
-                    {
-                        _logger.LogInformation("Compiling method {method.Name}", method.Name);
-
-                        var methodCodeNodeNeedingCode = new Z80MethodCodeNode(method);
-                        nodes.Add(methodCodeNodeNeedingCode);
-
-                        z80Writer.CompileMethod(methodCodeNodeNeedingCode);
-                    }
+                    var methodCodeNode = new Z80MethodCodeNode(method);
+                    nodesByFullMethodName.Add(method.FullName, methodCodeNode);
+                    var dependencyAnalyser = new MethodDependencyAnalyser(method);
+                    methodCodeNode.DependsOn = dependencyAnalyser.FindCallTargets();
                 }
             }
 
-            z80Writer.OutputCode(nodes, module.EntryPoint);
+            CompileNode(nodesByFullMethodName[module.EntryPoint.FullName], z80Writer, nodesByFullMethodName);
+
+            z80Writer.OutputCode(nodesByFullMethodName.Values, module.EntryPoint);
+        }
+
+        private void CompileNode(Z80MethodCodeNode node, Z80Writer writer, IDictionary<string, Z80MethodCodeNode> nodesByFullMethodName)
+        {
+            var method = node.Method;
+            _logger.LogInformation("Compiling method {method.Name}", method.Name);
+
+            writer.CompileMethod(node);
+            node.Compiled = true;
+
+            foreach (var dependentMethod in node.DependsOn)
+            {
+                var dependentNode = nodesByFullMethodName[dependentMethod.FullName];
+                CompileNode(dependentNode, writer, nodesByFullMethodName);
+            }            
         }
     }
 }
