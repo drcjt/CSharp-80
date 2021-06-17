@@ -159,43 +159,58 @@ CONV:
 	LD B, 0
 L1:	
 	LD A, 10
-	call div_hl_a
-	push af
-	inc b
-	ld a, h
-	or l
-	jr nz, L1
+	CALL DIV_HL_A
+	PUSH AF
+	INC B
+	LD A, H
+	OR L
+	JR NZ, L1
 
 L2:
-	pop af
-	or $30
-	call 33h
-	djnz L2
+	POP AF
+	OR 30H
+	CALL 33H
+	DJNZ L2
 
-	pop bc
-	pop de
-	ret
-
+	POP BC
+	POP DE
+	RET
 
 ; Divides HL by A, HL = HL / A, A = remainder
-div_hl_a:
-   push bc
-   ld c, a
-   xor	a
-   ld	b, 16
+DIV_HL_A:
+	PUSH BC
+	
+	LD C, A
+	XOR A
+	LD B, 16
 
-_loop:
-   add	hl, hl
-   rla
-   jr	c, $+5
-   cp	c
-   jr	c, $+4
+_LOOP:
+	ADD HL, HL
+	RLA
+	JR C, $+5
+	CP C
+	JR C, $+4
 
-   sub	c
-   inc	l
-   
-   djnz	_loop
-   
-   pop bc
+	SUB C
+	INC L
 
-   ret
+	DJNZ _LOOP
+
+	POP BC	
+	RET
+ 
+MUL16:                           ; This routine performs the operation DEHL=BC*DE
+	LD HL, 0
+	LD A, 16
+MUL16LOOP:
+	ADD HL, HL
+	RL E
+	RL D
+	JP NC, NOMUL16
+	ADD HL, BC
+	JP NC, NOMUL16
+	INC DE						; This instruction (with the jump) is like an "ADC DE,0"
+NOMUL16:
+	DEC A
+	JP NZ, MUL16LOOP
+	RET

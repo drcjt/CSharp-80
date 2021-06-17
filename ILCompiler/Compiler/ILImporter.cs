@@ -117,6 +117,7 @@ namespace ILCompiler.Compiler
 
                     case Code.Add:
                     case Code.Sub:
+                    case Code.Mul:
                         ImportBinaryOperation(opcode);
                         break;
 

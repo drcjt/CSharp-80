@@ -232,17 +232,25 @@ namespace ILCompiler.Compiler
 
             PushExpression(kind);
 
-            Append(Instruction.Pop(R16.DE));
-            Append(Instruction.Pop(R16.HL));
 
             switch (opcode)
             {
                 case Code.Add:
+                    Append(Instruction.Pop(R16.DE));
+                    Append(Instruction.Pop(R16.HL));
                     Append(Instruction.Add(R16.HL, R16.DE));
                     break;
 
                 case Code.Sub:
+                    Append(Instruction.Pop(R16.DE));
+                    Append(Instruction.Pop(R16.HL));
                     Append(Instruction.Sbc(R16.HL, R16.DE));
+                    break;
+
+                case Code.Mul:
+                    Append(Instruction.Pop(R16.DE));
+                    Append(Instruction.Pop(R16.BC));
+                    Append(Instruction.Call("MUL16"));
                     break;
             }
 
