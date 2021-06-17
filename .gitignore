@@ -30,9 +30,6 @@ zmac.exe
 zmac.zip
 tools/src
 
-# exclude launchsettings
-launchSettings.json
-
 # NuGet Packages
 *.nupkg
 # The packages folder can be ignored because of Package Restore
