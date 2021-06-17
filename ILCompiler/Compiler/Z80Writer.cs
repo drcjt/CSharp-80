@@ -1,10 +1,8 @@
 ﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.z80;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
@@ -24,18 +22,6 @@ namespace ILCompiler.Compiler
             _outputFilePath = outputFilePath;
 
             _out = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, false), Encoding.ASCII);
-        }
-
-        public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode)
-        {
-            var method = methodCodeNodeNeedingCode.Method;
-
-            if (!method.IsConstructor && !method.IsIntrinsic() && !method.IsPinvokeImpl)
-            {
-                var ilImporter = new ILImporter(_compilation, method);
-
-                ilImporter.Compile(methodCodeNodeNeedingCode);
-            }
         }
 
         private void OutputMethodNode(Z80MethodCodeNode methodCodeNode)
@@ -76,23 +62,29 @@ namespace ILCompiler.Compiler
             _out.WriteLine(Instruction.End("START"));
         }
 
-        public void OutputCode(IEnumerable<Z80MethodCodeNode> nodes, MethodDef entryMethod)
+        private void OutputCodeForNode(Z80MethodCodeNode node)
         {
-            OutputProlog(entryMethod);
-
-            foreach (var node in nodes)
+            if (!node.CodeEmitted)
             {
-                if (node.Compiled)
+                if (node.MethodCode != null)
                 {
-                    var method = node.Method;
-                    if (!method.IsConstructor && !method.IsIntrinsic() && !method.IsPinvokeImpl)
-                    {
-                        _out.WriteLine($"; {node.Method.FullName}");
+                    _out.WriteLine($"; {node.Method.FullName}");
 
-                        OutputMethodNode(node);
-                    }
+                    OutputMethodNode(node);
                 }
+
+                foreach (var dependentNodes in node.Dependencies)
+                {
+                    OutputCodeForNode(dependentNodes);
+                }
+                node.CodeEmitted = true;
             }
+        }
+        public void OutputCode(Z80MethodCodeNode root)
+        {
+            OutputProlog(root.Method);
+
+            OutputCodeForNode(root);
 
             OutputEpilog();
 

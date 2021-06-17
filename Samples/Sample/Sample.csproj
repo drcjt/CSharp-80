@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\cs80corlib\cs80corlib.csproj" />
+    <ProjectReference Include="..\..\ILCompiler\ILCompiler.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
