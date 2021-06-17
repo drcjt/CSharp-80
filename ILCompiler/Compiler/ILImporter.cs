@@ -54,6 +54,11 @@ namespace ILCompiler.Compiler
             // TODO: add any appropriate code to handle the end of importing a basic block
         }
 
+        private void ImportAppendTree(StackEntry entry)
+        {
+            _currentBasicBlock.Statements.Add(entry);
+        }
+
         private void ImportBasicBlock(IDictionary<int, int> offsetToIndexMap, BasicBlock block)
         {
             _currentBasicBlock = block;

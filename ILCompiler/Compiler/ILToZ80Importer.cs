@@ -230,6 +230,7 @@ namespace ILCompiler.Compiler
                 throw new NotSupportedException("Binary operations on types other than short not supported yet");
             }
 
+            // TODO: this needs to push an appropriate binary operator stack entry subclass
             PushExpression(kind);
 
 
@@ -277,11 +278,17 @@ namespace ILCompiler.Compiler
 
         public void ImportStoreVar(int index, bool argument)
         {
+            // pop the value being assigned
             var value = _stack.Pop();
+
             if (value.Kind != StackValueKind.Int16 && value.Kind != StackValueKind.ObjRef)
             {
                 throw new NotSupportedException("Storing variables other than short or object refs not supported yet");
             }
+
+            var op2 = new LocalVariableEntry(value.Kind);
+            var assignNode = new AssignmentEntry(op2, value);
+            ImportAppendTree(assignNode);
 
             var offset = index * 2; // TODO: This needs to take into account differing sizes of local vars
 

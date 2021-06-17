@@ -66,6 +66,49 @@ namespace ILCompiler.Compiler
         }
     }
 
+    /* TODO: Turn these into StackEntry subclasses
+     * basically this will become the tree oriented high level intermediate representation
+     * which will be the main output of the importer
+    // Leaf Nodes
+    LCL_VAR,
+    STORE_LCL_VAR,
+
+    // Constant Nodes
+    CNS_INT,
+    CNS_STR,
+
+    // Unary Operators
+    NOT,
+    NOP,
+    NEG,
+    INTRINSIC,
+    CAST,
+    STOREIND,
+
+    // Binary Operators
+    ADD,
+    SUB,
+    MUL,
+    ASG,
+    EQ,
+    NE,
+    LT,
+    LE,
+    GE,
+    GT,
+
+    // Branching Operators
+    CMP,
+    JTRUE,
+    JCC,
+
+    // 
+    CALL,
+    RETURN,
+    */
+
+
+    // TODO: consider renaming this as this is effectively a GenTree node
     public abstract class StackEntry
     {
         public StackValueKind Kind { get; }
@@ -80,7 +123,6 @@ namespace ILCompiler.Compiler
     {
         protected ConstantEntry(StackValueKind kind) : base(kind)
         {
-
         }
     }
 
@@ -98,7 +140,6 @@ namespace ILCompiler.Compiler
     {
         public Int16ConstantEntry(short value) : base(StackValueKind.Int16, value)
         {
-
         }
     }
 
@@ -106,7 +147,25 @@ namespace ILCompiler.Compiler
     {
         public Int32ConstantEntry(int value) : base(StackValueKind.Int32, value)
         {
+        }
+    }
 
+    public class LocalVariableEntry : StackEntry
+    {
+        public LocalVariableEntry(StackValueKind kind) : base(kind)
+        {
+        }
+    }
+
+    public class AssignmentEntry : StackEntry
+    {
+        public StackEntry Op1 { get; }
+        public StackEntry Op2 { get; }
+
+        public AssignmentEntry(StackEntry op1, StackEntry op2) : base(op1.Kind)
+        {
+            Op1 = op1;
+            Op2 = op2;
         }
     }
 
