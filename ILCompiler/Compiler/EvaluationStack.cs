@@ -1,5 +1,6 @@
 ﻿using ILCompiler.Common.TypeSystem.IL;
 using System;
+using System.Collections.Generic;
 
 namespace ILCompiler.Compiler
 {
@@ -140,7 +141,7 @@ namespace ILCompiler.Compiler
     // RETURN
     public class ReturnEntry : StackEntry
     {
-        public StackEntry Return { get; }
+        public StackEntry Return { get; set; }
 
         public ReturnEntry() : base(StackValueKind.Unknown)
         {
@@ -148,6 +149,7 @@ namespace ILCompiler.Compiler
 
         public ReturnEntry(StackEntry returnValue) : base(returnValue.Kind)
         {
+            Return = returnValue;
         }
     }
 
@@ -201,14 +203,36 @@ namespace ILCompiler.Compiler
         }
     }
 
+    public class CallEntry : StackEntry
+    {
+        public string TargetMethod { get; }
+        public IList<StackEntry> Arguments;
+
+        public CallEntry(string targetMethod, IList<StackEntry> arguments, StackValueKind returnKind) : base(returnKind)
+        {
+            TargetMethod = targetMethod;
+            Arguments = arguments;
+        }
+    }
+
+    public class IntrinsicEntry : StackEntry
+    {
+        public string TargetMethod { get; }
+        public IList<StackEntry> Arguments;
+
+        public IntrinsicEntry(string targetMethod, IList<StackEntry> arguments, StackValueKind returnKind) : base(returnKind)
+        {
+            TargetMethod = targetMethod;
+            Arguments = arguments;
+        }
+    }
+
     /* TODO: need to create classes to represent these HIR node types
     NOT,
     NOP,
     NEG,
-    INTRINSIC,
     CAST,
     CMP,
     JCC,
-    CALL,
     */
 }

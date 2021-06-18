@@ -397,7 +397,23 @@ namespace ILCompiler.Compiler
 
         private bool ImportIntrinsicCall(MethodDef methodToCall)
         {
-            // TODO: Add gentree code here
+            // Gen tree generation and type checking
+            IList<StackEntry> arguments = new List<StackEntry>();
+            for (int i = 0; i < methodToCall.Parameters.Count; i++)
+            {
+                var argument = _stack.Pop();
+                arguments.Add(argument);
+            }
+
+            // Not yet implemented methods with non void return type
+            if (methodToCall.HasReturnType)
+            {
+                throw new NotSupportedException();
+            }
+
+            var targetMethod = _compilation.NameMangler.GetMangledMethodName(methodToCall);
+            var callNode = new IntrinsicEntry(targetMethod, arguments, StackValueKind.Unknown);
+            ImportAppendTree(callNode);
 
             // Code gen
             switch (methodToCall.Name)
@@ -448,9 +464,7 @@ namespace ILCompiler.Compiler
 
         public void ImportCall(MethodDef methodToCall)
         {
-            // TODO: Add gentree code here
-
-            // Code gen
+            // Intrinsic calls
             if (methodToCall.IsIntrinsic())
             {
                 if (!ImportIntrinsicCall(methodToCall))
@@ -460,22 +474,40 @@ namespace ILCompiler.Compiler
                 return;
             }
 
+            // Pinvoke calls
             if (methodToCall.IsPinvokeImpl)
             {
                 Append(Instruction.Call(methodToCall.ImplMap.Name));
                 return;
             }
 
+            // Gen tree generation and type checking
+            IList<StackEntry> arguments = new List<StackEntry>();
+            for (int i = 0; i < methodToCall.Parameters.Count; i++)
+            {
+                var argument = _stack.Pop();
+                arguments.Add(argument);
+            }
+
+            // Not yet implemented methods with non void return type
+            if (methodToCall.HasReturnType)
+            {
+                throw new NotSupportedException();
+            }
+
             var targetMethod = _compilation.NameMangler.GetMangledMethodName(methodToCall);
+            var callNode = new CallEntry(targetMethod, arguments, StackValueKind.Unknown);
+            ImportAppendTree(callNode);
+
+            // Code gen
             Append(Instruction.Call(targetMethod));
         }
 
         public void ImportRet(MethodDef method)
         {
-            var hasReturnValue = method.HasReturnType;
-
             // Gen tree generation and type checking
-            StackEntry retNode;
+            var hasReturnValue = method.HasReturnType;
+            var retNode = new ReturnEntry();
             if (hasReturnValue)
             {
                 var value = _stack.Pop();
@@ -483,14 +515,9 @@ namespace ILCompiler.Compiler
                 {
                     throw new NotSupportedException("Return values of types other than short not supported yet");
                 }
-                retNode = new ReturnEntry(value);
-            }
-            else
-            {
-                retNode = new ReturnEntry();
+                retNode.Return = value;
             }
             ImportAppendTree(retNode);
-
 
             // Code gen
             var hasParameters = method.Parameters.Count > 0;
