@@ -216,9 +216,9 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void PushExpression(StackValueKind kind)
+        private void PushExpression(StackEntry expression)
         {
-            _stack.Push(new ExpressionEntry(kind));
+            _stack.Push(expression);
         }
     }
 }

@@ -66,49 +66,8 @@ namespace ILCompiler.Compiler
         }
     }
 
-    /* TODO: Turn these into StackEntry subclasses
-     * basically this will become the tree oriented high level intermediate representation
-     * which will be the main output of the importer
-    // Leaf Nodes
-    LCL_VAR,
-    STORE_LCL_VAR,
-
-    // Constant Nodes
-    CNS_INT,
-    CNS_STR,
-
-    // Unary Operators
-    NOT,
-    NOP,
-    NEG,
-    INTRINSIC,
-    CAST,
-    STOREIND,
-
-    // Binary Operators
-    ADD,
-    SUB,
-    MUL,
-    ASG,
-    EQ,
-    NE,
-    LT,
-    LE,
-    GE,
-    GT,
-
-    // Branching Operators
-    CMP,
-    JTRUE,
-    JCC,
-
-    // 
-    CALL,
-    RETURN,
-    */
-
-
-    // TODO: consider renaming this as this is effectively a GenTree node
+    // StackEntry and subclasses represent the tree oriented high level intermediate representation
+    // which will be the main output of the importer
     public abstract class StackEntry
     {
         public StackValueKind Kind { get; }
@@ -136,6 +95,15 @@ namespace ILCompiler.Compiler
         }
     }
 
+    // CNS_STR
+    public class StringConstantEntry : ConstantEntry<String>
+    {
+        public StringConstantEntry(string value) : base(StackValueKind.ObjRef, value)
+        {
+        }
+    }
+
+    // CNS_INT
     public class Int16ConstantEntry : ConstantEntry<short>
     {
         public Int16ConstantEntry(short value) : base(StackValueKind.Int16, value)
@@ -143,6 +111,7 @@ namespace ILCompiler.Compiler
         }
     }
 
+    // CNS_INT
     public class Int32ConstantEntry : ConstantEntry<int>
     {
         public Int32ConstantEntry(int value) : base(StackValueKind.Int32, value)
@@ -150,13 +119,76 @@ namespace ILCompiler.Compiler
         }
     }
 
-    public class LocalVariableEntry : StackEntry
+    // STOREIND
+    public class IndEntry : StackEntry
     {
-        public LocalVariableEntry(StackValueKind kind) : base(kind)
+        public IndEntry(StackEntry addr) : base(addr.Kind)
         {
         }
     }
 
+    // JTRUE
+    public class JumpTrueEntry : StackEntry
+    {
+        public StackEntry Condition { get; }
+        public JumpTrueEntry(StackEntry condition) : base(StackValueKind.Unknown)
+        {
+            Condition = condition;
+        }
+    }
+
+    // RETURN
+    public class ReturnEntry : StackEntry
+    {
+        public StackEntry Return { get; }
+
+        public ReturnEntry() : base(StackValueKind.Unknown)
+        {
+        }
+
+        public ReturnEntry(StackEntry returnValue) : base(returnValue.Kind)
+        {
+        }
+    }
+
+    public enum BinaryOp
+    {
+        ADD,
+        SUB,
+        MUL,
+        EQ,
+        NE,
+        LT,
+        LE,
+        GT,
+        GE
+    }
+
+    public class BinaryOperator : StackEntry
+    {
+        public BinaryOp Op { get; }
+        public StackEntry Op1 { get; }
+        public StackEntry Op2 { get; }
+
+        public BinaryOperator(BinaryOp op, StackEntry op1, StackEntry op2, StackValueKind kind) : base(kind)
+        {
+            Op = op;
+            Op1 = op1;
+            Op2 = op2;
+        }
+    }
+
+    // LCL_VAR
+    public class LocalVariableEntry : StackEntry
+    {
+        public int LocalNumber { get; } 
+        public LocalVariableEntry(int localNumber, StackValueKind kind) : base(kind)
+        {
+            LocalNumber = localNumber;
+        }
+    }
+
+    // ASG
     public class AssignmentEntry : StackEntry
     {
         public StackEntry Op1 { get; }
@@ -169,11 +201,14 @@ namespace ILCompiler.Compiler
         }
     }
 
-    public class ExpressionEntry : StackEntry
-    {
-        public ExpressionEntry(StackValueKind kind) : base(kind)
-        {
-
-        }
-    }
+    /* TODO: need to create classes to represent these HIR node types
+    NOT,
+    NOP,
+    NEG,
+    INTRINSIC,
+    CAST,
+    CMP,
+    JCC,
+    CALL,
+    */
 }

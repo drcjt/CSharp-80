@@ -103,25 +103,54 @@ namespace ILCompiler.Compiler
             "NOTEQ"             // Bne
         };
 
+        private readonly BinaryOp[] binaryOpByOpcode = new BinaryOp[]
+        {
+            BinaryOp.EQ,        // Beq
+            BinaryOp.GE,        // Bge
+            BinaryOp.GT,        // Bgt
+            BinaryOp.LE,        // Ble
+            BinaryOp.LT,        // Blt
+            BinaryOp.NE         // Bne
+        };
+
         public void ImportBranch(Code opcode, BasicBlock target, BasicBlock fallthrough)
         {
+            // Gen tree generation and type checking
             if (opcode != Code.Br)
             {
-                // Gen code here for condition comparison and if true then jump to target basic block via id
-
-                // Possible comparisions are blt, ble, bgt, bge, brfalse, brtrue, beq, bne
-
-                if (opcode == Code.Brfalse || opcode == Code.Brtrue)
+                var op1 = _stack.Pop();
+                if (op1.Kind != StackValueKind.Int16)
                 {
-                    // Only one argument
-                    var op = _stack.Pop();
-                    if (op.Kind != StackValueKind.Int16)
+                    throw new NotSupportedException("Boolean comparisonsonly supported using short as underlying type");
+                }
+
+                StackEntry op2;
+                if (opcode != Code.Brfalse && opcode == Code.Brtrue)
+                {
+                    op2 = _stack.Pop();
+                    if (op2.Kind != StackValueKind.Int16)
                     {
                         throw new NotSupportedException("Boolean comparisonsonly supported using short as underlying type");
                     }
+                }
+                else
+                {
+                    op2 = new Int16ConstantEntry((short)(opcode == Code.Brfalse ? 0 : 1));
+                }
+                op1 = new BinaryOperator(BinaryOp.EQ, op1, op2, StackValueKind.Int16);
+                ImportAppendTree(new JumpTrueEntry(op1));
+            }
+            else
+            {
+                // Don't generate any gentree for a branch.
+            }
 
+            // Code gen
+            if (opcode != Code.Br)
+            {
+                if (opcode == Code.Brfalse || opcode == Code.Brtrue)
+                {
                     var condition = (opcode == Code.Brfalse) ? Condition.Zero : Condition.NonZero;
-
                     Append(Instruction.Pop(R16.HL));
                     Append(Instruction.Ld(R16.DE, 0));
                     Append(Instruction.Or(R8.A, R8.A));
@@ -130,15 +159,6 @@ namespace ILCompiler.Compiler
                 }
                 else
                 {
-                    // two arguments
-                    var op1 = _stack.Pop();
-                    var op2 = _stack.Pop();
-
-                    if (op1.Kind != StackValueKind.Int16 && op2.Kind != StackValueKind.Int16)
-                    {
-                        throw new NotSupportedException("Binary operations on types other than short not supported yet");
-                    }
-
                     Append(Instruction.Pop(R16.HL));
                     Append(Instruction.Pop(R16.DE));
 
@@ -151,6 +171,7 @@ namespace ILCompiler.Compiler
                 Append(Instruction.Jp(target.Label));
             }
 
+            // Fall through handling
             ImportFallThrough(target);
 
             if (fallthrough != null)
@@ -161,9 +182,9 @@ namespace ILCompiler.Compiler
 
         public void ImportFallThrough(BasicBlock next)
         {
+            // Evaluation stack in each basic block holds the imported high level tree representation of the IL
+
             /*
-             * TODO: Work out why we need to record an evaluation stack against each basic block
-             * 
             EvaluationStack<StackEntry> entryStack = next.Stack;
 
             if (entryStack != null)
@@ -187,8 +208,7 @@ namespace ILCompiler.Compiler
                 }
             }
             else
-            {
-                
+            {                
                 if (Stack.Length > 0)
                 {
                     entryStack = new EvaluationStack<StackEntry>(Stack.Length);
@@ -199,8 +219,7 @@ namespace ILCompiler.Compiler
                         entryStack.Push(NewSpillSlot(Stack[i]));
                     }
                 }
-                next.Stack = entryStack;
-                
+                next.Stack = entryStack;                
             }
             */
             MarkBasicBlock(next);
@@ -208,9 +227,7 @@ namespace ILCompiler.Compiler
 
         public void ImportBinaryOperation(Code opcode)
         {
-            // review rom routines here to help with this
-            // http://www.trs-80.com/wordpress/zaps-patches-pokes-tips/rom-addresses-general/
-
+            // Gen tree generation and type checking
             var op1 = _stack.Pop();
             var op2 = _stack.Pop();
 
@@ -230,10 +247,10 @@ namespace ILCompiler.Compiler
                 throw new NotSupportedException("Binary operations on types other than short not supported yet");
             }
 
-            // TODO: this needs to push an appropriate binary operator stack entry subclass
-            PushExpression(kind);
+            var binaryExpr = new BinaryOperator(BinaryOp.ADD, op1, op2, kind);
+            PushExpression(binaryExpr);
 
-
+            // Code gen
             switch (opcode)
             {
                 case Code.Add:
@@ -254,42 +271,42 @@ namespace ILCompiler.Compiler
                     Append(Instruction.Call("MUL16"));
                     break;
             }
-
             Append(Instruction.Push(R16.HL));
         }
 
         public void ImportStoreIndirect(WellKnownType type)
         {
+            // Gen tree generation and type checking
             var value = _stack.Pop();
             var addr = _stack.Pop();
 
-            if (type == WellKnownType.SByte && addr.Kind == StackValueKind.Int16 && value.Kind == StackValueKind.Int16)
-            {
-                Append(Instruction.Pop(R16.BC));
-                Append(Instruction.Pop(R16.HL));
-
-                Append(Instruction.LdInd(R16.HL, R8.C));
-            }
-            else
+            if (type != WellKnownType.SByte || addr.Kind != StackValueKind.Int16 || value.Kind != StackValueKind.Int16)
             {
                 throw new NotSupportedException();
             }
+
+            var addrNode = new IndEntry(addr);
+            ImportAppendTree(new AssignmentEntry(addrNode, value));
+
+            // Code gen
+            Append(Instruction.Pop(R16.BC));
+            Append(Instruction.Pop(R16.HL));
+            Append(Instruction.LdInd(R16.HL, R8.C));
         }
 
         public void ImportStoreVar(int index, bool argument)
         {
-            // pop the value being assigned
+            // Gen tree generation and type checking
             var value = _stack.Pop();
-
             if (value.Kind != StackValueKind.Int16 && value.Kind != StackValueKind.ObjRef)
             {
                 throw new NotSupportedException("Storing variables other than short or object refs not supported yet");
             }
-
-            var op2 = new LocalVariableEntry(value.Kind);
+            var op2 = new LocalVariableEntry(index, value.Kind);
             var assignNode = new AssignmentEntry(op2, value);
             ImportAppendTree(assignNode);
 
+            // Code gen
             var offset = index * 2; // TODO: This needs to take into account differing sizes of local vars
 
             Append(Instruction.Pop(R16.HL));
@@ -299,9 +316,12 @@ namespace ILCompiler.Compiler
 
         public void ImportLoadVar(int index, bool argument)
         {
-            // TODO: need to actually use proper StackValueKind here!!
-            _stack.Push(new ExpressionEntry(StackValueKind.Int16));
+            // Gen tree generation and type checking
+            var localNumber = _method.Parameters.Count + index;
+            var node = new LocalVariableEntry(localNumber, StackValueKind.Int16);
+            PushExpression(node);
 
+            // Code gen
             var offset = index * 2; // TODO: This needs to take into account differing sizes of local vars
 
             Append(Instruction.Ld(R8.H, I16.IX, (short)-(offset + 1)));
@@ -311,9 +331,12 @@ namespace ILCompiler.Compiler
 
         public void ImportLdArg(int index)
         {
-            // TODO: need to push details of actual arg
-            _stack.Push(new ExpressionEntry(StackValueKind.Int16));
+            // Gen tree generation and type checking
 
+            var node = new LocalVariableEntry(index, StackValueKind.Int16);
+            PushExpression(node);
+
+            // Code gen
             var offset = index * 2; // TODO: This needs to take into account differing sizes of parameters
 
             Append(Instruction.Ld(R8.H, I16.IY, (short)-(offset + 1)));
@@ -323,16 +346,31 @@ namespace ILCompiler.Compiler
 
         public void ImportLoadInt(long value, StackValueKind kind)
         {
+            // Gen tree generation and type checking
             if (kind == StackValueKind.Int16)
             {
-                _stack.Push(new Int16ConstantEntry(checked((short)value)));
+                PushExpression(new Int16ConstantEntry(checked((short)value)));
+            }
+            else if (kind == StackValueKind.Int32)
+            {
+                PushExpression(new Int32ConstantEntry(checked((int)value)));
+            }
+            else
+            {
+                throw new NotSupportedException("Loading anything other than Int16 not currently supported");
+            }
+
+            // Code gen
+            if (kind == StackValueKind.Int16)
+            {
+                PushExpression(new Int16ConstantEntry(checked((short)value)));
 
                 Append(Instruction.Ld(R16.HL, (short)value));
                 Append(Instruction.Push(R16.HL));
             }
             else if (kind == StackValueKind.Int32)
             {
-                _stack.Push(new Int32ConstantEntry(checked((int)value)));
+                PushExpression(new Int32ConstantEntry(checked((int)value)));
 
                 var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
                 var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
@@ -342,16 +380,14 @@ namespace ILCompiler.Compiler
                 Append(Instruction.Ld(R16.HL, high));
                 Append(Instruction.Push(R16.HL));
             }
-            else
-            {
-                throw new NotSupportedException("Loading anything other than Int16 not currently supported");
-            }
         }
 
         public void ImportLoadString(string str)
         {
-            _stack.Push(new ExpressionEntry(StackValueKind.ObjRef));
+            // Gen tree generation and type checking
+            PushExpression(new StringConstantEntry(str));
 
+            // Code generation
             var label = LabelGenerator.GetLabel(LabelType.String);
             _labelsToStringData[label] = str;
 
@@ -361,7 +397,9 @@ namespace ILCompiler.Compiler
 
         private bool ImportIntrinsicCall(MethodDef methodToCall)
         {
+            // TODO: Add gentree code here
 
+            // Code gen
             switch (methodToCall.Name)
             {
                 // TODO: Suspect this won't stay as an intrinsic but at least we have the mechanism for instrincs
@@ -410,6 +448,9 @@ namespace ILCompiler.Compiler
 
         public void ImportCall(MethodDef methodToCall)
         {
+            // TODO: Add gentree code here
+
+            // Code gen
             if (methodToCall.IsIntrinsic())
             {
                 if (!ImportIntrinsicCall(methodToCall))
@@ -431,10 +472,10 @@ namespace ILCompiler.Compiler
 
         public void ImportRet(MethodDef method)
         {
-            var hasParameters = method.Parameters.Count > 0;
-            var hasLocals = method.Body.Variables.Count > 0;
             var hasReturnValue = method.HasReturnType;
 
+            // Gen tree generation and type checking
+            StackEntry retNode;
             if (hasReturnValue)
             {
                 var value = _stack.Pop();
@@ -442,7 +483,18 @@ namespace ILCompiler.Compiler
                 {
                     throw new NotSupportedException("Return values of types other than short not supported yet");
                 }
+                retNode = new ReturnEntry(value);
             }
+            else
+            {
+                retNode = new ReturnEntry();
+            }
+            ImportAppendTree(retNode);
+
+
+            // Code gen
+            var hasParameters = method.Parameters.Count > 0;
+            var hasLocals = method.Body.Variables.Count > 0;
 
             if (hasReturnValue)
             {
