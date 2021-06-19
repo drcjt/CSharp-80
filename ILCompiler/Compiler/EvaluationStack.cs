@@ -66,10 +66,29 @@ namespace ILCompiler.Compiler
             _top = 0;
         }
     }
+    
+    public interface IVisitableStackEntry
+    {
+        public void Accept(IStackEntryVisitor visitor);
+    }
+
+    public interface IStackEntryVisitor
+    {
+        public void Visit(ConstantEntry entry);
+        public void Visit(IndEntry entry);
+        public void Visit(JumpTrueEntry entry);
+        public void Visit(ReturnEntry entry);
+        public void Visit(BinaryOperator entry);
+        public void Visit(LocalVariableEntry entry);
+        public void Visit(AssignmentEntry entry);
+        public void Visit(CallEntry entry);
+        public void Visit(IntrinsicEntry entry);
+
+    }
 
     // StackEntry and subclasses represent the tree oriented high level intermediate representation
     // which will be the main output of the importer
-    public abstract class StackEntry
+    public abstract class StackEntry : IVisitableStackEntry
     {
         public StackValueKind Kind { get; }
 
@@ -79,12 +98,19 @@ namespace ILCompiler.Compiler
         {
             Kind = kind;
         }
+
+        abstract public void Accept(IStackEntryVisitor visitor);
     }
 
     public abstract class ConstantEntry : StackEntry
     {
         protected ConstantEntry(StackValueKind kind) : base(kind)
         {
+        }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 
@@ -125,8 +151,15 @@ namespace ILCompiler.Compiler
     // STOREIND
     public class IndEntry : StackEntry
     {
+        public StackEntry Addr { get; }
         public IndEntry(StackEntry addr) : base(addr.Kind)
         {
+            Addr = addr;
+        }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 
@@ -137,6 +170,11 @@ namespace ILCompiler.Compiler
         public JumpTrueEntry(StackEntry condition) : base(StackValueKind.Unknown)
         {
             Condition = condition;
+        }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 
@@ -152,6 +190,11 @@ namespace ILCompiler.Compiler
         public ReturnEntry(StackEntry returnValue) : base(returnValue.Kind)
         {
             Return = returnValue;
+        }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 
@@ -180,6 +223,11 @@ namespace ILCompiler.Compiler
             Op1 = op1;
             Op2 = op2;
         }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 
     // LCL_VAR
@@ -189,6 +237,11 @@ namespace ILCompiler.Compiler
         public LocalVariableEntry(int localNumber, StackValueKind kind) : base(kind)
         {
             LocalNumber = localNumber;
+        }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 
@@ -203,6 +256,11 @@ namespace ILCompiler.Compiler
             Op1 = op1;
             Op2 = op2;
         }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 
     public class CallEntry : StackEntry
@@ -215,6 +273,11 @@ namespace ILCompiler.Compiler
             TargetMethod = targetMethod;
             Arguments = arguments;
         }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 
     public class IntrinsicEntry : StackEntry
@@ -226,6 +289,11 @@ namespace ILCompiler.Compiler
         {
             TargetMethod = targetMethod;
             Arguments = arguments;
+        }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 
