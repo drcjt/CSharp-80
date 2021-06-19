@@ -16,7 +16,6 @@ namespace ILCompiler.Compiler
         // High level intermediate representation
         // main output of importation process
         public IList<StackEntry> Statements { get; } = new List<StackEntry>();
-
         public bool Marked { get; set; } = false;
 
         public string Label { get; private set; }

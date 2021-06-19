@@ -13,7 +13,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             Method = method;
         }
 
-        public IList<Instruction> MethodCode { get; set; }
+        public IList<Instruction> MethodCode { get; set; } = new List<Instruction>();
 
         public IList<Z80MethodCodeNode> Dependencies { get; set; }
         

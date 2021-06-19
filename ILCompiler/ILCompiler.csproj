@@ -5,6 +5,11 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;_NEW_CODEGEN</DefineConstants>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="dnlib" Version="3.3.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />

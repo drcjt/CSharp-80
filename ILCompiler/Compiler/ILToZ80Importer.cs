@@ -33,6 +33,7 @@ namespace ILCompiler.Compiler
             }
 
             // TODO: This Code gen stuff will be moved out of here soon
+#if !NEW_CODEGEN
             List<Instruction> instructions = new();
             GenerateStringData(instructions);
 
@@ -55,6 +56,7 @@ namespace ILCompiler.Compiler
             }
 
             methodCodeNodeNeedingCode.MethodCode = instructions;
+#endif
 
             return basicBlocks;
         }
@@ -260,10 +262,12 @@ namespace ILCompiler.Compiler
                 throw new NotSupportedException("Binary operations on types other than short not supported yet");
             }
 
-            var binaryExpr = new BinaryOperator(BinaryOp.ADD, op1, op2, kind);
+            BinaryOp binaryOp = opcode == Code.Add ? BinaryOp.ADD : (opcode == Code.Sub ? BinaryOp.SUB : BinaryOp.MUL);           
+            var binaryExpr = new BinaryOperator(binaryOp, op1, op2, kind);
             PushExpression(binaryExpr);
 
             // Code gen
+#if !NEW_CODEGEN
             switch (opcode)
             {
                 case Code.Add:
@@ -285,6 +289,7 @@ namespace ILCompiler.Compiler
                     break;
             }
             Append(Instruction.Push(R16.HL));
+#endif
         }
 
         public void ImportStoreIndirect(WellKnownType type)
@@ -335,11 +340,13 @@ namespace ILCompiler.Compiler
             PushExpression(node);
 
             // Code gen
+#if !NEW_CODEGEN
             var offset = index * 2; // TODO: This needs to take into account differing sizes of local vars
 
             Append(Instruction.Ld(R8.H, I16.IX, (short)-(offset + 1)));
             Append(Instruction.Ld(R8.L, I16.IX, (short)-(offset + 2)));
             Append(Instruction.Push(R16.HL));
+#endif
         }
 
         public void ImportLdArg(int index)
@@ -374,17 +381,14 @@ namespace ILCompiler.Compiler
             }
 
             // Code gen
+#if !NEW_CODEGEN
             if (kind == StackValueKind.Int16)
             {
-                PushExpression(new Int16ConstantEntry(checked((short)value)));
-
                 Append(Instruction.Ld(R16.HL, (short)value));
                 Append(Instruction.Push(R16.HL));
             }
             else if (kind == StackValueKind.Int32)
             {
-                PushExpression(new Int32ConstantEntry(checked((int)value)));
-
                 var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
                 var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
 
@@ -393,6 +397,7 @@ namespace ILCompiler.Compiler
                 Append(Instruction.Ld(R16.HL, high));
                 Append(Instruction.Push(R16.HL));
             }
+#endif
         }
 
         public void ImportLoadString(string str)
@@ -513,7 +518,9 @@ namespace ILCompiler.Compiler
             ImportAppendTree(callNode);
 
             // Code gen
+#if !NEW_CODEGEN
             Append(Instruction.Call(targetMethod));
+#endif
         }
 
         public void ImportRet(MethodDef method)
@@ -533,6 +540,7 @@ namespace ILCompiler.Compiler
             ImportAppendTree(retNode);
 
             // Code gen
+#if !NEW_CODEGEN
             var hasParameters = method.Parameters.Count > 0;
             var hasLocals = method.Body.Variables.Count > 0;
 
@@ -569,6 +577,7 @@ namespace ILCompiler.Compiler
             }
 
             Append(Instruction.Ret());
+#endif
         }
 
         public void Append(Instruction instruction)
