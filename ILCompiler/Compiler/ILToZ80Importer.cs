@@ -14,14 +14,24 @@ namespace ILCompiler.Compiler
     {
         private readonly Dictionary<string, string> _labelsToStringData = new Dictionary<string, string>();
 
-        public void Compile(Z80MethodCodeNode methodCodeNodeNeedingCode)
+        public IList<BasicBlock> Import(Z80MethodCodeNode methodCodeNodeNeedingCode)
         {
             var basicBlockAnalyser = new BasicBlockAnalyser(_method);
             var offsetToIndexMap = basicBlockAnalyser.FindBasicBlocks();
             _basicBlocks = basicBlockAnalyser.BasicBlocks;
 
-            ImportBasicBlocks(offsetToIndexMap);  // This converts IL to Z80
+            ImportBasicBlocks(offsetToIndexMap);
 
+            var basicBlocks = new List<BasicBlock>();
+            for (int i = 0; i < _basicBlocks.Length; i++)
+            {
+                if (_basicBlocks[i] != null)
+                {
+                    basicBlocks.Add(_basicBlocks[i]);
+                }
+            }
+
+            // TODO: This Code gen stuff will be moved out of here soon
             List<Instruction> instructions = new();
             GenerateStringData(instructions);
 
@@ -44,6 +54,8 @@ namespace ILCompiler.Compiler
             }
 
             methodCodeNodeNeedingCode.MethodCode = instructions;
+
+            return basicBlocks;
         }
 
         private void GenerateStringData(IList<Instruction> instructions)

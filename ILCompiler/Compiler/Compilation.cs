@@ -70,7 +70,9 @@ namespace ILCompiler.Compiler
             {
                 var ilImporter = new ILImporter(this, method);
 
-                ilImporter.Compile(methodCodeNodeNeedingCode);
+                // Main phases of the compiler live here
+                var basicBlocks = ilImporter.Import(methodCodeNodeNeedingCode);
+                // flowgraph.SetBlockOrder(basicBlocks);
             }
         }
     }

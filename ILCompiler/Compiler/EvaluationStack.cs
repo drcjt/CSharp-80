@@ -73,6 +73,8 @@ namespace ILCompiler.Compiler
     {
         public StackValueKind Kind { get; }
 
+        public StackEntry Next { get; set; }
+
         protected StackEntry(StackValueKind kind)
         {
             Kind = kind;
