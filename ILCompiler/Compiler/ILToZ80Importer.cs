@@ -3,6 +3,7 @@ using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
+using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.z80;
 using System;
 using System.Collections.Generic;
