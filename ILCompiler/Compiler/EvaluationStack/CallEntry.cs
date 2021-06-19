@@ -13,5 +13,10 @@ namespace ILCompiler.Compiler.EvaluationStack
             TargetMethod = targetMethod;
             Arguments = arguments;
         }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

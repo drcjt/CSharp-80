@@ -15,5 +15,10 @@ namespace ILCompiler.Compiler.EvaluationStack
         {
             Return = returnValue;
         }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

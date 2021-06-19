@@ -69,10 +69,11 @@ namespace ILCompiler.Compiler
             if (!method.IsConstructor && !method.IsIntrinsic() && !method.IsPinvokeImpl)
             {
                 var ilImporter = new ILImporter(this, method);
+                var flowgraph = new Flowgraph();
 
                 // Main phases of the compiler live here
                 var basicBlocks = ilImporter.Import(methodCodeNodeNeedingCode);
-                // flowgraph.SetBlockOrder(basicBlocks);
+                flowgraph.SetBlockOrder(basicBlocks);
             }
         }
     }

@@ -10,5 +10,10 @@ namespace ILCompiler.Compiler.EvaluationStack
         {
             Condition = condition;
         }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

@@ -4,7 +4,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 {
     // StackEntry and subclasses represent the tree oriented high level intermediate representation
     // which will be the main output of the importer
-    public abstract class StackEntry
+    public abstract class StackEntry : IVisitableStackEntry
     {
         public StackValueKind Kind { get; }
 
@@ -14,5 +14,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         {
             Kind = kind;
         }
+
+        abstract public void Accept(IStackEntryVisitor visitor);
     }
 }

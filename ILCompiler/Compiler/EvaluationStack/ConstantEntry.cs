@@ -8,6 +8,11 @@ namespace ILCompiler.Compiler.EvaluationStack
         protected ConstantEntry(StackValueKind kind) : base(kind)
         {
         }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 
     public abstract class ConstantEntry<T> : ConstantEntry where T : IConvertible

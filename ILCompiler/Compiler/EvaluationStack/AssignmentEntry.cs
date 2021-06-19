@@ -11,5 +11,10 @@
             Op1 = op1;
             Op2 = op2;
         }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }

@@ -15,5 +15,10 @@ namespace ILCompiler.Compiler.EvaluationStack
         {
             LocalNumber = localNumber;
         }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 }
