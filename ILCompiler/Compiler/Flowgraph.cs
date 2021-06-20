@@ -10,28 +10,36 @@ namespace ILCompiler.Compiler
             // Put code here to set execution order within the basic blocks
             foreach (var block in blocks)
             {
+                StackEntry current = null;
                 foreach (var statement in block.Statements)
                 {
-                    PostOrderTraversal(statement);
+                    // canonical post order traversal of the HIR tree
+
+                    // Will iterate the StackEntrys in each basic block and traverse the statement tree
+                    // setting the Next property on each stack entry to indicate the true execution order within the block
+                    var orderingVisitor = new PostOrderTraversalVisitor(current);
+                    statement.Accept(orderingVisitor);
+                    var first = orderingVisitor.First;
+                    current = orderingVisitor.Current;
+
+                    if (block.FirstNode == null)
+                    {
+                        block.FirstNode = first;
+                    }
                 }
             }
-
-            // canonical post order traversal of the HIR tree
-
-            // Will iterate the StackEntrys in each basic block and traverse the statement tree
-            // setting the Next property on each stack entry to indicate the true execution order within the block
-        }
-
-        private void PostOrderTraversal(StackEntry entry)
-        {
-            var orderingVisitor = new PostOrderTraversalVisitor();
-            entry.Accept(orderingVisitor);
         }
     }
 
     public class PostOrderTraversalVisitor : IStackEntryVisitor
     {
-        private StackEntry _current;
+        public PostOrderTraversalVisitor(StackEntry current)
+        {
+            Current = current;
+        }
+
+        public StackEntry Current { get; private set; }
+        public StackEntry First { get; set; }
         public void Visit(ConstantEntry entry)
         {
             SetNext(entry);
@@ -102,11 +110,15 @@ namespace ILCompiler.Compiler
 
         private void SetNext(StackEntry entry)
         {
-            if (_current != null)
+            if (Current != null)
             {
-                _current.Next = entry;
+                Current.Next = entry;
             }
-            _current = entry;
+            Current = entry;
+            if (First == null)
+            {
+                First = Current;
+            }
         }
     }
 }

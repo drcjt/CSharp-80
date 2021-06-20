@@ -132,19 +132,22 @@ namespace ILCompiler.Compiler
                 }
 
                 StackEntry op2;
-                if (opcode != Code.Brfalse && opcode == Code.Brtrue)
+                BinaryOp op;
+                if (opcode != Code.Brfalse && opcode != Code.Brtrue)
                 {
                     op2 = _stack.Pop();
                     if (op2.Kind != StackValueKind.Int16)
                     {
-                        throw new NotSupportedException("Boolean comparisonsonly supported using short as underlying type");
+                        throw new NotSupportedException("Boolean comparisons only supported using short as underlying type");
                     }
+                    op = BinaryOp.EQ + (opcode - Code.Beq);
                 }
                 else
                 {
                     op2 = new Int16ConstantEntry((short)(opcode == Code.Brfalse ? 0 : 1));
+                    op = BinaryOp.EQ;
                 }
-                op1 = new BinaryOperator(BinaryOp.EQ + (opcode - Code.Beq), op1, op2, StackValueKind.Int16);
+                op1 = new BinaryOperator(op, op1, op2, StackValueKind.Int16);
                 ImportAppendTree(new JumpTrueEntry(target.Label, op1));
             }
             else

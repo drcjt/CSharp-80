@@ -24,9 +24,11 @@ namespace ILCompiler.Compiler
         public void Generate(IList<BasicBlock> blocks)
         {
 #if NEW_CODEGEN
-            Append(new LabelInstruction(_compilation.NameMangler.GetMangledMethodName(_methodCodeNode.Method)));
-
             GenerateStringMap(blocks);
+
+            GenerateStringData();
+
+            Append(new LabelInstruction(_compilation.NameMangler.GetMangledMethodName(_methodCodeNode.Method)));
 
             GenerateProlog();
 
@@ -34,12 +36,20 @@ namespace ILCompiler.Compiler
             {
                 Append(new LabelInstruction(block.Label));
 
-                foreach (var statement in block.Statements)
+                var currentNode = block.FirstNode;
+
+                while (currentNode != null)
                 {
-                    statement.Accept(this);
+                    GenerateFromNode(currentNode);
+                    currentNode = currentNode.Next;
                 }
             }
 #endif
+        }
+
+        private void GenerateFromNode(StackEntry node)
+        {
+            node.Accept(this);
         }
 
         // TODO: Consider making this a separate phase
@@ -48,21 +58,37 @@ namespace ILCompiler.Compiler
             // Process all stack entrys and extract string definitions to populate the string map
             foreach (var block in blocks)
             {
-                foreach (var statement in block.Statements)
+                var currentNode = block.FirstNode;
+                while (currentNode != null)
                 {
-                    if (statement is StringConstantEntry)
+                    if (currentNode is StringConstantEntry)
                     {
-                        var stringConstantEntry = statement as StringConstantEntry;
+                        var stringConstantEntry = currentNode as StringConstantEntry;
 
                         var label = LabelGenerator.GetLabel(LabelType.String);
                         _labelsToStringData[label] = stringConstantEntry.Value;
 
                         stringConstantEntry.Label = label;
                     }
+                    currentNode = currentNode.Next;
                 }
             }
         }
-        
+
+        private void GenerateStringData()
+        {
+            // TODO: Need to eliminate duplicate strings
+
+            foreach (var keyValuePair in _labelsToStringData)
+            {
+                Append(new LabelInstruction(keyValuePair.Key));
+                foreach (var ch in keyValuePair.Value)
+                {
+                    Append(Instruction.Db((byte)ch));
+                }
+                Append(Instruction.Db(0));
+            }
+        }
         private void GenerateProlog()
         {
             // TODO: This assumes all locals are 16 bit in size
