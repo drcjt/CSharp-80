@@ -1,13 +1,15 @@
 ﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     // STOREIND
-    public class IndEntry : StackEntry
+    public class StoreIndEntry : StackEntry
     {
         public StackEntry Addr { get; }
+        public StackEntry Op1 { get; }
 
-        public IndEntry(StackEntry addr) : base(addr.Kind)
+        public StoreIndEntry(StackEntry addr, StackEntry op1) : base(addr.Kind)
         {
             Addr = addr;
+            Op1 = op1;
         }
 
         public override void Accept(IStackEntryVisitor visitor)

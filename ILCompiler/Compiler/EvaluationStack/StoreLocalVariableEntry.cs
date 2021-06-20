@@ -1,15 +1,16 @@
 ﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     // ASG
-    public class AssignmentEntry : StackEntry
+    public class StoreLocalVariableEntry : StackEntry
     {
         public StackEntry Op1 { get; }
-        public StackEntry Op2 { get; }
 
-        public AssignmentEntry(StackEntry op1, StackEntry op2) : base(op1.Kind)
+        public int LocalNumber { get; }
+
+        public StoreLocalVariableEntry(int localNumber, StackEntry op1) : base(op1.Kind)
         {
+            LocalNumber = localNumber;
             Op1 = op1;
-            Op2 = op2;
         }
 
         public override void Accept(IStackEntryVisitor visitor)

@@ -9,12 +9,12 @@ namespace ILCompiler.Compiler.EvaluationStack
     public interface IStackEntryVisitor
     {
         public void Visit(ConstantEntry entry);
-        public void Visit(IndEntry entry);
+        public void Visit(StoreIndEntry entry);
         public void Visit(JumpTrueEntry entry);
         public void Visit(ReturnEntry entry);
         public void Visit(BinaryOperator entry);
         public void Visit(LocalVariableEntry entry);
-        public void Visit(AssignmentEntry entry);
+        public void Visit(StoreLocalVariableEntry entry);
         public void Visit(CallEntry entry);
         public void Visit(IntrinsicEntry entry);
 

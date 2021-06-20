@@ -303,8 +303,7 @@ namespace ILCompiler.Compiler
                 throw new NotSupportedException();
             }
 
-            var addrNode = new IndEntry(addr);
-            ImportAppendTree(new AssignmentEntry(addrNode, value));
+            ImportAppendTree(new StoreIndEntry(addr, value));
 
             // Code gen
             Append(Instruction.Pop(R16.BC));
@@ -320,9 +319,8 @@ namespace ILCompiler.Compiler
             {
                 throw new NotSupportedException("Storing variables other than short or object refs not supported yet");
             }
-            var op2 = new LocalVariableEntry(index, value.Kind);
-            var assignNode = new AssignmentEntry(op2, value);
-            ImportAppendTree(assignNode);
+            var node = new StoreLocalVariableEntry(index, value);
+            ImportAppendTree(node);
 
             // Code gen
             var offset = index * 2; // TODO: This needs to take into account differing sizes of local vars

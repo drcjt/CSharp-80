@@ -38,8 +38,9 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
-        public void Visit(IndEntry entry)
+        public void Visit(StoreIndEntry entry)
         {
+            entry.Op1.Accept(this);
             entry.Addr.Accept(this);
             SetNext(entry);
         }
@@ -71,9 +72,8 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
-        public void Visit(AssignmentEntry entry)
+        public void Visit(StoreLocalVariableEntry entry)
         {
-            entry.Op2.Accept(this);
             entry.Op1.Accept(this);
             SetNext(entry);
         }

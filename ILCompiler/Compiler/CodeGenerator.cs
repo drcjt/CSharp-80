@@ -87,7 +87,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public void Visit(IndEntry entry)
+        public void Visit(StoreIndEntry entry)
         {
             throw new NotImplementedException();
         }
@@ -172,7 +172,7 @@ namespace ILCompiler.Compiler
             Append(Instruction.Ld(I16.IX, (short)-(offset + 2), R8.L));
         }
 
-        public void Visit(AssignmentEntry entry)
+        public void Visit(StoreLocalVariableEntry entry)
         {
             throw new NotImplementedException();
         }
