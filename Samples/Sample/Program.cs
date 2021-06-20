@@ -6,6 +6,7 @@ namespace MiniBCL
     {
         public static int Main()
 		{
+            /*
             Console.Clear();
 
             // Test subroutine call
@@ -47,6 +48,8 @@ namespace MiniBCL
             short b = 4;
             short c = 5;
             TestArguments(a, b, c);
+
+            */
 
             // Test implementation of write char completely written in C#
             WriteChar(0, 0, 48); // Write 0 to top left corner of screen

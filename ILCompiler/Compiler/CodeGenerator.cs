@@ -297,15 +297,12 @@ namespace ILCompiler.Compiler
 
         public void Visit(StoreLocalVariableEntry entry)
         {
-            if (entry.LocalNumber >= _methodCodeNode.Method.Parameters.Count)
-            {
-                // Storing to a local variable
-                var offset = entry.LocalNumber * 2; // TODO: This needs to take into account differing sizes of local vars
+            // Storing to a local variable
+            var offset = entry.LocalNumber * 2; // TODO: This needs to take into account differing sizes of local vars
 
-                Append(Instruction.Pop(R16.HL));
-                Append(Instruction.Ld(I16.IX, (short)-(offset + 1), R8.H));
-                Append(Instruction.Ld(I16.IX, (short)-(offset + 2), R8.L));
-            }
+            Append(Instruction.Pop(R16.HL));
+            Append(Instruction.Ld(I16.IX, (short)-(offset + 1), R8.H));
+            Append(Instruction.Ld(I16.IX, (short)-(offset + 2), R8.L));
         }
 
         public void Visit(CallEntry entry)

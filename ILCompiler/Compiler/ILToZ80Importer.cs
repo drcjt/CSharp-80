@@ -48,7 +48,7 @@ namespace ILCompiler.Compiler
                 if (basicBlock != null)
                 {
                     // Run optimization phases on basic blocks here
-                    _compilation.Optimizer.Optimize(basicBlock.Instructions);
+                    //_compilation.Optimizer.Optimize(basicBlock.Instructions);
 
                     instructions.Add(new LabelInstruction(basicBlock.Label));
                     instructions.AddRange(basicBlock.Instructions);
