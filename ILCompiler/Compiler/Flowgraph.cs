@@ -34,7 +34,6 @@ namespace ILCompiler.Compiler
         private StackEntry _current;
         public void Visit(ConstantEntry entry)
         {
-            //entry.Accept(this);
             SetNext(entry);
         }
 
@@ -48,6 +47,11 @@ namespace ILCompiler.Compiler
         public void Visit(JumpTrueEntry entry)
         {
             entry.Condition.Accept(this);
+            SetNext(entry);
+        }
+
+        public void Visit(JumpEntry entry)
+        {
             SetNext(entry);
         }
 

@@ -70,7 +70,7 @@ namespace ILCompiler.Compiler
             {
                 var ilImporter = new ILImporter(this, method);
                 var flowgraph = new Flowgraph();
-                var codeGenerator = new CodeGenerator(methodCodeNodeNeedingCode);
+                var codeGenerator = new CodeGenerator(this, methodCodeNodeNeedingCode);
 
                 // Main phases of the compiler live here
                 var basicBlocks = ilImporter.Import(methodCodeNodeNeedingCode);

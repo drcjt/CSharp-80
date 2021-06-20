@@ -108,6 +108,7 @@ namespace ILCompiler.Compiler
             }
         }
 
+#if !NEW_CODEGEN
         private readonly string[] comparisonRoutinesByOpcode = new string[]
         {
             "EQL",              // Beq
@@ -117,16 +118,7 @@ namespace ILCompiler.Compiler
             "LESSTHAN",         // Blt
             "NOTEQ"             // Bne
         };
-
-        private readonly BinaryOp[] binaryOpByOpcode = new BinaryOp[]
-        {
-            BinaryOp.EQ,        // Beq
-            BinaryOp.GE,        // Bge
-            BinaryOp.GT,        // Bgt
-            BinaryOp.LE,        // Ble
-            BinaryOp.LT,        // Blt
-            BinaryOp.NE         // Bne
-        };
+#endif
 
         public void ImportBranch(Code opcode, BasicBlock target, BasicBlock fallthrough)
         {
@@ -152,15 +144,16 @@ namespace ILCompiler.Compiler
                 {
                     op2 = new Int16ConstantEntry((short)(opcode == Code.Brfalse ? 0 : 1));
                 }
-                op1 = new BinaryOperator(BinaryOp.EQ, op1, op2, StackValueKind.Int16);
-                ImportAppendTree(new JumpTrueEntry(op1));
+                op1 = new BinaryOperator(BinaryOp.EQ + (opcode - Code.Beq), op1, op2, StackValueKind.Int16);
+                ImportAppendTree(new JumpTrueEntry(target.Label, op1));
             }
             else
             {
-                // Don't generate any gentree for a branch.
+                ImportAppendTree(new JumpEntry(target.Label));
             }
 
             // Code gen
+#if !NEW_CODEGEN
             if (opcode != Code.Br)
             {
                 if (opcode == Code.Brfalse || opcode == Code.Brtrue)
@@ -185,6 +178,7 @@ namespace ILCompiler.Compiler
             {
                 Append(Instruction.Jp(target.Label));
             }
+#endif
 
             // Fall through handling
             ImportFallThrough(target);
@@ -306,9 +300,11 @@ namespace ILCompiler.Compiler
             ImportAppendTree(new StoreIndEntry(addr, value));
 
             // Code gen
+#if !NEW_CODEGEN
             Append(Instruction.Pop(R16.BC));
             Append(Instruction.Pop(R16.HL));
             Append(Instruction.LdInd(R16.HL, R8.C));
+#endif
         }
 
         public void ImportStoreVar(int index, bool argument)
@@ -323,11 +319,13 @@ namespace ILCompiler.Compiler
             ImportAppendTree(node);
 
             // Code gen
+#if !NEW_CODEGEN
             var offset = index * 2; // TODO: This needs to take into account differing sizes of local vars
 
             Append(Instruction.Pop(R16.HL));
             Append(Instruction.Ld(I16.IX, (short)-(offset + 1), R8.H));
             Append(Instruction.Ld(I16.IX, (short)-(offset + 2), R8.L));
+#endif
         }
 
         public void ImportLoadVar(int index, bool argument)
@@ -355,11 +353,13 @@ namespace ILCompiler.Compiler
             PushExpression(node);
 
             // Code gen
+#if !NEW_CODEGEN
             var offset = index * 2; // TODO: This needs to take into account differing sizes of parameters
 
             Append(Instruction.Ld(R8.H, I16.IY, (short)-(offset + 1)));
             Append(Instruction.Ld(R8.L, I16.IY, (short)-(offset + 2)));
             Append(Instruction.Push(R16.HL));
+#endif
         }
 
         public void ImportLoadInt(long value, StackValueKind kind)
@@ -404,11 +404,13 @@ namespace ILCompiler.Compiler
             PushExpression(new StringConstantEntry(str));
 
             // Code generation
+#if !NEW_CODEGEN
             var label = LabelGenerator.GetLabel(LabelType.String);
             _labelsToStringData[label] = str;
 
             Append(Instruction.Ld(R16.HL, label));
             Append(Instruction.Push(R16.HL));
+#endif
         }
 
         private bool ImportIntrinsicCall(MethodDef methodToCall)
@@ -427,11 +429,38 @@ namespace ILCompiler.Compiler
                 throw new NotSupportedException();
             }
 
-            var targetMethod = _compilation.NameMangler.GetMangledMethodName(methodToCall);
-            var callNode = new IntrinsicEntry(targetMethod, arguments, StackValueKind.Unknown);
+            // Map method name to string that code generator will understand
+            var targetMethodName = "";
+            switch (methodToCall.Name)
+            {
+                // TODO: Suspect this won't stay as an intrinsic but at least we have the mechanism for instrincs
+                case "Write":
+                    if (IsTypeName(methodToCall, "System", "Console"))
+                    {
+                        var argtype = methodToCall.Parameters[0].Type;
+                        if (argtype.FullName == "System.String")
+                        {
+                            targetMethodName = "WriteString";
+                        }
+                        else if (argtype.FullName == "System.Int16")
+                        {
+                            targetMethodName = "WriteInt16";
+                        }
+                        else
+                        {
+                            targetMethodName = "WriteChar";
+                        }
+                    }
+                    break;
+                default:
+                    return false;
+            }
+
+            var callNode = new IntrinsicEntry(targetMethodName, arguments, StackValueKind.Unknown);
             ImportAppendTree(callNode);
 
             // Code gen
+#if !NEW_CODEGEN
             switch (methodToCall.Name)
             {
                 // TODO: Suspect this won't stay as an intrinsic but at least we have the mechanism for instrincs
@@ -457,15 +486,11 @@ namespace ILCompiler.Compiler
                             Append(Instruction.Ld(R8.A, R8.L)); // Load low byte of argument 1 into A
                             Append(Instruction.Call(0x0033)); // ROM routine to display character at current cursor position
                         }
-
-                        return true;
                     }
                     break;
-                default:
-                    break;
             }
-
-            return false;
+#endif
+            return true;
         }
 
         private static bool IsTypeName(MethodDef method, string typeNamespace, string typeName)

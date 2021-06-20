@@ -4,27 +4,36 @@ using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.z80;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ILCompiler.Compiler
 {
+    // TODO: This shouldn't really have any dependencies on dnlib/IL stuff
     public class CodeGenerator : IStackEntryVisitor
     {
+        private readonly Compilation _compilation;
         private readonly Z80MethodCodeNode _methodCodeNode;
-        public CodeGenerator(Z80MethodCodeNode methodCodeNodeNeedingCode)
+
+        private readonly Dictionary<string, string> _labelsToStringData = new Dictionary<string, string>();
+
+        public CodeGenerator(Compilation compilation, Z80MethodCodeNode methodCodeNodeNeedingCode)
         {
+            _compilation = compilation;
             _methodCodeNode = methodCodeNodeNeedingCode;
         }
 
         public void Generate(IList<BasicBlock> blocks)
         {
 #if NEW_CODEGEN
+            Append(new LabelInstruction(_compilation.NameMangler.GetMangledMethodName(_methodCodeNode.Method)));
+
+            GenerateStringMap(blocks);
+
             GenerateProlog();
 
             foreach (var block in blocks)
             {
+                Append(new LabelInstruction(block.Label));
+
                 foreach (var statement in block.Statements)
                 {
                     statement.Accept(this);
@@ -33,6 +42,27 @@ namespace ILCompiler.Compiler
 #endif
         }
 
+        // TODO: Consider making this a separate phase
+        private void GenerateStringMap(IList<BasicBlock> blocks)
+        {
+            // Process all stack entrys and extract string definitions to populate the string map
+            foreach (var block in blocks)
+            {
+                foreach (var statement in block.Statements)
+                {
+                    if (statement is StringConstantEntry)
+                    {
+                        var stringConstantEntry = statement as StringConstantEntry;
+
+                        var label = LabelGenerator.GetLabel(LabelType.String);
+                        _labelsToStringData[label] = stringConstantEntry.Value;
+
+                        stringConstantEntry.Label = label;
+                    }
+                }
+            }
+        }
+        
         private void GenerateProlog()
         {
             // TODO: This assumes all locals are 16 bit in size
@@ -85,16 +115,29 @@ namespace ILCompiler.Compiler
                 Append(Instruction.Ld(R16.HL, high));
                 Append(Instruction.Push(R16.HL));
             }
+            else if (entry.Kind == StackValueKind.ObjRef)
+            {
+                // Currently obj refs can only be strings
+                Append(Instruction.Ld(R16.HL, (entry as StringConstantEntry).Label));
+                Append(Instruction.Push(R16.HL));
+            }
         }
 
         public void Visit(StoreIndEntry entry)
         {
-            throw new NotImplementedException();
+            Append(Instruction.Pop(R16.BC));
+            Append(Instruction.Pop(R16.HL));
+            Append(Instruction.LdInd(R16.HL, R8.C));
         }
 
         public void Visit(JumpTrueEntry entry)
         {
-            throw new NotImplementedException();
+            Append(Instruction.Jp(Condition.C, entry.TargetLabel));
+        }
+        
+        public void Visit(JumpEntry entry)
+        {
+            Append(Instruction.Jp(entry.TargetLabel));
         }
 
         public void Visit(ReturnEntry entry)
@@ -144,23 +187,62 @@ namespace ILCompiler.Compiler
             switch (entry.Op)
             {
                 case BinaryOp.ADD:
-                    Append(Instruction.Pop(R16.DE));
-                    Append(Instruction.Pop(R16.HL));
-                    Append(Instruction.Add(R16.HL, R16.DE));
+                    GenerateAdd();
                     break;
 
                 case BinaryOp.SUB:
-                    Append(Instruction.Pop(R16.DE));
-                    Append(Instruction.Pop(R16.HL));
-                    Append(Instruction.Sbc(R16.HL, R16.DE));
+                    GenerateSub();
                     break;
 
                 case BinaryOp.MUL:
-                    Append(Instruction.Pop(R16.DE));
-                    Append(Instruction.Pop(R16.BC));
-                    Append(Instruction.Call("MUL16"));
+                    GenerateMul();
+                    break;
+
+                default:
+                    GenerateComparison(entry.Op);
                     break;
             }
+        }
+
+        private readonly string[] comparisonRoutinesByOpcode = new string[]
+        {
+            "EQL",              // Beq
+            "GREATERTHANEQ",    // Bge
+            "GREATERTHAN",      // Bgt
+            "LESSTHANEQ",       // Ble
+            "LESSTHAN",         // Blt
+            "NOTEQ"             // Bne
+        };
+
+        private void GenerateComparison(BinaryOp op)
+        {
+            Append(Instruction.Pop(R16.HL));
+            Append(Instruction.Pop(R16.DE));
+
+            Append(Instruction.Call(comparisonRoutinesByOpcode[op - BinaryOp.EQ]));
+        }
+
+        private void GenerateAdd()
+        {
+            Append(Instruction.Pop(R16.DE));
+            Append(Instruction.Pop(R16.HL));
+            Append(Instruction.Add(R16.HL, R16.DE));
+            Append(Instruction.Push(R16.HL));
+        }
+
+        private void GenerateSub()
+        {
+            Append(Instruction.Pop(R16.DE));
+            Append(Instruction.Pop(R16.HL));
+            Append(Instruction.Sbc(R16.HL, R16.DE));
+            Append(Instruction.Push(R16.HL));
+        }
+
+        private void GenerateMul()
+        {
+            Append(Instruction.Pop(R16.DE));
+            Append(Instruction.Pop(R16.BC));
+            Append(Instruction.Call("MUL16"));
             Append(Instruction.Push(R16.HL));
         }
 
@@ -174,7 +256,24 @@ namespace ILCompiler.Compiler
 
         public void Visit(StoreLocalVariableEntry entry)
         {
-            throw new NotImplementedException();
+            if (entry.LocalNumber >= _methodCodeNode.Method.Parameters.Count)
+            {
+                // Loading a local variable
+                var offset = (entry.LocalNumber - _methodCodeNode.Method.Parameters.Count) * 2; // TODO: This needs to take into account differing sizes of local vars
+
+                Append(Instruction.Pop(R16.HL));
+                Append(Instruction.Ld(I16.IX, (short)-(offset + 1), R8.H));
+                Append(Instruction.Ld(I16.IX, (short)-(offset + 2), R8.L));
+            }
+            else
+            {
+                // Loading an argument
+                var offset = entry.LocalNumber * 2; // TODO: This needs to take into account differing sizes of parameters
+
+                Append(Instruction.Ld(R8.H, I16.IY, (short)-(offset + 1)));
+                Append(Instruction.Ld(R8.L, I16.IY, (short)-(offset + 2)));
+                Append(Instruction.Push(R16.HL));
+            }
         }
 
         public void Visit(CallEntry entry)
@@ -184,12 +283,30 @@ namespace ILCompiler.Compiler
 
         public void Visit(IntrinsicEntry entry)
         {
-            throw new NotImplementedException();
+            var methodToCall = entry.TargetMethod;
+            switch (methodToCall)
+            {
+                case "WriteString":
+                    Append(Instruction.Pop(R16.HL));    // put argument 1 into HL
+                    Append(Instruction.Call("PRINT"));
+                    break;
+
+                case "WriteInt16":
+                    Append(Instruction.Pop(R16.HL));    // put argument 1 into HL
+                    Append(Instruction.Call("NUM2DEC"));
+                    break;
+
+                case "WriteChar":
+                    Append(Instruction.Pop(R16.HL));    // put argument 1 into HL
+                    Append(Instruction.Ld(R8.A, R8.L)); // Load low byte of argument 1 into A
+                    Append(Instruction.Call(0x0033)); // ROM routine to display character at current cursor position
+                    break;
+            }
         }
+
         public void Append(Instruction instruction)
         {
             _methodCodeNode.MethodCode.Add(instruction);
         }
-
     }
 }

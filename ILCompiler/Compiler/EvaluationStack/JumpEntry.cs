@@ -1,16 +1,19 @@
 ﻿using ILCompiler.Common.TypeSystem.IL;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ILCompiler.Compiler.EvaluationStack
 {
-    // JTRUE
-    public class JumpTrueEntry : StackEntry
+    public class JumpEntry : StackEntry
     {
-        public StackEntry Condition { get; }
         public string TargetLabel { get; }
-        public JumpTrueEntry(string targetLabel, StackEntry condition) : base(StackValueKind.Unknown)
+
+        public JumpEntry(string targetLabel) : base(StackValueKind.Unknown)
         {
             TargetLabel = targetLabel;
-            Condition = condition;
         }
 
         public override void Accept(IStackEntryVisitor visitor)

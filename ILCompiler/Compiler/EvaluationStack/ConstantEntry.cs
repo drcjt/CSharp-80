@@ -28,6 +28,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     // CNS_STR
     public class StringConstantEntry : ConstantEntry<String>
     {
+        public string Label { get; set; }
         public StringConstantEntry(string value) : base(StackValueKind.ObjRef, value)
         {
         }

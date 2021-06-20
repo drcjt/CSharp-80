@@ -11,6 +11,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         public void Visit(ConstantEntry entry);
         public void Visit(StoreIndEntry entry);
         public void Visit(JumpTrueEntry entry);
+        public void Visit(JumpEntry entry);
         public void Visit(ReturnEntry entry);
         public void Visit(BinaryOperator entry);
         public void Visit(LocalVariableEntry entry);
