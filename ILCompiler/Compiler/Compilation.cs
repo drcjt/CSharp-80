@@ -52,14 +52,18 @@ namespace ILCompiler.Compiler
 
         private void CompileNode(Z80MethodCodeNode node)
         {
-            _logger.LogInformation("Compiling method {method.Name}", node.Method.Name);
-
-            CompileMethod(node);
-
-            foreach (var dependentNode in node.Dependencies)
+            if (!node.Compiled)
             {
-                CompileNode(dependentNode);
-            }            
+                _logger.LogInformation("Compiling method {method.Name}", node.Method.Name);
+
+                CompileMethod(node);
+                node.Compiled = true;
+
+                foreach (var dependentNode in node.Dependencies)
+                {
+                    CompileNode(dependentNode);
+                }
+            }
         }
 
         public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode)

@@ -274,31 +274,37 @@ namespace ILCompiler.Compiler
 
         public void Visit(LocalVariableEntry entry)
         {
-            var offset = entry.LocalNumber;
-            Append(Instruction.Pop(R16.HL));
-            Append(Instruction.Ld(I16.IX, (short)-(offset + 1), R8.H));
-            Append(Instruction.Ld(I16.IX, (short)-(offset + 2), R8.L));
+            if (entry.LocalNumber >= _methodCodeNode.Method.Parameters.Count)
+            {
+                // Loading a local variable
+                var offset = (entry.LocalNumber - _methodCodeNode.Method.Parameters.Count) * 2; // TODO: This needs to take into account differing sizes of local vars
+
+                Append(Instruction.Ld(R8.H, I16.IX, (short)-(offset + 1)));
+                Append(Instruction.Ld(R8.L, I16.IX, (short)-(offset + 2)));
+                Append(Instruction.Push(R16.HL));
+            }
+            else
+            {
+                // Loading an argument
+                var offset = entry.LocalNumber * 2; // TODO: This needs to take into account differing sizes of local vars
+
+                Append(Instruction.Ld(R8.H, I16.IY, (short)-(offset + 1)));
+                Append(Instruction.Ld(R8.L, I16.IY, (short)-(offset + 2)));
+                Append(Instruction.Push(R16.HL));
+
+            }
         }
 
         public void Visit(StoreLocalVariableEntry entry)
         {
             if (entry.LocalNumber >= _methodCodeNode.Method.Parameters.Count)
             {
-                // Loading a local variable
-                var offset = (entry.LocalNumber - _methodCodeNode.Method.Parameters.Count) * 2; // TODO: This needs to take into account differing sizes of local vars
+                // Storing to a local variable
+                var offset = entry.LocalNumber * 2; // TODO: This needs to take into account differing sizes of local vars
 
                 Append(Instruction.Pop(R16.HL));
                 Append(Instruction.Ld(I16.IX, (short)-(offset + 1), R8.H));
                 Append(Instruction.Ld(I16.IX, (short)-(offset + 2), R8.L));
-            }
-            else
-            {
-                // Loading an argument
-                var offset = entry.LocalNumber * 2; // TODO: This needs to take into account differing sizes of parameters
-
-                Append(Instruction.Ld(R8.H, I16.IY, (short)-(offset + 1)));
-                Append(Instruction.Ld(R8.L, I16.IY, (short)-(offset + 2)));
-                Append(Instruction.Push(R16.HL));
             }
         }
 

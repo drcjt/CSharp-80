@@ -18,5 +18,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public IList<Z80MethodCodeNode> Dependencies { get; set; }
         
         public bool CodeEmitted { get; set; }
+
+        public bool Compiled { get; set; }
     }
 }

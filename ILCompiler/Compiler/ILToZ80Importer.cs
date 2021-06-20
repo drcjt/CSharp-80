@@ -125,17 +125,17 @@ namespace ILCompiler.Compiler
             // Gen tree generation and type checking
             if (opcode != Code.Br)
             {
-                var op1 = _stack.Pop();
-                if (op1.Kind != StackValueKind.Int16)
+                var op2 = _stack.Pop();
+                if (op2.Kind != StackValueKind.Int16)
                 {
                     throw new NotSupportedException("Boolean comparisonsonly supported using short as underlying type");
                 }
 
-                StackEntry op2;
+                StackEntry op1;
                 BinaryOp op;
                 if (opcode != Code.Brfalse && opcode != Code.Brtrue)
                 {
-                    op2 = _stack.Pop();
+                    op1 = _stack.Pop();
                     if (op2.Kind != StackValueKind.Int16)
                     {
                         throw new NotSupportedException("Boolean comparisons only supported using short as underlying type");
@@ -144,7 +144,7 @@ namespace ILCompiler.Compiler
                 }
                 else
                 {
-                    op2 = new Int16ConstantEntry((short)(opcode == Code.Brfalse ? 0 : 1));
+                    op1 = new Int16ConstantEntry((short)(opcode == Code.Brfalse ? 0 : 1));
                     op = BinaryOp.EQ;
                 }
                 op1 = new BinaryOperator(op, op1, op2, StackValueKind.Int16);
@@ -240,8 +240,8 @@ namespace ILCompiler.Compiler
         public void ImportBinaryOperation(Code opcode)
         {
             // Gen tree generation and type checking
-            var op1 = _stack.Pop();
             var op2 = _stack.Pop();
+            var op1 = _stack.Pop();
 
             // StackValueKind is carefully ordered to make this work
             StackValueKind kind;
@@ -518,19 +518,12 @@ namespace ILCompiler.Compiler
                 return;
             }
 
-            // Pinvoke calls
-            if (methodToCall.IsPinvokeImpl)
-            {
-                Append(Instruction.Call(methodToCall.ImplMap.Name));
-                return;
-            }
-
             // Gen tree generation and type checking
-            IList<StackEntry> arguments = new List<StackEntry>();
+            StackEntry[] arguments = new StackEntry[methodToCall.Parameters.Count];
             for (int i = 0; i < methodToCall.Parameters.Count; i++)
             {
                 var argument = _stack.Pop();
-                arguments.Add(argument);
+                arguments[methodToCall.Parameters.Count - i - 1] = argument;
             }
 
             // Not yet implemented methods with non void return type
@@ -539,7 +532,15 @@ namespace ILCompiler.Compiler
                 throw new NotSupportedException();
             }
 
-            var targetMethod = _compilation.NameMangler.GetMangledMethodName(methodToCall);
+            string targetMethod = "";
+            if (methodToCall.IsPinvokeImpl)
+            {
+                targetMethod = methodToCall.ImplMap.Name;
+            }
+            else
+            {
+                targetMethod = _compilation.NameMangler.GetMangledMethodName(methodToCall);
+            }
             var callNode = new CallEntry(targetMethod, arguments, StackValueKind.Unknown);
             ImportAppendTree(callNode);
 
