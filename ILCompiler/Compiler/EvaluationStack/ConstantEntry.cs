@@ -8,11 +8,6 @@ namespace ILCompiler.Compiler.EvaluationStack
         protected ConstantEntry(StackValueKind kind) : base(kind)
         {
         }
-
-        public override void Accept(IStackEntryVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
     }
 
     public abstract class ConstantEntry<T> : ConstantEntry where T : IConvertible
@@ -32,6 +27,11 @@ namespace ILCompiler.Compiler.EvaluationStack
         public StringConstantEntry(string value) : base(StackValueKind.ObjRef, value)
         {
         }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
     }
 
     // CNS_INT
@@ -39,6 +39,11 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public Int16ConstantEntry(short value) : base(StackValueKind.Int16, value)
         {
+        }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
         }
     }
 
@@ -48,5 +53,11 @@ namespace ILCompiler.Compiler.EvaluationStack
         public Int32ConstantEntry(int value) : base(StackValueKind.Int32, value)
         {
         }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+
     }
 }

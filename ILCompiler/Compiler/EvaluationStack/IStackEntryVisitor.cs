@@ -8,7 +8,9 @@ namespace ILCompiler.Compiler.EvaluationStack
 {
     public interface IStackEntryVisitor
     {
-        public void Visit(ConstantEntry entry);
+        public void Visit(Int16ConstantEntry entry);
+        public void Visit(Int32ConstantEntry entry);
+        public void Visit(StringConstantEntry entry);
         public void Visit(StoreIndEntry entry);
         public void Visit(JumpTrueEntry entry);
         public void Visit(JumpEntry entry);

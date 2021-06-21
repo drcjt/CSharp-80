@@ -120,31 +120,30 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public void Visit(ConstantEntry entry)
+        public void Visit(Int16ConstantEntry entry)
         {
-            if (entry.Kind == StackValueKind.Int16)
-            {
-                var value = (entry as Int16ConstantEntry).Value;
-                Append(Instruction.Ld(R16.HL, (short)value));
-                Append(Instruction.Push(R16.HL));
-            }
-            else if (entry.Kind == StackValueKind.Int32)
-            {
-                var value = (entry as Int32ConstantEntry).Value;
-                var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
-                var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
+            var value = (entry as Int16ConstantEntry).Value;
+            Append(Instruction.Ld(R16.HL, (short)value));
+            Append(Instruction.Push(R16.HL));
+        }
 
-                Append(Instruction.Ld(R16.HL, low));
-                Append(Instruction.Push(R16.HL));
-                Append(Instruction.Ld(R16.HL, high));
-                Append(Instruction.Push(R16.HL));
-            }
-            else if (entry.Kind == StackValueKind.ObjRef)
-            {
-                // Currently obj refs can only be strings
-                Append(Instruction.Ld(R16.HL, (entry as StringConstantEntry).Label));
-                Append(Instruction.Push(R16.HL));
-            }
+        public void Visit(Int32ConstantEntry entry)
+        {
+            var value = (entry as Int32ConstantEntry).Value;
+            var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
+            var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
+
+            Append(Instruction.Ld(R16.HL, low));
+            Append(Instruction.Push(R16.HL));
+            Append(Instruction.Ld(R16.HL, high));
+            Append(Instruction.Push(R16.HL));
+        }
+
+        public void Visit(StringConstantEntry entry)
+        {
+            // Currently obj refs can only be strings
+            Append(Instruction.Ld(R16.HL, (entry as StringConstantEntry).Label));
+            Append(Instruction.Push(R16.HL));
         }
 
         public void Visit(StoreIndEntry entry)
