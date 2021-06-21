@@ -13,8 +13,6 @@ namespace ILCompiler.Compiler
 {
     public partial class ILImporter
     {
-        private readonly Dictionary<string, string> _labelsToStringData = new Dictionary<string, string>();
-
         public IList<BasicBlock> Import(Z80MethodCodeNode methodCodeNodeNeedingCode)
         {
             var basicBlockAnalyser = new BasicBlockAnalyser(_method);
@@ -32,93 +30,8 @@ namespace ILCompiler.Compiler
                 }
             }
 
-            // TODO: This Code gen stuff will be moved out of here soon
-#if !NEW_CODEGEN
-            List<Instruction> instructions = new();
-            GenerateStringData(instructions);
-
-            instructions.Add(new LabelInstruction(_compilation.NameMangler.GetMangledMethodName(methodCodeNodeNeedingCode.Method)));
-
-            GenerateProlog(instructions, methodCodeNodeNeedingCode.Method);
-
-            // Loop thru basic blocks here to generate overall code for whole method
-            for (int i = 0; i < _basicBlocks.Length; i++)
-            {
-                var basicBlock = _basicBlocks[i];
-                if (basicBlock != null)
-                {
-                    // Run optimization phases on basic blocks here
-                    //_compilation.Optimizer.Optimize(basicBlock.Instructions);
-
-                    instructions.Add(new LabelInstruction(basicBlock.Label));
-                    instructions.AddRange(basicBlock.Instructions);
-                }
-            }
-
-            methodCodeNodeNeedingCode.MethodCode = instructions;
-#endif
-
             return basicBlocks;
         }
-
-        private void GenerateStringData(IList<Instruction> instructions)
-        {
-            // TODO: Need to eliminate duplicate strings
-
-            foreach (var keyValuePair in _labelsToStringData)
-            {
-                instructions.Add(new LabelInstruction(keyValuePair.Key));
-                foreach (var ch in keyValuePair.Value)
-                {
-                    instructions.Add(Instruction.Db((byte)ch));
-                }
-                instructions.Add(Instruction.Db(0));
-            }
-        }
-
-        private static void GenerateProlog(IList<Instruction> instructions, MethodDef method)
-        {
-            // TODO: This assumes all locals are 16 bit in size
-
-            var paramsCount = method.Parameters.Count;
-            if (paramsCount > 0)
-            {
-                instructions.Add(Instruction.Push(I16.IY));
-                // Set IY to start of arguments here
-                // IY = SP - (2 * (number of params + 2))
-
-                instructions.Add(Instruction.Ld(R16.HL, (short)(2 * (paramsCount + 2))));
-                instructions.Add(Instruction.Add(R16.HL, R16.SP));
-                instructions.Add(Instruction.Push(R16.HL));
-                instructions.Add(Instruction.Pop(I16.IY));
-            }
-
-            var localsCount = method.Body.Variables.Count;
-            if (localsCount > 0)
-            {
-                instructions.Add(Instruction.Push(I16.IX));
-                instructions.Add(Instruction.Ld(I16.IX, 0));
-                instructions.Add(Instruction.Add(I16.IX, R16.SP));
-
-                var localsSize = localsCount * 2;
-
-                instructions.Add(Instruction.Ld(R16.HL, (short)-localsSize));
-                instructions.Add(Instruction.Add(R16.HL, R16.SP));
-                instructions.Add(Instruction.Ld(R16.SP, R16.HL));
-            }
-        }
-
-#if !NEW_CODEGEN
-        private readonly string[] comparisonRoutinesByOpcode = new string[]
-        {
-            "EQL",              // Beq
-            "GREATERTHANEQ",    // Bge
-            "GREATERTHAN",      // Bgt
-            "LESSTHANEQ",       // Ble
-            "LESSTHAN",         // Blt
-            "NOTEQ"             // Bne
-        };
-#endif
 
         public void ImportBranch(Code opcode, BasicBlock target, BasicBlock fallthrough)
         {
@@ -154,34 +67,6 @@ namespace ILCompiler.Compiler
             {
                 ImportAppendTree(new JumpEntry(target.Label));
             }
-
-            // Code gen
-#if !NEW_CODEGEN
-            if (opcode != Code.Br)
-            {
-                if (opcode == Code.Brfalse || opcode == Code.Brtrue)
-                {
-                    var condition = (opcode == Code.Brfalse) ? Condition.Zero : Condition.NonZero;
-                    Append(Instruction.Pop(R16.HL));
-                    Append(Instruction.Ld(R16.DE, 0));
-                    Append(Instruction.Or(R8.A, R8.A));
-                    Append(Instruction.Sbc(R16.HL, R16.DE));
-                    Append(Instruction.Jp(condition, target.Label));
-                }
-                else
-                {
-                    Append(Instruction.Pop(R16.HL));
-                    Append(Instruction.Pop(R16.DE));
-
-                    Append(Instruction.Call(comparisonRoutinesByOpcode[opcode - Code.Beq]));
-                    Append(Instruction.Jp(Condition.C, target.Label));
-                }
-            }
-            else
-            {
-                Append(Instruction.Jp(target.Label));
-            }
-#endif
 
             // Fall through handling
             ImportFallThrough(target);
@@ -262,31 +147,6 @@ namespace ILCompiler.Compiler
             BinaryOp binaryOp = opcode == Code.Add ? BinaryOp.ADD : (opcode == Code.Sub ? BinaryOp.SUB : BinaryOp.MUL);           
             var binaryExpr = new BinaryOperator(binaryOp, op1, op2, kind);
             PushExpression(binaryExpr);
-
-            // Code gen
-#if !NEW_CODEGEN
-            switch (opcode)
-            {
-                case Code.Add:
-                    Append(Instruction.Pop(R16.DE));
-                    Append(Instruction.Pop(R16.HL));
-                    Append(Instruction.Add(R16.HL, R16.DE));
-                    break;
-
-                case Code.Sub:
-                    Append(Instruction.Pop(R16.DE));
-                    Append(Instruction.Pop(R16.HL));
-                    Append(Instruction.Sbc(R16.HL, R16.DE));
-                    break;
-
-                case Code.Mul:
-                    Append(Instruction.Pop(R16.DE));
-                    Append(Instruction.Pop(R16.BC));
-                    Append(Instruction.Call("MUL16"));
-                    break;
-            }
-            Append(Instruction.Push(R16.HL));
-#endif
         }
 
         public void ImportStoreIndirect(WellKnownType type)
@@ -301,13 +161,6 @@ namespace ILCompiler.Compiler
             }
 
             ImportAppendTree(new StoreIndEntry(addr, value));
-
-            // Code gen
-#if !NEW_CODEGEN
-            Append(Instruction.Pop(R16.BC));
-            Append(Instruction.Pop(R16.HL));
-            Append(Instruction.LdInd(R16.HL, R8.C));
-#endif
         }
 
         public void ImportStoreVar(int index, bool argument)
@@ -320,15 +173,6 @@ namespace ILCompiler.Compiler
             }
             var node = new StoreLocalVariableEntry(index, value);
             ImportAppendTree(node);
-
-            // Code gen
-#if !NEW_CODEGEN
-            var offset = index * 2; // TODO: This needs to take into account differing sizes of local vars
-
-            Append(Instruction.Pop(R16.HL));
-            Append(Instruction.Ld(I16.IX, (short)-(offset + 1), R8.H));
-            Append(Instruction.Ld(I16.IX, (short)-(offset + 2), R8.L));
-#endif
         }
 
         public void ImportLoadVar(int index, bool argument)
@@ -337,15 +181,6 @@ namespace ILCompiler.Compiler
             var localNumber = _method.Parameters.Count + index;
             var node = new LocalVariableEntry(localNumber, StackValueKind.Int16);
             PushExpression(node);
-
-            // Code gen
-#if !NEW_CODEGEN
-            var offset = index * 2; // TODO: This needs to take into account differing sizes of local vars
-
-            Append(Instruction.Ld(R8.H, I16.IX, (short)-(offset + 1)));
-            Append(Instruction.Ld(R8.L, I16.IX, (short)-(offset + 2)));
-            Append(Instruction.Push(R16.HL));
-#endif
         }
 
         public void ImportLdArg(int index)
@@ -354,15 +189,6 @@ namespace ILCompiler.Compiler
 
             var node = new LocalVariableEntry(index, StackValueKind.Int16);
             PushExpression(node);
-
-            // Code gen
-#if !NEW_CODEGEN
-            var offset = index * 2; // TODO: This needs to take into account differing sizes of parameters
-
-            Append(Instruction.Ld(R8.H, I16.IY, (short)-(offset + 1)));
-            Append(Instruction.Ld(R8.L, I16.IY, (short)-(offset + 2)));
-            Append(Instruction.Push(R16.HL));
-#endif
         }
 
         public void ImportLoadInt(long value, StackValueKind kind)
@@ -380,40 +206,12 @@ namespace ILCompiler.Compiler
             {
                 throw new NotSupportedException("Loading anything other than Int16 not currently supported");
             }
-
-            // Code gen
-#if !NEW_CODEGEN
-            if (kind == StackValueKind.Int16)
-            {
-                Append(Instruction.Ld(R16.HL, (short)value));
-                Append(Instruction.Push(R16.HL));
-            }
-            else if (kind == StackValueKind.Int32)
-            {
-                var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
-                var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
-
-                Append(Instruction.Ld(R16.HL, low));
-                Append(Instruction.Push(R16.HL));
-                Append(Instruction.Ld(R16.HL, high));
-                Append(Instruction.Push(R16.HL));
-            }
-#endif
         }
 
         public void ImportLoadString(string str)
         {
             // Gen tree generation and type checking
             PushExpression(new StringConstantEntry(str));
-
-            // Code generation
-#if !NEW_CODEGEN
-            var label = LabelGenerator.GetLabel(LabelType.String);
-            _labelsToStringData[label] = str;
-
-            Append(Instruction.Ld(R16.HL, label));
-            Append(Instruction.Push(R16.HL));
-#endif
         }
 
         private bool ImportIntrinsicCall(MethodDef methodToCall)
@@ -462,37 +260,6 @@ namespace ILCompiler.Compiler
             var callNode = new IntrinsicEntry(targetMethodName, arguments, StackValueKind.Unknown);
             ImportAppendTree(callNode);
 
-            // Code gen
-#if !NEW_CODEGEN
-            switch (methodToCall.Name)
-            {
-                // TODO: Suspect this won't stay as an intrinsic but at least we have the mechanism for instrincs
-                case "Write":
-                    if (IsTypeName(methodToCall, "System", "Console"))
-                    {
-                        var argtype = methodToCall.Parameters[0].Type;
-                        if (argtype.FullName == "System.String")
-                        {
-                            Append(Instruction.Pop(R16.HL));    // put argument 1 into HL
-                            Append(Instruction.Call("PRINT"));
-                        }
-                        else if (argtype.FullName == "System.Int16")
-                        {
-                            Append(Instruction.Pop(R16.HL));    // put argument 1 into HL
-                            Append(Instruction.Call("NUM2DEC"));
-                        }
-                        else
-                        {
-                            // TODO: Need to fix this to display number properly
-                            // rather than take low 8 bits and treat as ascii
-                            Append(Instruction.Pop(R16.HL));    // put argument 1 into HL
-                            Append(Instruction.Ld(R8.A, R8.L)); // Load low byte of argument 1 into A
-                            Append(Instruction.Call(0x0033)); // ROM routine to display character at current cursor position
-                        }
-                    }
-                    break;
-            }
-#endif
             return true;
         }
 
@@ -543,11 +310,6 @@ namespace ILCompiler.Compiler
             }
             var callNode = new CallEntry(targetMethod, arguments, StackValueKind.Unknown);
             ImportAppendTree(callNode);
-
-            // Code gen
-#if !NEW_CODEGEN
-            Append(Instruction.Call(targetMethod));
-#endif
         }
 
         public void ImportRet(MethodDef method)
@@ -565,46 +327,6 @@ namespace ILCompiler.Compiler
                 retNode.Return = value;
             }
             ImportAppendTree(retNode);
-
-            // Code gen
-#if !NEW_CODEGEN
-            var hasParameters = method.Parameters.Count > 0;
-            var hasLocals = method.Body.Variables.Count > 0;
-
-            if (hasReturnValue)
-            {
-                Append(Instruction.Pop(R16.BC));            // Copy return value into BC
-            }
-
-            if (hasLocals)
-            {
-                Append(Instruction.Ld(R16.SP, I16.IX));     // Move SP to before locals
-                Append(Instruction.Pop(I16.IX));            // Remove IX
-            }
-
-            if (hasParameters)
-            {
-                Append(Instruction.Pop(R16.BC));            // Remove IY
-                Append(Instruction.Pop(R16.HL));            // Store return address in HL
-                Append(Instruction.Ld(R16.SP, I16.IY));     // Reset SP to before arguments
-
-                Append(Instruction.Push(R16.BC));           // Restore IY
-                Append(Instruction.Pop(I16.IY)); 
-            }
-
-            if (hasReturnValue)
-            {
-                Append(Instruction.Pop(R16.HL));            // Store return address in HL
-                Append(Instruction.Push(R16.BC));           // Push return value
-                Append(Instruction.Push(R16.HL));           // Push return address
-            }
-            else if (hasParameters)
-            {
-                Append(Instruction.Push(R16.HL));           // Push return address
-            }
-
-            Append(Instruction.Ret());
-#endif
         }
 
         public void Append(Instruction instruction)

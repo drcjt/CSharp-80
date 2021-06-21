@@ -23,7 +23,6 @@ namespace ILCompiler.Compiler
 
         public void Generate(IList<BasicBlock> blocks)
         {
-#if NEW_CODEGEN
             GenerateStringMap(blocks);
 
             GenerateStringData();
@@ -44,7 +43,6 @@ namespace ILCompiler.Compiler
                     currentNode = currentNode.Next;
                 }
             }
-#endif
         }
 
         private void GenerateFromNode(StackEntry node)
