@@ -1,6 +1,5 @@
 ﻿namespace ILCompiler.Compiler.EvaluationStack
 {
-    // ASG
     public class StoreLocalVariableEntry : StackEntry
     {
         public StackEntry Op1 { get; }

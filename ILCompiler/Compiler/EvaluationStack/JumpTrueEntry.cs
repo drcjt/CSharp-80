@@ -2,7 +2,6 @@
 
 namespace ILCompiler.Compiler.EvaluationStack
 {
-    // JTRUE
     public class JumpTrueEntry : StackEntry
     {
         public StackEntry Condition { get; }

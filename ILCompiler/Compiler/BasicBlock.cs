@@ -9,12 +9,7 @@ namespace ILCompiler.Compiler
         public BasicBlock Next { get; set; }
         public int StartOffset { get; set; }
 
-        // TODO: This should really be a proper intermediate representation rather
-        // the z80 instructions directly
-        public IList<Instruction> Instructions { get; set; } = new List<Instruction>();
-
-        // High level intermediate representation
-        // main output of importation process
+        // High level intermediate representation - main output of importation process
         public IList<StackEntry> Statements { get; } = new List<StackEntry>();
 
         public StackEntry FirstNode { get; set; }
@@ -26,11 +21,6 @@ namespace ILCompiler.Compiler
         {
             StartOffset = offset;
             Label = LabelGenerator.GetLabel(LabelType.BasicBlock);
-        }
-
-        public void Append(Instruction instruction)
-        {
-            Instructions.Add(instruction);
         }
     }
 }

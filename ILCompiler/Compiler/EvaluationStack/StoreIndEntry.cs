@@ -1,6 +1,5 @@
 ﻿namespace ILCompiler.Compiler.EvaluationStack
 {
-    // STOREIND
     public class StoreIndEntry : StackEntry
     {
         public StackEntry Addr { get; }

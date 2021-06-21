@@ -1,5 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-using ILCompiler.Compiler.DependencyAnalysis;
+﻿using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.z80;
 using System;
@@ -76,7 +75,6 @@ namespace ILCompiler.Compiler
         private void GenerateStringData()
         {
             // TODO: Need to eliminate duplicate strings
-
             foreach (var keyValuePair in _labelsToStringData)
             {
                 Append(new LabelInstruction(keyValuePair.Key));
@@ -141,7 +139,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(StringConstantEntry entry)
         {
-            // Currently obj refs can only be strings
+            // TODO: Currently obj refs can only be strings
             Append(Instruction.Ld(R16.HL, (entry as StringConstantEntry).Label));
             Append(Instruction.Push(R16.HL));
         }

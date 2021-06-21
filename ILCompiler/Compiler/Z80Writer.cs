@@ -80,6 +80,7 @@ namespace ILCompiler.Compiler
                 node.CodeEmitted = true;
             }
         }
+
         public void OutputCode(Z80MethodCodeNode root)
         {
             OutputProlog(root.Method);

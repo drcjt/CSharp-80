@@ -2,7 +2,6 @@
 
 namespace ILCompiler.Compiler.EvaluationStack
 {
-    // RETURN
     public class ReturnEntry : StackEntry
     {
         public StackEntry Return { get; set; }
