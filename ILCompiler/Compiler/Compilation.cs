@@ -77,7 +77,7 @@ namespace ILCompiler.Compiler
                 var codeGenerator = new CodeGenerator(this, methodCodeNodeNeedingCode);
 
                 // Main phases of the compiler live here
-                var basicBlocks = ilImporter.Import(methodCodeNodeNeedingCode);
+                var basicBlocks = ilImporter.Import();
                 flowgraph.SetBlockOrder(basicBlocks);
                 codeGenerator.Generate(basicBlocks);
             }
