@@ -10,6 +10,12 @@ namespace ILCompiler.Compiler
     public class CodeGenerator : IStackEntryVisitor
     {
         private readonly Compilation _compilation;
+
+        // TODO: would like to eliminate use of the MethodDef property of _methodCodeNode
+        // This is currently used to access the MethodDef which is used for getting:
+        //  * count of parameters
+        //  * count of local variables
+        //  * if method has a non void return type
         private readonly Z80MethodCodeNode _methodCodeNode;
 
         private readonly Dictionary<string, string> _labelsToStringData = new Dictionary<string, string>();

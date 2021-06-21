@@ -51,8 +51,25 @@ namespace MiniBCL
             // Test implementation of write char completely written in C#
             WriteChar(0, 0, 48); // Write 0 to top left corner of screen
 
+            TestFibonacci(10);  // should display 55
+
             return 42;
 		}
+
+        private static void TestFibonacci(int n)
+        {
+            int result = 0;
+            int b = 1;
+            // In N steps, compute Fibonacci sequence iteratively.
+            for (int i = 0; i < n; i++)
+            {
+                int temp = result;
+                result = b;
+                b = temp + b;
+            }
+            Console.Write((short)result);
+        }
+
         private static void TestArguments(short a, short b, short c)
         {
             Console.Write(48 + a);
