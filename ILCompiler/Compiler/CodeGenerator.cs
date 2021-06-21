@@ -14,34 +14,44 @@ namespace ILCompiler.Compiler
 
         private readonly Dictionary<string, string> _labelsToStringData = new Dictionary<string, string>();
 
+        private IList<Instruction> _currentBlockInstructions = new List<Instruction>();
+
         public CodeGenerator(Compilation compilation, Z80MethodCodeNode methodCodeNodeNeedingCode)
         {
             _compilation = compilation;
             _methodCodeNode = methodCodeNodeNeedingCode;
         }
 
-        public void Generate(IList<BasicBlock> blocks)
+        public IList<Instruction> Generate(IList<BasicBlock> blocks)
         {
-            GenerateStringMap(blocks);
+            var methodInstructions = new List<Instruction>();
 
+            GenerateStringMap(blocks);
             GenerateStringData();
 
             Append(new LabelInstruction(_compilation.NameMangler.GetMangledMethodName(_methodCodeNode.Method)));
 
             GenerateProlog();
+            methodInstructions.AddRange(_currentBlockInstructions);
 
             foreach (var block in blocks)
             {
+                _currentBlockInstructions.Clear();
+
                 Append(new LabelInstruction(block.Label));
 
                 var currentNode = block.FirstNode;
-
                 while (currentNode != null)
                 {
                     GenerateFromNode(currentNode);
                     currentNode = currentNode.Next;
                 }
+
+                _compilation.Optimizer.Optimize(_currentBlockInstructions);
+                methodInstructions.AddRange(_currentBlockInstructions);
             }
+
+            return methodInstructions;
         }
 
         private void GenerateFromNode(StackEntry node)
@@ -88,33 +98,31 @@ namespace ILCompiler.Compiler
         private void GenerateProlog()
         {
             // TODO: This assumes all locals are 16 bit in size
-            var instructions = _methodCodeNode.MethodCode;
-
             var paramsCount = _methodCodeNode.Method.Parameters.Count;
             if (paramsCount > 0)
             {
-                instructions.Add(Instruction.Push(I16.IY));
+                Append(Instruction.Push(I16.IY));
                 // Set IY to start of arguments here
                 // IY = SP - (2 * (number of params + 2))
 
-                instructions.Add(Instruction.Ld(R16.HL, (short)(2 * (paramsCount + 2))));
-                instructions.Add(Instruction.Add(R16.HL, R16.SP));
-                instructions.Add(Instruction.Push(R16.HL));
-                instructions.Add(Instruction.Pop(I16.IY));
+                Append(Instruction.Ld(R16.HL, (short)(2 * (paramsCount + 2))));
+                Append(Instruction.Add(R16.HL, R16.SP));
+                Append(Instruction.Push(R16.HL));
+                Append(Instruction.Pop(I16.IY));
             }
 
             var localsCount = _methodCodeNode.Method.Body.Variables.Count;
             if (localsCount > 0)
             {
-                instructions.Add(Instruction.Push(I16.IX));
-                instructions.Add(Instruction.Ld(I16.IX, 0));
-                instructions.Add(Instruction.Add(I16.IX, R16.SP));
+                Append(Instruction.Push(I16.IX));
+                Append(Instruction.Ld(I16.IX, 0));
+                Append(Instruction.Add(I16.IX, R16.SP));
 
                 var localsSize = localsCount * 2;
 
-                instructions.Add(Instruction.Ld(R16.HL, (short)-localsSize));
-                instructions.Add(Instruction.Add(R16.HL, R16.SP));
-                instructions.Add(Instruction.Ld(R16.SP, R16.HL));
+                Append(Instruction.Ld(R16.HL, (short)-localsSize));
+                Append(Instruction.Add(R16.HL, R16.SP));
+                Append(Instruction.Ld(R16.SP, R16.HL));
             }
         }
 
@@ -330,7 +338,7 @@ namespace ILCompiler.Compiler
 
         public void Append(Instruction instruction)
         {
-            _methodCodeNode.MethodCode.Add(instruction);
+            _currentBlockInstructions.Add(instruction);
         }
     }
 }

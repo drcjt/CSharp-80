@@ -79,7 +79,8 @@ namespace ILCompiler.Compiler
                 // Main phases of the compiler live here
                 var basicBlocks = ilImporter.Import();
                 flowgraph.SetBlockOrder(basicBlocks);
-                codeGenerator.Generate(basicBlocks);
+                var instructions = codeGenerator.Generate(basicBlocks);
+                methodCodeNodeNeedingCode.MethodCode = instructions;
             }
         }
     }
