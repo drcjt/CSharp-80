@@ -103,6 +103,28 @@ namespace ILCompiler.Compiler
         }
         private void GenerateProlog()
         {
+            // Stack frame looks like this:
+            //
+            //     |                       |
+            //     |-----------------------|   <-- IY will point to here when method code executes
+            //     |       incoming        |
+            //     |       arguments       |
+            //     |-----------------------|
+            //     |    return address     |
+            //     +=======================+
+            //     |    IY (if arguments)  |
+            //     |     IX (if locals)    |
+            //     |-----------------------|   <-- IX will point to here when method code executes
+            //     |    Local variables    |
+            //     |-----------------------|
+            //     |   Arguments for the   |
+            //     ~     next method       ~
+            //     |                       |
+            //     |      |                |
+            //     |      | Stack grows    |
+            //            | downward
+            //            V
+
             // TODO: This assumes all locals are 16 bit in size
             var paramsCount = _methodCodeNode.Method.Parameters.Count;
             if (paramsCount > 0)
