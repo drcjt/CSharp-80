@@ -489,12 +489,6 @@ namespace ILCompiler.Compiler
                 arguments[methodToCall.Parameters.Count - i - 1] = argument;
             }
 
-            // Not yet implemented methods with non void return type
-            if (methodToCall.HasReturnType)
-            {
-                throw new NotSupportedException();
-            }
-
             string targetMethod = "";
             if (methodToCall.IsPinvokeImpl)
             {
@@ -504,8 +498,21 @@ namespace ILCompiler.Compiler
             {
                 targetMethod = _compilation.NameMangler.GetMangledMethodName(methodToCall);
             }
-            var callNode = new CallEntry(targetMethod, arguments, StackValueKind.Unknown);
-            ImportAppendTree(callNode);
+            var returnType = StackValueKind.Unknown;
+            if (methodToCall.HasReturnType)
+            {
+                // TODO: Need to support other return types than short
+                returnType = StackValueKind.Int16;
+            }    
+            var callNode = new CallEntry(targetMethod, arguments, returnType);
+            if (!methodToCall.HasReturnType)
+            {
+                ImportAppendTree(callNode);
+            }
+            else
+            {
+                PushExpression(callNode);
+            }
         }
 
         public void ImportRet(MethodDef method)

@@ -177,6 +177,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(ReturnEntry entry)
         {
+            // TODO: This assumes return value if present is int16
             var method = _methodCodeNode.Method;
             var hasReturnValue = method.HasReturnType;
             var hasParameters = method.Parameters.Count > 0;
@@ -184,7 +185,7 @@ namespace ILCompiler.Compiler
 
             if (hasReturnValue)
             {
-                Append(Instruction.Pop(R16.BC));            // Copy return value into BC
+                Append(Instruction.Pop(R16.DE));            // Copy return value into DE
             }
 
             if (hasLocals)
@@ -201,12 +202,13 @@ namespace ILCompiler.Compiler
 
                 Append(Instruction.Push(R16.BC));           // Restore IY
                 Append(Instruction.Pop(I16.IY));
+                Append(Instruction.Push(R16.HL));           // Restore return address (no args before it now)
             }
 
             if (hasReturnValue)
             {
                 Append(Instruction.Pop(R16.HL));            // Store return address in HL
-                Append(Instruction.Push(R16.BC));           // Push return value
+                Append(Instruction.Push(R16.DE));           // Push return value
                 Append(Instruction.Push(R16.HL));           // Push return address
             }
             else if (hasParameters)
