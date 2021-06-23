@@ -12,20 +12,20 @@ namespace ILCompiler.Compiler
 {
     public class ILImporter
     {
-        private readonly Compilation _compilation;
+        private readonly MethodCompiler _methodCompiler;
         private readonly MethodDef _method;
 
         private BasicBlock[] _basicBlocks;
         private BasicBlock _currentBasicBlock;
         private BasicBlock _pendingBasicBlocks;
 
-        public INameMangler NameMangler => _compilation.NameMangler;
+        public INameMangler NameMangler => _methodCompiler.NameMangler;
 
         private readonly EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
 
-        public ILImporter(Compilation compilation, MethodDef method)
+        public ILImporter(MethodCompiler methodCompiler, MethodDef method)
         {
-            _compilation = compilation;
+            _methodCompiler = methodCompiler;
             _method = method;
         }
 
@@ -180,9 +180,9 @@ namespace ILCompiler.Compiler
                         break;
 
                     default:
-                        if (_compilation.Configuration.IgnoreUnknownCil)
+                        if (_methodCompiler.Configuration.IgnoreUnknownCil)
                         {
-                            _compilation.Logger.LogWarning($"Unsupported IL opcode {opcode}");
+                            _methodCompiler.Logger.LogWarning($"Unsupported IL opcode {opcode}");
                         }
                         else
                         {
@@ -380,7 +380,7 @@ namespace ILCompiler.Compiler
 
         public void ImportLoadVar(int index, bool argument)
         {
-            var localNumber = _method.Parameters.Count + index;
+            var localNumber = _methodCompiler.ParameterCount + index;
             var node = new LocalVariableEntry(localNumber, StackValueKind.Int16);
             PushExpression(node);
         }
@@ -496,7 +496,7 @@ namespace ILCompiler.Compiler
             }
             else
             {
-                targetMethod = _compilation.NameMangler.GetMangledMethodName(methodToCall);
+                targetMethod = _methodCompiler.NameMangler.GetMangledMethodName(methodToCall);
             }
             var returnType = StackValueKind.Unknown;
             if (methodToCall.HasReturnType)

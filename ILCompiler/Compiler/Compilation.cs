@@ -56,31 +56,14 @@ namespace ILCompiler.Compiler
             {
                 _logger.LogInformation("Compiling method {method.Name}", node.Method.Name);
 
-                CompileMethod(node);
+                var methodCompiler = new MethodCompiler(this);
+                methodCompiler.CompileMethod(node);
                 node.Compiled = true;
 
                 foreach (var dependentNode in node.Dependencies)
                 {
                     CompileNode(dependentNode);
                 }
-            }
-        }
-
-        public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode)
-        {
-            var method = methodCodeNodeNeedingCode.Method;
-
-            if (!method.IsConstructor && !method.IsIntrinsic() && !method.IsPinvokeImpl)
-            {
-                var ilImporter = new ILImporter(this, method);
-                var flowgraph = new Flowgraph();
-                var codeGenerator = new CodeGenerator(this, methodCodeNodeNeedingCode);
-
-                // Main phases of the compiler live here
-                var basicBlocks = ilImporter.Import();
-                flowgraph.SetBlockOrder(basicBlocks);
-                var instructions = codeGenerator.Generate(basicBlocks);
-                methodCodeNodeNeedingCode.MethodCode = instructions;
             }
         }
     }
