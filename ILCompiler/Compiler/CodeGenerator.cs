@@ -345,6 +345,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(IntrinsicEntry entry)
         {
+            // TODO: Most of this should be done through MethodImplOptions.InternalCall instead
             var methodToCall = entry.TargetMethod;
             switch (methodToCall)
             {
@@ -355,7 +356,16 @@ namespace ILCompiler.Compiler
 
                 case "WriteInt16":
                     Append(Instruction.Pop(R16.HL));    // put argument 1 into HL
-                    Append(Instruction.Call("NUM2DEC"));
+                    Append(Instruction.Call("NUM2DEC2"));
+                    break;
+
+                // TODO: LTOA only prints unsigned ints at the minute
+                // need to fix z80 code to test for -ve numbers, print -ve sign
+                // and negate number before calling LTOA
+                case "WriteInt32":
+                    Append(Instruction.Pop(R16.DE));
+                    Append(Instruction.Pop(R16.HL));
+                    Append(Instruction.Call("LTOA"));
                     break;
 
                 case "WriteChar":

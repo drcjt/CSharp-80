@@ -91,9 +91,12 @@ namespace ILCompiler.Compiler
                             var value = (int)currentInstruction.Operand;
                             if (value < Int16.MinValue || value > Int16.MaxValue)
                             {
-                                throw new NotSupportedException("Cannot load I4 that is not an I2");
+                                ImportLoadInt((int)currentInstruction.Operand, StackValueKind.Int32);
                             }
-                            ImportLoadInt((int)currentInstruction.Operand, StackValueKind.Int16);
+                            else
+                            {
+                                ImportLoadInt((int)currentInstruction.Operand, StackValueKind.Int16);
+                            }
                         }
                         break;
 
@@ -444,9 +447,17 @@ namespace ILCompiler.Compiler
                         {
                             targetMethodName = "WriteInt16";
                         }
-                        else
+                        else if (argtype.FullName == "System.Int32")
+                        {
+                            targetMethodName = "WriteInt32";
+                        }
+                        else if (argtype.FullName == "System.Char")
                         {
                             targetMethodName = "WriteChar";
+                        }
+                        else
+                        {
+                            throw new NotSupportedException();
                         }
                     }
                     break;

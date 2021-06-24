@@ -8,6 +8,11 @@ namespace MiniBCL
 		{
             Console.Clear();
 
+            // Test writing out Int32 value
+            // TODO: This can only deal with +ve values
+            Console.Write(123456);
+            Console.WriteLine();
+
             // Test subroutine call
             HelloWorld();
 
@@ -72,9 +77,9 @@ namespace MiniBCL
 
         private static void TestArguments(short a, short b, short c)
         {
-            Console.Write(48 + a);
-            Console.Write(48 + b);
-            Console.Write(48 + c);
+            Console.Write((char)(48 + a));
+            Console.Write((char)(48 + b));
+            Console.Write((char)(48 + c));
             Console.Write('\n');
         }
 
@@ -91,7 +96,7 @@ namespace MiniBCL
         {
             short a = 50;
             short b = 3;
-            Console.Write(a + b);
+            Console.Write((short)(a + b));
             Console.Write('\n');
         }
 
@@ -100,7 +105,7 @@ namespace MiniBCL
             short i = 0;
             while (i < 5)
             {
-                Console.Write(48 + i);
+                Console.Write((char)(48 + i));
                 i++;
             }
             Console.Write('\n');
@@ -111,7 +116,7 @@ namespace MiniBCL
             short i = 5;
             while (i > 0)
             {
-                Console.Write(48 + i);
+                Console.Write((char)(48 + i));
                 i--;
             }
             Console.Write('\n');
@@ -122,7 +127,7 @@ namespace MiniBCL
             short i = 0;
             while (i <= 5)
             {
-                Console.Write(48 + i);
+                Console.Write((char)(48 + i));
                 i++;
             }
             Console.Write('\n');
@@ -133,7 +138,7 @@ namespace MiniBCL
             short i = 5;
             while (i >= 0)
             {
-                Console.Write(48 + i);
+                Console.Write((char)(48 + i));
                 i--;
             }
             Console.Write('\n');

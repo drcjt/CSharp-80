@@ -14,6 +14,9 @@ namespace System
 		[Intrinsic]
 		public static void Write(String str) { }
 
+		[Intrinsic]
+		public static void Write(char c) { }
+
 		[DllImport("Runtime", EntryPoint="SetXY")]
 		private static unsafe extern void SetConsoleCursorPosition(sbyte x, sbyte y);
 
