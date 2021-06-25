@@ -1,0 +1,5 @@
+CLS:
+	PUSH AF
+	CALL 01C9H
+	POP AF
+	RET

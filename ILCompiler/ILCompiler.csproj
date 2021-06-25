@@ -11,6 +11,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Runtime\s_eq.asm" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Runtime\s_eq.asm" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="dnlib" Version="3.3.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
@@ -18,10 +26,8 @@
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20071.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="csharprt.asm">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="copy /a $(ProjectDir)Runtime\*.asm $(ProjectDir)csharprt.asm" />
+  </Target>
 
 </Project>

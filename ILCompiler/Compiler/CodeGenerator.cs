@@ -265,12 +265,12 @@ namespace ILCompiler.Compiler
 
         private readonly string[] comparisonRoutinesByOpcode = new string[]
         {
-            "EQL",              // Beq
-            "GREATERTHANEQ",    // Bge
-            "GREATERTHAN",      // Bgt
-            "LESSTHANEQ",       // Ble
-            "LESSTHAN",         // Blt
-            "NOTEQ"             // Bne
+            "s_eq",             // Beq
+            "s_ge",             // Bge
+            "s_gt",             // Bgt
+            "s_le",             // Ble
+            "s_lt",             // Blt
+            "s_neq"             // Bne
         };
 
         private void GenerateComparison(BinaryOp op)
@@ -278,7 +278,8 @@ namespace ILCompiler.Compiler
             Append(Instruction.Pop(R16.HL));
             Append(Instruction.Pop(R16.DE));
 
-            Append(Instruction.Call(comparisonRoutinesByOpcode[op - BinaryOp.EQ]));
+            var comparisonAsmName = comparisonRoutinesByOpcode[op - BinaryOp.EQ];
+            Append(Instruction.Call(comparisonAsmName));
         }
 
         private void GenerateAdd()
@@ -301,7 +302,7 @@ namespace ILCompiler.Compiler
         {
             Append(Instruction.Pop(R16.DE));
             Append(Instruction.Pop(R16.BC));
-            Append(Instruction.Call("MUL16"));
+            Append(Instruction.Call("s_mul"));
             Append(Instruction.Push(R16.HL));
         }
 

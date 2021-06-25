@@ -17,7 +17,7 @@ namespace System
 		[Intrinsic]
 		public static void Write(char c) { }
 
-		[DllImport("Runtime", EntryPoint="SetXY")]
+		[DllImport(Libraries.Runtime, EntryPoint="SetXY")]
 		private static unsafe extern void SetConsoleCursorPosition(sbyte x, sbyte y);
 
 		public static unsafe void SetCursorPosition(int x, int y)
@@ -32,7 +32,7 @@ namespace System
 		}
 
 		/* Intrinsic is more efficient at the moment 
-		[DllImport("Runtime", EntryPoint = "WRITE")]
+		[DllImport(Libraries.Runtime, EntryPoint = "WRITE")]
 		private static unsafe extern void WriteConsole(Int32 ch);
 		
 		public static unsafe void Write(Int32 c)
@@ -41,18 +41,19 @@ namespace System
         }
 		*/
 
-		[DllImport("Runtime", EntryPoint = "CLS")]
+		[DllImport(Libraries.Runtime, EntryPoint = "CLS")]
 		public static unsafe extern void Clear();
 
 		public static void WriteLine()
         {
-			Write('\n');
+			Write(Environment.NewLine);
 		}
 
 		public static void WriteLine(string str) 
 		{
+			// TODO: Really want to use string concatenation here but not sure that will work yet
 			Write(str); 
-			Write('\n'); 
+			Write(Environment.NewLine); 
 		}
 	}
 }
