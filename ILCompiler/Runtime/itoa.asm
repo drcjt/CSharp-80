@@ -29,6 +29,33 @@ LTOA:
 	PUSH DE
     PUSH IY
 	PUSH IX
+
+	BIT 7, D        ; Test if long is negative
+	JR Z, LTOA2
+
+    PUSH DE
+    PUSH HL
+	LD A, '-'       ; Print -ve sign
+	CALL 33H
+    POP HL
+    POP DE
+
+    LD A, L         ; invert dehl
+    CPL
+    LD L, A
+    LD A, H
+    CPL
+    LD H, A
+    LD A, E
+    CPL
+    LD E, A
+    LD A, D
+    CPL
+    LD D, A
+
+    call l_inc_dehl     ; inc dehl
+
+LTOA2:
 	CALL B2D32
 	CALL PRINT
 	POP IX
@@ -38,7 +65,6 @@ LTOA:
 	POP AF
 	RET
 	
-
 ; Combined routine for conversion of different sized binary numbers into
 ; directly printable ASCII(Z)-string
 ; Input value in registers, number size and -related to that- registers to fill

@@ -9,8 +9,7 @@ namespace MiniBCL
             Console.Clear();
 
             // Test writing out Int32 value
-            // TODO: This can only deal with +ve values
-            Console.Write(123456);
+            Console.Write(-123456);
             Console.WriteLine();
 
             // Test subroutine call
