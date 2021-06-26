@@ -38,6 +38,7 @@ namespace ILCompiler.Common.TypeSystem.IL
                 case ElementType.Class:
                 case ElementType.Array:
                 case ElementType.SZArray:
+                case ElementType.String:
                     return StackValueKind.ObjRef;
                 case ElementType.ByRef:
                     return StackValueKind.ByRef;

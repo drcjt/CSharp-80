@@ -10,6 +10,7 @@ namespace ILCompiler.Compiler
     public class CodeGenerator : IStackEntryVisitor
     {
         private readonly Compilation _compilation;
+        private readonly LocalVariableDescriptor[] _localVariableTable;
 
         // TODO: would like to eliminate use of the MethodDef property of _methodCodeNode
         // This is currently used to access the MethodDef which is used for getting:
@@ -22,9 +23,10 @@ namespace ILCompiler.Compiler
 
         private IList<Instruction> _currentBlockInstructions = new List<Instruction>();
 
-        public CodeGenerator(Compilation compilation, Z80MethodCodeNode methodCodeNodeNeedingCode)
+        public CodeGenerator(Compilation compilation, LocalVariableDescriptor[] localVariableTable, Z80MethodCodeNode methodCodeNodeNeedingCode)
         {
             _compilation = compilation;
+            _localVariableTable = localVariableTable;
             _methodCodeNode = methodCodeNodeNeedingCode;
         }
 
@@ -125,15 +127,28 @@ namespace ILCompiler.Compiler
             //            | downward
             //            V
 
-            // TODO: This assumes all locals are 16 bit in size
+            var parametersSize = 0;
+            var localsSize = 0;
+            foreach (var localVariable in _localVariableTable)
+            {
+                if (localVariable.IsParameter)
+                {
+                    parametersSize += localVariable.ExactSize;
+                }
+                else
+                {
+                    localsSize += localVariable.ExactSize;
+                }
+            }
+
             var paramsCount = _methodCodeNode.Method.Parameters.Count;
             if (paramsCount > 0)
             {
                 Append(Instruction.Push(I16.IY));
                 // Set IY to start of arguments here
-                // IY = SP - (2 * (number of params + 2))
+                // IY = SP - 4 - size of parameters
 
-                Append(Instruction.Ld(R16.HL, (short)(2 * (paramsCount + 2))));
+                Append(Instruction.Ld(R16.HL, (short)(4 + parametersSize)));
                 Append(Instruction.Add(R16.HL, R16.SP));
                 Append(Instruction.Push(R16.HL));
                 Append(Instruction.Pop(I16.IY));
@@ -145,8 +160,6 @@ namespace ILCompiler.Compiler
                 Append(Instruction.Push(I16.IX));
                 Append(Instruction.Ld(I16.IX, 0));
                 Append(Instruction.Add(I16.IX, R16.SP));
-
-                var localsSize = localsCount * 2;
 
                 Append(Instruction.Ld(R16.HL, (short)-localsSize));
                 Append(Instruction.Add(R16.HL, R16.SP));

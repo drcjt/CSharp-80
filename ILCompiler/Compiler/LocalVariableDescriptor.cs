@@ -7,5 +7,7 @@ namespace ILCompiler.Compiler
         public bool IsParameter { get; set; }
 
         public StackValueKind Kind { get; set; }
+
+        public int ExactSize { get;set; }
     }
 }

@@ -4,6 +4,7 @@ using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
+using System;
 
 namespace ILCompiler.Compiler
 {
@@ -33,7 +34,12 @@ namespace ILCompiler.Compiler
             for (int parameterIndex = 0; parameterIndex < method.Parameters.Count; parameterIndex++)
             {
                 var kind = method.Parameters[parameterIndex].Type.GetStackValueKind();
-                var local = new LocalVariableDescriptor() { IsParameter = true, Kind = kind };
+                var local = new LocalVariableDescriptor() 
+                { 
+                    IsParameter = true, 
+                    Kind = kind,
+                    ExactSize = GetExactSize(kind)
+                };
                 _localVariableTable[parameterIndex] = local;
             }
 
@@ -42,9 +48,34 @@ namespace ILCompiler.Compiler
                 for (int variableIndex = 0; variableIndex < body.Variables.Count; variableIndex++)
                 {
                     var kind = body.Variables[variableIndex].Type.GetStackValueKind();
-                    var local = new LocalVariableDescriptor() { IsParameter = false, Kind = kind };
+                    var local = new LocalVariableDescriptor() 
+                    { 
+                        IsParameter = false, 
+                        Kind = kind, 
+                        ExactSize = GetExactSize(kind) 
+                    };
                     _localVariableTable[method.Parameters.Count + variableIndex] = local;
                 }
+            }
+        }
+
+        // TODO: Move this to a better place e.g TypeList.cs
+        private int GetExactSize(StackValueKind kind)
+        {
+            switch (kind)
+            {
+                case StackValueKind.Int16:
+                    return 2;
+                case StackValueKind.Int32:
+                    return 4;
+                case StackValueKind.Int64:
+                    return 8;
+                case StackValueKind.ObjRef:
+                    return 2;
+                case StackValueKind.NativeInt:
+                    return 2;
+                default:
+                    throw new NotImplementedException($"Kind {kind} not yet supported");
             }
         }
 
@@ -59,7 +90,7 @@ namespace ILCompiler.Compiler
             {
                 var ilImporter = new ILImporter(this, method);
                 var flowgraph = new Flowgraph();
-                var codeGenerator = new CodeGenerator(_compilation, methodCodeNodeNeedingCode);
+                var codeGenerator = new CodeGenerator(_compilation, _localVariableTable, methodCodeNodeNeedingCode);
 
                 // Main phases of the compiler live here
                 var basicBlocks = ilImporter.Import();
