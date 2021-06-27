@@ -333,12 +333,29 @@ namespace ILCompiler.Compiler
             else
             {
                 // Loading an argument
-                var offset = _localVariableTable[entry.LocalNumber].StackOffset;
+                var parameterDescriptor = _localVariableTable[entry.LocalNumber];
+                var offset = parameterDescriptor.StackOffset;
 
-                Append(Instruction.Ld(R8.H, I16.IY, (short)-(offset + 1)));
-                Append(Instruction.Ld(R8.L, I16.IY, (short)-(offset + 2)));
-                Append(Instruction.Push(R16.HL));
+                switch (parameterDescriptor.ExactSize)
+                {
+                    case 2:
+                        Append(Instruction.Ld(R8.H, I16.IY, (short)-(offset + 1)));
+                        Append(Instruction.Ld(R8.L, I16.IY, (short)-(offset + 2)));
+                        Append(Instruction.Push(R16.HL));
+                        break;
 
+                    case 4:
+                        Append(Instruction.Ld(R8.H, I16.IY, (short)-(offset + 1)));
+                        Append(Instruction.Ld(R8.L, I16.IY, (short)-(offset + 2)));
+                        Append(Instruction.Push(R16.HL));
+                        Append(Instruction.Ld(R8.H, I16.IY, (short)-(offset + 3)));
+                        Append(Instruction.Ld(R8.L, I16.IY, (short)-(offset + 4)));
+                        Append(Instruction.Push(R16.HL));
+                        break;
+
+                    default:
+                        throw new NotImplementedException();
+                }
             }
         }
 
