@@ -8,6 +8,8 @@ namespace MiniBCL
 		{
             Console.Clear();
 
+            TestDiv();
+
             // Test writing out Int32 value
             TestPassingInt32(123456);
 
@@ -63,6 +65,13 @@ namespace MiniBCL
         {
             Console.Write(value);
             Console.WriteLine();
+        }
+
+        private static void TestDiv()
+        {
+            short x = 100;
+            short y = 5;
+            Console.Write((short)(x / y));
         }
 
         private static short TestFibonacci(short n)

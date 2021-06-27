@@ -125,6 +125,7 @@ namespace ILCompiler.Compiler
                     case Code.Add:
                     case Code.Sub:
                     case Code.Mul:
+                    case Code.Div:
                         ImportBinaryOperation(opcode);
                         break;
 
@@ -352,7 +353,29 @@ namespace ILCompiler.Compiler
                 throw new NotSupportedException("Binary operations on types other than short not supported yet");
             }
 
-            BinaryOp binaryOp = opcode == Code.Add ? BinaryOp.ADD : (opcode == Code.Sub ? BinaryOp.SUB : BinaryOp.MUL);
+            BinaryOp binaryOp;
+            switch (opcode)
+            {
+                case Code.Add:
+                    binaryOp = BinaryOp.ADD;
+                    break;
+
+                case Code.Sub:
+                    binaryOp = BinaryOp.SUB;
+                    break;
+
+                case Code.Mul:
+                    binaryOp = BinaryOp.MUL;
+                    break;
+
+                case Code.Div:
+                    binaryOp = BinaryOp.DIV;
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
+
             var binaryExpr = new BinaryOperator(binaryOp, op1, op2, kind);
             PushExpression(binaryExpr);
         }

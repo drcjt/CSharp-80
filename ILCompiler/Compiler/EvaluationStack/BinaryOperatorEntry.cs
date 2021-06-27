@@ -7,6 +7,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         ADD,
         SUB,
         MUL,
+        DIV,
         EQ,
         NE,
         LT,

@@ -266,6 +266,10 @@ namespace ILCompiler.Compiler
                     GenerateMul();
                     break;
 
+                case BinaryOp.DIV:
+                    GenerateDiv();
+                    break;
+
                 default:
                     GenerateComparison(entry.Op);
                     break;
@@ -313,6 +317,14 @@ namespace ILCompiler.Compiler
             Append(Instruction.Pop(R16.BC));
             Append(Instruction.Call("s_mul"));
             Append(Instruction.Push(R16.HL));
+        }
+
+        private void GenerateDiv()
+        {
+            Append(Instruction.Pop(R16.DE));
+            Append(Instruction.Pop(R16.HL));
+            Append(Instruction.Call("s_div"));
+            Append(Instruction.Push(R16.DE));
         }
 
         public void Visit(LocalVariableEntry entry)
