@@ -9,8 +9,7 @@ namespace MiniBCL
             Console.Clear();
 
             // Test writing out Int32 value
-            Console.Write(-123456);
-            Console.WriteLine();
+            TestPassingInt32(123456);
 
             // Test subroutine call
             HelloWorld();
@@ -59,6 +58,12 @@ namespace MiniBCL
 
             return 42;
 		}
+
+        private static void TestPassingInt32(int value)
+        {
+            Console.Write(value);
+            Console.WriteLine();
+        }
 
         private static short TestFibonacci(short n)
         {

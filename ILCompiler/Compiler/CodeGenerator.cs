@@ -246,10 +246,6 @@ namespace ILCompiler.Compiler
                 Append(Instruction.Push(R16.DE));           // Push return value
                 Append(Instruction.Push(R16.HL));           // Push return address
             }
-            else if (hasParameters)
-            {
-                Append(Instruction.Push(R16.HL));           // Push return address
-            }
 
             Append(Instruction.Ret());
         }
