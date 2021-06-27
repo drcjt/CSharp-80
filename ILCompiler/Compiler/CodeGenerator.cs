@@ -324,7 +324,7 @@ namespace ILCompiler.Compiler
             if (entry.LocalNumber >= _methodCodeNode.Method.Parameters.Count)
             {
                 // Loading a local variable
-                var offset = (entry.LocalNumber - _methodCodeNode.Method.Parameters.Count) * 2; // TODO: This needs to take into account differing sizes of local vars
+                var offset = _localVariableTable[entry.LocalNumber].StackOffset;
 
                 Append(Instruction.Ld(R8.H, I16.IX, (short)-(offset + 1)));
                 Append(Instruction.Ld(R8.L, I16.IX, (short)-(offset + 2)));
@@ -333,7 +333,7 @@ namespace ILCompiler.Compiler
             else
             {
                 // Loading an argument
-                var offset = entry.LocalNumber * 2; // TODO: This needs to take into account differing sizes of local vars
+                var offset = _localVariableTable[entry.LocalNumber].StackOffset;
 
                 Append(Instruction.Ld(R8.H, I16.IY, (short)-(offset + 1)));
                 Append(Instruction.Ld(R8.L, I16.IY, (short)-(offset + 2)));

@@ -31,6 +31,7 @@ namespace ILCompiler.Compiler
             // Setup local variable table - includes parameters as well as locals in method
             _localVariableTable = new LocalVariableDescriptor[method.Parameters.Count + body?.Variables.Count ?? 0];
 
+            var offset = 0;
             for (int parameterIndex = 0; parameterIndex < method.Parameters.Count; parameterIndex++)
             {
                 var kind = method.Parameters[parameterIndex].Type.GetStackValueKind();
@@ -38,13 +39,16 @@ namespace ILCompiler.Compiler
                 { 
                     IsParameter = true, 
                     Kind = kind,
-                    ExactSize = GetExactSize(kind)
+                    ExactSize = GetExactSize(kind),
+                    StackOffset = offset
                 };
                 _localVariableTable[parameterIndex] = local;
+                offset += local.ExactSize;
             }
 
             if (body != null)
             {
+                offset = 0; // Reset as use separate index register to access locals than parameters
                 for (int variableIndex = 0; variableIndex < body.Variables.Count; variableIndex++)
                 {
                     var kind = body.Variables[variableIndex].Type.GetStackValueKind();
@@ -52,9 +56,11 @@ namespace ILCompiler.Compiler
                     { 
                         IsParameter = false, 
                         Kind = kind, 
-                        ExactSize = GetExactSize(kind) 
+                        ExactSize = GetExactSize(kind),
+                        StackOffset = offset
                     };
                     _localVariableTable[method.Parameters.Count + variableIndex] = local;
+                    offset += local.ExactSize;
                 }
             }
         }

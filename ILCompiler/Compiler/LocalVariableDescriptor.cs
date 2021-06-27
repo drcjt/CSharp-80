@@ -9,5 +9,7 @@ namespace ILCompiler.Compiler
         public StackValueKind Kind { get; set; }
 
         public int ExactSize { get;set; }
+
+        public int StackOffset { get; set; }
     }
 }
