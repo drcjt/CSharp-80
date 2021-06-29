@@ -1,6 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using System.Collections.Generic;
-using Instruction = ILCompiler.z80.Instruction;
 
 namespace ILCompiler.Compiler
 {

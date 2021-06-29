@@ -1,6 +1,6 @@
 ﻿using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.EvaluationStack;
-using ILCompiler.z80;
+using Z80Assembler;
 using System;
 using System.Collections.Generic;
 
@@ -55,7 +55,7 @@ namespace ILCompiler.Compiler
                     currentNode = currentNode.Next;
                 }
 
-                _compilation.Optimizer.Optimize(_currentBlockInstructions);
+                Optimize(_currentBlockInstructions);
                 methodInstructions.AddRange(_currentBlockInstructions);
             }
 
@@ -418,6 +418,43 @@ namespace ILCompiler.Compiler
         public void Append(Instruction instruction)
         {
             _currentBlockInstructions.Add(instruction);
+        }
+
+        private void Optimize(IList<Instruction> instructions)
+        {
+            EliminatePushXXPopXX(instructions);
+        }
+
+        private void EliminatePushXXPopXX(IList<Instruction> instructions)
+        {
+            int unoptimizedInstructionCount = instructions.Count;
+            Instruction lastInstruction = null;
+            var currentInstruction = instructions[0];
+            int count = 0;
+            do
+            {
+                if (lastInstruction?.Opcode == Opcode.Push && currentInstruction.Opcode == Opcode.Pop
+                    && lastInstruction?.Operands == currentInstruction.Operands)
+                {
+                    // Eliminate Push followed by Pop
+                    instructions.RemoveAt(count - 1);
+                    instructions.RemoveAt(count - 1);
+
+                    count--;
+                    currentInstruction = instructions[count];
+                    lastInstruction = count > 0 ? instructions[count - 1] : null;
+                }
+                else
+                {
+                    lastInstruction = currentInstruction;
+                    if (count + 1 < instructions.Count)
+                    {
+                        currentInstruction = instructions[++count];
+                    }
+                }
+            } while (count < instructions.Count - 1);
+
+            //_logger.LogInformation($"Eliminated {unoptimizedInstructionCount - instructions.Count} instructions");
         }
     }
 }

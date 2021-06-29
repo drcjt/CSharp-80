@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace ILCompiler.z80
+namespace Z80Assembler
 {
     public class Instruction
     {

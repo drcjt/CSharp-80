@@ -1,5 +1,5 @@
 ﻿using dnlib.DotNet;
-using ILCompiler.z80;
+using Z80Assembler;
 using System.Collections.Generic;
 
 namespace ILCompiler.Compiler.DependencyAnalysis

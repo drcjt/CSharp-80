@@ -4,10 +4,8 @@ using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
-using ILCompiler.z80;
 using ILCompiler.Compiler;
 using ILCompiler.Interfaces;
-using ILCompiler.z80.Interfaces;
 
 namespace ILCompiler
 {
@@ -50,7 +48,6 @@ namespace ILCompiler
             services.AddLogging(configure => configure.AddConsole()).AddTransient<Program>();
             services.AddSingleton<ICompilation, Compilation>();
             services.AddSingleton<IConfiguration, Configuration>();
-            services.AddSingleton<IOptimizer, Optimizer>();
             services.AddSingleton<INameMangler, NameMangler>();
         }
 

@@ -1,7 +1,6 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
-using ILCompiler.z80.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.IO;
@@ -11,20 +10,17 @@ namespace ILCompiler.Compiler
     public class Compilation : ICompilation
     {
         private readonly ILogger<Compilation> _logger;
-        private readonly IOptimizer _optimizer;
         private readonly IConfiguration _configuration;
         private readonly INameMangler _nameMangler;
 
         public ILogger<Compilation> Logger => _logger;
         public IConfiguration Configuration => _configuration;
-        public IOptimizer Optimizer => _optimizer;
         public INameMangler NameMangler => _nameMangler;
 
-        public Compilation(IConfiguration configuration, ILogger<Compilation> logger, IOptimizer optimizer, INameMangler nameMangler)
+        public Compilation(IConfiguration configuration, ILogger<Compilation> logger, INameMangler nameMangler)
         {
             _configuration = configuration;
             _logger = logger;
-            _optimizer = optimizer;
             _nameMangler = nameMangler;
         }
 

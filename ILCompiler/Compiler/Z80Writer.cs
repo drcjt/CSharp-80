@@ -1,6 +1,6 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Compiler.DependencyAnalysis;
-using ILCompiler.z80;
+using Z80Assembler;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;

@@ -1,4 +1,4 @@
-﻿namespace ILCompiler.z80
+﻿namespace Z80Assembler
 {
     public abstract class Register
     {
