@@ -12,4 +12,4 @@ Architecture
 ============
 
 [CSharp-80 Architecture](https://github.com/drcjt/CSharp-80/blob/main/Documentation/csharp-80-architecture.md) is similar to CoreRT in consuming CIL as input but
-generated Z80 Assembly language as output which can easily be turned into a native TRS-80 command file using an assembler such as [Z80Asm](http://www.trs-80emulators.com/z80asm/).
+generated Z80 Assembly language as output which can easily be turned into a native TRS-80 command file using an assembler such as [zmac](http://48k.ca/zmac.html).

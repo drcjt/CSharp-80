@@ -1,7 +1,7 @@
 # CSharp-80
 
 This repo contains a .NET Core ahead of time compiler targetting the Z80. The compiler can compile a managed .NET Core application into an assembly language file that 
-can be easily turned into a native Z80 binary file using an assembler such as [Z80Asm](http://www.trs-80emulators.com/z80asm/). To learn more about CSharp-80, see the
+can be easily turned into a native Z80 binary file using an assembler such as [zmac](http://48k.ca/zmac.html). To learn more about CSharp-80, see the
 [intro document](Documentation/intro-to-csharp-80.md)
 
 ## Goals
