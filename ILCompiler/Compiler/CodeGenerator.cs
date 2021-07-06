@@ -4,6 +4,7 @@ using Z80Assembler;
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using ILCompiler.Common.TypeSystem.IL;
 
 namespace ILCompiler.Compiler
 {
@@ -278,14 +279,20 @@ namespace ILCompiler.Compiler
         public void GenerateCodeForReturn(ReturnEntry entry)
         {
             // TODO: This assumes return value if present is int16
+            var targetType = entry.Return;
+
             var method = _methodCodeNode.Method;
-            var hasReturnValue = method.HasReturnType;
+            var hasReturnValue = targetType != null && targetType.Kind != StackValueKind.Unknown;
             var hasParameters = method.Parameters.Count > 0;
             var hasLocals = method.Body.Variables.Count > 0;
 
             if (hasReturnValue)
             {
                 _currentAssembler.Pop(R16.DE);            // Copy return value into DE
+                if (targetType != null && targetType.Kind == StackValueKind.Int32)
+                {
+                    _currentAssembler.Pop(R16.AF);
+                }
             }
 
             if (hasLocals)
@@ -308,6 +315,10 @@ namespace ILCompiler.Compiler
             if (hasReturnValue)
             {
                 _currentAssembler.Pop(R16.HL);            // Store return address in HL
+                if (targetType != null && targetType.Kind == StackValueKind.Int32)
+                {
+                    _currentAssembler.Push(R16.AF);
+                }
                 _currentAssembler.Push(R16.DE);           // Push return value
                 _currentAssembler.Push(R16.HL);           // Push return address
             }
@@ -394,11 +405,19 @@ namespace ILCompiler.Compiler
             if (entry.LocalNumber >= _methodCodeNode.Method.Parameters.Count)
             {
                 // Loading a local variable
-                var offset = _localVariableTable[entry.LocalNumber].StackOffset;
+                var localVariable = _localVariableTable[entry.LocalNumber];
+                var offset = localVariable.StackOffset;
 
                 _currentAssembler.Ld(R8.H, I16.IX, (short)-(offset + 1));
                 _currentAssembler.Ld(R8.L, I16.IX, (short)-(offset + 2));
                 _currentAssembler.Push(R16.HL);
+
+                if (localVariable.ExactSize == 4)
+                {
+                    _currentAssembler.Ld(R8.H, I16.IX, (short)-(offset + 3));
+                    _currentAssembler.Ld(R8.L, I16.IX, (short)-(offset + 4));
+                    _currentAssembler.Push(R16.HL);
+                }
             }
             else
             {
@@ -406,33 +425,30 @@ namespace ILCompiler.Compiler
                 var parameterDescriptor = _localVariableTable[entry.LocalNumber];
                 var offset = parameterDescriptor.StackOffset;
 
-                switch (parameterDescriptor.ExactSize)
+                _currentAssembler.Ld(R8.H, I16.IY, (short)-(offset + 1));
+                _currentAssembler.Ld(R8.L, I16.IY, (short)-(offset + 2));
+                _currentAssembler.Push(R16.HL);
+
+                if (parameterDescriptor.ExactSize == 4)
                 {
-                    case 2:
-                        _currentAssembler.Ld(R8.H, I16.IY, (short)-(offset + 1));
-                        _currentAssembler.Ld(R8.L, I16.IY, (short)-(offset + 2));
-                        _currentAssembler.Push(R16.HL);
-                        break;
-
-                    case 4:
-                        _currentAssembler.Ld(R8.H, I16.IY, (short)-(offset + 1));
-                        _currentAssembler.Ld(R8.L, I16.IY, (short)-(offset + 2));
-                        _currentAssembler.Push(R16.HL);
-                        _currentAssembler.Ld(R8.H, I16.IY, (short)-(offset + 3));
-                        _currentAssembler.Ld(R8.L, I16.IY, (short)-(offset + 4));
-                        _currentAssembler.Push(R16.HL);
-                        break;
-
-                    default:
-                        throw new NotImplementedException();
+                    _currentAssembler.Ld(R8.H, I16.IY, (short)-(offset + 3));
+                    _currentAssembler.Ld(R8.L, I16.IY, (short)-(offset + 4));
+                    _currentAssembler.Push(R16.HL);
                 }
             }
         }
 
         public void GenerateCodeForStoreLocalVariable(StoreLocalVariableEntry entry)
         {
-            // Storing to a local variable
-            var offset = entry.LocalNumber * 2; // TODO: This needs to take into account differing sizes of local vars
+            var localVariable = _localVariableTable[entry.LocalNumber];
+            var offset = localVariable.StackOffset;
+
+            if (localVariable.ExactSize == 4)
+            {
+                _currentAssembler.Pop(R16.HL);
+                _currentAssembler.Ld(I16.IX, (short)-(offset + 3), R8.H);
+                _currentAssembler.Ld(I16.IX, (short)-(offset + 4), R8.L);
+            }
 
             _currentAssembler.Pop(R16.HL);
             _currentAssembler.Ld(I16.IX, (short)-(offset + 1), R8.H);

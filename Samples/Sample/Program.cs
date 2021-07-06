@@ -8,6 +8,9 @@ namespace MiniBCL
 		{
             Console.Clear();
 
+            Int32 returnedInt32 = TestReturnInt32();
+            Console.WriteLine(returnedInt32);
+
             TestDiv();
 
             // Test writing out Int32 value
@@ -17,12 +20,10 @@ namespace MiniBCL
             HelloWorld();
 
             // Test writing int16 positive value
-            Console.Write((short)589);
-            Console.WriteLine();
+            Console.WriteLine((short)589);
 
             // Test writing int16 negative value
-            Console.Write((short)-8537);
-            Console.WriteLine();
+            Console.WriteLine((short)-8537);
 
             // Test boolean comparisons
             TestBooleanComparison();
@@ -55,11 +56,17 @@ namespace MiniBCL
 
             // Test implementation of write char completely written in C#
             WriteChar(0, 0, 48); // Write 0 to top left corner of screen
-
-            Console.Write(TestFibonacci(10));  // should display 55
-
+           
+            Console.WriteLine(TestFibonacci(10));  // should display 55
+            
             return 42;
 		}
+
+        private static Int32 TestReturnInt32()
+        {
+            Int32 result = 123456;
+            return result;
+        }
 
         private static void TestPassingInt32(int value)
         {
@@ -71,7 +78,7 @@ namespace MiniBCL
         {
             short x = 100;
             short y = 5;
-            Console.Write((short)(x / y));
+            Console.WriteLine((short)(x / y));
         }
 
         private static short TestFibonacci(short n)
@@ -200,7 +207,7 @@ namespace MiniBCL
         {
             byte* screenMemory = (byte*)0x3c00;
             short offset = 0;
-            for (int i = 0; i < y; i++)
+            for (short i = 0; i < y; i++)
             {
                 offset += 64;
             }

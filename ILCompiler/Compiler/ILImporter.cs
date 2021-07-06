@@ -14,6 +14,7 @@ namespace ILCompiler.Compiler
     {
         private readonly MethodCompiler _methodCompiler;
         private readonly MethodDef _method;
+        private readonly LocalVariableDescriptor[] _localVariableTable;
 
         private BasicBlock[] _basicBlocks;
         private BasicBlock _currentBasicBlock;
@@ -23,10 +24,11 @@ namespace ILCompiler.Compiler
 
         private readonly EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
 
-        public ILImporter(MethodCompiler methodCompiler, MethodDef method)
+        public ILImporter(MethodCompiler methodCompiler, MethodDef method, LocalVariableDescriptor[] localVariableTable)
         {
             _methodCompiler = methodCompiler;
             _method = method;
+            _localVariableTable = localVariableTable;
         }
 
         private void ImportBasicBlocks(IDictionary<int, int> offsetToIndexMap)
@@ -348,9 +350,9 @@ namespace ILCompiler.Compiler
                 kind = op2.Kind;
             }
 
-            if (kind != StackValueKind.Int16)
+            if (kind != StackValueKind.Int16 && kind != StackValueKind.NativeInt)
             {
-                throw new NotSupportedException("Binary operations on types other than short not supported yet");
+                throw new NotSupportedException("Binary operations on types other than short and nativeint not supported yet");
             }
 
             Operation binaryOp;
@@ -385,7 +387,7 @@ namespace ILCompiler.Compiler
             var value = _stack.Pop();
             var addr = _stack.Pop();
 
-            if (type != WellKnownType.SByte || addr.Kind != StackValueKind.Int16 || value.Kind != StackValueKind.Int16)
+            if (type != WellKnownType.SByte && addr.Kind != StackValueKind.Int16 && value.Kind != StackValueKind.Int16)
             {
                 throw new NotSupportedException();
             }
@@ -396,24 +398,27 @@ namespace ILCompiler.Compiler
         public void ImportStoreVar(int index, bool argument)
         {
             var value = _stack.Pop();
-            if (value.Kind != StackValueKind.Int16 && value.Kind != StackValueKind.ObjRef)
+            if (value.Kind != StackValueKind.Int16 && value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ObjRef)
             {
-                throw new NotSupportedException("Storing variables other than short or object refs not supported yet");
+                throw new NotSupportedException("Storing variables other than short, int32 or object refs not supported yet");
             }
-            var node = new StoreLocalVariableEntry(index, value);
+            var localNumber = _methodCompiler.ParameterCount + index;
+            var node = new StoreLocalVariableEntry(localNumber, value);
             ImportAppendTree(node);
         }
 
         public void ImportLoadVar(int index, bool argument)
         {
             var localNumber = _methodCompiler.ParameterCount + index;
-            var node = new LocalVariableEntry(localNumber, StackValueKind.Int16);
+            var localVariable = _localVariableTable[localNumber];
+            var node = new LocalVariableEntry(localNumber, localVariable.Kind);
             PushExpression(node);
         }
 
         public void ImportLdArg(int index)
         {
-            var node = new LocalVariableEntry(index, StackValueKind.Int16);
+            var argument = _localVariableTable[index];
+            var node = new LocalVariableEntry(index, argument.Kind);
             PushExpression(node);
         }
 
@@ -556,9 +561,9 @@ namespace ILCompiler.Compiler
             if (hasReturnValue)
             {
                 var value = _stack.Pop();
-                if (value.Kind != StackValueKind.Int16)
+                if (value.Kind != StackValueKind.Int16 && value.Kind != StackValueKind.Int32)
                 {
-                    throw new NotSupportedException("Return values of types other than short not supported yet");
+                    throw new NotSupportedException("Return values of types other than short and int32 not supported yet");
                 }
                 retNode.Return = value;
             }

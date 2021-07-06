@@ -49,6 +49,18 @@ namespace System
 			Write(Environment.NewLine);
 		}
 
+		public static void WriteLine(Int32 value)
+        {
+			Write(value);
+			WriteLine();
+        }
+
+		public static void WriteLine(Int16 value)
+        {
+			Write(value);
+			WriteLine();
+        }
+
 		public static void WriteLine(string str) 
 		{
 			// TODO: Really want to use string concatenation here but not sure that will work yet

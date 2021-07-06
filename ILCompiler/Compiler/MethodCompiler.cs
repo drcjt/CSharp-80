@@ -94,7 +94,7 @@ namespace ILCompiler.Compiler
 
             if (!method.IsConstructor && !method.IsIntrinsic() && !method.IsPinvokeImpl)
             {
-                var ilImporter = new ILImporter(this, method);
+                var ilImporter = new ILImporter(this, method, _localVariableTable);
                 var flowgraph = new Flowgraph();
                 var codeGenerator = new CodeGenerator(_compilation, _localVariableTable, methodCodeNodeNeedingCode);
 
