@@ -255,7 +255,7 @@ namespace ILCompiler.Compiler
                 }
 
                 StackEntry op1;
-                BinaryOp op;
+                Operation op;
                 if (opcode != Code.Brfalse && opcode != Code.Brtrue)
                 {
                     op1 = _stack.Pop();
@@ -263,12 +263,12 @@ namespace ILCompiler.Compiler
                     {
                         throw new NotSupportedException("Boolean comparisons only supported using short as underlying type");
                     }
-                    op = BinaryOp.EQ + (opcode - Code.Beq);
+                    op = Operation.Eq + (opcode - Code.Beq);
                 }
                 else
                 {
                     op1 = new Int16ConstantEntry((short)(opcode == Code.Brfalse ? 0 : 1));
-                    op = BinaryOp.EQ;
+                    op = Operation.Eq;
                 }
                 op1 = new BinaryOperator(op, op1, op2, StackValueKind.Int16);
                 ImportAppendTree(new JumpTrueEntry(target.Label, op1));
@@ -353,23 +353,23 @@ namespace ILCompiler.Compiler
                 throw new NotSupportedException("Binary operations on types other than short not supported yet");
             }
 
-            BinaryOp binaryOp;
+            Operation binaryOp;
             switch (opcode)
             {
                 case Code.Add:
-                    binaryOp = BinaryOp.ADD;
+                    binaryOp = Operation.Add;
                     break;
 
                 case Code.Sub:
-                    binaryOp = BinaryOp.SUB;
+                    binaryOp = Operation.Sub;
                     break;
 
                 case Code.Mul:
-                    binaryOp = BinaryOp.MUL;
+                    binaryOp = Operation.Mul;
                     break;
 
                 case Code.Div:
-                    binaryOp = BinaryOp.DIV;
+                    binaryOp = Operation.Div;
                     break;
 
                 default:

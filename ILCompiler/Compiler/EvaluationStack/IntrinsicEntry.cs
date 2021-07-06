@@ -10,6 +10,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public IntrinsicEntry(string targetMethod, IList<StackEntry> arguments, StackValueKind returnKind) : base(returnKind)
         {
+            Operation = Operation.Intrinsic;
             TargetMethod = targetMethod;
             Arguments = arguments;
         }

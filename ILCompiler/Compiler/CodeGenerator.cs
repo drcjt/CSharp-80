@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 namespace ILCompiler.Compiler
 {
     // TODO: This shouldn't really have any dependencies on dnlib/IL stuff
-    public class CodeGenerator : IStackEntryVisitor
+    public class CodeGenerator
     {
         private readonly Compilation _compilation;
         private readonly LocalVariableDescriptor[] _localVariableTable;
@@ -65,7 +65,71 @@ namespace ILCompiler.Compiler
 
         private void GenerateFromNode(StackEntry node)
         {
-            node.Accept(this);
+            switch (node.Operation)
+            {
+                case Operation.StoreIndirect:
+                    GenerateCodeForStoreIndirect(node as StoreIndEntry);
+                    break;
+
+                case Operation.Return:
+                    GenerateCodeForReturn(node as ReturnEntry);
+                    break;
+
+                case Operation.Constant_Int16:
+                    GenerateCodeForInt16Constant(node as Int16ConstantEntry);
+                    break;
+
+                case Operation.Constant_Int32:
+                    GenerateCodeForInt32Constant(node as Int32ConstantEntry);
+                    break;
+
+                case Operation.Constant_String:
+                    GenerateCodeForStringConstant(node as StringConstantEntry);
+                    break;
+
+                case Operation.JumpTrue:
+                    GenerateCodeForJumpTrue(node as JumpTrueEntry);
+                    break;
+
+                case Operation.Jump:
+                    GenerateCodeForJumpTrue(node as JumpEntry);
+                    break;
+
+                case Operation.Eq:
+                case Operation.Ne:
+                case Operation.Lt:
+                case Operation.Le:
+                case Operation.Gt:
+                case Operation.Ge:
+                    GenerateCodeForComparision(node as BinaryOperator);
+                    break;
+
+                case Operation.Add:
+                case Operation.Mul:
+                case Operation.Sub:
+                case Operation.Div:
+                    GenerateCodeForBinaryOperator(node as BinaryOperator);
+                    break;
+
+                case Operation.LocalVariable:
+                    GenerateCodeForLocalVariable(node as LocalVariableEntry);
+                    break;
+
+                case Operation.StoreLocalVariable:
+                    GenerateCodeForStoreLocalVariable(node as StoreLocalVariableEntry);
+                    break;
+
+                case Operation.Call:
+                    GenerateCodeForCall(node as CallEntry);
+                    break;
+
+                case Operation.Intrinsic:
+                    GenerateCodeForIntrinsic(node as IntrinsicEntry);
+                    break;
+
+                default:
+                    throw new NotImplementedException($"Unimplemented node type {node.Operation}");
+            }
         }
 
         // TODO: Consider making this a separate phase
@@ -168,14 +232,14 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public void Visit(Int16ConstantEntry entry)
+        public void GenerateCodeForInt16Constant(Int16ConstantEntry entry)
         {
-            var value = (entry as Int16ConstantEntry).Value;
+            var value = entry.Value;
             _currentAssembler.Ld(R16.HL, (short)value);
             _currentAssembler.Push(R16.HL);
         }
 
-        public void Visit(Int32ConstantEntry entry)
+        public void GenerateCodeForInt32Constant(Int32ConstantEntry entry)
         {
             var value = (entry as Int32ConstantEntry).Value;
             var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
@@ -187,31 +251,31 @@ namespace ILCompiler.Compiler
             _currentAssembler.Push(R16.HL);
         }
 
-        public void Visit(StringConstantEntry entry)
+        public void GenerateCodeForStringConstant(StringConstantEntry entry)
         {
             // TODO: Currently obj refs can only be strings
             _currentAssembler.Ld(R16.HL, (entry as StringConstantEntry).Label);
             _currentAssembler.Push(R16.HL);
         }
 
-        public void Visit(StoreIndEntry entry)
+        public void GenerateCodeForStoreIndirect(StoreIndEntry entry)
         {
             _currentAssembler.Pop(R16.BC);
             _currentAssembler.Pop(R16.HL);
             _currentAssembler.LdInd(R16.HL, R8.C);
         }
 
-        public void Visit(JumpTrueEntry entry)
+        public void GenerateCodeForJumpTrue(JumpTrueEntry entry)
         {
             _currentAssembler.Jp(Condition.C, entry.TargetLabel);
         }
         
-        public void Visit(JumpEntry entry)
+        public void GenerateCodeForJumpTrue(JumpEntry entry)
         {
             _currentAssembler.Jp(entry.TargetLabel);
         }
 
-        public void Visit(ReturnEntry entry)
+        public void GenerateCodeForReturn(ReturnEntry entry)
         {
             // TODO: This assumes return value if present is int16
             var method = _methodCodeNode.Method;
@@ -251,28 +315,24 @@ namespace ILCompiler.Compiler
             _currentAssembler.Ret();
         }
 
-        public void Visit(BinaryOperator entry)
+        public void GenerateCodeForBinaryOperator(BinaryOperator entry)
         {
-            switch (entry.Op)
+            switch (entry.Operation)
             {
-                case BinaryOp.ADD:
+                case Operation.Add:
                     GenerateAdd();
                     break;
 
-                case BinaryOp.SUB:
+                case Operation.Sub:
                     GenerateSub();
                     break;
 
-                case BinaryOp.MUL:
+                case Operation.Mul:
                     GenerateMul();
                     break;
 
-                case BinaryOp.DIV:
+                case Operation.Div:
                     GenerateDiv();
-                    break;
-
-                default:
-                    GenerateComparison(entry.Op);
                     break;
             }
         }
@@ -287,12 +347,13 @@ namespace ILCompiler.Compiler
             "s_neq"             // Bne
         };
 
-        private void GenerateComparison(BinaryOp op)
+        private void GenerateCodeForComparision(BinaryOperator entry)
         {
             _currentAssembler.Pop(R16.HL);
             _currentAssembler.Pop(R16.DE);
 
-            var comparisonAsmName = comparisonRoutinesByOpcode[op - BinaryOp.EQ];
+            var operation = entry.Operation;
+            var comparisonAsmName = comparisonRoutinesByOpcode[operation - Operation.Eq];
             _currentAssembler.Call(comparisonAsmName);
         }
 
@@ -328,7 +389,7 @@ namespace ILCompiler.Compiler
             _currentAssembler.Push(R16.DE);
         }
 
-        public void Visit(LocalVariableEntry entry)
+        public void GenerateCodeForLocalVariable(LocalVariableEntry entry)
         {
             if (entry.LocalNumber >= _methodCodeNode.Method.Parameters.Count)
             {
@@ -368,7 +429,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public void Visit(StoreLocalVariableEntry entry)
+        public void GenerateCodeForStoreLocalVariable(StoreLocalVariableEntry entry)
         {
             // Storing to a local variable
             var offset = entry.LocalNumber * 2; // TODO: This needs to take into account differing sizes of local vars
@@ -378,12 +439,12 @@ namespace ILCompiler.Compiler
             _currentAssembler.Ld(I16.IX, (short)-(offset + 2), R8.L);
         }
 
-        public void Visit(CallEntry entry)
+        public void GenerateCodeForCall(CallEntry entry)
         {
             _currentAssembler.Call(entry.TargetMethod);
         }
 
-        public void Visit(IntrinsicEntry entry)
+        public void GenerateCodeForIntrinsic(IntrinsicEntry entry)
         {
             // TODO: Most of this should be done through MethodImplOptions.InternalCall instead
             var methodToCall = entry.TargetMethod;

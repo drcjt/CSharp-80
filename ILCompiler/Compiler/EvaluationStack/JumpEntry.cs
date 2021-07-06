@@ -8,6 +8,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public JumpEntry(string targetLabel) : base(StackValueKind.Unknown)
         {
+            Operation = Operation.Jump;
             TargetLabel = targetLabel;
         }
 

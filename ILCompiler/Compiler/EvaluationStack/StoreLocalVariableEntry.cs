@@ -8,6 +8,7 @@
 
         public StoreLocalVariableEntry(int localNumber, StackEntry op1) : base(op1.Kind)
         {
+            Operation = Operation.StoreLocalVariable;
             LocalNumber = localNumber;
             Op1 = op1;
         }

@@ -25,6 +25,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         public string Label { get; set; }
         public StringConstantEntry(string value) : base(StackValueKind.ObjRef, value)
         {
+            Operation = Operation.Constant_String;
         }
 
         public override void Accept(IStackEntryVisitor visitor)
@@ -37,6 +38,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public Int16ConstantEntry(short value) : base(StackValueKind.Int16, value)
         {
+            Operation = Operation.Constant_Int16;
         }
 
         public override void Accept(IStackEntryVisitor visitor)
@@ -49,6 +51,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public Int32ConstantEntry(int value) : base(StackValueKind.Int32, value)
         {
+            Operation = Operation.Constant_Int32;
         }
 
         public override void Accept(IStackEntryVisitor visitor)

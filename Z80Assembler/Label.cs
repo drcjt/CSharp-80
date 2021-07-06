@@ -14,7 +14,7 @@ namespace Z80Assembler
 
         public override string ToString() => $"{Name}@{Id}";
 
-        public Label(string? name, ulong id)
+        public Label(string name, ulong id)
         {
             Name = name ?? "__label";
             Id = id;

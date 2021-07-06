@@ -10,6 +10,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public CallEntry(string targetMethod, IList<StackEntry> arguments, StackValueKind returnKind) : base(returnKind)
         {
+            Operation = Operation.Call;
             TargetMethod = targetMethod;
             Arguments = arguments;
         }

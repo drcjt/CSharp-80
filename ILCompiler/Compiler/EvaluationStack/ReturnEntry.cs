@@ -8,6 +8,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public ReturnEntry() : base(StackValueKind.Unknown)
         {
+            Operation = Operation.Return;
         }
 
         public ReturnEntry(StackEntry returnValue) : base(returnValue.Kind)

@@ -7,6 +7,7 @@
 
         public StoreIndEntry(StackEntry addr, StackEntry op1) : base(addr.Kind)
         {
+            Operation = Operation.StoreIndirect;
             Addr = addr;
             Op1 = op1;
         }
