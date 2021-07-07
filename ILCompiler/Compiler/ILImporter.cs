@@ -350,9 +350,9 @@ namespace ILCompiler.Compiler
                 kind = op2.Kind;
             }
 
-            if (kind != StackValueKind.Int16 && kind != StackValueKind.NativeInt)
+            if (kind != StackValueKind.Int16 && kind != StackValueKind.NativeInt && kind != StackValueKind.Int32)
             {
-                throw new NotSupportedException("Binary operations on types other than short and nativeint not supported yet");
+                throw new NotSupportedException("Binary operations on types other than short, int32 and nativeint not supported yet");
             }
 
             Operation binaryOp;

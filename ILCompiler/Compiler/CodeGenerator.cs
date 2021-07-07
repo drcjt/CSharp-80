@@ -326,78 +326,40 @@ namespace ILCompiler.Compiler
             _currentAssembler.Ret();
         }
 
+        private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> BinaryOperatorMappings = new Dictionary<Tuple<Operation, StackValueKind>, string>()
+        {
+            { Tuple.Create(Operation.Add, StackValueKind.Int16), "s_add" },
+            { Tuple.Create(Operation.Add, StackValueKind.Int32), "i_add" },
+            { Tuple.Create(Operation.Sub, StackValueKind.Int16), "s_sub" },
+            { Tuple.Create(Operation.Sub, StackValueKind.Int32), "i_sub" },
+            { Tuple.Create(Operation.Mul, StackValueKind.Int16), "s_mul" },
+            { Tuple.Create(Operation.Div, StackValueKind.Int16), "s_div" }
+        };
+
         public void GenerateCodeForBinaryOperator(BinaryOperator entry)
         {
-            switch (entry.Operation)
+            if (BinaryOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string routine))
             {
-                case Operation.Add:
-                    GenerateAdd();
-                    break;
-
-                case Operation.Sub:
-                    GenerateSub();
-                    break;
-
-                case Operation.Mul:
-                    GenerateMul();
-                    break;
-
-                case Operation.Div:
-                    GenerateDiv();
-                    break;
+                _currentAssembler.Call(routine);
             }
         }
 
-        private readonly string[] comparisonRoutinesByOpcode = new string[]
+        private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> ComparisonOperatorMappings = new Dictionary<Tuple<Operation, StackValueKind>, string>()
         {
-            "s_eq",             // Beq
-            "s_ge",             // Bge
-            "s_gt",             // Bgt
-            "s_le",             // Ble
-            "s_lt",             // Blt
-            "s_neq"             // Bne
+            { Tuple.Create(Operation.Eq, StackValueKind.Int16), "s_eq" },
+            { Tuple.Create(Operation.Ge, StackValueKind.Int16), "s_ge" },
+            { Tuple.Create(Operation.Gt, StackValueKind.Int16), "s_gt" },
+            { Tuple.Create(Operation.Le, StackValueKind.Int16), "s_le" },
+            { Tuple.Create(Operation.Lt, StackValueKind.Int16), "s_lt" },
+            { Tuple.Create(Operation.Ne, StackValueKind.Int16), "s_neq" },
         };
 
         private void GenerateCodeForComparision(BinaryOperator entry)
         {
-            _currentAssembler.Pop(R16.HL);
-            _currentAssembler.Pop(R16.DE);
-
-            var operation = entry.Operation;
-            var comparisonAsmName = comparisonRoutinesByOpcode[operation - Operation.Eq];
-            _currentAssembler.Call(comparisonAsmName);
-        }
-
-        private void GenerateAdd()
-        {
-            _currentAssembler.Pop(R16.DE);
-            _currentAssembler.Pop(R16.HL);
-            _currentAssembler.Add(R16.HL, R16.DE);
-            _currentAssembler.Push(R16.HL);
-        }
-
-        private void GenerateSub()
-        {
-            _currentAssembler.Pop(R16.DE);
-            _currentAssembler.Pop(R16.HL);
-            _currentAssembler.Sbc(R16.HL, R16.DE);
-            _currentAssembler.Push(R16.HL);
-        }
-
-        private void GenerateMul()
-        {
-            _currentAssembler.Pop(R16.DE);
-            _currentAssembler.Pop(R16.BC);
-            _currentAssembler.Call("s_mul");
-            _currentAssembler.Push(R16.HL);
-        }
-
-        private void GenerateDiv()
-        {
-            _currentAssembler.Pop(R16.DE);
-            _currentAssembler.Pop(R16.HL);
-            _currentAssembler.Call("s_div");
-            _currentAssembler.Push(R16.DE);
+            if (ComparisonOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string routine))
+            {
+                _currentAssembler.Call(routine);
+            }
         }
 
         public void GenerateCodeForLocalVariable(LocalVariableEntry entry)

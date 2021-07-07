@@ -17,6 +17,7 @@
         public static readonly Opcode Ld = new("Ld");
         public static readonly Opcode Call = new("Call");
         public static readonly Opcode Add = new("Add");
+        public static readonly Opcode Adc = new("Adc");
         public static readonly Opcode Ex = new("Ex");
         public static readonly Opcode Or = new("Or");
         public static readonly Opcode Jp = new("Jp");

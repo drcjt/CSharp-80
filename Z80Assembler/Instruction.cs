@@ -89,6 +89,11 @@ namespace Z80Assembler
             return new Instruction(Opcode.Add, target.ToString() + ", " + source.ToString());
         }
 
+        public static Instruction Adc(Register target, Register source)
+        {
+            return new Instruction(Opcode.Adc, target.ToString() + ", " + source.ToString());
+        }
+
         public static Instruction Sbc(R16Type target, R16Type source)
         {
             return new Instruction(Opcode.Sbc, target.ToString() + ", " + source.ToString());
@@ -156,6 +161,5 @@ namespace Z80Assembler
         {
             return new Instruction(Opcode.Db, b.ToString());
         }
-
     }
 }

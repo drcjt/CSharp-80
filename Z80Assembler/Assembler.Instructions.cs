@@ -48,6 +48,11 @@ namespace Z80Assembler
             AddInstruction(new Instruction(Opcode.Add, target.ToString() + ", " + source.ToString()));
         }
 
+        public void Adc(Register target, Register source)
+        {
+            AddInstruction(new Instruction(Opcode.Adc, target.ToString() + ", " + source.ToString()));
+        }
+
         public void Sbc(R16Type target, R16Type source)
         {
             AddInstruction(new Instruction(Opcode.Sbc, target.ToString() + ", " + source.ToString()));

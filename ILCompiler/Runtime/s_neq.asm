@@ -2,6 +2,13 @@
 ; DE != HL
 ; Carry set if true
 s_neq:
+	POP BC
+
+	POP HL
+	POP DE
+
+	PUSH BC
+
 	OR A
 	SBC HL, DE
 	SCF

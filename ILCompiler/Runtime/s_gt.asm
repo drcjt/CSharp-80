@@ -2,6 +2,13 @@
 ; DE > HL
 ; Carry set if true
 s_gt:
+	POP BC
+
+	POP HL
+	POP DE
+
+	PUSH BC
+
 	LD A, D
 	ADD A, 80H
 	LD B, A

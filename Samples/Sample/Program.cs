@@ -7,7 +7,7 @@ namespace MiniBCL
         public static int Main()
 		{
             Console.Clear();
-
+            
             Int32 returnedInt32 = TestReturnInt32();
             Console.WriteLine(returnedInt32);
 
@@ -45,7 +45,7 @@ namespace MiniBCL
 
             // Test equal branching
             TestEqualBranching();
-
+            
             // Test not equal branching
             TestNotEqualBranching();
 
@@ -58,7 +58,7 @@ namespace MiniBCL
             WriteChar(0, 0, 48); // Write 0 to top left corner of screen
            
             Console.WriteLine(TestFibonacci(10));  // should display 55
-            
+
             return 42;
 		}
 
