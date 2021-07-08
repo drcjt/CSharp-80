@@ -228,5 +228,17 @@ namespace MiniBCL
 
             screenMemory[offset + x] = ch;
         }
+
+        // Experiment to write short to int widening conversion in pure C# code vs z80 assembly
+        private unsafe static int Widen(short s)
+        {
+            Int32 retval;
+            Int16* ptr = (Int16*)&retval;
+
+            *ptr++ = (short)(s & 0x7F);
+            *ptr = (short)(s & 0x80);
+
+            return retval;
+        }
     }
 }
