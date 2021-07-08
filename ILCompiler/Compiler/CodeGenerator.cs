@@ -128,6 +128,11 @@ namespace ILCompiler.Compiler
                     GenerateCodeForIntrinsic(node as IntrinsicEntry);
                     break;
 
+                case Operation.Cast:
+                    // Insert code to do implicit cast
+                    GenerateCodeForCast(node as CastEntry);
+                    break;
+
                 default:
                     throw new NotImplementedException($"Unimplemented node type {node.Operation}");
             }
@@ -449,6 +454,22 @@ namespace ILCompiler.Compiler
                     _currentAssembler.Ld(R8.A, R8.L); // Load low byte of argument 1 into A
                     _currentAssembler.Call(0x0033); // ROM routine to display character at current cursor position
                     break;
+            }
+        }
+
+        public void GenerateCodeForCast(CastEntry entry)
+        {
+            var actualKind = entry.Op1.Kind;
+            var desiredKind = entry.DesiredKind;
+
+            if (actualKind == StackValueKind.Int16 && desiredKind == StackValueKind.Int32)
+            {
+                // Gen code for a widening conversion here
+                _currentAssembler.Call("stoi");
+            }
+            else
+            {
+                throw new NotImplementedException($"Implicit cast from {actualKind} to {desiredKind} not supported");
             }
         }
 

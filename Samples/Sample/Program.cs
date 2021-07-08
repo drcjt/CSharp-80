@@ -7,6 +7,8 @@ namespace MiniBCL
         public static int Main()
 		{
             Console.Clear();
+
+            TestImplicitCasting();
             
             Int32 returnedInt32 = TestReturnInt32();
             Console.WriteLine(returnedInt32);
@@ -61,6 +63,18 @@ namespace MiniBCL
 
             return 42;
 		}
+
+        private static void TestImplicitCasting()
+        {
+            short x = 3;
+            short y = 7;
+
+            // When code is generated we should have an implicit int16 to int32 cast
+            // inserted as roslyn will be targetting the WriteLine(Int32) method here
+            // yet the result of x + y will be an int16
+
+            Console.WriteLine(x + y);
+        }
 
         private static Int32 TestReturnInt32()
         {

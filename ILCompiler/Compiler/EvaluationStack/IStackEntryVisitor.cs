@@ -14,6 +14,6 @@
         public void Visit(StoreLocalVariableEntry entry);
         public void Visit(CallEntry entry);
         public void Visit(IntrinsicEntry entry);
-
+        public void Visit(CastEntry entry);
     }
 }

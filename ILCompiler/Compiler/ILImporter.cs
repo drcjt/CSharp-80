@@ -526,6 +526,16 @@ namespace ILCompiler.Compiler
             {
                 var argument = _stack.Pop();
                 arguments[methodToCall.Parameters.Count - i - 1] = argument;
+
+                // Wrap argument in CastEntry if required, e.g. if kind is int16 but method requires int32
+                var parameter = methodToCall.Parameters[i];
+                var requiredKind = parameter.Type.GetStackValueKind();
+                if (argument.Kind != requiredKind)
+                {
+                    argument = new CastEntry(requiredKind, argument);
+                }
+
+                arguments[methodToCall.Parameters.Count - i - 1] = argument;
             }
 
             string targetMethod = "";

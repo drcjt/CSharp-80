@@ -6,6 +6,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         Call,
         Return,
+        Cast,
         Add,
         Sub,
         Mul,
