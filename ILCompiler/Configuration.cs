@@ -5,5 +5,7 @@ namespace ILCompiler
     public class Configuration : IConfiguration
     {
         public bool IgnoreUnknownCil { get; set; } = false;
+
+        public bool DontInlineRuntime { get; set; } = false;
     }
 }

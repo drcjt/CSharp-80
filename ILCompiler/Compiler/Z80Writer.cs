@@ -43,12 +43,17 @@ namespace ILCompiler.Compiler
             _out.WriteLine(Instruction.Jp("START"));
 
             // Include the runtime assembly code
-            _out.WriteLine("include csharprt.asm");
+            if (_compilation.Configuration.DontInlineRuntime)
+            {
+                _out.WriteLine("include csharprt.asm");
+            }
 
             _out.WriteLine(new LabelInstruction("START"));
 
             _out.WriteLine(Instruction.Call(_compilation.NameMangler.GetMangledMethodName(entryMethod)));
 
+            // TODO: This assumes the entry point method always returns an int16
+            // need to handle other types e.g. void
             _out.WriteLine(Instruction.Pop(R16.BC));    // return value
             _out.WriteLine(Instruction.Pop(R16.HL));    // return address
             _out.WriteLine(Instruction.Push(R16.BC));
@@ -59,6 +64,11 @@ namespace ILCompiler.Compiler
 
         private void OutputEpilog()
         {
+            if (!_compilation.Configuration.DontInlineRuntime)
+            {
+                OutputRuntimeCode();
+            }
+
             _out.WriteLine(Instruction.End("START"));
         }
 
@@ -92,6 +102,23 @@ namespace ILCompiler.Compiler
             _out.Dispose();
 
             _compilation.Logger.LogDebug($"Written compiled file to {_outputFilePath}");
+        }
+
+        private void OutputRuntimeCode()
+        {
+            _out.WriteLine();
+            _out.WriteLine("; **** Runtime starts here");
+            string[] resourceNames = GetType().Assembly.GetManifestResourceNames();
+            foreach (string resourceName in resourceNames)
+            {
+                using (Stream stream = GetType().Assembly.GetManifestResourceStream(resourceName))
+                {
+                    using (var reader = new StreamReader(stream))
+                    {
+                        _out.Write(reader.ReadToEnd());
+                    }
+                }
+            }
         }
     }
 }

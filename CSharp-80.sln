@@ -19,7 +19,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{793A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "Samples\Sample\Sample.csproj", "{34DDF008-1399-4B78-BDD1-087481927C63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Z80Assembler", "Z80Assembler\Z80Assembler.csproj", "{0BFBDADF-5068-47E4-AA60-F8A87A67988D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Z80Assembler", "Z80Assembler\Z80Assembler.csproj", "{0BFBDADF-5068-47E4-AA60-F8A87A67988D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fib", "Samples\Fib\Fib.csproj", "{1C5765B4-0448-46C3-8BD5-39168A53F21A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,12 +49,17 @@ Global
 		{0BFBDADF-5068-47E4-AA60-F8A87A67988D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0BFBDADF-5068-47E4-AA60-F8A87A67988D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0BFBDADF-5068-47E4-AA60-F8A87A67988D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C5765B4-0448-46C3-8BD5-39168A53F21A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C5765B4-0448-46C3-8BD5-39168A53F21A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C5765B4-0448-46C3-8BD5-39168A53F21A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C5765B4-0448-46C3-8BD5-39168A53F21A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{34DDF008-1399-4B78-BDD1-087481927C63} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
+		{1C5765B4-0448-46C3-8BD5-39168A53F21A} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}

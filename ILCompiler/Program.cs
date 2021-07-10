@@ -14,6 +14,7 @@ namespace ILCompiler
         private FileInfo _outputFilePath;
         private FileInfo _inputFilePath;
         private bool _ignoreUnknownCil;
+        private bool _dontInlineRuntime;
 
         public static int Main(string[] args)
         {
@@ -75,20 +76,22 @@ namespace ILCompiler
             {
                 new Option<FileInfo>(new[] { "-o", "--outputFile" }, "Output file path") { Required = true },
                 new Option<bool>(new[] { "-f", "--ignoreUnknownCil" }, "Ignore unknown cil"),
+                new Option<bool>(new[] { "-i", "--dontInlineRuntime" }, "Don't inline runtime assembly" ),
                 new Argument<FileInfo>("inputFilePath"),
             };
 
             rootCommand.Description = "CSharp-80 compiler from C# IL to Z80 for TRS-80 Machines";
-            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, bool>(HandleCommand);
+            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, bool, bool>(HandleCommand);
 
             return rootCommand.InvokeAsync(args).Result;
         }
 
-        private void HandleCommand(FileInfo inputFilePath, FileInfo outputFile, bool ignoreUnknownCil = false)
+        private void HandleCommand(FileInfo inputFilePath, FileInfo outputFile, bool ignoreUnknownCil = false, bool dontInlineRuntime = false)
         {
             _inputFilePath = inputFilePath;
             _outputFilePath = outputFile;
             _ignoreUnknownCil = ignoreUnknownCil;
+            _dontInlineRuntime = dontInlineRuntime;
         }
     }
 }
