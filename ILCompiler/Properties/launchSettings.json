@@ -3,8 +3,8 @@
     "ILCompiler": {
       "commandName": "Project",
       "commandLineArgs": "--ignoreUnknownCil --outputFile Sample.asm Sample.dll",
-      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80\\Samples\\Sample\\bin\\Debug\\net5.0",
-      "sqlDebugging": true
+      "workingDirectory": "C:\\Users\\Desktop-Ryzen\\source\\repos\\CSharp-80\\Samples\\Sample\\bin\\Debug\\net5.0",
+      "sqlDebugging": false
     }
   }
 }

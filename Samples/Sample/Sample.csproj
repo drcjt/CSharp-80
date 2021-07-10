@@ -28,8 +28,12 @@
     <ProjectReference Include="..\..\ILCompiler\ILCompiler.csproj" />
   </ItemGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy $(SolutionDir)\ILCompiler\csharprt.asm $(TargetDir)&#xD;&#xA;$(SolutionDir)\ILCompiler\$(OutDir)\ILCompiler.exe --ignoreUnknownCil --outputFile $(TargetDir)\$(TargetName).asm $(TargetPath)&#xD;&#xA;&#xD;&#xA;call $(SolutionDir)\tools\get-tools.cmd&#xD;&#xA;&#xD;&#xA;$(SolutionDir)\tools\zmac.exe --oo cmd -o $(TargetDir)\$(TargetName).cmd  $(TargetDir)\$(TargetName).asm&#xD;&#xA;$(SolutionDir)\tools\trswrite.exe -o $(SolutionDir)\Samples\Samples.dsk $(TargetDir)\$(TargetName).cmd" />
+  <Target Name="ILCompile" AfterTargets="PostBuildEvent">
+    <Exec Command="copy $(SolutionDir)\ILCompiler\csharprt.asm $(TargetDir)"/>
+	<Exec Command="$(SolutionDir)\ILCompiler\$(OutDir)\ILCompiler.exe --ignoreUnknownCil --outputFile $(TargetDir)\$(TargetName).asm $(TargetPath)" />
+	<Exec Command="call $(SolutionDir)\tools\get-tools.cmd"/>
+	<Exec Command="$(SolutionDir)\tools\zmac.exe --oo cmd -o $(TargetDir)\$(TargetName).cmd  $(TargetDir)\$(TargetName).asm"/>
+	<Exec Command="$(SolutionDir)\tools\trswrite.exe -o $(SolutionDir)\Samples\Samples.dsk $(TargetDir)\$(TargetName).cmd"/>
   </Target>
   
 </Project>
