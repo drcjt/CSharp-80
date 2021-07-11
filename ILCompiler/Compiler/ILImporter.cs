@@ -91,8 +91,13 @@ namespace ILCompiler.Compiler
                     case Code.Ldc_I4:
                         {
                             var value = (int)currentInstruction.Operand;
-                            // TODO: This doesn't handle unsigned shorts properly as this will
-                            // fit into an Int16 but get put into and Int32 at the minute
+                            // Have to assume that all values outside of int16 range require
+                            // Int32 on the stack. Note that UInt16 values may fall into this
+                            // category, e.g. 40000.
+                            // However depending on what the value is then used for, e.g.
+                            // call to method, store to local variable then a narrowing conversion
+                            // will be implicitly inserted and if expression folding is implemented
+                            // this would allow the load to be implemented more efficiently.
                             if (value < Int16.MinValue || value > Int16.MaxValue)
                             {
                                 ImportLoadInt((int)currentInstruction.Operand, StackValueKind.Int32);
