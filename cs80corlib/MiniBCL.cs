@@ -25,7 +25,9 @@
 	public struct Boolean { }
 	public struct Char { }
 	public struct Int16 { }
+	public struct UInt16 { }
 	public struct Int32 { }
+	public struct UInt32 { }
 	public struct Int64 {}
 	public struct IntPtr { }
 	public struct Byte { }

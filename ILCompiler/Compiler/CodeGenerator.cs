@@ -440,13 +440,24 @@ namespace ILCompiler.Compiler
 
                 case "WriteInt16":
                     _currentAssembler.Pop(R16.HL);    // put argument 1 into HL
-                    _currentAssembler.Call("NUM2DEC2");
+                    _currentAssembler.Call("ITOA");
+                    break;
+
+                case "WriteUInt16":
+                    _currentAssembler.Pop(R16.HL);
+                    _currentAssembler.Call("UITOA");
                     break;
 
                 case "WriteInt32":
                     _currentAssembler.Pop(R16.DE);
                     _currentAssembler.Pop(R16.HL);
                     _currentAssembler.Call("LTOA");
+                    break;
+
+                case "WriteUInt32":
+                    _currentAssembler.Pop(R16.DE);
+                    _currentAssembler.Pop(R16.HL);
+                    _currentAssembler.Call("ULTOA");
                     break;
 
                 case "WriteChar":

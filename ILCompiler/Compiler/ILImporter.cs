@@ -91,6 +91,8 @@ namespace ILCompiler.Compiler
                     case Code.Ldc_I4:
                         {
                             var value = (int)currentInstruction.Operand;
+                            // TODO: This doesn't handle unsigned shorts properly as this will
+                            // fit into an Int16 but get put into and Int32 at the minute
                             if (value < Int16.MinValue || value > Int16.MaxValue)
                             {
                                 ImportLoadInt((int)currentInstruction.Operand, StackValueKind.Int32);
@@ -443,15 +445,8 @@ namespace ILCompiler.Compiler
             PushExpression(new StringConstantEntry(str));
         }
 
-        private bool ImportIntrinsicCall(MethodDef methodToCall)
+        private bool ImportIntrinsicCall(MethodDef methodToCall, StackEntry[] arguments)
         {
-            IList<StackEntry> arguments = new List<StackEntry>();
-            for (int i = 0; i < methodToCall.Parameters.Count; i++)
-            {
-                var argument = _stack.Pop();
-                arguments.Add(argument);
-            }
-
             // Not yet implemented methods with non void return type
             if (methodToCall.HasReturnType)
             {
@@ -467,25 +462,34 @@ namespace ILCompiler.Compiler
                     if (IsTypeName(methodToCall, "System", "Console"))
                     {
                         var argtype = methodToCall.Parameters[0].Type;
-                        if (argtype.FullName == "System.String")
+                        switch (argtype.FullName)
                         {
-                            targetMethodName = "WriteString";
-                        }
-                        else if (argtype.FullName == "System.Int16")
-                        {
-                            targetMethodName = "WriteInt16";
-                        }
-                        else if (argtype.FullName == "System.Int32")
-                        {
-                            targetMethodName = "WriteInt32";
-                        }
-                        else if (argtype.FullName == "System.Char")
-                        {
-                            targetMethodName = "WriteChar";
-                        }
-                        else
-                        {
-                            throw new NotSupportedException();
+                            case "System.String":
+                                targetMethodName = "WriteString";
+                                break;
+
+                            case "System.Int16":
+                                targetMethodName = "WriteInt16";
+                                break;
+
+                            case "System.UInt16":
+                                targetMethodName = "WriteUInt16";
+                                break;
+
+                            case "System.Int32":
+                                targetMethodName = "WriteInt32";
+                                break;
+
+                            case "System.UInt32":
+                                targetMethodName = "WriteUInt32";
+                                break;
+
+                            case "System.Char":
+                                targetMethodName = "WriteChar";
+                                break;
+
+                            default:
+                                throw new NotSupportedException();
                         }
                     }
                     break;
@@ -511,16 +515,6 @@ namespace ILCompiler.Compiler
 
         public void ImportCall(MethodDef methodToCall)
         {
-            // Intrinsic calls
-            if (methodToCall.IsIntrinsic())
-            {
-                if (!ImportIntrinsicCall(methodToCall))
-                {
-                    throw new NotSupportedException("Unknown intrinsic");
-                }
-                return;
-            }
-
             StackEntry[] arguments = new StackEntry[methodToCall.Parameters.Count];
             for (int i = 0; i < methodToCall.Parameters.Count; i++)
             {
@@ -536,6 +530,16 @@ namespace ILCompiler.Compiler
                 }
 
                 arguments[methodToCall.Parameters.Count - i - 1] = argument;
+            }
+
+            // Intrinsic calls
+            if (methodToCall.IsIntrinsic())
+            {
+                if (!ImportIntrinsicCall(methodToCall, arguments))
+                {
+                    throw new NotSupportedException("Unknown intrinsic");
+                }
+                return;
             }
 
             string targetMethod = "";

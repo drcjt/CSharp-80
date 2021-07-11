@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net5.0</TargetFramework>
+	  <LangVersion>latest</LangVersion>
+
+	  <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
+	  <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+	  <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+
+	  <Optimize>true</Optimize>
+	  <IncludePal>true</IncludePal>
+
+	  <!--Disable .NET Core SDK libs-->
+	  <NoStdLib>true</NoStdLib>
+	  <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+
+	  <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+	  <!-- Prevent .NET Core 3+ from generating exe -->
+	  <UseAppHost>false</UseAppHost>
+
+	  <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="Echo &quot;Building DSK image&quot;" />
+  </Target>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\cs80corlib\cs80corlib.csproj" />
+    <ProjectReference Include="..\Fib\Fib.csproj" />
+    <ProjectReference Include="..\Math\Math.csproj" />
+    <ProjectReference Include="..\Sample\Sample.csproj" />
+  </ItemGroup>
+
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Math\bin\Debug\net5.0\\Math.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Sample\bin\Debug\net5.0\\Sample.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Fib\bin\Debug\net5.0\\Fib.cmd" />
+  </Target>
+
+</Project>

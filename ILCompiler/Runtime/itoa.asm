@@ -1,5 +1,5 @@
 ; display number in HL as ascii
-NUM2DEC2:
+ITOA:
 	PUSH IX
 
 	BIT 7, H
@@ -14,6 +14,10 @@ NUM2DEC2:
 	LD A, 0
 	SBC A, H
 	LD H, A
+    JP CONV2
+
+UITOA:
+    PUSH IX
 
 CONV2:
 
@@ -54,6 +58,15 @@ LTOA:
     LD D, A
 
     call l_inc_dehl     ; inc dehl
+
+    JP LTOA2
+
+ULTOA:
+    PUSH AF
+	PUSH BC
+	PUSH DE
+    PUSH IY
+	PUSH IX
 
 LTOA2:
 	CALL B2D32

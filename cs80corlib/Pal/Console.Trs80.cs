@@ -12,6 +12,13 @@ namespace System
 		public static void Write(short value) { }
 
 		[Intrinsic]
+		public static void Write(uint value) { }
+
+		[Intrinsic]
+		public static void Write(ushort value) { }
+
+
+		[Intrinsic]
 		public static void Write(String str) { }
 
 		[Intrinsic]
@@ -60,6 +67,18 @@ namespace System
 			Write(value);
 			WriteLine();
         }
+
+		public static void WriteLine(UInt16 value)
+        {
+			Write(value);
+			WriteLine();
+        }
+
+		public static void WriteLine(UInt32 value)
+		{
+			Write(value);
+			WriteLine();
+		}
 
 		public static void WriteLine(string str) 
 		{
