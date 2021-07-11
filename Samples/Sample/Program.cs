@@ -57,7 +57,7 @@ namespace MiniBCL
             TestArguments(a, b, c);
 
             // Test implementation of write char completely written in C#
-            WriteChar(0, 0, 48); // Write 0 to top left corner of screen
+            //WriteChar(0, 0, 48); // Write 0 to top left corner of screen
            
             return 42;
 		}
@@ -214,6 +214,7 @@ namespace MiniBCL
         }
 
         // Experiment to write short to int widening conversion in pure C# code vs z80 assembly
+        // TODO: This requires conv.i2 to be implemented in the AOT/CodeGenerator
         private unsafe static int Widen(short s)
         {
             Int32 retval;

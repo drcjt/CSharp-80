@@ -400,11 +400,20 @@ namespace ILCompiler.Compiler
         public void ImportStoreVar(int index, bool argument)
         {
             var value = _stack.Pop();
+
+            var localNumber = _methodCompiler.ParameterCount + index;
+
+            // This is necessary as local variable might be a Int16
+            var requiredKind = _localVariableTable[localNumber].Kind;
+            if (requiredKind != value.Kind)
+            {
+                value = new CastEntry(requiredKind, value);
+            }
+
             if (value.Kind != StackValueKind.Int16 && value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ObjRef)
             {
                 throw new NotSupportedException("Storing variables other than short, int32 or object refs not supported yet");
             }
-            var localNumber = _methodCompiler.ParameterCount + index;
             var node = new StoreLocalVariableEntry(localNumber, value);
             ImportAppendTree(node);
         }
@@ -551,12 +560,7 @@ namespace ILCompiler.Compiler
             {
                 targetMethod = _methodCompiler.NameMangler.GetMangledMethodName(methodToCall);
             }
-            var returnType = StackValueKind.Unknown;
-            if (methodToCall.HasReturnType)
-            {
-                // TODO: Need to support other return types than short
-                returnType = StackValueKind.Int16;
-            }    
+            var returnType = methodToCall.ReturnType.GetStackValueKind();
             var callNode = new CallEntry(targetMethod, arguments, returnType);
             if (!methodToCall.HasReturnType)
             {

@@ -283,7 +283,6 @@ namespace ILCompiler.Compiler
 
         public void GenerateCodeForReturn(ReturnEntry entry)
         {
-            // TODO: This assumes return value if present is int16
             var targetType = entry.Return;
 
             var method = _methodCodeNode.Method;
@@ -293,6 +292,11 @@ namespace ILCompiler.Compiler
 
             if (hasReturnValue)
             {
+                if (targetType.Kind != StackValueKind.Int16 && targetType.Kind != StackValueKind.Int32)
+                {
+                    throw new NotImplementedException("Return types other than void, short, and int not supported");
+                }
+
                 _currentAssembler.Pop(R16.DE);            // Copy return value into DE
                 if (targetType != null && targetType.Kind == StackValueKind.Int32)
                 {
@@ -477,6 +481,13 @@ namespace ILCompiler.Compiler
             {
                 // Gen code for a widening conversion here
                 _currentAssembler.Call("stoi");
+            }
+            else if (actualKind == StackValueKind.Int32 && desiredKind == StackValueKind.Int16)
+            {
+                // TODO: Assess if this should really be a runtime routine or not
+                _currentAssembler.Pop(R16.HL);
+                _currentAssembler.Pop(R16.DE);
+                _currentAssembler.Push(R16.DE);
             }
             else
             {
