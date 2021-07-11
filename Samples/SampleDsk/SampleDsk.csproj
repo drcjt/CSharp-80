@@ -30,7 +30,7 @@
     <ProjectReference Include="..\Sample\Sample.csproj" />
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Math\bin\Debug\net5.0\\Math.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Sample\bin\Debug\net5.0\\Sample.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Fib\bin\Debug\net5.0\\Fib.cmd" />
   </Target>
 
