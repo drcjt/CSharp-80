@@ -23,10 +23,6 @@
 	  <OutputType>Exe</OutputType>
   </PropertyGroup>
 
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="Echo &quot;Building DSK image&quot;" />
-  </Target>
-
   <ItemGroup>
     <ProjectReference Include="..\..\cs80corlib\cs80corlib.csproj" />
     <ProjectReference Include="..\Fib\Fib.csproj" />
