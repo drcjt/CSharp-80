@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Text;
+using ILCompiler.Common.TypeSystem.IL;
 
 namespace ILCompiler.Compiler
 {
@@ -52,12 +53,28 @@ namespace ILCompiler.Compiler
 
             _out.WriteLine(Instruction.Call(_compilation.NameMangler.GetMangledMethodName(entryMethod)));
 
-            // TODO: This assumes the entry point method always returns an int16
-            // need to handle other types e.g. void
-            _out.WriteLine(Instruction.Pop(R16.BC));    // return value
-            _out.WriteLine(Instruction.Pop(R16.HL));    // return address
-            _out.WriteLine(Instruction.Push(R16.BC));
-            _out.WriteLine(Instruction.Push(R16.HL));
+            switch (entryMethod.ReturnType.GetStackValueKind())
+            {
+                case StackValueKind.Int16:
+                    _out.WriteLine(Instruction.Pop(R16.BC));    // return value
+                    _out.WriteLine(Instruction.Pop(R16.HL));    // return address
+                    _out.WriteLine(Instruction.Push(R16.BC));
+                    _out.WriteLine(Instruction.Push(R16.HL));
+                    break;
+
+                case StackValueKind.Int32:
+                    _out.WriteLine(Instruction.Pop(R16.BC));    // return value
+                    _out.WriteLine(Instruction.Pop(R16.DE));
+                    _out.WriteLine(Instruction.Pop(R16.HL));    // return address
+                    _out.WriteLine(Instruction.Push(R16.DE));
+                    _out.WriteLine(Instruction.Push(R16.BC));
+                    _out.WriteLine(Instruction.Push(R16.HL));
+                    break;
+
+                default:
+                    // TODO: Should deal with non void types that aren't Int16 or Int32 here
+                    break;
+            }
 
             _out.WriteLine(Instruction.Ret());
         }

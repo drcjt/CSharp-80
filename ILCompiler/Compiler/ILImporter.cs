@@ -409,11 +409,7 @@ namespace ILCompiler.Compiler
             var localNumber = _methodCompiler.ParameterCount + index;
 
             // This is necessary as local variable might be a Int16
-            var requiredKind = _localVariableTable[localNumber].Kind;
-            if (requiredKind != value.Kind)
-            {
-                value = new CastEntry(requiredKind, value);
-            }
+            value = CastIfNecessary(value, _localVariableTable[localNumber].Kind);
 
             if (value.Kind != StackValueKind.Int16 && value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ObjRef)
             {
@@ -536,14 +532,7 @@ namespace ILCompiler.Compiler
                 arguments[methodToCall.Parameters.Count - i - 1] = argument;
 
                 // Wrap argument in CastEntry if required, e.g. if kind is int16 but method requires int32
-                var parameter = methodToCall.Parameters[i];
-                var requiredKind = parameter.Type.GetStackValueKind();
-                if (argument.Kind != requiredKind)
-                {
-                    argument = new CastEntry(requiredKind, argument);
-                }
-
-                arguments[methodToCall.Parameters.Count - i - 1] = argument;
+                arguments[methodToCall.Parameters.Count - i - 1] = CastIfNecessary(argument, methodToCall.Parameters[i].Type.GetStackValueKind());
             }
 
             // Intrinsic calls
@@ -584,6 +573,10 @@ namespace ILCompiler.Compiler
             if (hasReturnValue)
             {
                 var value = _stack.Pop();
+
+                // Add cast if necessary
+                value = CastIfNecessary(value, method.ReturnType.GetStackValueKind());
+
                 if (value.Kind != StackValueKind.Int16 && value.Kind != StackValueKind.Int32)
                 {
                     throw new NotSupportedException("Return values of types other than short and int32 not supported yet");
@@ -591,6 +584,16 @@ namespace ILCompiler.Compiler
                 retNode.Return = value;
             }
             ImportAppendTree(retNode);
+        }
+
+        private StackEntry CastIfNecessary(StackEntry value, StackValueKind requiredKind)
+        {
+            StackEntry result = value;
+            if (value.Kind != requiredKind)
+            {
+                result = new CastEntry(requiredKind, value);
+            }
+            return result;
         }
     }
 }
