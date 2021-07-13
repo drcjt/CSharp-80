@@ -43,6 +43,14 @@ namespace ILCompiler.Compiler
 
             _out.WriteLine(Instruction.Jp("START"));
 
+            var hasReturnCode = entryMethod.ReturnType.GetStackValueKind() == StackValueKind.Int32;
+
+            if (hasReturnCode && _compilation.Configuration.PrintReturnCode)
+            {
+                _out.WriteLine(Instruction.Db("Return Code:","retcodemsg"));
+                _out.WriteLine(Instruction.Db(0));
+            }
+
             // Include the runtime assembly code
             if (_compilation.Configuration.DontInlineRuntime)
             {
@@ -53,27 +61,27 @@ namespace ILCompiler.Compiler
 
             _out.WriteLine(Instruction.Call(_compilation.NameMangler.GetMangledMethodName(entryMethod)));
 
-            switch (entryMethod.ReturnType.GetStackValueKind())
+            if (hasReturnCode && _compilation.Configuration.PrintReturnCode)
             {
-                case StackValueKind.Int16:
-                    _out.WriteLine(Instruction.Pop(R16.BC));    // return value
-                    _out.WriteLine(Instruction.Pop(R16.HL));    // return address
-                    _out.WriteLine(Instruction.Push(R16.BC));
-                    _out.WriteLine(Instruction.Push(R16.HL));
-                    break;
+                // Write string "Return Code:"
+                _out.WriteLine(Instruction.Ld(R16.HL, "retcodemsg"));
+                _out.WriteLine(Instruction.Call("PRINT"));
 
-                case StackValueKind.Int32:
-                    _out.WriteLine(Instruction.Pop(R16.BC));    // return value
-                    _out.WriteLine(Instruction.Pop(R16.DE));
-                    _out.WriteLine(Instruction.Pop(R16.HL));    // return address
-                    _out.WriteLine(Instruction.Push(R16.DE));
-                    _out.WriteLine(Instruction.Push(R16.BC));
-                    _out.WriteLine(Instruction.Push(R16.HL));
-                    break;
+                _out.WriteLine(Instruction.Pop(R16.DE));
+                _out.WriteLine(Instruction.Pop(R16.HL));
+                _out.WriteLine(Instruction.Push(R16.HL));
+                _out.WriteLine(Instruction.Push(R16.DE));
+                _out.WriteLine(Instruction.Call("LTOA"));
+            }
 
-                default:
-                    // TODO: Should deal with non void types that aren't Int16 or Int32 here
-                    break;
+            if (hasReturnCode)
+            {
+                _out.WriteLine(Instruction.Pop(R16.BC));    // return value
+                _out.WriteLine(Instruction.Pop(R16.DE));
+                _out.WriteLine(Instruction.Pop(R16.HL));    // return address
+                _out.WriteLine(Instruction.Push(R16.DE));
+                _out.WriteLine(Instruction.Push(R16.BC));
+                _out.WriteLine(Instruction.Push(R16.HL));
             }
 
             _out.WriteLine(Instruction.Ret());

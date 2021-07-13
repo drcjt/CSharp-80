@@ -7,5 +7,7 @@ namespace ILCompiler
         public bool IgnoreUnknownCil { get; set; } = false;
 
         public bool DontInlineRuntime { get; set; } = false;
+
+        public bool PrintReturnCode { get; set; } = true;
     }
 }
