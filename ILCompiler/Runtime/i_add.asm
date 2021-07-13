@@ -7,19 +7,22 @@ i_add:
 	POP AF		; Save return address
 	EX AF, AF'
 
-	POP DE		;DEHL
-	POP HL
-	POP BC		;BCAF
+	POP BC
 	POP AF
+
+	POP DE
+	POP HL
 
 	PUSH BC		; Put BC back
 	PUSH AF		; Swap AF and BC
-	POP BC
 
-	ADD HL, BC	; Add LSW
-	EX DE, HL
+	OR A
+
+	POP BC
+	ADC HL, BC	; Add LSW
 
 	POP BC		; Add MSW
+	EX DE, HL
 	ADC HL, BC
 	EX DE, HL	
 

@@ -6,18 +6,14 @@
 stoi:	
 	POP BC		; Save return address
 
-	POP HL
+	POP DE
 
-	LD A, H
-	AND 80H
-	LD D, A
-	LD E, 0
-	LD A, H
-	AND 7FH
-	LD H, A
+	LD H, D
+	ADD HL, HL
+	SBC HL, HL
 
-	PUSH HL
 	PUSH DE
+	PUSH HL
 
 	PUSH BC		; Restore return address
 	RET
