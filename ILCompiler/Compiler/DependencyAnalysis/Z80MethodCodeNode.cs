@@ -11,6 +11,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public Z80MethodCodeNode(MethodDef method)
         {
             Method = method;
+            ParamsCount = method.Parameters.Count;
+            LocalsCount = method.Body?.Variables.Count;
         }
 
         public IList<Instruction> MethodCode { get; set; }
@@ -20,5 +22,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public bool CodeEmitted { get; set; }
 
         public bool Compiled { get; set; }
+
+        public int ParamsCount { get; set; }
+        public int? LocalsCount { get; set; }
     }
 }

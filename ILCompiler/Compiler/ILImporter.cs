@@ -246,6 +246,7 @@ namespace ILCompiler.Compiler
 
         public void ImportConversion(WellKnownType wellKnownType, bool unsigned)
         {
+            // TODO: Need to implement conversion properly
             /*
             var op1 = _stack.Pop();
             if (op1.Kind != desiredKind)

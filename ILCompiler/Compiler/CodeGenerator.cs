@@ -13,17 +13,11 @@ namespace ILCompiler.Compiler
     {
         private readonly Compilation _compilation;
         private readonly LocalVariableDescriptor[] _localVariableTable;
-
-        // TODO: would like to eliminate use of the MethodDef property of _methodCodeNode
-        // This is currently used to access the MethodDef which is used for getting:
-        //  * count of parameters
-        //  * count of local variables
-        //  * if method has a non void return type
         private readonly Z80MethodCodeNode _methodCodeNode;
 
         private readonly Dictionary<string, string> _labelsToStringData = new Dictionary<string, string>();
 
-        private Assembler _currentAssembler = new Assembler();
+        private readonly Assembler _currentAssembler = new Assembler();
 
         public CodeGenerator(Compilation compilation, LocalVariableDescriptor[] localVariableTable, Z80MethodCodeNode methodCodeNodeNeedingCode)
         {
@@ -208,8 +202,7 @@ namespace ILCompiler.Compiler
                 }
             }
 
-            var paramsCount = _methodCodeNode.Method.Parameters.Count;
-            if (paramsCount > 0)
+            if (_methodCodeNode.ParamsCount > 0)
             {
                 assembler.Push(I16.IY);
                 // Set IY to start of arguments here
@@ -221,8 +214,7 @@ namespace ILCompiler.Compiler
                 assembler.Pop(I16.IY);
             }
 
-            var localsCount = _methodCodeNode.Method.Body.Variables.Count;
-            if (localsCount > 0)
+            if (_methodCodeNode.LocalsCount > 0)
             {
                 assembler.Push(I16.IX);
                 assembler.Ld(I16.IX, 0);
@@ -273,11 +265,7 @@ namespace ILCompiler.Compiler
         public void GenerateCodeForReturn(ReturnEntry entry)
         {
             var targetType = entry.Return;
-
-            var method = _methodCodeNode.Method;
             var hasReturnValue = targetType != null && targetType.Kind != StackValueKind.Unknown;
-            var hasParameters = method.Parameters.Count > 0;
-            var hasLocals = method.Body.Variables.Count > 0;
 
             if (hasReturnValue)
             {
@@ -290,13 +278,13 @@ namespace ILCompiler.Compiler
                 _currentAssembler.Pop(R16.AF);
             }
 
-            if (hasLocals)
+            if (_methodCodeNode.LocalsCount > 0)
             {
                 _currentAssembler.Ld(R16.SP, I16.IX);     // Move SP to before locals
                 _currentAssembler.Pop(I16.IX);            // Remove IX
             }
 
-            if (hasParameters)
+            if (_methodCodeNode.ParamsCount > 0)
             {
                 _currentAssembler.Pop(R16.BC);            // Remove IY
                 _currentAssembler.Pop(R16.HL);            // Store return address in HL
@@ -318,7 +306,7 @@ namespace ILCompiler.Compiler
             _currentAssembler.Ret();
         }
 
-        private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> BinaryOperatorMappings = new Dictionary<Tuple<Operation, StackValueKind>, string>()
+        private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> BinaryOperatorMappings = new()
         {
             { Tuple.Create(Operation.Add, StackValueKind.Int32), "i_add" },
             { Tuple.Create(Operation.Sub, StackValueKind.Int32), "i_sub" },
@@ -332,7 +320,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> ComparisonOperatorMappings = new Dictionary<Tuple<Operation, StackValueKind>, string>()
+        private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> ComparisonOperatorMappings = new()
         {
             { Tuple.Create(Operation.Eq, StackValueKind.Int32), "l_eq" },
             { Tuple.Create(Operation.Ge, StackValueKind.Int32), "l_ge" },
@@ -352,7 +340,7 @@ namespace ILCompiler.Compiler
 
         public void GenerateCodeForLocalVariable(LocalVariableEntry entry)
         {
-            if (entry.LocalNumber >= _methodCodeNode.Method.Parameters.Count)
+            if (entry.LocalNumber >= _methodCodeNode.ParamsCount)
             {
                 // Loading a local variable
                 var localVariable = _localVariableTable[entry.LocalNumber];
