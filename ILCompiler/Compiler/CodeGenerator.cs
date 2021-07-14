@@ -339,10 +339,10 @@ namespace ILCompiler.Compiler
         private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> ComparisonOperatorMappings = new Dictionary<Tuple<Operation, StackValueKind>, string>()
         {
             { Tuple.Create(Operation.Eq, StackValueKind.Int32), "l_eq" },
-//            { Tuple.Create(Operation.Ge, StackValueKind.Int16), "s_ge" },
-//            { Tuple.Create(Operation.Gt, StackValueKind.Int16), "s_gt" },
-//            { Tuple.Create(Operation.Le, StackValueKind.Int16), "s_le" },
-//            { Tuple.Create(Operation.Lt, StackValueKind.Int16), "s_lt" },
+            { Tuple.Create(Operation.Ge, StackValueKind.Int32), "l_ge" },
+            { Tuple.Create(Operation.Gt, StackValueKind.Int32), "l_gt" },
+            { Tuple.Create(Operation.Le, StackValueKind.Int32), "l_le" },
+            { Tuple.Create(Operation.Lt, StackValueKind.Int32), "l_lt" },
             { Tuple.Create(Operation.Ne, StackValueKind.Int32), "l_neq" },
         };
 
