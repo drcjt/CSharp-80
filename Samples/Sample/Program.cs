@@ -58,7 +58,7 @@ namespace MiniBCL
 
             // Test implementation of write char completely written in C#
             //WriteChar(0, 0, 48); // Write 0 to top left corner of screen
-           
+
             return 42;
 		}
 

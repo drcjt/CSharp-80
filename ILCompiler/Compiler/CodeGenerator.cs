@@ -320,12 +320,8 @@ namespace ILCompiler.Compiler
 
         private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> BinaryOperatorMappings = new Dictionary<Tuple<Operation, StackValueKind>, string>()
         {
-//            { Tuple.Create(Operation.Add, StackValueKind.Int16), "s_add" },
             { Tuple.Create(Operation.Add, StackValueKind.Int32), "i_add" },
-//            { Tuple.Create(Operation.Sub, StackValueKind.Int16), "s_sub" },
             { Tuple.Create(Operation.Sub, StackValueKind.Int32), "i_sub" },
-//            { Tuple.Create(Operation.Mul, StackValueKind.Int16), "s_mul" },
-//            { Tuple.Create(Operation.Div, StackValueKind.Int16), "s_div" }
         };
 
         public void GenerateCodeForBinaryOperator(BinaryOperator entry)

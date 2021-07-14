@@ -33,11 +33,6 @@
     <None Remove="Runtime\print.asm" />
     <None Remove="Runtime\setxy.asm" />
     <None Remove="Runtime\stoi.asm" />
-    <None Remove="Runtime\s_add.asm" />
-    <None Remove="Runtime\s_div.asm" />
-    <None Remove="Runtime\s_mul.asm" />
-    <None Remove="Runtime\s_neg.asm" />
-    <None Remove="Runtime\s_sub.asm" />
     <None Remove="Runtime\write.asm" />
   </ItemGroup>
 
@@ -50,18 +45,13 @@
     <EmbeddedResource Include="Runtime\print.asm" />
     <EmbeddedResource Include="Runtime\setxy.asm" />
     <EmbeddedResource Include="Runtime\stoi.asm" />
-    <EmbeddedResource Include="Runtime\s_add.asm" />
     <EmbeddedResource Include="Runtime\l_cmp.asm" />
-    <EmbeddedResource Include="Runtime\s_div.asm" />
     <EmbeddedResource Include="Runtime\l_eq.asm" />
     <EmbeddedResource Include="Runtime\l_ge.asm" />
     <EmbeddedResource Include="Runtime\l_gt.asm" />
     <EmbeddedResource Include="Runtime\l_le.asm" />
     <EmbeddedResource Include="Runtime\l_lt.asm" />
-    <EmbeddedResource Include="Runtime\s_mul.asm" />
-    <EmbeddedResource Include="Runtime\s_neg.asm" />
     <EmbeddedResource Include="Runtime\l_neq.asm" />
-    <EmbeddedResource Include="Runtime\s_sub.asm" />
     <EmbeddedResource Include="Runtime\write.asm" />
   </ItemGroup>
 
