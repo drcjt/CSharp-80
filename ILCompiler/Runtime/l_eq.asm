@@ -3,8 +3,8 @@
 ; Carry set if true
 
 l_eq:
-	POP AF
-	EX AF, AF'
+	POP DE
+	EXX
 
 	POP HL
 	POP DE
@@ -42,7 +42,7 @@ l_eq_2:
 	XOR A
 
 l_eq_4
-	EX AF, AF'
-	PUSH AF
+	EXX
+	PUSH DE
 
 	RET

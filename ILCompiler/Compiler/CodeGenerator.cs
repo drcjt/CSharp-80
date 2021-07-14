@@ -343,7 +343,7 @@ namespace ILCompiler.Compiler
 //            { Tuple.Create(Operation.Gt, StackValueKind.Int16), "s_gt" },
 //            { Tuple.Create(Operation.Le, StackValueKind.Int16), "s_le" },
 //            { Tuple.Create(Operation.Lt, StackValueKind.Int16), "s_lt" },
-//            { Tuple.Create(Operation.Ne, StackValueKind.Int16), "s_neq" },
+            { Tuple.Create(Operation.Ne, StackValueKind.Int32), "l_neq" },
         };
 
         private void GenerateCodeForComparision(BinaryOperator entry)
