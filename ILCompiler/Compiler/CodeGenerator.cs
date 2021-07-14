@@ -76,10 +76,6 @@ namespace ILCompiler.Compiler
                     GenerateCodeForReturn(node as ReturnEntry);
                     break;
 
-                case Operation.Constant_Int16:
-                    GenerateCodeForInt16Constant(node as Int16ConstantEntry);
-                    break;
-
                 case Operation.Constant_Int32:
                     GenerateCodeForInt32Constant(node as Int32ConstantEntry);
                     break;
@@ -238,13 +234,6 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public void GenerateCodeForInt16Constant(Int16ConstantEntry entry)
-        {
-            var value = entry.Value;
-            _currentAssembler.Ld(R16.HL, (short)value);
-            _currentAssembler.Push(R16.HL);
-        }
-
         public void GenerateCodeForInt32Constant(Int32ConstantEntry entry)
         {
             var value = (entry as Int32ConstantEntry).Value;
@@ -292,16 +281,13 @@ namespace ILCompiler.Compiler
 
             if (hasReturnValue)
             {
-                if (targetType.Kind != StackValueKind.Int16 && targetType.Kind != StackValueKind.Int32)
+                if (targetType.Kind != StackValueKind.Int32)
                 {
-                    throw new NotImplementedException("Return types other than void, short, and int not supported");
+                    throw new NotImplementedException("Return types other than void and int not supported");
                 }
 
                 _currentAssembler.Pop(R16.DE);            // Copy return value into DE
-                if (targetType != null && targetType.Kind == StackValueKind.Int32)
-                {
-                    _currentAssembler.Pop(R16.AF);
-                }
+                _currentAssembler.Pop(R16.AF);
             }
 
             if (hasLocals)
@@ -324,11 +310,8 @@ namespace ILCompiler.Compiler
             if (hasReturnValue)
             {
                 _currentAssembler.Pop(R16.HL);            // Store return address in HL
-                if (targetType != null && targetType.Kind == StackValueKind.Int32)
-                {
-                    _currentAssembler.Push(R16.AF);
-                }
-                _currentAssembler.Push(R16.DE);           // Push return value
+                _currentAssembler.Push(R16.AF);           // Push return value
+                _currentAssembler.Push(R16.DE);
                 _currentAssembler.Push(R16.HL);           // Push return address
             }
 
@@ -337,12 +320,12 @@ namespace ILCompiler.Compiler
 
         private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> BinaryOperatorMappings = new Dictionary<Tuple<Operation, StackValueKind>, string>()
         {
-            { Tuple.Create(Operation.Add, StackValueKind.Int16), "s_add" },
+//            { Tuple.Create(Operation.Add, StackValueKind.Int16), "s_add" },
             { Tuple.Create(Operation.Add, StackValueKind.Int32), "i_add" },
-            { Tuple.Create(Operation.Sub, StackValueKind.Int16), "s_sub" },
+//            { Tuple.Create(Operation.Sub, StackValueKind.Int16), "s_sub" },
             { Tuple.Create(Operation.Sub, StackValueKind.Int32), "i_sub" },
-            { Tuple.Create(Operation.Mul, StackValueKind.Int16), "s_mul" },
-            { Tuple.Create(Operation.Div, StackValueKind.Int16), "s_div" }
+//            { Tuple.Create(Operation.Mul, StackValueKind.Int16), "s_mul" },
+//            { Tuple.Create(Operation.Div, StackValueKind.Int16), "s_div" }
         };
 
         public void GenerateCodeForBinaryOperator(BinaryOperator entry)
@@ -355,12 +338,12 @@ namespace ILCompiler.Compiler
 
         private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> ComparisonOperatorMappings = new Dictionary<Tuple<Operation, StackValueKind>, string>()
         {
-            { Tuple.Create(Operation.Eq, StackValueKind.Int16), "s_eq" },
-            { Tuple.Create(Operation.Ge, StackValueKind.Int16), "s_ge" },
-            { Tuple.Create(Operation.Gt, StackValueKind.Int16), "s_gt" },
-            { Tuple.Create(Operation.Le, StackValueKind.Int16), "s_le" },
-            { Tuple.Create(Operation.Lt, StackValueKind.Int16), "s_lt" },
-            { Tuple.Create(Operation.Ne, StackValueKind.Int16), "s_neq" },
+            { Tuple.Create(Operation.Eq, StackValueKind.Int32), "l_eq" },
+//            { Tuple.Create(Operation.Ge, StackValueKind.Int16), "s_ge" },
+//            { Tuple.Create(Operation.Gt, StackValueKind.Int16), "s_gt" },
+//            { Tuple.Create(Operation.Le, StackValueKind.Int16), "s_le" },
+//            { Tuple.Create(Operation.Lt, StackValueKind.Int16), "s_lt" },
+//            { Tuple.Create(Operation.Ne, StackValueKind.Int16), "s_neq" },
         };
 
         private void GenerateCodeForComparision(BinaryOperator entry)
@@ -383,6 +366,7 @@ namespace ILCompiler.Compiler
                 _currentAssembler.Ld(R8.L, I16.IX, (short)-(offset + 2));
                 _currentAssembler.Push(R16.HL);
 
+                // TODO: Will this always be 4 now?
                 if (localVariable.ExactSize == 4)
                 {
                     _currentAssembler.Ld(R8.H, I16.IX, (short)-(offset + 3));
@@ -400,6 +384,7 @@ namespace ILCompiler.Compiler
                 _currentAssembler.Ld(R8.L, I16.IY, (short)-(offset + 2));
                 _currentAssembler.Push(R16.HL);
 
+                // TODO: Will this always be 4 now?
                 if (parameterDescriptor.ExactSize == 4)
                 {
                     _currentAssembler.Ld(R8.H, I16.IY, (short)-(offset + 3));
@@ -414,6 +399,7 @@ namespace ILCompiler.Compiler
             var localVariable = _localVariableTable[entry.LocalNumber];
             var offset = localVariable.StackOffset;
 
+            // TODO: Will this always be 4 now?
             if (localVariable.ExactSize == 4)
             {
                 _currentAssembler.Pop(R16.HL);
@@ -442,16 +428,6 @@ namespace ILCompiler.Compiler
                     _currentAssembler.Call("PRINT");
                     break;
 
-                case "WriteInt16":
-                    _currentAssembler.Pop(R16.HL);    // put argument 1 into HL
-                    _currentAssembler.Call("ITOA");
-                    break;
-
-                case "WriteUInt16":
-                    _currentAssembler.Pop(R16.HL);
-                    _currentAssembler.Call("UITOA");
-                    break;
-
                 case "WriteInt32":
                     _currentAssembler.Pop(R16.DE);
                     _currentAssembler.Pop(R16.HL);
@@ -465,6 +441,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case "WriteChar":
+                    _currentAssembler.Pop(R16.DE);    // chars are stored on stack as int32 so remove MSW
                     _currentAssembler.Pop(R16.HL);    // put argument 1 into HL
                     _currentAssembler.Ld(R8.A, R8.L); // Load low byte of argument 1 into A
                     _currentAssembler.Call(0x0033); // ROM routine to display character at current cursor position

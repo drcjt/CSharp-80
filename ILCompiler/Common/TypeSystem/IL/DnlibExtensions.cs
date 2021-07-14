@@ -34,7 +34,6 @@ namespace ILCompiler.Common.TypeSystem.IL
                 case ElementType.U1:
                 case ElementType.I2:
                 case ElementType.U2:
-                    return StackValueKind.Int16;
                 case ElementType.I4:
                 case ElementType.U4:
                     return StackValueKind.Int32;

@@ -1,21 +1,48 @@
-; 16 bit signed equal comparison
-; DE == HL
+; 32 bit signed equal comparison
+; Args from Stack, DEHL == BCAF
 ; Carry set if true
-s_eq:
-	POP BC
+
+l_eq:
+	POP AF
+	EX AF, AF'
 
 	POP HL
 	POP DE
 
-	OR A
-	SBC HL, DE
-	SCF
-	INC HL
-	RET Z
-	XOR A
-	LD L, A
-	LD H, A
+	POP BC
+	LD A, C
+	CP L
+	JR NZ, l_eq_1
 
-	PUSH BC
+	LD A, B
+	CP H
+	JR NZ, l_eq_1
+
+	POP BC
+
+	LD A, C
+	CP E
+	JR NZ, l_eq_2
+
+	LD A, B
+	CP D
+	JR NZ, l_eq_2
+
+l_eq_3:
+	SCF
+
+	JP l_eq_4
+
+l_eq_1:
+
+	POP BC
+
+l_eq_2:
+
+	XOR A
+
+l_eq_4
+	EX AF, AF'
+	PUSH AF
 
 	RET
