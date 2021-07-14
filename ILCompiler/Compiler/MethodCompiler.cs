@@ -35,10 +35,12 @@ namespace ILCompiler.Compiler
             for (int parameterIndex = 0; parameterIndex < method.Parameters.Count; parameterIndex++)
             {
                 var kind = method.Parameters[parameterIndex].Type.GetStackValueKind();
+                var unsigned = method.Parameters[parameterIndex].Type.IsUnsigned();
                 var local = new LocalVariableDescriptor() 
                 { 
                     IsParameter = true, 
                     Kind = kind,
+                    IsUnsigned = unsigned,
                     ExactSize = GetExactSize(kind),
                     StackOffset = offset
                 };
@@ -52,10 +54,12 @@ namespace ILCompiler.Compiler
                 for (int variableIndex = 0; variableIndex < body.Variables.Count; variableIndex++)
                 {
                     var kind = body.Variables[variableIndex].Type.GetStackValueKind();
+                    var unsigned = body.Variables[variableIndex].Type.IsUnsigned();
                     var local = new LocalVariableDescriptor() 
                     { 
                         IsParameter = false, 
                         Kind = kind, 
+                        IsUnsigned = unsigned,
                         ExactSize = GetExactSize(kind),
                         StackOffset = offset
                     };

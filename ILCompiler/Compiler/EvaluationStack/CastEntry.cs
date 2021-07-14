@@ -7,11 +7,14 @@ namespace ILCompiler.Compiler.EvaluationStack
         public StackValueKind DesiredKind { get; }
         public StackEntry Op1 { get; }
 
-        public CastEntry(StackValueKind desiredKind, StackEntry op1) : base(desiredKind)
+        public bool Unsigned { get;  }
+
+        public CastEntry(StackValueKind desiredKind, bool unsigned, StackEntry op1) : base(desiredKind)
         {
             Operation = Operation.Cast;
             DesiredKind = desiredKind;
             Op1 = op1;
+            Unsigned = unsigned;
         }
 
         public override void Accept(IStackEntryVisitor visitor)

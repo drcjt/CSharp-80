@@ -180,6 +180,11 @@ namespace ILCompiler.Compiler
                         break;
 
                     case Code.Conv_I2:
+                        ImportConversion(StackValueKind.Int16, false);
+                        break;
+
+                    case Code.Conv_U2:
+                        ImportConversion(StackValueKind.Int16, true);
                         break;
 
                     case Code.Ret:
@@ -251,6 +256,16 @@ namespace ILCompiler.Compiler
             }
 
             return basicBlocks;
+        }
+
+        public void ImportConversion(StackValueKind desiredKind, bool unsigned)
+        {
+            var op1 = _stack.Pop();
+            if (op1.Kind != desiredKind)
+            {
+                op1 = new CastEntry(desiredKind, unsigned, op1);
+            }
+            _stack.Push(op1);
         }
 
         public void ImportBranch(Code opcode, BasicBlock target, BasicBlock fallthrough)
@@ -409,7 +424,8 @@ namespace ILCompiler.Compiler
             var localNumber = _methodCompiler.ParameterCount + index;
 
             // This is necessary as local variable might be a Int16
-            value = CastIfNecessary(value, _localVariableTable[localNumber].Kind);
+            var unsigned = _localVariableTable[localNumber].IsUnsigned;
+            value = CastIfNecessary(value, unsigned, _localVariableTable[localNumber].Kind);
 
             if (value.Kind != StackValueKind.Int16 && value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ObjRef)
             {
@@ -532,7 +548,9 @@ namespace ILCompiler.Compiler
                 arguments[methodToCall.Parameters.Count - i - 1] = argument;
 
                 // Wrap argument in CastEntry if required, e.g. if kind is int16 but method requires int32
-                arguments[methodToCall.Parameters.Count - i - 1] = CastIfNecessary(argument, methodToCall.Parameters[i].Type.GetStackValueKind());
+                // Use parameter type to infer signness of argument to enable appropriate casting
+                var unsigned = methodToCall.Parameters[i].Type.IsUnsigned();
+                arguments[methodToCall.Parameters.Count - i - 1] = CastIfNecessary(argument, unsigned, methodToCall.Parameters[i].Type.GetStackValueKind());
             }
 
             // Intrinsic calls
@@ -574,8 +592,8 @@ namespace ILCompiler.Compiler
             {
                 var value = _stack.Pop();
 
-                // Add cast if necessary
-                value = CastIfNecessary(value, method.ReturnType.GetStackValueKind());
+                // Add cast if necessary. Note we know the type must be signed.
+                value = CastIfNecessary(value, false, method.ReturnType.GetStackValueKind());
 
                 if (value.Kind != StackValueKind.Int16 && value.Kind != StackValueKind.Int32)
                 {
@@ -586,12 +604,12 @@ namespace ILCompiler.Compiler
             ImportAppendTree(retNode);
         }
 
-        private StackEntry CastIfNecessary(StackEntry value, StackValueKind requiredKind)
+        private StackEntry CastIfNecessary(StackEntry value, bool unsigned, StackValueKind requiredKind)
         {
             StackEntry result = value;
             if (value.Kind != requiredKind)
             {
-                result = new CastEntry(requiredKind, value);
+                result = new CastEntry(requiredKind, unsigned, value);
             }
             return result;
         }

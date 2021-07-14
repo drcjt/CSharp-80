@@ -476,6 +476,7 @@ namespace ILCompiler.Compiler
         {
             var actualKind = entry.Op1.Kind;
             var desiredKind = entry.DesiredKind;
+            var unsigned = entry.Unsigned;
 
             if (actualKind == StackValueKind.Int16 && desiredKind == StackValueKind.Int32)
             {
@@ -484,11 +485,22 @@ namespace ILCompiler.Compiler
             }
             else if (actualKind == StackValueKind.Int32 && desiredKind == StackValueKind.Int16)
             {
-                // TODO: Assess if this should really be a runtime routine or not
-                _currentAssembler.Pop(R16.HL);
-                _currentAssembler.Pop(R16.DE);
-                _currentAssembler.Push(R16.DE);
-            }
+                if (unsigned)
+                {
+                    // TODO: Assess if this should really be a runtime routine or not
+                    _currentAssembler.Pop(R16.HL);
+                    _currentAssembler.Pop(R16.DE);
+                    _currentAssembler.Push(R16.DE);
+                }
+                else
+                {
+                    // TODO: narrow signed int32 to int16
+                    // Take sign bit from msw and set in lsw
+                    _currentAssembler.Pop(R16.HL);
+                    _currentAssembler.Pop(R16.DE);
+                    _currentAssembler.Push(R16.DE);
+                }
+            }            
             else
             {
                 throw new NotImplementedException($"Implicit cast from {actualKind} to {desiredKind} not supported");
