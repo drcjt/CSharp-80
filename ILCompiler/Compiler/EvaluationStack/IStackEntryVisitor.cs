@@ -2,7 +2,6 @@
 {
     public interface IStackEntryVisitor
     {
-        public void Visit(Int16ConstantEntry entry);
         public void Visit(Int32ConstantEntry entry);
         public void Visit(StringConstantEntry entry);
         public void Visit(StoreIndEntry entry);

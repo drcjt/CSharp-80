@@ -2,7 +2,7 @@
 ; Args from Stack, DEHL != BCAF
 ; Carry set if true
 
-l_neq:
+i_neq:
 	POP DE
 	EXX
 
@@ -12,33 +12,32 @@ l_neq:
 	POP BC
 	LD A, C
 	CP L
-	JR NZ, l_neq_1
+	JR NZ, i_neq_1
 
 	LD A, B
 	CP H
-	JR NZ, l_neq_1
+	JR NZ, i_neq_1
 
 	POP BC
 
 	LD A, C
 	CP E
-	JR NZ, l_neq_2
+	JR NZ, i_neq_2
 
 	LD A, B
 	CP D
-	JR NZ, l_neq_2
+	JR NZ, i_neq_2
 
-l_neq_3:
-	JP l_eq_4
+	JP i_neq_3
 
-l_neq_1:
+i_neq_1:
 
 	POP BC
 
-l_neq_2:
+i_neq_2:
 	SCF
 
-l_neq_4
+i_neq_3
 	EXX
 	PUSH DE
 

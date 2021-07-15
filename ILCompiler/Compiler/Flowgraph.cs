@@ -42,11 +42,6 @@ namespace ILCompiler.Compiler
             Current = current;
         }
 
-        public void Visit(Int16ConstantEntry entry)
-        {
-            SetNext(entry);
-        }
-
         public void Visit(Int32ConstantEntry entry)
         {
             SetNext(entry);

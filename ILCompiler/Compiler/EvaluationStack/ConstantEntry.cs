@@ -34,19 +34,6 @@ namespace ILCompiler.Compiler.EvaluationStack
         }
     }
 
-    public class Int16ConstantEntry : ConstantEntry<short>
-    {
-        public Int16ConstantEntry(short value) : base(StackValueKind.Int16, value)
-        {
-            Operation = Operation.Constant_Int16;
-        }
-
-        public override void Accept(IStackEntryVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-    }
-
     public class Int32ConstantEntry : ConstantEntry<int>
     {
         public Int32ConstantEntry(int value) : base(StackValueKind.Int32, value)

@@ -1,7 +1,7 @@
-; 32 bit signed less than comparison
+; 32 bit signed less than equal comparison
 ; Entry: primary, secondary on stack
 ; Exit: Carry set if true
-l_lt:
+i_le:
 	POP BC
 
 	POP HL
@@ -9,8 +9,13 @@ l_lt:
 
 	PUSH BC
 
-	CALL l_cmp
+	CALL i_cmp
 	RET C
 	
+	SCF
+	RET Z
+
 	DEC L
+
+	OR A
 	RET

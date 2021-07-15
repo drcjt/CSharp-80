@@ -310,6 +310,7 @@ namespace ILCompiler.Compiler
         {
             { Tuple.Create(Operation.Add, StackValueKind.Int32), "i_add" },
             { Tuple.Create(Operation.Sub, StackValueKind.Int32), "i_sub" },
+            { Tuple.Create(Operation.Mul, StackValueKind.Int32), "i_mul" },
         };
 
         public void GenerateCodeForBinaryOperator(BinaryOperator entry)
@@ -322,12 +323,12 @@ namespace ILCompiler.Compiler
 
         private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> ComparisonOperatorMappings = new()
         {
-            { Tuple.Create(Operation.Eq, StackValueKind.Int32), "l_eq" },
-            { Tuple.Create(Operation.Ge, StackValueKind.Int32), "l_ge" },
-            { Tuple.Create(Operation.Gt, StackValueKind.Int32), "l_gt" },
-            { Tuple.Create(Operation.Le, StackValueKind.Int32), "l_le" },
-            { Tuple.Create(Operation.Lt, StackValueKind.Int32), "l_lt" },
-            { Tuple.Create(Operation.Ne, StackValueKind.Int32), "l_neq" },
+            { Tuple.Create(Operation.Eq, StackValueKind.Int32), "i_eq" },
+            { Tuple.Create(Operation.Ge, StackValueKind.Int32), "i_ge" },
+            { Tuple.Create(Operation.Gt, StackValueKind.Int32), "i_gt" },
+            { Tuple.Create(Operation.Le, StackValueKind.Int32), "i_le" },
+            { Tuple.Create(Operation.Lt, StackValueKind.Int32), "i_lt" },
+            { Tuple.Create(Operation.Ne, StackValueKind.Int32), "i_neq" },
         };
 
         private void GenerateCodeForComparision(BinaryOperator entry)

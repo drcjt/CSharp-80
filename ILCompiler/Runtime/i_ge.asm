@@ -1,7 +1,7 @@
-; 32 bit signed greater than comparison
+; 32 bit signed greater than equal comparison
 ; Entry: primary, secondary on stack
 ; Exit: Carry set if true
-l_gt:
+i_ge:
 	POP BC
 
 	POP HL
@@ -9,12 +9,14 @@ l_gt:
 
 	PUSH BC
 
-	CALL l_cmp
-	JR Z, l_gt_1
+	CALL i_cmp
 
 	CCF
 	RET C
 
-l_gt_1:
+	SCF
+	RET Z
+
 	DEC L
+	CCF
 	RET
