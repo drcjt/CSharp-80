@@ -47,8 +47,7 @@ Each method to be compiled is represented as a list of `BasicBlock` objects. Eac
 oriented form or High-level Internal Representation (HIR). In a later phase in the compiler the tree is converted into a linear ordered form or Linear Internal Representation (LIR).
 
 Both the HIR and LIR blocks are composed of `StackEntry` objects that define the operations performed by the block. Note that all `StackEntry` objects have an associated `StackValueKind`
-which represents the type of data the object represents. This should correspond to the basic types defined in the ECMA standard - however I have added an extra type explicitly
-representing 16 bit signed integers to enable more optimal code generation for the 16-bit z80 processor.
+which represents the type of data the object represents.
 
 ### Importation
 Importation is the phase that creates the IR for each method, reading in one IL instruction at a time, and building up the IR tree representation. The `ILImporter.Import(..)` method
