@@ -120,7 +120,8 @@ namespace ILCompiler.Compiler
                     case Code.Add:
                     case Code.Sub:
                     case Code.Mul:
-                    case Code.Div:
+                    case Code.Div_Un:
+                    case Code.Rem_Un:
                         ImportBinaryOperation(opcode);
                         break;
 
@@ -383,6 +384,14 @@ namespace ILCompiler.Compiler
 
                 case Code.Div:
                     binaryOp = Operation.Div;
+                    break;
+
+                case Code.Div_Un:
+                    binaryOp = Operation.Div_Un;
+                    break;
+
+                case Code.Rem_Un:
+                    binaryOp = Operation.Rem_Un;
                     break;
 
                 default:

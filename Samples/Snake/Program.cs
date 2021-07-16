@@ -22,7 +22,6 @@ namespace MiniBCL
             return 0;
         }
 
-        // TODO: Needs Rem.un to be implemented
         public static uint Next(uint val)
         {
             uint next = (1103515245 * val + 12345) % 2147483648;
