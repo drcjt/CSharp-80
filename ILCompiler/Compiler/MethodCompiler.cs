@@ -74,8 +74,6 @@ namespace ILCompiler.Compiler
         {
             switch (kind)
             {
-                case StackValueKind.Int16:
-                    return 2;
                 case StackValueKind.Int32:
                     return 4;
                 case StackValueKind.Int64:

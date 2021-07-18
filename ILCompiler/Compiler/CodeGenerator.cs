@@ -440,35 +440,35 @@ namespace ILCompiler.Compiler
         public void GenerateCodeForCast(CastEntry entry)
         {
             var actualKind = entry.Op1.Kind;
-            var desiredKind = entry.DesiredKind;
+            var desiredType = entry.DesiredType;
             var unsigned = entry.Unsigned;
 
-            if (actualKind == StackValueKind.Int16 && desiredKind == StackValueKind.Int32)
+            if (actualKind == StackValueKind.Int32 && desiredType == Common.TypeSystem.WellKnownType.UInt16 && unsigned)
             {
-                // Gen code for a widening conversion here
-                _currentAssembler.Call("stoi");
+                _currentAssembler.Pop(R16.HL);
+                _currentAssembler.Pop(R16.DE);
+
+                _currentAssembler.Ld(R16.HL, 0);    // clear msw
+
+                _currentAssembler.Push(R16.DE);
+                _currentAssembler.Push(R16.HL);
             }
-            else if (actualKind == StackValueKind.Int32 && desiredKind == StackValueKind.Int16)
+            else if (actualKind == StackValueKind.Int32 && desiredType == Common.TypeSystem.WellKnownType.Int16 && !unsigned)
             {
-                if (unsigned)
-                {
-                    // TODO: Assess if this should really be a runtime routine or not
-                    _currentAssembler.Pop(R16.HL);
-                    _currentAssembler.Pop(R16.DE);
-                    _currentAssembler.Push(R16.DE);
-                }
-                else
-                {
-                    // TODO: narrow signed int32 to int16
-                    // Take sign bit from msw and set in lsw
-                    _currentAssembler.Pop(R16.HL);
-                    _currentAssembler.Pop(R16.DE);
-                    _currentAssembler.Push(R16.DE);
-                }
-            }            
+                _currentAssembler.Pop(R16.HL);
+                _currentAssembler.Pop(R16.DE);
+
+                _currentAssembler.Ld(R8.H, R8.D);
+
+                _currentAssembler.Add(R16.HL, R16.HL);  // move sign bit into carry flag
+                _currentAssembler.Sbc(R16.HL, R16.HL);  // hl is now 0 or FFFF
+
+                _currentAssembler.Push(R16.DE);
+                _currentAssembler.Push(R16.HL);
+            }
             else
             {
-                throw new NotImplementedException($"Implicit cast from {actualKind} to {desiredKind} not supported");
+                throw new NotImplementedException($"Implicit cast from {actualKind} to {desiredType} not supported");
             }
         }
 

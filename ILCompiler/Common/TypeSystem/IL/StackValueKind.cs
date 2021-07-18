@@ -3,7 +3,6 @@
     public enum StackValueKind
     {
         Unknown,
-        Int16,
         Int32,
         Int64,
         NativeInt,
