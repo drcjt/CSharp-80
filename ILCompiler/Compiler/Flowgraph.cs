@@ -86,6 +86,12 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
+        public void Visit(UnaryOperator entry)
+        {
+            entry.Op1.Accept(this);
+            SetNext(entry);
+        }
+
         public void Visit(LocalVariableEntry entry)
         {
             SetNext(entry);

@@ -4,6 +4,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 {
     public enum Operation
     {
+        Neg,
         Call,
         Return,
         Cast,

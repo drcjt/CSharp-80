@@ -174,6 +174,10 @@ namespace ILCompiler.Compiler
                         ImportConversion(WellKnownType.UInt16, true);
                         break;
 
+                    case Code.Neg:
+                        ImportNeg();
+                        break;
+
                     case Code.Ret:
                         ImportRet(_method);
                         return;
@@ -208,6 +212,13 @@ namespace ILCompiler.Compiler
                     return;
                 }
             }
+        }
+
+        private void ImportNeg()
+        {
+            var op1 = _stack.Pop();
+            op1 = new UnaryOperator(Operation.Neg, op1);
+            _stack.Push(op1);
         }
 
         private void MarkBasicBlock(BasicBlock basicBlock)

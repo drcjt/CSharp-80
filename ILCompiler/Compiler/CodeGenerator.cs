@@ -86,6 +86,10 @@ namespace ILCompiler.Compiler
                     GenerateCodeForJumpTrue(node as JumpEntry);
                     break;
 
+                case Operation.Neg:
+                    GenerateCodeForNeg(node as UnaryOperator);
+                    break;
+
                 case Operation.Eq:
                 case Operation.Ne:
                 case Operation.Lt:
@@ -321,6 +325,18 @@ namespace ILCompiler.Compiler
             if (BinaryOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string routine))
             {
                 _currentAssembler.Call(routine);
+            }
+        }
+
+        public void GenerateCodeForNeg(UnaryOperator entry)
+        {
+            if (entry.Operation == Operation.Neg)
+            {
+                _currentAssembler.Call("i_neg");
+            }
+            else
+            {
+                throw new NotImplementedException($"Unary operator {entry.Operation} not implemented");
             }
         }
 

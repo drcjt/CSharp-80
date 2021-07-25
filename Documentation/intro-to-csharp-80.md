@@ -44,6 +44,7 @@ sub | int32
 mul | int32
 div.un | int32
 rem.un | int32
+neg | int32
 br.s | int32
 blt.s | int32
 bgt.s | int32

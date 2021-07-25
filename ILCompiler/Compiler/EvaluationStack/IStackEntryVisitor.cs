@@ -14,5 +14,6 @@
         public void Visit(CallEntry entry);
         public void Visit(IntrinsicEntry entry);
         public void Visit(CastEntry entry);
+        public void Visit(UnaryOperator entry);
     }
 }

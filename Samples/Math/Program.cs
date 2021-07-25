@@ -8,6 +8,9 @@ namespace MiniBCL
 		{
             Console.Clear();
 
+            short a = 123;
+            Console.WriteLine(-a);
+
             Console.WriteLine(5 + 4);       // output: 9
 
             ushort x = 45123;
