@@ -34,6 +34,16 @@ i_div_un:
    or l
    jr z, divide_zero  
 
+   call l0_small_divu_32_32x32
+
+   push hl
+   push de
+
+   ex af, af'
+   push af
+   ret
+
+
 l0_small_divu_32_32x32:
 
    xor a
@@ -109,18 +119,11 @@ loop_1:
    ld e,c
    ld d,a
 
-   ; quotient = dehl
-   ; remainder = dehl'
-
-   push hl
-   push de
-
-   ex af, af'
-   push af
    ret
 
 divide_zero:
 
+; TODO: this should be putting some values back on the stack too!
     dec de
     scf
     ret

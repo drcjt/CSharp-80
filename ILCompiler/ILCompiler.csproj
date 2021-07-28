@@ -22,6 +22,7 @@
     <None Remove="Runtime\itoa.asm" />
     <None Remove="Runtime\i_add.asm" />
     <None Remove="Runtime\i_cmp.asm" />
+    <None Remove="Runtime\i_div.asm" />
     <None Remove="Runtime\i_div_un.asm" />
     <None Remove="Runtime\i_eq.asm" />
     <None Remove="Runtime\i_ge.asm" />
@@ -44,6 +45,7 @@
     <EmbeddedResource Include="Runtime\cls.asm" />
     <EmbeddedResource Include="Runtime\itoa.asm" />
     <EmbeddedResource Include="Runtime\i_add.asm" />
+    <EmbeddedResource Include="Runtime\i_div.asm" />
     <EmbeddedResource Include="Runtime\i_div_un.asm" />
     <EmbeddedResource Include="Runtime\i_mul.asm" />
     <EmbeddedResource Include="Runtime\i_neg.asm" />

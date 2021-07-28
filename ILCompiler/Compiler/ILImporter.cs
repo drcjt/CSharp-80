@@ -120,6 +120,7 @@ namespace ILCompiler.Compiler
                     case Code.Add:
                     case Code.Sub:
                     case Code.Mul:
+                    case Code.Div:
                     case Code.Div_Un:
                     case Code.Rem_Un:
                         ImportBinaryOperation(opcode);

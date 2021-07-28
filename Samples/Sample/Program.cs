@@ -88,9 +88,15 @@ namespace MiniBCL
 
         private static void TestDiv()
         {
-            short x = 100;
-            short y = 5;
-            Console.WriteLine((short)(x / y));
+            // Unsigned division
+            uint a = 100;
+            uint b = 5;
+            Console.WriteLine(a / b);
+
+            // signed divison
+            int x = -90;
+            int y = 3;
+            Console.WriteLine(x / y);            
         }
 
         private static void TestArguments(short a, short b, short c)

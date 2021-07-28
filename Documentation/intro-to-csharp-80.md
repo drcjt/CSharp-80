@@ -42,6 +42,7 @@ stind.i1 |
 add	| int32
 sub | int32
 mul | int32
+div | int32
 div.un | int32
 rem.un | int32
 neg | int32
