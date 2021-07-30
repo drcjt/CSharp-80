@@ -125,7 +125,6 @@ namespace ILCompiler.Compiler
                     break;
 
                 case Operation.Cast:
-                    // Insert code to do implicit cast
                     GenerateCodeForCast(node as CastEntry);
                     break;
 
