@@ -271,7 +271,7 @@ namespace ILCompiler.Compiler
                 var op2 = _stack.Pop();
                 if (op2.Kind != StackValueKind.Int32)
                 {
-                    throw new NotSupportedException("Boolean comparisonsonly supported using int as underlying type");
+                    throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
                 }
 
                 StackEntry op1;
