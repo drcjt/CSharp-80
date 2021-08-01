@@ -34,6 +34,17 @@ i_div:
    or l
    jr z, divide_zero_s  
 
+   call l0_small_div_32_32x32
+
+   push hl
+   push de
+
+   ex af, af'
+   push af
+   ret
+
+l0_small_div_32_32x32:
+
    ld a,d
    
    exx
@@ -73,12 +84,7 @@ i_div:
    ; remainder = dehl'
 
 i_div_end:
-   push hl
-   push de
-
-   ex af, af'
-   push af
-   ret
+    ret
 
 divide_zero_s:
 

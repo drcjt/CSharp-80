@@ -103,6 +103,7 @@ namespace ILCompiler.Compiler
                 case Operation.Mul:
                 case Operation.Sub:
                 case Operation.Div:
+                case Operation.Rem:
                 case Operation.Div_Un:
                 case Operation.Rem_Un:
                     GenerateCodeForBinaryOperator(node as BinaryOperator);
@@ -317,6 +318,7 @@ namespace ILCompiler.Compiler
             { Tuple.Create(Operation.Sub, StackValueKind.Int32), "i_sub" },
             { Tuple.Create(Operation.Mul, StackValueKind.Int32), "i_mul" },
             { Tuple.Create(Operation.Div, StackValueKind.Int32), "i_div" },
+            { Tuple.Create(Operation.Rem, StackValueKind.Int32), "i_rem" },
             { Tuple.Create(Operation.Div_Un, StackValueKind.Int32), "i_div_un" },
             { Tuple.Create(Operation.Rem_Un, StackValueKind.Int32), "i_rem_un" },
         };

@@ -121,6 +121,7 @@ namespace ILCompiler.Compiler
                     case Code.Sub:
                     case Code.Mul:
                     case Code.Div:
+                    case Code.Rem:
                     case Code.Div_Un:
                     case Code.Rem_Un:
                         ImportBinaryOperation(opcode);
@@ -373,37 +374,11 @@ namespace ILCompiler.Compiler
                 throw new NotSupportedException("Binary operations on types other than int32 not supported yet");
             }
 
-            Operation binaryOp;
-            switch (opcode)
+            if (opcode < Code.Add || opcode > Code.Rem_Un)
             {
-                case Code.Add:
-                    binaryOp = Operation.Add;
-                    break;
-
-                case Code.Sub:
-                    binaryOp = Operation.Sub;
-                    break;
-
-                case Code.Mul:
-                    binaryOp = Operation.Mul;
-                    break;
-
-                case Code.Div:
-                    binaryOp = Operation.Div;
-                    break;
-
-                case Code.Div_Un:
-                    binaryOp = Operation.Div_Un;
-                    break;
-
-                case Code.Rem_Un:
-                    binaryOp = Operation.Rem_Un;
-                    break;
-
-                default:
-                    throw new NotImplementedException();
+                throw new NotImplementedException();
             }
-
+            Operation binaryOp = Operation.Add + (opcode - Code.Add);
             var binaryExpr = new BinaryOperator(binaryOp, op1, op2, kind);
             PushExpression(binaryExpr);
         }

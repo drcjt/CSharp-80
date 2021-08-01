@@ -17,7 +17,7 @@
    ;
    ; uses  : af, bc, de, hl, bc', de', hl'
 
-i_rem_un:
+i_rem:
     pop af
     ex af, af'
 
@@ -32,9 +32,9 @@ i_rem_un:
    or e
    or h
    or l
-   jr z, i_rem_un_divide_zero  
+   jr z, i_rem_divide_zero  
 
-   call l0_small_divu_32_32x32
+   call l0_small_div_32_32x32
 
    exx
    push hl
@@ -45,7 +45,7 @@ i_rem_un:
    push af
    ret
 
-i_rem_un_divide_zero:
+i_rem_divide_zero:
 
     dec de
     scf

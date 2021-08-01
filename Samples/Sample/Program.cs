@@ -14,6 +14,7 @@ namespace MiniBCL
             Console.WriteLine(returnedInt32);
 
             TestDiv();
+            TestRem();
 
             // Test writing out Int32 value
             TestPassingInt32(123456);
@@ -98,6 +99,20 @@ namespace MiniBCL
             int y = 3;
             Console.WriteLine(x / y);            
         }
+
+        private static void TestRem()
+        {
+            // Unsigned remainder
+            uint a = 100;
+            uint b = 3;
+            Console.WriteLine(a % b);
+
+            // signed remainder
+            int x = -100;
+            int y = 7;
+            Console.WriteLine(x % y);
+        }
+
 
         private static void TestArguments(short a, short b, short c)
         {
