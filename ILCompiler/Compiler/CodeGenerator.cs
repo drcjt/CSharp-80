@@ -83,7 +83,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case Operation.Jump:
-                    GenerateCodeForJumpTrue(node as JumpEntry);
+                    GenerateCodeForJump(node as JumpEntry);
                     break;
 
                 case Operation.Neg:
@@ -96,7 +96,7 @@ namespace ILCompiler.Compiler
                 case Operation.Le:
                 case Operation.Gt:
                 case Operation.Ge:
-                    GenerateCodeForComparision(node as BinaryOperator);
+                    GenerateCodeForComparison(node as BinaryOperator);
                     break;
 
                 case Operation.Add:
@@ -260,10 +260,11 @@ namespace ILCompiler.Compiler
 
         public void GenerateCodeForJumpTrue(JumpTrueEntry entry)
         {
+            // TODO: This should really check if top of stack is 0 or 1 (i4)
             _currentAssembler.Jp(Condition.C, entry.TargetLabel);
         }
         
-        public void GenerateCodeForJumpTrue(JumpEntry entry)
+        public void GenerateCodeForJump(JumpEntry entry)
         {
             _currentAssembler.Jp(entry.TargetLabel);
         }
@@ -353,11 +354,13 @@ namespace ILCompiler.Compiler
             { Tuple.Create(Operation.Ne, StackValueKind.Int32), "i_neq" },
         };
 
-        private void GenerateCodeForComparision(BinaryOperator entry)
+        private void GenerateCodeForComparison(BinaryOperator entry)
         {
             if (ComparisonOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string routine))
             {
                 _currentAssembler.Call(routine);
+                // TODO: If carry set then push i4 1 else push i4 0
+
             }
         }
 

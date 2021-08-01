@@ -127,6 +127,13 @@ namespace ILCompiler.Compiler
                         ImportBinaryOperation(opcode);
                         break;
 
+                    case Code.Ceq:
+                        {
+                            var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
+                            ImportBranch(Code.Beq, _basicBlocks[(int)target.Offset], _basicBlocks[currentOffset]);
+                        }
+                        break;
+
                     case Code.Br_S:
                     case Code.Blt_S:
                     case Code.Bgt_S:
@@ -262,6 +269,24 @@ namespace ILCompiler.Compiler
         {
             var op1 = _stack.Pop();
             op1 = new CastEntry(wellKnownType, unsigned, op1);
+            _stack.Push(op1);
+        }
+
+        public void ImportCompare(Code opcode)
+        {
+            var op2 = _stack.Pop();
+            if (op2.Kind != StackValueKind.Int32)
+            {
+                throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
+            }
+            StackEntry op1;
+            var op = Operation.Eq + (opcode - Code.Beq);
+            op1 = _stack.Pop();
+            if (op2.Kind != StackValueKind.Int32)
+            {
+                throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
+            }
+            op1 = new BinaryOperator(op, op1, op2, StackValueKind.Int32);
             _stack.Push(op1);
         }
 
