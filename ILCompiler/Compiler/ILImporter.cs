@@ -129,8 +129,7 @@ namespace ILCompiler.Compiler
 
                     case Code.Ceq:
                         {
-                            var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
-                            ImportBranch(Code.Beq, _basicBlocks[(int)target.Offset], _basicBlocks[currentOffset]);
+                            ImportCompare(Code.Beq);
                         }
                         break;
 

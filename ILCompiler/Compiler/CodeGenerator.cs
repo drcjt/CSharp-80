@@ -260,8 +260,12 @@ namespace ILCompiler.Compiler
 
         public void GenerateCodeForJumpTrue(JumpTrueEntry entry)
         {
-            // TODO: This should really check if top of stack is 0 or 1 (i4)
-            _currentAssembler.Jp(Condition.C, entry.TargetLabel);
+            // Pop i4 from stack and jump if non zero
+            _currentAssembler.Pop(R16.HL);
+            _currentAssembler.Pop(R16.HL);
+            _currentAssembler.Ld(R8.A, 0);
+            _currentAssembler.Add(R8.A, R8.L);
+            _currentAssembler.Jp(Condition.NonZero, entry.TargetLabel);
         }
         
         public void GenerateCodeForJump(JumpEntry entry)
@@ -359,8 +363,12 @@ namespace ILCompiler.Compiler
             if (ComparisonOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string routine))
             {
                 _currentAssembler.Call(routine);
-                // TODO: If carry set then push i4 1 else push i4 0
-
+                // If carry set then push i4 1 else push i4 0
+                _currentAssembler.Ld(R16.HL, 0);
+                _currentAssembler.Adc(R16.HL, R16.HL);
+                _currentAssembler.Push(R16.HL);
+                _currentAssembler.Ld(R16.HL, 0);
+                _currentAssembler.Push(R16.HL);
             }
         }
 
