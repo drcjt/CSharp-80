@@ -11,6 +11,11 @@ namespace ILCompiler.Compiler.EvaluationStack
             LocalNumber = localNumber;
         }
 
+        public override StackEntry Duplicate()
+        {
+            return new LocalVariableEntry(LocalNumber, Kind);
+        }
+
         public override void Accept(IStackEntryVisitor visitor)
         {
             visitor.Visit(this);

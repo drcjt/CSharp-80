@@ -15,6 +15,10 @@ namespace ILCompiler.Compiler.EvaluationStack
         {
             Return = returnValue;
         }
+        public override StackEntry Duplicate()
+        {
+            return new ReturnEntry();
+        }
 
         public override void Accept(IStackEntryVisitor visitor)
         {

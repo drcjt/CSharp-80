@@ -16,6 +16,8 @@ namespace ILCompiler.Compiler
 
         public string Label { get; private set; }
 
+        public EvaluationStack<StackEntry> EntryStack;
+
         public BasicBlock(int offset)
         {
             StartOffset = offset;

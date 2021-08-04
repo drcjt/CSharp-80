@@ -14,6 +14,11 @@ namespace ILCompiler.Compiler.EvaluationStack
             Op2 = op2;
         }
 
+        public override StackEntry Duplicate()
+        {
+            return new BinaryOperator(Operation, Op1.Duplicate(), Op2.Duplicate(), Kind);
+        }
+
         public override void Accept(IStackEntryVisitor visitor)
         {
             visitor.Visit(this);

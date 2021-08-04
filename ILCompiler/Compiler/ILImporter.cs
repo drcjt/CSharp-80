@@ -48,6 +48,16 @@ namespace ILCompiler.Compiler
         private void StartImportingBasicBlock(BasicBlock basicBlock)
         {
             _stack.Clear();
+
+            EvaluationStack<StackEntry> entryStack = basicBlock.EntryStack;
+            if (entryStack != null)
+            {
+                int n = entryStack.Length;
+                for (int i = 0; i < n; i++)
+                {
+                    _stack.Push(entryStack[i].Duplicate());
+                }
+            }
         }
 
         private void EndImportingBasicBlock(BasicBlock basicBlock)
@@ -336,8 +346,7 @@ namespace ILCompiler.Compiler
         {
             // Evaluation stack in each basic block holds the imported high level tree representation of the IL
 
-            /*
-            EvaluationStack<StackEntry> entryStack = next.Stack;
+            EvaluationStack<StackEntry> entryStack = next.EntryStack;
 
             if (entryStack != null)
             {
@@ -356,24 +365,36 @@ namespace ILCompiler.Compiler
                         throw new InvalidProgramException();
                     }
 
-                    // TODO: Should this compare the "Type" of the entries too??
+                    if (entryStack[i].Kind == StackValueKind.ValueType)
+                    {
+                        if (entryStack[i].Kind != _stack[i].Kind)
+                            throw new InvalidProgramException();
+                    }
                 }
             }
             else
             {                
-                if (Stack.Length > 0)
+                if (_stack.Length > 0)
                 {
-                    entryStack = new EvaluationStack<StackEntry>(Stack.Length);
+                    // Stack is not empty at end of basic block
+                    // So we must spill stack into temps
+                    // Anything on the stack effectively gets turned into assignments to
+                    // temporary local variables
+                    // And successor basic blocks will have these temporary local variables
+                    // on the stack on entry
 
-                    // TODO: Need to understand why this is required
-                    for (int i = 0; i < Stack.Length; i++)
+                    entryStack = new EvaluationStack<StackEntry>(_stack.Length);
+
+                    for (int i = 0; i < _stack.Length; i++)
                     {
-                        entryStack.Push(NewSpillSlot(Stack[i]));
+                        // TODO: Replace items on stack with TEMP ASSIGNMENTS
+                        // TODO: PUT TEMPS onto entry stack
+                        //entryStack.Push(_stack[i]);
                     }
                 }
-                next.Stack = entryStack;                
+                next.EntryStack = entryStack;                
             }
-            */
+
             MarkBasicBlock(next);
         }
 

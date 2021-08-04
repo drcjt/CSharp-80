@@ -18,6 +18,11 @@ namespace ILCompiler.Compiler.EvaluationStack
             Unsigned = unsigned;
         }
 
+        public override StackEntry Duplicate()
+        {
+            return new CastEntry(DesiredType, Unsigned, Op1.Duplicate());
+        }
+
         public override void Accept(IStackEntryVisitor visitor)
         {
             visitor.Visit(this);

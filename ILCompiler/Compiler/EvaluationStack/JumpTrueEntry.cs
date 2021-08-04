@@ -13,6 +13,11 @@ namespace ILCompiler.Compiler.EvaluationStack
             Condition = condition;
         }
 
+        public override StackEntry Duplicate()
+        {
+            return new JumpTrueEntry(TargetLabel, Condition.Duplicate());
+        }
+
         public override void Accept(IStackEntryVisitor visitor)
         {
             visitor.Visit(this);

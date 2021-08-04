@@ -13,6 +13,11 @@
             Op1 = op1;
         }
 
+        public override StackEntry Duplicate()
+        {
+            return new StoreLocalVariableEntry(LocalNumber, Op1.Duplicate());
+        }
+
         public override void Accept(IStackEntryVisitor visitor)
         {
             visitor.Visit(this);

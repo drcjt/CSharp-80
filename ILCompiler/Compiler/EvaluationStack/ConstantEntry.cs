@@ -27,6 +27,10 @@ namespace ILCompiler.Compiler.EvaluationStack
         {
             Operation = Operation.Constant_String;
         }
+        public override StackEntry Duplicate()
+        {
+            return new StringConstantEntry(Value);
+        }
 
         public override void Accept(IStackEntryVisitor visitor)
         {
@@ -39,6 +43,11 @@ namespace ILCompiler.Compiler.EvaluationStack
         public Int32ConstantEntry(int value) : base(StackValueKind.Int32, value)
         {
             Operation = Operation.Constant_Int32;
+        }
+
+        public override StackEntry Duplicate()
+        {
+            return new Int32ConstantEntry(Value);
         }
 
         public override void Accept(IStackEntryVisitor visitor)

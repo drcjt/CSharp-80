@@ -12,6 +12,11 @@ namespace ILCompiler.Compiler.EvaluationStack
             TargetLabel = targetLabel;
         }
 
+        public override StackEntry Duplicate()
+        {
+            return new JumpEntry(TargetLabel);
+        }
+
         public override void Accept(IStackEntryVisitor visitor)
         {
             visitor.Visit(this);

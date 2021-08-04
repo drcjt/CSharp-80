@@ -15,6 +15,11 @@ namespace ILCompiler.Compiler.EvaluationStack
             Arguments = arguments;
         }
 
+        public override StackEntry Duplicate()
+        {
+            return new IntrinsicEntry(TargetMethod, Arguments, Kind);
+        }
+
         public override void Accept(IStackEntryVisitor visitor)
         {
             visitor.Visit(this);

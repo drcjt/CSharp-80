@@ -47,6 +47,9 @@ namespace ILCompiler.Compiler.EvaluationStack
             Kind = kind;
         }
 
+        // TODO: Consider using a visitor to do the duplication
+        public abstract StackEntry Duplicate();
+
         abstract public void Accept(IStackEntryVisitor visitor);
     }
 }
