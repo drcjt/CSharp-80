@@ -5,12 +5,13 @@ using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 
 namespace ILCompiler.Compiler
 {
     public class MethodCompiler
     {
-        private LocalVariableDescriptor[] _localVariableTable;
+        private IList<LocalVariableDescriptor> _localVariableTable;
         private readonly Compilation _compilation;
 
         public int ParameterCount { get; private set; }
@@ -29,7 +30,7 @@ namespace ILCompiler.Compiler
             var body = method.MethodBody as CilBody;
 
             // Setup local variable table - includes parameters as well as locals in method
-            _localVariableTable = new LocalVariableDescriptor[method.Parameters.Count + body?.Variables.Count ?? 0];
+            _localVariableTable = new List<LocalVariableDescriptor>(method.Parameters.Count + body?.Variables.Count ?? 0);
 
             var offset = 0;
             for (int parameterIndex = 0; parameterIndex < method.Parameters.Count; parameterIndex++)
@@ -41,10 +42,11 @@ namespace ILCompiler.Compiler
                     IsParameter = true, 
                     Kind = kind,
                     IsUnsigned = unsigned,
-                    ExactSize = GetExactSize(kind),
-                    StackOffset = offset
+                    ExactSize = TypeList.GetExactSize(kind),
+                    StackOffset = offset,
+                    IsTemp = false,
                 };
-                _localVariableTable[parameterIndex] = local;
+                _localVariableTable.Add(local);
                 offset += local.ExactSize;
             }
 
@@ -60,30 +62,13 @@ namespace ILCompiler.Compiler
                         IsParameter = false, 
                         Kind = kind, 
                         IsUnsigned = unsigned,
-                        ExactSize = GetExactSize(kind),
-                        StackOffset = offset
+                        ExactSize = TypeList.GetExactSize(kind),
+                        StackOffset = offset,
+                        IsTemp = false,
                     };
-                    _localVariableTable[method.Parameters.Count + variableIndex] = local;
+                    _localVariableTable.Add(local);
                     offset += local.ExactSize;
                 }
-            }
-        }
-
-        // TODO: Move this to a better place e.g TypeList.cs
-        private int GetExactSize(StackValueKind kind)
-        {
-            switch (kind)
-            {
-                case StackValueKind.Int32:
-                    return 4;
-                case StackValueKind.Int64:
-                    return 8;
-                case StackValueKind.ObjRef:
-                    return 2;
-                case StackValueKind.NativeInt:
-                    return 2;
-                default:
-                    throw new NotImplementedException($"Kind {kind} not yet supported");
             }
         }
 

@@ -12,14 +12,14 @@ namespace ILCompiler.Compiler
     public class CodeGenerator
     {
         private readonly Compilation _compilation;
-        private readonly LocalVariableDescriptor[] _localVariableTable;
+        private readonly IList<LocalVariableDescriptor> _localVariableTable;
         private readonly Z80MethodCodeNode _methodCodeNode;
 
         private readonly Dictionary<string, string> _labelsToStringData = new Dictionary<string, string>();
 
         private readonly Assembler _currentAssembler = new Assembler();
 
-        public CodeGenerator(Compilation compilation, LocalVariableDescriptor[] localVariableTable, Z80MethodCodeNode methodCodeNodeNeedingCode)
+        public CodeGenerator(Compilation compilation, IList<LocalVariableDescriptor> localVariableTable, Z80MethodCodeNode methodCodeNodeNeedingCode)
         {
             _compilation = compilation;
             _localVariableTable = localVariableTable;

@@ -13,5 +13,7 @@ namespace ILCompiler.Compiler
         public int ExactSize { get;set; }
 
         public int StackOffset { get; set; }
+
+        public bool IsTemp { get; set; }
     }
 }

@@ -7,6 +7,8 @@ using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace ILCompiler.Compiler
 {
@@ -14,7 +16,7 @@ namespace ILCompiler.Compiler
     {
         private readonly MethodCompiler _methodCompiler;
         private readonly MethodDef _method;
-        private readonly LocalVariableDescriptor[] _localVariableTable;
+        private readonly IList<LocalVariableDescriptor> _localVariableTable;
 
         private BasicBlock[] _basicBlocks;
         private BasicBlock _currentBasicBlock;
@@ -24,7 +26,7 @@ namespace ILCompiler.Compiler
 
         private readonly EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
 
-        public ILImporter(MethodCompiler methodCompiler, MethodDef method, LocalVariableDescriptor[] localVariableTable)
+        public ILImporter(MethodCompiler methodCompiler, MethodDef method, IList<LocalVariableDescriptor> localVariableTable)
         {
             _methodCompiler = methodCompiler;
             _method = method;
@@ -68,6 +70,14 @@ namespace ILCompiler.Compiler
         private void ImportAppendTree(StackEntry entry)
         {
             _currentBasicBlock.Statements.Add(entry);
+        }
+
+        private StackEntry ImportExtractLastStmt()
+        {
+            var lastStmtIndex = _currentBasicBlock.Statements.Count - 1;
+            var lastStmt = _currentBasicBlock.Statements[lastStmtIndex];
+            _currentBasicBlock.Statements.RemoveAt(lastStmtIndex);
+            return lastStmt;
         }
 
         private void ImportBasicBlock(IDictionary<int, int> offsetToIndexMap, BasicBlock block)
@@ -232,6 +242,36 @@ namespace ILCompiler.Compiler
             }
         }
 
+        private int GrabTemp()
+        {
+            var temp = new LocalVariableDescriptor()
+            {
+                IsParameter = false,
+                IsTemp = true,
+            };
+
+            _localVariableTable.Add(temp);
+
+            return _localVariableTable.Count - 1;
+        }
+
+        private StackEntry ImportSpillStackEntry(StackEntry entry, int? tempNumber = null)
+        {
+            if (tempNumber == null)
+            {
+                tempNumber = GrabTemp();
+                var temp = _localVariableTable[tempNumber.Value];
+                temp.Kind = entry.Kind;
+                temp.ExactSize = TypeList.GetExactSize(entry.Kind);
+                temp.StackOffset = tempNumber == 0 ? 0 : _localVariableTable[tempNumber.Value - 1].StackOffset + temp.ExactSize;
+            }
+
+            var node = new StoreLocalVariableEntry(tempNumber.Value, entry);
+            ImportAppendTree(node);
+
+            return new LocalVariableEntry(tempNumber.Value, entry.Kind);
+        }
+
         private void ImportNeg()
         {
             var op1 = _stack.Pop();
@@ -372,26 +412,39 @@ namespace ILCompiler.Compiler
                     }
                 }
             }
-            else
-            {                
-                if (_stack.Length > 0)
+
+            if (_stack.Length > 0)
+            {
+                // Stack is not empty at end of basic block
+                // So we must spill stack into temps
+                // Anything on the stack effectively gets turned into assignments to
+                // temporary local variables
+                // And successor basic blocks will have these temporary local variables
+                // on the stack on entry
+
+                var setupEntryStack = entryStack == null;
+                if (setupEntryStack)
                 {
-                    // Stack is not empty at end of basic block
-                    // So we must spill stack into temps
-                    // Anything on the stack effectively gets turned into assignments to
-                    // temporary local variables
-                    // And successor basic blocks will have these temporary local variables
-                    // on the stack on entry
-
                     entryStack = new EvaluationStack<StackEntry>(_stack.Length);
+                }
 
-                    for (int i = 0; i < _stack.Length; i++)
+                var lastStmt = ImportExtractLastStmt();
+
+                for (int i = 0; i < _stack.Length; i++)
+                {
+                    int? tempNumber = null;
+                    if (!setupEntryStack)
                     {
-                        // TODO: Replace items on stack with TEMP ASSIGNMENTS
-                        // TODO: PUT TEMPS onto entry stack
-                        //entryStack.Push(_stack[i]);
+                        tempNumber = (entryStack[i] as LocalVariableEntry).LocalNumber;
+                    }
+                    var temp = ImportSpillStackEntry(_stack[i], tempNumber);
+                    if (setupEntryStack)
+                    {
+                        entryStack.Push(temp);
                     }
                 }
+                ImportAppendTree(lastStmt);
+
                 next.EntryStack = entryStack;                
             }
 
