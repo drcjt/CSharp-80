@@ -1,0 +1,29 @@
+﻿.assembly bgeexe
+{
+}
+.method public static int32 Main() {
+.entrypoint
+.locals ()
+	ldc.i4 0x55555555
+	ldc.i4 0x44444444
+	bge next0
+	br fail
+next0:
+	ldc.i4 0x66666666
+	ldc.i4 0x66666666
+	bge next1
+	br fail
+next1:
+	ldc.i4 0x44444444
+	ldc.i4 0x55555555
+	bge fail
+	br pass
+pass:
+	ldc.i4 0x0000
+	br end
+fail:
+	ldc.i4 0x0001
+	br end
+end:
+	ret
+}
