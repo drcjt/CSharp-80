@@ -39,9 +39,19 @@ namespace ILCompiler.Compiler
             _out.WriteLine($"; {DateTime.Now}");
             _out.WriteLine();
 
-            _out.WriteLine(Instruction.Org(0x5200));
-
-            _out.WriteLine(Instruction.Jp("START"));
+            if (!_compilation.Configuration.IntegrationTests)
+            {
+                _out.WriteLine(Instruction.Org(0x5200));
+                _out.WriteLine(Instruction.Jp("START"));
+            }
+            else
+            {
+                _out.WriteLine(Instruction.Org(0x0000));
+                _out.WriteLine(Instruction.Call("START"));
+                _out.WriteLine(Instruction.Pop(R16.DE));
+                _out.WriteLine(Instruction.Pop(R16.HL));
+                _out.WriteLine(Instruction.Halt());
+            }    
 
             var hasReturnCode = entryMethod.ReturnType.GetStackValueKind() == StackValueKind.Int32;
 

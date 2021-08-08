@@ -59,6 +59,11 @@ namespace Z80Assembler
             return new Instruction(Opcode.Org, string.Format("{0:X}H", address));
         }
 
+        public static Instruction Halt()
+        {
+            return new Instruction(Opcode.Halt);
+        }
+
         public static Instruction Call(string label)
         {
             return new Instruction(Opcode.Call, label);

@@ -22,6 +22,7 @@
         public static readonly Opcode Or = new("Or");
         public static readonly Opcode Jp = new("Jp");
         public static readonly Opcode Sbc = new("Sbc");
+        public static readonly Opcode Halt = new("Halt");
 
         public static readonly Opcode Org = new("Org", true);
         public static readonly Opcode End = new("End", true);

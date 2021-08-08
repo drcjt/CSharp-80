@@ -17,6 +17,7 @@ namespace ILCompiler
         private bool _dontInlineRuntime;
         private bool _printReturnCode;
         private string _corelibPath;
+        private bool _integrationTests;
 
         public static int Main(string[] args)
         {
@@ -63,6 +64,8 @@ namespace ILCompiler
                 var configuration = serviceProvider.GetService<IConfiguration>();
                 configuration.IgnoreUnknownCil = _ignoreUnknownCil;
                 configuration.CorelibPath = _corelibPath;
+                configuration.PrintReturnCode = _printReturnCode;
+                configuration.IntegrationTests = _integrationTests;
 
                 var compiler = serviceProvider.GetService<ICompilation>();            
                 compiler.Compile(_inputFilePath.FullName, _outputFilePath.FullName);
@@ -82,16 +85,17 @@ namespace ILCompiler
                 new Option<bool>(new[] { "-i", "--dontInlineRuntime" }, "Don't inline runtime assembly" ),
                 new Option<bool>(new[] { "-r", "--printReturnCode" }, "Print return code" ),
                 new Option<string>(new[] { "-cl", "--corelibPath" }, "Core lib path"),
+                new Option<bool>(new[] { "-it", "--integrationTests" }, "Compile for integration tests" ),
                 new Argument<FileInfo>("inputFilePath"),
             };
 
             rootCommand.Description = "CSharp-80 compiler from C# IL to Z80 for TRS-80 Machines";
-            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, bool, bool, bool, string>(HandleCommand);
+            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, bool, bool, bool, string, bool>(HandleCommand);
 
             return rootCommand.InvokeAsync(args).Result;
         }
 
-        private void HandleCommand(FileInfo inputFilePath, FileInfo outputFile, bool ignoreUnknownCil = false, bool dontInlineRuntime = false, bool printReturnCode = true, string corelibPath = null)
+        private void HandleCommand(FileInfo inputFilePath, FileInfo outputFile, bool ignoreUnknownCil = false, bool dontInlineRuntime = false, bool printReturnCode = true, string corelibPath = null, bool integrationTests = false)
         {
             _inputFilePath = inputFilePath;
             _outputFilePath = outputFile;
@@ -99,6 +103,7 @@ namespace ILCompiler
             _dontInlineRuntime = dontInlineRuntime;
             _printReturnCode = printReturnCode;
             _corelibPath = corelibPath;
+            _integrationTests = integrationTests;
         }
     }
 }
