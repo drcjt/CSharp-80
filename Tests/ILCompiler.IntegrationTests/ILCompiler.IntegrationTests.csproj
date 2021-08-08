@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <None Remove="il_bvt\*.exe" />
+	<None Remove="il_bvt\*.asm" />
   </ItemGroup>
 
   <ItemGroup>
