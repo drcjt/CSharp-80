@@ -10,7 +10,6 @@ install:
 before_build:
   # Display .NET Core version
   - cmd: dotnet --version
-  - cmd: nuget restore
 
 build_script:
   # output will be in ./src/bin/debug/netcoreapp1.1/publish
