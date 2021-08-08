@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.31423.177
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILCompiler", "ILCompiler\ILCompiler.csproj", "{D277F530-9004-4F8D-9A6E-896906A32739}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILCompiler.Tests", "ILCompiler.Tests\ILCompiler.Tests.csproj", "{517870C5-B8AC-483E-80CC-9B0CBBFCC412}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{788056D0-345F-498A-A8D7-4373442E613F}"
 	ProjectSection(SolutionItems) = preProject
 		Documentation\csharp-80-architecture.md = Documentation\csharp-80-architecture.md
