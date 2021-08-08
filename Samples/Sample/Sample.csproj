@@ -28,11 +28,8 @@
     <ProjectReference Include="..\..\ILCompiler\ILCompiler.csproj" />
   </ItemGroup>
 
-  <Target Name="ILCompile" AfterTargets="PostBuildEvent">
-	<Exec Command="$(SolutionDir)\ILCompiler\$(OutDir)\ILCompiler.exe --ignoreUnknownCil --outputFile $(TargetDir)\$(TargetName).asm $(TargetPath)" />
-	<Exec Command="call $(SolutionDir)\tools\get-tools.cmd"/>
-	<Exec Command="$(SolutionDir)\tools\zmac.exe --oo cmd -o $(TargetDir)\$(TargetName).cmd  $(TargetDir)\$(TargetName).asm"/>
-	<!--<Exec Command="$(SolutionDir)\tools\trswrite.exe -o $(SolutionDir)\Samples\Samples.dsk $(TargetDir)\$(TargetName).cmd"/> -->
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="$(SolutionDir)ILCompiler\$(OutDir)ILCompiler.exe --ignoreUnknownCil --outputFile $(TargetDir)$(TargetName).asm $(TargetPath)&#xD;&#xA;call $(SolutionDir)\tools\get-tools.cmd&#xD;&#xA;$(SolutionDir)\tools\zmac.exe --oo cmd -o $(TargetDir)\$(TargetName).cmd  $(TargetDir)\$(TargetName).asm&#xD;&#xA;" />
   </Target>
   
 </Project>
