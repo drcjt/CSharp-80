@@ -30,7 +30,12 @@ namespace ILCompiler.Compiler
 
             ModuleContext modCtx = ModuleDef.CreateModuleContext();
             ModuleDefMD module = ModuleDefMD.Load(inputFilePath, modCtx);
-            string corlibFilePath = Path.Combine(Path.GetDirectoryName(inputFilePath), "cs80corlib.dll");
+
+            var corlibFilePath = Configuration.CorelibPath;
+            if (string.IsNullOrEmpty(corlibFilePath))
+            {
+                corlibFilePath = Path.Combine(Path.GetDirectoryName(inputFilePath), "cs80corlib.dll");
+            }
             ModuleDefMD corlibModule = ModuleDefMD.Load(corlibFilePath, modCtx);
 
             var typesToCompile = new List<TypeDef>();

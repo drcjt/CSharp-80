@@ -9,5 +9,7 @@ namespace ILCompiler
         public bool DontInlineRuntime { get; set; } = false;
 
         public bool PrintReturnCode { get; set; } = true;
+
+        public string CorelibPath { get; set; }
     }
 }

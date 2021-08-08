@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -9,9 +9,13 @@
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
   </ItemGroup>
-
+	
   <ItemGroup>
     <ProjectReference Include="..\..\ILCompiler\ILCompiler.csproj" />
-  </ItemGroup>
+  </ItemGroup>	
+	
+  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+    <Exec Command="call &quot;$(DevEnvDir)..\Tools\vsdevcmd.bat&quot;&#xD;&#xA;call $(TargetDir)..\..\..\build_il.bat $(SolutionDir) $(OutDir) $(TargetDir)" />
+  </Target>
 
 </Project>
