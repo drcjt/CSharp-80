@@ -190,6 +190,12 @@ namespace ILCompiler.Compiler
                         ImportLdArg(opcode - Code.Ldarg_0);
                         break;
 
+                    case Code.Ldarg_S:
+                    case Code.Ldarg:
+                        var parameter = currentInstruction.Operand as Parameter;
+                        ImportLdArg(parameter.Index);
+                        break;
+
                     case Code.Ldstr:
                         ImportLoadString(currentInstruction.Operand as string);
                         break;
