@@ -19,7 +19,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             var dependencies = new Dictionary<Z80MethodCodeNode, IList<MethodDef>>();
             foreach (var type in types)
             {
-                _compilation.Logger.LogInformation("Analysing dependencies for Type {type.Name}", type.Name);
+                _compilation.Logger.LogDebug("Analysing dependencies for Type {type.Name}", type.Name);
 
                 foreach (var method in type.Methods)
                 {

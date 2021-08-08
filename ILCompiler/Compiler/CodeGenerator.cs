@@ -536,7 +536,7 @@ namespace ILCompiler.Compiler
                 }
             } while (count < instructions.Count - 1);
 
-            _compilation.Logger.LogInformation($"Eliminated {unoptimizedInstructionCount - instructions.Count} instructions");
+            _compilation.Logger.LogDebug($"Eliminated {unoptimizedInstructionCount - instructions.Count} instructions");
         }
     }
 }

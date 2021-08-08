@@ -54,7 +54,7 @@ namespace ILCompiler.Compiler
         {
             if (!node.Compiled)
             {
-                _logger.LogInformation("Compiling method {method.Name}", node.Method.Name);
+                _logger.LogDebug("Compiling method {method.Name}", node.Method.Name);
 
                 var methodCompiler = new MethodCompiler(this);
                 methodCompiler.CompileMethod(node);
