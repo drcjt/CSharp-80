@@ -10,12 +10,6 @@ namespace CSharp80.Tests.BVT
     public class ILBvtTests
     {
         [Test]
-        public void ForDebug()
-        {
-            IlBvtTest(@".\il_bvt\conv.cim");
-        }
-
-        [Test]
         [TestCaseSource(typeof(ILBvtTests), nameof(IlBvtTestCaseData))]
         public void IlBvtTest(string ilFileName)
         {
