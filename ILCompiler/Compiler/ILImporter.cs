@@ -7,8 +7,6 @@ using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace ILCompiler.Compiler
 {
@@ -95,7 +93,11 @@ namespace ILCompiler.Compiler
                 var opcode = currentInstruction.OpCode.Code;
 
                 switch (opcode)
-                {
+{
+                    case Code.Ldc_I4_M1:
+                        ImportLoadInt(-1, StackValueKind.Int32);
+                        break;
+
                     case Code.Ldc_I4_0:
                     case Code.Ldc_I4_1:
                     case Code.Ldc_I4_2:
