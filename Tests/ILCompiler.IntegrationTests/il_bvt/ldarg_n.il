@@ -1,4 +1,9 @@
-﻿.class ldarg_n {
+﻿.assembly extern mscorlib
+{
+    .ver 4:0:0:0
+    .publickeytoken = (B7 7A 5C 56 19 34 E0 89)
+}
+.class ldarg_n {
 .method public static int32 I4_0(int32,int32,int32,int32) {
 	ldarg.0
 	ret

@@ -1,4 +1,9 @@
-﻿.class ldarg_starg {
+﻿.assembly extern mscorlib
+{
+    .ver 4:0:0:0
+    .publickeytoken = (B7 7A 5C 56 19 34 E0 89)
+}
+.class ldarg_starg {
 .method public static int32 stargi4(int32) {
 .maxstack 5
 	ldarg 0
