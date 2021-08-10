@@ -15,6 +15,7 @@ namespace ILCompiler.Compiler
         private readonly MethodCompiler _methodCompiler;
         private readonly MethodDef _method;
         private readonly IList<LocalVariableDescriptor> _localVariableTable;
+        private readonly IConfiguration _configuration;
 
         private BasicBlock[] _basicBlocks;
         private BasicBlock _currentBasicBlock;
@@ -24,11 +25,12 @@ namespace ILCompiler.Compiler
 
         private readonly EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
 
-        public ILImporter(MethodCompiler methodCompiler, MethodDef method, IList<LocalVariableDescriptor> localVariableTable)
+        public ILImporter(MethodCompiler methodCompiler, MethodDef method, IList<LocalVariableDescriptor> localVariableTable, IConfiguration configuration)
         {
             _methodCompiler = methodCompiler;
             _method = method;
             _localVariableTable = localVariableTable;
+            _configuration = configuration;
         }
 
         private void ImportBasicBlocks(IDictionary<int, int> offsetToIndexMap)
@@ -225,7 +227,7 @@ namespace ILCompiler.Compiler
                         break;
 
                     default:
-                        if (_methodCompiler.Configuration.IgnoreUnknownCil)
+                        if (_configuration.IgnoreUnknownCil)
                         {
                             _methodCompiler.Logger.LogWarning($"Unsupported IL opcode {opcode}");
                         }

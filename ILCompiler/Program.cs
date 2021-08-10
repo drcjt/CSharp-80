@@ -13,11 +13,7 @@ namespace ILCompiler
     {
         private FileInfo _outputFilePath;
         private FileInfo _inputFilePath;
-        private bool _ignoreUnknownCil;
-        private bool _dontInlineRuntime;
-        private bool _printReturnCode;
-        private string _corelibPath;
-        private bool _integrationTests;
+        private static IConfiguration _configuration;
 
         public static int Main(string[] args)
         {
@@ -51,7 +47,7 @@ namespace ILCompiler
         {
             services.AddLogging(configure => configure.AddConsole()).AddTransient<Program>();
             services.AddSingleton<ICompilation, Compilation>();
-            services.AddSingleton<IConfiguration, Configuration>();
+            services.AddSingleton(sp => _configuration);
             services.AddSingleton<INameMangler, NameMangler>();
         }
 
@@ -61,13 +57,7 @@ namespace ILCompiler
 
             if (result == 0)
             {
-                var configuration = serviceProvider.GetService<IConfiguration>();
-                configuration.IgnoreUnknownCil = _ignoreUnknownCil;
-                configuration.CorelibPath = _corelibPath;
-                configuration.PrintReturnCode = _printReturnCode;
-                configuration.IntegrationTests = _integrationTests;
-
-                var compiler = serviceProvider.GetService<ICompilation>();            
+                var compiler = serviceProvider.GetService<ICompilation>();
                 compiler.Compile(_inputFilePath.FullName, _outputFilePath.FullName);
             }
             else
@@ -90,20 +80,16 @@ namespace ILCompiler
             };
 
             rootCommand.Description = "CSharp-80 compiler from C# IL to Z80 for TRS-80 Machines";
-            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, bool, bool, bool, string, bool>(HandleCommand);
+            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, Configuration>(HandleCommand);
 
             return rootCommand.InvokeAsync(args).Result;
         }
 
-        private void HandleCommand(FileInfo inputFilePath, FileInfo outputFile, bool ignoreUnknownCil = false, bool dontInlineRuntime = false, bool printReturnCode = true, string corelibPath = null, bool integrationTests = false)
+        private void HandleCommand(FileInfo inputFilePath, FileInfo outputFile, Configuration configuration)
         {
             _inputFilePath = inputFilePath;
             _outputFilePath = outputFile;
-            _ignoreUnknownCil = ignoreUnknownCil;
-            _dontInlineRuntime = dontInlineRuntime;
-            _printReturnCode = printReturnCode;
-            _corelibPath = corelibPath;
-            _integrationTests = integrationTests;
+            _configuration = configuration;
         }
     }
 }

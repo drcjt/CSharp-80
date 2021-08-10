@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using System.Text;
 using ILCompiler.Common.TypeSystem.IL;
+using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler
 {
@@ -15,12 +16,14 @@ namespace ILCompiler.Compiler
         private readonly StreamWriter _out;
         private readonly string _inputFilePath;
         private readonly string _outputFilePath;
+        private readonly IConfiguration _configuration;
 
-        public Z80Writer(Compilation compilation, string inputFilePath, string outputFilePath)
+        public Z80Writer(Compilation compilation, string inputFilePath, string outputFilePath, IConfiguration configuration)
         {
             _compilation = compilation;
             _inputFilePath = inputFilePath;
             _outputFilePath = outputFilePath;
+            _configuration = configuration;
 
             _out = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, false), Encoding.ASCII);
         }
@@ -39,7 +42,7 @@ namespace ILCompiler.Compiler
             _out.WriteLine($"; {DateTime.Now}");
             _out.WriteLine();
 
-            if (!_compilation.Configuration.IntegrationTests)
+            if (!_configuration.IntegrationTests)
             {
                 _out.WriteLine(Instruction.Org(0x5200));
                 _out.WriteLine(Instruction.Jp("START"));
@@ -55,14 +58,14 @@ namespace ILCompiler.Compiler
 
             var hasReturnCode = entryMethod.ReturnType.GetStackValueKind() == StackValueKind.Int32;
 
-            if (hasReturnCode && _compilation.Configuration.PrintReturnCode)
+            if (hasReturnCode && _configuration.PrintReturnCode)
             {
                 _out.WriteLine(Instruction.Db("Return Code:","retcodemsg"));
                 _out.WriteLine(Instruction.Db(0));
             }
 
             // Include the runtime assembly code
-            if (_compilation.Configuration.DontInlineRuntime)
+            if (_configuration.DontInlineRuntime)
             {
                 _out.WriteLine("include csharprt.asm");
             }
@@ -71,7 +74,7 @@ namespace ILCompiler.Compiler
 
             _out.WriteLine(Instruction.Call(_compilation.NameMangler.GetMangledMethodName(entryMethod)));
 
-            if (hasReturnCode && _compilation.Configuration.PrintReturnCode)
+            if (hasReturnCode && _configuration.PrintReturnCode)
             {
                 // Write string "Return Code:"
                 _out.WriteLine(Instruction.Ld(R16.HL, "retcodemsg"));
@@ -99,7 +102,7 @@ namespace ILCompiler.Compiler
 
         private void OutputEpilog()
         {
-            if (!_compilation.Configuration.DontInlineRuntime)
+            if (!_configuration.DontInlineRuntime)
             {
                 OutputRuntimeCode();
             }

@@ -14,7 +14,6 @@ namespace ILCompiler.Compiler
         private readonly INameMangler _nameMangler;
 
         public ILogger<Compilation> Logger => _logger;
-        public IConfiguration Configuration => _configuration;
         public INameMangler NameMangler => _nameMangler;
 
         public Compilation(IConfiguration configuration, ILogger<Compilation> logger, INameMangler nameMangler)
@@ -26,12 +25,12 @@ namespace ILCompiler.Compiler
 
         public void Compile(string inputFilePath, string outputFilePath)
         {
-            var z80Writer = new Z80Writer(this, inputFilePath, outputFilePath);
+            var z80Writer = new Z80Writer(this, inputFilePath, outputFilePath, _configuration);
 
             ModuleContext modCtx = ModuleDef.CreateModuleContext();
             ModuleDefMD module = ModuleDefMD.Load(inputFilePath, modCtx);
 
-            var corlibFilePath = Configuration.CorelibPath;
+            var corlibFilePath = _configuration.CorelibPath;
             if (string.IsNullOrEmpty(corlibFilePath))
             {
                 corlibFilePath = Path.Combine(Path.GetDirectoryName(inputFilePath), "cs80corlib.dll");
@@ -56,7 +55,7 @@ namespace ILCompiler.Compiler
             {
                 _logger.LogDebug("Compiling method {method.Name}", node.Method.Name);
 
-                var methodCompiler = new MethodCompiler(this);
+                var methodCompiler = new MethodCompiler(this, _configuration);
                 methodCompiler.CompileMethod(node);
                 node.Compiled = true;
 

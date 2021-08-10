@@ -13,16 +13,17 @@ namespace ILCompiler.Compiler
     {
         private IList<LocalVariableDescriptor> _localVariableTable;
         private readonly Compilation _compilation;
+        private readonly IConfiguration _configuration;
 
         public int ParameterCount { get; private set; }
 
         public ILogger<Compilation> Logger => _compilation.Logger;
-        public IConfiguration Configuration => _compilation.Configuration;
         public INameMangler NameMangler => _compilation.NameMangler;
 
-        public MethodCompiler(Compilation compilation)
+        public MethodCompiler(Compilation compilation, IConfiguration configuration)
         {
             _compilation = compilation;
+            _configuration = configuration;
         }
 
         private void SetupLocalVariableTable(MethodDef method)
@@ -81,7 +82,7 @@ namespace ILCompiler.Compiler
 
             if (!method.IsConstructor && !method.IsIntrinsic() && !method.IsPinvokeImpl)
             {
-                var ilImporter = new ILImporter(this, method, _localVariableTable);
+                var ilImporter = new ILImporter(this, method, _localVariableTable, _configuration);
                 var flowgraph = new Flowgraph();
                 var codeGenerator = new CodeGenerator(_compilation, _localVariableTable, methodCodeNodeNeedingCode);
 
