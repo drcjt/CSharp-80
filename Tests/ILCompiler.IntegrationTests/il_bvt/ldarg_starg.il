@@ -7,10 +7,8 @@
 .method public static int32 stargi4(int32) {
 .maxstack 5
 	ldarg 0
-	/*TODO: Uncomment these instructions when starg is implemented
 	starg 0
 	ldarg 0
-	*/
 	ret
 }
 .method public static int32 Main() {

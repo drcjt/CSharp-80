@@ -68,6 +68,10 @@ ldarg.0 | int32
 ldarg.1 | int32
 ldarg.2 | int32
 ldarg.3 | int32
+ldarg | int32
+ldarg.s | int32
+starg | int32
+starg.s | int32
 ldstr | Very simple implementation not really using proper object representation for string
 ret |
 call |

@@ -6,16 +6,19 @@
 
         public int LocalNumber { get; }
 
-        public StoreLocalVariableEntry(int localNumber, StackEntry op1) : base(op1.Kind)
+        public bool IsParameter { get; }
+
+        public StoreLocalVariableEntry(int localNumber, bool parameter, StackEntry op1) : base(op1.Kind)
         {
             Operation = Operation.StoreLocalVariable;
             LocalNumber = localNumber;
+            IsParameter = parameter;
             Op1 = op1;
         }
 
         public override StackEntry Duplicate()
         {
-            return new StoreLocalVariableEntry(LocalNumber, Op1.Duplicate());
+            return new StoreLocalVariableEntry(LocalNumber, IsParameter, Op1.Duplicate());
         }
 
         public override void Accept(IStackEntryVisitor visitor)

@@ -417,17 +417,19 @@ namespace ILCompiler.Compiler
             var localVariable = _localVariableTable[entry.LocalNumber];
             var offset = localVariable.StackOffset;
 
+            var indexRegister = entry.IsParameter ? I16.IY : I16.IX;
+
             // TODO: Will this always be 4 now?
             if (localVariable.ExactSize == 4)
             {
                 _currentAssembler.Pop(R16.HL);
-                _currentAssembler.Ld(I16.IX, (short)-(offset + 3), R8.H);
-                _currentAssembler.Ld(I16.IX, (short)-(offset + 4), R8.L);
+                _currentAssembler.Ld(indexRegister, (short)-(offset + 3), R8.H);
+                _currentAssembler.Ld(indexRegister, (short)-(offset + 4), R8.L);
             }
 
             _currentAssembler.Pop(R16.HL);
-            _currentAssembler.Ld(I16.IX, (short)-(offset + 1), R8.H);
-            _currentAssembler.Ld(I16.IX, (short)-(offset + 2), R8.L);
+            _currentAssembler.Ld(indexRegister, (short)-(offset + 1), R8.H);
+            _currentAssembler.Ld(indexRegister, (short)-(offset + 2), R8.L);
         }
 
         public void GenerateCodeForCall(CallEntry entry)

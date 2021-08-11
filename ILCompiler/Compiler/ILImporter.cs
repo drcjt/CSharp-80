@@ -196,8 +196,18 @@ namespace ILCompiler.Compiler
 
                     case Code.Ldarg_S:
                     case Code.Ldarg:
-                        var parameter = currentInstruction.Operand as Parameter;
-                        ImportLdArg(parameter.Index);
+                        {
+                            var parameter = currentInstruction.Operand as Parameter;
+                            ImportLdArg(parameter.Index);
+                        }
+                        break;
+
+                    case Code.Starg_S:
+                    case Code.Starg:
+                        {
+                            var parameter = currentInstruction.Operand as Parameter;
+                            ImportStArg(parameter.Index);
+                        }
                         break;
 
                     case Code.Ldstr:
@@ -276,7 +286,7 @@ namespace ILCompiler.Compiler
                 temp.StackOffset = tempNumber == 0 ? 0 : _localVariableTable[tempNumber.Value - 1].StackOffset + temp.ExactSize;
             }
 
-            var node = new StoreLocalVariableEntry(tempNumber.Value, entry);
+            var node = new StoreLocalVariableEntry(tempNumber.Value, false, entry);
             ImportAppendTree(node);
 
             return new LocalVariableEntry(tempNumber.Value, entry.Kind);
@@ -512,7 +522,7 @@ namespace ILCompiler.Compiler
                 throw new NotSupportedException("Storing variables other than short, int32 or object refs not supported yet");
             }
             var localNumber = _methodCompiler.ParameterCount + index;
-            var node = new StoreLocalVariableEntry(localNumber, value);
+            var node = new StoreLocalVariableEntry(localNumber, false, value);
             ImportAppendTree(node);
         }
 
@@ -529,6 +539,17 @@ namespace ILCompiler.Compiler
             var argument = _localVariableTable[index];
             var node = new LocalVariableEntry(index, argument.Kind);
             PushExpression(node);
+        }
+
+        public void ImportStArg(int index)
+        {
+            var value = _stack.Pop();
+            if (value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ObjRef)
+            {
+                throw new NotSupportedException("Storing to argument other than short, int32 or object refs not supported yet");
+            }
+            var node = new StoreLocalVariableEntry(index, true, value);
+            ImportAppendTree(node);
         }
 
         public void ImportLoadInt(long value, StackValueKind kind)
