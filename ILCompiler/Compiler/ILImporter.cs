@@ -95,7 +95,11 @@ namespace ILCompiler.Compiler
                 var opcode = currentInstruction.OpCode.Code;
 
                 switch (opcode)
-{
+                {
+                    case Code.Nop:
+                        ImportNop();
+                        break;
+
                     case Code.Ldc_I4_M1:
                         ImportLoadInt(-1, StackValueKind.Int32);
                         break;
@@ -290,6 +294,11 @@ namespace ILCompiler.Compiler
             ImportAppendTree(node);
 
             return new LocalVariableEntry(tempNumber.Value, entry.Kind);
+        }
+
+        private void ImportNop()
+        {
+            // Nothing to do
         }
 
         private void ImportNeg()
