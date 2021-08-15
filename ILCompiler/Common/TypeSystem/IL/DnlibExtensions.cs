@@ -24,6 +24,7 @@ namespace ILCompiler.Common.TypeSystem.IL
 
             return false;
         }
+
         public static StackValueKind GetStackValueKind(this TypeSig typeSig)
         {
             switch (typeSig.ElementType)

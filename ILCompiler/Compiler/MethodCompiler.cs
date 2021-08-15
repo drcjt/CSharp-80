@@ -37,15 +37,14 @@ namespace ILCompiler.Compiler
             for (int parameterIndex = 0; parameterIndex < method.Parameters.Count; parameterIndex++)
             {
                 var kind = method.Parameters[parameterIndex].Type.GetStackValueKind();
-                var unsigned = method.Parameters[parameterIndex].Type.IsUnsigned();
                 var local = new LocalVariableDescriptor() 
                 { 
                     IsParameter = true, 
                     Kind = kind,
-                    IsUnsigned = unsigned,
                     ExactSize = TypeList.GetExactSize(kind),
                     StackOffset = offset,
                     IsTemp = false,
+                    Type = LocalVariableType.Int,
                 };
                 _localVariableTable.Add(local);
                 offset += local.ExactSize;
@@ -57,21 +56,49 @@ namespace ILCompiler.Compiler
                 for (int variableIndex = 0; variableIndex < body.Variables.Count; variableIndex++)
                 {
                     var kind = body.Variables[variableIndex].Type.GetStackValueKind();
-                    var unsigned = body.Variables[variableIndex].Type.IsUnsigned();
                     var local = new LocalVariableDescriptor() 
                     { 
                         IsParameter = false, 
                         Kind = kind, 
-                        IsUnsigned = unsigned,
-                        ExactSize = TypeList.GetExactSize(kind),
+                        ExactSize = GetExactSize(body.Variables[variableIndex].Type),
                         StackOffset = offset,
                         IsTemp = false,
+                        Type = LocalVariableType.Int,
                     };
                     _localVariableTable.Add(local);
                     offset += local.ExactSize;
                 }
             }
         }
+
+        // TODO: Consider moving this to DnlibExtensions
+        private static int GetExactSize(TypeSig type)
+        {
+            if (type.ElementType == ElementType.ValueType)
+            {
+                var typeDefOrRef = type.TryGetTypeDefOrRef();
+                var typeDef = typeDefOrRef.ResolveTypeDef();
+                if (typeDef != null)
+                {
+                    var typeSize = 0;
+                    foreach (var field in typeDef.Fields)
+                    {
+                        typeSize += GetExactSize(field.FieldType);
+                    }
+
+                    return typeSize;
+                }
+                else
+                {
+                    throw new Exception("Could not resolve type def");
+                }
+            }
+            else
+            {
+                return TypeList.GetExactSize(type.GetStackValueKind());
+            }
+        }
+
 
         public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode)
         {

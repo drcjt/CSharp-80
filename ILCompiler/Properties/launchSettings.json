@@ -2,8 +2,8 @@
   "profiles": {
     "ILCompiler": {
       "commandName": "Project",
-      "commandLineArgs": "--ignoreUnknownCil --outputFile Sample.asm Sample.dll",
-      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80\\Samples\\Sample\\bin\\Debug\\net5.0",
+      "commandLineArgs": "--ignoreUnknownCil true --outputFile structs.asm structs.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80\\Samples\\Structs\\bin\\Debug\\net5.0",
       "sqlDebugging": false
     }
   }

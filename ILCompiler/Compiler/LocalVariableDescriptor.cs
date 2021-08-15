@@ -8,12 +8,12 @@ namespace ILCompiler.Compiler
 
         public StackValueKind Kind { get; set; }
 
-        public bool IsUnsigned { get; set; }
-
         public int ExactSize { get;set; }
 
         public int StackOffset { get; set; }
 
         public bool IsTemp { get; set; }
+
+        public LocalVariableType Type { get; set; }
     }
 }
