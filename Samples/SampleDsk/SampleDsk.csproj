@@ -29,10 +29,10 @@
     <ProjectReference Include="..\Math\Math.csproj" />
     <ProjectReference Include="..\Sample\Sample.csproj" />
     <ProjectReference Include="..\Snake\Snake.csproj" />
+    <ProjectReference Include="..\Structs\Structs.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Math\$(OutDir)\Math.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Sample\$(OutDir)\Sample.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Fib\$(OutDir)\Fib.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Snake\$(OutDir)\Snake.cmd" />
+	  <Exec Command="$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Math\$(OutDir)\Math.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Sample\$(OutDir)\Sample.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Fib\$(OutDir)\Fib.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Snake\$(OutDir)\Snake.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Structs\$(OutDir)\Structs.cmd" />  
   </Target>
-
 </Project>

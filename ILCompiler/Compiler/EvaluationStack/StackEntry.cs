@@ -30,6 +30,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         LocalVariable,
         StoreIndirect,
         StoreLocalVariable,
+        AddressOf,
     }
 
     // StackEntry and subclasses represent the tree oriented high level intermediate representation

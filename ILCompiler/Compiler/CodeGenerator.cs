@@ -129,6 +129,10 @@ namespace ILCompiler.Compiler
                     GenerateCodeForCast(node as CastEntry);
                     break;
 
+                case Operation.AddressOf:
+                    GenerateCodeForAddressOf(node as AddressOfEntry);
+                    break;
+
                 default:
                     throw new NotImplementedException($"Unimplemented node type {node.Operation}");
             }
@@ -369,6 +373,38 @@ namespace ILCompiler.Compiler
                 _currentAssembler.Push(R16.HL);
                 _currentAssembler.Ld(R16.HL, 0);
                 _currentAssembler.Push(R16.HL);
+            }
+        }
+
+        public void GenerateCodeForAddressOf(AddressOfEntry entry)
+        {
+            if (entry.Op1 is LocalVariableEntry)
+            {
+                var localVarEntry = entry.Op1 as LocalVariableEntry;
+                if (localVarEntry.LocalNumber >= _methodCodeNode.ParamsCount)
+                {
+                    // Loading address of a local variable
+                    var localVariable = _localVariableTable[localVarEntry.LocalNumber];
+                    var offset = localVariable.StackOffset;
+
+                    // Calculate and push the actual 16 bit address
+                    _currentAssembler.Push(I16.IX);
+                    _currentAssembler.Pop(R16.HL);
+                    if (offset > 0)
+                    {
+                        _currentAssembler.Ld(R16.DE, (short)(offset));
+                        _currentAssembler.Add(R16.HL, R16.DE);
+                    }
+                    _currentAssembler.Push(R16.HL);
+
+                    // Push 0 to makeup full 32 bit value
+                    _currentAssembler.Ld(R16.HL, 0);
+                    _currentAssembler.Push(R16.HL);
+                }
+            }
+            else
+            {
+                throw new NotImplementedException("AddressOf only supported for local vars");
             }
         }
 

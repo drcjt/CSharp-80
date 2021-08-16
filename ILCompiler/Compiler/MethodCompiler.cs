@@ -107,7 +107,7 @@ namespace ILCompiler.Compiler
 
             SetupLocalVariableTable(method);
 
-            if (!method.IsConstructor && !method.IsIntrinsic() && !method.IsPinvokeImpl)
+            if (!method.IsIntrinsic() && !method.IsPinvokeImpl)
             {
                 var ilImporter = new ILImporter(this, method, _localVariableTable, _configuration);
                 var flowgraph = new Flowgraph();

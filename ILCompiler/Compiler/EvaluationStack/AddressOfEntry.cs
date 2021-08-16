@@ -1,20 +1,24 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace ILCompiler.Compiler.EvaluationStack
 {
-    public class UnaryOperator : StackEntry
+    public class AddressOfEntry : StackEntry
     {
         public StackEntry Op1 { get; }
 
-        public UnaryOperator(Operation operation, StackEntry op1) : base(op1.Kind)
+        public AddressOfEntry(StackEntry op1) : base(op1.Kind)
         {
-            Operation = operation;
+            Operation = Operation.AddressOf;
             Op1 = op1;
         }
 
         public override StackEntry Duplicate()
         {
-            return new UnaryOperator(Operation, Op1.Duplicate());
+            return new AddressOfEntry(Op1.Duplicate());
         }
 
         public override void Accept(IStackEntryVisitor visitor)

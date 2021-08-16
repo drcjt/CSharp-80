@@ -141,6 +141,11 @@ namespace ILCompiler.Compiler
                         ImportLoadVar(opcode - Code.Ldloc_0, false);
                         break;
 
+                    case Code.Ldloca:
+                    case Code.Ldloca_S:
+                        ImportAddressOfVar((currentInstruction.Operand as Local).Index, false);
+                        break;
+
                     case Code.Stind_I1:
                         ImportStoreIndirect(WellKnownType.SByte);
                         break;
@@ -541,6 +546,15 @@ namespace ILCompiler.Compiler
             var localVariable = _localVariableTable[localNumber];
             var node = new LocalVariableEntry(localNumber, localVariable.Kind);
             PushExpression(node);
+        }
+
+        public void ImportAddressOfVar(int index, bool argument)
+        {
+            var localNumber = _methodCompiler.ParameterCount + index;
+            var localVariable = _localVariableTable[localNumber];
+            var node = new LocalVariableEntry(localNumber, localVariable.Kind);
+            var addrNode = new AddressOfEntry(node);
+            PushExpression(addrNode);
         }
 
         public void ImportLdArg(int index)
