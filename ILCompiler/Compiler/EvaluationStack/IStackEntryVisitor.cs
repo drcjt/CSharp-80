@@ -16,5 +16,6 @@
         public void Visit(CastEntry entry);
         public void Visit(UnaryOperator entry);
         public void Visit(AddressOfEntry entry);
+        public void Visit(IndirectEntry entry);
     }
 }

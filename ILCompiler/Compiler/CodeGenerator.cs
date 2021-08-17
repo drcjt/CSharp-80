@@ -48,7 +48,7 @@ namespace ILCompiler.Compiler
                 while (currentNode != null)
                 {
                     GenerateFromNode(currentNode);
-                    currentNode = currentNode.Next;
+                    currentNode = currentNode.Next;                    
                 }
 
                 Optimize(_currentAssembler.Instructions);
@@ -115,6 +115,10 @@ namespace ILCompiler.Compiler
 
                 case Operation.StoreLocalVariable:
                     GenerateCodeForStoreLocalVariable(node as StoreLocalVariableEntry);
+                    break;
+
+                case Operation.Indirect:
+                    GenerateCodeForIndirect(node as IndirectEntry);
                     break;
 
                 case Operation.Call:
@@ -260,6 +264,37 @@ namespace ILCompiler.Compiler
             _currentAssembler.Pop(R16.BC);
             _currentAssembler.Pop(R16.HL);
             _currentAssembler.LdInd(R16.HL, R8.C);
+        }
+
+        public void GenerateCodeForIndirect(IndirectEntry entry)
+        {
+            if (entry.Kind == StackValueKind.Int32)
+            {
+                // Save IX into DE
+                _currentAssembler.Push(I16.IX);
+                _currentAssembler.Pop(R16.DE);
+
+                // Get indirect address from stack into IX
+                _currentAssembler.Pop(I16.IX);
+
+                // Get 16 bits from IX and push onto stack
+                _currentAssembler.Ld(R8.H, I16.IX, 0);
+                _currentAssembler.Ld(R8.L, I16.IX, 1);
+                _currentAssembler.Push(R16.HL);
+
+                // Get next 16 bits from IX + 2 and push onto stack
+                _currentAssembler.Ld(R8.H, I16.IX, 2);
+                _currentAssembler.Ld(R8.L, I16.IX, 3);
+                _currentAssembler.Push(R16.HL);
+
+                // Restore IX from DE
+                _currentAssembler.Push(R16.DE);
+                _currentAssembler.Pop(I16.IX);
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }    
         }
 
         public void GenerateCodeForJumpTrue(JumpTrueEntry entry)

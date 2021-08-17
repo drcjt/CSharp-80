@@ -21,6 +21,8 @@ namespace ILCompiler.Compiler
                     return 2;
                 case StackValueKind.NativeInt:
                     return 2;
+                case StackValueKind.ByRef:
+                    return 4;
                 default:
                     throw new NotImplementedException($"Kind {kind} not yet supported");
             }

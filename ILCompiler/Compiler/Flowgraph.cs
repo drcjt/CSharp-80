@@ -59,6 +59,12 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
+        public void Visit(IndirectEntry entry)
+        {
+            entry.Op1.Accept(this);
+            SetNext(entry);
+        }
+
         public void Visit(JumpTrueEntry entry)
         {
             entry.Condition.Accept(this);

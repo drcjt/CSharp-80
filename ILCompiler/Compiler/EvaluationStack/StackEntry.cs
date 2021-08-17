@@ -28,6 +28,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         Jump,
         JumpTrue,
         LocalVariable,
+        Indirect,
         StoreIndirect,
         StoreLocalVariable,
         AddressOf,

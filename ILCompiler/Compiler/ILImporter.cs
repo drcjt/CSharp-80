@@ -134,11 +134,21 @@ namespace ILCompiler.Compiler
                         ImportStoreVar(opcode - Code.Stloc_0, false);
                         break;
 
+                    case Code.Stloc:
+                    case Code.Stloc_S:
+                        ImportStoreVar((currentInstruction.Operand as Local).Index, false);
+                        break;
+
                     case Code.Ldloc_0:
                     case Code.Ldloc_1:
                     case Code.Ldloc_2:
                     case Code.Ldloc_3:
                         ImportLoadVar(opcode - Code.Ldloc_0, false);
+                        break;
+
+                    case Code.Ldloc:
+                    case Code.Ldloc_S:
+                        ImportLoadVar((currentInstruction.Operand as Local).Index, false);
                         break;
 
                     case Code.Ldloca:
@@ -148,6 +158,10 @@ namespace ILCompiler.Compiler
 
                     case Code.Stind_I1:
                         ImportStoreIndirect(WellKnownType.SByte);
+                        break;
+
+                    case Code.Ldind_I4:
+                        ImportLoadIndirect(WellKnownType.Int32);
                         break;
 
                     case Code.Add:
@@ -526,6 +540,20 @@ namespace ILCompiler.Compiler
             }
 
             ImportAppendTree(new StoreIndEntry(addr, value));
+        }
+
+        public void ImportLoadIndirect(WellKnownType type)
+        {
+            if (type == WellKnownType.Int32)
+            {
+                var addr = _stack.Pop();
+                var node = new IndirectEntry(addr, StackValueKind.Int32);
+                PushExpression(node);
+            }
+            else
+            {
+                throw new NotImplementedException("LoadIndirect only supports I4");
+            }    
         }
 
         public void ImportStoreVar(int index, bool argument)
