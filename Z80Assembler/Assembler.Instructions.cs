@@ -43,6 +43,11 @@ namespace Z80Assembler
             AddInstruction(new Instruction(Opcode.End, label));
         }
 
+        public void Inc(Register target)
+        {
+            AddInstruction(new Instruction(Opcode.Inc, target.ToString()));
+        }
+
         public void Add(Register target, Register source)
         {
             AddInstruction(new Instruction(Opcode.Add, target.ToString() + ", " + source.ToString()));

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using ILCompiler.Common.TypeSystem.IL;
+using ILCompiler.Common.TypeSystem;
 
 namespace ILCompiler.Compiler
 {
@@ -261,9 +262,43 @@ namespace ILCompiler.Compiler
 
         public void GenerateCodeForStoreIndirect(StoreIndEntry entry)
         {
+            // TODO: assumes value is int32
             _currentAssembler.Pop(R16.BC);
-            _currentAssembler.Pop(R16.HL);
-            _currentAssembler.LdInd(R16.HL, R8.C);
+            _currentAssembler.Pop(R16.DE);
+
+            _currentAssembler.Pop(R16.HL);  // Address is stored as 32 bits but will only use lsw
+            _currentAssembler.Pop(R16.AF);
+
+            switch (entry.TargetType)
+            {
+                case WellKnownType.SByte:
+                case WellKnownType.Byte:
+                case WellKnownType.Boolean:
+                case WellKnownType.Char:
+                    _currentAssembler.LdInd(R16.HL, R8.C);
+                    break;
+
+                case WellKnownType.Int16:
+                case WellKnownType.UInt16:
+                    _currentAssembler.LdInd(R16.HL, R8.B);
+                    _currentAssembler.Inc(R16.HL);
+                    _currentAssembler.LdInd(R16.HL, R8.C);
+                    break;
+
+                case WellKnownType.Int32:
+                case WellKnownType.UInt32:
+                    _currentAssembler.LdInd(R16.HL, R8.D);
+                    _currentAssembler.Inc(R16.HL);
+                    _currentAssembler.LdInd(R16.HL, R8.E);
+                    _currentAssembler.Inc(R16.HL);
+                    _currentAssembler.LdInd(R16.HL, R8.B);
+                    _currentAssembler.Inc(R16.HL);
+                    _currentAssembler.LdInd(R16.HL, R8.C);
+                    break;
+
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         public void GenerateCodeForIndirect(IndirectEntry entry)
@@ -278,13 +313,29 @@ namespace ILCompiler.Compiler
                 _currentAssembler.Pop(I16.IX);
 
                 // Get 16 bits from IX and push onto stack
-                _currentAssembler.Ld(R8.H, I16.IX, 0);
-                _currentAssembler.Ld(R8.L, I16.IX, 1);
+                if (entry.TargetType == WellKnownType.Int32 || entry.TargetType == WellKnownType.UInt32)
+                {
+                    _currentAssembler.Ld(R8.H, I16.IX, 0);      // i4
+                    _currentAssembler.Ld(R8.L, I16.IX, 1);
+                }
+                else
+                {
+                    _currentAssembler.Ld(R16.HL, 0);
+                }
+
                 _currentAssembler.Push(R16.HL);
 
                 // Get next 16 bits from IX + 2 and push onto stack
-                _currentAssembler.Ld(R8.H, I16.IX, 2);
-                _currentAssembler.Ld(R8.L, I16.IX, 3);
+                if (entry.TargetType <= WellKnownType.Byte)
+                {
+                    _currentAssembler.Ld(R8.H, 0);  // i1
+                }
+                else
+                {
+                    _currentAssembler.Ld(R8.H, I16.IX, 2);      // i2
+                }
+                _currentAssembler.Ld(R8.L, I16.IX, 3);      // i1
+
                 _currentAssembler.Push(R16.HL);
 
                 // Restore IX from DE

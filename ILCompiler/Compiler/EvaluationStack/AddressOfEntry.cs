@@ -10,6 +10,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public StackEntry Op1 { get; }
 
+        // TODO: Should kind be nativeint or byref?
         public AddressOfEntry(StackEntry op1) : base(op1.Kind)
         {
             Operation = Operation.AddressOf;

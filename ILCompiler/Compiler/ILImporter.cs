@@ -159,7 +159,20 @@ namespace ILCompiler.Compiler
                     case Code.Stind_I1:
                         ImportStoreIndirect(WellKnownType.SByte);
                         break;
+                    case Code.Stind_I2:
+                        ImportStoreIndirect(WellKnownType.Int16);
+                        break;
+                    case Code.Stind_I4:
+                        ImportStoreIndirect(WellKnownType.Int32);
+                        break;
 
+
+                    case Code.Ldind_I1:
+                        ImportLoadIndirect(WellKnownType.SByte);
+                        break;
+                    case Code.Ldind_I2:
+                        ImportLoadIndirect(WellKnownType.Int16);
+                        break;
                     case Code.Ldind_I4:
                         ImportLoadIndirect(WellKnownType.Int32);
                         break;
@@ -534,26 +547,19 @@ namespace ILCompiler.Compiler
             var value = _stack.Pop();
             var addr = _stack.Pop();
 
-            if (type != WellKnownType.SByte && addr.Kind != StackValueKind.NativeInt)
+            if (value.Kind != StackValueKind.Int32)
             {
                 throw new NotSupportedException();
             }
 
-            ImportAppendTree(new StoreIndEntry(addr, value));
+            ImportAppendTree(new StoreIndEntry(addr, value, type));
         }
 
         public void ImportLoadIndirect(WellKnownType type)
         {
-            if (type == WellKnownType.Int32)
-            {
-                var addr = _stack.Pop();
-                var node = new IndirectEntry(addr, StackValueKind.Int32);
-                PushExpression(node);
-            }
-            else
-            {
-                throw new NotImplementedException("LoadIndirect only supports I4");
-            }    
+            var addr = _stack.Pop();
+            var node = new IndirectEntry(addr, StackValueKind.Int32, type);
+            PushExpression(node);
         }
 
         public void ImportStoreVar(int index, bool argument)

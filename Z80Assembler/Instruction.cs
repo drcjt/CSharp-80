@@ -89,6 +89,11 @@ namespace Z80Assembler
             return new Instruction(Opcode.End, label);
         }
 
+        public static Instruction Inc(Register target)
+        {
+            return new Instruction(Opcode.Inc, target.ToString());
+        }
+
         public static Instruction Add(Register target, Register source)
         {
             return new Instruction(Opcode.Add, target.ToString() + ", " + source.ToString());
