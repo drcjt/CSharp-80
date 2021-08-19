@@ -115,6 +115,11 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
+        public void Visit(FieldEntry entry)
+        {
+            SetNext(entry);
+        }
+
         public void Visit(CallEntry entry)
         {
             foreach (var argument in entry.Arguments)

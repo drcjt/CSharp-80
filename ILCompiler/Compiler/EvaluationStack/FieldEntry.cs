@@ -13,6 +13,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public FieldEntry(StackValueKind kind) : base(kind)
         {
+            Operation = Operation.Field;
         }
 
         public override FieldEntry Duplicate()
@@ -22,7 +23,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public override void Accept(IStackEntryVisitor visitor)
         {
-            throw new NotImplementedException();
+            visitor.Visit(this);
         }
     }
 }

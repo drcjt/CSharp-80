@@ -118,6 +118,10 @@ namespace ILCompiler.Compiler
                     GenerateCodeForStoreLocalVariable(node as StoreLocalVariableEntry);
                     break;
 
+                case Operation.Field:
+                    // TODO: Implement code gen for field access
+                    break;
+
                 case Operation.Indirect:
                     GenerateCodeForIndirect(node as IndirectEntry);
                     break;
