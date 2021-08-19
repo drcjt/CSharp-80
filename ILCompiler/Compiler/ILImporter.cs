@@ -177,6 +177,14 @@ namespace ILCompiler.Compiler
                         ImportLoadIndirect(WellKnownType.Int32);
                         break;
 
+                    case Code.Stfld:
+                        ImportStoreField(currentInstruction.Operand as FieldDef);
+                        break;
+
+                    case Code.Ldfld:
+                        ImportLoadField(currentInstruction.Operand as FieldDef);
+                        break;
+
                     case Code.Add:
                     case Code.Sub:
                     case Code.Mul:
@@ -542,6 +550,21 @@ namespace ILCompiler.Compiler
             PushExpression(binaryExpr);
         }
 
+        public void ImportStoreField(FieldDef fieldDef)
+        {
+            var value = _stack.Pop();
+            var addr = _stack.Pop();
+
+            var kind = fieldDef.FieldType.GetStackValueKind();
+
+            if (value.Kind != StackValueKind.Int32)
+            {
+                throw new NotSupportedException();
+            }
+
+            ImportAppendTree(new StoreIndEntry(addr, value, WellKnownType.Int32));
+        }
+
         public void ImportStoreIndirect(WellKnownType type)
         {
             var value = _stack.Pop();
@@ -559,6 +582,12 @@ namespace ILCompiler.Compiler
         {
             var addr = _stack.Pop();
             var node = new IndirectEntry(addr, StackValueKind.Int32, type);
+            PushExpression(node);
+        }
+
+        public void ImportLoadField(FieldDef fieldDef)
+        {
+            var node = new FieldEntry(StackValueKind.Int32);
             PushExpression(node);
         }
 
