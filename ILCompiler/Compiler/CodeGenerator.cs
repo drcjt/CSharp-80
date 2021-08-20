@@ -500,41 +500,16 @@ namespace ILCompiler.Compiler
 
         public void GenerateCodeForLocalVariable(LocalVariableEntry entry)
         {
-            if (entry.LocalNumber >= _methodCodeNode.ParamsCount)
-            {
-                // Loading a local variable
-                var localVariable = _localVariableTable[entry.LocalNumber];
-                var offset = localVariable.StackOffset;
+            var variable = _localVariableTable[entry.LocalNumber];
+            var indexRegister = entry.LocalNumber >= _methodCodeNode.ParamsCount ? I16.IX : I16.IY;
 
-                _currentAssembler.Ld(R8.H, I16.IX, (short)-(offset + 1));
-                _currentAssembler.Ld(R8.L, I16.IX, (short)-(offset + 2));
+            // Loading a local variable
+            var endOffset = variable.StackOffset + variable.ExactSize;
+            for (int offset = variable.StackOffset; offset < endOffset; offset += 2)
+            { 
+                _currentAssembler.Ld(R8.H, indexRegister, (short)-(offset + 1));
+                _currentAssembler.Ld(R8.L, indexRegister, (short)-(offset + 2));
                 _currentAssembler.Push(R16.HL);
-
-                // TODO: Will this always be 4 now?
-                if (localVariable.ExactSize == 4)
-                {
-                    _currentAssembler.Ld(R8.H, I16.IX, (short)-(offset + 3));
-                    _currentAssembler.Ld(R8.L, I16.IX, (short)-(offset + 4));
-                    _currentAssembler.Push(R16.HL);
-                }
-            }
-            else
-            {
-                // Loading an argument
-                var parameterDescriptor = _localVariableTable[entry.LocalNumber];
-                var offset = parameterDescriptor.StackOffset;
-
-                _currentAssembler.Ld(R8.H, I16.IY, (short)-(offset + 1));
-                _currentAssembler.Ld(R8.L, I16.IY, (short)-(offset + 2));
-                _currentAssembler.Push(R16.HL);
-
-                // TODO: Will this always be 4 now?
-                if (parameterDescriptor.ExactSize == 4)
-                {
-                    _currentAssembler.Ld(R8.H, I16.IY, (short)-(offset + 3));
-                    _currentAssembler.Ld(R8.L, I16.IY, (short)-(offset + 4));
-                    _currentAssembler.Push(R16.HL);
-                }
             }
         }
 

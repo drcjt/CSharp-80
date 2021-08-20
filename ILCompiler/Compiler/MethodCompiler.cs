@@ -41,7 +41,7 @@ namespace ILCompiler.Compiler
                 { 
                     IsParameter = true, 
                     Kind = kind,
-                    ExactSize = TypeList.GetExactSize(kind),
+                    ExactSize = GetExactSize(method.Parameters[parameterIndex].Type),
                     StackOffset = offset,
                     IsTemp = false,
                     Type = LocalVariableType.Int,
