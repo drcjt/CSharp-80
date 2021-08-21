@@ -587,7 +587,13 @@ namespace ILCompiler.Compiler
 
         public void ImportLoadField(FieldDef fieldDef)
         {
-            var node = new FieldEntry(StackValueKind.Int32);
+            var obj = _stack.Pop();
+
+            // TODO: Validate obj is a value type
+
+             obj = new AddressOfEntry(obj);
+
+            var node = new FieldEntry(obj, StackValueKind.Int32);
             PushExpression(node);
         }
 

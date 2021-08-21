@@ -9,16 +9,17 @@ namespace ILCompiler.Compiler.EvaluationStack
 {
     public class FieldEntry : StackEntry
     {
-        // Some information about field goes here
+        public StackEntry Op1 { get; }
 
-        public FieldEntry(StackValueKind kind) : base(kind)
+        public FieldEntry(StackEntry op1, StackValueKind kind) : base(kind)
         {
             Operation = Operation.Field;
+            Op1 = op1;
         }
 
         public override FieldEntry Duplicate()
         {
-            return new FieldEntry(Kind);
+            return new FieldEntry(Op1.Duplicate(), Kind);
         }
 
         public override void Accept(IStackEntryVisitor visitor)
