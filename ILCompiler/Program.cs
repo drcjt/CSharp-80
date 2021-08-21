@@ -76,6 +76,7 @@ namespace ILCompiler
                 new Option<bool>(new[] { "-r", "--printReturnCode" }, "Print return code" ),
                 new Option<string>(new[] { "-cl", "--corelibPath" }, "Core lib path"),
                 new Option<bool>(new[] { "-it", "--integrationTests" }, "Compile for integration tests" ),
+                new Option<bool>(new[] { "-d", "--dumpIRTrees" }, "Dump IR trees"),
                 new Argument<FileInfo>("inputFilePath"),
             };
 

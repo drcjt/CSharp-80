@@ -115,6 +115,12 @@ namespace ILCompiler.Compiler
 
                 // Main phases of the compiler live here
                 var basicBlocks = ilImporter.Import();
+
+                if (_configuration.DumpIRTrees)
+                {
+                    TreeDumper.Dump(basicBlocks);
+                }
+
                 flowgraph.SetBlockOrder(basicBlocks);
                 var instructions = codeGenerator.Generate(basicBlocks);
                 methodCodeNodeNeedingCode.MethodCode = instructions;
