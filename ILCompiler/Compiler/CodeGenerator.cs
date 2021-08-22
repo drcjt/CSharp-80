@@ -267,11 +267,18 @@ namespace ILCompiler.Compiler
         public void GenerateCodeForStoreIndirect(StoreIndEntry entry)
         {
             // TODO: assumes value is int32
-            _currentAssembler.Pop(R16.BC);
             _currentAssembler.Pop(R16.DE);
+            _currentAssembler.Pop(R16.BC);
 
             _currentAssembler.Pop(R16.HL);  // Address is stored as 32 bits but will only use lsw
             _currentAssembler.Pop(R16.AF);
+
+            _currentAssembler.Push(I16.IX); // Save IX
+
+            _currentAssembler.Push(R16.HL); // Put HL into IX
+            _currentAssembler.Pop(I16.IX);
+
+            short offset = (short)(entry.FieldOffset ?? 0);
 
             switch (entry.TargetType)
             {
@@ -279,30 +286,28 @@ namespace ILCompiler.Compiler
                 case WellKnownType.Byte:
                 case WellKnownType.Boolean:
                 case WellKnownType.Char:
-                    _currentAssembler.LdInd(R16.HL, R8.C);
+                    _currentAssembler.Ld(I16.IX, offset, R8.C);
                     break;
 
                 case WellKnownType.Int16:
                 case WellKnownType.UInt16:
-                    _currentAssembler.LdInd(R16.HL, R8.B);
-                    _currentAssembler.Inc(R16.HL);
-                    _currentAssembler.LdInd(R16.HL, R8.C);
+                    _currentAssembler.Ld(I16.IX, (short)(offset + 1), R8.B);
+                    _currentAssembler.Ld(I16.IX, (short)(offset + 0), R8.C);
                     break;
 
                 case WellKnownType.Int32:
                 case WellKnownType.UInt32:
-                    _currentAssembler.LdInd(R16.HL, R8.D);
-                    _currentAssembler.Inc(R16.HL);
-                    _currentAssembler.LdInd(R16.HL, R8.E);
-                    _currentAssembler.Inc(R16.HL);
-                    _currentAssembler.LdInd(R16.HL, R8.B);
-                    _currentAssembler.Inc(R16.HL);
-                    _currentAssembler.LdInd(R16.HL, R8.C);
+                    _currentAssembler.Ld(I16.IX, (short)(offset + 3), R8.D);
+                    _currentAssembler.Ld(I16.IX, (short)(offset + 2), R8.E);
+                    _currentAssembler.Ld(I16.IX, (short)(offset + 1), R8.B);
+                    _currentAssembler.Ld(I16.IX, (short)(offset + 0), R8.C);
                     break;
 
                 default:
                     throw new NotImplementedException();
             }
+
+            _currentAssembler.Pop(I16.IX);
         }
 
         public void GenerateCodeForIndirect(IndirectEntry entry)
@@ -315,32 +320,44 @@ namespace ILCompiler.Compiler
 
                 // Get indirect address from stack into IX
                 _currentAssembler.Pop(I16.IX);
+                _currentAssembler.Pop(R16.AF);  // Ignore lsw of address
 
-                // Get 16 bits from IX and push onto stack
-                if (entry.TargetType == WellKnownType.Int32 || entry.TargetType == WellKnownType.UInt32)
+                // TODO: This assumes value to push onto stack is an i4
+                switch (entry.TargetType)
                 {
-                    _currentAssembler.Ld(R8.H, I16.IX, 0);      // i4
-                    _currentAssembler.Ld(R8.L, I16.IX, 1);
-                }
-                else
-                {
-                    _currentAssembler.Ld(R16.HL, 0);
-                }
+                    case WellKnownType.SByte:
+                    case WellKnownType.Byte:
+                    case WellKnownType.Boolean:
+                    case WellKnownType.Char:
+                        _currentAssembler.Ld(R16.HL, 0);
+                        _currentAssembler.Push(R16.HL);
+                        _currentAssembler.Ld(R8.H, 0);
+                        _currentAssembler.Ld(R8.L, I16.IX, 0);
+                        _currentAssembler.Push(R16.HL);
+                        break;
 
-                _currentAssembler.Push(R16.HL);
+                    case WellKnownType.Int16:
+                    case WellKnownType.UInt16:
+                        _currentAssembler.Ld(R16.HL, 0);
+                        _currentAssembler.Push(R16.HL);
+                        _currentAssembler.Ld(R8.H, I16.IX, 1);
+                        _currentAssembler.Ld(R8.L, I16.IX, 0);
+                        _currentAssembler.Push(R16.HL);
+                        break;
 
-                // Get next 16 bits from IX + 2 and push onto stack
-                if (entry.TargetType <= WellKnownType.Byte)
-                {
-                    _currentAssembler.Ld(R8.H, 0);  // i1
-                }
-                else
-                {
-                    _currentAssembler.Ld(R8.H, I16.IX, 2);      // i2
-                }
-                _currentAssembler.Ld(R8.L, I16.IX, 3);      // i1
+                    case WellKnownType.Int32:
+                    case WellKnownType.UInt32:
+                        _currentAssembler.Ld(R8.H, I16.IX, 3);
+                        _currentAssembler.Ld(R8.L, I16.IX, 2);
+                        _currentAssembler.Push(R16.HL);
+                        _currentAssembler.Ld(R8.H, I16.IX, 1);
+                        _currentAssembler.Ld(R8.L, I16.IX, 0);
+                        _currentAssembler.Push(R16.HL);
+                        break;
 
-                _currentAssembler.Push(R16.HL);
+                    default:
+                        throw new NotImplementedException();
+                }
 
                 // Restore IX from DE
                 _currentAssembler.Push(R16.DE);
@@ -475,20 +492,22 @@ namespace ILCompiler.Compiler
                 {
                     // Loading address of a local variable
                     var localVariable = _localVariableTable[localVarEntry.LocalNumber];
-                    var offset = localVariable.StackOffset;
+                    var offset = -localVariable.StackOffset;
+
+                    // Push 0 to makeup full 32 bit value
+                    _currentAssembler.Ld(R16.HL, 0);
+                    _currentAssembler.Push(R16.HL);
 
                     // Calculate and push the actual 16 bit address
                     _currentAssembler.Push(I16.IX);
                     _currentAssembler.Pop(R16.HL);
-                    if (offset > 0)
-                    {
-                        _currentAssembler.Ld(R16.DE, (short)(offset));
-                        _currentAssembler.Add(R16.HL, R16.DE);
-                    }
-                    _currentAssembler.Push(R16.HL);
 
-                    // Push 0 to makeup full 32 bit value
-                    _currentAssembler.Ld(R16.HL, 0);
+                    // TODO: assumes local var is i4
+                    offset -= 4;
+                    _currentAssembler.Ld(R16.DE, (short)(offset));
+                    _currentAssembler.Add(R16.HL, R16.DE);
+
+                    // Push address
                     _currentAssembler.Push(R16.HL);
                 }
             }

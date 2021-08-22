@@ -41,6 +41,7 @@ namespace ILCompiler.Compiler
                 { 
                     IsParameter = true, 
                     Kind = kind,
+                    // TODO: Should this set field offset??
                     ExactSize = GetExactSize(method.Parameters[parameterIndex].Type),
                     StackOffset = offset,
                     IsTemp = false,
@@ -60,7 +61,7 @@ namespace ILCompiler.Compiler
                     { 
                         IsParameter = false, 
                         Kind = kind, 
-                        ExactSize = GetExactSize(body.Variables[variableIndex].Type),
+                        ExactSize = GetExactSize(body.Variables[variableIndex].Type, true),
                         StackOffset = offset,
                         IsTemp = false,
                         Type = LocalVariableType.Int,
@@ -72,7 +73,7 @@ namespace ILCompiler.Compiler
         }
 
         // TODO: Consider moving this to DnlibExtensions
-        private static int GetExactSize(TypeSig type)
+        private static int GetExactSize(TypeSig type, bool setFieldOffset = false)
         {
             if (type.ElementType == ElementType.ValueType)
             {
@@ -83,6 +84,10 @@ namespace ILCompiler.Compiler
                     var typeSize = 0;
                     foreach (var field in typeDef.Fields)
                     {
+                        if (setFieldOffset)
+                        {
+                            field.FieldOffset = (uint)typeSize;
+                        }
                         typeSize += GetExactSize(field.FieldType);
                     }
 

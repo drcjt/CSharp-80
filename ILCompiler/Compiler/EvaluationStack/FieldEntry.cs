@@ -9,9 +9,11 @@ namespace ILCompiler.Compiler.EvaluationStack
 {
     public class FieldEntry : StackEntry
     {
+        public uint FieldOffset { get; }
+
         public StackEntry Op1 { get; }
 
-        public FieldEntry(StackEntry op1, StackValueKind kind) : base(kind)
+        public FieldEntry(StackEntry op1, uint? fieldOffset, StackValueKind kind) : base(kind)
         {
             Operation = Operation.Field;
             Op1 = op1;
@@ -19,7 +21,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public override FieldEntry Duplicate()
         {
-            return new FieldEntry(Op1.Duplicate(), Kind);
+            return new FieldEntry(Op1.Duplicate(), FieldOffset, Kind);
         }
 
         public override void Accept(IStackEntryVisitor visitor)

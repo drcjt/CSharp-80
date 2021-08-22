@@ -562,7 +562,7 @@ namespace ILCompiler.Compiler
                 throw new NotSupportedException();
             }
 
-            ImportAppendTree(new StoreIndEntry(addr, value, WellKnownType.Int32));
+            ImportAppendTree(new StoreIndEntry(addr, value, WellKnownType.Int32, fieldDef.FieldOffset));
         }
 
         public void ImportStoreIndirect(WellKnownType type)
@@ -593,7 +593,7 @@ namespace ILCompiler.Compiler
 
              obj = new AddressOfEntry(obj);
 
-            var node = new FieldEntry(obj, StackValueKind.Int32);
+            var node = new FieldEntry(obj, fieldDef.FieldOffset, StackValueKind.Int32);
             PushExpression(node);
         }
 
