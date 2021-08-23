@@ -589,9 +589,13 @@ namespace ILCompiler.Compiler
         {
             var obj = _stack.Pop();
 
-            // TODO: Validate obj is a value type
+            // Validate obj is a value type
+            if (obj.Kind != StackValueKind.ValueType)
+            {
+                throw new NotImplementedException();
+            }
 
-             obj = new AddressOfEntry(obj);
+            obj = new AddressOfEntry(obj);
 
             var node = new FieldEntry(obj, fieldDef.FieldOffset, StackValueKind.Int32);
             PushExpression(node);

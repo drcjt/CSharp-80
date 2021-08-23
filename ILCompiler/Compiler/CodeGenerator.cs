@@ -119,7 +119,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case Operation.Field:
-                    // TODO: Implement code gen for field access
+                    GenerateCodeForField(node as FieldEntry);
                     break;
 
                 case Operation.Indirect:
@@ -308,6 +308,16 @@ namespace ILCompiler.Compiler
             }
 
             _currentAssembler.Pop(I16.IX);
+        }
+
+        public void GenerateCodeForField(FieldEntry entry)
+        {
+            // Load field onto stack
+            var fieldOffset = entry.FieldOffset;
+
+            // TODO: This should really be dealt with by a morphing phase
+            var indirectEntry = new IndirectEntry(null, entry.Kind, WellKnownType.Int32);
+            GenerateCodeForIndirect(indirectEntry);
         }
 
         public void GenerateCodeForIndirect(IndirectEntry entry)

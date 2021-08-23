@@ -117,6 +117,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(FieldEntry entry)
         {
+            entry.Op1.Accept(this);
             SetNext(entry);
         }
 
