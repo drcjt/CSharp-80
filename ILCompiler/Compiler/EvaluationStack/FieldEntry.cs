@@ -17,6 +17,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         {
             Operation = Operation.Field;
             Op1 = op1;
+            FieldOffset = fieldOffset.Value;
         }
 
         public override FieldEntry Duplicate()

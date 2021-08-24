@@ -157,7 +157,10 @@ namespace ILCompiler.Compiler
 
         public void Visit(FieldEntry entry)
         {
-            Print($"field");
+            Print($"field {entry.FieldOffset}");
+            _indent++;
+            entry.Op1.Accept(this);
+            _indent--;
         }
     }
 }

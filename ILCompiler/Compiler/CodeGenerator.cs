@@ -297,10 +297,10 @@ namespace ILCompiler.Compiler
 
                 case WellKnownType.Int32:
                 case WellKnownType.UInt32:
-                    _currentAssembler.Ld(I16.IX, (short)(offset + 3), R8.D);
-                    _currentAssembler.Ld(I16.IX, (short)(offset + 2), R8.E);
-                    _currentAssembler.Ld(I16.IX, (short)(offset + 1), R8.B);
-                    _currentAssembler.Ld(I16.IX, (short)(offset + 0), R8.C);
+                    _currentAssembler.Ld(I16.IX, (short)(offset + 3), R8.B);
+                    _currentAssembler.Ld(I16.IX, (short)(offset + 2), R8.C);
+                    _currentAssembler.Ld(I16.IX, (short)(offset + 1), R8.D);
+                    _currentAssembler.Ld(I16.IX, (short)(offset + 0), R8.E);
                     break;
 
                 default:
@@ -317,10 +317,10 @@ namespace ILCompiler.Compiler
 
             // TODO: This should really be dealt with by a morphing phase
             var indirectEntry = new IndirectEntry(null, entry.Kind, WellKnownType.Int32);
-            GenerateCodeForIndirect(indirectEntry);
+            GenerateCodeForIndirect(indirectEntry, fieldOffset);
         }
 
-        public void GenerateCodeForIndirect(IndirectEntry entry)
+        public void GenerateCodeForIndirect(IndirectEntry entry, uint fieldOffset = 0)
         {
             if (entry.Kind == StackValueKind.Int32)
             {
@@ -339,29 +339,29 @@ namespace ILCompiler.Compiler
                     case WellKnownType.Byte:
                     case WellKnownType.Boolean:
                     case WellKnownType.Char:
-                        _currentAssembler.Ld(R16.HL, 0);
-                        _currentAssembler.Push(R16.HL);
                         _currentAssembler.Ld(R8.H, 0);
-                        _currentAssembler.Ld(R8.L, I16.IX, 0);
+                        _currentAssembler.Ld(R8.L, I16.IX, (short)(fieldOffset + 0));
+                        _currentAssembler.Push(R16.HL);
+                        _currentAssembler.Ld(R16.HL, 0);
                         _currentAssembler.Push(R16.HL);
                         break;
 
                     case WellKnownType.Int16:
                     case WellKnownType.UInt16:
-                        _currentAssembler.Ld(R16.HL, 0);
+                        _currentAssembler.Ld(R8.H, I16.IX, (short)(fieldOffset + 1));
+                        _currentAssembler.Ld(R8.L, I16.IX, (short)(fieldOffset + 0));
                         _currentAssembler.Push(R16.HL);
-                        _currentAssembler.Ld(R8.H, I16.IX, 1);
-                        _currentAssembler.Ld(R8.L, I16.IX, 0);
+                        _currentAssembler.Ld(R16.HL, 0);
                         _currentAssembler.Push(R16.HL);
                         break;
 
                     case WellKnownType.Int32:
                     case WellKnownType.UInt32:
-                        _currentAssembler.Ld(R8.H, I16.IX, 3);
-                        _currentAssembler.Ld(R8.L, I16.IX, 2);
+                        _currentAssembler.Ld(R8.H, I16.IX, (short)(fieldOffset + 3));
+                        _currentAssembler.Ld(R8.L, I16.IX, (short)(fieldOffset + 2));
                         _currentAssembler.Push(R16.HL);
-                        _currentAssembler.Ld(R8.H, I16.IX, 1);
-                        _currentAssembler.Ld(R8.L, I16.IX, 0);
+                        _currentAssembler.Ld(R8.H, I16.IX, (short)(fieldOffset + 1));
+                        _currentAssembler.Ld(R8.L, I16.IX, (short)(fieldOffset + 0));
                         _currentAssembler.Push(R16.HL);
                         break;
 
@@ -502,7 +502,7 @@ namespace ILCompiler.Compiler
                 {
                     // Loading address of a local variable
                     var localVariable = _localVariableTable[localVarEntry.LocalNumber];
-                    var offset = -localVariable.StackOffset;
+                    var offset = localVariable.StackOffset + localVariable.ExactSize;
 
                     // Push 0 to makeup full 32 bit value
                     _currentAssembler.Ld(R16.HL, 0);
@@ -512,9 +512,7 @@ namespace ILCompiler.Compiler
                     _currentAssembler.Push(I16.IX);
                     _currentAssembler.Pop(R16.HL);
 
-                    // TODO: assumes local var is i4
-                    offset -= 4;
-                    _currentAssembler.Ld(R16.DE, (short)(offset));
+                    _currentAssembler.Ld(R16.DE, (short)(-offset));
                     _currentAssembler.Add(R16.HL, R16.DE);
 
                     // Push address
