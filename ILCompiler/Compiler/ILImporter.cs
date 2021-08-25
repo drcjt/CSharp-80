@@ -185,6 +185,10 @@ namespace ILCompiler.Compiler
                         ImportLoadField(currentInstruction.Operand as FieldDef);
                         break;
 
+                    case Code.Initobj:
+                        // TODO: Need to implement this
+                        break;
+
                     case Code.Add:
                     case Code.Sub:
                     case Code.Mul:
@@ -590,7 +594,7 @@ namespace ILCompiler.Compiler
             var obj = _stack.Pop();
 
             // Validate obj is a value type
-            if (obj.Kind != StackValueKind.ValueType)
+            if (obj.Kind != StackValueKind.ValueType && obj.Kind != StackValueKind.ObjRef)
             {
                 throw new NotImplementedException();
             }

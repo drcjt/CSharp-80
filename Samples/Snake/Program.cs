@@ -1,31 +1,22 @@
 ﻿using System;
 
-namespace MiniBCL
+namespace Snake
 {
     public static class Program
     {
-        public static int Main()
+        public static void Main()
 		{
             Console.Clear();
 
-            uint val = Next(0);
-            Console.WriteLine(val);
-            val = Next(val);
-            Console.WriteLine(val);
-            val = Next(val);
-            Console.WriteLine(val);
-            val = Next(val);
-            Console.WriteLine(val);
-            val = Next(val);
-            Console.WriteLine(val);
+            // TODO: This doesn't do anything at the minute as initobj is unimplemented
+            Random random = new Random();
 
-            return 0;
-        }
-
-        public static uint Next(uint val)
-        {
-            uint next = (1103515245 * val + 12345) % 2147483648;
-            return next;
+            random._val = 0;            
+            Console.WriteLine(random.Next());
+            Console.WriteLine(random.Next());
+            Console.WriteLine(random.Next());
+            Console.WriteLine(random.Next());
+            Console.WriteLine(random.Next());
         }
     }
 }

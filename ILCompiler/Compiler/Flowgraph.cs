@@ -100,9 +100,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(AddressOfEntry entry)
         {
-            // TODO: Morphing should avoid this as this is effectively
-            // transforming AddressOf(LocalVariableEntry(x)) = AddressOf(x)
-            //entry.Op1.Accept(this);
+            entry.Op1.Accept(this);
             SetNext(entry);
         }
 

@@ -18,9 +18,9 @@ namespace ILCompiler.Compiler
                 case StackValueKind.Int64:
                     return 8;
                 case StackValueKind.ObjRef:
-                    return 2;
+                    return 4;
                 case StackValueKind.NativeInt:
-                    return 2;
+                    return 4;
                 case StackValueKind.ByRef:
                     return 4;
                 default:
