@@ -187,6 +187,7 @@ namespace ILCompiler.Compiler
 
                     case Code.Initobj:
                         // TODO: Need to implement this
+                        _stack.Pop();
                         break;
 
                     case Code.Add:
