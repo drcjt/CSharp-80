@@ -64,8 +64,11 @@ namespace System
 		public static void WriteLine(string str) 
 		{
 			// TODO: Really want to use string concatenation here but not sure that will work yet
-			Write(str); 
-			Write(Environment.NewLine); 
+			Write(str);
+			WriteLine();
+
+			// TODO: seems to be an issue with this
+			//WriteLine(Environment.NewLine); 
 		}
 	}
 }

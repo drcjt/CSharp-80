@@ -266,12 +266,12 @@ namespace ILCompiler.Compiler
 
         public void GenerateCodeForStoreIndirect(StoreIndEntry entry)
         {
+            _currentAssembler.Pop(R16.HL);  // Address is stored as 32 bits but will only use lsw
+            _currentAssembler.Pop(R16.AF);
+
             // TODO: assumes value is int32
             _currentAssembler.Pop(R16.DE);
             _currentAssembler.Pop(R16.BC);
-
-            _currentAssembler.Pop(R16.HL);  // Address is stored as 32 bits but will only use lsw
-            _currentAssembler.Pop(R16.AF);
 
             _currentAssembler.Push(I16.IX); // Save IX
 

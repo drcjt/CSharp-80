@@ -54,8 +54,8 @@ namespace ILCompiler.Compiler
 
         public void Visit(StoreIndEntry entry)
         {
-            entry.Addr.Accept(this);
             entry.Op1.Accept(this);
+            entry.Addr.Accept(this);
             SetNext(entry);
         }
 

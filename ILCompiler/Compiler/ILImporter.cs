@@ -605,7 +605,8 @@ namespace ILCompiler.Compiler
                 throw new NotImplementedException();
             }
 
-            var node = new FieldEntry(obj, fieldDef.FieldOffset, StackValueKind.Int32);
+            var kind = fieldDef.FieldType.GetStackValueKind();
+            var node = new FieldEntry(obj, fieldDef.FieldOffset, kind);
             PushExpression(node);
         }
 
