@@ -93,6 +93,11 @@ namespace ILCompiler.Compiler
             Print($"lclVar {entry.Kind} V{entry.LocalNumber}");
         }
 
+        public void Visit(LocalVariableAddressEntry entry)
+        {
+            Print($"lclVarAddr V{entry.LocalNumber}");
+        }
+
         public void Visit(StoreLocalVariableEntry entry)
         {
             Print($"storelcl {entry.LocalNumber}");
@@ -134,14 +139,6 @@ namespace ILCompiler.Compiler
         public void Visit(UnaryOperator entry)
         {
             Print($"{entry.Operation}");
-            _indent++;
-            entry.Op1.Accept(this);
-            _indent--;
-        }
-
-        public void Visit(AddressOfEntry entry)
-        {
-            Print($"addressof");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;

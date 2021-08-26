@@ -114,6 +114,10 @@ namespace ILCompiler.Compiler
                     GenerateCodeForLocalVariable(node as LocalVariableEntry);
                     break;
 
+                case Operation.LocalVariableAddress:
+                    GenerateCodeForLocalVariableAddress(node as LocalVariableAddressEntry);
+                    break;
+
                 case Operation.StoreLocalVariable:
                     GenerateCodeForStoreLocalVariable(node as StoreLocalVariableEntry);
                     break;
@@ -136,10 +140,6 @@ namespace ILCompiler.Compiler
 
                 case Operation.Cast:
                     GenerateCodeForCast(node as CastEntry);
-                    break;
-
-                case Operation.AddressOf:
-                    GenerateCodeForAddressOf(node as AddressOfEntry);
                     break;
 
                 default:
@@ -493,38 +493,6 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public void GenerateCodeForAddressOf(AddressOfEntry entry)
-        {
-            if (entry.Op1 is LocalVariableEntry)
-            {
-                var localVarEntry = entry.Op1 as LocalVariableEntry;
-                if (localVarEntry.LocalNumber >= _methodCodeNode.ParamsCount)
-                {
-                    // Loading address of a local variable
-                    var localVariable = _localVariableTable[localVarEntry.LocalNumber];
-                    var offset = localVariable.StackOffset + localVariable.ExactSize;
-
-                    // Push 0 to makeup full 32 bit value
-                    _currentAssembler.Ld(R16.HL, 0);
-                    _currentAssembler.Push(R16.HL);
-
-                    // Calculate and push the actual 16 bit address
-                    _currentAssembler.Push(I16.IX);
-                    _currentAssembler.Pop(R16.HL);
-
-                    _currentAssembler.Ld(R16.DE, (short)(-offset));
-                    _currentAssembler.Add(R16.HL, R16.DE);
-
-                    // Push address
-                    _currentAssembler.Push(R16.HL);
-                }
-            }
-            else
-            {
-                throw new NotImplementedException("AddressOf only supported for local vars");
-            }
-        }
-
         public void GenerateCodeForLocalVariable(LocalVariableEntry entry)
         {
             var variable = _localVariableTable[entry.LocalNumber];
@@ -537,6 +505,35 @@ namespace ILCompiler.Compiler
                 _currentAssembler.Ld(R8.H, indexRegister, (short)-(offset + 1));
                 _currentAssembler.Ld(R8.L, indexRegister, (short)-(offset + 2));
                 _currentAssembler.Push(R16.HL);
+            }
+        }
+
+        public void GenerateCodeForLocalVariableAddress(LocalVariableAddressEntry entry)
+        {
+            if (entry.LocalNumber >= _methodCodeNode.ParamsCount)
+            {
+                // Loading address of a local variable
+                var localVariable = _localVariableTable[entry.LocalNumber];
+                var offset = localVariable.StackOffset + localVariable.ExactSize;
+
+                // Push 0 to makeup full 32 bit value
+                _currentAssembler.Ld(R16.HL, 0);
+                _currentAssembler.Push(R16.HL);
+
+                // Calculate and push the actual 16 bit address
+                _currentAssembler.Push(I16.IX);
+                _currentAssembler.Pop(R16.HL);
+
+                _currentAssembler.Ld(R16.DE, (short)(-offset));
+                _currentAssembler.Add(R16.HL, R16.DE);
+
+                // Push address
+                _currentAssembler.Push(R16.HL);
+
+            }
+            else
+            {
+                throw new NotImplementedException();
             }
         }
 

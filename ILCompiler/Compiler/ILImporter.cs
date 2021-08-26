@@ -594,13 +594,16 @@ namespace ILCompiler.Compiler
         {
             var obj = _stack.Pop();
 
-            // Validate obj is a value type
-            if (obj.Kind != StackValueKind.ValueType && obj.Kind != StackValueKind.ObjRef)
+            if (obj.Kind == StackValueKind.ValueType)
+            {
+                var localNode = obj as LocalVariableEntry;
+                obj = new LocalVariableAddressEntry(localNode.LocalNumber);
+            }
+
+            if (obj.Kind != StackValueKind.ObjRef)
             {
                 throw new NotImplementedException();
             }
-
-            obj = new AddressOfEntry(obj);
 
             var node = new FieldEntry(obj, fieldDef.FieldOffset, StackValueKind.Int32);
             PushExpression(node);
@@ -630,9 +633,8 @@ namespace ILCompiler.Compiler
         {
             var localNumber = _methodCompiler.ParameterCount + index;
             var localVariable = _localVariableTable[localNumber];
-            var node = new LocalVariableEntry(localNumber, localVariable.Kind);
-            var addrNode = new AddressOfEntry(node);
-            PushExpression(addrNode);
+            var node = new LocalVariableAddressEntry(localNumber);
+            PushExpression(node);
         }
 
         public void ImportLdArg(int index)

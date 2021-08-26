@@ -98,13 +98,12 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
-        public void Visit(AddressOfEntry entry)
+        public void Visit(LocalVariableEntry entry)
         {
-            entry.Op1.Accept(this);
             SetNext(entry);
         }
 
-        public void Visit(LocalVariableEntry entry)
+        public void Visit(LocalVariableAddressEntry entry)
         {
             SetNext(entry);
         }
