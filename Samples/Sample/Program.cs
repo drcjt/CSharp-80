@@ -190,13 +190,11 @@ namespace MiniBCL
             short b = 4;
             if (a == b)
             {
-                Console.Write("True");
-                Console.WriteLine();
+                Console.WriteLine("True");
             }
             else
             {
-                Console.Write("False");
-                Console.WriteLine();
+                Console.WriteLine("False");
             }
         }
 
@@ -207,20 +205,17 @@ namespace MiniBCL
             short b = 5;
             if (a != b)
             {
-                Console.Write("True");
-                Console.WriteLine();
+                Console.WriteLine("True");
             }
             else
             {
-                Console.Write("False");
-                Console.WriteLine();
+                Console.WriteLine("False");
             }
         }
 
         private static void HelloWorld()
 		{
-            Console.Write("Hello World");
-            Console.WriteLine();
+            Console.WriteLine("Hello World");
 		}
 
         // Experiment to see if we can write routine to update video memory completely in C#!!

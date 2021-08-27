@@ -262,6 +262,8 @@ namespace ILCompiler.Compiler
             // TODO: Currently obj refs can only be strings
             _currentAssembler.Ld(R16.HL, (entry as StringConstantEntry).Label);
             _currentAssembler.Push(R16.HL);
+            _currentAssembler.Ld(R16.HL, 0);
+            _currentAssembler.Push(R16.HL);
         }
 
         public void GenerateCodeForStoreIndirect(StoreIndEntry entry)
@@ -569,7 +571,8 @@ namespace ILCompiler.Compiler
             switch (methodToCall)
             {
                 case "WriteString":
-                    _currentAssembler.Pop(R16.HL);    // put argument 1 into HL
+                    _currentAssembler.Pop(R16.DE);    // put argument 1 into HL
+                    _currentAssembler.Pop(R16.HL);
                     _currentAssembler.Call("PRINT");
                     break;
 
