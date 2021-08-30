@@ -5,7 +5,7 @@ namespace MiniBCL
     public static class Program
     {
         public static int Main()
-		{
+        {
             Console.Clear();
 
             short a = 123;
@@ -20,7 +20,7 @@ namespace MiniBCL
             //PostIncrementOperator();
 
             return 42;
-		}
+        }
 
         // TODO: This requires dup to be implemented
         private static void PostIncrementOperator()

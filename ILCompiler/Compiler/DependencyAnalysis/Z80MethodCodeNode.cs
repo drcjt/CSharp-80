@@ -1,6 +1,6 @@
 ﻿using dnlib.DotNet;
-using Z80Assembler;
 using System.Collections.Generic;
+using Z80Assembler;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
@@ -18,7 +18,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public IList<Instruction> MethodCode { get; set; }
 
         public IList<Z80MethodCodeNode> Dependencies { get; set; }
-        
+
         public bool CodeEmitted { get; set; }
 
         public bool Compiled { get; set; }

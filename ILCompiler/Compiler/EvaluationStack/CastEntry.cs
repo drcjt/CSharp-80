@@ -1,5 +1,4 @@
 ﻿using ILCompiler.Common.TypeSystem;
-using ILCompiler.Common.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.EvaluationStack
 {
@@ -8,7 +7,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         public WellKnownType DesiredType { get; }
         public StackEntry Op1 { get; }
 
-        public bool Unsigned { get;  }
+        public bool Unsigned { get; }
 
         public CastEntry(WellKnownType desiredType, bool unsigned, StackEntry op1) : base(op1.Kind)
         {

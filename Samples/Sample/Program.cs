@@ -5,11 +5,11 @@ namespace MiniBCL
     public static class Program
     {
         public static int Main()
-		{
+        {
             Console.Clear();
 
             TestImplicitCasting();
-            
+
             Int32 returnedInt32 = TestReturnInt32();
             Console.WriteLine(returnedInt32);
 
@@ -48,7 +48,7 @@ namespace MiniBCL
 
             // Test equal branching
             TestEqualBranching();
-            
+
             // Test not equal branching
             TestNotEqualBranching();
 
@@ -61,7 +61,7 @@ namespace MiniBCL
             //WriteChar(0, 0, 48); // Write 0 to top left corner of screen
 
             return 42;
-		}
+        }
 
         private static void TestImplicitCasting()
         {
@@ -97,7 +97,7 @@ namespace MiniBCL
             // signed divison
             int x = -90;
             int y = 3;
-            Console.WriteLine(x / y);            
+            Console.WriteLine(x / y);
         }
 
         private static void TestRem()
@@ -214,9 +214,9 @@ namespace MiniBCL
         }
 
         private static void HelloWorld()
-		{
+        {
             Console.WriteLine("Hello World");
-		}
+        }
 
         // Experiment to see if we can write routine to update video memory completely in C#!!
         // ...

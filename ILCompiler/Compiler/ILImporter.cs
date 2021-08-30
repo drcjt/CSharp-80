@@ -519,7 +519,7 @@ namespace ILCompiler.Compiler
                 }
                 ImportAppendTree(lastStmt);
 
-                next.EntryStack = entryStack;                
+                next.EntryStack = entryStack;
             }
 
             MarkBasicBlock(next);

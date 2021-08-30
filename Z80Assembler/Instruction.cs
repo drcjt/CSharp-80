@@ -26,9 +26,9 @@ namespace Z80Assembler
             this.Opcode = opcode;
         }
 
-		public override string ToString()
-		{
-			var stringBuilder = new StringBuilder();
+        public override string ToString()
+        {
+            var stringBuilder = new StringBuilder();
 
             if (!string.IsNullOrEmpty(Label))
             {
@@ -46,8 +46,8 @@ namespace Z80Assembler
                 }
             }
 
-			return stringBuilder.ToString();
-		}
+            return stringBuilder.ToString();
+        }
 
         public static Instruction Ret()
         {

@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         public StackEntry Addr { get; }
         public StackEntry Op1 { get; }
         public uint? FieldOffset { get; set; }
-        public WellKnownType TargetType { get;}
+        public WellKnownType TargetType { get; }
 
         public StoreIndEntry(StackEntry addr, StackEntry op1, WellKnownType targetType, uint? fieldOffset = null) : base(addr.Kind)
         {

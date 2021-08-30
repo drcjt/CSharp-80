@@ -4,7 +4,6 @@ using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 
 namespace ILCompiler.Compiler
@@ -37,9 +36,9 @@ namespace ILCompiler.Compiler
             for (int parameterIndex = 0; parameterIndex < method.Parameters.Count; parameterIndex++)
             {
                 var kind = method.Parameters[parameterIndex].Type.GetStackValueKind();
-                var local = new LocalVariableDescriptor() 
-                { 
-                    IsParameter = true, 
+                var local = new LocalVariableDescriptor()
+                {
+                    IsParameter = true,
                     Kind = kind,
                     // TODO: Should this set field offset??
                     ExactSize = method.Parameters[parameterIndex].Type.GetExactSize(),
@@ -57,10 +56,10 @@ namespace ILCompiler.Compiler
                 for (int variableIndex = 0; variableIndex < body.Variables.Count; variableIndex++)
                 {
                     var kind = body.Variables[variableIndex].Type.GetStackValueKind();
-                    var local = new LocalVariableDescriptor() 
-                    { 
-                        IsParameter = false, 
-                        Kind = kind, 
+                    var local = new LocalVariableDescriptor()
+                    {
+                        IsParameter = false,
+                        Kind = kind,
                         ExactSize = body.Variables[variableIndex].Type.GetExactSize(true),
                         StackOffset = offset,
                         IsTemp = false,

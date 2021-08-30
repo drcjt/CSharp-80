@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace SampleDsk
+﻿namespace SampleDsk
 {
     public static class Program
     {

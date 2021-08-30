@@ -5,10 +5,10 @@ namespace MiniBCL
     public static class Program
     {
         public static void Main()
-		{
-            Console.Clear();          
+        {
+            Console.Clear();
             Console.WriteLine(Fibonacci(10));  // should display 55
-		}
+        }
 
         private static short Fibonacci(short n)
         {

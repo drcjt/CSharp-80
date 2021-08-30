@@ -1,12 +1,12 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
-using Z80Assembler;
+using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Text;
-using ILCompiler.Common.TypeSystem.IL;
-using ILCompiler.Interfaces;
+using Z80Assembler;
 
 namespace ILCompiler.Compiler
 {
@@ -54,13 +54,13 @@ namespace ILCompiler.Compiler
                 _out.WriteLine(Instruction.Pop(R16.DE));
                 _out.WriteLine(Instruction.Pop(R16.HL));
                 _out.WriteLine(Instruction.Halt());
-            }    
+            }
 
             var hasReturnCode = entryMethod.ReturnType.GetStackValueKind() == StackValueKind.Int32;
 
             if (hasReturnCode && _configuration.PrintReturnCode)
             {
-                _out.WriteLine(Instruction.Db("Return Code:","retcodemsg"));
+                _out.WriteLine(Instruction.Db("Return Code:", "retcodemsg"));
                 _out.WriteLine(Instruction.Db(0));
             }
 

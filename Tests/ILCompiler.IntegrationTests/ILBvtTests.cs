@@ -1,7 +1,6 @@
 ﻿using Konamiman.Z80dotNet;
 using NUnit.Framework;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 
 namespace CSharp80.Tests.BVT
@@ -14,7 +13,7 @@ namespace CSharp80.Tests.BVT
         public void IlBvtTest(string ilFileName)
         {
             var z80 = new Z80Processor();
-            
+
             // The Z80 simulator doesn't handle auto stop correctly
             // if the sp is manually manipulated e.g. ld sp, xx
             // so we have to disable it but will rely on auto stop

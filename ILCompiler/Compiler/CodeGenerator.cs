@@ -1,12 +1,12 @@
-﻿using ILCompiler.Compiler.DependencyAnalysis;
+﻿using ILCompiler.Common.TypeSystem;
+using ILCompiler.Common.TypeSystem.IL;
+using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.EvaluationStack;
-using Z80Assembler;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using ILCompiler.Common.TypeSystem.IL;
-using ILCompiler.Common.TypeSystem;
 using System.Diagnostics;
+using Z80Assembler;
 
 namespace ILCompiler.Compiler
 {
@@ -50,7 +50,7 @@ namespace ILCompiler.Compiler
                 while (currentNode != null)
                 {
                     GenerateFromNode(currentNode);
-                    currentNode = currentNode.Next;                    
+                    currentNode = currentNode.Next;
                 }
 
                 Optimize(_currentAssembler.Instructions);
@@ -399,7 +399,7 @@ namespace ILCompiler.Compiler
             _currentAssembler.Add(R8.A, R8.L);
             _currentAssembler.Jp(Condition.NonZero, entry.TargetLabel);
         }
-        
+
         public void GenerateCodeForJump(JumpEntry entry)
         {
             _currentAssembler.Jp(entry.TargetLabel);
@@ -514,7 +514,7 @@ namespace ILCompiler.Compiler
             // Loading a local variable/argument
             var endOffset = variable.StackOffset + variable.ExactSize;
             for (int offset = variable.StackOffset; offset < endOffset; offset += 2)
-            { 
+            {
                 _currentAssembler.Ld(R8.H, indexRegister, (short)-(offset + 1));
                 _currentAssembler.Ld(R8.L, indexRegister, (short)-(offset + 2));
                 _currentAssembler.Push(R16.HL);

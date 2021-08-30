@@ -1,11 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using ILCompiler.Compiler;
+using ILCompiler.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
-using ILCompiler.Compiler;
-using ILCompiler.Interfaces;
 
 namespace ILCompiler
 {
