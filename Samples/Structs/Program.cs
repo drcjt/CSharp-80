@@ -4,12 +4,10 @@ namespace Structs
 {
     public struct Nested
     {
-        public bool Sucess;
-        public short Length;
+        public int Length;
 
-        public Nested(bool success, short length)
+        public Nested(int length)
         {
-            Sucess = success;
             Length = length;
         }
     }
@@ -18,11 +16,13 @@ namespace Structs
     {
         public int X;
         public int Y;
+        public Nested N;
 
-        public SimpleVector(int x, int y)
+        public SimpleVector(int x, int y, Nested n)
         {
             X = x;
             Y = y;
+            N = n;
         }
     }
 
@@ -30,11 +30,17 @@ namespace Structs
     {
         public static void Main()
         {
-            Nested n = new Nested(true, 25);
-            SimpleVector vector = new SimpleVector(3, 4);
+            Nested n = new Nested(25);
+            SimpleVector vector = new SimpleVector(3, 4, n);
 
-            Console.WriteLine(vector.X);
-            Console.WriteLine(vector.Y);
+            var length = Test(vector);
+            Console.WriteLine(length);
+
+        }
+        public static int Test(SimpleVector v)
+        {
+            var n = v.N;
+            return n.Length;
         }
     }
 }

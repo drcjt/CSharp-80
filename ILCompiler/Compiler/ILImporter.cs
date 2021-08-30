@@ -562,7 +562,7 @@ namespace ILCompiler.Compiler
 
             var kind = fieldDef.FieldType.GetStackValueKind();
 
-            if (value.Kind != StackValueKind.Int32)
+            if (value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ValueType)
             {
                 throw new NotSupportedException();
             }
@@ -605,17 +605,18 @@ namespace ILCompiler.Compiler
                 throw new NotImplementedException();
             }
 
+            var fieldSize = fieldDef.FieldType.GetExactSize(false);
             var kind = fieldDef.FieldType.GetStackValueKind();
-            var node = new FieldEntry(obj, fieldDef.FieldOffset, kind);
+            var node = new FieldEntry(obj, fieldDef.FieldOffset, fieldSize, kind);
             PushExpression(node);
         }
 
         public void ImportStoreVar(int index, bool argument)
         {
             var value = _stack.Pop();
-            if (value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ObjRef)
+            if (value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ObjRef && value.Kind != StackValueKind.ValueType)
             {
-                throw new NotSupportedException("Storing variables other than short, int32 or object refs not supported yet");
+                throw new NotSupportedException("Storing variables other than short, int32 ,object refs, or valuetypes not supported yet");
             }
             var localNumber = _methodCompiler.ParameterCount + index;
             var node = new StoreLocalVariableEntry(localNumber, false, value);

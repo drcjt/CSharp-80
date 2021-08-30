@@ -42,7 +42,7 @@ namespace ILCompiler.Compiler
                     IsParameter = true, 
                     Kind = kind,
                     // TODO: Should this set field offset??
-                    ExactSize = GetExactSize(method.Parameters[parameterIndex].Type),
+                    ExactSize = method.Parameters[parameterIndex].Type.GetExactSize(),
                     StackOffset = offset,
                     IsTemp = false,
                     Type = LocalVariableType.Int,
@@ -61,7 +61,7 @@ namespace ILCompiler.Compiler
                     { 
                         IsParameter = false, 
                         Kind = kind, 
-                        ExactSize = GetExactSize(body.Variables[variableIndex].Type, true),
+                        ExactSize = body.Variables[variableIndex].Type.GetExactSize(true),
                         StackOffset = offset,
                         IsTemp = false,
                         Type = LocalVariableType.Int,
@@ -71,39 +71,6 @@ namespace ILCompiler.Compiler
                 }
             }
         }
-
-        // TODO: Consider moving this to DnlibExtensions
-        private static int GetExactSize(TypeSig type, bool setFieldOffset = false)
-        {
-            if (type.ElementType == ElementType.ValueType)
-            {
-                var typeDefOrRef = type.TryGetTypeDefOrRef();
-                var typeDef = typeDefOrRef.ResolveTypeDef();
-                if (typeDef != null)
-                {
-                    var typeSize = 0;
-                    foreach (var field in typeDef.Fields)
-                    {
-                        if (setFieldOffset)
-                        {
-                            field.FieldOffset = (uint)typeSize;
-                        }
-                        typeSize += GetExactSize(field.FieldType);
-                    }
-
-                    return typeSize;
-                }
-                else
-                {
-                    throw new Exception("Could not resolve type def");
-                }
-            }
-            else
-            {
-                return TypeList.GetExactSize(type.GetStackValueKind());
-            }
-        }
-
 
         public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode)
         {

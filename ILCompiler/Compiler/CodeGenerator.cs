@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Common.TypeSystem;
+using System.Diagnostics;
 
 namespace ILCompiler.Compiler
 {
@@ -299,6 +300,8 @@ namespace ILCompiler.Compiler
 
                 case WellKnownType.Int32:
                 case WellKnownType.UInt32:
+                    // TODO: Should this cope with arbitrary size fields e.g. structs?
+
                     _currentAssembler.Ld(I16.IX, (short)(offset + 3), R8.B);
                     _currentAssembler.Ld(I16.IX, (short)(offset + 2), R8.C);
                     _currentAssembler.Ld(I16.IX, (short)(offset + 1), R8.D);
@@ -319,12 +322,12 @@ namespace ILCompiler.Compiler
 
             // TODO: This should really be dealt with by a morphing phase
             var indirectEntry = new IndirectEntry(null, entry.Kind, WellKnownType.Int32);
-            GenerateCodeForIndirect(indirectEntry, fieldOffset);
+            GenerateCodeForIndirect(indirectEntry, fieldOffset, entry.Size);
         }
 
-        public void GenerateCodeForIndirect(IndirectEntry entry, uint fieldOffset = 0)
+        public void GenerateCodeForIndirect(IndirectEntry entry, uint fieldOffset = 0, int fieldSize = 0)
         {
-            if (entry.Kind == StackValueKind.Int32)
+            if (entry.Kind == StackValueKind.Int32 || entry.Kind == StackValueKind.ValueType)
             {
                 // Save IX into DE
                 _currentAssembler.Push(I16.IX);
@@ -334,7 +337,6 @@ namespace ILCompiler.Compiler
                 _currentAssembler.Pop(I16.IX);
                 _currentAssembler.Pop(R16.AF);  // Ignore lsw of address
 
-                // TODO: This assumes value to push onto stack is an i4
                 switch (entry.TargetType)
                 {
                     case WellKnownType.SByte:
@@ -359,12 +361,19 @@ namespace ILCompiler.Compiler
 
                     case WellKnownType.Int32:
                     case WellKnownType.UInt32:
-                        _currentAssembler.Ld(R8.H, I16.IX, (short)(fieldOffset + 3));
-                        _currentAssembler.Ld(R8.L, I16.IX, (short)(fieldOffset + 2));
-                        _currentAssembler.Push(R16.HL);
-                        _currentAssembler.Ld(R8.H, I16.IX, (short)(fieldOffset + 1));
-                        _currentAssembler.Ld(R8.L, I16.IX, (short)(fieldOffset + 0));
-                        _currentAssembler.Push(R16.HL);
+                        Debug.Assert(fieldSize % 4 == 0);
+
+                        // TODO: For large vars consider generating code to loop itself to minimize size of code
+
+                        for (int offset = (int)fieldOffset; offset < fieldOffset + fieldSize; offset += 4)
+                        {
+                            _currentAssembler.Ld(R8.H, I16.IX, (short)(offset + 3));
+                            _currentAssembler.Ld(R8.L, I16.IX, (short)(offset + 2));
+                            _currentAssembler.Push(R16.HL);
+                            _currentAssembler.Ld(R8.H, I16.IX, (short)(offset + 1));
+                            _currentAssembler.Ld(R8.L, I16.IX, (short)(offset + 0));
+                            _currentAssembler.Push(R16.HL);
+                        }
                         break;
 
                     default:
@@ -378,7 +387,7 @@ namespace ILCompiler.Compiler
             else
             {
                 throw new NotImplementedException();
-            }    
+            }
         }
 
         public void GenerateCodeForJumpTrue(JumpTrueEntry entry)
@@ -500,7 +509,9 @@ namespace ILCompiler.Compiler
             var variable = _localVariableTable[entry.LocalNumber];
             var indexRegister = entry.LocalNumber >= _methodCodeNode.ParamsCount ? I16.IX : I16.IY;
 
-            // Loading a local variable
+            // TODO: For large vars consider generating code to loop itself to minimize size of code
+
+            // Loading a local variable/argument
             var endOffset = variable.StackOffset + variable.ExactSize;
             for (int offset = variable.StackOffset; offset < endOffset; offset += 2)
             { 
@@ -510,53 +521,44 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public void GenerateCodeForLocalVariableAddress(LocalVariableAddressEntry entry)
+        public void GenerateCodeForStoreLocalVariable(StoreLocalVariableEntry entry)
         {
-            if (entry.LocalNumber >= _methodCodeNode.ParamsCount)
+            var variable = _localVariableTable[entry.LocalNumber];
+            var indexRegister = entry.IsParameter ? I16.IY : I16.IX;
+
+            // TODO: For large vars consider generating code to loop itself to minimize size of code
+
+            // Loading a local variable/argument
+            var endOffset = variable.StackOffset + variable.ExactSize - 2;
+            for (int offset = endOffset; offset >= variable.StackOffset; offset -= 2)
             {
-                // Loading address of a local variable
-                var localVariable = _localVariableTable[entry.LocalNumber];
-                var offset = localVariable.StackOffset + localVariable.ExactSize;
-
-                // Push 0 to makeup full 32 bit value
-                _currentAssembler.Ld(R16.HL, 0);
-                _currentAssembler.Push(R16.HL);
-
-                // Calculate and push the actual 16 bit address
-                _currentAssembler.Push(I16.IX);
                 _currentAssembler.Pop(R16.HL);
-
-                _currentAssembler.Ld(R16.DE, (short)(-offset));
-                _currentAssembler.Add(R16.HL, R16.DE);
-
-                // Push address
-                _currentAssembler.Push(R16.HL);
-
-            }
-            else
-            {
-                throw new NotImplementedException();
+                _currentAssembler.Ld(indexRegister, (short)-(offset + 1), R8.H);
+                _currentAssembler.Ld(indexRegister, (short)-(offset + 2), R8.L);
             }
         }
 
-        public void GenerateCodeForStoreLocalVariable(StoreLocalVariableEntry entry)
+        public void GenerateCodeForLocalVariableAddress(LocalVariableAddressEntry entry)
         {
+            // Loading address of a local variable/argument
             var localVariable = _localVariableTable[entry.LocalNumber];
-            var offset = localVariable.StackOffset;
+            var offset = localVariable.StackOffset + localVariable.ExactSize;
 
-            var indexRegister = entry.IsParameter ? I16.IY : I16.IX;
+            // Push 0 to makeup full 32 bit value
+            _currentAssembler.Ld(R16.HL, 0);
+            _currentAssembler.Push(R16.HL);
 
-            // TODO: Will this always be 4 now?
-            if (localVariable.ExactSize == 4)
-            {
-                _currentAssembler.Pop(R16.HL);
-                _currentAssembler.Ld(indexRegister, (short)-(offset + 3), R8.H);
-                _currentAssembler.Ld(indexRegister, (short)-(offset + 4), R8.L);
-            }
-
+            // Calculate and push the actual 16 bit address
+            // Need to use IX for local vars, IY for arguments
+            var indexRegister = entry.LocalNumber >= _methodCodeNode.ParamsCount ? I16.IX : I16.IY;
+            _currentAssembler.Push(indexRegister);
             _currentAssembler.Pop(R16.HL);
-            _currentAssembler.Ld(indexRegister, (short)-(offset + 1), R8.H);
-            _currentAssembler.Ld(indexRegister, (short)-(offset + 2), R8.L);
+
+            _currentAssembler.Ld(R16.DE, (short)(-offset));
+            _currentAssembler.Add(R16.HL, R16.DE);
+
+            // Push address
+            _currentAssembler.Push(R16.HL);
         }
 
         public void GenerateCodeForCall(CallEntry entry)
