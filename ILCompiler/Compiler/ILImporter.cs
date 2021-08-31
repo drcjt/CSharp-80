@@ -1,16 +1,16 @@
 ﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.Importer;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ILCompiler.Compiler
 {
-    public class ILImporter
+    public class ILImporter : IILImporter
     {
         private readonly MethodCompiler _methodCompiler;
         private readonly MethodDef _method;
@@ -25,12 +25,39 @@ namespace ILCompiler.Compiler
 
         private readonly EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
 
+        private readonly IList<IOpcodeImporter> _importers = new List<IOpcodeImporter>();
+
+        public int ParameterCount { get => _methodCompiler.ParameterCount; }
+        public IList<LocalVariableDescriptor> LocalVariableTable { get => _localVariableTable; }
+        public BasicBlock[] BasicBlocks { get => _basicBlocks; }
+
         public ILImporter(MethodCompiler methodCompiler, MethodDef method, IList<LocalVariableDescriptor> localVariableTable, IConfiguration configuration)
         {
             _methodCompiler = methodCompiler;
             _method = method;
             _localVariableTable = localVariableTable;
             _configuration = configuration;
+
+            _importers.Add(new NopImporter());
+            _importers.Add(new LoadIntImporter(this));
+            _importers.Add(new StoreVarImporter(this));
+            _importers.Add(new LoadVarImporter(this));
+            _importers.Add(new AddressOfVarImporter(this));
+            _importers.Add(new StoreIndirectImporter(this));
+            _importers.Add(new LoadIndirectImporter(this));
+            _importers.Add(new StoreFieldImporter(this));
+            _importers.Add(new LoadFieldImporter(this));
+            _importers.Add(new BinaryOperationImporter(this));
+            _importers.Add(new CompareImporter(this));
+            _importers.Add(new BranchImporter(this));
+            _importers.Add(new LdArgImporter(this));
+            _importers.Add(new StArgImporter(this));
+            _importers.Add(new LoadStringImporter(this));
+            _importers.Add(new InitObjImporter(this));
+            _importers.Add(new ConversionImporter(this));
+            _importers.Add(new NegImporter(this));
+            _importers.Add(new RetImporter(this));
+            _importers.Add(new CallImporter(this));
         }
 
         private void ImportBasicBlocks(IDictionary<int, int> offsetToIndexMap)
@@ -67,7 +94,7 @@ namespace ILCompiler.Compiler
             // TODO: add any appropriate code to handle the end of importing a basic block
         }
 
-        private void ImportAppendTree(StackEntry entry)
+        public void ImportAppendTree(StackEntry entry)
         {
             _currentBasicBlock.Statements.Add(entry);
         }
@@ -94,207 +121,29 @@ namespace ILCompiler.Compiler
 
                 var opcode = currentInstruction.OpCode.Code;
 
-                switch (opcode)
+                var importer = _importers.FirstOrDefault(importer => importer.CanImport(opcode));
+
+                if (importer != null)
                 {
-                    case Code.Nop:
-                        ImportNop();
-                        break;
-
-                    case Code.Ldc_I4_M1:
-                        ImportLoadInt(-1, StackValueKind.Int32);
-                        break;
-
-                    case Code.Ldc_I4_0:
-                    case Code.Ldc_I4_1:
-                    case Code.Ldc_I4_2:
-                    case Code.Ldc_I4_3:
-                    case Code.Ldc_I4_4:
-                    case Code.Ldc_I4_5:
-                    case Code.Ldc_I4_6:
-                    case Code.Ldc_I4_7:
-                    case Code.Ldc_I4_8:
-                        ImportLoadInt(opcode - Code.Ldc_I4_0, StackValueKind.Int32);
-                        break;
-
-                    case Code.Ldc_I4:
-                        {
-                            var value = (int)currentInstruction.Operand;
-                            ImportLoadInt((int)currentInstruction.Operand, StackValueKind.Int32);
-                        }
-                        break;
-
-                    case Code.Ldc_I4_S:
-                        ImportLoadInt((sbyte)currentInstruction.Operand, StackValueKind.Int32);
-                        break;
-
-                    case Code.Stloc_0:
-                    case Code.Stloc_1:
-                    case Code.Stloc_2:
-                    case Code.Stloc_3:
-                        ImportStoreVar(opcode - Code.Stloc_0, false);
-                        break;
-
-                    case Code.Stloc:
-                    case Code.Stloc_S:
-                        ImportStoreVar((currentInstruction.Operand as Local).Index, false);
-                        break;
-
-                    case Code.Ldloc_0:
-                    case Code.Ldloc_1:
-                    case Code.Ldloc_2:
-                    case Code.Ldloc_3:
-                        ImportLoadVar(opcode - Code.Ldloc_0, false);
-                        break;
-
-                    case Code.Ldloc:
-                    case Code.Ldloc_S:
-                        ImportLoadVar((currentInstruction.Operand as Local).Index, false);
-                        break;
-
-                    case Code.Ldloca:
-                    case Code.Ldloca_S:
-                        ImportAddressOfVar((currentInstruction.Operand as Local).Index, false);
-                        break;
-
-                    case Code.Stind_I1:
-                        ImportStoreIndirect(WellKnownType.SByte);
-                        break;
-                    case Code.Stind_I2:
-                        ImportStoreIndirect(WellKnownType.Int16);
-                        break;
-                    case Code.Stind_I4:
-                        ImportStoreIndirect(WellKnownType.Int32);
-                        break;
-
-
-                    case Code.Ldind_I1:
-                        ImportLoadIndirect(WellKnownType.SByte);
-                        break;
-                    case Code.Ldind_I2:
-                        ImportLoadIndirect(WellKnownType.Int16);
-                        break;
-                    case Code.Ldind_I4:
-                        ImportLoadIndirect(WellKnownType.Int32);
-                        break;
-
-                    case Code.Stfld:
-                        ImportStoreField(currentInstruction.Operand as FieldDef);
-                        break;
-
-                    case Code.Ldfld:
-                        ImportLoadField(currentInstruction.Operand as FieldDef);
-                        break;
-
-                    case Code.Initobj:
-                        // TODO: Need to implement this
-                        _stack.Pop();
-                        break;
-
-                    case Code.Add:
-                    case Code.Sub:
-                    case Code.Mul:
-                    case Code.Div:
-                    case Code.Rem:
-                    case Code.Div_Un:
-                    case Code.Rem_Un:
-                        ImportBinaryOperation(opcode);
-                        break;
-
-                    case Code.Ceq:
-                        {
-                            ImportCompare(Code.Beq);
-                        }
-                        break;
-
-                    case Code.Br_S:
-                    case Code.Blt_S:
-                    case Code.Bgt_S:
-                    case Code.Ble_S:
-                    case Code.Bge_S:
-                    case Code.Beq_S:
-                    case Code.Bne_Un_S:
-                    case Code.Brfalse_S:
-                    case Code.Brtrue_S:
-                        {
-                            var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
-                            ImportBranch(opcode + (Code.Br - Code.Br_S), _basicBlocks[(int)target.Offset], (opcode != Code.Br) ? _basicBlocks[currentOffset] : null);
-                        }
+                    var importContext = new ImportContext()
+                    {
+                        CurrentBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null,
+                        Method = _method,
+                        NameMangler = _methodCompiler.NameMangler,
+                    };
+                    importer.Import(currentInstruction, importContext);
+                    if (importContext.StopImporting)
+                    {
                         return;
-
-                    case Code.Br:
-                    case Code.Blt:
-                    case Code.Bgt:
-                    case Code.Ble:
-                    case Code.Bge:
-                    case Code.Beq:
-                    case Code.Bne_Un:
-                    case Code.Brfalse:
-                    case Code.Brtrue:
-                        {
-                            var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
-                            ImportBranch(opcode, _basicBlocks[(int)target.Offset], (opcode != Code.Br) ? _basicBlocks[currentOffset] : null);
-                        }
-                        return;
-
-                    case Code.Ldarg_0:
-                    case Code.Ldarg_1:
-                    case Code.Ldarg_2:
-                    case Code.Ldarg_3:
-                        ImportLdArg(opcode - Code.Ldarg_0);
-                        break;
-
-                    case Code.Ldarg_S:
-                    case Code.Ldarg:
-                        {
-                            var parameter = currentInstruction.Operand as Parameter;
-                            ImportLdArg(parameter.Index);
-                        }
-                        break;
-
-                    case Code.Starg_S:
-                    case Code.Starg:
-                        {
-                            var parameter = currentInstruction.Operand as Parameter;
-                            ImportStArg(parameter.Index);
-                        }
-                        break;
-
-                    case Code.Ldstr:
-                        ImportLoadString(currentInstruction.Operand as string);
-                        break;
-
-                    case Code.Conv_I2:
-                        ImportConversion(WellKnownType.Int16, false);
-                        break;
-
-                    case Code.Conv_U2:
-                        ImportConversion(WellKnownType.UInt16, true);
-                        break;
-
-                    case Code.Neg:
-                        ImportNeg();
-                        break;
-
-                    case Code.Ret:
-                        ImportRet(_method);
-                        return;
-
-                    case Code.Call:
-                        var methodDefOrRef = currentInstruction.Operand as IMethodDefOrRef;
-                        var methodDef = methodDefOrRef.ResolveMethodDefThrow();
-                        ImportCall(methodDef);
-                        break;
-
-                    default:
-                        if (_configuration.IgnoreUnknownCil)
-                        {
-                            _methodCompiler.Logger.LogWarning($"Unsupported IL opcode {opcode}");
-                        }
-                        else
-                        {
-                            throw new UnknownCilException($"Unsupported IL opcode {opcode}");
-                        }
-                        break;
+                    }
+                }   
+                else  if (_configuration.IgnoreUnknownCil)
+                {
+                    _methodCompiler.Logger.LogWarning($"Unsupported IL opcode {opcode}");
+                }
+                else
+                {
+                    throw new UnknownCilException($"Unsupported IL opcode {opcode}");
                 }
 
                 if (currentOffset == _basicBlocks.Length)
@@ -341,18 +190,6 @@ namespace ILCompiler.Compiler
             return new LocalVariableEntry(tempNumber.Value, entry.Kind);
         }
 
-        private void ImportNop()
-        {
-            // Nothing to do
-        }
-
-        private void ImportNeg()
-        {
-            var op1 = _stack.Pop();
-            op1 = new UnaryOperator(Operation.Neg, op1);
-            _stack.Push(op1);
-        }
-
         private void MarkBasicBlock(BasicBlock basicBlock)
         {
             if (!basicBlock.Marked)
@@ -363,9 +200,14 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void PushExpression(StackEntry expression)
+        public void PushExpression(StackEntry expression)
         {
             _stack.Push(expression);
+        }
+
+        public StackEntry PopExpression()
+        {
+            return _stack.Pop();
         }
 
         public IList<BasicBlock> Import()
@@ -386,74 +228,6 @@ namespace ILCompiler.Compiler
             }
 
             return basicBlocks;
-        }
-
-        public void ImportConversion(WellKnownType wellKnownType, bool unsigned)
-        {
-            var op1 = _stack.Pop();
-            op1 = new CastEntry(wellKnownType, unsigned, op1);
-            _stack.Push(op1);
-        }
-
-        public void ImportCompare(Code opcode)
-        {
-            var op2 = _stack.Pop();
-            if (op2.Kind != StackValueKind.Int32)
-            {
-                throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
-            }
-            StackEntry op1;
-            var op = Operation.Eq + (opcode - Code.Beq);
-            op1 = _stack.Pop();
-            if (op2.Kind != StackValueKind.Int32)
-            {
-                throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
-            }
-            op1 = new BinaryOperator(op, op1, op2, StackValueKind.Int32);
-            _stack.Push(op1);
-        }
-
-        public void ImportBranch(Code opcode, BasicBlock target, BasicBlock fallthrough)
-        {
-            if (opcode != Code.Br)
-            {
-                var op2 = _stack.Pop();
-                if (op2.Kind != StackValueKind.Int32)
-                {
-                    throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
-                }
-
-                StackEntry op1;
-                Operation op;
-                if (opcode != Code.Brfalse && opcode != Code.Brtrue)
-                {
-                    op1 = _stack.Pop();
-                    if (op2.Kind != StackValueKind.Int32)
-                    {
-                        throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
-                    }
-                    op = Operation.Eq + (opcode - Code.Beq);
-                }
-                else
-                {
-                    op1 = new Int32ConstantEntry((short)(opcode == Code.Brfalse ? 0 : 1));
-                    op = Operation.Eq;
-                }
-                op1 = new BinaryOperator(op, op1, op2, StackValueKind.Int32);
-                ImportAppendTree(new JumpTrueEntry(target.Label, op1));
-            }
-            else
-            {
-                ImportAppendTree(new JumpEntry(target.Label));
-            }
-
-            // Fall through handling
-            ImportFallThrough(target);
-
-            if (fallthrough != null)
-            {
-                ImportFallThrough(fallthrough);
-            }
         }
 
         public void ImportFallThrough(BasicBlock next)
@@ -523,271 +297,6 @@ namespace ILCompiler.Compiler
             }
 
             MarkBasicBlock(next);
-        }
-
-        public void ImportBinaryOperation(Code opcode)
-        {
-            var op2 = _stack.Pop();
-            var op1 = _stack.Pop();
-
-            // StackValueKind is carefully ordered to make this work
-            StackValueKind kind;
-            if (op1.Kind > op2.Kind)
-            {
-                kind = op1.Kind;
-            }
-            else
-            {
-                kind = op2.Kind;
-            }
-
-            if (kind != StackValueKind.Int32)
-            {
-                throw new NotSupportedException("Binary operations on types other than int32 not supported yet");
-            }
-
-            if (opcode < Code.Add || opcode > Code.Rem_Un)
-            {
-                throw new NotImplementedException();
-            }
-            Operation binaryOp = Operation.Add + (opcode - Code.Add);
-            var binaryExpr = new BinaryOperator(binaryOp, op1, op2, kind);
-            PushExpression(binaryExpr);
-        }
-
-        public void ImportStoreField(FieldDef fieldDef)
-        {
-            var value = _stack.Pop();
-            var addr = _stack.Pop();
-
-            var kind = fieldDef.FieldType.GetStackValueKind();
-
-            if (value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ValueType)
-            {
-                throw new NotSupportedException();
-            }
-
-            ImportAppendTree(new StoreIndEntry(addr, value, WellKnownType.Int32, fieldDef.FieldOffset));
-        }
-
-        public void ImportStoreIndirect(WellKnownType type)
-        {
-            var value = _stack.Pop();
-            var addr = _stack.Pop();
-
-            if (value.Kind != StackValueKind.Int32)
-            {
-                throw new NotSupportedException();
-            }
-
-            ImportAppendTree(new StoreIndEntry(addr, value, type));
-        }
-
-        public void ImportLoadIndirect(WellKnownType type)
-        {
-            var addr = _stack.Pop();
-            var node = new IndirectEntry(addr, StackValueKind.Int32, type);
-            PushExpression(node);
-        }
-
-        public void ImportLoadField(FieldDef fieldDef)
-        {
-            var obj = _stack.Pop();
-
-            if (obj.Kind == StackValueKind.ValueType)
-            {
-                var localNode = obj as LocalVariableEntry;
-                obj = new LocalVariableAddressEntry(localNode.LocalNumber);
-            }
-
-            if (obj.Kind != StackValueKind.ObjRef)
-            {
-                throw new NotImplementedException();
-            }
-
-            var fieldSize = fieldDef.FieldType.GetExactSize(false);
-            var kind = fieldDef.FieldType.GetStackValueKind();
-            var node = new FieldEntry(obj, fieldDef.FieldOffset, fieldSize, kind);
-            PushExpression(node);
-        }
-
-        public void ImportStoreVar(int index, bool argument)
-        {
-            var value = _stack.Pop();
-            if (value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ObjRef && value.Kind != StackValueKind.ValueType)
-            {
-                throw new NotSupportedException("Storing variables other than short, int32 ,object refs, or valuetypes not supported yet");
-            }
-            var localNumber = _methodCompiler.ParameterCount + index;
-            var node = new StoreLocalVariableEntry(localNumber, false, value);
-            ImportAppendTree(node);
-        }
-
-        public void ImportLoadVar(int index, bool argument)
-        {
-            var localNumber = _methodCompiler.ParameterCount + index;
-            var localVariable = _localVariableTable[localNumber];
-            var node = new LocalVariableEntry(localNumber, localVariable.Kind);
-            PushExpression(node);
-        }
-
-        public void ImportAddressOfVar(int index, bool argument)
-        {
-            var localNumber = _methodCompiler.ParameterCount + index;
-            var localVariable = _localVariableTable[localNumber];
-            var node = new LocalVariableAddressEntry(localNumber);
-            PushExpression(node);
-        }
-
-        public void ImportLdArg(int index)
-        {
-            var argument = _localVariableTable[index];
-            var node = new LocalVariableEntry(index, argument.Kind);
-            PushExpression(node);
-        }
-
-        public void ImportStArg(int index)
-        {
-            var value = _stack.Pop();
-            if (value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ObjRef)
-            {
-                throw new NotSupportedException("Storing to argument other than short, int32 or object refs not supported yet");
-            }
-            var node = new StoreLocalVariableEntry(index, true, value);
-            ImportAppendTree(node);
-        }
-
-        public void ImportLoadInt(long value, StackValueKind kind)
-        {
-            if (kind == StackValueKind.Int32)
-            {
-                PushExpression(new Int32ConstantEntry(checked((int)value)));
-            }
-            else
-            {
-                throw new NotSupportedException("Loading anything other than Int16 not currently supported");
-            }
-        }
-
-        public void ImportLoadString(string str)
-        {
-            PushExpression(new StringConstantEntry(str));
-        }
-
-        private bool ImportIntrinsicCall(MethodDef methodToCall, StackEntry[] arguments)
-        {
-            // Not yet implemented methods with non void return type
-            if (methodToCall.HasReturnType)
-            {
-                throw new NotSupportedException();
-            }
-
-            // Map method name to string that code generator will understand
-            var targetMethodName = "";
-            switch (methodToCall.Name)
-            {
-                // TODO: Suspect this won't stay as an intrinsic but at least we have the mechanism for instrincs
-                case "Write":
-                    if (IsTypeName(methodToCall, "System", "Console"))
-                    {
-                        var argtype = methodToCall.Parameters[0].Type;
-                        switch (argtype.FullName)
-                        {
-                            case "System.String":
-                                targetMethodName = "WriteString";
-                                break;
-
-                            case "System.Int32":
-                                targetMethodName = "WriteInt32";
-                                break;
-
-                            case "System.UInt32":
-                                targetMethodName = "WriteUInt32";
-                                break;
-
-                            case "System.Char":
-                                targetMethodName = "WriteChar";
-                                break;
-
-                            default:
-                                throw new NotSupportedException();
-                        }
-                    }
-                    break;
-                default:
-                    return false;
-            }
-
-            var callNode = new IntrinsicEntry(targetMethodName, arguments, StackValueKind.Unknown);
-            ImportAppendTree(callNode);
-
-            return true;
-        }
-
-        private static bool IsTypeName(MethodDef method, string typeNamespace, string typeName)
-        {
-            var metadataType = method.DeclaringType;
-            if (metadataType == null)
-            {
-                return false;
-            }
-            return metadataType.Namespace == typeNamespace && metadataType.Name == typeName;
-        }
-
-        public void ImportCall(MethodDef methodToCall)
-        {
-            StackEntry[] arguments = new StackEntry[methodToCall.Parameters.Count];
-            for (int i = 0; i < methodToCall.Parameters.Count; i++)
-            {
-                var argument = _stack.Pop();
-                arguments[methodToCall.Parameters.Count - i - 1] = argument;
-            }
-
-            // Intrinsic calls
-            if (methodToCall.IsIntrinsic())
-            {
-                if (!ImportIntrinsicCall(methodToCall, arguments))
-                {
-                    throw new NotSupportedException("Unknown intrinsic");
-                }
-                return;
-            }
-
-            string targetMethod = "";
-            if (methodToCall.IsPinvokeImpl)
-            {
-                targetMethod = methodToCall.ImplMap.Name;
-            }
-            else
-            {
-                targetMethod = _methodCompiler.NameMangler.GetMangledMethodName(methodToCall);
-            }
-            var returnType = methodToCall.ReturnType.GetStackValueKind();
-            var callNode = new CallEntry(targetMethod, arguments, returnType);
-            if (!methodToCall.HasReturnType)
-            {
-                ImportAppendTree(callNode);
-            }
-            else
-            {
-                PushExpression(callNode);
-            }
-        }
-
-        public void ImportRet(MethodDef method)
-        {
-            var hasReturnValue = method.HasReturnType;
-            var retNode = new ReturnEntry();
-            if (hasReturnValue)
-            {
-                var value = _stack.Pop();
-                if (value.Kind != StackValueKind.Int32)
-                {
-                    throw new NotSupportedException("Return values of types other than short and int32 not supported yet");
-                }
-                retNode.Return = value;
-            }
-            ImportAppendTree(retNode);
         }
     }
 }
