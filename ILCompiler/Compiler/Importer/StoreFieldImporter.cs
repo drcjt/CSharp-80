@@ -10,23 +10,14 @@ namespace ILCompiler.Compiler.Importer
 {
     public class StoreFieldImporter : IOpcodeImporter
     {
-        private readonly IILImporter _importer;
-        public StoreFieldImporter(IILImporter importer)
-        {
-            _importer = importer;
-        }
+        public bool CanImport(Code code) => code == Code.Stfld;
 
-        public bool CanImport(Code opcode)
-        {
-            return opcode == Code.Stfld;
-        }
-
-        public void Import(Instruction instruction, ImportContext context)
+        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
             var fieldDef = instruction.Operand as FieldDef;
 
-            var value = _importer.PopExpression();
-            var addr = _importer.PopExpression();
+            var value = importer.PopExpression();
+            var addr = importer.PopExpression();
 
             var kind = fieldDef.FieldType.GetStackValueKind();
 
@@ -35,7 +26,7 @@ namespace ILCompiler.Compiler.Importer
                 throw new NotSupportedException();
             }
 
-            _importer.ImportAppendTree(new StoreIndEntry(addr, value, WellKnownType.Int32, fieldDef.FieldOffset));
+            importer.ImportAppendTree(new StoreIndEntry(addr, value, WellKnownType.Int32, fieldDef.FieldOffset));
         }
     }
 }

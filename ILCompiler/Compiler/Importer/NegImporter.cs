@@ -6,23 +6,11 @@ namespace ILCompiler.Compiler.Importer
 {
     public class NegImporter : IOpcodeImporter
     {
-        private readonly IILImporter _importer;
+        public bool CanImport(Code code) => code == Code.Neg;
 
-        public NegImporter(IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
-            _importer = importer;
-        }
-
-        public bool CanImport(Code opcode)
-        {
-            return opcode == Code.Neg;
-        }
-
-        public void Import(Instruction instruction, ImportContext context)
-        {
-            var op1 = _importer.PopExpression();
-            op1 = new UnaryOperator(Operation.Neg, op1);
-            _importer.PushExpression(op1);
+            importer.PushExpression(new UnaryOperator(Operation.Neg, importer.PopExpression()));
         }
     }
 }

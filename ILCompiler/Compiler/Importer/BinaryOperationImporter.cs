@@ -8,52 +8,34 @@ namespace ILCompiler.Compiler.Importer
 {
     public class BinaryOperationImporter : IOpcodeImporter
     {
-        private readonly IILImporter _importer;
-        public BinaryOperationImporter(IILImporter importer)
+        public bool CanImport(Code code)
         {
-            _importer = importer;
+            return code == Code.Add ||
+                   code == Code.Sub ||
+                   code == Code.Mul ||
+                   code == Code.Div ||
+                   code == Code.Rem ||
+                   code == Code.Div_Un ||
+                   code == Code.Rem_Un;
         }
 
-        public bool CanImport(Code opcode)
+        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
-            return opcode == Code.Add ||
-                   opcode == Code.Sub ||
-                   opcode == Code.Mul ||
-                   opcode == Code.Div ||
-                   opcode == Code.Rem ||
-                   opcode == Code.Div_Un ||
-                   opcode == Code.Rem_Un;
-        }
-
-        public void Import(Instruction instruction, ImportContext context)
-        {
-            var op2 = _importer.PopExpression();
-            var op1 = _importer.PopExpression();
+            var op2 = importer.PopExpression();
+            var op1 = importer.PopExpression();
 
             // StackValueKind is carefully ordered to make this work
             StackValueKind kind;
-            if (op1.Kind > op2.Kind)
-            {
-                kind = op1.Kind;
-            }
-            else
-            {
-                kind = op2.Kind;
-            }
+            kind = op1.Kind > op2.Kind ? op1.Kind : op2.Kind;
 
             if (kind != StackValueKind.Int32)
             {
                 throw new NotSupportedException("Binary operations on types other than int32 not supported yet");
             }
 
-            var opcode = instruction.OpCode.Code;
-            if (opcode < Code.Add || opcode > Code.Rem_Un)
-            {
-                throw new NotImplementedException();
-            }
-            Operation binaryOp = Operation.Add + (opcode - Code.Add);
+            Operation binaryOp = Operation.Add + (instruction.OpCode.Code - Code.Add);
             var binaryExpr = new BinaryOperator(binaryOp, op1, op2, kind);
-            _importer.PushExpression(binaryExpr);
+            importer.PushExpression(binaryExpr);
         }
     }
 }

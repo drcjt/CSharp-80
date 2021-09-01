@@ -9,44 +9,33 @@ namespace ILCompiler.Compiler.Importer
 {
     public class StoreIndirectImporter : IOpcodeImporter
     {
-        private readonly IILImporter _importer;
-        public StoreIndirectImporter(IILImporter importer)
-        {
-            _importer = importer;
-        }
+        public bool CanImport(Code code) => code == Code.Stind_I1 || code == Code.Stind_I2 || code == Code.Stind_I4;
 
-        public bool CanImport(Code opcode)
+        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
-            return opcode == Code.Stind_I1 || opcode == Code.Stind_I2 || opcode == Code.Stind_I4;
-        }
+            WellKnownType type = GetWellKnownType(instruction);
 
-        public void Import(Instruction instruction, ImportContext context)
-        {
-            WellKnownType type;
-            switch (instruction.OpCode.Code)
-            {
-                case Code.Stind_I1:
-                    type = WellKnownType.SByte;
-                    break;
-                case Code.Stind_I2:
-                    type = WellKnownType.Int16;
-                    break;
-                case Code.Stind_I4:
-                    type = WellKnownType.Int32;
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-
-            var value = _importer.PopExpression();
-            var addr = _importer.PopExpression();
+            var value = importer.PopExpression();
+            var addr = importer.PopExpression();
 
             if (value.Kind != StackValueKind.Int32)
             {
                 throw new NotSupportedException();
             }
 
-            _importer.ImportAppendTree(new StoreIndEntry(addr, value, type));
+            importer.ImportAppendTree(new StoreIndEntry(addr, value, type));
+        }
+
+        private static WellKnownType GetWellKnownType(Instruction instruction)
+        {
+            var type = instruction.OpCode.Code switch
+            {
+                Code.Stind_I1 => WellKnownType.SByte,
+                Code.Stind_I2 => WellKnownType.Int16,
+                Code.Stind_I4 => WellKnownType.Int32,
+                _ => throw new NotImplementedException(),
+            };
+            return type;
         }
     }
 }

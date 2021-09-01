@@ -8,35 +8,25 @@ namespace ILCompiler.Compiler.Importer
 {
     public class CompareImporter : IOpcodeImporter
     {
-        private readonly IILImporter _importer;
+        public bool CanImport(Code code) => code == Code.Ceq;
 
-        public CompareImporter(IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
-            _importer = importer;
-        }
-
-        public bool CanImport(Code opcode)
-        {
-            return opcode == Code.Ceq;
-        }
-
-        public void Import(Instruction instruction, ImportContext context)
-        {
-            var op2 = _importer.PopExpression();
+            var op2 = importer.PopExpression();
             if (op2.Kind != StackValueKind.Int32)
             {
                 throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
             }
             StackEntry op1;
-            var opcode = Code.Beq;
-            var op = Operation.Eq + (opcode - Code.Beq);
-            op1 = _importer.PopExpression();
+            var code = Code.Beq;
+            var op = Operation.Eq + (code - Code.Beq);
+            op1 = importer.PopExpression();
             if (op2.Kind != StackValueKind.Int32)
             {
                 throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
             }
             op1 = new BinaryOperator(op, op1, op2, StackValueKind.Int32);
-            _importer.PushExpression(op1);
+            importer.PushExpression(op1);
         }
     }
 }

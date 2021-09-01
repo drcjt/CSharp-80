@@ -3,24 +3,14 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class InitObjImporter : IOpcodeImporter
+    public class InitobjImporter : IOpcodeImporter
     {
-        private readonly IILImporter _importer;
+        public bool CanImport(Code code) => code == Code.Initobj;
 
-        public InitObjImporter(IILImporter importer)
-        {
-            _importer = importer;
-        }
-
-        public bool CanImport(Code opcode)
-        {
-            return opcode == Code.Initobj;
-        }
-
-        public void Import(Instruction instruction, ImportContext context)
+        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
             // TODO: Need to implement this
-            _importer.PopExpression();
+            importer.PopExpression();
         }
     }
 }

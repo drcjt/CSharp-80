@@ -9,38 +9,25 @@ namespace ILCompiler.Compiler.Importer
 {
     public class LoadIndirectImporter : IOpcodeImporter
     {
-        private readonly IILImporter _importer;
-        public LoadIndirectImporter(IILImporter importer)
-        {
-            _importer = importer;
-        }
+        public bool CanImport(Code code) => code == Code.Ldind_I1 || code == Code.Ldind_I2 || code == Code.Ldind_I4;
 
-        public bool CanImport(Code opcode)
+        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
-            return opcode == Code.Ldind_I1 || opcode == Code.Ldind_I2 || opcode == Code.Ldind_I4;
-        }
-
-        public void Import(Instruction instruction, ImportContext context)
-        {
-            WellKnownType type;
-            switch (instruction.OpCode.Code)
-            {
-                case Code.Ldind_I1:
-                    type = WellKnownType.SByte;
-                    break;
-                case Code.Ldind_I2:
-                    type = WellKnownType.Int16;
-                    break;
-                case Code.Ldind_I4:
-                    type = WellKnownType.Int32;
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-
-            var addr = _importer.PopExpression();
+            var type = GetWellKnownType(instruction.OpCode.Code);
+            var addr = importer.PopExpression();
             var node = new IndirectEntry(addr, StackValueKind.Int32, type);
-            _importer.PushExpression(node);
+            importer.PushExpression(node);
+        }
+
+        private WellKnownType GetWellKnownType(Code code)
+        {
+            return code switch
+            {
+                Code.Ldind_I1 => WellKnownType.SByte,
+                Code.Ldind_I2 => WellKnownType.Int16,
+                Code.Ldind_I4 => WellKnownType.Int32,
+                _ => throw new NotImplementedException(),
+            };
         }
     }
 }

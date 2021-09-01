@@ -8,45 +8,38 @@ namespace ILCompiler.Compiler.Importer
 {
     public class StoreVarImporter : IOpcodeImporter
     {
-        private readonly IILImporter _importer;
-        public StoreVarImporter(IILImporter importer)
+        public bool CanImport(Code code)
         {
-            _importer = importer;
+            return code == Code.Stloc ||
+                   code == Code.Stloc_S ||
+                   code == Code.Stloc_0 ||
+                   code == Code.Stloc_1 ||
+                   code == Code.Stloc_2 ||
+                   code == Code.Stloc_3;
         }
 
-        public bool CanImport(Code opcode)
+        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
-            return opcode == Code.Stloc ||
-                   opcode == Code.Stloc_S ||
-                   opcode == Code.Stloc_0 ||
-                   opcode == Code.Stloc_1 ||
-                   opcode == Code.Stloc_2 ||
-                   opcode == Code.Stloc_3;
-        }
+            int index = GetIndex(instruction);
 
-        public void Import(Instruction instruction, ImportContext context)
-        {
-            var index = 0;
-            switch (instruction.OpCode.Code)
-            {
-                case Code.Stloc:
-                case Code.Stloc_S:
-                    index = (instruction.Operand as Local).Index;
-                    break;
-
-                default:
-                    index = instruction.OpCode.Code - Code.Stloc_0;
-                    break;
-            }
-
-            var value = _importer.PopExpression();
+            var value = importer.PopExpression();
             if (value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ObjRef && value.Kind != StackValueKind.ValueType)
             {
                 throw new NotSupportedException("Storing variables other than short, int32 ,object refs, or valuetypes not supported yet");
             }
-            var localNumber = _importer.ParameterCount + index;
+            var localNumber = importer.ParameterCount + index;
             var node = new StoreLocalVariableEntry(localNumber, false, value);
-            _importer.ImportAppendTree(node);
+            importer.ImportAppendTree(node);
+        }
+
+        private static int GetIndex(Instruction instruction)
+        {
+            var index = instruction.OpCode.Code switch
+            {
+                Code.Stloc or Code.Stloc_S => (instruction.Operand as Local).Index,
+                _ => instruction.OpCode.Code - Code.Stloc_0,
+            };
+            return index;
         }
     }
 }

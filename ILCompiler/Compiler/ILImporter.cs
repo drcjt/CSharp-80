@@ -10,7 +10,7 @@ using System.Linq;
 
 namespace ILCompiler.Compiler
 {
-    public class ILImporter : IILImporter
+    public class ILImporter
     {
         private readonly MethodCompiler _methodCompiler;
         private readonly MethodDef _method;
@@ -26,10 +26,26 @@ namespace ILCompiler.Compiler
         private readonly EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
 
         private readonly IList<IOpcodeImporter> _importers = new List<IOpcodeImporter>();
+        private readonly ILImporterProxy _importerProxy;
 
-        public int ParameterCount { get => _methodCompiler.ParameterCount; }
-        public IList<LocalVariableDescriptor> LocalVariableTable { get => _localVariableTable; }
-        public BasicBlock[] BasicBlocks { get => _basicBlocks; }
+        private class ILImporterProxy : IILImporter
+        {
+            private readonly ILImporter _importer;
+            public ILImporterProxy(ILImporter importer)
+            {
+                _importer = importer;
+            }
+
+            public int ParameterCount => _importer._methodCompiler.ParameterCount;
+            public IList<LocalVariableDescriptor> LocalVariableTable => _importer._localVariableTable;
+
+            public BasicBlock[] BasicBlocks => _importer._basicBlocks;
+
+            public void ImportAppendTree(StackEntry entry) => _importer.ImportAppendTree(entry);
+            public void ImportFallThrough(BasicBlock next) => _importer.ImportFallThrough(next);
+            public StackEntry PopExpression() => _importer._stack.Pop();
+            public void PushExpression(StackEntry entry) => _importer._stack.Push(entry);
+        }
 
         public ILImporter(MethodCompiler methodCompiler, MethodDef method, IList<LocalVariableDescriptor> localVariableTable, IConfiguration configuration)
         {
@@ -38,26 +54,8 @@ namespace ILCompiler.Compiler
             _localVariableTable = localVariableTable;
             _configuration = configuration;
 
-            _importers.Add(new NopImporter());
-            _importers.Add(new LoadIntImporter(this));
-            _importers.Add(new StoreVarImporter(this));
-            _importers.Add(new LoadVarImporter(this));
-            _importers.Add(new AddressOfVarImporter(this));
-            _importers.Add(new StoreIndirectImporter(this));
-            _importers.Add(new LoadIndirectImporter(this));
-            _importers.Add(new StoreFieldImporter(this));
-            _importers.Add(new LoadFieldImporter(this));
-            _importers.Add(new BinaryOperationImporter(this));
-            _importers.Add(new CompareImporter(this));
-            _importers.Add(new BranchImporter(this));
-            _importers.Add(new LdArgImporter(this));
-            _importers.Add(new StArgImporter(this));
-            _importers.Add(new LoadStringImporter(this));
-            _importers.Add(new InitObjImporter(this));
-            _importers.Add(new ConversionImporter(this));
-            _importers.Add(new NegImporter(this));
-            _importers.Add(new RetImporter(this));
-            _importers.Add(new CallImporter(this));
+            _importers = OpcodeImporterFactory.GetAllOpcodeImporters();
+            _importerProxy = new ILImporterProxy(this);
         }
 
         private void ImportBasicBlocks(IDictionary<int, int> offsetToIndexMap)
@@ -94,7 +92,7 @@ namespace ILCompiler.Compiler
             // TODO: add any appropriate code to handle the end of importing a basic block
         }
 
-        public void ImportAppendTree(StackEntry entry)
+        private void ImportAppendTree(StackEntry entry)
         {
             _currentBasicBlock.Statements.Add(entry);
         }
@@ -131,7 +129,7 @@ namespace ILCompiler.Compiler
                         Method = _method,
                         NameMangler = _methodCompiler.NameMangler,
                     };
-                    importer.Import(currentInstruction, importContext);
+                    importer.Import(currentInstruction, importContext, _importerProxy);
                     if (importContext.StopImporting)
                     {
                         return;
@@ -200,16 +198,6 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public void PushExpression(StackEntry expression)
-        {
-            _stack.Push(expression);
-        }
-
-        public StackEntry PopExpression()
-        {
-            return _stack.Pop();
-        }
-
         public IList<BasicBlock> Import()
         {
             var basicBlockAnalyser = new BasicBlockAnalyser(_method);
@@ -230,7 +218,7 @@ namespace ILCompiler.Compiler
             return basicBlocks;
         }
 
-        public void ImportFallThrough(BasicBlock next)
+        private void ImportFallThrough(BasicBlock next)
         {
             // Evaluation stack in each basic block holds the imported high level tree representation of the IL
 

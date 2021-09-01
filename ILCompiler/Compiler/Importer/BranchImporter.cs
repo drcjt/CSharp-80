@@ -8,16 +8,9 @@ namespace ILCompiler.Compiler.Importer
 {
     public class BranchImporter : IOpcodeImporter
     {
-        private readonly IILImporter _importer;
-
-        public BranchImporter(IILImporter importer)
+        public bool CanImport(Code code)
         {
-            _importer = importer;
-        }
-
-        public bool CanImport(Code opcode)
-        {
-            switch (opcode)
+            switch (code)
             {
                 case Code.Br_S:
                 case Code.Blt_S:
@@ -44,10 +37,10 @@ namespace ILCompiler.Compiler.Importer
             return false;
         }
 
-        public void Import(Instruction instruction, ImportContext context)
+        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
-            var opcode = instruction.OpCode.Code;
-            switch (opcode)
+            var code = instruction.OpCode.Code;
+            switch (code)
             {
                 case Code.Br_S:
                 case Code.Blt_S:
@@ -58,17 +51,17 @@ namespace ILCompiler.Compiler.Importer
                 case Code.Bne_Un_S:
                 case Code.Brfalse_S:
                 case Code.Brtrue_S:
-                    opcode += (Code.Br - Code.Br_S);
+                    code += (Code.Br - Code.Br_S);
                     break;
             }
             var target = instruction.Operand as Instruction;
 
-            var targetBlock = _importer.BasicBlocks[(int)target.Offset];
-            var fallthroughBlock = (opcode != Code.Br) ? context.CurrentBlock : null;
+            var targetBlock = importer.BasicBlocks[(int)target.Offset];
+            var fallthroughBlock = (code != Code.Br) ? context.CurrentBlock : null;
 
-            if (opcode != Code.Br)
+            if (code != Code.Br)
             {
-                var op2 = _importer.PopExpression();
+                var op2 = importer.PopExpression();
                 if (op2.Kind != StackValueKind.Int32)
                 {
                     throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
@@ -76,34 +69,34 @@ namespace ILCompiler.Compiler.Importer
 
                 StackEntry op1;
                 Operation op;
-                if (opcode != Code.Brfalse && opcode != Code.Brtrue)
+                if (code != Code.Brfalse && code != Code.Brtrue)
                 {
-                    op1 = _importer.PopExpression();
+                    op1 = importer.PopExpression();
                     if (op2.Kind != StackValueKind.Int32)
                     {
                         throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
                     }
-                    op = Operation.Eq + (opcode - Code.Beq);
+                    op = Operation.Eq + (code - Code.Beq);
                 }
                 else
                 {
-                    op1 = new Int32ConstantEntry((short)(opcode == Code.Brfalse ? 0 : 1));
+                    op1 = new Int32ConstantEntry((short)(code == Code.Brfalse ? 0 : 1));
                     op = Operation.Eq;
                 }
                 op1 = new BinaryOperator(op, op1, op2, StackValueKind.Int32);
-                _importer.ImportAppendTree(new JumpTrueEntry(targetBlock.Label, op1));
+                importer.ImportAppendTree(new JumpTrueEntry(targetBlock.Label, op1));
             }
             else
             {
-                _importer.ImportAppendTree(new JumpEntry(targetBlock.Label));
+                importer.ImportAppendTree(new JumpEntry(targetBlock.Label));
             }
 
             // Fall through handling
-            _importer.ImportFallThrough(targetBlock);
+            importer.ImportFallThrough(targetBlock);
 
             if (fallthroughBlock != null)
             {
-                _importer.ImportFallThrough(fallthroughBlock);
+                importer.ImportFallThrough(fallthroughBlock);
             }
 
             context.StopImporting = true;

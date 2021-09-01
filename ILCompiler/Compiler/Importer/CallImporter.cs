@@ -9,40 +9,31 @@ namespace ILCompiler.Compiler.Importer
 {
     public class CallImporter : IOpcodeImporter
     {
-        private readonly IILImporter _importer;
-        public CallImporter(IILImporter importer)
-        {
-            _importer = importer;
-        }
+        public bool CanImport(Code code) => code == Code.Call;
 
-        public bool CanImport(Code opcode)
-        {
-            return opcode == Code.Call;
-        }
-
-        public void Import(Instruction instruction, ImportContext context)
+        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
             var methodDefOrRef = instruction.Operand as IMethodDefOrRef;
             var methodToCall = methodDefOrRef.ResolveMethodDefThrow();
 
-            StackEntry[] arguments = new StackEntry[methodToCall.Parameters.Count];
-            for (int i = 0; i < methodToCall.Parameters.Count; i++)
+            var arguments = new StackEntry[methodToCall.Parameters.Count];
+            for (var i = 0; i < methodToCall.Parameters.Count; i++)
             {
-                var argument = _importer.PopExpression();
+                var argument = importer.PopExpression();
                 arguments[methodToCall.Parameters.Count - i - 1] = argument;
             }
 
             // Intrinsic calls
             if (methodToCall.IsIntrinsic())
             {
-                if (!ImportIntrinsicCall(methodToCall, arguments))
+                if (!ImportIntrinsicCall(methodToCall, arguments, importer))
                 {
                     throw new NotSupportedException("Unknown intrinsic");
                 }
                 return;
             }
 
-            string targetMethod = "";
+            string targetMethod;
             if (methodToCall.IsPinvokeImpl)
             {
                 targetMethod = methodToCall.ImplMap.Name;
@@ -55,15 +46,15 @@ namespace ILCompiler.Compiler.Importer
             var callNode = new CallEntry(targetMethod, arguments, returnType);
             if (!methodToCall.HasReturnType)
             {
-                _importer.ImportAppendTree(callNode);
+                importer.ImportAppendTree(callNode);
             }
             else
             {
-                _importer.PushExpression(callNode);
+                importer.PushExpression(callNode);
             }
         }
 
-        private bool ImportIntrinsicCall(MethodDef methodToCall, StackEntry[] arguments)
+        private static bool ImportIntrinsicCall(MethodDef methodToCall, StackEntry[] arguments, IILImporter importer)
         {
             // Not yet implemented methods with non void return type
             if (methodToCall.HasReturnType)
@@ -80,27 +71,14 @@ namespace ILCompiler.Compiler.Importer
                     if (IsTypeName(methodToCall, "System", "Console"))
                     {
                         var argtype = methodToCall.Parameters[0].Type;
-                        switch (argtype.FullName)
+                        targetMethodName = argtype.FullName switch
                         {
-                            case "System.String":
-                                targetMethodName = "WriteString";
-                                break;
-
-                            case "System.Int32":
-                                targetMethodName = "WriteInt32";
-                                break;
-
-                            case "System.UInt32":
-                                targetMethodName = "WriteUInt32";
-                                break;
-
-                            case "System.Char":
-                                targetMethodName = "WriteChar";
-                                break;
-
-                            default:
-                                throw new NotSupportedException();
-                        }
+                            "System.String" => "WriteString",
+                            "System.Int32" => "WriteInt32",
+                            "System.UInt32" => "WriteUInt32",
+                            "System.Char" => "WriteChar",
+                            _ => throw new NotSupportedException(),
+                        };
                     }
                     break;
                 default:
@@ -108,7 +86,7 @@ namespace ILCompiler.Compiler.Importer
             }
 
             var callNode = new IntrinsicEntry(targetMethodName, arguments, StackValueKind.Unknown);
-            _importer.ImportAppendTree(callNode);
+            importer.ImportAppendTree(callNode);
 
             return true;
         }

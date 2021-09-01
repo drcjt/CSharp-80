@@ -7,27 +7,16 @@ namespace ILCompiler.Compiler.Importer
 {
     public class ConversionImporter : IOpcodeImporter
     {
-        private readonly IILImporter _importer;
+        public bool CanImport(Code code) => code == Code.Conv_I2 || code == Code.Conv_U2;
 
-        public ConversionImporter(IILImporter importer)
-        {
-            _importer = importer;
-        }
-
-        public bool CanImport(Code opcode)
-        {
-            return opcode == Code.Conv_I2 ||
-                   opcode == Code.Conv_U2;
-        }
-
-        public void Import(Instruction instruction, ImportContext context)
+        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
             var unsigned = instruction.OpCode.Code == Code.Conv_U2;
             var wellKnownType = instruction.OpCode.Code == Code.Conv_I2 ? WellKnownType.Int16 : WellKnownType.UInt16;
 
-            var op1 = _importer.PopExpression();
+            var op1 = importer.PopExpression();
             op1 = new CastEntry(wellKnownType, unsigned, op1);
-            _importer.PushExpression(op1);
+            importer.PushExpression(op1);
         }
     }
 }
