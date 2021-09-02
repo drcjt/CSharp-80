@@ -272,11 +272,8 @@ namespace ILCompiler.Compiler
             _currentAssembler.Pop(R16.HL);  // Address is stored as 32 bits but will only use lsw
             _currentAssembler.Pop(R16.AF);
 
-            // TODO: assumes value is int32
-            _currentAssembler.Pop(R16.DE);
-            _currentAssembler.Pop(R16.BC);
-
-            _currentAssembler.Push(I16.IX); // Save IX
+            _currentAssembler.Push(I16.IX); // Put IX into AF
+            _currentAssembler.Pop(R16.AF);
 
             _currentAssembler.Push(R16.HL); // Put HL into IX
             _currentAssembler.Pop(I16.IX);
@@ -289,11 +286,15 @@ namespace ILCompiler.Compiler
                 case WellKnownType.Byte:
                 case WellKnownType.Boolean:
                 case WellKnownType.Char:
+                    _currentAssembler.Pop(R16.DE);
+                    _currentAssembler.Pop(R16.BC);
                     _currentAssembler.Ld(I16.IX, offset, R8.C);
                     break;
 
                 case WellKnownType.Int16:
                 case WellKnownType.UInt16:
+                    _currentAssembler.Pop(R16.DE);
+                    _currentAssembler.Pop(R16.BC);
                     _currentAssembler.Ld(I16.IX, (short)(offset + 1), R8.B);
                     _currentAssembler.Ld(I16.IX, (short)(offset + 0), R8.C);
                     break;
@@ -301,17 +302,24 @@ namespace ILCompiler.Compiler
                 case WellKnownType.Int32:
                 case WellKnownType.UInt32:
                     // TODO: Should this cope with arbitrary size fields e.g. structs?
+                    var endOffset = offset + (entry.FieldSize ?? 4) - 4;
+                    for (int stackoffset = endOffset; stackoffset >= offset; stackoffset -= 4)
+                    {
+                        _currentAssembler.Pop(R16.DE);
+                        _currentAssembler.Pop(R16.BC);
 
-                    _currentAssembler.Ld(I16.IX, (short)(offset + 3), R8.B);
-                    _currentAssembler.Ld(I16.IX, (short)(offset + 2), R8.C);
-                    _currentAssembler.Ld(I16.IX, (short)(offset + 1), R8.D);
-                    _currentAssembler.Ld(I16.IX, (short)(offset + 0), R8.E);
+                        _currentAssembler.Ld(I16.IX, (short)(stackoffset + 3), R8.B);
+                        _currentAssembler.Ld(I16.IX, (short)(stackoffset + 2), R8.C);
+                        _currentAssembler.Ld(I16.IX, (short)(stackoffset + 1), R8.D);
+                        _currentAssembler.Ld(I16.IX, (short)(stackoffset + 0), R8.E);
+                    }
                     break;
 
                 default:
                     throw new NotImplementedException();
             }
 
+            _currentAssembler.Push(R16.AF);
             _currentAssembler.Pop(I16.IX);
         }
 

@@ -5,10 +5,12 @@ namespace Structs
     public struct Nested
     {
         public int Length;
+        public int Width;
 
-        public Nested(int length)
+        public Nested(int length, int width)
         {
             Length = length;
+            Width = width;
         }
     }
 
@@ -30,8 +32,11 @@ namespace Structs
     {
         public static void Main()
         {
-            Nested n = new Nested(25);
+            Nested n = new Nested(25, 7);
+            Nested n2 = new Nested(49, 8);
             SimpleVector vector = new SimpleVector(3, 4, n);
+
+            vector.N = n2;
 
             var length = Test(vector);
             Console.WriteLine(length);

@@ -25,8 +25,9 @@ namespace ILCompiler.Compiler.Importer
             {
                 throw new NotSupportedException();
             }
+            var fieldSize = fieldDef.FieldType.GetExactSize(false);
 
-            importer.ImportAppendTree(new StoreIndEntry(addr, value, WellKnownType.Int32, fieldDef.FieldOffset));
+            importer.ImportAppendTree(new StoreIndEntry(addr, value, WellKnownType.Int32, fieldDef.FieldOffset, fieldSize));
         }
     }
 }
