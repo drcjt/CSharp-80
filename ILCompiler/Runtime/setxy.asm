@@ -1,10 +1,22 @@
 SETXY:
-	POP HL   ; return address
-	POP BC   ; y 
+	POP BC   ; return address
+
+	POP HL
+	POP HL   ; y
+
+	POP DE
 	POP DE   ; x
-	PUSH HL  ; restore return address
-	LD HL, 4020H ; 
-	LD (HL), E
-	INC HL
-	LD (HL), C
+
+	ADD HL, HL ; multiply y by 64
+	ADD HL, HL
+	ADD HL, HL
+	ADD HL, HL
+	ADD HL, HL
+	ADD HL, HL
+	ADD HL, DE ; add x
+
+	PUSH BC  ; restore return address
+
+	LD (4020H), HL	
+
 	RET

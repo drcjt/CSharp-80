@@ -18,7 +18,7 @@ namespace System
         public static void Write(char c) { }
 
         [DllImport(Libraries.Runtime, EntryPoint = "SetXY")]
-        private static unsafe extern void SetConsoleCursorPosition(sbyte x, sbyte y);
+        public static unsafe extern void SetConsoleCursorPosition(sbyte x, sbyte y);
 
         public static unsafe void SetCursorPosition(int x, int y)
         {
@@ -31,15 +31,8 @@ namespace System
             SetConsoleCursorPosition((sbyte)x, (sbyte)y);
         }
 
-        /* Intrinsic is more efficient at the moment 
 		[DllImport(Libraries.Runtime, EntryPoint = "WRITE")]
-		private static unsafe extern void WriteConsole(Int32 ch);
-		
-		public static unsafe void Write(Int32 c)
-        {
-			WriteConsole(c);
-        }
-		*/
+		public static unsafe extern void WriteConsole(Int32 ch);
 
         [DllImport(Libraries.Runtime, EntryPoint = "CLS")]
         public static unsafe extern void Clear();
