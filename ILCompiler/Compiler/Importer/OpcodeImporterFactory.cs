@@ -31,7 +31,8 @@ namespace ILCompiler.Compiler.Importer
                     new ConversionImporter(),
                     new NegImporter(),
                     new RetImporter(),
-                    new CallImporter()
+                    new CallImporter(),
+                    new DupImporter(),
                 };
             }
             return _opcodeImporters;
