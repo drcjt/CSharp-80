@@ -14,6 +14,8 @@ SETXY:
 	ADD HL, HL
 	ADD HL, HL
 	ADD HL, DE ; add x
+	LD DE, 3C00H
+	ADD HL, DE
 
 	PUSH BC  ; restore return address
 
