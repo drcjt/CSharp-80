@@ -32,6 +32,9 @@ namespace ILCompiler.Compiler
             // Setup local variable table - includes parameters as well as locals in method
             _localVariableTable = new List<LocalVariableDescriptor>(method.Parameters.Count + body?.Variables.Count ?? 0);
 
+            // TODO: can exact size/stack offset calcuations be deferred to code gen time??
+
+            var totalParametersSize = 0;
             var offset = 0;
             for (int parameterIndex = 0; parameterIndex < method.Parameters.Count; parameterIndex++)
             {
@@ -48,6 +51,16 @@ namespace ILCompiler.Compiler
                 };
                 _localVariableTable.Add(local);
                 offset += local.ExactSize;
+                totalParametersSize += local.ExactSize;
+            }
+
+            // Now fixup offset for parameters given that we now know the overall size of the parameters
+            // and also take into account the return address and frame pointer (IX)
+            foreach (var local in _localVariableTable)
+            {
+                // return address occupies 2 bytes
+                // frame pointer occupies 2 bytes
+                local.StackOffset -= (totalParametersSize + 2 + 2);
             }
 
             if (body != null)

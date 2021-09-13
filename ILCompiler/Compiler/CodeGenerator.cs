@@ -189,14 +189,13 @@ namespace ILCompiler.Compiler
             // Stack frame looks like this:
             //
             //     |                       |
-            //     |-----------------------|   <-- IY will point to here when method code executes
+            //     |-----------------------|
             //     |       incoming        |
             //     |       arguments       |
             //     |-----------------------|
             //     |    return address     |
             //     +=======================+
-            //     |    IY (if arguments)  |
-            //     |     IX (if locals)    |
+            //     |     IX (optional)     |    Not present if no locals or params
             //     |-----------------------|   <-- IX will point to here when method code executes
             //     |    Local variables    |
             //     |-----------------------|
@@ -208,38 +207,25 @@ namespace ILCompiler.Compiler
             //            | downward
             //            V
 
-            var parametersSize = 0;
             var localsSize = 0;
             foreach (var localVariable in _localVariableTable)
             {
-                if (localVariable.IsParameter)
-                {
-                    parametersSize += localVariable.ExactSize;
-                }
-                else
+                if (!localVariable.IsParameter)
                 {
                     localsSize += localVariable.ExactSize;
                 }
             }
 
-            if (_methodCodeNode.ParamsCount > 0)
-            {
-                assembler.Push(I16.IY);
-                // Set IY to start of arguments here
-                // IY = SP - 4 - size of parameters
-
-                assembler.Ld(R16.HL, (short)(4 + parametersSize));
-                assembler.Add(R16.HL, R16.SP);
-                assembler.Push(R16.HL);
-                assembler.Pop(I16.IY);
-            }
-
-            if (_methodCodeNode.LocalsCount > 0)
+            if (_methodCodeNode.ParamsCount > 0 || _methodCodeNode.LocalsCount > 0)
             {
                 assembler.Push(I16.IX);
                 assembler.Ld(I16.IX, 0);
                 assembler.Add(I16.IX, R16.SP);
+            }
 
+            if (_methodCodeNode.LocalsCount > 0)
+            {
+                // Reserve space on stack for locals
                 assembler.Ld(R16.HL, (short)-localsSize);
                 assembler.Add(R16.HL, R16.SP);
                 assembler.Ld(R16.SP, R16.HL);
@@ -425,35 +411,62 @@ namespace ILCompiler.Compiler
                     throw new NotImplementedException("Return types other than void and int not supported");
                 }
 
-                _currentAssembler.Pop(R16.DE);            // Copy return value into DE
-                _currentAssembler.Pop(R16.AF);
-            }
-
-            if (_methodCodeNode.LocalsCount > 0)
-            {
-                _currentAssembler.Ld(R16.SP, I16.IX);     // Move SP to before locals
-                _currentAssembler.Pop(I16.IX);            // Remove IX
-            }
-
-            if (_methodCodeNode.ParamsCount > 0)
-            {
-                _currentAssembler.Pop(R16.BC);            // Remove IY
-                _currentAssembler.Pop(R16.HL);            // Store return address in HL
-                _currentAssembler.Ld(R16.SP, I16.IY);     // Reset SP to before arguments
-
-                _currentAssembler.Push(R16.BC);           // Restore IY
+                // TODO: Support return values other than 4 bytes in size e.g. structs
+                _currentAssembler.Pop(R16.DE);            // Copy return value into DE/IY
                 _currentAssembler.Pop(I16.IY);
-                _currentAssembler.Push(R16.HL);           // Restore return address (no args before it now)
+            }
+
+            // Unwind stack frame
+            if (_methodCodeNode.ParamsCount > 0 || _methodCodeNode.LocalsCount > 0)
+            {
+                if (_methodCodeNode.LocalsCount > 0)
+                {
+                    _currentAssembler.Ld(R16.SP, I16.IX);     // Move SP to before locals
+                }
+                _currentAssembler.Pop(I16.IX);            // Remove IX
+
+                if (_methodCodeNode.ParamsCount > 0)
+                {
+                    // Calculate size of parameters
+                    var totalParametersSize = 0;
+                    foreach (var local in _localVariableTable)
+                    {
+                        if (local.IsParameter)
+                        {
+                            totalParametersSize += local.ExactSize;
+                        }
+                    }
+
+                    // TODO: consider optimising simple cases to just use Pop to remove the parameters.
+                    // will probably be better for 1 or maybe 2 32bit parameters.
+
+                    // Work out start of params so we can reset SP after removing return address
+                    _currentAssembler.Ld(R16.HL, 0);
+                    _currentAssembler.Add(R16.HL, R16.SP);
+                    _currentAssembler.Ld(R16.BC, (short)(2 + totalParametersSize));
+                    _currentAssembler.Add(R16.HL, R16.BC);
+                }
+
+                _currentAssembler.Pop(R16.BC);      // Store return address in BC
+
+                if (_methodCodeNode.ParamsCount > 0)
+                {
+                    // Remove parameters from stack
+                    _currentAssembler.Ld(R16.SP, R16.HL);
+                }
+            }
+            else
+            {
+                _currentAssembler.Pop(R16.BC);      // Store return address in BC
             }
 
             if (hasReturnValue)
             {
-                _currentAssembler.Pop(R16.HL);            // Store return address in HL
-                _currentAssembler.Push(R16.AF);           // Push return value
+                _currentAssembler.Push(I16.IY);
                 _currentAssembler.Push(R16.DE);
-                _currentAssembler.Push(R16.HL);           // Push return address
             }
 
+            _currentAssembler.Push(R16.BC);
             _currentAssembler.Ret();
         }
 
@@ -515,7 +528,6 @@ namespace ILCompiler.Compiler
         public void GenerateCodeForLocalVariable(LocalVariableEntry entry)
         {
             var variable = _localVariableTable[entry.LocalNumber];
-            var indexRegister = entry.LocalNumber >= _methodCodeNode.ParamsCount ? I16.IX : I16.IY;
 
             // TODO: For large vars consider generating code to loop itself to minimize size of code
 
@@ -523,8 +535,8 @@ namespace ILCompiler.Compiler
             var endOffset = variable.StackOffset + variable.ExactSize;
             for (int offset = variable.StackOffset; offset < endOffset; offset += 2)
             {
-                _currentAssembler.Ld(R8.H, indexRegister, (short)-(offset + 1));
-                _currentAssembler.Ld(R8.L, indexRegister, (short)-(offset + 2));
+                _currentAssembler.Ld(R8.H, I16.IX, (short)-(offset + 1));
+                _currentAssembler.Ld(R8.L, I16.IX, (short)-(offset + 2));
                 _currentAssembler.Push(R16.HL);
             }
         }
@@ -532,8 +544,6 @@ namespace ILCompiler.Compiler
         public void GenerateCodeForStoreLocalVariable(StoreLocalVariableEntry entry)
         {
             var variable = _localVariableTable[entry.LocalNumber];
-            var indexRegister = entry.IsParameter ? I16.IY : I16.IX;
-
             // TODO: For large vars consider generating code to loop itself to minimize size of code
 
             // Loading a local variable/argument
@@ -541,8 +551,8 @@ namespace ILCompiler.Compiler
             for (int offset = endOffset; offset >= variable.StackOffset; offset -= 2)
             {
                 _currentAssembler.Pop(R16.HL);
-                _currentAssembler.Ld(indexRegister, (short)-(offset + 1), R8.H);
-                _currentAssembler.Ld(indexRegister, (short)-(offset + 2), R8.L);
+                _currentAssembler.Ld(I16.IX, (short)-(offset + 1), R8.H);
+                _currentAssembler.Ld(I16.IX, (short)-(offset + 2), R8.L);                
             }
         }
 
@@ -557,9 +567,7 @@ namespace ILCompiler.Compiler
             _currentAssembler.Push(R16.HL);
 
             // Calculate and push the actual 16 bit address
-            // Need to use IX for local vars, IY for arguments
-            var indexRegister = entry.LocalNumber >= _methodCodeNode.ParamsCount ? I16.IX : I16.IY;
-            _currentAssembler.Push(indexRegister);
+            _currentAssembler.Push(I16.IX);
             _currentAssembler.Pop(R16.HL);
 
             _currentAssembler.Ld(R16.DE, (short)(-offset));
