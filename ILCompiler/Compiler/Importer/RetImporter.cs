@@ -16,6 +16,14 @@ namespace ILCompiler.Compiler.Importer
             if (context.Method.HasReturnType)
             {
                 var value = importer.PopExpression();
+
+                if (value.Kind == StackValueKind.ValueType)
+                {
+                    // returning a struct
+                    // so generate assignment to hidden return buffer argument first
+
+                }
+
                 if (value.Kind != StackValueKind.Int32)
                 {
                     throw new NotSupportedException("Return values of types other than short and int32 not supported yet");

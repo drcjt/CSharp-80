@@ -43,7 +43,18 @@ namespace ILCompiler.Compiler.Importer
                 targetMethod = context.NameMangler.GetMangledMethodName(methodToCall);
             }
             var returnType = methodToCall.ReturnType.GetStackValueKind();
+
+            if (returnType == StackValueKind.ValueType)
+            {
+                // Return type is a struct
+                // generate new temp to act as return buffer
+                // need to add extra hidden parameter to call that will be a pointer to temp to
+                // hold returned struct
+                // Also need to add exta node after call to load temp to stack
+            }
+
             var callNode = new CallEntry(targetMethod, arguments, returnType);
+
             if (!methodToCall.HasReturnType)
             {
                 importer.ImportAppendTree(callNode);

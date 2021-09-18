@@ -33,6 +33,7 @@ namespace ILCompiler.Compiler.Importer
                     new RetImporter(),
                     new CallImporter(),
                     new DupImporter(),
+                    new NewobjImporter(),
                 };
             }
             return _opcodeImporters;

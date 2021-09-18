@@ -28,14 +28,21 @@ namespace ILCompiler.Compiler
             var z80Writer = new Z80Writer(this, inputFilePath, outputFilePath, _configuration);
 
             ModuleContext modCtx = ModuleDef.CreateModuleContext();
-            ModuleDefMD module = ModuleDefMD.Load(inputFilePath, modCtx);
 
             var corlibFilePath = _configuration.CorelibPath;
             if (string.IsNullOrEmpty(corlibFilePath))
             {
-                corlibFilePath = Path.Combine(Path.GetDirectoryName(inputFilePath), "cs80corlib.dll");
+                corlibFilePath = Path.Combine(Path.GetDirectoryName(inputFilePath), "mscorlib.dll");
             }
             ModuleDefMD corlibModule = ModuleDefMD.Load(corlibFilePath, modCtx);
+            var corlibAssemblyRef = corlibModule.Assembly.ToAssemblyRef();
+
+            var options = new ModuleCreationOptions(modCtx)
+            {
+                CorLibAssemblyRef = corlibAssemblyRef
+            };
+
+            ModuleDefMD module = ModuleDefMD.Load(inputFilePath, options);
 
             var typesToCompile = new List<TypeDef>();
             typesToCompile.AddRange(corlibModule.Types);

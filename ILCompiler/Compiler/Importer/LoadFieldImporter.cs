@@ -22,9 +22,9 @@ namespace ILCompiler.Compiler.Importer
                 obj = new LocalVariableAddressEntry((obj as LocalVariableEntry).LocalNumber);
             }
 
-            if (obj.Kind != StackValueKind.ObjRef)
+            if (obj.Kind != StackValueKind.ObjRef && obj.Kind != StackValueKind.ByRef)
             {
-                throw new NotImplementedException();
+                throw new NotImplementedException($"LoadFieldImporter does not support {obj.Kind}");
             }
 
             var fieldSize = fieldDef.FieldType.GetExactSize(false);
