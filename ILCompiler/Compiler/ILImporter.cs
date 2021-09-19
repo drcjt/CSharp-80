@@ -45,6 +45,8 @@ namespace ILCompiler.Compiler
             public void ImportFallThrough(BasicBlock next) => _importer.ImportFallThrough(next);
             public StackEntry PopExpression() => _importer._stack.Pop();
             public void PushExpression(StackEntry entry) => _importer._stack.Push(entry);
+
+            public int GrabTemp() => _importer.GrabTemp();
         }
 
         public ILImporter(MethodCompiler methodCompiler, MethodDef method, IList<LocalVariableDescriptor> localVariableTable, IConfiguration configuration)
@@ -179,6 +181,9 @@ namespace ILCompiler.Compiler
                 var temp = _localVariableTable[tempNumber.Value];
                 temp.Kind = entry.Kind;
                 temp.ExactSize = TypeList.GetExactSize(entry.Kind);
+
+                // TODO: This needs to take into account parameters as if this is the first temp and there are no locals
+                // then we don't want to base stackoffset on the stackoffset of the last parameter
                 temp.StackOffset = tempNumber == 0 ? 0 : _localVariableTable[tempNumber.Value - 1].StackOffset + temp.ExactSize;
             }
 

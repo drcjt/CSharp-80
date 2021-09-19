@@ -208,22 +208,27 @@ namespace ILCompiler.Compiler
             //            V
 
             var localsSize = 0;
+            var tempCount = 0;
             foreach (var localVariable in _localVariableTable)
             {
+                if (localVariable.IsTemp)
+                {
+                    tempCount++;
+                }
                 if (!localVariable.IsParameter)
                 {
                     localsSize += localVariable.ExactSize;
                 }
             }
 
-            if (_methodCodeNode.ParamsCount > 0 || _methodCodeNode.LocalsCount > 0)
+            if (_methodCodeNode.ParamsCount > 0 || (_methodCodeNode.LocalsCount + tempCount) > 0)
             {
                 assembler.Push(I16.IX);
                 assembler.Ld(I16.IX, 0);
                 assembler.Add(I16.IX, R16.SP);
             }
 
-            if (_methodCodeNode.LocalsCount > 0)
+            if (_methodCodeNode.LocalsCount + tempCount > 0)
             {
                 // Reserve space on stack for locals
                 assembler.Ld(R16.HL, (short)-localsSize);
@@ -417,9 +422,18 @@ namespace ILCompiler.Compiler
             }
 
             // Unwind stack frame
-            if (_methodCodeNode.ParamsCount > 0 || _methodCodeNode.LocalsCount > 0)
+            var tempCount = 0;
+            foreach (var localVariable in _localVariableTable)
             {
-                if (_methodCodeNode.LocalsCount > 0)
+                if (localVariable.IsTemp)
+                {
+                    tempCount++;
+                }
+            }
+
+            if (_methodCodeNode.ParamsCount > 0 || (_methodCodeNode.LocalsCount + tempCount) > 0)
+            {
+                if (_methodCodeNode.LocalsCount + tempCount > 0)
                 {
                     _currentAssembler.Ld(R16.SP, I16.IX);     // Move SP to before locals
                 }

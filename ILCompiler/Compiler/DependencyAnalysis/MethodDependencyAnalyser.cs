@@ -27,6 +27,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                     switch (currentInstruction.OpCode.Code)
                     {
+                        case Code.Newobj:
                         case Code.Call:
                             var methodDefOrRef = currentInstruction.Operand as IMethodDefOrRef;
                             var methodDef = methodDefOrRef.ResolveMethodDef();

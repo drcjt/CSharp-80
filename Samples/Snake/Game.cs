@@ -25,34 +25,21 @@ namespace Snake
 
         public static void Main()
         {
-            TestRandom();
-            /*
-            FrameBuffer fb = new FrameBuffer();
+            //FrameBuffer fb = new FrameBuffer();
 
-            while (true)
+            int loopCount = 4;
+            while (loopCount > 0)
             {
                 Game g = new Game(123);
+                
+                // Just for testing
+                Console.WriteLine(g._random.Next());
 
-                bool result = g.Run(ref fb);
+                //bool result = g.Run(ref fb);
 
-                fb.Render();
+                //fb.Render();
+                loopCount -= 1;
             }
-            */
-        }
-
-        private static void TestRandom()
-        {
-            Console.Clear();
-
-            // TODO: This doesn't do anything at the minute as initobj is unimplemented
-            Random random = new Random();
-
-            random._val = 0;
-            Console.WriteLine(random.Next());
-            Console.WriteLine(random.Next());
-            Console.WriteLine(random.Next());
-            Console.WriteLine(random.Next());
-            Console.WriteLine(random.Next());
         }
     }
 }

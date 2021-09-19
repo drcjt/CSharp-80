@@ -11,6 +11,8 @@ namespace ILCompiler.Interfaces
         StackEntry PopExpression();
         void ImportFallThrough(BasicBlock next);
 
+        int GrabTemp(); 
+
         int ParameterCount { get; }
         IList<LocalVariableDescriptor> LocalVariableTable { get; }
         BasicBlock[] BasicBlocks { get; }
