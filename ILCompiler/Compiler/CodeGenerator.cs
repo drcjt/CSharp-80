@@ -30,6 +30,8 @@ namespace ILCompiler.Compiler
 
         public IList<Instruction> Generate(IList<BasicBlock> blocks)
         {
+            AssignFrameOffsets();
+
             var methodInstructions = new List<Instruction>();
 
             GenerateStringMap(blocks);
@@ -58,6 +60,79 @@ namespace ILCompiler.Compiler
             }
 
             return methodInstructions;
+        }
+
+        private void AssignFrameOffsets()
+        {
+            // First process the arguments
+            var totalArgumentsSize = AssignFrameOffsetsToArgs();
+
+            // Calculate the frame offsets for local variables
+            AssignFrameOffsetsToLocals();
+
+            // Patch the offsets
+            FixFrameOffsets(totalArgumentsSize);
+        }
+
+        private void FixFrameOffsets(int totalArgumentsSize)
+        {
+            // Now fixup offset for parameters given that we now know the overall size of the parameters
+            // and also take into account the return address and frame pointer (IX)
+            foreach (var variable in _localVariableTable)
+            {
+                if (variable.IsParameter)
+                {
+                    // return address occupies 2 bytes
+                    // frame pointer occupies 2 bytes
+                    variable.StackOffset -= (totalArgumentsSize + 2 + 2);
+                }
+            }
+        }
+
+        private int AssignFrameOffsetsToArgs()
+        {
+            var totalArgumentsSize = 0;
+            var offset = 0;
+
+            foreach (var localVariable in _localVariableTable)
+            {
+                if (localVariable.IsParameter)
+                {
+                    var argumentSize = localVariable.Type.GetExactSize(true);
+                    localVariable.ExactSize = argumentSize;
+                    localVariable.StackOffset = offset;
+
+                    offset += argumentSize;
+                    totalArgumentsSize += argumentSize;
+                }
+            }
+
+            return totalArgumentsSize;
+        }
+
+        private void AssignFrameOffsetsToLocals()
+        {
+            var offset = 0;
+            foreach (var localVariable in _localVariableTable)
+            {
+                if (!localVariable.IsParameter)
+                {
+                    int localSize;
+                    if (localVariable.Type != null)
+                    {
+                        localSize = localVariable.Type.GetExactSize(true);
+                    }
+                    else
+                    {
+                        // For spilled entries we may not have managed type info
+                        localSize = TypeList.GetExactSize(localVariable.Kind);
+                    }
+                    localVariable.ExactSize = localSize;
+                    localVariable.StackOffset = offset;
+
+                    offset += localSize;
+                }
+            }
         }
 
         private void GenerateFromNode(StackEntry node)
@@ -269,7 +344,7 @@ namespace ILCompiler.Compiler
             _currentAssembler.Push(R16.HL); // Put HL into IX
             _currentAssembler.Pop(I16.IX);
 
-            short offset = (short)(entry.FieldOffset ?? 0);
+            short offset = (short)(entry.FieldOffset);
 
             switch (entry.TargetType)
             {
@@ -293,7 +368,7 @@ namespace ILCompiler.Compiler
                 case WellKnownType.Int32:
                 case WellKnownType.UInt32:
                     // TODO: Should this cope with arbitrary size fields e.g. structs?
-                    var endOffset = offset + (entry.FieldSize ?? 4) - 4;
+                    var endOffset = offset + entry.FieldSize - 4;
                     for (int stackoffset = endOffset; stackoffset >= offset; stackoffset -= 4)
                     {
                         _currentAssembler.Pop(R16.DE);
@@ -317,7 +392,7 @@ namespace ILCompiler.Compiler
         public void GenerateCodeForField(FieldEntry entry)
         {
             // Load field onto stack
-            var fieldOffset = entry.FieldOffset;
+            var fieldOffset = entry.Offset;
 
             // TODO: This should really be dealt with by a morphing phase
             var indirectEntry = new IndirectEntry(null, entry.Kind, WellKnownType.Int32);

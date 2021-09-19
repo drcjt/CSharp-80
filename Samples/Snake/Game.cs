@@ -28,17 +28,18 @@ namespace Snake
             //FrameBuffer fb = new FrameBuffer();
 
             int loopCount = 4;
-            while (loopCount > 0)
+            while (true)
             {
                 Game g = new Game(123);
-                
+
                 // Just for testing
+                Console.WriteLine(loopCount);
                 Console.WriteLine(g._random.Next());
 
                 //bool result = g.Run(ref fb);
 
                 //fb.Render();
-                loopCount -= 1;
+                loopCount++;
             }
         }
     }

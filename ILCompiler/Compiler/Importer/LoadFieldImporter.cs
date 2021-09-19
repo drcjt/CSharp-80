@@ -27,9 +27,8 @@ namespace ILCompiler.Compiler.Importer
                 throw new NotImplementedException($"LoadFieldImporter does not support {obj.Kind}");
             }
 
-            var fieldSize = fieldDef.FieldType.GetExactSize(false);
             var kind = fieldDef.FieldType.GetStackValueKind();
-            var node = new FieldEntry(obj, fieldDef.FieldOffset, fieldSize, kind);
+            var node = new FieldEntry(obj, fieldDef, kind);
             importer.PushExpression(node);
         }
     }

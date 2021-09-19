@@ -17,7 +17,7 @@ namespace ILCompiler.Compiler.Importer
         {
             var index = GetIndex(instruction);
             var argument = importer.LocalVariableTable[index];
-            var node = new LocalVariableEntry(index, argument.Kind);
+            var node = new LocalVariableEntry(index, argument.Kind, argument.Type);
             importer.PushExpression(node);
         }
 

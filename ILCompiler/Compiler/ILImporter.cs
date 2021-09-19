@@ -180,17 +180,13 @@ namespace ILCompiler.Compiler
                 tempNumber = GrabTemp();
                 var temp = _localVariableTable[tempNumber.Value];
                 temp.Kind = entry.Kind;
-                temp.ExactSize = TypeList.GetExactSize(entry.Kind);
-
-                // TODO: This needs to take into account parameters as if this is the first temp and there are no locals
-                // then we don't want to base stackoffset on the stackoffset of the last parameter
-                temp.StackOffset = tempNumber == 0 ? 0 : _localVariableTable[tempNumber.Value - 1].StackOffset + temp.ExactSize;
+                temp.Type = entry.Type;
             }
 
             var node = new StoreLocalVariableEntry(tempNumber.Value, false, entry);
             ImportAppendTree(node);
 
-            return new LocalVariableEntry(tempNumber.Value, entry.Kind);
+            return new LocalVariableEntry(tempNumber.Value, entry.Kind, _localVariableTable[tempNumber.Value].Type);
         }
 
         private void MarkBasicBlock(BasicBlock basicBlock)

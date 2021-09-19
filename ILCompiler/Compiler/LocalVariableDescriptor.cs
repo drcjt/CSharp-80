@@ -1,4 +1,5 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
+﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.IL;
 
 namespace ILCompiler.Compiler
 {
@@ -14,6 +15,6 @@ namespace ILCompiler.Compiler
 
         public bool IsTemp { get; set; }
 
-        public LocalVariableType Type { get; set; }
+        public TypeSig Type { get; set; }
     }
 }
