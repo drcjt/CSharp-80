@@ -42,10 +42,13 @@ namespace ILCompiler.Compiler.Importer
             {
                 targetMethod = context.NameMangler.GetMangledMethodName(methodToCall);
             }
-            var returnType = methodToCall.ReturnType.GetStackValueKind();
 
+            var returnType = methodToCall.ReturnType.GetStackValueKind();
             if (returnType == StackValueKind.ValueType)
             {
+                // TODO: valuetype does not imply struct
+                // need to deal with enums here too
+
                 // Return type is a struct
                 // generate new temp to act as return buffer
                 // need to add extra hidden parameter to call that will be a pointer to temp to

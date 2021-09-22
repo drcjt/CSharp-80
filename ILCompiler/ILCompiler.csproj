@@ -39,10 +39,12 @@
     <None Remove="Runtime\print.asm" />
     <None Remove="Runtime\setxy.asm" />
     <None Remove="Runtime\stoi.asm" />
+    <None Remove="Runtime\ticks.asm" />
     <None Remove="Runtime\write.asm" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Runtime\ticks.asm" />
     <EmbeddedResource Include="Runtime\cls.asm" />
     <EmbeddedResource Include="Runtime\itoa.asm" />
     <EmbeddedResource Include="Runtime\i_add.asm" />

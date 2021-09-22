@@ -34,6 +34,7 @@ namespace ILCompiler.Compiler.Importer
                     new CallImporter(),
                     new DupImporter(),
                     new NewobjImporter(),
+                    new PopImporter(),
                 };
             }
             return _opcodeImporters;
