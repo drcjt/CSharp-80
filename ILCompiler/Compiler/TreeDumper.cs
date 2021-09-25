@@ -156,5 +156,13 @@ namespace ILCompiler.Compiler
             entry.Op1.Accept(this);
             _indent--;
         }
+
+        public void Visit(FieldAddressEntry entry)
+        {
+            Print($"fieldAddr {entry.FieldDef.Name}");
+            _indent++;
+            entry.Op1.Accept(this);
+            _indent--;
+        }
     }
 }

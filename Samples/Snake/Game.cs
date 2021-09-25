@@ -17,7 +17,7 @@ namespace Snake
             _random = new Random(randomSeed);
         }
 
-        private void Run(/* ref FrameBuffer fb */)
+        private Result Run(/* ref FrameBuffer fb */)
         {
             int gameTime = Environment.TickCount;
             while (true)
@@ -31,6 +31,7 @@ namespace Snake
                     gameTime = Environment.TickCount;
 
                 Console.WriteLine(_random.Next());
+                Console.WriteLine(gameTime);
             }
         }
 

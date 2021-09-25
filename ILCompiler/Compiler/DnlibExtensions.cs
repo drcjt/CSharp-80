@@ -15,13 +15,21 @@ namespace ILCompiler.Compiler
                 if (typeDef != null)
                 {
                     var typeSize = 0;
-                    foreach (var field in typeDef.Fields)
+
+                    if (typeDef.IsEnum)
                     {
-                        if (setFieldOffset)
+                        typeSize = TypeList.GetExactSize(typeDef.GetEnumUnderlyingType().GetStackValueKind());
+                    }
+                    else
+                    {
+                        foreach (var field in typeDef.Fields)
                         {
-                            field.FieldOffset = (uint)typeSize;
+                            if (setFieldOffset)
+                            {
+                                field.FieldOffset = (uint)typeSize;
+                            }
+                            typeSize += GetExactSize(field.FieldType);
                         }
-                        typeSize += GetExactSize(field.FieldType);
                     }
 
                     return typeSize;

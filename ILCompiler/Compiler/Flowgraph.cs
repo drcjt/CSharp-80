@@ -120,6 +120,12 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
+        public void Visit(FieldAddressEntry entry)
+        {
+            entry.Op1.Accept(this);
+            SetNext(entry);
+        }
+
         public void Visit(CallEntry entry)
         {
             foreach (var argument in entry.Arguments)

@@ -18,5 +18,6 @@
         public void Visit(UnaryOperator entry);
         public void Visit(IndirectEntry entry);
         public void Visit(FieldEntry entry);
+        public void Visit(FieldAddressEntry entry);
     }
 }

@@ -27,6 +27,12 @@ namespace ILCompiler.Common.TypeSystem.IL
 
         public static StackValueKind GetStackValueKind(this TypeSig typeSig)
         {
+            var typeDef = typeSig.TryGetTypeDef();
+            if (typeDef != null && typeDef.IsEnum)
+            {
+                return GetStackValueKind(typeDef.GetEnumUnderlyingType());
+            }
+
             switch (typeSig.ElementType)
             {
                 case ElementType.Boolean:

@@ -31,6 +31,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         LocalVariable,
         LocalVariableAddress,
         Field,
+        FieldAddress,
         Indirect,
         StoreIndirect,
         StoreLocalVariable,

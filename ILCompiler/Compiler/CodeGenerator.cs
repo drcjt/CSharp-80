@@ -202,6 +202,10 @@ namespace ILCompiler.Compiler
                     GenerateCodeForField(node as FieldEntry);
                     break;
 
+                case Operation.FieldAddress:
+                    GenerateCodeForFieldAddress(node as FieldAddressEntry);
+                    break;
+
                 case Operation.Indirect:
                     GenerateCodeForIndirect(node as IndirectEntry);
                     break;
@@ -394,9 +398,26 @@ namespace ILCompiler.Compiler
             // Load field onto stack
             var fieldOffset = entry.Offset;
 
-            // TODO: This should really be dealt with by a morphing phase
             var indirectEntry = new IndirectEntry(null, entry.Kind, WellKnownType.Int32);
             GenerateCodeForIndirect(indirectEntry, fieldOffset, entry.Size);
+        }
+
+        public void GenerateCodeForFieldAddress(FieldAddressEntry entry)
+        {
+            var fieldOffset = entry.Offset;
+
+            // Get address of object
+            _currentAssembler.Pop(R16.HL);
+            _currentAssembler.Pop(R16.DE);      // lsw will be ignored
+
+            // Calculate field address
+            _currentAssembler.Ld(R16.DE, (short)fieldOffset);
+            _currentAssembler.Add(R16.HL, R16.DE);
+
+            // Push field address onto the stack
+            _currentAssembler.Push(R16.HL);
+            _currentAssembler.Ld(R16.DE, 0);
+            _currentAssembler.Push(R16.DE);           
         }
 
         public void GenerateCodeForIndirect(IndirectEntry entry, uint fieldOffset = 0, int fieldSize = 0)
