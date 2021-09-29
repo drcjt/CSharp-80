@@ -20,10 +20,6 @@ namespace ILCompiler.Compiler.Importer
 
             var obj = importer.PopExpression();
 
-            if (obj.Kind == StackValueKind.ValueType)
-            {
-                obj = new LocalVariableAddressEntry((obj as LocalVariableEntry).LocalNumber);
-            }
 
             if (obj.Kind != StackValueKind.ObjRef && obj.Kind != StackValueKind.ByRef)
             {

@@ -415,9 +415,9 @@ namespace ILCompiler.Compiler
             _currentAssembler.Add(R16.HL, R16.DE);
 
             // Push field address onto the stack
-            _currentAssembler.Push(R16.HL);
             _currentAssembler.Ld(R16.DE, 0);
-            _currentAssembler.Push(R16.DE);           
+            _currentAssembler.Push(R16.DE);
+            _currentAssembler.Push(R16.HL);
         }
 
         public void GenerateCodeForIndirect(IndirectEntry entry, uint fieldOffset = 0, int fieldSize = 0)

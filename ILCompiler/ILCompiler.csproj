@@ -37,6 +37,7 @@
     <None Remove="Runtime\i_sub.asm" />
     <None Remove="Runtime\l_inc_dehl.asm" />
     <None Remove="Runtime\print.asm" />
+    <None Remove="Runtime\setres.asm" />
     <None Remove="Runtime\setxy.asm" />
     <None Remove="Runtime\stoi.asm" />
     <None Remove="Runtime\ticks.asm" />
@@ -44,6 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Runtime\setres.asm" />
     <EmbeddedResource Include="Runtime\ticks.asm" />
     <EmbeddedResource Include="Runtime\cls.asm" />
     <EmbeddedResource Include="Runtime\itoa.asm" />

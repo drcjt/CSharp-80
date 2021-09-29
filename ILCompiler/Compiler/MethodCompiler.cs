@@ -4,6 +4,7 @@ using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 
 namespace ILCompiler.Compiler
@@ -80,6 +81,7 @@ namespace ILCompiler.Compiler
 
                 if (_configuration.DumpIRTrees)
                 {
+                    Console.WriteLine($"METHOD: {method.FullName}");
                     TreeDumper.Dump(basicBlocks);
                 }
 

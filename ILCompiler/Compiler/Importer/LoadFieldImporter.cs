@@ -19,7 +19,17 @@ namespace ILCompiler.Compiler.Importer
 
             if (obj.Kind == StackValueKind.ValueType)
             {
-                obj = new LocalVariableAddressEntry((obj as LocalVariableEntry).LocalNumber);
+                if (obj is LocalVariableEntry)
+                {
+                    obj = new LocalVariableAddressEntry((obj as LocalVariableEntry).LocalNumber);
+                }
+                else if (obj is FieldEntry)
+                {
+                    // TODO: Need to work out what to do here.
+                    // The field is effectively on top of the stack so need the address of this field
+                    // Think the right answer is to merge the FieldEntry nodes together
+                    throw new NotImplementedException("Nested Field Loads not yet implemented");
+                }
             }
 
             if (obj.Kind != StackValueKind.ObjRef && obj.Kind != StackValueKind.ByRef)

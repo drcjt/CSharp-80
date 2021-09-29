@@ -46,7 +46,7 @@ namespace ILCompiler.Compiler
             _indent++;
             entry.Addr.Accept(this);
             _indent--;
-            Print($"ind");
+            Print($"storeind");
             _indent++;
             entry.Op1.Accept(this);
             _indent++;
