@@ -23,8 +23,4 @@
     <AssemblyName>mscorlib</AssemblyName>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="System\" />
-  </ItemGroup>
-
 </Project>

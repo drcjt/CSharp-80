@@ -8,7 +8,7 @@ namespace System.Drawing
         Black = 1
     }
 
-    public class Drawing
+    public partial class Graphics
     {
         [DllImport(Libraries.Runtime, EntryPoint = "SETRES")]
         public static extern void SetPixel(int x, int y, Color color = Color.White);

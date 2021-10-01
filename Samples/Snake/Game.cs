@@ -25,7 +25,7 @@ namespace Snake
             int gameTime = Environment.TickCount;
             while (true)
             {
-                Drawing.SetPixel(s.headX, s.headY, Color.White);
+                Graphics.SetPixel(s.headX, s.headY, Color.White);
 
                 gameTime += 100;
 
@@ -35,7 +35,7 @@ namespace Snake
                 else
                     gameTime = Environment.TickCount;
 
-                Drawing.SetPixel(s.headX, s.headY, Color.Black);
+                Graphics.SetPixel(s.headX, s.headY, Color.Black);
 
                 // TODO: Changing this to s.headX++ causes issues need to investigate
                 s.headX = s.headX + 1;
@@ -47,12 +47,49 @@ namespace Snake
             }
         }
 
-        public static void Main()
+        public static void StarBurst()
         {
             Console.Clear();
 
-            //FrameBuffer fb = new FrameBuffer();
+            Random random = new Random((uint)Environment.TickCount);
+
+            for (int i = 0; i < 30; i++)
+            {
+                int x = (byte)random.Next() % 127;
+                int y = (byte)random.Next() % 47;
+
+                Graphics.DrawLine(0, 0, x, y);
+            }
+        }
+
+        public static void StarField()
+        {
+            Console.Clear();
+
+            Random random = new Random((uint)Environment.TickCount);
+
             while (true)
+            {
+                for (int i = 0; i < 100; i++)
+                {
+                    Graphics.SetPixel((byte)random.Next() % 127, (byte)random.Next() % 47, Color.White);
+                }
+
+                for (int i = 0; i < 1000; i++)
+                {
+                    Graphics.SetPixel((byte)random.Next() % 127, (byte)random.Next() % 47, Color.Black);
+                }
+            }
+        }
+
+        public static void Main()
+        {
+            StarBurst();
+
+            Console.Clear();
+
+            //FrameBuffer fb = new FrameBuffer();
+            while (false)
             {                
                 Game g = new Game((uint)Environment.TickCount);
                 Result result = g.Run(/* ref fb */);
