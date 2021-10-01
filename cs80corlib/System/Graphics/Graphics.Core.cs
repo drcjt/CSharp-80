@@ -12,15 +12,10 @@
         public static void DrawLine(int x0, int y0, int x1, int y1)
         {
             // Bresenhams algorithm
-            bool steep = false;
-            if (Math.Abs(y1 - y0) > Math.Abs(x1 - x0))
-            {
-                steep = true;
-            }
+            bool steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0);
             if (steep)
             {
-                int t;
-                t = x0; // swap x0 and y0
+                int t = x0; // swap x0 and y0
                 x0 = y0;
                 y0 = t;
                 t = x1; // swap x1 and y1
@@ -29,8 +24,7 @@
             }
             if (x0 > x1)
             {
-                int t;
-                t = x0; // swap x0 and x1
+                int t = x0; // swap x0 and x1
                 x0 = x1;
                 x1 = t;
                 t = y0; // swap y0 and y1
