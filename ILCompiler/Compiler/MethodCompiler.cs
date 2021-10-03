@@ -42,6 +42,7 @@ namespace ILCompiler.Compiler
                     Kind = kind,
                     Type = method.Parameters[parameterIndex].Type,
                     IsTemp = false,
+                    Name = method.Parameters[parameterIndex].Name,
                 };
                 _localVariableTable.Add(local);
             }
@@ -57,6 +58,7 @@ namespace ILCompiler.Compiler
                         Kind = kind,
                         Type = body.Variables[variableIndex].Type,
                         IsTemp = false,
+                        Name = body.Variables[variableIndex].Name,
                     };
                     _localVariableTable.Add(local);
                 }
@@ -82,7 +84,18 @@ namespace ILCompiler.Compiler
                 if (_configuration.DumpIRTrees)
                 {
                     Console.WriteLine($"METHOD: {method.FullName}");
+
+                    Console.WriteLine();
+
+                    int lclNum = 0;
+                    foreach (var lclVar in _localVariableTable)
+                    {
+                        Console.WriteLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Kind}");
+                        lclNum++;
+                    }
+
                     TreeDumper.Dump(basicBlocks);
+                    Console.WriteLine();
                 }
 
                 flowgraph.SetBlockOrder(basicBlocks);

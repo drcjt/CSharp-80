@@ -16,5 +16,7 @@ namespace ILCompiler.Compiler
         public bool IsTemp { get; set; }
 
         public TypeSig Type { get; set; }
+
+        public string Name;
     }
 }

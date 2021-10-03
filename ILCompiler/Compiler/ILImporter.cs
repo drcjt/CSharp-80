@@ -101,9 +101,13 @@ namespace ILCompiler.Compiler
 
         private StackEntry ImportExtractLastStmt()
         {
-            var lastStmtIndex = _currentBasicBlock.Statements.Count - 1;
-            var lastStmt = _currentBasicBlock.Statements[lastStmtIndex];
-            _currentBasicBlock.Statements.RemoveAt(lastStmtIndex);
+            StackEntry lastStmt = null;
+            if (_currentBasicBlock.Statements.Count > 0)
+            {
+                var lastStmtIndex = _currentBasicBlock.Statements.Count - 1;
+                lastStmt = _currentBasicBlock.Statements[lastStmtIndex];
+                _currentBasicBlock.Statements.RemoveAt(lastStmtIndex);
+            }
             return lastStmt;
         }
 
@@ -252,12 +256,15 @@ namespace ILCompiler.Compiler
 
             if (_stack.Length > 0)
             {
-                // Stack is not empty at end of basic block
-                // So we must spill stack into temps
-                // Anything on the stack effectively gets turned into assignments to
-                // temporary local variables
-                // And successor basic blocks will have these temporary local variables
-                // on the stack on entry
+                // If the block is not empty on exit from the basic block, additional
+                // processing is needed to make sure the block successors can use the
+                // values on the predecessor’s stack.
+                // 
+                // Any branch/jump statement is removed.
+                // Next the remaining values on the stack are removed and converted
+                // into assignments to new temps
+                // The next basic blocks entry stack is setup to contain the temps
+                // The branch/jump statement is put back if there was one
 
                 var setupEntryStack = entryStack == null;
                 if (setupEntryStack)
@@ -265,8 +272,10 @@ namespace ILCompiler.Compiler
                     entryStack = new EvaluationStack<StackEntry>(_stack.Length);
                 }
 
+                // Remove the branch/jump statement at the end of the block if present
                 var lastStmt = ImportExtractLastStmt();
 
+                // Spill stuff on stack in new temps and setup new stack to contain the temps
                 for (int i = 0; i < _stack.Length; i++)
                 {
                     int? tempNumber = null;
@@ -280,8 +289,15 @@ namespace ILCompiler.Compiler
                         entryStack.Push(temp);
                     }
                 }
-                ImportAppendTree(lastStmt);
 
+                // Add the branch/jump statement back if there was one
+                if (lastStmt != null)
+                {
+                    ImportAppendTree(lastStmt);
+                }
+
+                // Set the entry stack for the next basic block to the one we've built
+                // e.g. with the new temps on it
                 next.EntryStack = entryStack;
             }
 
