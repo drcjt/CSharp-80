@@ -5,6 +5,10 @@
 .entrypoint
 .locals ()
 	ldc.i4 0x1
+	brtrue next0
+	br fail
+next0:
+	ldc.i4 0x2
 	brtrue pass
 fail:
 	ldc.i4 0x0001
