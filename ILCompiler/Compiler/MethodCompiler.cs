@@ -4,8 +4,8 @@ using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace ILCompiler.Compiler
 {
@@ -83,19 +83,21 @@ namespace ILCompiler.Compiler
 
                 if (_configuration.DumpIRTrees)
                 {
-                    Console.WriteLine($"METHOD: {method.FullName}");
-
-                    Console.WriteLine();
+                    _compilation.Logger.LogInformation($"METHOD: {method.FullName}");
 
                     int lclNum = 0;
+                    StringBuilder sb = new StringBuilder();
                     foreach (var lclVar in _localVariableTable)
                     {
-                        Console.WriteLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Kind}");
+                        sb.AppendLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Kind}");
+
                         lclNum++;
                     }
+                    _compilation.Logger.LogInformation(sb.ToString());
 
-                    TreeDumper.Dump(basicBlocks);
-                    Console.WriteLine();
+                    var treeDumper = new TreeDumper();
+                    var treedump = treeDumper.Dump(basicBlocks);
+                    _compilation.Logger.LogInformation(treedump);
                 }
 
                 flowgraph.SetBlockOrder(basicBlocks);

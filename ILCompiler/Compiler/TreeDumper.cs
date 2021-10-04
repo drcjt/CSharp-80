@@ -1,6 +1,7 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace ILCompiler.Compiler
 {
@@ -8,27 +9,30 @@ namespace ILCompiler.Compiler
     {
         private static int _indent;
 
-        public static void Dump(IList<BasicBlock> blocks)
+        private StringBuilder _sb;
+
+        public string Dump(IList<BasicBlock> blocks)
         {
+            _sb = new StringBuilder();
             foreach (var block in blocks)
             {
-                Console.WriteLine($"Block {block.Label}");
+                _sb.AppendLine($"Block {block.Label}");
 
                 foreach (var statement in block.Statements)
                 {
                     _indent = 0;
-                    Console.WriteLine("▌ stmtExpr");
+                    _sb.AppendLine("▌ stmtExpr");
                     _indent++;
 
-                    var dumper = new TreeDumper();
-                    statement.Accept(dumper);
+                    statement.Accept(this);
                 }
-            }
+            }        
+            return _sb.ToString();
         }
 
         private void Print(string text)
         {
-            Console.WriteLine(new String(' ', _indent * 3) + "▌ " + text);
+            _sb.AppendLine(new String(' ', _indent * 3) + "▌ " + text);
         }
 
         public void Visit(Int32ConstantEntry entry)
