@@ -37,8 +37,7 @@ namespace Snake
 
                 Graphics.SetPixel(s.headX, s.headY, Color.Black);
 
-                // TODO: Changing this to s.headX++ causes issues need to investigate
-                s.headX = s.headX + 1;
+                s.headX++;
                 if (s.headX > 127)
                 {
                     s.headX = 0;
@@ -84,12 +83,10 @@ namespace Snake
 
         public static void Main()
         {
-            StarBurst();
-
             Console.Clear();
 
             //FrameBuffer fb = new FrameBuffer();
-            while (false)
+            while (true)
             {                
                 Game g = new Game((uint)Environment.TickCount);
                 Result result = g.Run(/* ref fb */);

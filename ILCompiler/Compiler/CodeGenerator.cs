@@ -420,7 +420,7 @@ namespace ILCompiler.Compiler
             _currentAssembler.Push(R16.HL);
         }
 
-        public void GenerateCodeForIndirect(IndirectEntry entry, uint fieldOffset = 0, int fieldSize = 0)
+        public void GenerateCodeForIndirect(IndirectEntry entry, uint fieldOffset = 0, int fieldSize = 4)
         {
             if (entry.Kind == StackValueKind.Int32 || entry.Kind == StackValueKind.ValueType)
             {
@@ -457,6 +457,7 @@ namespace ILCompiler.Compiler
                     case WellKnownType.Int32:
                     case WellKnownType.UInt32:
                         Debug.Assert(fieldSize % 4 == 0);
+                        Debug.Assert(fieldSize > 0);
 
                         // TODO: For large vars consider generating code to loop itself to minimize size of code
 
