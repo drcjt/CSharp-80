@@ -62,20 +62,20 @@ namespace Snake
                 s.headY += dy;
                 if (s.headX > 127)
                 {
-                    s.headX = 127;
+                    s.headX = 0;
                 }
                 if (s.headY > 47)
                 {
-                    s.headY = 47;
+                    s.headY = 0;
                 }
 
                 if (s.headX < 0)
                 {
-                    s.headX = 0;
+                    s.headX = 127;
                 }
                 if (s.headY < 0)
                 {
-                    s.headY = 0;
+                    s.headY = 47;
                 }
             }
         }
