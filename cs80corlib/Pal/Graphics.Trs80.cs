@@ -12,5 +12,9 @@ namespace System.Drawing
     {
         [DllImport(Libraries.Runtime, EntryPoint = "SETRES")]
         public static extern void SetPixel(int x, int y, Color color = Color.White);
+
+        // TODO: These are not part of standard MS Graphics class
+        public const int ScreenWidth = 127;
+        public const int ScreenHeight = 47;
     }
 }

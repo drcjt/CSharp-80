@@ -20,7 +20,7 @@ namespace Snake
 
         private Result Run(/* ref FrameBuffer fb */)
         {
-            Snake s = new Snake((byte)(_random.Next() % 128), (byte)(_random.Next() % 48));
+            Snake s = new Snake(WrapAround((byte)_random.Next(), Graphics.ScreenWidth), WrapAround((byte)_random.Next(), Graphics.ScreenHeight));
 
             int dx = 1;
             int dy = 0;
@@ -60,24 +60,17 @@ namespace Snake
 
                 s.headX += dx;
                 s.headY += dy;
-                if (s.headX > 127)
-                {
-                    s.headX = 0;
-                }
-                if (s.headY > 47)
-                {
-                    s.headY = 0;
-                }
 
-                if (s.headX < 0)
-                {
-                    s.headX = 127;
-                }
-                if (s.headY < 0)
-                {
-                    s.headY = 47;
-                }
+                // Wrap around
+                s.headX = WrapAround(s.headX, Graphics.ScreenWidth);
+                s.headY = WrapAround(s.headY, Graphics.ScreenHeight);
             }
+        }
+
+        private static int WrapAround(int coordinate, int max)
+        {
+            coordinate %= max + 1;
+            return (coordinate < 0) ? max : coordinate;
         }
 
         public static void StarBurst()
@@ -88,8 +81,8 @@ namespace Snake
 
             for (int i = 0; i < 30; i++)
             {
-                int x = (byte)random.Next() % 127;
-                int y = (byte)random.Next() % 47;
+                int x = (byte)random.Next() % Graphics.ScreenWidth;
+                int y = (byte)random.Next() % Graphics.ScreenHeight;
 
                 Graphics.DrawLine(0, 0, x, y);
             }
@@ -105,12 +98,12 @@ namespace Snake
             {
                 for (int i = 0; i < 100; i++)
                 {
-                    Graphics.SetPixel((byte)random.Next() % 127, (byte)random.Next() % 47, Color.White);
+                    Graphics.SetPixel((byte)random.Next() % Graphics.ScreenWidth, (byte)random.Next() % Graphics.ScreenHeight, Color.White);
                 }
 
                 for (int i = 0; i < 1000; i++)
                 {
-                    Graphics.SetPixel((byte)random.Next() % 127, (byte)random.Next() % 47, Color.Black);
+                    Graphics.SetPixel((byte)random.Next() % Graphics.ScreenWidth, (byte)random.Next() % Graphics.ScreenHeight, Color.Black);
                 }
             }
         }
