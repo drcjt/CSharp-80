@@ -37,6 +37,27 @@ namespace System
         [DllImport(Libraries.Runtime, EntryPoint = "CLS")]
         public static unsafe extern void Clear();
 
+        public static bool KeyAvailable => (KbdScan() != 0);
+
+        /*
+        // TODO: Need to implement struct return types for this
+        public static unsafe ConsoleKeyInfo ReadKey(bool intercept)
+        {
+            int c = KbdScan();
+
+            ConsoleKey k = default;
+            if (c == 87)
+                k = ConsoleKey.UpArrow;
+            else if (c == 83)
+                k = ConsoleKey.DownArrow;
+
+            return new ConsoleKeyInfo(c, k, false, false, false);
+        }
+        */
+
+        [DllImport(Libraries.Runtime, EntryPoint = "KbdScan")]
+        public static unsafe extern int KbdScan();
+
         public static void WriteLine()
         {
             Write(Environment.NewLine);

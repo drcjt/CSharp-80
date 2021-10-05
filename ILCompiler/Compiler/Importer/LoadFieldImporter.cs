@@ -13,7 +13,8 @@ namespace ILCompiler.Compiler.Importer
 
         public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
-            var fieldDef = instruction.Operand as FieldDef;
+            var fieldDefOrRef = instruction.Operand as IField;
+            var fieldDef = fieldDefOrRef.ResolveFieldDef();
 
             var obj = importer.PopExpression();
 

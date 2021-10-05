@@ -24,10 +24,14 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 foreach (var method in type.Methods)
                 {
                     var methodCodeNode = new Z80MethodCodeNode(method);
-                    nodesByFullMethodName.Add(method.FullName, methodCodeNode);
 
-                    var dependencyAnalyser = new MethodDependencyAnalyser(method);
-                    dependencies[methodCodeNode] = dependencyAnalyser.FindCallTargets();
+                    if (!nodesByFullMethodName.ContainsKey(method.FullName))
+                    {
+                        nodesByFullMethodName.Add(method.FullName, methodCodeNode);
+
+                        var dependencyAnalyser = new MethodDependencyAnalyser(method);
+                        dependencies[methodCodeNode] = dependencyAnalyser.FindCallTargets();
+                    }
                 }
             }
 

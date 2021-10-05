@@ -22,6 +22,9 @@ namespace Snake
         {
             Snake s = new Snake((byte)(_random.Next() % 128), (byte)(_random.Next() % 48));
 
+            int dx = 1;
+            int dy = 0;
+
             int gameTime = Environment.TickCount;
             while (true)
             {
@@ -35,13 +38,44 @@ namespace Snake
                 else
                     gameTime = Environment.TickCount;
 
-                Graphics.SetPixel(s.headX, s.headY, Color.Black);
+                //Graphics.SetPixel(s.headX, s.headY, Color.Black);
 
-                s.headX++;
+                int keyChar = Console.KbdScan();
+                if (keyChar == 10)
+                {
+                    dx = 0; dy = 1;
+                }
+                else if (keyChar == 91)
+                {
+                    dx = 0; dy = -1;
+                }
+                else if (keyChar == 8)
+                {
+                    dx = -1; dy = 0;
+                }
+                else if (keyChar == 9)
+                {
+                    dx = 1; dy = 0;
+                }
+
+                s.headX += dx;
+                s.headY += dy;
                 if (s.headX > 127)
                 {
+                    s.headX = 127;
+                }
+                if (s.headY > 47)
+                {
+                    s.headY = 47;
+                }
+
+                if (s.headX < 0)
+                {
                     s.headX = 0;
-                    return Result.Loss;
+                }
+                if (s.headY < 0)
+                {
+                    s.headY = 0;
                 }
             }
         }
