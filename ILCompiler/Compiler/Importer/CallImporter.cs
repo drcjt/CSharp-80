@@ -51,9 +51,10 @@ namespace ILCompiler.Compiler.Importer
 
                 // Return type is a struct
                 // generate new temp to act as return buffer
-                // need to add extra hidden parameter to call that will be a pointer to temp to
-                // hold returned struct
-                // Also need to add exta node after call to load temp to stack
+                // need to add extra hidden parameter to call that is pointer
+                // to return buffer.
+                // Method called will need to copy struct to the return buffer
+                // Finally calling code will need to load return buffer to stack
             }
 
             var callNode = new CallEntry(targetMethod, arguments, returnType);
