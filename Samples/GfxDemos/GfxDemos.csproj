@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+
+    <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    
+    <Optimize>true</Optimize>
+    <IncludePal>true</IncludePal>
+    
+    <!--Disable .NET Core SDK libs-->
+    <NoStdLib>true</NoStdLib>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <!-- Prevent .NET Core 3+ from generating exe -->
+    <UseAppHost>false</UseAppHost>
+    
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\cs80corlib\cs80corlib.csproj" />
+    <ProjectReference Include="..\..\ILCompiler\ILCompiler.csproj" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="$(SolutionDir)ILCompiler\$(OutDir)ILCompiler.exe --ignoreUnknownCil --outputFile $(TargetDir)$(TargetName).asm $(TargetPath)&#xD;&#xA;call $(SolutionDir)\tools\get-tools.cmd&#xD;&#xA;$(SolutionDir)\tools\zmac.exe --oo cmd -o $(TargetDir)\$(TargetName).cmd  $(TargetDir)\$(TargetName).asm" />
+  </Target>
+  
+</Project>

@@ -73,41 +73,6 @@ namespace Snake
             return (coordinate < 0) ? max : coordinate;
         }
 
-        public static void StarBurst()
-        {
-            Console.Clear();
-
-            Random random = new Random((uint)Environment.TickCount);
-
-            for (int i = 0; i < 30; i++)
-            {
-                int x = (byte)random.Next() % Graphics.ScreenWidth;
-                int y = (byte)random.Next() % Graphics.ScreenHeight;
-
-                Graphics.DrawLine(0, 0, x, y);
-            }
-        }
-
-        public static void StarField()
-        {
-            Console.Clear();
-
-            Random random = new Random((uint)Environment.TickCount);
-
-            while (true)
-            {
-                for (int i = 0; i < 100; i++)
-                {
-                    Graphics.SetPixel((byte)random.Next() % Graphics.ScreenWidth, (byte)random.Next() % Graphics.ScreenHeight, Color.White);
-                }
-
-                for (int i = 0; i < 1000; i++)
-                {
-                    Graphics.SetPixel((byte)random.Next() % Graphics.ScreenWidth, (byte)random.Next() % Graphics.ScreenHeight, Color.Black);
-                }
-            }
-        }
-
         public static void Main()
         {
             Console.Clear();
