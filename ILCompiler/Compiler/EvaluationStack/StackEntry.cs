@@ -1,5 +1,4 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.IL;
+﻿using ILCompiler.Common.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.EvaluationStack
 {
@@ -43,17 +42,16 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public StackValueKind Kind { get; }
 
-        // Managed type if any
-        public TypeSig Type { get; }
+        public int? ExactSize { get; }
 
         public StackEntry Next { get; set; }
 
         public Operation Operation { get; set; }
 
-        protected StackEntry(StackValueKind kind, TypeSig type = null)
+        protected StackEntry(StackValueKind kind, int? exactSize = null)
         {
             Kind = kind;
-            Type = type;
+            ExactSize = exactSize;
         }
 
         // TODO: Consider using a visitor to do the duplication

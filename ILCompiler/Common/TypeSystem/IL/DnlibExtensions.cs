@@ -25,6 +25,19 @@ namespace ILCompiler.Common.TypeSystem.IL
             return false;
         }
 
+        public static bool IsStruct(this TypeSig typeSig)
+        {
+            var typeDef = typeSig.TryGetTypeDef();
+            if (typeDef == null)
+            {
+                return typeSig.IsValueType && !typeSig.IsPrimitive;
+            }    
+            else
+            {
+                return typeDef.IsValueType && !typeDef.IsPrimitive && !typeDef.IsEnum;
+            }
+        }
+
         public static StackValueKind GetStackValueKind(this TypeSig typeSig)
         {
             var typeDef = typeSig.TryGetTypeDef();

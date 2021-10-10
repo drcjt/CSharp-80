@@ -12,6 +12,7 @@ namespace ILCompiler.Compiler
     public class MethodCompiler
     {
         private IList<LocalVariableDescriptor> _localVariableTable;
+        public int? ReturnBufferArgIndex { get; private set; }
         private readonly Compilation _compilation;
         private readonly IConfiguration _configuration;
 
@@ -40,9 +41,9 @@ namespace ILCompiler.Compiler
                 {
                     IsParameter = true,
                     Kind = kind,
-                    Type = method.Parameters[parameterIndex].Type,
                     IsTemp = false,
                     Name = method.Parameters[parameterIndex].Name,
+                    ExactSize = method.Parameters[parameterIndex].Type.GetExactSize(),
                 };
                 _localVariableTable.Add(local);
             }
@@ -56,12 +57,38 @@ namespace ILCompiler.Compiler
                     {
                         IsParameter = false,
                         Kind = kind,
-                        Type = body.Variables[variableIndex].Type,
                         IsTemp = false,
                         Name = body.Variables[variableIndex].Name,
+                        ExactSize =  body.Variables[variableIndex].Type.GetExactSize(),
                     };
                     _localVariableTable.Add(local);
                 }
+            }
+
+            if (method.HasReturnType)
+            {
+                var returnType = method.ReturnType;
+                InitReturnBufferArg(returnType, method.HasThis);
+            }
+        }
+
+        private void InitReturnBufferArg(TypeSig returnType, bool hasThis)
+        {
+            if (returnType.IsStruct())
+            {
+                var returnBuffer = new LocalVariableDescriptor()
+                {
+                    IsParameter = true,
+                    Kind = StackValueKind.ByRef,
+                    IsTemp = false,
+                    ExactSize = returnType.GetExactSize(),
+                };
+
+                // Ensure return buffer parameter goes after the this parameter if present
+                ReturnBufferArgIndex = hasThis ? 1 : 0;
+                _localVariableTable.Insert(ReturnBufferArgIndex.Value, returnBuffer);
+
+                ParameterCount++;
             }
         }
 

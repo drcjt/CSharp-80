@@ -1,12 +1,13 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Common.TypeSystem.IL;
 using System;
+using System.Diagnostics;
 
 namespace ILCompiler.Compiler
 {
     public static class DnlibExtensions
     {
-        public static int GetExactSize(this TypeSig type, bool setFieldOffset = false)
+        public static int GetExactSize(this TypeSig type)
         {
             if (type.ElementType == ElementType.ValueType)
             {
@@ -24,10 +25,11 @@ namespace ILCompiler.Compiler
                     {
                         foreach (var field in typeDef.Fields)
                         {
-                            if (setFieldOffset)
+                            if (field.FieldOffset.HasValue)
                             {
-                                field.FieldOffset = (uint)typeSize;
+                                Debug.Assert(typeSize == field.FieldOffset.Value);
                             }
+                            field.FieldOffset = (uint)typeSize;
                             typeSize += GetExactSize(field.FieldType);
                         }
                     }

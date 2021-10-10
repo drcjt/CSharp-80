@@ -16,9 +16,29 @@ namespace ILCompiler.Compiler.Importer
         public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
             var index = GetIndex(instruction);
-            var argument = importer.LocalVariableTable[index];
-            var node = new LocalVariableEntry(index, argument.Kind, argument.Type);
+            var lclNum = MapIlArgNum(index, importer.ReturnBufferArgIndex);
+
+            var argument = importer.LocalVariableTable[lclNum];
+            var node = new LocalVariableEntry(lclNum, argument.Kind, argument.ExactSize);
             importer.PushExpression(node);
+        }
+
+        /// <summary>
+        /// Map IL arg num to account for hidden parameters
+        /// </summary>
+        /// <param name="ilArgNum"></param>
+        /// <returns></returns>
+        private int MapIlArgNum(int ilArgNum, int? returnBufferArgIndex)
+        {
+            if (returnBufferArgIndex.HasValue)
+            {
+                if (ilArgNum >= returnBufferArgIndex)
+                {
+                    ilArgNum++;
+                }
+            }
+
+            return ilArgNum;
         }
 
         private int GetIndex(Instruction instruction)

@@ -4,6 +4,7 @@ using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 using System;
+using System.Collections.Generic;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -16,12 +17,13 @@ namespace ILCompiler.Compiler.Importer
             var methodDefOrRef = instruction.Operand as IMethodDefOrRef;
             var methodToCall = methodDefOrRef.ResolveMethodDefThrow();
 
-            var arguments = new StackEntry[methodToCall.Parameters.Count];
+            var arguments = new List<StackEntry>();
             for (var i = 0; i < methodToCall.Parameters.Count; i++)
             {
                 var argument = importer.PopExpression();
-                arguments[methodToCall.Parameters.Count - i - 1] = argument;
+                arguments.Add(argument);
             }
+            arguments.Reverse();
 
             // Intrinsic calls
             if (methodToCall.IsIntrinsic())
@@ -43,21 +45,19 @@ namespace ILCompiler.Compiler.Importer
                 targetMethod = context.NameMangler.GetMangledMethodName(methodToCall);
             }
 
-            var returnType = methodToCall.ReturnType.GetStackValueKind();
-            if (returnType == StackValueKind.ValueType)
+            int returnBufferArgIndex = 0;
+            var returnType = methodToCall.ReturnType;
+            if (methodToCall.HasReturnType)
             {
-                // TODO: valuetype does not imply struct
-                // need to deal with enums here too
-
-                // Return type is a struct
-                // generate new temp to act as return buffer
-                // need to add extra hidden parameter to call that is pointer
-                // to return buffer.
-                // Method called will need to copy struct to the return buffer
-                // Finally calling code will need to load return buffer to stack
+                if (returnType.IsStruct())
+                {
+                    returnBufferArgIndex = FixupCallStructReturn(returnType, arguments, importer, methodToCall.HasThis);
+                }
             }
 
-            var callNode = new CallEntry(targetMethod, arguments, returnType);
+            int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetExactSize() : null;
+
+            var callNode = new CallEntry(targetMethod, arguments, returnType.GetStackValueKind(), returnTypeSize);
 
             if (!methodToCall.HasReturnType)
             {
@@ -65,11 +65,35 @@ namespace ILCompiler.Compiler.Importer
             }
             else
             {
-                importer.PushExpression(callNode);
+                if (returnType.IsStruct())
+                {
+                    importer.ImportAppendTree(callNode);
+
+                    // Load return buffer to stack
+                    var loadTemp = new LocalVariableEntry(returnBufferArgIndex, returnType.GetStackValueKind(), returnType.GetExactSize());
+                    importer.PushExpression(loadTemp);
+                }
+                else
+                {
+                    importer.PushExpression(callNode);
+                }
             }
         }
 
-        private static bool ImportIntrinsicCall(MethodDef methodToCall, StackEntry[] arguments, IILImporter importer)
+        private int FixupCallStructReturn(TypeSig returnType, List<StackEntry> arguments, IILImporter importer, bool hasThis)
+        {
+            // Create temp
+            var lclNum = importer.GrabTemp(returnType.GetStackValueKind(), returnType.GetExactSize());
+            var returnBufferPtr = new LocalVariableAddressEntry(lclNum);
+
+            // Ensure return buffer parameter goes after the this parameter if present
+            var returnBufferArgPos = hasThis ? 1 : 0;
+            arguments.Insert(returnBufferArgPos, returnBufferPtr);
+
+            return lclNum;
+        }
+
+        private static bool ImportIntrinsicCall(MethodDef methodToCall, IList<StackEntry> arguments, IILImporter importer)
         {
             // Not yet implemented methods with non void return type
             if (methodToCall.HasReturnType)

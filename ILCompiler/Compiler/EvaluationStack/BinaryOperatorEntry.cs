@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         public StackEntry Op1 { get; }
         public StackEntry Op2 { get; }
 
-        public BinaryOperator(Operation operation, StackEntry op1, StackEntry op2, StackValueKind kind) : base(kind)
+        public BinaryOperator(Operation operation, StackEntry op1, StackEntry op2, StackValueKind kind) : base(kind, op1.ExactSize)
         {
             Operation = operation;
             Op1 = op1;

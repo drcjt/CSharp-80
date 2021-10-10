@@ -39,7 +39,7 @@ namespace ILCompiler.Compiler.Importer
             }
 
             var kind = fieldDef.FieldType.GetStackValueKind();
-            var node = new FieldEntry(obj, fieldDef, kind);
+            var node = new FieldEntry(obj, fieldDef.Name, fieldDef.FieldOffset, fieldDef.FieldType.GetExactSize(), kind);
             importer.PushExpression(node);
         }
     }

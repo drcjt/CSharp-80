@@ -1,4 +1,5 @@
-﻿using dnlib.DotNet.Emit;
+﻿using dnlib.DotNet;
+using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
@@ -15,19 +16,24 @@ namespace ILCompiler.Compiler.Importer
             var retNode = new ReturnEntry();
             if (context.Method.HasReturnType)
             {
+                var returnType = context.Method.ReturnType;
+
                 var value = importer.PopExpression();
 
-                if (value.Kind == StackValueKind.ValueType)
+                if (returnType.IsStruct())
                 {
-                    // returning a struct
-                    // so generate assignment to hidden return buffer argument first
-
+                    // Record return buffer argument index
+                    // so that code gen can generate code to
+                    // copy struct on top of stack to the 
+                    // return buffer.
+                    retNode.ReturnBufferArgIndex = context.Method.HasThis ? 1 : 0;
+                    retNode.ReturnTypeExactSize = returnType.GetExactSize();
+                }
+                else if (value.Kind != StackValueKind.Int32)
+                {
+                    throw new NotSupportedException($"Unsupported Return type {value.Kind}");
                 }
 
-                if (value.Kind != StackValueKind.Int32)
-                {
-                    throw new NotSupportedException("Return values of types other than short and int32 not supported yet");
-                }
                 retNode.Return = value;
             }
             importer.ImportAppendTree(retNode);

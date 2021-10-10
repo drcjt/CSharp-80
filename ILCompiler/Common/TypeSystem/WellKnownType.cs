@@ -1,4 +1,6 @@
-﻿namespace ILCompiler.Common.TypeSystem
+﻿using System;
+
+namespace ILCompiler.Common.TypeSystem
 {
     public enum WellKnownType
     {
@@ -38,5 +40,19 @@
 
         TypedReference,
         ByReferenceOfT,
+    }
+
+    public static class WellKnownTypeExtensions
+    {
+        public static int GetWellKnownTypeSize(this WellKnownType type)
+        {
+            return type switch
+            {
+                WellKnownType.SByte => 1,
+                WellKnownType.Int16 => 2,
+                WellKnownType.Int32 => 4,
+                _ => throw new NotImplementedException(),
+            };
+        }
     }
 }

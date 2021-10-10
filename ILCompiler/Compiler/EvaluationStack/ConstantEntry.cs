@@ -5,7 +5,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 {
     public abstract class ConstantEntry : StackEntry
     {
-        protected ConstantEntry(StackValueKind kind) : base(kind)
+        protected ConstantEntry(StackValueKind kind, int? exactSize) : base(kind, exactSize)
         {
         }
     }
@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public T Value { get; }
 
-        protected ConstantEntry(StackValueKind kind, T value) : base(kind)
+        protected ConstantEntry(StackValueKind kind, T value, int? exactSize) : base(kind, exactSize)
         {
             Value = value;
         }
@@ -23,7 +23,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     public class StringConstantEntry : ConstantEntry<String>
     {
         public string Label { get; set; }
-        public StringConstantEntry(string value) : base(StackValueKind.ObjRef, value)
+        public StringConstantEntry(string value) : base(StackValueKind.ObjRef, value, 4)
         {
             Operation = Operation.Constant_String;
         }
@@ -40,7 +40,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
     public class Int32ConstantEntry : ConstantEntry<int>
     {
-        public Int32ConstantEntry(int value) : base(StackValueKind.Int32, value)
+        public Int32ConstantEntry(int value) : base(StackValueKind.Int32, value, 4)
         {
             Operation = Operation.Constant_Int32;
         }

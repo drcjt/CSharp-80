@@ -16,20 +16,17 @@ namespace ILCompiler.Compiler.Importer
             var methodDefOrRef = instruction.Operand as IMethodDefOrRef;
             var methodToCall = methodDefOrRef.ResolveMethodDefThrow();
 
-            var objType = methodToCall.DeclaringType;
+            var declType = methodToCall.DeclaringType;
 
-            if (!objType.IsValueType)
+            if (!declType.IsValueType)
             {
                 throw new NotSupportedException("Newobj not supported for non value types");
             }
 
-            var lclNum = importer.GrabTemp();
+            var objType = declType.ToTypeSig();
+            var objKind = objType.GetStackValueKind();
 
-            //TODO: Should this be in GrabTemp?
-            var temp = importer.LocalVariableTable[lclNum];
-            temp.Type = objType.ToTypeSig();
-            temp.Kind = objType.ToTypeSig().GetStackValueKind();
-
+            var lclNum = importer.GrabTemp(objKind, objType.GetExactSize());
             var newObjThisPtr = new LocalVariableAddressEntry(lclNum);
 
             // Add newObjThisPtr as first parameter to call to constructor
@@ -43,12 +40,12 @@ namespace ILCompiler.Compiler.Importer
             var targetMethod = context.NameMangler.GetMangledMethodName(methodToCall);
             var returnType = methodToCall.ReturnType.GetStackValueKind();
 
-            var callNode = new CallEntry(targetMethod, arguments, returnType);
+            var callNode = new CallEntry(targetMethod, arguments, returnType, objType.GetExactSize());
 
             // ctor has no return type so just append the tree
             importer.ImportAppendTree(callNode);
 
-            var node = new LocalVariableEntry(lclNum, temp.Kind, temp.Type);
+            var node = new LocalVariableEntry(lclNum, objKind, objType.GetExactSize());
             importer.PushExpression(node);
         }
     }

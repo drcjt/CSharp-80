@@ -1,27 +1,25 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.IL;
+﻿using ILCompiler.Common.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.EvaluationStack
 {
     public class FieldEntry : StackEntry
     {
-        public uint Offset => FieldDef.FieldOffset.Value;
-        public int Size => FieldDef.FieldType.GetExactSize(false);
+        public uint? Offset;
+        public string Name;
 
         public StackEntry Op1 { get; }
 
-        public FieldDef FieldDef { get; }
-
-        public FieldEntry(StackEntry op1, FieldDef fieldDef, StackValueKind kind) : base(kind, fieldDef.FieldType)
+        public FieldEntry(StackEntry op1, string name, uint? offset, int size, StackValueKind kind) : base(kind, size)
         {
             Operation = Operation.Field;
             Op1 = op1;
-            FieldDef = fieldDef;
+            Name = name;
+            Offset = offset;
         }
 
         public override FieldEntry Duplicate()
         {
-            return new FieldEntry(Op1.Duplicate(), FieldDef, Kind);
+            return new FieldEntry(Op1.Duplicate(), Name, Offset, ExactSize.Value, Kind);
         }
 
         public override void Accept(IStackEntryVisitor visitor)

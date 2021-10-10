@@ -13,13 +13,7 @@ namespace ILCompiler.Compiler.Importer
             var op1 = importer.PopExpression();
 
             // Need to spill result removed from stack to a temp that will never be used
-            var lclNum = importer.GrabTemp();
-
-            //TODO: Should this be in GrabTemp?
-            var temp = importer.LocalVariableTable[lclNum];
-            temp.Kind = op1.Kind;
-            temp.Type = op1.Type;
-
+            var lclNum = importer.GrabTemp(op1.Kind, op1.ExactSize);
             var node = new StoreLocalVariableEntry(lclNum, false, op1);
 
             // ctor has no return type so just append the tree

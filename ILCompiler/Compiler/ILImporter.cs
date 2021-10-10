@@ -41,12 +41,14 @@ namespace ILCompiler.Compiler
 
             public BasicBlock[] BasicBlocks => _importer._basicBlocks;
 
+            public int? ReturnBufferArgIndex => _importer._methodCompiler.ReturnBufferArgIndex;
+
             public void ImportAppendTree(StackEntry entry) => _importer.ImportAppendTree(entry);
             public void ImportFallThrough(BasicBlock next) => _importer.ImportFallThrough(next);
             public StackEntry PopExpression() => _importer._stack.Pop();
             public void PushExpression(StackEntry entry) => _importer._stack.Push(entry);
 
-            public int GrabTemp() => _importer.GrabTemp();
+            public int GrabTemp(StackValueKind kind, int? exactSize) => _importer.GrabTemp(kind, exactSize);
         }
 
         public ILImporter(MethodCompiler methodCompiler, MethodDef method, IList<LocalVariableDescriptor> localVariableTable, IConfiguration configuration)
@@ -164,12 +166,14 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private int GrabTemp()
+        private int GrabTemp(StackValueKind kind, int? exactSize)
         {
             var temp = new LocalVariableDescriptor()
             {
                 IsParameter = false,
                 IsTemp = true,
+                Kind = kind,
+                ExactSize = exactSize.Value,
             };
 
             _localVariableTable.Add(temp);
@@ -181,16 +185,14 @@ namespace ILCompiler.Compiler
         {
             if (tempNumber == null)
             {
-                tempNumber = GrabTemp();
+                tempNumber = GrabTemp(entry.Kind, entry.ExactSize);
                 var temp = _localVariableTable[tempNumber.Value];
-                temp.Kind = entry.Kind;
-                temp.Type = entry.Type;
             }
 
             var node = new StoreLocalVariableEntry(tempNumber.Value, false, entry);
             ImportAppendTree(node);
 
-            return new LocalVariableEntry(tempNumber.Value, entry.Kind, _localVariableTable[tempNumber.Value].Type);
+            return new LocalVariableEntry(tempNumber.Value, entry.Kind, entry.ExactSize);
         }
 
         private void MarkBasicBlock(BasicBlock basicBlock)

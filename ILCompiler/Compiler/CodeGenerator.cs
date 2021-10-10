@@ -98,7 +98,7 @@ namespace ILCompiler.Compiler
             {
                 if (localVariable.IsParameter)
                 {
-                    var argumentSize = localVariable.Type.GetExactSize(true);
+                    var argumentSize = localVariable.ExactSize;
                     localVariable.ExactSize = argumentSize;
                     localVariable.StackOffset = offset;
 
@@ -117,20 +117,8 @@ namespace ILCompiler.Compiler
             {
                 if (!localVariable.IsParameter)
                 {
-                    int localSize;
-                    if (localVariable.Type != null)
-                    {
-                        localSize = localVariable.Type.GetExactSize(true);
-                    }
-                    else
-                    {
-                        // For spilled entries we may not have managed type info
-                        localSize = TypeList.GetExactSize(localVariable.Kind);
-                    }
-                    localVariable.ExactSize = localSize;
                     localVariable.StackOffset = offset;
-
-                    offset += localSize;
+                    offset += localVariable.ExactSize;
                 }
             }
         }
@@ -372,7 +360,7 @@ namespace ILCompiler.Compiler
                 case WellKnownType.Int32:
                 case WellKnownType.UInt32:
                     // TODO: Should this cope with arbitrary size fields e.g. structs?
-                    var endOffset = offset + entry.FieldSize - 4;
+                    var endOffset = offset + entry.ExactSize.Value - 4;
                     for (int stackoffset = endOffset; stackoffset >= offset; stackoffset -= 4)
                     {
                         _currentAssembler.Pop(R16.DE);
@@ -393,13 +381,37 @@ namespace ILCompiler.Compiler
             _currentAssembler.Pop(I16.IX);
         }
 
+        private void CopyWordsFromStackToHL(int fieldSize)
+        {
+            _currentAssembler.Push(I16.IX);
+            _currentAssembler.Pop(R16.AF);
+
+            _currentAssembler.Push(R16.HL);
+            _currentAssembler.Pop(I16.IX);
+
+            var endOffset = fieldSize - 4;
+            for (int stackOffset = endOffset; stackOffset >= 0; stackOffset -= 4)
+            {
+                _currentAssembler.Pop(R16.DE);
+                _currentAssembler.Pop(R16.BC);
+
+                _currentAssembler.Ld(I16.IX, (short)(stackOffset + 3), R8.B);
+                _currentAssembler.Ld(I16.IX, (short)(stackOffset + 2), R8.C);
+                _currentAssembler.Ld(I16.IX, (short)(stackOffset + 1), R8.D);
+                _currentAssembler.Ld(I16.IX, (short)(stackOffset + 0), R8.E);
+            }
+
+            _currentAssembler.Push(R16.AF);
+            _currentAssembler.Pop(I16.IX);
+        }
+
         public void GenerateCodeForField(FieldEntry entry)
         {
             // Load field onto stack
             var fieldOffset = entry.Offset;
 
             var indirectEntry = new IndirectEntry(null, entry.Kind, WellKnownType.Int32);
-            GenerateCodeForIndirect(indirectEntry, fieldOffset, entry.Size);
+            GenerateCodeForIndirect(indirectEntry, fieldOffset.Value, entry.ExactSize.Value);
         }
 
         public void GenerateCodeForFieldAddress(FieldAddressEntry entry)
@@ -508,14 +520,27 @@ namespace ILCompiler.Compiler
 
             if (hasReturnValue)
             {
-                if (targetType.Kind != StackValueKind.Int32)
+                if (entry.ReturnBufferArgIndex.HasValue)
                 {
-                    throw new NotImplementedException("Return types other than void and int not supported");
-                }
+                    // Returning a struct
 
-                // TODO: Support return values other than 4 bytes in size e.g. structs
-                _currentAssembler.Pop(R16.DE);            // Copy return value into DE/IY
-                _currentAssembler.Pop(I16.IY);
+                    // Load address of return buffer into HL
+                    var variable = _localVariableTable[entry.ReturnBufferArgIndex.Value];
+                    _currentAssembler.Ld(R8.H, I16.IX, (short)-(variable.StackOffset + 1));
+                    _currentAssembler.Ld(R8.L, I16.IX, (short)-(variable.StackOffset + 2));
+
+                    // Copy struct to the return buffer
+                    CopyWordsFromStackToHL(entry.ReturnTypeExactSize.Value);
+                }
+                else if (targetType.Kind != StackValueKind.Int32)
+                {
+                    throw new NotImplementedException($"Unsupported return type {targetType.Kind}");
+                }
+                else
+                {
+                    _currentAssembler.Pop(R16.DE);            // Copy return value into DE/IY
+                    _currentAssembler.Pop(I16.IY);
+                }
             }
 
             // Unwind stack frame
@@ -571,7 +596,7 @@ namespace ILCompiler.Compiler
                 _currentAssembler.Pop(R16.BC);      // Store return address in BC
             }
 
-            if (hasReturnValue)
+            if (hasReturnValue && !entry.ReturnBufferArgIndex.HasValue)
             {
                 _currentAssembler.Push(I16.IY);
                 _currentAssembler.Push(R16.DE);

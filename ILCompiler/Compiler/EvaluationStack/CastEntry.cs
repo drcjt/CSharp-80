@@ -9,7 +9,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public bool Unsigned { get; }
 
-        public CastEntry(WellKnownType desiredType, bool unsigned, StackEntry op1) : base(op1.Kind)
+        public CastEntry(WellKnownType desiredType, bool unsigned, StackEntry op1) : base(op1.Kind, op1.ExactSize)
         {
             Operation = Operation.Cast;
             DesiredType = desiredType;

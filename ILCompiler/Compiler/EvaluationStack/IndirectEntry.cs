@@ -8,7 +8,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         public StackEntry Op1 { get; }
         public WellKnownType TargetType { get; }
 
-        public IndirectEntry(StackEntry op1, StackValueKind kind, WellKnownType targetType) : base(kind)
+        public IndirectEntry(StackEntry op1, StackValueKind kind, WellKnownType targetType) : base(kind, targetType.GetWellKnownTypeSize())
         {
             Operation = Operation.Indirect;
             Op1 = op1;
