@@ -25,6 +25,12 @@ namespace ILCompiler.Compiler.Importer
             {
                 throw new NotSupportedException();
             }
+            // Ensure fields have all offsets calculated
+            if (!fieldDef.FieldOffset.HasValue)
+            {
+                fieldDef.DeclaringType.ToTypeSig().GetExactSize();
+            }
+
             var fieldSize = fieldDef.FieldType.GetExactSize();
 
             importer.ImportAppendTree(new StoreIndEntry(addr, value, WellKnownType.Int32, fieldDef.FieldOffset, fieldDef.FieldType.GetExactSize()));

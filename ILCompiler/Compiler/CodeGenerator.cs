@@ -526,8 +526,8 @@ namespace ILCompiler.Compiler
 
                     // Load address of return buffer into HL
                     var variable = _localVariableTable[entry.ReturnBufferArgIndex.Value];
-                    _currentAssembler.Ld(R8.H, I16.IX, (short)-(variable.StackOffset + 1));
-                    _currentAssembler.Ld(R8.L, I16.IX, (short)-(variable.StackOffset + 2));
+                    _currentAssembler.Ld(R8.H, I16.IX, (short)-(variable.StackOffset + 3));
+                    _currentAssembler.Ld(R8.L, I16.IX, (short)-(variable.StackOffset + 4));
 
                     // Copy struct to the return buffer
                     CopyWordsFromStackToHL(entry.ReturnTypeExactSize.Value);
