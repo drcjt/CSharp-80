@@ -20,10 +20,12 @@ namespace Paint
             Color cursorColor = Color.White;
             while (true)
             {
-                int keyChar = Console.KbdScan();
+                var cki = Console.ReadKey(true);
 
-                if (keyChar != 0)
-                {
+                if (cki.KeyChar != 0)
+                { 
+                    int keyChar = cki.KeyChar;
+
                     Graphics.SetPixel(currentX, currentY, color);
 
                     if (keyChar == 10)

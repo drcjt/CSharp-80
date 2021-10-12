@@ -37,23 +37,35 @@ namespace System
         [DllImport(Libraries.Runtime, EntryPoint = "CLS")]
         public static unsafe extern void Clear();
 
+        // TODO: This doesn't seem to work properly
         public static bool KeyAvailable => (KbdScan() != 0);
 
-        /*
-        // TODO: Need to implement struct return types for this
+        public static unsafe ConsoleKeyInfo ReadKey()
+        {
+            return ReadKey(false);
+        }
         public static unsafe ConsoleKeyInfo ReadKey(bool intercept)
         {
-            int c = KbdScan();
+            char c = (char)KbdScan();
 
+            // Interpret WASD as arrow keys
             ConsoleKey k = default;
-            if (c == 87)
+            if (c == 'w')
                 k = ConsoleKey.UpArrow;
-            else if (c == 83)
+            else if (c == 'd')
                 k = ConsoleKey.DownArrow;
+            else if (c == 's')
+                k = ConsoleKey.LeftArrow;
+            else if (c == 'a')
+                k = ConsoleKey.RightArrow;
+
+            if (c != 0 && !intercept)
+            {
+                Write(c);
+            }
 
             return new ConsoleKeyInfo(c, k, false, false, false);
         }
-        */
 
         [DllImport(Libraries.Runtime, EntryPoint = "KbdScan")]
         public static unsafe extern int KbdScan();

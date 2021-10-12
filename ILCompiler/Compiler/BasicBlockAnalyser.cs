@@ -105,8 +105,14 @@ namespace ILCompiler.Compiler
 
                     case Code.Switch:
                         {
-                            throw new NotImplementedException();
+                            var targets = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction[];
+                            foreach (var target in targets)
+                            {
+                                var targetOffset = target.Offset;
+                                CreateBasicBlock((int)targetOffset); // target of jump
+                            }
                         }
+                        break;
                 }
                 currentOffset += currentInstruction.GetSize();
                 currentIndex++;

@@ -35,6 +35,9 @@
 
     public abstract class ValueType { }
     public abstract class Enum : ValueType { }
+
+    public abstract class Delegate { }
+
     public class Attribute { }
 }
 

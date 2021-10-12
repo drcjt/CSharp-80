@@ -14,8 +14,10 @@
         public ConsoleKeyInfo(char keyChar, ConsoleKey key, bool shift, bool alt, bool control)
         {
             Key = key;
+            KeyChar = keyChar;
         }
 
         public readonly ConsoleKey Key;
+        public readonly char KeyChar;
     }
 }

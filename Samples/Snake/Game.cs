@@ -40,20 +40,20 @@ namespace Snake
 
                 //Graphics.SetPixel(s.headX, s.headY, Color.Black);
 
-                int keyChar = Console.KbdScan();
-                if (keyChar == 10)
+                ConsoleKeyInfo ki = Console.ReadKey(true);
+                if (ki.KeyChar == 10)
                 {
                     dx = 0; dy = 1;
                 }
-                else if (keyChar == 91)
+                else if (ki.KeyChar == 91)
                 {
                     dx = 0; dy = -1;
                 }
-                else if (keyChar == 8)
+                else if (ki.KeyChar == 8)
                 {
                     dx = -1; dy = 0;
                 }
-                else if (keyChar == 9)
+                else if (ki.KeyChar == 9)
                 {
                     dx = 1; dy = 0;
                 }
