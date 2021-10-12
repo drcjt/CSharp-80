@@ -81,7 +81,7 @@ namespace ILCompiler.Compiler
                     IsParameter = true,
                     Kind = StackValueKind.ByRef,
                     IsTemp = false,
-                    ExactSize = returnType.GetExactSize(),
+                    ExactSize = 4, // Ptr is just an int32
                 };
 
                 // Ensure return buffer parameter goes after the this parameter if present

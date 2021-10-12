@@ -389,8 +389,7 @@ namespace ILCompiler.Compiler
             _currentAssembler.Push(R16.HL);
             _currentAssembler.Pop(I16.IX);
 
-            var endOffset = fieldSize - 4;
-            for (int stackOffset = endOffset; stackOffset >= 0; stackOffset -= 4)
+            for (int stackOffset = 0; stackOffset < fieldSize; stackOffset += 4)
             {
                 _currentAssembler.Pop(R16.DE);
                 _currentAssembler.Pop(R16.BC);
