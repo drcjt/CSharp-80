@@ -65,6 +65,7 @@ namespace ILCompiler.Compiler
         private void ImportBasicBlocks(IDictionary<int, int> offsetToIndexMap)
         {
             _pendingBasicBlocks = _basicBlocks[0];
+            _pendingBasicBlocks.Marked = true;
             while (_pendingBasicBlocks != null)
             {
                 BasicBlock basicBlock = _pendingBasicBlocks;

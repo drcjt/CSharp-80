@@ -37,18 +37,12 @@ namespace System
         [DllImport(Libraries.Runtime, EntryPoint = "CLS")]
         public static unsafe extern void Clear();
 
-        // TODO: This doesn't seem to work properly
-        public static bool KeyAvailable => (KbdScan() != 0);
-
-        public static unsafe ConsoleKeyInfo ReadKey()
-        {
-            return ReadKey(false);
-        }
+        public static bool KeyAvailable => KeyAvail();
+        public static unsafe ConsoleKeyInfo ReadKey() => ReadKey(false);
         public static unsafe ConsoleKeyInfo ReadKey(bool intercept)
         {
             char c = (char)KbdScan();
 
-            // Interpret WASD as arrow keys
             ConsoleKey k = default;
             if (c == 'w')
                 k = ConsoleKey.UpArrow;
@@ -59,7 +53,8 @@ namespace System
             else if (c == 'a')
                 k = ConsoleKey.RightArrow;
 
-            if (c != 0 && !intercept)
+            // dispplay key if required
+            if (!intercept && c != 0)
             {
                 Write(c);
             }
@@ -67,8 +62,12 @@ namespace System
             return new ConsoleKeyInfo(c, k, false, false, false);
         }
 
+        // Fast key test routine
+        [DllImport(Libraries.Runtime, EntryPoint = "KeyAvail")]
+        private static unsafe extern bool KeyAvail();
+
         [DllImport(Libraries.Runtime, EntryPoint = "KbdScan")]
-        public static unsafe extern int KbdScan();
+        private static unsafe extern int KbdScan();
 
         public static void WriteLine()
         {

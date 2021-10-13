@@ -25,45 +25,44 @@ namespace Snake
             int dx = 1;
             int dy = 0;
 
+            Graphics.SetPixel(s.headX, s.headY, Color.White);
+
             int gameTime = Environment.TickCount;
             while (true)
             {
-                Graphics.SetPixel(s.headX, s.headY, Color.White);
+                if (Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo ki = Console.ReadKey(true);
+                    if (ki.KeyChar == 10)
+                    {
+                        dx = 0; dy = 1;
+                    }
+                    else if (ki.KeyChar == 91)
+                    {
+                        dx = 0; dy = -1;
+                    }
+                    else if (ki.KeyChar == 8)
+                    {
+                        dx = -1; dy = 0;
+                    }
+                    else if (ki.KeyChar == 9)
+                    {
+                        dx = 1; dy = 0;
+                    }
+                }
 
-                gameTime += 100;
-
-                int delay = gameTime - Environment.TickCount;
-                if (delay > 0)
-                    Thread.Sleep(delay);
-                else
+                // TODO: This timing mechanism doesn't quite work as get occasional
+                // pauses which I believe are due to TickCount wrapping around
+                int delay = Environment.TickCount - gameTime;
+                if (delay > 25)
+                {
                     gameTime = Environment.TickCount;
 
-                //Graphics.SetPixel(s.headX, s.headY, Color.Black);
+                    s.headX = WrapAround(s.headX + dx, Graphics.ScreenWidth);
+                    s.headY = WrapAround(s.headY + dy, Graphics.ScreenHeight);
 
-                ConsoleKeyInfo ki = Console.ReadKey(true);
-                if (ki.KeyChar == 10)
-                {
-                    dx = 0; dy = 1;
+                    Graphics.SetPixel(s.headX, s.headY, Color.White);
                 }
-                else if (ki.KeyChar == 91)
-                {
-                    dx = 0; dy = -1;
-                }
-                else if (ki.KeyChar == 8)
-                {
-                    dx = -1; dy = 0;
-                }
-                else if (ki.KeyChar == 9)
-                {
-                    dx = 1; dy = 0;
-                }
-
-                s.headX += dx;
-                s.headY += dy;
-
-                // Wrap around
-                s.headX = WrapAround(s.headX, Graphics.ScreenWidth);
-                s.headY = WrapAround(s.headY, Graphics.ScreenHeight);
             }
         }
 
