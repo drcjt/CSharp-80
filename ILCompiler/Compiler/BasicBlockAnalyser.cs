@@ -111,6 +111,8 @@ namespace ILCompiler.Compiler
                                 var targetOffset = target.Offset;
                                 CreateBasicBlock((int)targetOffset); // target of jump
                             }
+                            var nextInstructionOffset = currentOffset + currentInstruction.GetSize();
+                            CreateBasicBlock(nextInstructionOffset); // instruction after jump
                         }
                         break;
                 }

@@ -67,6 +67,12 @@ namespace ILCompiler.Compiler
             Print($"jump {entry.TargetLabel}");
         }
 
+        public void Visit(SwitchEntry entry)
+        {
+            entry.Op1.Accept(this);
+            Print($"switch {entry.JumpTable}");
+        }
+
         public void Visit(ReturnEntry entry)
         {
             Print("return");

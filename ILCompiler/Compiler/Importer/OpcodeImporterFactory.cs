@@ -36,6 +36,7 @@ namespace ILCompiler.Compiler.Importer
                     new NewobjImporter(),
                     new PopImporter(),
                     new AddressOfFieldImporter(),
+                    new SwitchImporter(),
                 };
             }
             return _opcodeImporters;

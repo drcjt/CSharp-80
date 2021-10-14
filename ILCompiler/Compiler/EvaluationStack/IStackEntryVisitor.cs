@@ -19,5 +19,7 @@
         public void Visit(IndirectEntry entry);
         public void Visit(FieldEntry entry);
         public void Visit(FieldAddressEntry entry);
+
+        public void Visit(SwitchEntry entry);
     }
 }

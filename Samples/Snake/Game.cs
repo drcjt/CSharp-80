@@ -33,21 +33,13 @@ namespace Snake
                 if (Console.KeyAvailable)
                 {
                     ConsoleKeyInfo ki = Console.ReadKey(true);
-                    if (ki.KeyChar == 10)
+                    int kc = ki.KeyChar;
+                    switch (kc)
                     {
-                        dx = 0; dy = 1;
-                    }
-                    else if (ki.KeyChar == 91)
-                    {
-                        dx = 0; dy = -1;
-                    }
-                    else if (ki.KeyChar == 8)
-                    {
-                        dx = -1; dy = 0;
-                    }
-                    else if (ki.KeyChar == 9)
-                    {
-                        dx = 1; dy = 0;
+                        case 10: dx = 0; dy = 1; break;
+                        case 91: dx = 0; dy = -1; break;
+                        case 8: dx = -1; dy = 0; break;
+                        case 9: dx = 1; dy = 0; break;
                     }
                 }
 

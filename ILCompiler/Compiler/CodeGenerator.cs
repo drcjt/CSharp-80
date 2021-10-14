@@ -210,6 +210,10 @@ namespace ILCompiler.Compiler
                     GenerateCodeForCast(node as CastEntry);
                     break;
 
+                case Operation.Switch:
+                    GenerateCodeForSwitch(node as SwitchEntry);
+                    break;
+
                 default:
                     throw new NotImplementedException($"Unimplemented node type {node.Operation}");
             }
@@ -510,6 +514,25 @@ namespace ILCompiler.Compiler
         public void GenerateCodeForJump(JumpEntry entry)
         {
             _currentAssembler.Jp(entry.TargetLabel);
+        }
+
+        public void GenerateCodeForSwitch(SwitchEntry entry)
+        {
+            _currentAssembler.Pop(R16.HL);
+            _currentAssembler.Pop(R16.HL);
+
+            _currentAssembler.Ld(R8.A, R8.L);
+
+            for (int targetIndex = 0; targetIndex < entry.JumpTable.Count; targetIndex++)
+            {
+                _currentAssembler.Or(R8.A);
+                _currentAssembler.Jp(Condition.Zero, entry.JumpTable[targetIndex]);
+
+                if (targetIndex < entry.JumpTable.Count - 1)
+                {
+                    _currentAssembler.Dec(R8.A);
+                }
+            }
         }
 
         public void GenerateCodeForReturn(ReturnEntry entry)

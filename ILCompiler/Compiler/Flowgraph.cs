@@ -150,6 +150,12 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
+        public void Visit(SwitchEntry entry)
+        {
+            entry.Op1.Accept(this);
+            SetNext(entry);
+        }
+
         private void SetNext(StackEntry entry)
         {
             if (Current != null)

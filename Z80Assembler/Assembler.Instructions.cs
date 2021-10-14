@@ -43,6 +43,10 @@ namespace Z80Assembler
         {
             AddInstruction(new Instruction(Opcode.Inc, target.ToString()));
         }
+        public void Dec(Register target)
+        {
+            AddInstruction(new Instruction(Opcode.Dec, target.ToString()));
+        }
 
         public void Add(Register target, Register source)
         {
@@ -99,9 +103,9 @@ namespace Z80Assembler
             AddInstruction(new Instruction(Opcode.Ex, target.ToString() + ", " + source.ToString()));
         }
 
-        public void Or(R8Type target, R8Type source)
+        public void Or(R8Type target)
         {
-            AddInstruction(new Instruction(Opcode.Or, target.ToString() + ", " + source.ToString()));
+            AddInstruction(new Instruction(Opcode.Or, target.ToString()));
         }
 
         public void Jp(Condition condition, string label)

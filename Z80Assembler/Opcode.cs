@@ -24,6 +24,7 @@
         public static readonly Opcode Sbc = new("Sbc");
         public static readonly Opcode Halt = new("Halt");
         public static readonly Opcode Inc = new("Inc");
+        public static readonly Opcode Dec = new("Dec");
 
         public static readonly Opcode Org = new("Org", true);
         public static readonly Opcode End = new("End", true);
