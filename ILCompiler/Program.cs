@@ -62,7 +62,7 @@ namespace ILCompiler
             }
             else
             {
-                _logger.LogError("Failed to parse command line");
+                throw new Exception("Failed to parse command line");
             }
         }
 

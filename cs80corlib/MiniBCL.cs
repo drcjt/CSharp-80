@@ -30,6 +30,7 @@
     public struct UInt32 { }
     public struct Int64 { }
     public struct IntPtr { }
+    public struct UIntPtr { }
     public struct Byte { }
     public struct SByte { }
 

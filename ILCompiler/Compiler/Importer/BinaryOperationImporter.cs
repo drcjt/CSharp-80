@@ -28,9 +28,9 @@ namespace ILCompiler.Compiler.Importer
             StackValueKind kind;
             kind = op1.Kind > op2.Kind ? op1.Kind : op2.Kind;
 
-            if (kind != StackValueKind.Int32)
+            if (kind != StackValueKind.Int32 && kind != StackValueKind.NativeInt)
             {
-                throw new NotSupportedException("Binary operations on types other than int32 not supported yet");
+                throw new NotSupportedException($"Binary operation on type {kind} not supported");
             }
 
             Operation binaryOp = Operation.Add + (instruction.OpCode.Code - Code.Add);

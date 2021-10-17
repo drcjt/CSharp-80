@@ -331,8 +331,8 @@ namespace ILCompiler.Compiler
 
         public void GenerateCodeForStoreIndirect(StoreIndEntry entry)
         {
-            _currentAssembler.Pop(R16.HL);  // Address is stored as 32 bits but will only use lsw
             _currentAssembler.Pop(R16.AF);
+            _currentAssembler.Pop(R16.HL);  // Address is stored as 32 bits but will only use lsw
 
             _currentAssembler.Push(I16.IX); // Put IX into AF
             _currentAssembler.Pop(R16.AF);
@@ -422,17 +422,17 @@ namespace ILCompiler.Compiler
             var fieldOffset = entry.Offset;
 
             // Get address of object
-            _currentAssembler.Pop(R16.HL);
             _currentAssembler.Pop(R16.DE);      // lsw will be ignored
+            _currentAssembler.Pop(R16.HL);
 
             // Calculate field address
             _currentAssembler.Ld(R16.DE, (short)fieldOffset);
             _currentAssembler.Add(R16.HL, R16.DE);
 
             // Push field address onto the stack
+            _currentAssembler.Push(R16.HL);
             _currentAssembler.Ld(R16.DE, 0);
             _currentAssembler.Push(R16.DE);
-            _currentAssembler.Push(R16.HL);
         }
 
         public void GenerateCodeForIndirect(IndirectEntry entry, uint fieldOffset = 0, int fieldSize = 4)
@@ -444,8 +444,8 @@ namespace ILCompiler.Compiler
                 _currentAssembler.Pop(R16.DE);
 
                 // Get indirect address from stack into IX
-                _currentAssembler.Pop(I16.IX);
                 _currentAssembler.Pop(R16.AF);  // Ignore lsw of address
+                _currentAssembler.Pop(I16.IX);
 
                 switch (entry.TargetType)
                 {
@@ -548,8 +548,8 @@ namespace ILCompiler.Compiler
 
                     // Load address of return buffer into HL
                     var variable = _localVariableTable[entry.ReturnBufferArgIndex.Value];
-                    _currentAssembler.Ld(R8.H, I16.IX, (short)-(variable.StackOffset + 3));
-                    _currentAssembler.Ld(R8.L, I16.IX, (short)-(variable.StackOffset + 4));
+                    _currentAssembler.Ld(R8.H, I16.IX, (short)-(variable.StackOffset + 1));
+                    _currentAssembler.Ld(R8.L, I16.IX, (short)-(variable.StackOffset + 2));
 
                     // Copy struct to the return buffer
                     CopyWordsFromStackToHL(entry.ReturnTypeExactSize.Value);
@@ -631,6 +631,7 @@ namespace ILCompiler.Compiler
         private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> BinaryOperatorMappings = new()
         {
             { Tuple.Create(Operation.Add, StackValueKind.Int32), "i_add" },
+            { Tuple.Create(Operation.Add, StackValueKind.NativeInt), "i_add" },
             { Tuple.Create(Operation.Sub, StackValueKind.Int32), "i_sub" },
             { Tuple.Create(Operation.Mul, StackValueKind.Int32), "i_mul" },
             { Tuple.Create(Operation.Div, StackValueKind.Int32), "i_div" },
@@ -720,10 +721,6 @@ namespace ILCompiler.Compiler
             var localVariable = _localVariableTable[entry.LocalNumber];
             var offset = localVariable.StackOffset + localVariable.ExactSize;
 
-            // Push 0 to makeup full 32 bit value
-            _currentAssembler.Ld(R16.HL, 0);
-            _currentAssembler.Push(R16.HL);
-
             // Calculate and push the actual 16 bit address
             _currentAssembler.Push(I16.IX);
             _currentAssembler.Pop(R16.HL);
@@ -732,6 +729,10 @@ namespace ILCompiler.Compiler
             _currentAssembler.Add(R16.HL, R16.DE);
 
             // Push address
+            _currentAssembler.Push(R16.HL);
+
+            // Push 0 to makeup full 32 bit value
+            _currentAssembler.Ld(R16.HL, 0);
             _currentAssembler.Push(R16.HL);
         }
 

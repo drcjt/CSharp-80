@@ -64,6 +64,7 @@ namespace ILCompiler.Common.TypeSystem.IL
                 case ElementType.R8:
                     return StackValueKind.Float;
                 case ElementType.Ptr:
+                case ElementType.I:
                     return StackValueKind.NativeInt;
                 case ElementType.ValueType:
                     return StackValueKind.ValueType;

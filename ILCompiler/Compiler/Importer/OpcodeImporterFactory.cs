@@ -37,6 +37,7 @@ namespace ILCompiler.Compiler.Importer
                     new PopImporter(),
                     new AddressOfFieldImporter(),
                     new SwitchImporter(),
+                    new LocallocImporter(),
                 };
             }
             return _opcodeImporters;
