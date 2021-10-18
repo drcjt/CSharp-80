@@ -9,7 +9,7 @@ namespace ILCompiler.Compiler.Importer
 {
     public class StoreIndirectImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Stind_I1 || code == Code.Stind_I2 || code == Code.Stind_I4;
+        public bool CanImport(Code code) => code == Code.Stind_I1 || code == Code.Stind_I2 || code == Code.Stind_I4 || code == Code.Stind_I;
 
         public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
@@ -33,6 +33,7 @@ namespace ILCompiler.Compiler.Importer
                 Code.Stind_I1 => WellKnownType.SByte,
                 Code.Stind_I2 => WellKnownType.Int16,
                 Code.Stind_I4 => WellKnownType.Int32,
+                Code.Stind_I => WellKnownType.Int32,
                 _ => throw new NotImplementedException(),
             };
             return type;

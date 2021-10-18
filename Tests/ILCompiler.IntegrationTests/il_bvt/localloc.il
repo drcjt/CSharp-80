@@ -12,6 +12,21 @@
 .maxstack 10
 .locals (native int)
 
+	ldc.i4 0x1
+	localloc
+	stloc 0
+	ldloc 0
+	ldc.i4 0x8
+	// TODO: Uncomment when conv.i implemented
+	//conv.i
+	stind.i
+	ldloc 0
+	ldind.i
+	ldc.i4 0x8
+	// TODO: Uncomment when conv.i implemented
+	//conv.i
+	bne.un fail
+
 	ldc.i4	0x1
 	localloc
 	stloc 0
