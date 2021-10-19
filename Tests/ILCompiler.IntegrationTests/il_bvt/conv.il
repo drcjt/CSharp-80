@@ -16,6 +16,31 @@
 .method public static int32 Main() {
 .entrypoint
 .maxstack 10
+	ldc.i4 0x7fffffff	// max_i4
+	conv.u1
+	ldc.i4 0xff
+	bne.un fail
+
+	ldc.i4 0x00000001	// one_i4
+	conv.u1
+	ldc.i4 0x01
+	bne.un fail
+
+	ldc.i4 0x00000000	// zero_i4
+	conv.u1
+	ldc.i4 0x00
+	bne.un fail
+
+	ldc.i4 0xffffffff	// minus_one_i4
+	conv.u1
+	ldc.i4 0x000000ff
+	bne.un fail
+
+	ldc.i4 0x80000000	// min_i4
+	conv.u1
+	ldc.i4 0x00
+	bne.un fail
+
 	ldc.i4 0x8F0F0F0F
 	call int32 conv::i4(int32)
 	conv.i2

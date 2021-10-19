@@ -803,6 +803,17 @@ namespace ILCompiler.Compiler
                 _currentAssembler.Push(R16.DE);
                 _currentAssembler.Push(R16.HL);
             }
+            else if (actualKind == StackValueKind.Int32 && desiredType == WellKnownType.Byte && unsigned)
+            {
+                _currentAssembler.Pop(R16.HL);
+                _currentAssembler.Pop(R16.DE);
+
+                _currentAssembler.Ld(R16.HL, 0);    // clear msw
+                _currentAssembler.Ld(R8.D, 0);
+
+                _currentAssembler.Push(R16.DE);
+                _currentAssembler.Push(R16.HL);
+            }
             else
             {
                 throw new NotImplementedException($"Implicit cast from {actualKind} to {desiredType} not supported");
