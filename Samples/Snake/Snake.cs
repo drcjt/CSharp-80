@@ -5,13 +5,19 @@
         private int* _snakeXs;
         private int* _snakeYs;
 
-        int _snakeHead = 0;
-        int _snakeTail = 0;
+        int _snakeHead;
+        int _snakeTail;
 
         int _maxLength;
 
+        public int Length;
+
         public unsafe Snake(int x, int y, int* snakeXs, int* snakeYs, int length)
         {
+            _snakeHead = 0;
+            _snakeTail = 0;
+            Length = 2;
+
             _snakeXs = snakeXs;
             _snakeYs = snakeYs;
 
@@ -20,8 +26,6 @@
             _snakeXs[0] = x;
             _snakeYs[0] = y;
         }
-
-        public int Length = 2;
 
         public unsafe void Next(int x, int y)
         {
