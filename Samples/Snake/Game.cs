@@ -18,14 +18,24 @@ namespace Snake
             _random = new Random(randomSeed);
         }
 
-        private Result Run(/* ref FrameBuffer fb */)
+        private unsafe Result Run(/* ref FrameBuffer fb */)
         {
-            Snake s = new Snake(WrapAround((byte)_random.Next(), Graphics.ScreenWidth), WrapAround((byte)_random.Next(), Graphics.ScreenHeight));
+            // TOOD: this is the max length right now as IX/IY offset
+            // addressing limits the stack size.
+            const int MAX_LENGTH = 6;
+
+            var snakeXs = stackalloc int[MAX_LENGTH];
+            var snakeYs = stackalloc int[MAX_LENGTH];
+
+            Snake s = new Snake(WrapAround((byte)_random.Next(), Graphics.ScreenWidth), WrapAround((byte)_random.Next(), Graphics.ScreenHeight), snakeXs, snakeYs, MAX_LENGTH);
+
+            MakeFood(s, out int foodX, out int foodY);
+            Graphics.SetPixel(foodX, foodY, Color.White);
 
             int dx = 1;
             int dy = 0;
 
-            Graphics.SetPixel(s.headX, s.headY, Color.White);
+            Graphics.SetPixel(s.HeadX, s.HeadY, Color.White);
 
             int gameTime = Environment.TickCount;
             while (true)
@@ -46,16 +56,39 @@ namespace Snake
                 // TODO: This timing mechanism doesn't quite work as get occasional
                 // pauses which I believe are due to TickCount wrapping around
                 int delay = Environment.TickCount - gameTime;
-                if (delay > 25)
+                if (delay > 100)
                 {
                     gameTime = Environment.TickCount;
 
-                    s.headX = WrapAround(s.headX + dx, Graphics.ScreenWidth);
-                    s.headY = WrapAround(s.headY + dy, Graphics.ScreenHeight);
+                    s.Next(WrapAround(s.HeadX + dx, Graphics.ScreenWidth), WrapAround(s.HeadY + dy, Graphics.ScreenHeight));
 
-                    Graphics.SetPixel(s.headX, s.headY, Color.White);
+                    if (s.HitTest(foodX, foodY))
+                    {
+                        if (s.Extend())
+                        {
+                            MakeFood(s, out foodX, out foodY);
+                            Graphics.SetPixel(foodX, foodY, Color.White);
+                        }
+                        else
+                        {
+                            return Result.Win;
+                        }
+                    }
+
+                    Graphics.SetPixel(s.HeadX, s.HeadY, Color.White);
+                    Graphics.SetPixel(s.TailX, s.TailY, Color.Black);
                 }
             }
+        }
+
+        void MakeFood(in Snake snake, out int foodX, out int foodY)
+        {
+            do
+            {
+                foodX = WrapAround((byte)_random.Next(), Graphics.ScreenWidth);
+                foodY = WrapAround((byte)_random.Next(), Graphics.ScreenHeight);
+            }
+            while (snake.HitTest(foodX, foodY));
         }
 
         private static int WrapAround(int coordinate, int max)
@@ -73,6 +106,15 @@ namespace Snake
             {                
                 Game g = new Game((uint)Environment.TickCount);
                 Result result = g.Run(/* ref fb */);
+
+                if (result == Result.Win)
+                {
+                    Console.WriteLine("You win");
+
+                    // TODO: This seems to return immediately???
+                    Console.ReadKey(intercept: true);
+                    Console.Clear();
+                }
 
                 //fb.Render();
             }

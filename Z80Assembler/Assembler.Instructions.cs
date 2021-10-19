@@ -75,11 +75,13 @@ namespace Z80Assembler
 
         public void Ld(R8Type target, I16Type source, short offset)
         {
+            if (offset < -128 || offset > 127) throw new NotImplementedException($"Index addressing offset {offset} not supported");
             AddInstruction(new Instruction(Opcode.Ld, target.ToString() + ", (" + source.ToString() + string.Format("{0:+#;-#;+0}", offset) + ")"));
         }
 
         public void Ld(I16Type target, short offset, R8Type source)
         {
+            if (offset < -128 || offset > 127) throw new NotImplementedException($"Index addressing offset {offset} not supported");
             AddInstruction(new Instruction(Opcode.Ld, "(" + target.ToString() + string.Format("{0:+#;-#;+0}", offset) + "), " + source.ToString()));
         }
 

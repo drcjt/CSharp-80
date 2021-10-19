@@ -437,7 +437,7 @@ namespace ILCompiler.Compiler
 
         public void GenerateCodeForIndirect(IndirectEntry entry, uint fieldOffset = 0, int fieldSize = 4)
         {
-            if (entry.Kind == StackValueKind.Int32 || entry.Kind == StackValueKind.ValueType)
+            if (entry.Kind == StackValueKind.Int32 || entry.Kind == StackValueKind.ValueType || entry.Kind == StackValueKind.NativeInt)
             {
                 // Save IX into DE
                 _currentAssembler.Push(I16.IX);

@@ -21,9 +21,9 @@ namespace ILCompiler.Compiler.Importer
 
             var kind = fieldDef.FieldType.GetStackValueKind();
 
-            if (value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ValueType)
+            if (value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ValueType && value.Kind != StackValueKind.NativeInt)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException($"Storing to field of type {value.Kind} not supported");
             }
             // Ensure fields have all offsets calculated
             if (!fieldDef.FieldOffset.HasValue)
