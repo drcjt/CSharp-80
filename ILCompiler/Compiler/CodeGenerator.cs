@@ -100,7 +100,7 @@ namespace ILCompiler.Compiler
                 {
                     var argumentSize = localVariable.ExactSize;
                     localVariable.ExactSize = argumentSize;
-                    localVariable.StackOffset = offset;
+                    localVariable.StackOffset = offset + localVariable.ExactSize;
 
                     offset += argumentSize;
                     totalArgumentsSize += argumentSize;
@@ -117,7 +117,7 @@ namespace ILCompiler.Compiler
             {
                 if (!localVariable.IsParameter)
                 {
-                    localVariable.StackOffset = offset;
+                    localVariable.StackOffset = offset + localVariable.ExactSize;
                     offset += localVariable.ExactSize;
                 }
             }
@@ -363,9 +363,7 @@ namespace ILCompiler.Compiler
 
                 case WellKnownType.Int32:
                 case WellKnownType.UInt32:
-                    // TODO: Should this cope with arbitrary size fields e.g. structs?
-                    var endOffset = offset + entry.ExactSize.Value - 4;
-                    for (int stackoffset = endOffset; stackoffset >= offset; stackoffset -= 4)
+                    for (int stackoffset = offset; stackoffset < offset + entry.ExactSize.Value; stackoffset += 4)
                     {
                         _currentAssembler.Pop(R16.DE);
                         _currentAssembler.Pop(R16.BC);
@@ -476,7 +474,8 @@ namespace ILCompiler.Compiler
 
                         // TODO: For large vars consider generating code to loop itself to minimize size of code
 
-                        for (int offset = (int)fieldOffset; offset < fieldOffset + fieldSize; offset += 4)
+                        var endOffset = (int)fieldOffset + fieldSize - 4;
+                        for (int offset = endOffset; offset >= fieldOffset; offset -= 4)
                         {
                             _currentAssembler.Ld(R8.H, I16.IX, (short)(offset + 3));
                             _currentAssembler.Ld(R8.L, I16.IX, (short)(offset + 2));
@@ -548,8 +547,8 @@ namespace ILCompiler.Compiler
 
                     // Load address of return buffer into HL
                     var variable = _localVariableTable[entry.ReturnBufferArgIndex.Value];
-                    _currentAssembler.Ld(R8.H, I16.IX, (short)-(variable.StackOffset + 1));
-                    _currentAssembler.Ld(R8.L, I16.IX, (short)-(variable.StackOffset + 2));
+                    _currentAssembler.Ld(R8.H, I16.IX, (short)-(variable.StackOffset - 3));
+                    _currentAssembler.Ld(R8.L, I16.IX, (short)-(variable.StackOffset - 2));
 
                     // Copy struct to the return buffer
                     CopyWordsFromStackToHL(entry.ReturnTypeExactSize.Value);
@@ -691,8 +690,8 @@ namespace ILCompiler.Compiler
             // TODO: For large vars consider generating code to loop itself to minimize size of code
 
             // Loading a local variable/argument
-            var endOffset = variable.StackOffset + variable.ExactSize;
-            for (int offset = variable.StackOffset; offset < endOffset; offset += 2)
+            var startOffset = variable.StackOffset - variable.ExactSize;
+            for (int offset = startOffset; offset < variable.StackOffset; offset += 2)
             {
                 _currentAssembler.Ld(R8.H, I16.IX, (short)-(offset + 1));
                 _currentAssembler.Ld(R8.L, I16.IX, (short)-(offset + 2));
@@ -706,12 +705,12 @@ namespace ILCompiler.Compiler
             // TODO: For large vars consider generating code to loop itself to minimize size of code
 
             // Loading a local variable/argument
-            var endOffset = variable.StackOffset + variable.ExactSize - 2;
-            for (int offset = endOffset; offset >= variable.StackOffset; offset -= 2)
+            var endOffset = variable.StackOffset - variable.ExactSize;
+            for (int offset = variable.StackOffset; offset > endOffset; offset -= 2)
             {
                 _currentAssembler.Pop(R16.HL);
-                _currentAssembler.Ld(I16.IX, (short)-(offset + 1), R8.H);
-                _currentAssembler.Ld(I16.IX, (short)-(offset + 2), R8.L);                
+                _currentAssembler.Ld(I16.IX, (short)-(offset - 1), R8.H);
+                _currentAssembler.Ld(I16.IX, (short)-(offset - 0), R8.L);
             }
         }
 
@@ -719,7 +718,7 @@ namespace ILCompiler.Compiler
         {
             // Loading address of a local variable/argument
             var localVariable = _localVariableTable[entry.LocalNumber];
-            var offset = localVariable.StackOffset + localVariable.ExactSize;
+            var offset = localVariable.StackOffset;
 
             // Calculate and push the actual 16 bit address
             _currentAssembler.Push(I16.IX);
