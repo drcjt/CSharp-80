@@ -3,7 +3,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
 	<nullable>enable</nullable>
-	<WarningsAsErrors>CS8600;CS8602;CS8603</WarningsAsErrors>	  
+	<WarningsAsErrors>Nullable</WarningsAsErrors>	  
   </PropertyGroup>
 
   <PropertyGroup>
