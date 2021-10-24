@@ -15,9 +15,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             LocalsCount = method.Body?.Variables.Count;
         }
 
-        public IList<Instruction> MethodCode { get; set; }
+        public IList<Instruction>? MethodCode { get; set; }
 
-        public IList<Z80MethodCodeNode> Dependencies { get; set; }
+        public IList<Z80MethodCodeNode>? Dependencies { get; set; }
 
         public bool CodeEmitted { get; set; }
 

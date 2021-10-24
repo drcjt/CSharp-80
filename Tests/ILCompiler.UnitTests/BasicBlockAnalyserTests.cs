@@ -28,10 +28,10 @@ namespace ILCompiler.Tests
                 new Instruction(OpCodes.Ldc_I4_S, 1234),
             });
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
+            var offsetToIndexMap = new Dictionary<int, int>();
 
-            basicBlockAnalyser.FindBasicBlocks();
+            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
 
-            var basicBlocks = basicBlockAnalyser.BasicBlocks;
             Assert.AreEqual(1, basicBlocks.Count(x => x != null));
             Assert.IsNotNull(basicBlocks[0]);
         }
@@ -47,10 +47,10 @@ namespace ILCompiler.Tests
             code.Add(branchTarget);
             var method = BuildMethod(code);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
+            var offsetToIndexMap = new Dictionary<int, int>();
 
-            basicBlockAnalyser.FindBasicBlocks();
+            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
 
-            var basicBlocks = basicBlockAnalyser.BasicBlocks;
             Assert.AreEqual(3, basicBlocks.Count(x => x != null));
             Assert.IsNotNull(basicBlocks[branchTarget.Offset]);
         }
@@ -67,10 +67,10 @@ namespace ILCompiler.Tests
             code.Add(branchTarget);
             var method = BuildMethod(code);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
+            var offsetToIndexMap = new Dictionary<int, int>();
 
-            basicBlockAnalyser.FindBasicBlocks();
+            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
 
-            var basicBlocks = basicBlockAnalyser.BasicBlocks;
             Assert.AreEqual(3, basicBlocks.Count(x => x != null));
             Assert.IsNotNull(basicBlocks[instructionAfterBranch.Offset]);
         }
@@ -85,10 +85,10 @@ namespace ILCompiler.Tests
             code.Add(OpCodes.Br.ToInstruction(branchTarget));
             var method = BuildMethod(code);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
+            var offsetToIndexMap = new Dictionary<int, int>();
 
-            basicBlockAnalyser.FindBasicBlocks();
+            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
 
-            var basicBlocks = basicBlockAnalyser.BasicBlocks;
             Assert.AreEqual(2, basicBlocks.Count(x => x != null));
             Assert.IsNotNull(basicBlocks[branchTarget.Offset]);
         }

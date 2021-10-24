@@ -128,31 +128,31 @@ namespace ILCompiler.Compiler
             switch (node.Operation)
             {
                 case Operation.StoreIndirect:
-                    GenerateCodeForStoreIndirect(node as StoreIndEntry);
+                    GenerateCodeForStoreIndirect(node.As<StoreIndEntry>());
                     break;
 
                 case Operation.Return:
-                    GenerateCodeForReturn(node as ReturnEntry);
+                    GenerateCodeForReturn(node.As<ReturnEntry>());
                     break;
 
                 case Operation.Constant_Int32:
-                    GenerateCodeForInt32Constant(node as Int32ConstantEntry);
+                    GenerateCodeForInt32Constant(node.As<Int32ConstantEntry>());
                     break;
 
                 case Operation.Constant_String:
-                    GenerateCodeForStringConstant(node as StringConstantEntry);
+                    GenerateCodeForStringConstant(node.As<StringConstantEntry>());
                     break;
 
                 case Operation.JumpTrue:
-                    GenerateCodeForJumpTrue(node as JumpTrueEntry);
+                    GenerateCodeForJumpTrue(node.As<JumpTrueEntry>());
                     break;
 
                 case Operation.Jump:
-                    GenerateCodeForJump(node as JumpEntry);
+                    GenerateCodeForJump(node.As<JumpEntry>());
                     break;
 
                 case Operation.Neg:
-                    GenerateCodeForNeg(node as UnaryOperator);
+                    GenerateCodeForNeg(node.As<UnaryOperator>());
                     break;
 
                 case Operation.Eq:
@@ -161,7 +161,7 @@ namespace ILCompiler.Compiler
                 case Operation.Le:
                 case Operation.Gt:
                 case Operation.Ge:
-                    GenerateCodeForComparison(node as BinaryOperator);
+                    GenerateCodeForComparison(node.As<BinaryOperator>());
                     break;
 
                 case Operation.Add:
@@ -171,47 +171,47 @@ namespace ILCompiler.Compiler
                 case Operation.Rem:
                 case Operation.Div_Un:
                 case Operation.Rem_Un:
-                    GenerateCodeForBinaryOperator(node as BinaryOperator);
+                    GenerateCodeForBinaryOperator(node.As<BinaryOperator>());
                     break;
 
                 case Operation.LocalVariable:
-                    GenerateCodeForLocalVariable(node as LocalVariableEntry);
+                    GenerateCodeForLocalVariable(node.As<LocalVariableEntry>());
                     break;
 
                 case Operation.LocalVariableAddress:
-                    GenerateCodeForLocalVariableAddress(node as LocalVariableAddressEntry);
+                    GenerateCodeForLocalVariableAddress(node.As<LocalVariableAddressEntry>());
                     break;
 
                 case Operation.StoreLocalVariable:
-                    GenerateCodeForStoreLocalVariable(node as StoreLocalVariableEntry);
+                    GenerateCodeForStoreLocalVariable(node.As<StoreLocalVariableEntry>());
                     break;
 
                 case Operation.Field:
-                    GenerateCodeForField(node as FieldEntry);
+                    GenerateCodeForField(node.As<FieldEntry>());
                     break;
 
                 case Operation.FieldAddress:
-                    GenerateCodeForFieldAddress(node as FieldAddressEntry);
+                    GenerateCodeForFieldAddress(node.As<FieldAddressEntry>());
                     break;
 
                 case Operation.Indirect:
-                    GenerateCodeForIndirect(node as IndirectEntry);
+                    GenerateCodeForIndirect(node.As<IndirectEntry>());
                     break;
 
                 case Operation.Call:
-                    GenerateCodeForCall(node as CallEntry);
+                    GenerateCodeForCall(node.As<CallEntry>());
                     break;
 
                 case Operation.Intrinsic:
-                    GenerateCodeForIntrinsic(node as IntrinsicEntry);
+                    GenerateCodeForIntrinsic(node.As<IntrinsicEntry>());
                     break;
 
                 case Operation.Cast:
-                    GenerateCodeForCast(node as CastEntry);
+                    GenerateCodeForCast(node.As<CastEntry>());
                     break;
 
                 case Operation.Switch:
-                    GenerateCodeForSwitch(node as SwitchEntry);
+                    GenerateCodeForSwitch(node.As<SwitchEntry>());
                     break;
 
                 default:
@@ -230,7 +230,7 @@ namespace ILCompiler.Compiler
                 {
                     if (currentNode is StringConstantEntry)
                     {
-                        var stringConstantEntry = currentNode as StringConstantEntry;
+                        var stringConstantEntry = currentNode.As<StringConstantEntry>();
 
                         var label = LabelGenerator.GetLabel(LabelType.String);
                         _labelsToStringData[label] = stringConstantEntry.Value;
@@ -340,7 +340,7 @@ namespace ILCompiler.Compiler
             _currentAssembler.Push(R16.HL); // Put HL into IX
             _currentAssembler.Pop(I16.IX);
 
-            short offset = (short)(entry.FieldOffset);
+            short offset = (short)entry.FieldOffset;
 
             switch (entry.TargetType)
             {
@@ -363,7 +363,8 @@ namespace ILCompiler.Compiler
 
                 case WellKnownType.Int32:
                 case WellKnownType.UInt32:
-                    for (int stackoffset = offset; stackoffset < offset + entry.ExactSize.Value; stackoffset += 4)
+                    var exactSize = entry.ExactSize ?? 0;
+                    for (int stackoffset = offset; stackoffset < offset + exactSize; stackoffset += 4)
                     {
                         _currentAssembler.Pop(R16.DE);
                         _currentAssembler.Pop(R16.BC);
@@ -409,10 +410,11 @@ namespace ILCompiler.Compiler
         public void GenerateCodeForField(FieldEntry entry)
         {
             // Load field onto stack
-            var fieldOffset = entry.Offset;
+            var fieldOffset = entry.Offset ?? 0;
+            var exactSize = entry.ExactSize ?? 0;
 
-            var indirectEntry = new IndirectEntry(null, entry.Kind, WellKnownType.Int32);
-            GenerateCodeForIndirect(indirectEntry, fieldOffset.Value, entry.ExactSize.Value);
+            var indirectEntry = new IndirectEntry(entry, entry.Kind, WellKnownType.Int32);
+            GenerateCodeForIndirect(indirectEntry, fieldOffset, exactSize);
         }
 
         public void GenerateCodeForFieldAddress(FieldAddressEntry entry)
@@ -551,11 +553,12 @@ namespace ILCompiler.Compiler
                     _currentAssembler.Ld(R8.L, I16.IX, (short)-(variable.StackOffset - 2));
 
                     // Copy struct to the return buffer
-                    CopyWordsFromStackToHL(entry.ReturnTypeExactSize.Value);
+                    var returnTypeExactSize = entry.ReturnTypeExactSize ?? 0;
+                    CopyWordsFromStackToHL(returnTypeExactSize);
                 }
-                else if (targetType.Kind != StackValueKind.Int32)
+                else if (targetType?.Kind != StackValueKind.Int32)
                 {
-                    throw new NotImplementedException($"Unsupported return type {targetType.Kind}");
+                    throw new NotImplementedException($"Unsupported return type {targetType?.Kind}");
                 }
                 else
                 {
@@ -641,7 +644,7 @@ namespace ILCompiler.Compiler
 
         public void GenerateCodeForBinaryOperator(BinaryOperator entry)
         {
-            if (BinaryOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string routine))
+            if (BinaryOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string? routine))
             {
                 _currentAssembler.Call(routine);
             }
@@ -671,7 +674,7 @@ namespace ILCompiler.Compiler
 
         private void GenerateCodeForComparison(BinaryOperator entry)
         {
-            if (ComparisonOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string routine))
+            if (ComparisonOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string? routine))
             {
                 _currentAssembler.Call(routine);
                 // If carry set then push i4 1 else push i4 0
@@ -827,7 +830,7 @@ namespace ILCompiler.Compiler
         private void EliminatePushXXPopXX(IList<Instruction> instructions)
         {
             int unoptimizedInstructionCount = instructions.Count;
-            Instruction lastInstruction = null;
+            Instruction? lastInstruction = null;
             var currentInstruction = instructions[0];
             int count = 0;
             do

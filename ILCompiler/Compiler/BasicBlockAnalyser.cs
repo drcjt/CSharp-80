@@ -8,49 +8,40 @@ namespace ILCompiler.Compiler
     public class BasicBlockAnalyser
     {
         private readonly MethodDef _method;
-        private BasicBlock[] _basicBlocks;
-
-        public BasicBlock[] BasicBlocks
-        {
-            get
-            {
-                return _basicBlocks;
-            }
-        }
 
         public BasicBlockAnalyser(MethodDef method)
         {
             _method = method;
         }
 
-        public IDictionary<int, int> FindBasicBlocks()
+        public BasicBlock[] FindBasicBlocks(IDictionary<int, int> offsetToIndexMap)
         {
             var instructions = _method.Body.Instructions;
             var lastInstruction = instructions[instructions.Count - 1];
             var maxOffset = (int)lastInstruction.Offset + lastInstruction.GetSize();
-            _basicBlocks = new BasicBlock[maxOffset];
+            var basicBlocks = new BasicBlock[maxOffset];
 
-            CreateBasicBlock(0);
+            CreateBasicBlock(basicBlocks, 0);
 
-            return FindJumpTargets();
+            FindJumpTargets(basicBlocks, offsetToIndexMap);
+
+            return basicBlocks;
         }
 
-        private void CreateBasicBlock(int offset)
+        private void CreateBasicBlock(BasicBlock[] basicBlocks,  int offset)
         {
-            var basicBlock = _basicBlocks[offset];
+            var basicBlock = basicBlocks[offset];
             if (basicBlock == null)
             {
                 basicBlock = new BasicBlock(offset);
-                _basicBlocks[offset] = basicBlock;
+                basicBlocks[offset] = basicBlock;
             }
         }
 
-        private IDictionary<int, int> FindJumpTargets()
+        private void FindJumpTargets(BasicBlock[] basicBlocks, IDictionary<int, int> offsetToIndexMap)
         {
             var currentIndex = 0;
             var currentOffset = 0;
-
-            var offsetToIndexMap = new Dictionary<int, int>();
 
             while (currentIndex < _method.Body.Instructions.Count)
             {
@@ -84,11 +75,11 @@ namespace ILCompiler.Compiler
                     case Code.Brfalse_S:
                     case Code.Brtrue_S:
                         {
-                            var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
+                            var target = currentInstruction.OperandAs<Instruction>();
                             var targetOffset = target.Offset;
-                            CreateBasicBlock((int)targetOffset); // target of jump                            
+                            CreateBasicBlock(basicBlocks, (int)targetOffset); // target of jump                            
                             var nextInstructionOffset = currentOffset + currentInstruction.GetSize();
-                            CreateBasicBlock(nextInstructionOffset); // instruction after jump
+                            CreateBasicBlock(basicBlocks, nextInstructionOffset); // instruction after jump
                         }
                         break;
 
@@ -97,30 +88,30 @@ namespace ILCompiler.Compiler
                     case Code.Br:
                     case Code.Leave:
                         {
-                            var target = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction;
-                            var targetOffset = target.Offset;
-                            CreateBasicBlock((int)targetOffset); // target of jump
+                            var target = currentInstruction.OperandAs<Instruction>();
+                            CreateBasicBlock(basicBlocks,  (int)target.Offset); // target of jump
                         }
                         break;
 
                     case Code.Switch:
                         {
                             var targets = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction[];
-                            foreach (var target in targets)
+                            if (targets != null)
                             {
-                                var targetOffset = target.Offset;
-                                CreateBasicBlock((int)targetOffset); // target of jump
+                                foreach (var target in targets)
+                                {
+                                    var targetOffset = target.Offset;
+                                    CreateBasicBlock(basicBlocks,  (int)targetOffset); // target of jump
+                                }
                             }
                             var nextInstructionOffset = currentOffset + currentInstruction.GetSize();
-                            CreateBasicBlock(nextInstructionOffset); // instruction after jump
+                            CreateBasicBlock(basicBlocks, nextInstructionOffset); // instruction after jump
                         }
                         break;
                 }
                 currentOffset += currentInstruction.GetSize();
                 currentIndex++;
             }
-
-            return offsetToIndexMap;
         }
     }
 }

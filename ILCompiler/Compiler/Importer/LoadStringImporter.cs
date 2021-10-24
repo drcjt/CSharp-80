@@ -10,7 +10,7 @@ namespace ILCompiler.Compiler.Importer
 
         public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
-            importer.PushExpression(new StringConstantEntry(instruction.Operand as string));
+            importer.PushExpression(new StringConstantEntry(instruction.OperandAs<string>()));
         }
     }
 }

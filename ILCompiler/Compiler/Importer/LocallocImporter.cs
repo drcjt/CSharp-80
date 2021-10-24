@@ -13,14 +13,14 @@ namespace ILCompiler.Compiler.Importer
 
         public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
-            var op2 = importer.PopExpression();
+            var op2 = importer.PopExpression().As<Int32ConstantEntry>();
 
             if (op2.Kind != StackValueKind.Int32)
             {
                 throw new NotSupportedException("Localloc requires int size");
             }
 
-            var allocSize = (op2 as Int32ConstantEntry).Value;
+            var allocSize = op2.Value;
 
             // Ensure we don't allocate less than each stack entry size
             allocSize = RoundUp(allocSize, 4);

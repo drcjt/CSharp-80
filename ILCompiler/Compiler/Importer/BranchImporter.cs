@@ -54,7 +54,7 @@ namespace ILCompiler.Compiler.Importer
                     code += (Code.Br - Code.Br_S);
                     break;
             }
-            var target = instruction.Operand as Instruction;
+            var target = instruction.OperandAs<Instruction>();
 
             var targetBlock = importer.BasicBlocks[(int)target.Offset];
             var fallthroughBlock = (code != Code.Br) ? context.CurrentBlock : null;

@@ -22,7 +22,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
     public class StringConstantEntry : ConstantEntry<String>
     {
-        public string Label { get; set; }
+        public string Label { get; set; } = String.Empty;
         public StringConstantEntry(string value) : base(StackValueKind.ObjRef, value, 4)
         {
             Operation = Operation.Constant_String;

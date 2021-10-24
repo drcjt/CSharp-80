@@ -22,7 +22,7 @@ namespace ILCompiler.Compiler.Importer
             {
                 if (obj is LocalVariableEntry)
                 {
-                    obj = new LocalVariableAddressEntry((obj as LocalVariableEntry).LocalNumber);
+                    obj = new LocalVariableAddressEntry((obj.As<LocalVariableEntry>()).LocalNumber);
                 }
                 else if (obj is FieldEntry)
                 {

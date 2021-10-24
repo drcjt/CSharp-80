@@ -9,11 +9,11 @@ namespace ILCompiler.Compiler
     {
         private static int _indent;
 
-        private StringBuilder _sb;
+        private StringBuilder _sb = new StringBuilder();
 
         public string Dump(IList<BasicBlock> blocks)
         {
-            _sb = new StringBuilder();
+            _sb.Clear();
             foreach (var block in blocks)
             {
                 _sb.AppendLine($"Block {block.Label}");

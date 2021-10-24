@@ -36,7 +36,7 @@ namespace ILCompiler.Compiler.Importer
         {
             var index = instruction.OpCode.Code switch
             {
-                Code.Stloc or Code.Stloc_S => (instruction.Operand as Local).Index,
+                Code.Stloc or Code.Stloc_S => (instruction.OperandAs<Local>()).Index,
                 _ => instruction.OpCode.Code - Code.Stloc_0,
             };
             return index;

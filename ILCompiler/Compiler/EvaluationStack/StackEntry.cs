@@ -45,7 +45,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public int? ExactSize { get; }
 
-        public StackEntry Next { get; set; }
+        public StackEntry? Next { get; set; }
 
         public Operation Operation { get; set; }
 
@@ -59,5 +59,10 @@ namespace ILCompiler.Compiler.EvaluationStack
         public abstract StackEntry Duplicate();
 
         abstract public void Accept(IStackEntryVisitor visitor);
+
+        public T As<T>() where T : StackEntry
+        {
+            return (T)this;
+        }
     }
 }

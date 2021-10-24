@@ -15,7 +15,7 @@ namespace ILCompiler.Compiler
         {
             foreach (var block in blocks)
             {
-                StackEntry current = null;
+                StackEntry? current = null;
                 foreach (var statement in block.Statements)
                 {
                     var orderingVisitor = new PostOrderTraversalVisitor(current);
@@ -34,10 +34,10 @@ namespace ILCompiler.Compiler
 
     public class PostOrderTraversalVisitor : IStackEntryVisitor
     {
-        public StackEntry Current { get; private set; }
-        public StackEntry First { get; set; }
+        public StackEntry? Current { get; private set; }
+        public StackEntry? First { get; set; }
 
-        public PostOrderTraversalVisitor(StackEntry current)
+        public PostOrderTraversalVisitor(StackEntry? current)
         {
             Current = current;
         }

@@ -47,7 +47,7 @@ namespace ILCompiler.Compiler.Importer
             int index = code - Code.Ldarg_0;
             if (IsLdArg(code))
             {
-                index = (instruction.Operand as Parameter).Index;
+                index = (instruction.OperandAs<Parameter>()).Index;
             }
 
             return index;

@@ -30,9 +30,12 @@ namespace ILCompiler.Compiler
 
         private void OutputMethodNode(Z80MethodCodeNode methodCodeNode)
         {
-            foreach (var instruction in methodCodeNode.MethodCode)
+            if (methodCodeNode.MethodCode != null)
             {
-                _out.WriteLine(instruction.ToString());
+                foreach (var instruction in methodCodeNode.MethodCode)
+                {
+                    _out.WriteLine(instruction.ToString());
+                }
             }
         }
 
@@ -121,9 +124,12 @@ namespace ILCompiler.Compiler
                     OutputMethodNode(node);
                 }
 
-                foreach (var dependentNodes in node.Dependencies)
+                if (node.Dependencies != null)
                 {
-                    OutputCodeForNode(dependentNodes);
+                    foreach (var dependentNodes in node.Dependencies)
+                    {
+                        OutputCodeForNode(dependentNodes);
+                    }
                 }
                 node.CodeEmitted = true;
             }
@@ -149,11 +155,14 @@ namespace ILCompiler.Compiler
             string[] resourceNames = GetType().Assembly.GetManifestResourceNames();
             foreach (string resourceName in resourceNames)
             {
-                using (Stream stream = GetType().Assembly.GetManifestResourceStream(resourceName))
+                using (Stream? stream = GetType().Assembly.GetManifestResourceStream(resourceName))
                 {
-                    using (var reader = new StreamReader(stream))
+                    if (stream != null)
                     {
-                        _out.Write(reader.ReadToEnd());
+                        using (var reader = new StreamReader(stream))
+                        {
+                            _out.Write(reader.ReadToEnd());
+                        }
                     }
                 }
             }

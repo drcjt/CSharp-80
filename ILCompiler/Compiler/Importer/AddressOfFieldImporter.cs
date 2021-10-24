@@ -27,7 +27,7 @@ namespace ILCompiler.Compiler.Importer
                 throw new NotImplementedException($"LoadFieldImporter does not support {obj.Kind}");
             }
 
-            var node = new FieldAddressEntry(fieldDef.Name, obj, fieldDef.FieldOffset.Value);
+            var node = new FieldAddressEntry(fieldDef.Name, obj, fieldDef?.FieldOffset ?? 0);
 
             importer.PushExpression(node);
         }

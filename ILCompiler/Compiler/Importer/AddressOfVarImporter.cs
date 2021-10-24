@@ -13,7 +13,7 @@ namespace ILCompiler.Compiler.Importer
 
         public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
-            importer.PushExpression(new LocalVariableAddressEntry(importer.ParameterCount + (instruction.Operand as Local).Index));
+            importer.PushExpression(new LocalVariableAddressEntry(importer.ParameterCount + (instruction.OperandAs<Local>()).Index));
         }
     }
 }

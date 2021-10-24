@@ -18,8 +18,8 @@ namespace ILCompiler.Compiler
         private readonly IConfiguration _configuration;
 
         private BasicBlock[] _basicBlocks;
-        private BasicBlock _currentBasicBlock;
-        private BasicBlock _pendingBasicBlocks;
+        private BasicBlock? _currentBasicBlock;
+        private BasicBlock? _pendingBasicBlocks;
 
         public INameMangler NameMangler => _methodCompiler.NameMangler;
 
@@ -57,6 +57,7 @@ namespace ILCompiler.Compiler
             _method = method;
             _localVariableTable = localVariableTable;
             _configuration = configuration;
+            _basicBlocks = Array.Empty<BasicBlock>();
 
             _importers = OpcodeImporterFactory.GetAllOpcodeImporters();
             _importerProxy = new ILImporterProxy(this);
@@ -81,9 +82,9 @@ namespace ILCompiler.Compiler
         {
             _stack.Clear();
 
-            EvaluationStack<StackEntry> entryStack = basicBlock.EntryStack;
-            if (entryStack != null)
+            if (basicBlock.EntryStack != null)
             {
+                EvaluationStack<StackEntry> entryStack = basicBlock.EntryStack;
                 int n = entryStack.Length;
                 for (int i = 0; i < n; i++)
                 {
@@ -99,13 +100,13 @@ namespace ILCompiler.Compiler
 
         private void ImportAppendTree(StackEntry entry)
         {
-            _currentBasicBlock.Statements.Add(entry);
+            _currentBasicBlock?.Statements.Add(entry);
         }
 
-        private StackEntry ImportExtractLastStmt()
+        private StackEntry? ImportExtractLastStmt()
         {
-            StackEntry lastStmt = null;
-            if (_currentBasicBlock.Statements.Count > 0)
+            StackEntry? lastStmt = null;
+            if (_currentBasicBlock?.Statements.Count > 0)
             {
                 var lastStmtIndex = _currentBasicBlock.Statements.Count - 1;
                 lastStmt = _currentBasicBlock.Statements[lastStmtIndex];
@@ -132,12 +133,8 @@ namespace ILCompiler.Compiler
 
                 if (importer != null)
                 {
-                    var importContext = new ImportContext()
-                    {
-                        CurrentBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null,
-                        Method = _method,
-                        NameMangler = _methodCompiler.NameMangler,
-                    };
+                    var currentBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null;
+                    var importContext = new ImportContext(currentBlock, _method, _methodCompiler.NameMangler);
                     importer.Import(currentInstruction, importContext, _importerProxy);
                     if (importContext.StopImporting)
                     {
@@ -174,7 +171,7 @@ namespace ILCompiler.Compiler
                 IsParameter = false,
                 IsTemp = true,
                 Kind = kind,
-                ExactSize = exactSize.Value,
+                ExactSize = exactSize ?? 0,
             };
 
             _localVariableTable.Add(temp);
@@ -209,28 +206,28 @@ namespace ILCompiler.Compiler
         public IList<BasicBlock> Import()
         {
             var basicBlockAnalyser = new BasicBlockAnalyser(_method);
-            var offsetToIndexMap = basicBlockAnalyser.FindBasicBlocks();
-            _basicBlocks = basicBlockAnalyser.BasicBlocks;
+            var offsetToIndexMap = new Dictionary<int, int>();
+            _basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
 
             ImportBasicBlocks(offsetToIndexMap);
 
-            var basicBlocks = new List<BasicBlock>();
+            var importedBasicBlocks = new List<BasicBlock>();
             for (int i = 0; i < _basicBlocks.Length; i++)
             {
                 if (_basicBlocks[i] != null)
                 {
-                    basicBlocks.Add(_basicBlocks[i]);
+                    importedBasicBlocks.Add(_basicBlocks[i]);
                 }
             }
 
-            return basicBlocks;
+            return importedBasicBlocks;
         }
 
         private void ImportFallThrough(BasicBlock next)
         {
             // Evaluation stack in each basic block holds the imported high level tree representation of the IL
 
-            EvaluationStack<StackEntry> entryStack = next.EntryStack;
+            EvaluationStack<StackEntry>? entryStack = next.EntryStack;
 
             if (entryStack != null)
             {
@@ -270,7 +267,7 @@ namespace ILCompiler.Compiler
                 // The branch/jump statement is put back if there was one
 
                 var setupEntryStack = entryStack == null;
-                if (setupEntryStack)
+                if (entryStack == null)
                 {
                     entryStack = new EvaluationStack<StackEntry>(_stack.Length);
                 }
@@ -284,7 +281,7 @@ namespace ILCompiler.Compiler
                     int? tempNumber = null;
                     if (!setupEntryStack)
                     {
-                        tempNumber = (entryStack[i] as LocalVariableEntry).LocalNumber;
+                        tempNumber = (entryStack[i].As<LocalVariableEntry>()).LocalNumber;
                     }
                     var temp = ImportSpillStackEntry(_stack[i], tempNumber);
                     if (setupEntryStack)

@@ -32,7 +32,11 @@ namespace ILCompiler.Compiler
             var corlibFilePath = _configuration.CorelibPath;
             if (string.IsNullOrEmpty(corlibFilePath))
             {
-                corlibFilePath = Path.Combine(Path.GetDirectoryName(inputFilePath), "mscorlib.dll");
+                var inputDirectoryName = Path.GetDirectoryName(inputFilePath);
+                if (inputDirectoryName != null)
+                {
+                    corlibFilePath = Path.Combine(inputDirectoryName, "mscorlib.dll");
+                }
             }
             ModuleDefMD corlibModule = ModuleDefMD.Load(corlibFilePath, modCtx);
             var corlibAssemblyRef = corlibModule.Assembly.ToAssemblyRef();
@@ -66,9 +70,12 @@ namespace ILCompiler.Compiler
                 methodCompiler.CompileMethod(node);
                 node.Compiled = true;
 
-                foreach (var dependentNode in node.Dependencies)
+                if (node.Dependencies != null)
                 {
-                    CompileNode(dependentNode);
+                    foreach (var dependentNode in node.Dependencies)
+                    {
+                        CompileNode(dependentNode);
+                    }
                 }
             }
         }

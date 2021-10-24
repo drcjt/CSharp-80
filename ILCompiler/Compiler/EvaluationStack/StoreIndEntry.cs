@@ -6,11 +6,11 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public StackEntry Addr { get; }
         public StackEntry Op1 { get; }
-        public uint? FieldOffset;
+        public uint FieldOffset;
 
         public WellKnownType TargetType { get; }
 
-        public StoreIndEntry(StackEntry addr, StackEntry op1, WellKnownType targetType, uint? fieldOffset = 0, int? size = 4) : base(addr.Kind, size)
+        public StoreIndEntry(StackEntry addr, StackEntry op1, WellKnownType targetType, uint fieldOffset = 0, int? size = 4) : base(addr.Kind, size)
         {
             Operation = Operation.StoreIndirect;
             Addr = addr;

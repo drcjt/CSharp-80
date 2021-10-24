@@ -13,10 +13,10 @@ namespace ILCompiler.Compiler
 
         public string GetMangledMethodName(MethodDef method)
         {
-            string mangledName;
-            if (_mangledMethodNames.TryGetValue(method.FullName, out mangledName))
+            if (_mangledMethodNames.TryGetValue(method.FullName, out string? mangledName))
+            {
                 return mangledName;
-
+            }
 
             mangledName = $"m{nextMethodId++}";
             _mangledMethodNames.Add(method.FullName, mangledName);

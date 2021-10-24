@@ -25,6 +25,7 @@ namespace ILCompiler.Compiler
         {
             _compilation = compilation;
             _configuration = configuration;
+            _localVariableTable = new List<LocalVariableDescriptor>();
         }
 
         private void SetupLocalVariableTable(MethodDef method)
@@ -32,8 +33,6 @@ namespace ILCompiler.Compiler
             var body = method.MethodBody as CilBody;
 
             // Setup local variable table - includes parameters as well as locals in method
-            _localVariableTable = new List<LocalVariableDescriptor>(method.Parameters.Count + body?.Variables.Count ?? 0);
-
             for (int parameterIndex = 0; parameterIndex < method.Parameters.Count; parameterIndex++)
             {
                 var kind = method.Parameters[parameterIndex].Type.GetStackValueKind();

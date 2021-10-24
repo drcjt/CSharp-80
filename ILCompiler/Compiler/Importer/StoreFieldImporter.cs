@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.Importer
 
         public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
-            var fieldDef = instruction.Operand as FieldDef;
+            var fieldDef = instruction.OperandAs<FieldDef>();
 
             var value = importer.PopExpression();
             var addr = importer.PopExpression();
@@ -25,15 +25,18 @@ namespace ILCompiler.Compiler.Importer
             {
                 throw new NotSupportedException($"Storing to field of type {value.Kind} not supported");
             }
+
             // Ensure fields have all offsets calculated
-            if (!fieldDef.FieldOffset.HasValue)
+            if (fieldDef.FieldOffset == null)
             {
                 fieldDef.DeclaringType.ToTypeSig().GetExactSize();
             }
 
+            // TODO: Can this be removed
             var fieldSize = fieldDef.FieldType.GetExactSize();
+            var fieldOffset = fieldDef.FieldOffset ?? 0;
 
-            importer.ImportAppendTree(new StoreIndEntry(addr, value, WellKnownType.Int32, fieldDef.FieldOffset, fieldDef.FieldType.GetExactSize()));
+            importer.ImportAppendTree(new StoreIndEntry(addr, value, WellKnownType.Int32, fieldOffset, fieldSize));
         }
     }
 }

@@ -18,7 +18,7 @@ namespace ILCompiler.Compiler.Importer
             {
                 throw new NotSupportedException("Storing to argument other than short, int32 or object refs not supported yet");
             }
-            var node = new StoreLocalVariableEntry((instruction.Operand as Parameter).Index, true, value);
+            var node = new StoreLocalVariableEntry((instruction.OperandAs<Parameter>()).Index, true, value);
             importer.ImportAppendTree(node);
         }
     }

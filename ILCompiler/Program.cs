@@ -11,9 +11,8 @@ namespace ILCompiler
 {
     public class Program
     {
-        private FileInfo _outputFilePath;
-        private FileInfo _inputFilePath;
-        private static IConfiguration _configuration;
+        private FileInfo? _outputFilePath;
+        private FileInfo? _inputFilePath;
 
         public static int Main(string[] args)
         {
@@ -23,7 +22,7 @@ namespace ILCompiler
                 ConfigureServices(services);
                 using (ServiceProvider serviceProvider = services.BuildServiceProvider())
                 {
-                    Program app = serviceProvider.GetService<Program>();
+                    Program app = serviceProvider.GetRequiredService<Program>();
                     app.Run(args, serviceProvider);
                 }
             }
@@ -47,17 +46,18 @@ namespace ILCompiler
         {
             services.AddLogging(configure => configure.AddConsole()).AddTransient<Program>();
             services.AddSingleton<ICompilation, Compilation>();
-            services.AddSingleton(sp => _configuration);
+            services.AddSingleton<IConfiguration, Configuration>();
             services.AddSingleton<INameMangler, NameMangler>();
         }
 
         private void Run(string[] args, ServiceProvider serviceProvider)
         {
-            var result = ParseCommandLine(args);
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var result = ParseCommandLine(args, configuration);
 
-            if (result == 0)
+            if (result == 0 && _inputFilePath != null && _outputFilePath != null)
             {
-                var compiler = serviceProvider.GetService<ICompilation>();
+                var compiler = serviceProvider.GetRequiredService<ICompilation>();
                 compiler.Compile(_inputFilePath.FullName, _outputFilePath.FullName);
             }
             else
@@ -66,7 +66,7 @@ namespace ILCompiler
             }
         }
 
-        private int ParseCommandLine(string[] args)
+        private int ParseCommandLine(string[] args, IConfiguration configuration)
         {
             var rootCommand = new RootCommand
             {
@@ -81,16 +81,21 @@ namespace ILCompiler
             };
 
             rootCommand.Description = "CSharp-80 compiler from C# IL to Z80 for TRS-80 Machines";
-            rootCommand.Handler = CommandHandler.Create<FileInfo, FileInfo, Configuration>(HandleCommand);
+            rootCommand.Handler = CommandHandler.Create<FileInfo?, FileInfo?, Configuration>(
+                (inputFilePath, outputFile, parsedConfiguration) => 
+                {
+                    _inputFilePath = inputFilePath;
+                    _outputFilePath = outputFile;
+                    configuration.CorelibPath = parsedConfiguration.CorelibPath;
+                    configuration.DumpIRTrees = parsedConfiguration.DumpIRTrees;
+                    configuration.IgnoreUnknownCil = parsedConfiguration.IgnoreUnknownCil;
+                    configuration.PrintReturnCode = parsedConfiguration.PrintReturnCode;
+                    configuration.IntegrationTests = parsedConfiguration.IntegrationTests;
+                    configuration.DontInlineRuntime = parsedConfiguration.DontInlineRuntime;
+                }
+            );
 
             return rootCommand.InvokeAsync(args).Result;
-        }
-
-        private void HandleCommand(FileInfo inputFilePath, FileInfo outputFile, Configuration configuration)
-        {
-            _inputFilePath = inputFilePath;
-            _outputFilePath = outputFile;
-            _configuration = configuration;
         }
     }
 }

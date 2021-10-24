@@ -15,6 +15,6 @@ namespace ILCompiler.Compiler
 
         public bool IsTemp { get; set; }
 
-        public string Name;
+        public string Name = string.Empty;
     }
 }
