@@ -5,25 +5,26 @@ namespace Z80Assembler
 {
     public class Instruction
     {
-        public string Label { get; }
-        public Opcode Opcode { get; }
-        public string Operands { get; }
+        public string Label { get; } = String.Empty;
+        public Opcode? Opcode { get; }
+        public string Operands { get; } = String.Empty;
 
         private readonly bool _upperCase = true;
 
-        public Instruction(string label, Opcode opcode, string operands) : this(opcode, operands)
+        public Instruction(string label, Opcode? opcode, string operands) : this(opcode, operands)
         {
-            this.Label = label;
+            Label = label;
         }
 
-        public Instruction(Opcode opcode, string operands) : this(opcode)
+        public Instruction(Opcode? opcode, string operands) : this(opcode)
         {
-            this.Operands = operands;
+            Operands = operands;
         }
 
-        public Instruction(Opcode opcode)
+        public Instruction(Opcode? opcode)
         {
-            this.Opcode = opcode;
+            Opcode = opcode;
+
         }
 
         public override string ToString()

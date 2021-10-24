@@ -17,7 +17,7 @@ namespace Z80Assembler
             Instructions.Clear();
         }
 
-        public Label CreateLabel(string name = null)
+        public Label CreateLabel(string name)
         {
             _currentLabelId++;
             var label = new Label(name, _currentLabelId);

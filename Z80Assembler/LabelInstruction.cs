@@ -2,7 +2,7 @@
 {
     public class LabelInstruction : Instruction
     {
-        public LabelInstruction(string label) : base(label, null, string.Empty)
+        public LabelInstruction(string label) : base(label, opcode: null, operands: string.Empty)
         {
         }
     }
