@@ -12,14 +12,6 @@
 	ldc.i4 0x00000011
 	stind.i1
 
-	ldloca 1
-	ldc.i4 0x00002222
-	stind.i2
-
-	ldloca 2
-	ldc.i4 0x44444444
-	stind.i4
-
 	ldloca 0
 	ldind.i1
 	ldc.i4 0x00000011
@@ -27,10 +19,18 @@
 	brfalse fail
 
 	ldloca 1
+	ldc.i4 0x00002222
+	stind.i2
+
+	ldloca 1
 	ldind.i2
 	ldc.i4 0x00002222
 	ceq
 	brfalse fail
+
+	ldloca 2
+	ldc.i4 0x44444444
+	stind.i4
 
 	ldloca 2
 	ldind.i4

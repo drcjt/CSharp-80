@@ -331,80 +331,141 @@ namespace ILCompiler.Compiler
 
         public void GenerateCodeForStoreIndirect(StoreIndEntry entry)
         {
-            _currentAssembler.Pop(R16.AF);
-            _currentAssembler.Pop(R16.HL);  // Address is stored as 32 bits but will only use lsw
-
-            _currentAssembler.Push(I16.IX); // Put IX into AF
-            _currentAssembler.Pop(R16.AF);
-
-            _currentAssembler.Push(R16.HL); // Put HL into IX
-            _currentAssembler.Pop(I16.IX);
-
-            short offset = (short)entry.FieldOffset;
-
-            switch (entry.TargetType)
+            var exactSize = entry.ExactSize ?? 0;
+            if (exactSize > 0)
             {
-                case WellKnownType.SByte:
-                case WellKnownType.Byte:
-                case WellKnownType.Boolean:
-                case WellKnownType.Char:
-                    _currentAssembler.Pop(R16.DE);
-                    _currentAssembler.Pop(R16.BC);
-                    _currentAssembler.Ld(I16.IX, offset, R8.C);
-                    break;
+                _currentAssembler.Pop(R16.HL);
+                _currentAssembler.Pop(R16.HL);  // Address is stored as 32 bits but will only use lsw
 
-                case WellKnownType.Int16:
-                case WellKnownType.UInt16:
-                    _currentAssembler.Pop(R16.DE);
-                    _currentAssembler.Pop(R16.BC);
-                    _currentAssembler.Ld(I16.IX, (short)(offset + 1), R8.B);
-                    _currentAssembler.Ld(I16.IX, (short)(offset + 0), R8.C);
-                    break;
-
-                case WellKnownType.Int32:
-                case WellKnownType.UInt32:
-                    var exactSize = entry.ExactSize ?? 0;
-                    for (int stackoffset = offset; stackoffset < offset + exactSize; stackoffset += 4)
-                    {
-                        _currentAssembler.Pop(R16.DE);
-                        _currentAssembler.Pop(R16.BC);
-
-                        _currentAssembler.Ld(I16.IX, (short)(stackoffset + 3), R8.B);
-                        _currentAssembler.Ld(I16.IX, (short)(stackoffset + 2), R8.C);
-                        _currentAssembler.Ld(I16.IX, (short)(stackoffset + 1), R8.D);
-                        _currentAssembler.Ld(I16.IX, (short)(stackoffset + 0), R8.E);
-                    }
-                    break;
-
-                default:
-                    throw new NotImplementedException();
-            }
-
-            _currentAssembler.Push(R16.AF);
-            _currentAssembler.Pop(I16.IX);
-        }
-
-        private void CopyWordsFromStackToHL(int fieldSize)
-        {
-            _currentAssembler.Push(I16.IX);
-            _currentAssembler.Pop(R16.AF);
-
-            _currentAssembler.Push(R16.HL);
-            _currentAssembler.Pop(I16.IX);
-
-            for (int stackOffset = 0; stackOffset < fieldSize; stackOffset += 4)
-            {
-                _currentAssembler.Pop(R16.DE);
+                _currentAssembler.Push(I16.IX);
                 _currentAssembler.Pop(R16.BC);
 
-                _currentAssembler.Ld(I16.IX, (short)(stackOffset + 3), R8.B);
-                _currentAssembler.Ld(I16.IX, (short)(stackOffset + 2), R8.C);
-                _currentAssembler.Ld(I16.IX, (short)(stackOffset + 1), R8.D);
-                _currentAssembler.Ld(I16.IX, (short)(stackOffset + 0), R8.E);
-            }
+                _currentAssembler.Push(R16.HL);
+                _currentAssembler.Pop(I16.IX);
 
-            _currentAssembler.Push(R16.AF);
-            _currentAssembler.Pop(I16.IX);
+                short offset = (short)entry.FieldOffset;                
+                CopyFromStackToIX(exactSize, offset);
+
+                _currentAssembler.Push(R16.BC);
+                _currentAssembler.Pop(I16.IX);
+            }
+        }
+
+        private void CopyFromStackToIX(int size, int ixOffset = 0, bool restoreIX = false)
+        {
+            int changeToIX = 0;
+
+
+            var totalBytesToCopy = size;
+            int originalIxOffset = ixOffset;
+            do
+            {
+                var bytesToCopy = totalBytesToCopy > 4 ? 4 : totalBytesToCopy;
+
+                // offset has to be -128 to + 127
+                if (ixOffset + 3 > 127)
+                {
+                    // Need to move IX along to keep stackOffset within -128 to +127 range
+                    _currentAssembler.Ld(R16.DE, 127);
+                    _currentAssembler.Add(I16.IX, R16.DE);
+                    changeToIX += 127;
+
+                    ixOffset -= 127;
+                    size -= 127;
+                }
+
+                switch (bytesToCopy)
+                {
+                    case 1:
+                        _currentAssembler.Pop(R16.HL);
+                        _currentAssembler.Pop(R16.HL);
+                        _currentAssembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
+                        break;
+                    case 2:
+                        _currentAssembler.Pop(R16.HL);
+                        _currentAssembler.Pop(R16.HL);
+                        _currentAssembler.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
+                        _currentAssembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
+                        break;
+                    case 4:
+                        _currentAssembler.Pop(R16.HL);
+                        _currentAssembler.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
+                        _currentAssembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
+                        _currentAssembler.Pop(R16.HL);
+                        _currentAssembler.Ld(I16.IX, (short)(ixOffset + 3), R8.H);
+                        _currentAssembler.Ld(I16.IX, (short)(ixOffset + 2), R8.L);
+                        break;
+                }
+
+                ixOffset += 4;
+                totalBytesToCopy -= 4;
+            } while (ixOffset < size + originalIxOffset);
+
+            if (changeToIX != 0 && restoreIX)
+            {
+                _currentAssembler.Ld(R16.DE, (short)(-changeToIX));
+                _currentAssembler.Add(I16.IX, R16.DE);
+            }
+        }
+
+        private void CopyFromIXToStack(int size, int ixOffset = 0, bool restoreIX = false)
+        {
+            int changeToIX = 0;
+
+            int originalIxOffset = ixOffset;
+            ixOffset += size - 4;
+            do
+            {
+                var bytesToCopy = size > 4 ? 4 : size;
+                size -= 4;
+
+                if (ixOffset + 3 < -128)
+                {
+                    var delta = ixOffset + 3;
+                    _currentAssembler.Ld(R16.DE, (short)delta);
+                    _currentAssembler.Add(I16.IX, R16.DE);
+                    changeToIX += delta;
+
+                    ixOffset -= delta;
+                    originalIxOffset -= delta;
+                }
+
+                switch (bytesToCopy)
+                {
+                    case 1:
+                        _currentAssembler.Ld(R8.H, 0);
+                        _currentAssembler.Ld(R8.L, I16.IX, (short)(ixOffset + 3));
+                        _currentAssembler.Push(R16.HL);
+                        _currentAssembler.Ld(R16.HL, 0);
+                        _currentAssembler.Push(R16.HL);
+                        break;
+
+                    case 2:
+                        _currentAssembler.Ld(R8.H, I16.IX, (short)(ixOffset + 3));
+                        _currentAssembler.Ld(R8.L, I16.IX, (short)(ixOffset + 2));
+                        _currentAssembler.Push(R16.HL);
+                        _currentAssembler.Ld(R16.HL, 0);
+                        _currentAssembler.Push(R16.HL);
+                        break;
+
+                    case 4:
+                        _currentAssembler.Ld(R8.H, I16.IX, (short)(ixOffset + 3));
+                        _currentAssembler.Ld(R8.L, I16.IX, (short)(ixOffset + 2));
+                        _currentAssembler.Push(R16.HL);
+                        _currentAssembler.Ld(R8.H, I16.IX, (short)(ixOffset + 1));
+                        _currentAssembler.Ld(R8.L, I16.IX, (short)(ixOffset + 0));
+                        _currentAssembler.Push(R16.HL);
+                        break;
+                }
+
+                ixOffset -= 4;
+            } while (ixOffset >= originalIxOffset);
+
+            if (changeToIX != 0 && restoreIX)
+            {
+                _currentAssembler.Ld(R16.DE, (short)(-changeToIX));
+                _currentAssembler.Add(I16.IX, R16.DE);
+            }
         }
 
         public void GenerateCodeForField(FieldEntry entry)
@@ -413,7 +474,7 @@ namespace ILCompiler.Compiler
             var fieldOffset = entry.Offset ?? 0;
             var exactSize = entry.ExactSize ?? 0;
 
-            var indirectEntry = new IndirectEntry(entry, entry.Kind, WellKnownType.Int32);
+            var indirectEntry = new IndirectEntry(entry, entry.Kind, exactSize);
             GenerateCodeForIndirect(indirectEntry, fieldOffset, exactSize);
         }
 
@@ -441,59 +502,17 @@ namespace ILCompiler.Compiler
             {
                 // Save IX into DE
                 _currentAssembler.Push(I16.IX);
-                _currentAssembler.Pop(R16.DE);
+                _currentAssembler.Pop(R16.BC);
 
                 // Get indirect address from stack into IX
-                _currentAssembler.Pop(R16.AF);  // Ignore lsw of address
+                _currentAssembler.Pop(I16.IX);  // Ignore lsw of address
                 _currentAssembler.Pop(I16.IX);
 
-                switch (entry.TargetType)
-                {
-                    case WellKnownType.SByte:
-                    case WellKnownType.Byte:
-                    case WellKnownType.Boolean:
-                    case WellKnownType.Char:
-                        _currentAssembler.Ld(R8.H, 0);
-                        _currentAssembler.Ld(R8.L, I16.IX, (short)(fieldOffset + 0));
-                        _currentAssembler.Push(R16.HL);
-                        _currentAssembler.Ld(R16.HL, 0);
-                        _currentAssembler.Push(R16.HL);
-                        break;
-
-                    case WellKnownType.Int16:
-                    case WellKnownType.UInt16:
-                        _currentAssembler.Ld(R8.H, I16.IX, (short)(fieldOffset + 1));
-                        _currentAssembler.Ld(R8.L, I16.IX, (short)(fieldOffset + 0));
-                        _currentAssembler.Push(R16.HL);
-                        _currentAssembler.Ld(R16.HL, 0);
-                        _currentAssembler.Push(R16.HL);
-                        break;
-
-                    case WellKnownType.Int32:
-                    case WellKnownType.UInt32:
-                        Debug.Assert(fieldSize % 4 == 0);
-                        Debug.Assert(fieldSize > 0);
-
-                        // TODO: For large vars consider generating code to loop itself to minimize size of code
-
-                        var endOffset = (int)fieldOffset + fieldSize - 4;
-                        for (int offset = endOffset; offset >= fieldOffset; offset -= 4)
-                        {
-                            _currentAssembler.Ld(R8.H, I16.IX, (short)(offset + 3));
-                            _currentAssembler.Ld(R8.L, I16.IX, (short)(offset + 2));
-                            _currentAssembler.Push(R16.HL);
-                            _currentAssembler.Ld(R8.H, I16.IX, (short)(offset + 1));
-                            _currentAssembler.Ld(R8.L, I16.IX, (short)(offset + 0));
-                            _currentAssembler.Push(R16.HL);
-                        }
-                        break;
-
-                    default:
-                        throw new NotImplementedException();
-                }
+                var size = entry.ExactSize ?? 4;
+                CopyFromIXToStack(size, (short)fieldOffset);
 
                 // Restore IX from DE
-                _currentAssembler.Push(R16.DE);
+                _currentAssembler.Push(R16.BC);
                 _currentAssembler.Pop(I16.IX);
             }
             else
@@ -552,9 +571,18 @@ namespace ILCompiler.Compiler
                     _currentAssembler.Ld(R8.H, I16.IX, (short)-(variable.StackOffset - 3));
                     _currentAssembler.Ld(R8.L, I16.IX, (short)-(variable.StackOffset - 2));
 
+                    _currentAssembler.Push(I16.IX); // save IX to BC
+                    _currentAssembler.Pop(R16.BC);
+
+                    _currentAssembler.Push(R16.HL); // Move HL to IX
+                    _currentAssembler.Pop(I16.IX);
+
                     // Copy struct to the return buffer
                     var returnTypeExactSize = entry.ReturnTypeExactSize ?? 0;
-                    CopyWordsFromStackToHL(returnTypeExactSize);
+                    CopyFromStackToIX(returnTypeExactSize);
+
+                    _currentAssembler.Push(R16.BC); // restore IX
+                    _currentAssembler.Pop(I16.IX);
                 }
                 else if (targetType?.Kind != StackValueKind.Int32)
                 {
@@ -690,31 +718,18 @@ namespace ILCompiler.Compiler
         {
             var variable = _localVariableTable[entry.LocalNumber];
 
-            // TODO: For large vars consider generating code to loop itself to minimize size of code
-
             // Loading a local variable/argument
-            var startOffset = variable.StackOffset - variable.ExactSize;
-            for (int offset = startOffset; offset < variable.StackOffset; offset += 2)
-            {
-                _currentAssembler.Ld(R8.H, I16.IX, (short)-(offset + 1));
-                _currentAssembler.Ld(R8.L, I16.IX, (short)-(offset + 2));
-                _currentAssembler.Push(R16.HL);
-            }
+            Debug.Assert(variable.ExactSize % 4 == 0);
+            CopyFromIXToStack(variable.ExactSize, -variable.StackOffset, restoreIX: true);
         }
 
         public void GenerateCodeForStoreLocalVariable(StoreLocalVariableEntry entry)
         {
             var variable = _localVariableTable[entry.LocalNumber];
-            // TODO: For large vars consider generating code to loop itself to minimize size of code
 
-            // Loading a local variable/argument
-            var endOffset = variable.StackOffset - variable.ExactSize;
-            for (int offset = variable.StackOffset; offset > endOffset; offset -= 2)
-            {
-                _currentAssembler.Pop(R16.HL);
-                _currentAssembler.Ld(I16.IX, (short)-(offset - 1), R8.H);
-                _currentAssembler.Ld(I16.IX, (short)-(offset - 0), R8.L);
-            }
+            // Storing a local variable/argument
+            Debug.Assert(variable.ExactSize % 4 == 0);
+            CopyFromStackToIX(variable.ExactSize, -variable.StackOffset, restoreIX: true);
         }
 
         public void GenerateCodeForLocalVariableAddress(LocalVariableAddressEntry entry)

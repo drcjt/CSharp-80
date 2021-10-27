@@ -15,7 +15,7 @@ namespace ILCompiler.Compiler.Importer
         {
             var type = GetWellKnownType(instruction.OpCode.Code);
             var addr = importer.PopExpression();
-            var node = new IndirectEntry(addr, StackValueKind.Int32, type);
+            var node = new IndirectEntry(addr, StackValueKind.Int32, type.GetWellKnownTypeSize());
             importer.PushExpression(node);
         }
 

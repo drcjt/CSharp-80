@@ -13,8 +13,6 @@ namespace ILCompiler.Compiler.Importer
 
         public void Import(Instruction instruction, ImportContext context, IILImporter importer)
         {
-            WellKnownType type = GetWellKnownType(instruction);
-
             var value = importer.PopExpression();
             var addr = importer.PopExpression();
 
@@ -23,7 +21,10 @@ namespace ILCompiler.Compiler.Importer
                 throw new NotSupportedException();
             }
 
-            importer.ImportAppendTree(new StoreIndEntry(addr, value, type));
+            WellKnownType type = GetWellKnownType(instruction);
+            int exactSize = type.GetWellKnownTypeSize();
+
+            importer.ImportAppendTree(new StoreIndEntry(addr, value, type, fieldOffset: 0, exactSize));
         }
 
         private static WellKnownType GetWellKnownType(Instruction instruction)

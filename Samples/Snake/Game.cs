@@ -22,7 +22,7 @@ namespace Snake
         {
             // TOOD: this is the max length right now as IX/IY offset
             // addressing limits the stack size.
-            const int MAX_LENGTH = 6;
+            const int MAX_LENGTH = 20;
 
             var snakeXs = stackalloc int[MAX_LENGTH];
             var snakeYs = stackalloc int[MAX_LENGTH];
@@ -56,7 +56,7 @@ namespace Snake
                 // TODO: This timing mechanism doesn't quite work as get occasional
                 // pauses which I believe are due to TickCount wrapping around
                 int delay = Environment.TickCount - gameTime;
-                if (delay > 100)
+                if (delay > 50)
                 {
                     gameTime = Environment.TickCount;
 

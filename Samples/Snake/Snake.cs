@@ -62,13 +62,9 @@
 
         public unsafe readonly bool HitTest(int x, int y)
         {
-            for (int i = 0; i < Length; i++)
+            if (_snakeXs[_snakeHead] == x && _snakeYs[_snakeHead] == y)
             {
-                if (_snakeXs[(_snakeHead + i) % _maxLength] == x &&
-                    _snakeYs[(_snakeHead + i) % _maxLength] == y)
-                {
-                    return true;
-                }
+                return true;
             }
 
             return false;

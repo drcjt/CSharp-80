@@ -153,7 +153,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(IndirectEntry entry)
         {
-            Print($"ind {entry.TargetType}");
+            Print($"ind ");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
