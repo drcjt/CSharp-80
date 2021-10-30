@@ -27,15 +27,16 @@ namespace Snake
             var snakeXs = stackalloc int[MAX_LENGTH];
             var snakeYs = stackalloc int[MAX_LENGTH];
 
-            Snake s = new Snake(WrapAround((byte)_random.Next(), Graphics.ScreenWidth), WrapAround((byte)_random.Next(), Graphics.ScreenHeight), snakeXs, snakeYs, MAX_LENGTH);
+            Snake s = new Snake(WrapAround((byte)_random.Next(), Graphics.ScreenWidth / 2), WrapAround((byte)_random.Next(), Graphics.ScreenHeight), snakeXs, snakeYs, MAX_LENGTH, (Direction)(_random.Next() % 4));
 
             MakeFood(s, out int foodX, out int foodY);
-            Graphics.SetPixel(foodX, foodY, Color.White);
+
+            SetPixel(foodX, foodY, Color.White);
 
             int dx = 1;
             int dy = 0;
 
-            Graphics.SetPixel(s.HeadX, s.HeadY, Color.White);
+            SetPixel(s.HeadX, s.HeadY, Color.White);
 
             int gameTime = Environment.TickCount;
             while (true)
@@ -46,46 +47,51 @@ namespace Snake
                     int kc = ki.KeyChar;
                     switch (kc)
                     {
-                        case 10: dx = 0; dy = 1; break;
-                        case 91: dx = 0; dy = -1; break;
-                        case 8: dx = -1; dy = 0; break;
-                        case 9: dx = 1; dy = 0; break;
+                        case 10: s.Course = Direction.Down; break;
+                        case 91: s.Course = Direction.Up; break;
+                        case 8: s.Course = Direction.Left; break;
+                        case 9: s.Course = Direction.Right; break;
                     }
                 }
 
-                // TODO: This timing mechanism doesn't quite work as get occasional
-                // pauses which I believe are due to TickCount wrapping around
-                int delay = Environment.TickCount - gameTime;
-                if (delay > 50)
+
+                Thread.Sleep(50);
+
+                SetPixel(s.TailX, s.TailY, Color.Black);
+
+                if (!s.Update())
                 {
-                    gameTime = Environment.TickCount;
+                    return Result.Loss;
+                }
 
-                    s.Next(WrapAround(s.HeadX + dx, Graphics.ScreenWidth), WrapAround(s.HeadY + dy, Graphics.ScreenHeight));
+                SetPixel(s.HeadX, s.HeadY, Color.White);
 
-                    if (s.HitTest(foodX, foodY))
+                if (s.HitTest(foodX, foodY))
+                {
+                    if (s.Extend())
                     {
-                        if (s.Extend())
-                        {
-                            MakeFood(s, out foodX, out foodY);
-                            Graphics.SetPixel(foodX, foodY, Color.White);
-                        }
-                        else
-                        {
-                            return Result.Win;
-                        }
+                        MakeFood(s, out foodX, out foodY);
+                        SetPixel(foodX, foodY, Color.White);
                     }
-
-                    Graphics.SetPixel(s.HeadX, s.HeadY, Color.White);
-                    Graphics.SetPixel(s.TailX, s.TailY, Color.Black);
+                    else
+                    {
+                        return Result.Win;
+                    }
                 }
             }
+        }
+
+        private static void SetPixel(int x, int y, Color color)
+        {
+            Graphics.SetPixel(x * 2, y, color);
+            Graphics.SetPixel((x * 2) + 1, y, color);
         }
 
         void MakeFood(in Snake snake, out int foodX, out int foodY)
         {
             do
             {
-                foodX = WrapAround((byte)_random.Next(), Graphics.ScreenWidth);
+                foodX = WrapAround((byte)_random.Next(), Graphics.ScreenWidth / 2);
                 foodY = WrapAround((byte)_random.Next(), Graphics.ScreenHeight);
             }
             while (snake.HitTest(foodX, foodY));
@@ -111,8 +117,18 @@ namespace Snake
                 {
                     Console.WriteLine("You win");
 
+                    Thread.Sleep(5000);
+
                     // TODO: This seems to return immediately???
-                    Console.ReadKey(intercept: true);
+                    //Console.ReadKey(intercept: true);
+                    Console.Clear();
+                }
+                else
+                {
+                    Console.WriteLine("You lose");
+
+                    Thread.Sleep(5000);
+
                     Console.Clear();
                 }
 

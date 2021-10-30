@@ -355,7 +355,6 @@ namespace ILCompiler.Compiler
         {
             int changeToIX = 0;
 
-
             var totalBytesToCopy = size;
             int originalIxOffset = ixOffset;
             do
@@ -500,7 +499,7 @@ namespace ILCompiler.Compiler
         {
             if (entry.Kind == StackValueKind.Int32 || entry.Kind == StackValueKind.ValueType || entry.Kind == StackValueKind.NativeInt)
             {
-                // Save IX into DE
+                // Save IX into BC
                 _currentAssembler.Push(I16.IX);
                 _currentAssembler.Pop(R16.BC);
 
@@ -511,7 +510,7 @@ namespace ILCompiler.Compiler
                 var size = entry.ExactSize ?? 4;
                 CopyFromIXToStack(size, (short)fieldOffset);
 
-                // Restore IX from DE
+                // Restore IX from BC
                 _currentAssembler.Push(R16.BC);
                 _currentAssembler.Pop(I16.IX);
             }

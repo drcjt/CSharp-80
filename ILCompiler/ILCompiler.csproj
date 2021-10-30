@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <None Remove="Runtime\cls.asm" />
+    <None Remove="Runtime\delay.asm" />
     <None Remove="Runtime\itoa.asm" />
     <None Remove="Runtime\i_add.asm" />
     <None Remove="Runtime\i_cmp.asm" />
@@ -52,6 +53,7 @@
     <EmbeddedResource Include="Runtime\keyavail.asm" />
     <EmbeddedResource Include="Runtime\setres.asm" />
     <EmbeddedResource Include="Runtime\kbdscan.asm" />
+    <EmbeddedResource Include="Runtime\delay.asm" />
     <EmbeddedResource Include="Runtime\ticks.asm" />
     <EmbeddedResource Include="Runtime\cls.asm" />
     <EmbeddedResource Include="Runtime\itoa.asm" />
