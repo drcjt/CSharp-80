@@ -794,9 +794,8 @@ namespace ILCompiler.Compiler
         {
             var actualKind = entry.Op1.Kind;
             var desiredType = entry.DesiredType;
-            var unsigned = entry.Unsigned;
 
-            if (actualKind == StackValueKind.Int32 && desiredType == Common.TypeSystem.WellKnownType.UInt16 && unsigned)
+            if (actualKind == StackValueKind.Int32 && desiredType == Common.TypeSystem.WellKnownType.UInt16)
             {
                 _currentAssembler.Pop(R16.HL);
                 _currentAssembler.Pop(R16.DE);
@@ -806,7 +805,7 @@ namespace ILCompiler.Compiler
                 _currentAssembler.Push(R16.DE);
                 _currentAssembler.Push(R16.HL);
             }
-            else if (actualKind == StackValueKind.Int32 && desiredType == Common.TypeSystem.WellKnownType.Int16 && !unsigned)
+            else if (actualKind == StackValueKind.Int32 && desiredType == Common.TypeSystem.WellKnownType.Int16)
             {
                 _currentAssembler.Pop(R16.HL);
                 _currentAssembler.Pop(R16.DE);
@@ -819,13 +818,27 @@ namespace ILCompiler.Compiler
                 _currentAssembler.Push(R16.DE);
                 _currentAssembler.Push(R16.HL);
             }
-            else if (actualKind == StackValueKind.Int32 && desiredType == WellKnownType.Byte && unsigned)
+            else if (actualKind == StackValueKind.Int32 && desiredType == WellKnownType.Byte)
             {
                 _currentAssembler.Pop(R16.HL);
                 _currentAssembler.Pop(R16.DE);
 
                 _currentAssembler.Ld(R16.HL, 0);    // clear msw
                 _currentAssembler.Ld(R8.D, 0);
+
+                _currentAssembler.Push(R16.DE);
+                _currentAssembler.Push(R16.HL);
+            }
+            else if (actualKind == StackValueKind.Int32 && desiredType == WellKnownType.SByte)
+            {
+                _currentAssembler.Pop(R16.HL);
+                _currentAssembler.Pop(R16.DE);
+
+                _currentAssembler.Ld(R8.H, R8.E);
+
+                _currentAssembler.Add(R16.HL, R16.HL);  // move sign bit into carry flag
+                _currentAssembler.Sbc(R16.HL, R16.HL);  // hl is now 0000 or FFFF
+                _currentAssembler.Ld(R8.D, R8.L);       // D is now 00 or FF
 
                 _currentAssembler.Push(R16.DE);
                 _currentAssembler.Push(R16.HL);

@@ -30,11 +30,7 @@ namespace Snake
             Snake s = new Snake(WrapAround((byte)_random.Next(), Graphics.ScreenWidth / 2), WrapAround((byte)_random.Next(), Graphics.ScreenHeight), snakeXs, snakeYs, MAX_LENGTH, (Direction)(_random.Next() % 4));
 
             MakeFood(s, out int foodX, out int foodY);
-
             SetPixel(foodX, foodY, Color.White);
-
-            int dx = 1;
-            int dy = 0;
 
             SetPixel(s.HeadX, s.HeadY, Color.White);
 
