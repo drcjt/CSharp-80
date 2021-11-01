@@ -13,7 +13,6 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public FieldAddressEntry(String name, StackEntry op1, uint offset) : base(StackValueKind.ObjRef, 4)
         {
-            Operation = Operation.FieldAddress;
             Name = name;
             Op1 = op1;
             Offset = offset;

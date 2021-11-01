@@ -5,9 +5,6 @@ namespace ILCompiler.Compiler.EvaluationStack
     public enum Operation
     {
         Neg,
-        Call,
-        Return,
-        Cast,
         Add,
         Sub,
         Mul,
@@ -21,20 +18,6 @@ namespace ILCompiler.Compiler.EvaluationStack
         Le,
         Lt,
         Ne,
-        Constant_Int16,
-        Constant_Int32,
-        Constant_String,
-        Intrinsic,
-        Jump,
-        JumpTrue,
-        LocalVariable,
-        LocalVariableAddress,
-        Field,
-        FieldAddress,
-        Indirect,
-        StoreIndirect,
-        StoreLocalVariable,
-        Switch,
     }
 
     // StackEntry and subclasses represent the tree oriented high level intermediate representation
@@ -46,8 +29,6 @@ namespace ILCompiler.Compiler.EvaluationStack
         public int? ExactSize { get; }
 
         public StackEntry? Next { get; set; }
-
-        public Operation Operation { get; set; }
 
         protected StackEntry(StackValueKind kind, int? exactSize = null)
         {

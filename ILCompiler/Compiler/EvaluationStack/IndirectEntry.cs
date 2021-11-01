@@ -9,7 +9,6 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public IndirectEntry(StackEntry op1, StackValueKind kind, int? exactSize) : base(kind, exactSize)
         {
-            Operation = Operation.Indirect;
             Op1 = op1;
         }
 

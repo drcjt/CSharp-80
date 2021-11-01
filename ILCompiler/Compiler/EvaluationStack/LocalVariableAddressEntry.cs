@@ -8,7 +8,6 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public LocalVariableAddressEntry(int localNumber) : base(StackValueKind.ObjRef, 4)
         {
-            Operation = Operation.LocalVariableAddress;
             LocalNumber = localNumber;
         }
 

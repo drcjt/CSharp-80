@@ -7,7 +7,6 @@ namespace ILCompiler.Compiler.EvaluationStack
         public int LocalNumber { get; }
         public LocalVariableEntry(int localNumber, StackValueKind kind, int? exactSize) : base(kind, exactSize)
         {
-            Operation = Operation.LocalVariable;
             LocalNumber = localNumber;
         }
 

@@ -34,7 +34,7 @@ namespace ILCompiler.Compiler.Importer
             }
 
             Operation binaryOp = Operation.Add + (instruction.OpCode.Code - Code.Add);
-            var binaryExpr = new BinaryOperator(binaryOp, op1, op2, kind);
+            var binaryExpr = new BinaryOperator(binaryOp, isComparison: false, op1, op2, kind);
             importer.PushExpression(binaryExpr);
         }
     }

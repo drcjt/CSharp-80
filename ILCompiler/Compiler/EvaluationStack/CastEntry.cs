@@ -9,7 +9,6 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public CastEntry(WellKnownType desiredType, StackEntry op1) : base(op1.Kind, op1.ExactSize)
         {
-            Operation = Operation.Cast;
             DesiredType = desiredType;
             Op1 = op1;
         }

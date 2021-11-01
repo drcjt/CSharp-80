@@ -25,7 +25,6 @@ namespace ILCompiler.Compiler.EvaluationStack
         public string Label { get; set; } = String.Empty;
         public StringConstantEntry(string value) : base(StackValueKind.ObjRef, value, 4)
         {
-            Operation = Operation.Constant_String;
         }
         public override StackEntry Duplicate()
         {
@@ -42,7 +41,6 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public Int32ConstantEntry(int value) : base(StackValueKind.Int32, value, 4)
         {
-            Operation = Operation.Constant_Int32;
         }
 
         public override StackEntry Duplicate()

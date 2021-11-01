@@ -10,8 +10,7 @@ using Z80Assembler;
 
 namespace ILCompiler.Compiler
 {
-    // TODO: This shouldn't really have any dependencies on dnlib/IL stuff
-    public class CodeGenerator
+    public class CodeGenerator : IStackEntryVisitor
     {
         private readonly Compilation _compilation;
         private readonly IList<LocalVariableDescriptor> _localVariableTable;
@@ -51,7 +50,7 @@ namespace ILCompiler.Compiler
                 var currentNode = block.FirstNode;
                 while (currentNode != null)
                 {
-                    GenerateFromNode(currentNode);
+                    currentNode.Accept(this);
                     currentNode = currentNode.Next;
                 }
 
@@ -123,100 +122,101 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void GenerateFromNode(StackEntry node)
+        public void Visit(Int32ConstantEntry entry)
         {
-            switch (node.Operation)
+            GenerateCodeForInt32Constant(entry);
+        }
+
+        public void Visit(StringConstantEntry entry)
+        {
+            GenerateCodeForStringConstant(entry);
+        }
+
+        public void Visit(StoreIndEntry entry)
+        {
+            GenerateCodeForStoreIndirect(entry);
+        }
+
+        public void Visit(JumpTrueEntry entry)
+        {
+            GenerateCodeForJumpTrue(entry);
+        }
+
+        public void Visit(JumpEntry entry)
+        {
+            GenerateCodeForJump(entry);
+        }
+
+        public void Visit(ReturnEntry entry)
+        {
+            GenerateCodeForReturn(entry);
+        }
+
+        public void Visit(BinaryOperator entry)
+        {
+            if (entry.IsComparison)
             {
-                case Operation.StoreIndirect:
-                    GenerateCodeForStoreIndirect(node.As<StoreIndEntry>());
-                    break;
-
-                case Operation.Return:
-                    GenerateCodeForReturn(node.As<ReturnEntry>());
-                    break;
-
-                case Operation.Constant_Int32:
-                    GenerateCodeForInt32Constant(node.As<Int32ConstantEntry>());
-                    break;
-
-                case Operation.Constant_String:
-                    GenerateCodeForStringConstant(node.As<StringConstantEntry>());
-                    break;
-
-                case Operation.JumpTrue:
-                    GenerateCodeForJumpTrue(node.As<JumpTrueEntry>());
-                    break;
-
-                case Operation.Jump:
-                    GenerateCodeForJump(node.As<JumpEntry>());
-                    break;
-
-                case Operation.Neg:
-                    GenerateCodeForNeg(node.As<UnaryOperator>());
-                    break;
-
-                case Operation.Eq:
-                case Operation.Ne:
-                case Operation.Lt:
-                case Operation.Le:
-                case Operation.Gt:
-                case Operation.Ge:
-                    GenerateCodeForComparison(node.As<BinaryOperator>());
-                    break;
-
-                case Operation.Add:
-                case Operation.Mul:
-                case Operation.Sub:
-                case Operation.Div:
-                case Operation.Rem:
-                case Operation.Div_Un:
-                case Operation.Rem_Un:
-                    GenerateCodeForBinaryOperator(node.As<BinaryOperator>());
-                    break;
-
-                case Operation.LocalVariable:
-                    GenerateCodeForLocalVariable(node.As<LocalVariableEntry>());
-                    break;
-
-                case Operation.LocalVariableAddress:
-                    GenerateCodeForLocalVariableAddress(node.As<LocalVariableAddressEntry>());
-                    break;
-
-                case Operation.StoreLocalVariable:
-                    GenerateCodeForStoreLocalVariable(node.As<StoreLocalVariableEntry>());
-                    break;
-
-                case Operation.Field:
-                    GenerateCodeForField(node.As<FieldEntry>());
-                    break;
-
-                case Operation.FieldAddress:
-                    GenerateCodeForFieldAddress(node.As<FieldAddressEntry>());
-                    break;
-
-                case Operation.Indirect:
-                    GenerateCodeForIndirect(node.As<IndirectEntry>());
-                    break;
-
-                case Operation.Call:
-                    GenerateCodeForCall(node.As<CallEntry>());
-                    break;
-
-                case Operation.Intrinsic:
-                    GenerateCodeForIntrinsic(node.As<IntrinsicEntry>());
-                    break;
-
-                case Operation.Cast:
-                    GenerateCodeForCast(node.As<CastEntry>());
-                    break;
-
-                case Operation.Switch:
-                    GenerateCodeForSwitch(node.As<SwitchEntry>());
-                    break;
-
-                default:
-                    throw new NotImplementedException($"Unimplemented node type {node.Operation}");
+                GenerateCodeForComparison(entry);
             }
+            else
+            {
+                GenerateCodeForBinaryOperator(entry);
+            }
+        }
+
+        public void Visit(LocalVariableEntry entry)
+        {
+            GenerateCodeForLocalVariable(entry);
+        }
+
+        public void Visit(LocalVariableAddressEntry entry)
+        {
+            GenerateCodeForLocalVariableAddress(entry);
+        }
+
+        public void Visit(StoreLocalVariableEntry entry)
+        {
+            GenerateCodeForStoreLocalVariable(entry);
+        }
+
+        public void Visit(CallEntry entry)
+        {
+            GenerateCodeForCall(entry);
+        }
+
+        public void Visit(IntrinsicEntry entry)
+        {
+            GenerateCodeForIntrinsic(entry);
+        }
+
+        public void Visit(CastEntry entry)
+        {
+            GenerateCodeForCast(entry);
+        }
+
+        public void Visit(UnaryOperator entry)
+        {
+            GenerateCodeForNeg(entry);
+        }
+
+        public void Visit(IndirectEntry entry)
+        {
+            GenerateCodeForIndirect(entry);
+        }
+
+        public void Visit(FieldEntry entry)
+        {
+            GenerateCodeForField(entry);
+        }
+
+        public void Visit(FieldAddressEntry entry)
+        {
+            GenerateCodeForFieldAddress(entry);
+        }
+
+        public void Visit(SwitchEntry entry)
+        {
+            GenerateCodeForSwitch(entry);
         }
 
         // TODO: Consider making this a separate phase

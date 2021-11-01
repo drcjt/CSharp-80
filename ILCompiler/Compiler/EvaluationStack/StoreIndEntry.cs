@@ -12,7 +12,6 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public StoreIndEntry(StackEntry addr, StackEntry op1, WellKnownType targetType, uint fieldOffset = 0, int? size = 4) : base(addr.Kind, size)
         {
-            Operation = Operation.StoreIndirect;
             Addr = addr;
             Op1 = op1;
             FieldOffset = fieldOffset;

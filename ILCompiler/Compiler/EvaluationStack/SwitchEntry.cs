@@ -10,7 +10,6 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public SwitchEntry(StackEntry op1, IList<string> jumpTable) : base(StackValueKind.Unknown)
         {
-            Operation = Operation.Switch;
             Op1 = op1;
             JumpTable = jumpTable;
         }

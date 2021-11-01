@@ -83,7 +83,7 @@ namespace ILCompiler.Compiler.Importer
                     op1 = new Int32ConstantEntry(0);
                     op = (code == Code.Brfalse) ? Operation.Eq : Operation.Ne;
                 }
-                op1 = new BinaryOperator(op, op1, op2, StackValueKind.Int32);
+                op1 = new BinaryOperator(op, isComparison: true, op1, op2, StackValueKind.Int32);
                 importer.ImportAppendTree(new JumpTrueEntry(targetBlock.Label, op1));
             }
             else

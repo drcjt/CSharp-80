@@ -14,7 +14,6 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public ReturnEntry(StackEntry? returnValue, int? returnBufferArgIndex, int? returnTypeExactSize) : base(returnValue?.Kind ?? StackValueKind.Unknown)
         {
-            Operation = Operation.Return;
             Return = returnValue;
             ReturnBufferArgIndex = returnBufferArgIndex;
             ReturnTypeExactSize = returnTypeExactSize;

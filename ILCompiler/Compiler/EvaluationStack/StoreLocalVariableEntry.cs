@@ -10,7 +10,6 @@
 
         public StoreLocalVariableEntry(int localNumber, bool parameter, StackEntry op1) : base(op1.Kind)
         {
-            Operation = Operation.StoreLocalVariable;
             LocalNumber = localNumber;
             IsParameter = parameter;
             Op1 = op1;

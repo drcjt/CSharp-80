@@ -8,7 +8,6 @@ namespace ILCompiler.Compiler.EvaluationStack
         public string TargetLabel { get; }
         public JumpTrueEntry(string targetLabel, StackEntry condition) : base(StackValueKind.Unknown)
         {
-            Operation = Operation.JumpTrue;
             TargetLabel = targetLabel;
             Condition = condition;
         }

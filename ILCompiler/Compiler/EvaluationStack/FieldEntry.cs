@@ -11,7 +11,6 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public FieldEntry(StackEntry op1, string name, uint? offset, int? size, StackValueKind kind) : base(kind, size)
         {
-            Operation = Operation.Field;
             Op1 = op1;
             Name = name;
             Offset = offset;

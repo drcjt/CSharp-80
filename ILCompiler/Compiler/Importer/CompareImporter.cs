@@ -38,7 +38,7 @@ namespace ILCompiler.Compiler.Importer
             {
                 throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
             }
-            op1 = new BinaryOperator(op, op1, op2, StackValueKind.Int32);
+            op1 = new BinaryOperator(op, isComparison: true, op1, op2, StackValueKind.Int32);
             importer.PushExpression(op1);
         }
     }
