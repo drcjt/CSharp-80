@@ -1,5 +1,5 @@
-﻿using ILCompiler.Common.TypeSystem;
-using ILCompiler.Common.TypeSystem.IL;
+﻿using ILCompiler.Common.TypeSystem.IL;
+using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.EvaluationStack;
 using Microsoft.Extensions.Logging;
@@ -124,12 +124,12 @@ namespace ILCompiler.Compiler
 
         public void Visit(Int32ConstantEntry entry)
         {
-            GenerateCodeForInt32Constant(entry);
+            Int32ConstantCodeGenerator.GenerateCode(entry, _currentAssembler);
         }
 
         public void Visit(StringConstantEntry entry)
         {
-            GenerateCodeForStringConstant(entry);
+            StringConstantCodeGenerator.GenerateCode(entry, _currentAssembler);
         }
 
         public void Visit(StoreIndEntry entry)
@@ -139,12 +139,12 @@ namespace ILCompiler.Compiler
 
         public void Visit(JumpTrueEntry entry)
         {
-            GenerateCodeForJumpTrue(entry);
+            JumpTrueCodeGenerator.GenerateCode(entry, _currentAssembler);
         }
 
         public void Visit(JumpEntry entry)
         {
-            GenerateCodeForJump(entry);
+            JumpCodeGenerator.GenerateCode(entry, _currentAssembler);
         }
 
         public void Visit(ReturnEntry entry)
@@ -156,11 +156,11 @@ namespace ILCompiler.Compiler
         {
             if (entry.IsComparison)
             {
-                GenerateCodeForComparison(entry);
+                ComparisonCodeGenerator.GenerateCode(entry, _currentAssembler);
             }
             else
             {
-                GenerateCodeForBinaryOperator(entry);
+                BinaryOperatorCodeGenerator.GenerateCode(entry, _currentAssembler);
             }
         }
 
@@ -171,7 +171,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(LocalVariableAddressEntry entry)
         {
-            GenerateCodeForLocalVariableAddress(entry);
+            LocalVariableAddressCodeGenerator.GenerateCode(entry, _currentAssembler, _localVariableTable);
         }
 
         public void Visit(StoreLocalVariableEntry entry)
@@ -181,22 +181,22 @@ namespace ILCompiler.Compiler
 
         public void Visit(CallEntry entry)
         {
-            GenerateCodeForCall(entry);
+            CallCodeGenerator.GenerateCode(entry, _currentAssembler);
         }
 
         public void Visit(IntrinsicEntry entry)
         {
-            GenerateCodeForIntrinsic(entry);
+            IntrinsicCodeGenerator.GenerateCode(entry, _currentAssembler);
         }
 
         public void Visit(CastEntry entry)
         {
-            GenerateCodeForCast(entry);
+            CastCodeGenerator.GenerateCode(entry, _currentAssembler);
         }
 
         public void Visit(UnaryOperator entry)
         {
-            GenerateCodeForNeg(entry);
+            UnaryOperatorCodeGenerator.GenerateCode(entry, _currentAssembler);
         }
 
         public void Visit(IndirectEntry entry)
@@ -211,12 +211,12 @@ namespace ILCompiler.Compiler
 
         public void Visit(FieldAddressEntry entry)
         {
-            GenerateCodeForFieldAddress(entry);
+            FieldAddressCodeGenerator.GenerateCode(entry, _currentAssembler);
         }
 
         public void Visit(SwitchEntry entry)
         {
-            GenerateCodeForSwitch(entry);
+            SwitchCodeGenerator.GenerateCode(entry, _currentAssembler);
         }
 
         // TODO: Consider making this a separate phase
@@ -306,27 +306,6 @@ namespace ILCompiler.Compiler
                 assembler.Add(R16.HL, R16.SP);
                 assembler.Ld(R16.SP, R16.HL);
             }
-        }
-
-        public void GenerateCodeForInt32Constant(Int32ConstantEntry entry)
-        {
-            var value = (entry as Int32ConstantEntry).Value;
-            var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
-            var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
-
-            _currentAssembler.Ld(R16.HL, low);
-            _currentAssembler.Push(R16.HL);
-            _currentAssembler.Ld(R16.HL, high);
-            _currentAssembler.Push(R16.HL);
-        }
-
-        public void GenerateCodeForStringConstant(StringConstantEntry entry)
-        {
-            // TODO: Currently obj refs can only be strings
-            _currentAssembler.Ld(R16.HL, (entry as StringConstantEntry).Label);
-            _currentAssembler.Push(R16.HL);
-            _currentAssembler.Ld(R16.HL, 0);
-            _currentAssembler.Push(R16.HL);
         }
 
         public void GenerateCodeForStoreIndirect(StoreIndEntry entry)
@@ -477,24 +456,6 @@ namespace ILCompiler.Compiler
             GenerateCodeForIndirect(indirectEntry, fieldOffset, exactSize);
         }
 
-        public void GenerateCodeForFieldAddress(FieldAddressEntry entry)
-        {
-            var fieldOffset = entry.Offset;
-
-            // Get address of object
-            _currentAssembler.Pop(R16.DE);      // lsw will be ignored
-            _currentAssembler.Pop(R16.HL);
-
-            // Calculate field address
-            _currentAssembler.Ld(R16.DE, (short)fieldOffset);
-            _currentAssembler.Add(R16.HL, R16.DE);
-
-            // Push field address onto the stack
-            _currentAssembler.Push(R16.HL);
-            _currentAssembler.Ld(R16.DE, 0);
-            _currentAssembler.Push(R16.DE);
-        }
-
         public void GenerateCodeForIndirect(IndirectEntry entry, uint fieldOffset = 0, int fieldSize = 4)
         {
             if (entry.Kind == StackValueKind.Int32 || entry.Kind == StackValueKind.ValueType || entry.Kind == StackValueKind.NativeInt)
@@ -517,40 +478,6 @@ namespace ILCompiler.Compiler
             else
             {
                 throw new NotImplementedException();
-            }
-        }
-
-        public void GenerateCodeForJumpTrue(JumpTrueEntry entry)
-        {
-            // Pop i4 from stack and jump if non zero
-            _currentAssembler.Pop(R16.HL);
-            _currentAssembler.Pop(R16.HL);
-            _currentAssembler.Ld(R8.A, 0);
-            _currentAssembler.Add(R8.A, R8.L);
-            _currentAssembler.Jp(Condition.NonZero, entry.TargetLabel);
-        }
-
-        public void GenerateCodeForJump(JumpEntry entry)
-        {
-            _currentAssembler.Jp(entry.TargetLabel);
-        }
-
-        public void GenerateCodeForSwitch(SwitchEntry entry)
-        {
-            _currentAssembler.Pop(R16.HL);
-            _currentAssembler.Pop(R16.HL);
-
-            _currentAssembler.Ld(R8.A, R8.L);
-
-            for (int targetIndex = 0; targetIndex < entry.JumpTable.Count; targetIndex++)
-            {
-                _currentAssembler.Or(R8.A);
-                _currentAssembler.Jp(Condition.Zero, entry.JumpTable[targetIndex]);
-
-                if (targetIndex < entry.JumpTable.Count - 1)
-                {
-                    _currentAssembler.Dec(R8.A);
-                }
             }
         }
 
@@ -657,62 +584,6 @@ namespace ILCompiler.Compiler
             _currentAssembler.Ret();
         }
 
-        private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> BinaryOperatorMappings = new()
-        {
-            { Tuple.Create(Operation.Add, StackValueKind.Int32), "i_add" },
-            { Tuple.Create(Operation.Add, StackValueKind.NativeInt), "i_add" },
-            { Tuple.Create(Operation.Sub, StackValueKind.Int32), "i_sub" },
-            { Tuple.Create(Operation.Mul, StackValueKind.Int32), "i_mul" },
-            { Tuple.Create(Operation.Div, StackValueKind.Int32), "i_div" },
-            { Tuple.Create(Operation.Rem, StackValueKind.Int32), "i_rem" },
-            { Tuple.Create(Operation.Div_Un, StackValueKind.Int32), "i_div_un" },
-            { Tuple.Create(Operation.Rem_Un, StackValueKind.Int32), "i_rem_un" },
-        };
-
-        public void GenerateCodeForBinaryOperator(BinaryOperator entry)
-        {
-            if (BinaryOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string? routine))
-            {
-                _currentAssembler.Call(routine);
-            }
-        }
-
-        public void GenerateCodeForNeg(UnaryOperator entry)
-        {
-            if (entry.Operation == Operation.Neg)
-            {
-                _currentAssembler.Call("i_neg");
-            }
-            else
-            {
-                throw new NotImplementedException($"Unary operator {entry.Operation} not implemented");
-            }
-        }
-
-        private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> ComparisonOperatorMappings = new()
-        {
-            { Tuple.Create(Operation.Eq, StackValueKind.Int32), "i_eq" },
-            { Tuple.Create(Operation.Ge, StackValueKind.Int32), "i_ge" },
-            { Tuple.Create(Operation.Gt, StackValueKind.Int32), "i_gt" },
-            { Tuple.Create(Operation.Le, StackValueKind.Int32), "i_le" },
-            { Tuple.Create(Operation.Lt, StackValueKind.Int32), "i_lt" },
-            { Tuple.Create(Operation.Ne, StackValueKind.Int32), "i_neq" },
-        };
-
-        private void GenerateCodeForComparison(BinaryOperator entry)
-        {
-            if (ComparisonOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string? routine))
-            {
-                _currentAssembler.Call(routine);
-                // If carry set then push i4 1 else push i4 0
-                _currentAssembler.Ld(R16.HL, 0);
-                _currentAssembler.Adc(R16.HL, R16.HL);
-                _currentAssembler.Push(R16.HL);
-                _currentAssembler.Ld(R16.HL, 0);
-                _currentAssembler.Push(R16.HL);
-            }
-        }
-
         public void GenerateCodeForLocalVariable(LocalVariableEntry entry)
         {
             var variable = _localVariableTable[entry.LocalNumber];
@@ -729,124 +600,6 @@ namespace ILCompiler.Compiler
             // Storing a local variable/argument
             Debug.Assert(variable.ExactSize % 4 == 0);
             CopyFromStackToIX(variable.ExactSize, -variable.StackOffset, restoreIX: true);
-        }
-
-        public void GenerateCodeForLocalVariableAddress(LocalVariableAddressEntry entry)
-        {
-            // Loading address of a local variable/argument
-            var localVariable = _localVariableTable[entry.LocalNumber];
-            var offset = localVariable.StackOffset;
-
-            // Calculate and push the actual 16 bit address
-            _currentAssembler.Push(I16.IX);
-            _currentAssembler.Pop(R16.HL);
-
-            _currentAssembler.Ld(R16.DE, (short)(-offset));
-            _currentAssembler.Add(R16.HL, R16.DE);
-
-            // Push address
-            _currentAssembler.Push(R16.HL);
-
-            // Push 0 to makeup full 32 bit value
-            _currentAssembler.Ld(R16.HL, 0);
-            _currentAssembler.Push(R16.HL);
-        }
-
-        public void GenerateCodeForCall(CallEntry entry)
-        {
-            _currentAssembler.Call(entry.TargetMethod);
-        }
-
-        public void GenerateCodeForIntrinsic(IntrinsicEntry entry)
-        {
-            // TODO: Most of this should be done through MethodImplOptions.InternalCall instead
-            var methodToCall = entry.TargetMethod;
-            switch (methodToCall)
-            {
-                case "WriteString":
-                    _currentAssembler.Pop(R16.DE);    // put argument 1 into HL
-                    _currentAssembler.Pop(R16.HL);
-                    _currentAssembler.Call("PRINT");
-                    break;
-
-                case "WriteInt32":
-                    _currentAssembler.Pop(R16.DE);
-                    _currentAssembler.Pop(R16.HL);
-                    _currentAssembler.Call("LTOA");
-                    break;
-
-                case "WriteUInt32":
-                    _currentAssembler.Pop(R16.DE);
-                    _currentAssembler.Pop(R16.HL);
-                    _currentAssembler.Call("ULTOA");
-                    break;
-
-                case "WriteChar":
-                    _currentAssembler.Pop(R16.DE);    // chars are stored on stack as int32 so remove MSW
-                    _currentAssembler.Pop(R16.HL);    // put argument 1 into HL
-                    _currentAssembler.Ld(R8.A, R8.L); // Load low byte of argument 1 into A
-                    _currentAssembler.Call(0x0033); // ROM routine to display character at current cursor position
-                    break;
-            }
-        }
-
-        public void GenerateCodeForCast(CastEntry entry)
-        {
-            var actualKind = entry.Op1.Kind;
-            var desiredType = entry.DesiredType;
-
-            if (actualKind == StackValueKind.Int32 && desiredType == Common.TypeSystem.WellKnownType.UInt16)
-            {
-                _currentAssembler.Pop(R16.HL);
-                _currentAssembler.Pop(R16.DE);
-
-                _currentAssembler.Ld(R16.HL, 0);    // clear msw
-
-                _currentAssembler.Push(R16.DE);
-                _currentAssembler.Push(R16.HL);
-            }
-            else if (actualKind == StackValueKind.Int32 && desiredType == Common.TypeSystem.WellKnownType.Int16)
-            {
-                _currentAssembler.Pop(R16.HL);
-                _currentAssembler.Pop(R16.DE);
-
-                _currentAssembler.Ld(R8.H, R8.D);
-
-                _currentAssembler.Add(R16.HL, R16.HL);  // move sign bit into carry flag
-                _currentAssembler.Sbc(R16.HL, R16.HL);  // hl is now 0 or FFFF
-
-                _currentAssembler.Push(R16.DE);
-                _currentAssembler.Push(R16.HL);
-            }
-            else if (actualKind == StackValueKind.Int32 && desiredType == WellKnownType.Byte)
-            {
-                _currentAssembler.Pop(R16.HL);
-                _currentAssembler.Pop(R16.DE);
-
-                _currentAssembler.Ld(R16.HL, 0);    // clear msw
-                _currentAssembler.Ld(R8.D, 0);
-
-                _currentAssembler.Push(R16.DE);
-                _currentAssembler.Push(R16.HL);
-            }
-            else if (actualKind == StackValueKind.Int32 && desiredType == WellKnownType.SByte)
-            {
-                _currentAssembler.Pop(R16.HL);
-                _currentAssembler.Pop(R16.DE);
-
-                _currentAssembler.Ld(R8.H, R8.E);
-
-                _currentAssembler.Add(R16.HL, R16.HL);  // move sign bit into carry flag
-                _currentAssembler.Sbc(R16.HL, R16.HL);  // hl is now 0000 or FFFF
-                _currentAssembler.Ld(R8.D, R8.L);       // D is now 00 or FF
-
-                _currentAssembler.Push(R16.DE);
-                _currentAssembler.Push(R16.HL);
-            }
-            else
-            {
-                throw new NotImplementedException($"Implicit cast from {actualKind} to {desiredType} not supported");
-            }
         }
 
         private void Optimize(IList<Instruction> instructions)
