@@ -3,37 +3,37 @@ using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    internal class IntrinsicCodeGenerator
+    internal class IntrinsicCodeGenerator : ICodeGenerator<IntrinsicEntry>
     {
-        public static void GenerateCode(IntrinsicEntry entry, Assembler assembler)
+        public void GenerateCode(IntrinsicEntry entry, CodeGeneratorContext context)
         {
             // TODO: Most of this should be done through MethodImplOptions.InternalCall instead
             var methodToCall = entry.TargetMethod;
             switch (methodToCall)
             {
                 case "WriteString":
-                    assembler.Pop(R16.DE);    // put argument 1 into HL
-                    assembler.Pop(R16.HL);
-                    assembler.Call("PRINT");
+                    context.Assembler.Pop(R16.DE);    // put argument 1 into HL
+                    context.Assembler.Pop(R16.HL);
+                    context.Assembler.Call("PRINT");
                     break;
 
                 case "WriteInt32":
-                    assembler.Pop(R16.DE);
-                    assembler.Pop(R16.HL);
-                    assembler.Call("LTOA");
+                    context.Assembler.Pop(R16.DE);
+                    context.Assembler.Pop(R16.HL);
+                    context.Assembler.Call("LTOA");
                     break;
 
                 case "WriteUInt32":
-                    assembler.Pop(R16.DE);
-                    assembler.Pop(R16.HL);
-                    assembler.Call("ULTOA");
+                    context.Assembler.Pop(R16.DE);
+                    context.Assembler.Pop(R16.HL);
+                    context.Assembler.Call("ULTOA");
                     break;
 
                 case "WriteChar":
-                    assembler.Pop(R16.DE);    // chars are stored on stack as int32 so remove MSW
-                    assembler.Pop(R16.HL);    // put argument 1 into HL
-                    assembler.Ld(R8.A, R8.L); // Load low byte of argument 1 into A
-                    assembler.Call(0x0033); // ROM routine to display character at current cursor position
+                    context.Assembler.Pop(R16.DE);    // chars are stored on stack as int32 so remove MSW
+                    context.Assembler.Pop(R16.HL);    // put argument 1 into HL
+                    context.Assembler.Ld(R8.A, R8.L); // Load low byte of argument 1 into A
+                    context.Assembler.Call(0x0033); // ROM routine to display character at current cursor position
                     break;
             }
         }

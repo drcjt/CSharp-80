@@ -24,6 +24,7 @@ namespace ILCompiler.Compiler.Importer
                 {
                     obj = new LocalVariableAddressEntry((obj.As<LocalVariableEntry>()).LocalNumber);
                 }
+                /*
                 else if (obj is FieldEntry)
                 {
                     // TODO: Need to work out what to do here.
@@ -31,6 +32,7 @@ namespace ILCompiler.Compiler.Importer
                     // Think the right answer is to merge the FieldEntry nodes together
                     throw new NotImplementedException("Nested Field Loads not yet implemented");
                 }
+                */
             }
 
             if (obj.Kind != StackValueKind.ObjRef && obj.Kind != StackValueKind.ByRef)
@@ -39,7 +41,7 @@ namespace ILCompiler.Compiler.Importer
             }
 
             var kind = fieldDef.FieldType.GetStackValueKind();
-            var node = new FieldEntry(obj, fieldDef.Name, fieldDef.FieldOffset, fieldDef.FieldType.GetExactSize(), kind);
+            var node = new IndirectEntry(obj, kind, fieldDef.FieldType.GetExactSize(), fieldDef.FieldOffset ?? 0);
             importer.PushExpression(node);
         }
     }

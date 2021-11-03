@@ -114,12 +114,6 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
-        public void Visit(FieldEntry entry)
-        {
-            entry.Op1.Accept(this);
-            SetNext(entry);
-        }
-
         public void Visit(FieldAddressEntry entry)
         {
             entry.Op1.Accept(this);

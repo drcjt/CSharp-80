@@ -4,19 +4,18 @@ using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    public class Int32ConstantCodeGenerator
+    internal class Int32ConstantCodeGenerator : ICodeGenerator<Int32ConstantEntry>
     {
-        public static void GenerateCode(Int32ConstantEntry entry, Assembler assembler)
+        public void GenerateCode(Int32ConstantEntry entry, CodeGeneratorContext context)
         {
             var value = (entry as Int32ConstantEntry).Value;
             var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
             var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
 
-            assembler.Ld(R16.HL, low);
-            assembler.Push(R16.HL);
-            assembler.Ld(R16.HL, high);
-            assembler.Push(R16.HL);
+            context.Assembler.Ld(R16.HL, low);
+            context.Assembler.Push(R16.HL);
+            context.Assembler.Ld(R16.HL, high);
+            context.Assembler.Push(R16.HL);
         }
-
     }
 }

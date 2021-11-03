@@ -3,24 +3,24 @@ using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    public class FieldAddressCodeGenerator
+    internal class FieldAddressCodeGenerator : ICodeGenerator<FieldAddressEntry>
     {
-        public static void GenerateCode(FieldAddressEntry entry, Assembler assembler)
+        public void GenerateCode(FieldAddressEntry entry, CodeGeneratorContext context)
         {
             var fieldOffset = entry.Offset;
 
             // Get address of object
-            assembler.Pop(R16.DE);      // lsw will be ignored
-            assembler.Pop(R16.HL);
+            context.Assembler.Pop(R16.DE);      // lsw will be ignored
+            context.Assembler.Pop(R16.HL);
 
             // Calculate field address
-            assembler.Ld(R16.DE, (short)fieldOffset);
-            assembler.Add(R16.HL, R16.DE);
+            context.Assembler.Ld(R16.DE, (short)fieldOffset);
+            context.Assembler.Add(R16.HL, R16.DE);
 
             // Push field address onto the stack
-            assembler.Push(R16.HL);
-            assembler.Ld(R16.DE, 0);
-            assembler.Push(R16.DE);
+            context.Assembler.Push(R16.HL);
+            context.Assembler.Ld(R16.DE, 0);
+            context.Assembler.Push(R16.DE);
         }
     }
 }

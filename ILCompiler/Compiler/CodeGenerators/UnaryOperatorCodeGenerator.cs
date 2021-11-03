@@ -1,16 +1,15 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using System;
-using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    public class UnaryOperatorCodeGenerator
+    internal class UnaryOperatorCodeGenerator : ICodeGenerator<UnaryOperator>
     {
-        public static void GenerateCode(UnaryOperator entry, Assembler assembler)
+        public void GenerateCode(UnaryOperator entry, CodeGeneratorContext context)
         {
             if (entry.Operation == Operation.Neg)
             {
-                assembler.Call("i_neg");
+                context.Assembler.Call("i_neg");
             }
             else
             {

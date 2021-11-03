@@ -1,5 +1,10 @@
 ﻿namespace ILCompiler.Compiler.EvaluationStack
 {
+    public interface IGenericStackEntryVisitor
+    {
+        public void Visit<T>(T entry) where T : StackEntry;
+    }
+
     public interface IStackEntryVisitor
     {
         public void Visit(Int32ConstantEntry entry);
@@ -17,7 +22,6 @@
         public void Visit(CastEntry entry);
         public void Visit(UnaryOperator entry);
         public void Visit(IndirectEntry entry);
-        public void Visit(FieldEntry entry);
         public void Visit(FieldAddressEntry entry);
 
         public void Visit(SwitchEntry entry);

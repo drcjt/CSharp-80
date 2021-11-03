@@ -159,14 +159,6 @@ namespace ILCompiler.Compiler
             _indent--;
         }
 
-        public void Visit(FieldEntry entry)
-        {
-            Print($"field {entry.Name}");
-            _indent++;
-            entry.Op1.Accept(this);
-            _indent--;
-        }
-
         public void Visit(FieldAddressEntry entry)
         {
             Print($"fieldAddr {entry.Name}");

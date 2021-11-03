@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             Method = method;
             ParamsCount = method.Parameters.Count;
-            LocalsCount = method.Body?.Variables.Count;
+            LocalsCount = method.Body?.Variables.Count ?? 0;
         }
 
         public IList<Instruction>? MethodCode { get; set; }
@@ -24,6 +24,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public bool Compiled { get; set; }
 
         public int ParamsCount { get; set; }
-        public int? LocalsCount { get; set; }
+        public int LocalsCount { get; set; }
     }
 }

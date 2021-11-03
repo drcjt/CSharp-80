@@ -3,15 +3,15 @@ using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    public  class StringConstantCodeGenerator
+    internal class StringConstantCodeGenerator : ICodeGenerator<StringConstantEntry>
     {
-        public static void GenerateCode(StringConstantEntry entry, Assembler assembler)
+        public void GenerateCode(StringConstantEntry entry, CodeGeneratorContext context)
         {
             // TODO: Currently obj refs can only be strings
-            assembler.Ld(R16.HL, (entry as StringConstantEntry).Label);
-            assembler.Push(R16.HL);
-            assembler.Ld(R16.HL, 0);
-            assembler.Push(R16.HL);
+            context.Assembler.Ld(R16.HL, (entry as StringConstantEntry).Label);
+            context.Assembler.Push(R16.HL);
+            context.Assembler.Ld(R16.HL, 0);
+            context.Assembler.Push(R16.HL);
         }
     }
 }

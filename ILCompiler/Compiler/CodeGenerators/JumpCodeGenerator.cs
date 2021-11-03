@@ -1,13 +1,12 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
-using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    public class JumpCodeGenerator
+    internal class JumpCodeGenerator : ICodeGenerator<JumpEntry>
     {
-        public static void GenerateCode(JumpEntry entry, Assembler assembler)
+        public void GenerateCode(JumpEntry entry, CodeGeneratorContext context)
         {
-            assembler.Jp(entry.TargetLabel);
+            context.Assembler.Jp(entry.TargetLabel);
         }
     }
 }

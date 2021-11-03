@@ -6,7 +6,7 @@ using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    public class BinaryOperatorCodeGenerator
+    internal class BinaryOperatorCodeGenerator : ICodeGenerator<BinaryOperator>
     {
         private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> BinaryOperatorMappings = new()
         {
@@ -20,11 +20,37 @@ namespace ILCompiler.Compiler.CodeGenerators
             { Tuple.Create(Operation.Rem_Un, StackValueKind.Int32), "i_rem_un" },
         };
 
-        public static void GenerateCode(BinaryOperator entry, Assembler assembler)
+        private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> ComparisonOperatorMappings = new()
         {
-            if (BinaryOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string? routine))
+            { Tuple.Create(Operation.Eq, StackValueKind.Int32), "i_eq" },
+            { Tuple.Create(Operation.Ge, StackValueKind.Int32), "i_ge" },
+            { Tuple.Create(Operation.Gt, StackValueKind.Int32), "i_gt" },
+            { Tuple.Create(Operation.Le, StackValueKind.Int32), "i_le" },
+            { Tuple.Create(Operation.Lt, StackValueKind.Int32), "i_lt" },
+            { Tuple.Create(Operation.Ne, StackValueKind.Int32), "i_neq" },
+        };
+
+        public void GenerateCode(BinaryOperator entry, CodeGeneratorContext context)
+        {
+            if (entry.IsComparison)
             {
-                assembler.Call(routine);
+                if (ComparisonOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string? routine))
+                {
+                    context.Assembler.Call(routine);
+                    // If carry set then push i4 1 else push i4 0
+                    context.Assembler.Ld(R16.HL, 0);
+                    context.Assembler.Adc(R16.HL, R16.HL);
+                    context.Assembler.Push(R16.HL);
+                    context.Assembler.Ld(R16.HL, 0);
+                    context.Assembler.Push(R16.HL);
+                }
+            }
+            else
+            {
+                if (BinaryOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string? routine))
+                {
+                    context.Assembler.Call(routine);
+                }
             }
         }
     }

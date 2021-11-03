@@ -1,30 +1,29 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
-using System.Collections.Generic;
 using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    public class LocalVariableAddressCodeGenerator
+    internal class LocalVariableAddressCodeGenerator : ICodeGenerator<LocalVariableAddressEntry>
     {
-        public static void GenerateCode(LocalVariableAddressEntry entry, Assembler assembler, IList<LocalVariableDescriptor> localVariableTable)
+        public void GenerateCode(LocalVariableAddressEntry entry, CodeGeneratorContext context)
         {
             // Loading address of a local variable/argument
-            var localVariable = localVariableTable[entry.LocalNumber];
+            var localVariable = context.LocalVariableTable[entry.LocalNumber];
             var offset = localVariable.StackOffset;
 
             // Calculate and push the actual 16 bit address
-            assembler.Push(I16.IX);
-            assembler.Pop(R16.HL);
+            context.Assembler.Push(I16.IX);
+            context.Assembler.Pop(R16.HL);
 
-            assembler.Ld(R16.DE, (short)(-offset));
-            assembler.Add(R16.HL, R16.DE);
+            context.Assembler.Ld(R16.DE, (short)(-offset));
+            context.Assembler.Add(R16.HL, R16.DE);
 
             // Push address
-            assembler.Push(R16.HL);
+            context.Assembler.Push(R16.HL);
 
             // Push 0 to makeup full 32 bit value
-            assembler.Ld(R16.HL, 0);
-            assembler.Push(R16.HL);
+            context.Assembler.Ld(R16.HL, 0);
+            context.Assembler.Push(R16.HL);
         }
     }
 }

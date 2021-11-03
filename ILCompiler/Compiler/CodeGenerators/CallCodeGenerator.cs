@@ -1,13 +1,12 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
-using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    public class CallCodeGenerator
+    internal class CallCodeGenerator : ICodeGenerator<CallEntry>
     {
-        public static void GenerateCode(CallEntry entry, Assembler assembler)
+        public void GenerateCode(CallEntry entry, CodeGeneratorContext context)
         {
-            assembler.Call(entry.TargetMethod);
+            context.Assembler.Call(entry.TargetMethod);
         }
     }
 }
