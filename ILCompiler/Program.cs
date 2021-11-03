@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler;
-using ILCompiler.Interfaces;
+﻿using ILCompiler.Interfaces;
+using ILCompiler.IoC;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -18,13 +18,9 @@ namespace ILCompiler
         {
             try
             {
-                var services = new ServiceCollection();
-                ConfigureServices(services);
-                using (ServiceProvider serviceProvider = services.BuildServiceProvider())
-                {
-                    Program app = serviceProvider.GetRequiredService<Program>();
-                    app.Run(args, serviceProvider);
-                }
+                var serviceProvider = ServiceProviderFactory.ServiceProvider;
+                Program app = serviceProvider.GetRequiredService<Program>();
+                app.Run(args, serviceProvider);
             }
             catch (Exception e)
             {
@@ -42,15 +38,7 @@ namespace ILCompiler
             _logger = logger;
         }
 
-        private static void ConfigureServices(ServiceCollection services)
-        {
-            services.AddLogging(configure => configure.AddConsole()).AddTransient<Program>();
-            services.AddSingleton<ICompilation, Compilation>();
-            services.AddSingleton<IConfiguration, Configuration>();
-            services.AddSingleton<INameMangler, NameMangler>();
-        }
-
-        private void Run(string[] args, ServiceProvider serviceProvider)
+        private void Run(string[] args, IServiceProvider serviceProvider)
         {
             var configuration = serviceProvider.GetRequiredService<IConfiguration>();
             var result = ParseCommandLine(args, configuration);

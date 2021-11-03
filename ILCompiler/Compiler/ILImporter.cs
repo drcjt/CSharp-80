@@ -3,10 +3,11 @@ using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
 using ILCompiler.Interfaces;
+using ILCompiler.IoC;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ILCompiler.Compiler
 {
@@ -25,7 +26,7 @@ namespace ILCompiler.Compiler
 
         private readonly EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
 
-        private readonly IList<IOpcodeImporter> _importers = new List<IOpcodeImporter>();
+        private readonly IOpcodeImporterFactory _importerFactory;
         private readonly ILImporterProxy _importerProxy;
 
         private class ILImporterProxy : IILImporter
@@ -59,7 +60,9 @@ namespace ILCompiler.Compiler
             _configuration = configuration;
             _basicBlocks = Array.Empty<BasicBlock>();
 
-            _importers = OpcodeImporterFactory.GetAllOpcodeImporters();
+            // TODO: Refactor this to not use service locator pattern
+            _importerFactory = ServiceProviderFactory.ServiceProvider.GetRequiredService<IOpcodeImporterFactory>();
+
             _importerProxy = new ILImporterProxy(this);
         }
 
@@ -129,7 +132,7 @@ namespace ILCompiler.Compiler
 
                 var opcode = currentInstruction.OpCode.Code;
 
-                var importer = _importers.FirstOrDefault(importer => importer.CanImport(opcode));
+                var importer = _importerFactory.GetImporter(opcode);
 
                 if (importer != null)
                 {
