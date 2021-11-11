@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <ILCompilerExe>$(MSBuildThisFileDirectory)/net5.0/ILCompiler.exe</ILCompilerExe>
+    <ILCompilerExe>$(MSBuildThisFileDirectory)/net6.0/ILCompiler.exe</ILCompilerExe>
   </PropertyGroup>
 
   <Target Name="ILCompiler" AfterTargets="PostBuildEvent">

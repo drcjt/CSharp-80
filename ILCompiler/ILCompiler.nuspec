@@ -10,6 +10,6 @@
     <file src="MyILCompiler.targets" target="build/CSharp80.ILCompiler.targets" />
 
     <file src="ILCompiler.targets" target="tools/" />
-    <file src="$publishdir$\net5.0\**\*" target="tools/net5.0/" />
+    <file src="$publishdir$\net6.0\**\*" target="tools/net6.0/" />
   </files>
 </package>
