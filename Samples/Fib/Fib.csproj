@@ -3,24 +3,22 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <LangVersion>latest</LangVersion>
+	 <Nullable>enable</Nullable>
 
     <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    
-    <Optimize>true</Optimize>
-    <IncludePal>true</IncludePal>
-    
+        
     <!--Disable .NET Core SDK libs-->
     <NoStdLib>true</NoStdLib>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-    <!-- Prevent .NET Core 3+ from generating exe -->
-    <UseAppHost>false</UseAppHost>
-    
-    <OutputType>Exe</OutputType>
+	  <!-- Prevent .NET Core 3+ from generating exe -->
+	  <UseAppHost>false</UseAppHost>
+
+	  <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>

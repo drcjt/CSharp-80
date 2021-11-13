@@ -8,9 +8,6 @@
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
-    <Optimize>true</Optimize>
-    <IncludePal>true</IncludePal>
-
     <!--Disable .NET Core SDK libs-->
     <NoStdLib>true</NoStdLib>
     <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
