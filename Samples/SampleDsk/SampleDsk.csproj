@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\cs80corlib\cs80corlib.csproj" />
+    <ProjectReference Include="..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
     <ProjectReference Include="..\Fib\Fib.csproj" />
     <ProjectReference Include="..\Math\Math.csproj" />
     <ProjectReference Include="..\NetBot\NetBot.csproj" />

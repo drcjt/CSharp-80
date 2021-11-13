@@ -20,7 +20,7 @@
     <!-- Prevent .NET Core 3+ from generating exe -->
     <UseAppHost>false</UseAppHost>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <AssemblyName>mscorlib</AssemblyName>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
   </PropertyGroup>
 
 </Project>

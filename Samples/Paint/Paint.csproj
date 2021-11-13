@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\cs80corlib\cs80corlib.csproj" />
+    <ProjectReference Include="..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
     <ProjectReference Include="..\..\ILCompiler\ILCompiler.csproj" />
   </ItemGroup>
 

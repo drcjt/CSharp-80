@@ -35,7 +35,7 @@ namespace ILCompiler.Compiler
                 var inputDirectoryName = Path.GetDirectoryName(inputFilePath);
                 if (inputDirectoryName != null)
                 {
-                    corlibFilePath = Path.Combine(inputDirectoryName, "mscorlib.dll");
+                    corlibFilePath = Path.Combine(inputDirectoryName, "System.Private.CoreLib.dll");
                 }
             }
             ModuleDefMD corlibModule = ModuleDefMD.Load(corlibFilePath, modCtx);
