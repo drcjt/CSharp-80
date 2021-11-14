@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool CanImport(Code code) => code == Code.Call;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var methodDefOrRef = instruction.Operand as IMethodDefOrRef;
             var methodToCall = methodDefOrRef.ResolveMethodDefThrow();
@@ -80,7 +80,7 @@ namespace ILCompiler.Compiler.Importer
             }
         }
 
-        private int FixupCallStructReturn(TypeSig returnType, List<StackEntry> arguments, IILImporter importer, bool hasThis)
+        private int FixupCallStructReturn(TypeSig returnType, List<StackEntry> arguments, IILImporterProxy importer, bool hasThis)
         {
             // Create temp
             var lclNum = importer.GrabTemp(returnType.GetStackValueKind(), returnType.GetExactSize());
@@ -93,7 +93,7 @@ namespace ILCompiler.Compiler.Importer
             return lclNum;
         }
 
-        private static bool ImportIntrinsicCall(MethodDef methodToCall, IList<StackEntry> arguments, IILImporter importer)
+        private static bool ImportIntrinsicCall(MethodDef methodToCall, IList<StackEntry> arguments, IILImporterProxy importer)
         {
             // Not yet implemented methods with non void return type
             if (methodToCall.HasReturnType)

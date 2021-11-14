@@ -8,7 +8,7 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool CanImport(Code code) => code == Code.Neg;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             importer.PushExpression(new UnaryOperator(Operation.Neg, importer.PopExpression()));
         }

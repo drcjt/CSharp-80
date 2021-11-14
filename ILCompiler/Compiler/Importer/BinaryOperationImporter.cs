@@ -19,7 +19,7 @@ namespace ILCompiler.Compiler.Importer
                    code == Code.Rem_Un;
         }
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var op2 = importer.PopExpression();
             var op1 = importer.PopExpression();

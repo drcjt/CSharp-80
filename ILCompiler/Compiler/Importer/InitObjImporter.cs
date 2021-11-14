@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool CanImport(Code code) => code == Code.Initobj;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             // TODO: Need to implement this
             importer.PopExpression();

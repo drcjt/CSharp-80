@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool CanImport(Code code) => code == Code.Stfld;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var fieldDef = instruction.OperandAs<FieldDef>();
 

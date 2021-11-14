@@ -11,7 +11,7 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool CanImport(Code code) => code == Code.Localloc;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var op2 = importer.PopExpression().As<Int32ConstantEntry>();
 

@@ -11,7 +11,7 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool CanImport(Code code) => code == Code.Newobj;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var methodDefOrRef = instruction.Operand as IMethodDefOrRef;
             var methodToCall = methodDefOrRef.ResolveMethodDefThrow();

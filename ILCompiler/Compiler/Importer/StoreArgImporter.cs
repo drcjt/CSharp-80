@@ -11,7 +11,7 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool CanImport(Code code) => code == Code.Starg || code == Code.Starg_S;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var value = importer.PopExpression();
             if (value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ObjRef)

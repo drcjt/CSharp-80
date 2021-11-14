@@ -1,6 +1,7 @@
 ﻿using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Interfaces;
 using ILCompiler.IoC;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -9,27 +10,27 @@ using Z80Assembler;
 
 namespace ILCompiler.Compiler
 {
-    public class CodeGenerator : IGenericStackEntryVisitor
+    public class CodeGenerator : ICodeGenerator, IGenericStackEntryVisitor
     {
-        private readonly Compilation _compilation;
+        private readonly INameMangler _nameMangler;
+        private readonly ILogger<CodeGenerator> _logger;
+        private readonly ICodeGeneratorFactory _codeGeneratorFactory;
 
         private readonly Dictionary<string, string> _labelsToStringData = new Dictionary<string, string>();
 
-        private readonly ICodeGeneratorFactory _codeGeneratorFactory;
+        private CodeGeneratorContext _context = null!;
 
-        private readonly CodeGeneratorContext _context;
-
-        public CodeGenerator(Compilation compilation, IList<LocalVariableDescriptor> localVariableTable, Z80MethodCodeNode methodCodeNode)
+        public CodeGenerator(INameMangler nameMangler, ILogger<CodeGenerator> logger, ICodeGeneratorFactory codeGeneratorFactory)
         {
-            _compilation = compilation;
-
-            _codeGeneratorFactory = ServiceProviderFactory.ServiceProvider.GetRequiredService<ICodeGeneratorFactory>();
-
-            _context = new CodeGeneratorContext(localVariableTable, methodCodeNode);
+            _nameMangler = nameMangler;
+            _logger = logger;
+            _codeGeneratorFactory = codeGeneratorFactory;
         }
 
-        public IList<Instruction> Generate(IList<BasicBlock> blocks)
+        public IList<Instruction> Generate(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable, Z80MethodCodeNode methodCodeNode)
         {
+            _context = new CodeGeneratorContext(localVariableTable, methodCodeNode);
+
             AssignFrameOffsets();
 
             var methodInstructions = new List<Instruction>();
@@ -37,7 +38,7 @@ namespace ILCompiler.Compiler
             GenerateStringMap(blocks);
             GenerateStringData(_context.Assembler);
 
-            _context.Assembler.AddInstruction(new LabelInstruction(_compilation.NameMangler.GetMangledMethodName(_context.Method)));
+            _context.Assembler.AddInstruction(new LabelInstruction(_nameMangler.GetMangledMethodName(_context.Method)));
 
             GenerateProlog(_context.Assembler);
             methodInstructions.AddRange(_context.Assembler.Instructions);
@@ -253,7 +254,7 @@ namespace ILCompiler.Compiler
                 }
             } while (count < instructions.Count - 1);
 
-            _compilation.Logger.LogDebug($"Eliminated {unoptimizedInstructionCount - instructions.Count} instructions");
+            _logger.LogDebug("Eliminated {eliminatedInstructions} instructions", unoptimizedInstructionCount - instructions.Count);
         }
     }
 }

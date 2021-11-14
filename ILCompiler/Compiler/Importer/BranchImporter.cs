@@ -37,7 +37,7 @@ namespace ILCompiler.Compiler.Importer
             return false;
         }
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var code = instruction.OpCode.Code;
             switch (code)

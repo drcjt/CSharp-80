@@ -9,22 +9,24 @@ using System.Text;
 
 namespace ILCompiler.Compiler
 {
-    public class MethodCompiler
+    public class MethodCompiler : IMethodCompiler
     {
-        private IList<LocalVariableDescriptor> _localVariableTable;
-        public int? ReturnBufferArgIndex { get; private set; }
-        private readonly Compilation _compilation;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<MethodCompiler> _logger;
+        private readonly CodeGeneratorFactory _codeGeneratorFactory;
+        private readonly ILImporterFactory _ilImporterFactory;
 
-        public int ParameterCount { get; private set; }
+        private int _parameterCount;
+        private int? _returnBufferArgIndex;
+        
+        private IList<LocalVariableDescriptor> _localVariableTable;
 
-        public ILogger<Compilation> Logger => _compilation.Logger;
-        public INameMangler NameMangler => _compilation.NameMangler;
-
-        public MethodCompiler(Compilation compilation, IConfiguration configuration)
+        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, CodeGeneratorFactory codeGeneratorFactory, ILImporterFactory ilImporterFactory)
         {
-            _compilation = compilation;
             _configuration = configuration;
+            _logger = logger;
+            _codeGeneratorFactory = codeGeneratorFactory;
+            _ilImporterFactory = ilImporterFactory;
             _localVariableTable = new List<LocalVariableDescriptor>();
         }
 
@@ -84,32 +86,32 @@ namespace ILCompiler.Compiler
                 };
 
                 // Ensure return buffer parameter goes after the this parameter if present
-                ReturnBufferArgIndex = hasThis ? 1 : 0;
-                _localVariableTable.Insert(ReturnBufferArgIndex.Value, returnBuffer);
+                _returnBufferArgIndex = hasThis ? 1 : 0;
+                _localVariableTable.Insert(_returnBufferArgIndex.Value, returnBuffer);
 
-                ParameterCount++;
+                _parameterCount++;
             }
         }
 
         public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode)
         {
             var method = methodCodeNodeNeedingCode.Method;
-            ParameterCount = method.Parameters.Count;
+            _parameterCount = method.Parameters.Count;
 
             SetupLocalVariableTable(method);
 
             if (!method.IsIntrinsic() && !method.IsPinvokeImpl)
             {
-                var ilImporter = new ILImporter(this, method, _localVariableTable, _configuration);
+                var ilImporter = _ilImporterFactory.GetILImporter();
                 var flowgraph = new Flowgraph();
-                var codeGenerator = new CodeGenerator(_compilation, _localVariableTable, methodCodeNodeNeedingCode);
+                var codeGenerator = _codeGeneratorFactory.GetCodeGenerator();
 
                 // Main phases of the compiler live here
-                var basicBlocks = ilImporter.Import();
+                var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _localVariableTable);
 
                 if (_configuration.DumpIRTrees)
                 {
-                    _compilation.Logger.LogInformation($"METHOD: {method.FullName}");
+                    _logger.LogInformation("METHOD: {methodFullName}", method.FullName);
 
                     int lclNum = 0;
                     StringBuilder sb = new StringBuilder();
@@ -119,15 +121,15 @@ namespace ILCompiler.Compiler
 
                         lclNum++;
                     }
-                    _compilation.Logger.LogInformation(sb.ToString());
+                    _logger.LogInformation("{localVars}", sb.ToString());
 
                     var treeDumper = new TreeDumper();
                     var treedump = treeDumper.Dump(basicBlocks);
-                    _compilation.Logger.LogInformation(treedump);
+                    _logger.LogInformation("{treedump}", treedump);
                 }
 
                 flowgraph.SetBlockOrder(basicBlocks);
-                var instructions = codeGenerator.Generate(basicBlocks);
+                var instructions = codeGenerator.Generate(basicBlocks, _localVariableTable, methodCodeNodeNeedingCode);
                 methodCodeNodeNeedingCode.MethodCode = instructions;
             }
         }

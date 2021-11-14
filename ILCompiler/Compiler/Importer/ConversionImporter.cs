@@ -19,7 +19,7 @@ namespace ILCompiler.Compiler.Importer
             code == Code.Conv_U || 
             code == Code.Conv_I;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             WellKnownType wellKnownType;
             switch (instruction.OpCode.Code)

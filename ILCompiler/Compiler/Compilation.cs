@@ -11,22 +11,21 @@ namespace ILCompiler.Compiler
     {
         private readonly ILogger<Compilation> _logger;
         private readonly IConfiguration _configuration;
-        private readonly INameMangler _nameMangler;
+        private readonly MethodCompilerFactory _methodCompilerFactory;
+        private readonly Z80Writer _z80Writer;
+        private readonly TypeDependencyAnalyser _typeDependencyAnalyser;
 
-        public ILogger<Compilation> Logger => _logger;
-        public INameMangler NameMangler => _nameMangler;
-
-        public Compilation(IConfiguration configuration, ILogger<Compilation> logger, INameMangler nameMangler)
+        public Compilation(IConfiguration configuration, ILogger<Compilation> logger, MethodCompilerFactory methodCompilerFactory, Z80Writer z80Writer, TypeDependencyAnalyser typeDependencyAnalyser)
         {
             _configuration = configuration;
             _logger = logger;
-            _nameMangler = nameMangler;
+            _methodCompilerFactory = methodCompilerFactory;
+            _z80Writer = z80Writer;
+            _typeDependencyAnalyser = typeDependencyAnalyser;
         }
 
         public void Compile(string inputFilePath, string outputFilePath)
         {
-            var z80Writer = new Z80Writer(this, inputFilePath, outputFilePath, _configuration);
-
             ModuleContext modCtx = ModuleDef.CreateModuleContext();
 
             var corlibFilePath = _configuration.CorelibPath;
@@ -52,12 +51,11 @@ namespace ILCompiler.Compiler
             typesToCompile.AddRange(corlibModule.Types);
             typesToCompile.AddRange(module.Types);
 
-            var dependencyAnalyser = new TypeDependencyAnalyser(this);
-            var rootNode = dependencyAnalyser.AnalyseDependencies(typesToCompile, module.EntryPoint);
+            var rootNode = _typeDependencyAnalyser.AnalyseDependencies(typesToCompile, module.EntryPoint);
 
             CompileNode(rootNode);
 
-            z80Writer.OutputCode(rootNode);
+            _z80Writer.OutputCode(rootNode, inputFilePath, outputFilePath);
         }
 
         private void CompileNode(Z80MethodCodeNode node)
@@ -66,7 +64,7 @@ namespace ILCompiler.Compiler
             {
                 _logger.LogDebug("Compiling method {method.Name}", node.Method.Name);
 
-                var methodCompiler = new MethodCompiler(this, _configuration);
+                var methodCompiler = _methodCompilerFactory.GetMethodCompiler();
                 methodCompiler.CompileMethod(node);
                 node.Compiled = true;
 

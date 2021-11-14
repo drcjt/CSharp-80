@@ -6,11 +6,11 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class TypeDependencyAnalyser
     {
-        private readonly Compilation _compilation;
+        private readonly ILogger<TypeDependencyAnalyser> _logger;
 
-        public TypeDependencyAnalyser(Compilation compilation)
+        public TypeDependencyAnalyser(ILogger<TypeDependencyAnalyser> logger)
         {
-            _compilation = compilation;
+            _logger = logger;
         }
 
         public Z80MethodCodeNode AnalyseDependencies(IList<TypeDef> types, MethodDef root)
@@ -19,7 +19,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             var dependencies = new Dictionary<Z80MethodCodeNode, IList<MethodDef>>();
             foreach (var type in types)
             {
-                _compilation.Logger.LogDebug("Analysing dependencies for Type {type.Name}", type.Name);
+                _logger.LogDebug("Analysing dependencies for Type {type.Name}", type.Name);
 
                 foreach (var method in type.Methods)
                 {

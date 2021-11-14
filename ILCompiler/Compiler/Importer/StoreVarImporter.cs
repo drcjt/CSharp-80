@@ -18,7 +18,7 @@ namespace ILCompiler.Compiler.Importer
                    code == Code.Stloc_3;
         }
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             int index = GetIndex(instruction);
 

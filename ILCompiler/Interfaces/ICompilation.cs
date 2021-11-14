@@ -1,4 +1,7 @@
-﻿namespace ILCompiler.Interfaces
+﻿using ILCompiler.Compiler;
+using Microsoft.Extensions.Logging;
+
+namespace ILCompiler.Interfaces
 {
     public interface ICompilation
     {

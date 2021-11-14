@@ -17,7 +17,7 @@ namespace ILCompiler.Compiler.Importer
                    code == Code.Cgt_Un;
         }
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var op2 = importer.PopExpression();
             if (op2.Kind != StackValueKind.Int32)

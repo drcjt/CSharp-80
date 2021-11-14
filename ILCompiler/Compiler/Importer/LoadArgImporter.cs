@@ -13,7 +13,7 @@ namespace ILCompiler.Compiler.Importer
         private static bool IsLdArgN(Code code) => code == Code.Ldarg_0 || code == Code.Ldarg_1 || code == Code.Ldarg_2 || code == Code.Ldarg_3;
         
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var index = GetIndex(instruction);
             var lclNum = MapIlArgNum(index, importer.ReturnBufferArgIndex);

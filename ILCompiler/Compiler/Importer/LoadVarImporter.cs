@@ -16,7 +16,7 @@ namespace ILCompiler.Compiler.Importer
                    code == Code.Ldloc_3;
         }
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             int index = GetIndex(instruction);
             var localNumber = importer.ParameterCount + index;

@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.Importer
             return opcode == Code.Ldflda;
         }
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var fieldDefOrRef = instruction.Operand as IField;
             var fieldDef = fieldDefOrRef.ResolveFieldDef();

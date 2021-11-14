@@ -5,7 +5,7 @@ using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    internal class CodeGeneratorContext
+    public class CodeGeneratorContext
     {
         public Assembler Assembler = new Assembler();
         public IList<LocalVariableDescriptor> LocalVariableTable;

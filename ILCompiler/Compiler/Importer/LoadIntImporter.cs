@@ -22,7 +22,7 @@ namespace ILCompiler.Compiler.Importer
                    code == Code.Ldc_I4_S;
         }
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             importer.PushExpression(new Int32ConstantEntry(checked((int)GetValue(instruction))));
         }

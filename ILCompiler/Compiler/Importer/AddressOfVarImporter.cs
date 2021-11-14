@@ -11,7 +11,7 @@ namespace ILCompiler.Compiler.Importer
             return opcode == Code.Ldloca || opcode == Code.Ldloca_S;
         }
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             importer.PushExpression(new LocalVariableAddressEntry(importer.ParameterCount + (instruction.OperandAs<Local>()).Index));
         }

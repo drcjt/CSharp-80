@@ -3,33 +3,34 @@ using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
 using ILCompiler.Interfaces;
-using ILCompiler.IoC;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 
 namespace ILCompiler.Compiler
 {
-    public class ILImporter
+    public class ILImporter : IILImporter
     {
-        private readonly MethodCompiler _methodCompiler;
-        private readonly MethodDef _method;
-        private readonly IList<LocalVariableDescriptor> _localVariableTable;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<ILImporter> _logger;
+        private readonly INameMangler _nameMangler;
+
+        private MethodDef _method = null!;
+        private IList<LocalVariableDescriptor> _localVariableTable = null!;
 
         private BasicBlock[] _basicBlocks;
         private BasicBlock? _currentBasicBlock;
         private BasicBlock? _pendingBasicBlocks;
 
-        public INameMangler NameMangler => _methodCompiler.NameMangler;
+        private int _parameterCount;
+        private int? _returnBufferArgIndex;
 
         private readonly EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
 
         private readonly IOpcodeImporterFactory _importerFactory;
         private readonly ILImporterProxy _importerProxy;
 
-        private class ILImporterProxy : IILImporter
+        private class ILImporterProxy : IILImporterProxy
         {
             private readonly ILImporter _importer;
             public ILImporterProxy(ILImporter importer)
@@ -37,12 +38,12 @@ namespace ILCompiler.Compiler
                 _importer = importer;
             }
 
-            public int ParameterCount => _importer._methodCompiler.ParameterCount;
+            public int ParameterCount => _importer._parameterCount;
             public IList<LocalVariableDescriptor> LocalVariableTable => _importer._localVariableTable;
 
             public BasicBlock[] BasicBlocks => _importer._basicBlocks;
 
-            public int? ReturnBufferArgIndex => _importer._methodCompiler.ReturnBufferArgIndex;
+            public int? ReturnBufferArgIndex => _importer._returnBufferArgIndex;
 
             public void ImportAppendTree(StackEntry entry) => _importer.ImportAppendTree(entry);
             public void ImportFallThrough(BasicBlock next) => _importer.ImportFallThrough(next);
@@ -52,16 +53,13 @@ namespace ILCompiler.Compiler
             public int GrabTemp(StackValueKind kind, int? exactSize) => _importer.GrabTemp(kind, exactSize);
         }
 
-        public ILImporter(MethodCompiler methodCompiler, MethodDef method, IList<LocalVariableDescriptor> localVariableTable, IConfiguration configuration)
+        public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IOpcodeImporterFactory importerFactory)
         {
-            _methodCompiler = methodCompiler;
-            _method = method;
-            _localVariableTable = localVariableTable;
             _configuration = configuration;
             _basicBlocks = Array.Empty<BasicBlock>();
-
-            // TODO: Refactor this to not use service locator pattern
-            _importerFactory = ServiceProviderFactory.ServiceProvider.GetRequiredService<IOpcodeImporterFactory>();
+            _logger = logger;
+            _nameMangler = nameMangler;
+            _importerFactory = importerFactory;
 
             _importerProxy = new ILImporterProxy(this);
         }
@@ -137,7 +135,7 @@ namespace ILCompiler.Compiler
                 if (importer != null)
                 {
                     var currentBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null;
-                    var importContext = new ImportContext(currentBlock, _method, _methodCompiler.NameMangler);
+                    var importContext = new ImportContext(currentBlock, _method, _nameMangler);
                     importer.Import(currentInstruction, importContext, _importerProxy);
                     if (importContext.StopImporting)
                     {
@@ -146,7 +144,7 @@ namespace ILCompiler.Compiler
                 }   
                 else  if (_configuration.IgnoreUnknownCil)
                 {
-                    _methodCompiler.Logger.LogWarning($"Unsupported IL opcode {opcode}");
+                    _logger.LogWarning("Unsupported IL opcode {opcode}", opcode);
                 }
                 else
                 {
@@ -206,8 +204,14 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public IList<BasicBlock> Import()
+        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDef method, IList<LocalVariableDescriptor> localVariableTable)
         {
+            _parameterCount = parameterCount;
+            _returnBufferArgIndex = returnBufferArgIndex;
+
+            _method = method;
+            _localVariableTable = localVariableTable;
+
             var basicBlockAnalyser = new BasicBlockAnalyser(_method);
             var offsetToIndexMap = new Dictionary<int, int>();
             _basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);

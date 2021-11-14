@@ -1,11 +1,13 @@
 ﻿using ILCompiler.Compiler;
 using ILCompiler.Compiler.CodeGenerators;
+using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
+using CodeGeneratorFactory = ILCompiler.Compiler.CodeGeneratorFactory;
 
 namespace ILCompiler.IoC
 {
@@ -18,7 +20,22 @@ namespace ILCompiler.IoC
             var services = new ServiceCollection();
             ConfigureServices(services);
             ConfigureImporters(services);
+
+            services.AddSingleton<Compiler.CodeGenerators.CodeGeneratorFactory>();
             ConfigureCodeGenerators(services);
+
+            services.AddSingleton<MethodCompilerFactory>();
+            services.AddTransient<IMethodCompiler, MethodCompiler>();
+
+            services.AddSingleton<CodeGeneratorFactory>();
+            services.AddTransient<ICodeGenerator, CodeGenerator>();
+
+            services.AddSingleton<ILImporterFactory>();
+            services.AddTransient<IILImporter, ILImporter>();
+
+            services.AddSingleton<Z80Writer>();
+
+            services.AddSingleton<TypeDependencyAnalyser>();
 
             ServiceProvider = services.BuildServiceProvider();
         }
@@ -31,7 +48,7 @@ namespace ILCompiler.IoC
             services.AddSingleton<INameMangler, NameMangler>();
 
             services.AddSingleton<IOpcodeImporterFactory, OpcodeImporterFactory>();
-            services.AddSingleton<ICodeGeneratorFactory, CodeGeneratorFactory>();
+            services.AddSingleton<ICodeGeneratorFactory, Compiler.CodeGenerators.CodeGeneratorFactory>();
         }
 
         private static void ConfigureCodeGenerators(ServiceCollection services)

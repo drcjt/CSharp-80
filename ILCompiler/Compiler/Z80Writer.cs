@@ -12,20 +12,19 @@ namespace ILCompiler.Compiler
 {
     public class Z80Writer
     {
-        private readonly Compilation _compilation;
-        private readonly StreamWriter _out;
-        private readonly string _inputFilePath;
-        private readonly string _outputFilePath;
         private readonly IConfiguration _configuration;
+        private readonly INameMangler _nameMangler;
+        private readonly ILogger<Z80Writer> _logger;
 
-        public Z80Writer(Compilation compilation, string inputFilePath, string outputFilePath, IConfiguration configuration)
+        private string _inputFilePath = null!;
+        private string _outputFilePath = null!;
+        private StreamWriter _out = null!;
+
+        public Z80Writer(IConfiguration configuration, INameMangler nameMangler, ILogger<Z80Writer> logger)
         {
-            _compilation = compilation;
-            _inputFilePath = inputFilePath;
-            _outputFilePath = outputFilePath;
             _configuration = configuration;
-
-            _out = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, false), Encoding.ASCII);
+            _nameMangler = nameMangler;
+            _logger = logger;
         }
 
         private void OutputMethodNode(Z80MethodCodeNode methodCodeNode)
@@ -75,7 +74,7 @@ namespace ILCompiler.Compiler
 
             _out.WriteLine(new LabelInstruction("START"));
 
-            _out.WriteLine(Instruction.Call(_compilation.NameMangler.GetMangledMethodName(entryMethod)));
+            _out.WriteLine(Instruction.Call(_nameMangler.GetMangledMethodName(entryMethod)));
 
             if (hasReturnCode && _configuration.PrintReturnCode)
             {
@@ -135,8 +134,12 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public void OutputCode(Z80MethodCodeNode root)
+        public void OutputCode(Z80MethodCodeNode root, string inputFilePath, string outputFilePath)
         {
+            _inputFilePath = inputFilePath;
+            _outputFilePath = outputFilePath;
+            _out = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, false), Encoding.ASCII);
+
             OutputProlog(root.Method);
 
             OutputCodeForNode(root);
@@ -145,7 +148,7 @@ namespace ILCompiler.Compiler
 
             _out.Dispose();
 
-            _compilation.Logger.LogDebug($"Written compiled file to {_outputFilePath}");
+            _logger.LogDebug($"Written compiled file to {_outputFilePath}");
         }
 
         private void OutputRuntimeCode()

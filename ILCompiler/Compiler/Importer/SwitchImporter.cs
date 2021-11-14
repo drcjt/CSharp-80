@@ -10,7 +10,7 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool CanImport(Code opcode) => opcode == Code.Switch;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporter importer)
+        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var fallthroughBlock = context.CurrentBlock;
 
