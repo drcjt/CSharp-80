@@ -3,6 +3,7 @@ using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
+using ILCompiler.IoC;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Text;
@@ -13,15 +14,15 @@ namespace ILCompiler.Compiler
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<MethodCompiler> _logger;
-        private readonly CodeGeneratorFactory _codeGeneratorFactory;
-        private readonly ILImporterFactory _ilImporterFactory;
+        private readonly Factory<ICodeGenerator> _codeGeneratorFactory;
+        private readonly Factory<IILImporter> _ilImporterFactory;
 
         private int _parameterCount;
         private int? _returnBufferArgIndex;
         
         private IList<LocalVariableDescriptor> _localVariableTable;
 
-        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, CodeGeneratorFactory codeGeneratorFactory, ILImporterFactory ilImporterFactory)
+        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, Factory<ICodeGenerator> codeGeneratorFactory, Factory<IILImporter> ilImporterFactory)
         {
             _configuration = configuration;
             _logger = logger;
@@ -102,9 +103,9 @@ namespace ILCompiler.Compiler
 
             if (!method.IsIntrinsic() && !method.IsPinvokeImpl)
             {
-                var ilImporter = _ilImporterFactory.GetILImporter();
+                var ilImporter = _ilImporterFactory.Create();
                 var flowgraph = new Flowgraph();
-                var codeGenerator = _codeGeneratorFactory.GetCodeGenerator();
+                var codeGenerator = _codeGeneratorFactory.Create();
 
                 // Main phases of the compiler live here
                 var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _localVariableTable);

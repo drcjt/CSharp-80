@@ -7,7 +7,6 @@ using ILCompiler.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
-using CodeGeneratorFactory = ILCompiler.Compiler.CodeGeneratorFactory;
 
 namespace ILCompiler.IoC
 {
@@ -21,16 +20,16 @@ namespace ILCompiler.IoC
             ConfigureServices(services);
             ConfigureImporters(services);
 
-            services.AddSingleton<Compiler.CodeGenerators.CodeGeneratorFactory>();
+            services.AddSingleton<CodeGeneratorFactory>();
             ConfigureCodeGenerators(services);
 
-            services.AddSingleton<MethodCompilerFactory>();
+            services.AddFactory<IMethodCompiler>();
             services.AddTransient<IMethodCompiler, MethodCompiler>();
 
-            services.AddSingleton<CodeGeneratorFactory>();
+            services.AddFactory<ICodeGenerator>();
             services.AddTransient<ICodeGenerator, CodeGenerator>();
 
-            services.AddSingleton<ILImporterFactory>();
+            services.AddFactory<IILImporter>();
             services.AddTransient<IILImporter, ILImporter>();
 
             services.AddSingleton<Z80Writer>();

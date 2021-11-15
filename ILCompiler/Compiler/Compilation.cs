@@ -1,6 +1,7 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
+using ILCompiler.IoC;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.IO;
@@ -11,11 +12,11 @@ namespace ILCompiler.Compiler
     {
         private readonly ILogger<Compilation> _logger;
         private readonly IConfiguration _configuration;
-        private readonly MethodCompilerFactory _methodCompilerFactory;
+        private readonly Factory<IMethodCompiler> _methodCompilerFactory;
         private readonly Z80Writer _z80Writer;
         private readonly TypeDependencyAnalyser _typeDependencyAnalyser;
 
-        public Compilation(IConfiguration configuration, ILogger<Compilation> logger, MethodCompilerFactory methodCompilerFactory, Z80Writer z80Writer, TypeDependencyAnalyser typeDependencyAnalyser)
+        public Compilation(IConfiguration configuration, ILogger<Compilation> logger, Factory<IMethodCompiler> methodCompilerFactory, Z80Writer z80Writer, TypeDependencyAnalyser typeDependencyAnalyser)
         {
             _configuration = configuration;
             _logger = logger;
@@ -64,7 +65,7 @@ namespace ILCompiler.Compiler
             {
                 _logger.LogDebug("Compiling method {method.Name}", node.Method.Name);
 
-                var methodCompiler = _methodCompilerFactory.GetMethodCompiler();
+                var methodCompiler = _methodCompilerFactory.Create();
                 methodCompiler.CompileMethod(node);
                 node.Compiled = true;
 
