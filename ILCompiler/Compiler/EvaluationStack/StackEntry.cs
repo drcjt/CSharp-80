@@ -18,6 +18,8 @@ namespace ILCompiler.Compiler.EvaluationStack
         Le,
         Lt,
         Ne,
+        Lsh,
+        Rsh,
     }
 
     // StackEntry and subclasses represent the tree oriented high level intermediate representation

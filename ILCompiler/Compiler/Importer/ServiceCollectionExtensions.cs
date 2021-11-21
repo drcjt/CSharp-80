@@ -32,6 +32,7 @@ namespace ILCompiler.Compiler.Importer
             services.AddSingleton<IOpcodeImporter, AddressOfFieldImporter>();
             services.AddSingleton<IOpcodeImporter, SwitchImporter>();
             services.AddSingleton<IOpcodeImporter, LocallocImporter>();
+            services.AddSingleton<IOpcodeImporter, ShiftOperationImporter>();
 
             return services;
         }

@@ -18,6 +18,8 @@ namespace ILCompiler.Compiler.CodeGenerators
             { Tuple.Create(Operation.Rem, StackValueKind.Int32), "i_rem" },
             { Tuple.Create(Operation.Div_Un, StackValueKind.Int32), "i_div_un" },
             { Tuple.Create(Operation.Rem_Un, StackValueKind.Int32), "i_rem_un" },
+            { Tuple.Create(Operation.Lsh, StackValueKind.Int32), "i_lsh" },
+            { Tuple.Create(Operation.Rsh, StackValueKind.Int32), "i_rsh" },
         };
 
         private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> ComparisonOperatorMappings = new()
@@ -50,6 +52,10 @@ namespace ILCompiler.Compiler.CodeGenerators
                 if (BinaryOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, entry.Kind), out string? routine))
                 {
                     context.Assembler.Call(routine);
+                }
+                else
+                {
+                    throw new NotImplementedException("Binary operator not yet implemented");
                 }
             }
         }

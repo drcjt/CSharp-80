@@ -31,12 +31,14 @@
     <None Remove="Runtime\i_ge.asm" />
     <None Remove="Runtime\i_gt.asm" />
     <None Remove="Runtime\i_le.asm" />
+    <None Remove="Runtime\i_lsh.asm" />
     <None Remove="Runtime\i_lt.asm" />
     <None Remove="Runtime\i_mul.asm" />
     <None Remove="Runtime\i_neg.asm" />
     <None Remove="Runtime\i_neq.asm" />
     <None Remove="Runtime\i_rem.asm" />
     <None Remove="Runtime\i_rem_un.asm" />
+    <None Remove="Runtime\i_rsh.asm" />
     <None Remove="Runtime\i_sub.asm" />
     <None Remove="Runtime\kbdscan.asm" />
     <None Remove="Runtime\keyavail.asm" />
@@ -50,6 +52,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Runtime\i_rsh.asm" />
+    <EmbeddedResource Include="Runtime\i_lsh.asm" />
     <EmbeddedResource Include="Runtime\keyavail.asm" />
     <EmbeddedResource Include="Runtime\setres.asm" />
     <EmbeddedResource Include="Runtime\kbdscan.asm" />
