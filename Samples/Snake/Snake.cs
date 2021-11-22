@@ -47,6 +47,12 @@ namespace Snake
 
             _snakeXs[0] = x;
             _snakeYs[0] = y;
+
+            for (int i = 1; i < length; i++)
+            {
+                _snakeXs[i] = -1;
+                _snakeYs[i] = -1;
+            }
         }
 
         private static int WrapAround(int coordinate, int max)
@@ -76,9 +82,9 @@ namespace Snake
             // speed of the generated code
             for (int i = 0; i < Length; i++)
             {
-                var index = (_snakeHead - i) % _maxLength;
-                if (_snakeXs[index] == newHeadX &&
-                    _snakeYs[index] == newHeadY)
+                //var index = (_snakeHead - i) % _maxLength;
+                if (_snakeXs[i] == newHeadX &&
+                    _snakeYs[i] == newHeadY)
                 {
                     // Hit snake with itself
                     return false;
