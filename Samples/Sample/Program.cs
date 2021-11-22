@@ -119,7 +119,7 @@ namespace MiniBCL
             Console.Write((char)(48 + a));
             Console.Write((char)(48 + b));
             Console.Write((char)(48 + c));
-            Console.Write('\n');
+            Console.WriteLine();
         }
 
         private static void TestBooleanComparison()
@@ -127,7 +127,7 @@ namespace MiniBCL
             bool b = true;
             if (b)
             {
-                Console.Write("Bool Test\n");
+                Console.WriteLine("Bool Test");
             }
         }
 
@@ -136,7 +136,7 @@ namespace MiniBCL
             short a = 50;
             short b = 3;
             Console.Write((short)(a + b));
-            Console.Write('\n');
+            Console.WriteLine();
         }
 
         private static void TestLessThanBranching()
@@ -147,7 +147,7 @@ namespace MiniBCL
                 Console.Write((char)(48 + i));
                 i++;
             }
-            Console.Write('\n');
+            Console.WriteLine();
         }
 
         private static void TestGreaterThanBranching()
@@ -158,7 +158,7 @@ namespace MiniBCL
                 Console.Write((char)(48 + i));
                 i--;
             }
-            Console.Write('\n');
+            Console.WriteLine();
         }
 
         private static void TestLessThanOrEqualBranching()
@@ -169,7 +169,7 @@ namespace MiniBCL
                 Console.Write((char)(48 + i));
                 i++;
             }
-            Console.Write('\n');
+            Console.WriteLine();
         }
 
         private static void TestGreaterThanOrEqualBranching()
@@ -180,7 +180,7 @@ namespace MiniBCL
                 Console.Write((char)(48 + i));
                 i--;
             }
-            Console.Write('\n');
+            Console.WriteLine();
         }
 
         // Note Roslyn inverts the condition so this produces a beq instruction in the IL

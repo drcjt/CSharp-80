@@ -22,6 +22,7 @@
   <ItemGroup>
     <None Remove="Runtime\CPM\cls.asm" />
     <None Remove="Runtime\CPM\print.asm" />
+    <None Remove="Runtime\CPM\printchr.asm" />
     <None Remove="Runtime\delay.asm" />
     <None Remove="Runtime\itoa.asm" />
     <None Remove="Runtime\i_add.asm" />
@@ -50,11 +51,13 @@
     <None Remove="Runtime\ticks.asm" />
     <None Remove="Runtime\TRS80\cls.asm" />
     <None Remove="Runtime\TRS80\print.asm" />
+    <None Remove="Runtime\TRS80\printchr.asm" />
     <None Remove="Runtime\write.asm" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Runtime\CPM\cls.asm" />
+    <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
     <EmbeddedResource Include="Runtime\CPM\print.asm" />
     <EmbeddedResource Include="Runtime\i_rsh.asm" />
     <EmbeddedResource Include="Runtime\i_lsh.asm" />
@@ -84,6 +87,7 @@
     <EmbeddedResource Include="Runtime\i_neq.asm" />
     <EmbeddedResource Include="Runtime\TRS80\cls.asm" />
     <EmbeddedResource Include="Runtime\TRS80\print.asm" />
+    <EmbeddedResource Include="Runtime\TRS80\printchr.asm" />
     <EmbeddedResource Include="Runtime\write.asm" />
   </ItemGroup>
 

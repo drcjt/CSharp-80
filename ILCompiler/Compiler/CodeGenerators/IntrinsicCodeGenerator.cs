@@ -35,11 +35,17 @@ namespace ILCompiler.Compiler.CodeGenerators
                         context.Assembler.Pop(R16.DE);    // chars are stored on stack as int32 so remove MSW
                         context.Assembler.Pop(R16.HL);    // put argument 1 into HL
 
+                        context.Assembler.Push(R16.BC);     // save registers
+                        context.Assembler.Push(R16.DE);
+                        context.Assembler.Push(R16.HL);
+
                         context.Assembler.Ld(R8.C, 2);      // Call CPM BDOS C_WRITE console write
                         context.Assembler.Ld(R8.E, R8.L);   // character to write goes into E
-                        context.Assembler.Push(R16.HL);     // save HL
                         context.Assembler.Call(0x05);       // call BDOS C_WRITE
-                        context.Assembler.Pop(R16.HL);      // restore HL
+
+                        context.Assembler.Pop(R16.HL);      // restore registers
+                        context.Assembler.Pop(R16.DE);
+                        context.Assembler.Pop(R16.BC);
                     }
                     else
                     {

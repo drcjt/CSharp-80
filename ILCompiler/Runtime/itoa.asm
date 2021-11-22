@@ -37,12 +37,8 @@ LTOA:
 	BIT 7, D        ; Test if long is negative
 	JR Z, LTOA2
 
-    PUSH DE
-    PUSH HL
-	LD A, '-'       ; Print -ve sign
-	CALL 33H
-    POP HL
-    POP DE
+    LD A, '-'       ; Print -ve sign
+    CALL PRINTCHR
 
     LD A, L         ; invert dehl
     CPL
