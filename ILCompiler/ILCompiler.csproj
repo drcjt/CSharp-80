@@ -20,7 +20,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Runtime\cls.asm" />
+    <None Remove="Runtime\CPM\cls.asm" />
+    <None Remove="Runtime\CPM\print.asm" />
     <None Remove="Runtime\delay.asm" />
     <None Remove="Runtime\itoa.asm" />
     <None Remove="Runtime\i_add.asm" />
@@ -43,15 +44,18 @@
     <None Remove="Runtime\kbdscan.asm" />
     <None Remove="Runtime\keyavail.asm" />
     <None Remove="Runtime\l_inc_dehl.asm" />
-    <None Remove="Runtime\print.asm" />
     <None Remove="Runtime\setres.asm" />
     <None Remove="Runtime\setxy.asm" />
     <None Remove="Runtime\stoi.asm" />
     <None Remove="Runtime\ticks.asm" />
+    <None Remove="Runtime\TRS80\cls.asm" />
+    <None Remove="Runtime\TRS80\print.asm" />
     <None Remove="Runtime\write.asm" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Runtime\CPM\cls.asm" />
+    <EmbeddedResource Include="Runtime\CPM\print.asm" />
     <EmbeddedResource Include="Runtime\i_rsh.asm" />
     <EmbeddedResource Include="Runtime\i_lsh.asm" />
     <EmbeddedResource Include="Runtime\keyavail.asm" />
@@ -59,7 +63,6 @@
     <EmbeddedResource Include="Runtime\kbdscan.asm" />
     <EmbeddedResource Include="Runtime\delay.asm" />
     <EmbeddedResource Include="Runtime\ticks.asm" />
-    <EmbeddedResource Include="Runtime\cls.asm" />
     <EmbeddedResource Include="Runtime\itoa.asm" />
     <EmbeddedResource Include="Runtime\i_add.asm" />
     <EmbeddedResource Include="Runtime\i_div.asm" />
@@ -70,7 +73,6 @@
     <EmbeddedResource Include="Runtime\i_rem_un.asm" />
     <EmbeddedResource Include="Runtime\i_sub.asm" />
     <EmbeddedResource Include="Runtime\l_inc_dehl.asm" />
-    <EmbeddedResource Include="Runtime\print.asm" />
     <EmbeddedResource Include="Runtime\setxy.asm" />
     <EmbeddedResource Include="Runtime\stoi.asm" />
     <EmbeddedResource Include="Runtime\i_cmp.asm" />
@@ -80,6 +82,8 @@
     <EmbeddedResource Include="Runtime\i_le.asm" />
     <EmbeddedResource Include="Runtime\i_lt.asm" />
     <EmbeddedResource Include="Runtime\i_neq.asm" />
+    <EmbeddedResource Include="Runtime\TRS80\cls.asm" />
+    <EmbeddedResource Include="Runtime\TRS80\print.asm" />
     <EmbeddedResource Include="Runtime\write.asm" />
   </ItemGroup>
 
@@ -96,7 +100,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="copy /a $(ProjectDir)Runtime\*.asm $(ProjectDir)csharprt.asm" />
+    <Exec Command="copy /a $(ProjectDir)Runtime\*.asm $(ProjectDir)csharprt.asm&#xD;&#xA;copy /a $(ProjectDir)Runtime\CPM\*.asm $(ProjectDir)cpmrt.asm&#xD;&#xA;copy /a $(ProjectDir)Runtime\TRS80\*.asm $(ProjectDir)trs80rt.asm" />
   </Target>
 
   <Target Name="PublishAll" BeforeTargets="GenerateNuspec">

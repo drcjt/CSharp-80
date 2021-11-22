@@ -10,5 +10,6 @@ namespace ILCompiler
         public bool PrintReturnCode { get; set; } = true;
         public string CorelibPath { get; set; } = string.Empty;
         public bool IntegrationTests { get; set; }
+        public bool TargetCpm { get; set; } = false;
     }
 }

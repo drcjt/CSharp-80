@@ -65,6 +65,7 @@ namespace ILCompiler
                 new Option<string>(new[] { "-cl", "--corelibPath" }, "Core lib path"),
                 new Option<bool>(new[] { "-it", "--integrationTests" }, "Compile for integration tests" ),
                 new Option<bool>(new[] { "-d", "--dumpIRTrees" }, "Dump IR trees"),
+                new Option<bool>(new[] { "-cpm", "--targetCpm" }, "Target Cpm"),
                 new Argument<FileInfo>("inputFilePath"),
             };
 
@@ -80,6 +81,7 @@ namespace ILCompiler
                     configuration.PrintReturnCode = parsedConfiguration.PrintReturnCode;
                     configuration.IntegrationTests = parsedConfiguration.IntegrationTests;
                     configuration.DontInlineRuntime = parsedConfiguration.DontInlineRuntime;
+                    configuration.TargetCpm = parsedConfiguration.TargetCpm;
                 }
             );
 

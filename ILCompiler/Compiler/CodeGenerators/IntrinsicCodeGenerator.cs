@@ -30,10 +30,24 @@ namespace ILCompiler.Compiler.CodeGenerators
                     break;
 
                 case "WriteChar":
-                    context.Assembler.Pop(R16.DE);    // chars are stored on stack as int32 so remove MSW
-                    context.Assembler.Pop(R16.HL);    // put argument 1 into HL
-                    context.Assembler.Ld(R8.A, R8.L); // Load low byte of argument 1 into A
-                    context.Assembler.Call(0x0033); // ROM routine to display character at current cursor position
+                    if (context.Configuration.TargetCpm)
+                    {
+                        context.Assembler.Pop(R16.DE);    // chars are stored on stack as int32 so remove MSW
+                        context.Assembler.Pop(R16.HL);    // put argument 1 into HL
+
+                        context.Assembler.Ld(R8.C, 2);      // Call CPM BDOS C_WRITE console write
+                        context.Assembler.Ld(R8.E, R8.L);   // character to write goes into E
+                        context.Assembler.Push(R16.HL);     // save HL
+                        context.Assembler.Call(0x05);       // call BDOS C_WRITE
+                        context.Assembler.Pop(R16.HL);      // restore HL
+                    }
+                    else
+                    {
+                        context.Assembler.Pop(R16.DE);    // chars are stored on stack as int32 so remove MSW
+                        context.Assembler.Pop(R16.HL);    // put argument 1 into HL
+                        context.Assembler.Ld(R8.A, R8.L); // Load low byte of argument 1 into A
+                        context.Assembler.Call(0x0033); // ROM routine to display character at current cursor position
+                    }
                     break;
             }
         }

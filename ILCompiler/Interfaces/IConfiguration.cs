@@ -8,5 +8,6 @@
         public bool PrintReturnCode { get; set; }
         public string CorelibPath { get; set; }
         public bool IntegrationTests { get; set; }
+        public bool TargetCpm { get; set; }
     }
 }

@@ -46,7 +46,7 @@ namespace ILCompiler.Compiler
 
             if (!_configuration.IntegrationTests)
             {
-                _out.WriteLine(Instruction.Org(0x5200));
+                _out.WriteLine(Instruction.Org((short)(_configuration.TargetCpm ? 0x0100 : 0x5200)));
                 _out.WriteLine(Instruction.Jp("START"));
             }
             else
@@ -70,6 +70,14 @@ namespace ILCompiler.Compiler
             if (_configuration.DontInlineRuntime)
             {
                 _out.WriteLine("include csharprt.asm");
+                if (_configuration.TargetCpm)
+                {
+                    _out.WriteLine("include cpmrt.asm");
+                }
+                else
+                {
+                    _out.WriteLine("include trs80rt.asm");
+                }
             }
 
             _out.WriteLine(new LabelInstruction("START"));
@@ -158,6 +166,9 @@ namespace ILCompiler.Compiler
             string[] resourceNames = GetType().Assembly.GetManifestResourceNames();
             foreach (string resourceName in resourceNames)
             {
+                if (resourceName.StartsWith("ILCompiler.Runtime.TRS80") && _configuration.TargetCpm) continue;
+                if (resourceName.StartsWith("ILCompiler.Runtime.CPM") && !_configuration.TargetCpm) continue;
+
                 using (Stream? stream = GetType().Assembly.GetManifestResourceStream(resourceName))
                 {
                     if (stream != null)

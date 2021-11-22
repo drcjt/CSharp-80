@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Compiler.DependencyAnalysis;
+using ILCompiler.Interfaces;
 using System.Collections.Generic;
 using Z80Assembler;
 
@@ -15,10 +16,13 @@ namespace ILCompiler.Compiler.CodeGenerators
 
         private Z80MethodCodeNode _method;
 
-        public CodeGeneratorContext(IList<LocalVariableDescriptor> localVariableTable, Z80MethodCodeNode method)
+        public readonly IConfiguration Configuration;
+
+        public CodeGeneratorContext(IList<LocalVariableDescriptor> localVariableTable, Z80MethodCodeNode method, IConfiguration configuration)
         {
             LocalVariableTable = localVariableTable;
             _method = method;
+            Configuration = configuration;
         }
     }
 }

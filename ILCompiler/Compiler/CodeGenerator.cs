@@ -15,21 +15,23 @@ namespace ILCompiler.Compiler
         private readonly INameMangler _nameMangler;
         private readonly ILogger<CodeGenerator> _logger;
         private readonly ICodeGeneratorFactory _codeGeneratorFactory;
+        private readonly IConfiguration _configuration;
 
         private readonly Dictionary<string, string> _labelsToStringData = new Dictionary<string, string>();
 
         private CodeGeneratorContext _context = null!;
 
-        public CodeGenerator(INameMangler nameMangler, ILogger<CodeGenerator> logger, ICodeGeneratorFactory codeGeneratorFactory)
+        public CodeGenerator(INameMangler nameMangler, ILogger<CodeGenerator> logger, ICodeGeneratorFactory codeGeneratorFactory, IConfiguration configuration)
         {
             _nameMangler = nameMangler;
             _logger = logger;
             _codeGeneratorFactory = codeGeneratorFactory;
+            _configuration = configuration;
         }
 
         public IList<Instruction> Generate(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable, Z80MethodCodeNode methodCodeNode)
         {
-            _context = new CodeGeneratorContext(localVariableTable, methodCodeNode);
+            _context = new CodeGeneratorContext(localVariableTable, methodCodeNode, _configuration);
 
             AssignFrameOffsets();
 
