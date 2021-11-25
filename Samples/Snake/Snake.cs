@@ -13,7 +13,8 @@ namespace Snake
 
         int _maxLength;
 
-        public int Length;
+        public int ActualLength;
+        public int DesiredLength;
 
         private Direction _direction;
         private Direction _oldDirection;
@@ -38,7 +39,8 @@ namespace Snake
 
             _snakeHead = 0;
             _snakeTail = 0;
-            Length = 1;
+            ActualLength = 1;
+            DesiredLength = 1;
 
             _snakeXs = snakeXs;
             _snakeYs = snakeYs;
@@ -47,12 +49,6 @@ namespace Snake
 
             _snakeXs[0] = x;
             _snakeYs[0] = y;
-
-            for (int i = 1; i < length; i++)
-            {
-                _snakeXs[i] = -1;
-                _snakeYs[i] = -1;
-            }
         }
 
         private static int WrapAround(int coordinate, int max)
@@ -60,7 +56,6 @@ namespace Snake
             coordinate %= max + 1;
             return (coordinate < 0) ? max : coordinate;
         }
-
 
         public unsafe bool Update()
         {
@@ -77,48 +72,48 @@ namespace Snake
             newHeadX = WrapAround(newHeadX, Graphics.ScreenWidth / 2);
             newHeadY = WrapAround(newHeadY, Graphics.ScreenHeight);
 
+            if (ActualLength == DesiredLength)
+            {
+                _snakeTail++;
+                _snakeTail %= _maxLength;
+            }
+            else
+            {
+                ActualLength++;
+            }
+
             // TODO: This slows down as the length of the snake increases
             // need to look at optimisations in codegen to improve the
             // speed of the generated code
-            for (int i = 0; i < Length; i++)
+            var cell = _snakeTail;
+            for (var i = 0; i < ActualLength; i++)
             {
-                //var index = (_snakeHead - i) % _maxLength;
-                if (_snakeXs[i] == newHeadX &&
-                    _snakeYs[i] == newHeadY)
+                cell++;
+                if (cell >= _maxLength)
                 {
-                    // Hit snake with itself
+                    cell = 0;
+                }
+                if (_snakeXs[cell] == newHeadX &&
+                    _snakeYs[cell] == newHeadY)
+                {
                     return false;
                 }
             }
 
             // Add new head
-            _snakeHead = (_snakeHead + 1) % _maxLength;
+            _snakeHead++;
+            _snakeHead %= _maxLength;
             _snakeXs[_snakeHead] = newHeadX;
             _snakeYs[_snakeHead] = newHeadY;
-
-            int distance = 0;
-            if (_snakeHead > _snakeTail)
-            {
-                distance = _snakeHead - _snakeTail;
-            }
-            else
-            {
-                distance = _snakeHead + (_maxLength - _snakeTail);
-            }
-
-            if (distance == Length)
-            {
-                _snakeTail = (_snakeTail + 1) % _maxLength;
-            }
 
             return true;
         }
 
         public bool Extend()
         {
-            if (Length < _maxLength)
+            if (ActualLength < _maxLength - 1)
             {
-                Length++;
+                DesiredLength++;
                 return true;
             }
             return false;
