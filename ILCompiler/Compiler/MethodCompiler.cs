@@ -130,6 +130,16 @@ namespace ILCompiler.Compiler
                 }
 
                 flowgraph.SetBlockOrder(basicBlocks);
+
+
+                if (_configuration.DumpIRTrees)
+                {
+                    // Dump LIR here
+                    var lirDumper = new LIRDumper();
+                    var lirDump = lirDumper.Dump(basicBlocks);
+                    _logger.LogInformation("{lirDump}", lirDump);
+                }
+
                 var instructions = codeGenerator.Generate(basicBlocks, _localVariableTable, methodCodeNodeNeedingCode);
                 methodCodeNodeNeedingCode.MethodCode = instructions;
             }

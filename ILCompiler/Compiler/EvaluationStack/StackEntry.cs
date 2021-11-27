@@ -31,11 +31,15 @@ namespace ILCompiler.Compiler.EvaluationStack
         public int? ExactSize { get; }
 
         public StackEntry? Next { get; set; }
+        public int TreeID { get; }
+
+        private static int _treeID = 0;
 
         protected StackEntry(StackValueKind kind, int? exactSize = null)
         {
             Kind = kind;
             ExactSize = exactSize;
+            TreeID = _treeID++;
         }
 
         // TODO: Consider using a visitor to do the duplication
