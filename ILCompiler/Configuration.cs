@@ -11,5 +11,6 @@ namespace ILCompiler
         public string CorelibPath { get; set; } = string.Empty;
         public bool IntegrationTests { get; set; }
         public bool TargetCpm { get; set; } = false;
+        public int StackStart { get; set; } = 0xffff;
     }
 }

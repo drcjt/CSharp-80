@@ -20,14 +20,15 @@ namespace Snake
 
         private unsafe Result Run(/* ref FrameBuffer fb */)
         {
-            // TOOD: this is the max length right now as IX/IY offset
-            // addressing limits the stack size.
-            const int MAX_LENGTH = 20;
+            const int MAX_LENGTH = 80;
 
             var snakeXs = stackalloc int[MAX_LENGTH];
             var snakeYs = stackalloc int[MAX_LENGTH];
 
-            Snake s = new Snake(WrapAround((byte)_random.Next(), Graphics.ScreenWidth / 2), WrapAround((byte)_random.Next(), Graphics.ScreenHeight), snakeXs, snakeYs, MAX_LENGTH, (Direction)(_random.Next() % 4));
+            var startX = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenWidth / 2);
+            var startY = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenHeight);
+
+            Snake s = new Snake(startX, startY, snakeXs, snakeYs, MAX_LENGTH, (Direction)(_random.Next() % 4));
 
             MakeFood(s, out int foodX, out int foodY);
             SetPixel(foodX, foodY, Color.White);
@@ -49,7 +50,6 @@ namespace Snake
                         case 9: s.Course = Direction.Right; break;
                     }
                 }
-
 
                 Thread.Sleep(50);
 
@@ -87,16 +87,10 @@ namespace Snake
         {
             do
             {
-                foodX = WrapAround((byte)_random.Next(), Graphics.ScreenWidth / 2);
-                foodY = WrapAround((byte)_random.Next(), Graphics.ScreenHeight);
+                foodX = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenWidth / 2);
+                foodY = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenHeight);
             }
             while (snake.HitTest(foodX, foodY));
-        }
-
-        private static int WrapAround(int coordinate, int max)
-        {
-            coordinate %= max + 1;
-            return (coordinate < 0) ? max : coordinate;
         }
 
         public static void Main()
@@ -105,7 +99,7 @@ namespace Snake
 
             //FrameBuffer fb = new FrameBuffer();
             while (true)
-            {                
+            {
                 Game g = new Game((uint)Environment.TickCount);
                 Result result = g.Run(/* ref fb */);
 

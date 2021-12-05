@@ -66,6 +66,7 @@ namespace ILCompiler
                 new Option<bool>(new[] { "-it", "--integrationTests" }, "Compile for integration tests" ),
                 new Option<bool>(new[] { "-d", "--dumpIRTrees" }, "Dump IR trees"),
                 new Option<bool>(new[] { "-cpm", "--targetCpm" }, "Target Cpm"),
+                new Option<int>(new[] { "-ss", "--stackStart" }, "Stack Start Address"),
                 new Argument<FileInfo>("inputFilePath"),
             };
 
@@ -82,6 +83,7 @@ namespace ILCompiler
                     configuration.IntegrationTests = parsedConfiguration.IntegrationTests;
                     configuration.DontInlineRuntime = parsedConfiguration.DontInlineRuntime;
                     configuration.TargetCpm = parsedConfiguration.TargetCpm;
+                    configuration.StackStart = parsedConfiguration.StackStart;
                 }
             );
 

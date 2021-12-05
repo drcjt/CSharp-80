@@ -47,11 +47,30 @@ namespace ILCompiler.Compiler
             if (!_configuration.IntegrationTests)
             {
                 _out.WriteLine(Instruction.Org((short)(_configuration.TargetCpm ? 0x0100 : 0x5200)));
-                _out.WriteLine(Instruction.Jp("START"));
+                _out.WriteLine(new LabelInstruction("ENTRY"));
+
+                // Save original stack location
+                _out.WriteLine(Instruction.LdInd("ORIGSP", R16.SP));
+
+                // Relocate the stack
+                _out.WriteLine(Instruction.Ld(R16.SP, (short)_configuration.StackStart));
+
+                // Start the program
+                _out.WriteLine(Instruction.Call("START"));
+
+                // Restore the original stack
+                _out.WriteLine(Instruction.LdInd(R16.SP, "ORIGSP"));
+
+                // Return to the operating system
+                _out.WriteLine(Instruction.Ret());
+
+                // Holds the original stack location
+                _out.WriteLine(Instruction.Db("  ", "ORIGSP"));
             }
             else
             {
                 _out.WriteLine(Instruction.Org(0x0000));
+                _out.WriteLine(new LabelInstruction("ENTRY"));
                 _out.WriteLine(Instruction.Call("START"));
                 _out.WriteLine(Instruction.Pop(R16.DE));
                 _out.WriteLine(Instruction.Pop(R16.HL));
@@ -117,7 +136,7 @@ namespace ILCompiler.Compiler
                 OutputRuntimeCode();
             }
 
-            _out.WriteLine(Instruction.End("START"));
+            _out.WriteLine(Instruction.End("ENTRY"));
         }
 
         private void OutputCodeForNode(Z80MethodCodeNode node)

@@ -51,12 +51,6 @@ namespace Snake
             _snakeYs[0] = y;
         }
 
-        private static int WrapAround(int coordinate, int max)
-        {
-            coordinate %= max + 1;
-            return (coordinate < 0) ? max : coordinate;
-        }
-
         public unsafe bool Update()
         {
             var newHeadX = HeadX;
@@ -69,8 +63,8 @@ namespace Snake
                 case Direction.Down: newHeadY++; break;
             }
 
-            newHeadX = WrapAround(newHeadX, Graphics.ScreenWidth / 2);
-            newHeadY = WrapAround(newHeadY, Graphics.ScreenHeight);
+            newHeadX = GraphicHelper.WrapAround(newHeadX, Graphics.ScreenWidth / 2);
+            newHeadY = GraphicHelper.WrapAround(newHeadY, Graphics.ScreenHeight);
 
             if (ActualLength == DesiredLength)
             {

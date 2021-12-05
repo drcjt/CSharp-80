@@ -134,13 +134,25 @@ namespace Z80Assembler
         {
             return new Instruction(Opcode.Ld, target.ToString() + ", " + source.ToString());
         }
+
         public static Instruction Ld(R16Type target, string label)
         {
             return new Instruction(Opcode.Ld, target.ToString() + ", " + label);
         }
+
         public static Instruction LdInd(R16Type target, R8Type source)
         {
             return new Instruction(Opcode.Ld, "(" + target.ToString() + "), " + source.ToString());
+        }
+
+        public static Instruction LdInd(Register target, string source)
+        {
+            return new Instruction(Opcode.Ld, target.ToString() + ", (" + source + ")");
+        }
+
+        public static Instruction LdInd(string label, Register source)
+        {
+            return new Instruction(Opcode.Ld, "(" + label + "), " + source.ToString());
         }
 
         public static Instruction Ex(Register target, Register source)
