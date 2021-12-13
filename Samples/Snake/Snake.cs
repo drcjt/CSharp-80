@@ -76,9 +76,25 @@ namespace Snake
                 ActualLength++;
             }
 
-            // TODO: This slows down as the length of the snake increases
-            // need to look at optimisations in codegen to improve the
-            // speed of the generated code
+            if (SnakeHit(newHeadX, newHeadY))
+            {
+                return false;
+            }
+
+            // Add new head
+            _snakeHead++;
+            _snakeHead %= _maxLength;
+            _snakeXs[_snakeHead] = newHeadX;
+            _snakeYs[_snakeHead] = newHeadY;
+
+            return true;
+        }
+
+        // TODO: This slows down as the length of the snake increases
+        // need to look at optimisations in codegen to improve the
+        // speed of the generated code
+        private bool SnakeHit(int newHeadX, int newHeadY)
+        {
             var cell = _snakeTail;
             for (var i = 0; i < ActualLength; i++)
             {
@@ -90,17 +106,11 @@ namespace Snake
                 if (_snakeXs[cell] == newHeadX &&
                     _snakeYs[cell] == newHeadY)
                 {
-                    return false;
+                    return true;
                 }
             }
 
-            // Add new head
-            _snakeHead++;
-            _snakeHead %= _maxLength;
-            _snakeXs[_snakeHead] = newHeadX;
-            _snakeYs[_snakeHead] = newHeadY;
-
-            return true;
+            return false;
         }
 
         public bool Extend()
