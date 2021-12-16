@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler.Importer
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            var fallthroughBlock = context.CurrentBlock;
+            var fallthroughBlock = context.FallThroughBlock;
 
             var op1 = importer.PopExpression();
 

@@ -131,6 +131,8 @@ namespace ILCompiler.Compiler
 
                 flowgraph.SetBlockOrder(basicBlocks);
 
+                var ssaBuilder = new SsaBuilder();
+                ssaBuilder.Build(basicBlocks);
 
                 if (_configuration.DumpIRTrees)
                 {

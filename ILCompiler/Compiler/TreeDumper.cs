@@ -18,6 +18,13 @@ namespace ILCompiler.Compiler
             {
                 _sb.AppendLine($"Block {block.Label}");
 
+                _sb.Append($"Block successors: ");
+                foreach (var successor in block.Successors)
+                {
+                    _sb.Append($"${successor.Label}, ");
+                }
+                _sb.AppendLine();
+
                 foreach (var statement in block.Statements)
                 {
                     _indent = 0;

@@ -134,8 +134,8 @@ namespace ILCompiler.Compiler
 
                 if (importer != null)
                 {
-                    var currentBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null;
-                    var importContext = new ImportContext(currentBlock, _method, _nameMangler);
+                    var fallthroughBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null;
+                    var importContext = new ImportContext(block, fallthroughBlock, _method, _nameMangler);
                     importer.Import(currentInstruction, importContext, _importerProxy);
                     if (importContext.StopImporting)
                     {
@@ -232,6 +232,8 @@ namespace ILCompiler.Compiler
 
         private void ImportFallThrough(BasicBlock next)
         {
+            _currentBasicBlock!.Successors.Add(next);
+
             // Evaluation stack in each basic block holds the imported high level tree representation of the IL
 
             EvaluationStack<StackEntry>? entryStack = next.EntryStack;
