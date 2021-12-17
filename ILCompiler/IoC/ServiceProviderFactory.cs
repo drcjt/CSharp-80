@@ -31,6 +31,9 @@ namespace ILCompiler.IoC
             services.AddTransient<IILImporter, ILImporter>();
             services.AddImporters();
 
+            services.AddFactory<ISsaBuilder>();
+            services.AddTransient<ISsaBuilder, SsaBuilder>();
+
             services.AddSingleton<Z80Writer>();
 
             services.AddSingleton<TypeDependencyAnalyser>();

@@ -14,20 +14,22 @@ namespace ILCompiler.Compiler
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<MethodCompiler> _logger;
-        private readonly Factory<ICodeGenerator> _codeGeneratorFactory;
         private readonly Factory<IILImporter> _ilImporterFactory;
+        private readonly Factory<ISsaBuilder> _saBuilderFactory;
+        private readonly Factory<ICodeGenerator> _codeGeneratorFactory;
 
         private int _parameterCount;
         private int? _returnBufferArgIndex;
         
         private IList<LocalVariableDescriptor> _localVariableTable;
 
-        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, Factory<ICodeGenerator> codeGeneratorFactory, Factory<IILImporter> ilImporterFactory)
+        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, Factory<ICodeGenerator> codeGeneratorFactory, Factory<IILImporter> ilImporterFactory, Factory<ISsaBuilder> ssaBuilderFactory)
         {
             _configuration = configuration;
             _logger = logger;
-            _codeGeneratorFactory = codeGeneratorFactory;
             _ilImporterFactory = ilImporterFactory;
+            _saBuilderFactory = ssaBuilderFactory;
+            _codeGeneratorFactory = codeGeneratorFactory;
             _localVariableTable = new List<LocalVariableDescriptor>();
         }
 
@@ -131,7 +133,7 @@ namespace ILCompiler.Compiler
 
                 flowgraph.SetBlockOrder(basicBlocks);
 
-                var ssaBuilder = new SsaBuilder();
+                var ssaBuilder = _saBuilderFactory.Create();
                 ssaBuilder.Build(basicBlocks);
 
                 if (_configuration.DumpIRTrees)
