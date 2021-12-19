@@ -14,6 +14,7 @@ namespace ILCompiler.Compiler
             foreach (var block in blocks)
             {
                 _sb.AppendLine($"Block {block.Label}");
+                _sb.AppendLine($"Block immediate dominator {block.ImmediateDominator?.Label}");
 
                 var currentNode = block.FirstNode;
                 while (currentNode != null)

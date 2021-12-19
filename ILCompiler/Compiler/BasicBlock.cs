@@ -8,7 +8,11 @@ namespace ILCompiler.Compiler
         public BasicBlock? Next { get; set; }
         public int StartOffset { get; set; }
 
+        public uint PostOrderNum { get; set; }
+
+        public BasicBlock? ImmediateDominator { get; set; }
         public IList<BasicBlock> Successors = new List<BasicBlock>();
+        public IList<BasicBlock> Predecessors = new List<BasicBlock>();
 
         // High level intermediate representation - main output of importation process
         public IList<StackEntry> Statements { get; } = new List<StackEntry>();

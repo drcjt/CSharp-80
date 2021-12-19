@@ -232,7 +232,11 @@ namespace ILCompiler.Compiler
 
         private void ImportFallThrough(BasicBlock next)
         {
+            // Setup successor of current block as next
             _currentBasicBlock!.Successors.Add(next);
+
+            // Setup predecessor of next block as current block
+            next.Predecessors.Add(_currentBasicBlock);
 
             // Evaluation stack in each basic block holds the imported high level tree representation of the IL
 
