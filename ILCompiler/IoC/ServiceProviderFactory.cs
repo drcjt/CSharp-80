@@ -3,6 +3,7 @@ using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
+using ILCompiler.Compiler.Lowerings;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,6 @@ namespace ILCompiler.IoC
             services.AddFactory<IMethodCompiler>();
             services.AddTransient<IMethodCompiler, MethodCompiler>();
 
-            services.AddSingleton<CodeGeneratorFactory>();
             services.AddFactory<ICodeGenerator>();
             services.AddTransient<ICodeGenerator, CodeGenerator>();
             services.AddCodeGenerators();
@@ -30,6 +30,10 @@ namespace ILCompiler.IoC
             services.AddFactory<IILImporter>();
             services.AddTransient<IILImporter, ILImporter>();
             services.AddImporters();
+
+            services.AddFactory<ILowering>();
+            services.AddTransient<ILowering, Lowering>();
+            services.AddLowerings();
 
             services.AddFactory<ISsaBuilder>();
             services.AddTransient<ISsaBuilder, SsaBuilder>();
@@ -50,6 +54,7 @@ namespace ILCompiler.IoC
 
             services.AddSingleton<IOpcodeImporterFactory, OpcodeImporterFactory>();
             services.AddSingleton<ICodeGeneratorFactory, CodeGeneratorFactory>();
+            services.AddSingleton<ILoweringFactory, LoweringFactory>();
         }
     }
 }

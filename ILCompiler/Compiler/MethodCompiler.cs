@@ -17,13 +17,15 @@ namespace ILCompiler.Compiler
         private readonly Factory<IILImporter> _ilImporterFactory;
         private readonly Factory<ISsaBuilder> _saBuilderFactory;
         private readonly Factory<ICodeGenerator> _codeGeneratorFactory;
+        private readonly Factory<ILowering> _loweringFactory;
 
         private int _parameterCount;
         private int? _returnBufferArgIndex;
         
         private IList<LocalVariableDescriptor> _localVariableTable;
 
-        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, Factory<ICodeGenerator> codeGeneratorFactory, Factory<IILImporter> ilImporterFactory, Factory<ISsaBuilder> ssaBuilderFactory)
+        // TODO: Refactor to reduce number of args
+        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, Factory<ICodeGenerator> codeGeneratorFactory, Factory<IILImporter> ilImporterFactory, Factory<ISsaBuilder> ssaBuilderFactory, Factory<ILowering> loweringFactory)
         {
             _configuration = configuration;
             _logger = logger;
@@ -31,6 +33,7 @@ namespace ILCompiler.Compiler
             _saBuilderFactory = ssaBuilderFactory;
             _codeGeneratorFactory = codeGeneratorFactory;
             _localVariableTable = new List<LocalVariableDescriptor>();
+            _loweringFactory = loweringFactory;
         }
 
         private void SetupLocalVariableTable(MethodDef method)
@@ -143,6 +146,10 @@ namespace ILCompiler.Compiler
                     var lirDump = lirDumper.Dump(basicBlocks);
                     _logger.LogInformation("{lirDump}", lirDump);
                 }
+
+                // Lower
+                var lowering = _loweringFactory.Create();
+                lowering.Run(basicBlocks);
 
                 var instructions = codeGenerator.Generate(basicBlocks, _localVariableTable, methodCodeNodeNeedingCode);
                 methodCodeNodeNeedingCode.MethodCode = instructions;

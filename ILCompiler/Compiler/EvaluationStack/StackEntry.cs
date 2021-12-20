@@ -35,6 +35,8 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         private static int _treeID = 0;
 
+        public bool Contained { get; set; }
+
         protected StackEntry(StackValueKind kind, int? exactSize = null)
         {
             Kind = kind;
