@@ -128,7 +128,11 @@ namespace ILCompiler.Compiler
 
         public void Visit<T>(T entry) where T : StackEntry
         {
-            _codeGeneratorFactory.GetCodeGenerator<T>().GenerateCode(entry, _context);
+            // Contained nodes are part of their parents from a code generation perspective
+            if (!entry.Contained)
+            {
+                _codeGeneratorFactory.GetCodeGenerator<T>().GenerateCode(entry, _context);
+            }
         }
 
         // TODO: Consider making this a separate phase
