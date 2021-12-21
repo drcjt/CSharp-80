@@ -23,20 +23,20 @@ namespace ILCompiler.IoC
             services.AddFactory<IMethodCompiler>();
             services.AddTransient<IMethodCompiler, MethodCompiler>();
 
-            services.AddFactory<ICodeGenerator>();
-            services.AddTransient<ICodeGenerator, CodeGenerator>();
-            services.AddCodeGenerators();
+            services.AddSingleton<IPhaseFactory, PhaseFactory>();
 
-            services.AddFactory<IILImporter>();
             services.AddTransient<IILImporter, ILImporter>();
             services.AddImporters();
 
-            services.AddFactory<ILowering>();
+            services.AddTransient<IFlowgraph, Flowgraph>();
+
+            services.AddTransient<ISsaBuilder, SsaBuilder>();
+
             services.AddTransient<ILowering, Lowering>();
             services.AddLowerings();
 
-            services.AddFactory<ISsaBuilder>();
-            services.AddTransient<ISsaBuilder, SsaBuilder>();
+            services.AddTransient<ICodeGenerator, CodeGenerator>();
+            services.AddCodeGenerators();
 
             services.AddSingleton<Z80Writer>();
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ILCompiler.Interfaces
 {
-    public interface ILowering
+    public interface ILowering : IPhase
     {
         public void Run(IList<BasicBlock> blocks);
     }

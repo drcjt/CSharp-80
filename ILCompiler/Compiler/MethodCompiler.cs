@@ -3,7 +3,6 @@ using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
-using ILCompiler.IoC;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Text;
@@ -14,26 +13,19 @@ namespace ILCompiler.Compiler
     {
         private readonly IConfiguration _configuration;
         private readonly ILogger<MethodCompiler> _logger;
-        private readonly Factory<IILImporter> _ilImporterFactory;
-        private readonly Factory<ISsaBuilder> _saBuilderFactory;
-        private readonly Factory<ICodeGenerator> _codeGeneratorFactory;
-        private readonly Factory<ILowering> _loweringFactory;
+        private readonly IPhaseFactory _phaseFactory;
 
         private int _parameterCount;
         private int? _returnBufferArgIndex;
         
         private IList<LocalVariableDescriptor> _localVariableTable;
 
-        // TODO: Refactor to reduce number of args
-        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, Factory<ICodeGenerator> codeGeneratorFactory, Factory<IILImporter> ilImporterFactory, Factory<ISsaBuilder> ssaBuilderFactory, Factory<ILowering> loweringFactory)
+        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory)
         {
             _configuration = configuration;
             _logger = logger;
-            _ilImporterFactory = ilImporterFactory;
-            _saBuilderFactory = ssaBuilderFactory;
-            _codeGeneratorFactory = codeGeneratorFactory;
             _localVariableTable = new List<LocalVariableDescriptor>();
-            _loweringFactory = loweringFactory;
+            _phaseFactory = phaseFactory;
         }
 
         private void SetupLocalVariableTable(MethodDef method)
@@ -108,9 +100,7 @@ namespace ILCompiler.Compiler
 
             if (!method.IsIntrinsic() && !method.IsPinvokeImpl)
             {
-                var ilImporter = _ilImporterFactory.Create();
-                var flowgraph = new Flowgraph();
-                var codeGenerator = _codeGeneratorFactory.Create();
+                var ilImporter = _phaseFactory.Create<IILImporter>();
 
                 // Main phases of the compiler live here
                 var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _localVariableTable);
@@ -134,9 +124,10 @@ namespace ILCompiler.Compiler
                     _logger.LogInformation("{treedump}", treedump);
                 }
 
+                var flowgraph = _phaseFactory.Create<IFlowgraph>();
                 flowgraph.SetBlockOrder(basicBlocks);
 
-                var ssaBuilder = _saBuilderFactory.Create();
+                var ssaBuilder = _phaseFactory.Create<ISsaBuilder>();
                 ssaBuilder.Build(basicBlocks);
 
                 if (_configuration.DumpIRTrees)
@@ -148,9 +139,10 @@ namespace ILCompiler.Compiler
                 }
 
                 // Lower
-                var lowering = _loweringFactory.Create();
+                var lowering = _phaseFactory.Create<ILowering>();
                 lowering.Run(basicBlocks);
 
+                var codeGenerator = _phaseFactory.Create<ICodeGenerator>();
                 var instructions = codeGenerator.Generate(basicBlocks, _localVariableTable, methodCodeNodeNeedingCode);
                 methodCodeNodeNeedingCode.MethodCode = instructions;
             }

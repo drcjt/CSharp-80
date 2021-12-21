@@ -1,9 +1,10 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Interfaces;
 using System.Collections.Generic;
 
 namespace ILCompiler.Compiler
 {
-    public class Flowgraph
+    public class Flowgraph : IFlowgraph
     {
         /// <summary>
         /// Performs a canonical post order traversal of the HIR tree

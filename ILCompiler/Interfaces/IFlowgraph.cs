@@ -3,8 +3,8 @@ using System.Collections.Generic;
 
 namespace ILCompiler.Interfaces
 {
-    public interface ISsaBuilder : IPhase
+    public interface IFlowgraph : IPhase
     {
-        public void Build(IList<BasicBlock> blocks);
+        void SetBlockOrder(IList<BasicBlock> blocks);
     }
 }
