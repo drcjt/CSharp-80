@@ -18,6 +18,7 @@
     <ProjectReference Include="..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
     <ProjectReference Include="..\Fib\Fib.csproj" />
     <ProjectReference Include="..\Math\Math.csproj" />
+    <ProjectReference Include="..\Matrix\Matrix.csproj" />
     <ProjectReference Include="..\NetBot\NetBot.csproj" />
     <ProjectReference Include="..\Sample\Sample.csproj" />
     <ProjectReference Include="..\Snake\Snake.csproj" />
@@ -27,6 +28,6 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Math\$(OutDir)\Math.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Sample\$(OutDir)\Sample.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Fib\$(OutDir)\Fib.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Snake\$(OutDir)\Snake.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Structs\$(OutDir)\Structs.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Paint\$(OutDir)\Paint.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\GfxDemos\$(OutDir)\GfxDemos.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\NetBot\$(OutDir)\NetBot.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk" />  
+	  <Exec Command="$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Math\$(OutDir)\Math.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Sample\$(OutDir)\Sample.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Fib\$(OutDir)\Fib.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Snake\$(OutDir)\Snake.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Structs\$(OutDir)\Structs.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Paint\$(OutDir)\Paint.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\GfxDemos\$(OutDir)\GfxDemos.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\NetBot\$(OutDir)\NetBot.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk $(ProjectDir)..\Matrix\$(OutDir)\Matrix.cmd&#xD;&#xA;$(SolutionDir)tools\trswrite.exe -o $(ProjectDir)..\Samples.dsk" />  
   </Target>
 </Project>
