@@ -16,23 +16,30 @@ namespace ILCompiler.Compiler.Importer
             var fieldDefOrRef = instruction.Operand as IField;
             var fieldDef = fieldDefOrRef.ResolveFieldDef();
 
+            var fieldOffset = fieldDef.FieldOffset ?? 0;
+
             var obj = importer.PopExpression();
 
             if (obj.Kind == StackValueKind.ValueType)
-            {
+            {                
                 if (obj is LocalVariableEntry)
                 {
                     obj = new LocalVariableAddressEntry((obj.As<LocalVariableEntry>()).LocalNumber);
                 }
-                /*
-                else if (obj is FieldEntry)
+                else if (obj is IndirectEntry)
                 {
-                    // TODO: Need to work out what to do here.
-                    // The field is effectively on top of the stack so need the address of this field
-                    // Think the right answer is to merge the FieldEntry nodes together
-                    throw new NotImplementedException("Nested Field Loads not yet implemented");
+                    // If the object is itself an IndirectEntry e.g. resulting from a Ldfld
+                    // then we should merge the Ldfld's together
+
+                    // e.g. Ldfld SimpleVector::N
+                    //      Ldfld Nested::Length
+                    // will get converted into a single IndirectEntry node with the field offset
+                    // being the combination of the field offsets for N and Length
+
+                    var previousIndirect = obj.As<IndirectEntry>();
+                    fieldOffset = previousIndirect.Offset + fieldOffset;
+                    obj = previousIndirect.Op1;
                 }
-                */
             }
 
             if (obj.Kind != StackValueKind.ObjRef && obj.Kind != StackValueKind.ByRef)
@@ -41,7 +48,7 @@ namespace ILCompiler.Compiler.Importer
             }
 
             var kind = fieldDef.FieldType.GetStackValueKind();
-            var node = new IndirectEntry(obj, kind, fieldDef.FieldType.GetExactSize(), fieldDef.FieldOffset ?? 0);
+            var node = new IndirectEntry(obj, kind, fieldDef.FieldType.GetExactSize(), fieldOffset);
             importer.PushExpression(node);
         }
     }

@@ -15,7 +15,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 var bytesToCopy = totalBytesToCopy > 4 ? 4 : totalBytesToCopy;
 
                 // offset has to be -128 to + 127
-                if (ixOffset + 3 > 127)
+                while (ixOffset + 3 > 127)
                 {
                     // Need to move IX along to keep stackOffset within -128 to +127 range
                     assembler.Ld(R16.DE, 127);
@@ -24,6 +24,15 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                     ixOffset -= 127;
                     size -= 127;
+                }
+                while (ixOffset < -128)
+                {
+                    assembler.Ld(R16.DE, -128);
+                    assembler.Add(I16.IX, R16.DE);
+                    changeToIX -= 128;
+
+                    ixOffset += 128;
+                    size += 128;
                 }
 
                 switch (bytesToCopy)
