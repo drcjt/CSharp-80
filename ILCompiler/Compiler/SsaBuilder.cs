@@ -66,9 +66,9 @@ namespace ILCompiler.Compiler
             return postOrder;
         }
 
-        private static void ComputeImmediateDominators(IList<BasicBlock> postOrder)
+        private void ComputeImmediateDominators(IList<BasicBlock> postOrder)
         {
-            Console.WriteLine("[SsaBuilder:ComputeImmediateDominators])");
+            _logger.LogDebug("[SsaBuilder:ComputeImmediateDominators])");
 
             var count = postOrder.Count;
 
@@ -85,7 +85,7 @@ namespace ILCompiler.Compiler
                 {
                     var block = postOrder[i];
 
-                    Console.WriteLine($"Visiting in reverse post order: {block.Label}");
+                    _logger.LogDebug($"Visiting in reverse post order: {block.Label}");
 
                     // Find the first processed predecessor
                     BasicBlock? predecessorBlock = null;
@@ -100,7 +100,7 @@ namespace ILCompiler.Compiler
 
                     if (predecessorBlock != null)
                     {
-                        Console.WriteLine($"Predecessor block is {predecessorBlock.Label}");
+                       _logger.LogDebug($"Predecessor block is {predecessorBlock.Label}");
                     }
 
                     // Intersect DOM, if computed for all predecessors
@@ -123,11 +123,11 @@ namespace ILCompiler.Compiler
                     {
                         changed = true;
 
-                        Console.WriteLine($"ImmediateDominator of {block.Label} becomes {basicBlockDominator?.Label}");
+                        _logger.LogDebug($"ImmediateDominator of {block.Label} becomes {basicBlockDominator?.Label}");
                         block.ImmediateDominator = basicBlockDominator;
                     }
 
-                    Console.WriteLine($"Marking block {block.Label} as processed");
+                    _logger.LogDebug($"Marking block {block.Label} as processed");
                     processedBlocks.Add(block);
                 }
             }
