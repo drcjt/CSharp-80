@@ -4,44 +4,46 @@ namespace Matrix
 {
     public static class Program
     {
+        const int Height = 16;
+        const int Width = 20;
         public unsafe static void Main()
         {
             var random = new Random((uint)Environment.TickCount);
 
-            int height = 16;
-            int width = 20;
 
-            int* y = stackalloc int[64];    // TODO: If use width here then get problems!!
+            // TODO: Cannot use width here as this generates IL using
+            // the mul.ovf.un opcode which is not supported yet ..
+            int* y = stackalloc int[20];
 
-            for (int x = 0; x < width; x++)
+            for (int x = 0; x < Width; x++)
             {
-                y[x] = (int)random.Next() % height;
+                y[x] = (int)random.Next() % Height;
             }
 
             Console.Clear();
 
             while (true)
             {
-                for (int x = 0; x < width; x++)
+                for (int x = 0; x < Width; x++)
                 {
                     var t = y[x];
                     Console.SetCursorPosition(x, t);
                     Console.Write('A');
 
-                    Console.SetCursorPosition(x, inScreenYPosition(t - 6, height));
+                    Console.SetCursorPosition(x, InScreenYPosition(t - 6));
                     Console.Write(' ');
 
-                    y[x] = inScreenYPosition(t + 1, height);
+                    y[x] = InScreenYPosition(t + 1);
                 }
             }
         }
 
-        public static int inScreenYPosition(int yPosition, int height)
+        public static int InScreenYPosition(int yPosition)
         {
-            if (yPosition < 0)
-                return yPosition + height;
-            else if (yPosition < height)
+            if (yPosition >= 0 && yPosition < Height)
                 return yPosition;
+            else if (yPosition < 0)
+                return yPosition + Height;
             else
                 return 0;
         }
