@@ -13,7 +13,7 @@ before_build:
 
 build_script:
   # output will be in ./src/bin/debug/netcoreapp1.1/publish
-  - cmd: dotnet publish CSharp-80.sln
+  - cmd: dotnet publish CSharp-80.sln -c Release
   
 test_script:
   - cmd: nuget install Appveyor.TestLogger -Version 2.0.0
