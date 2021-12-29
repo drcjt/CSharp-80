@@ -8,7 +8,7 @@ namespace ILCompiler.Interfaces
     public interface IILImporterProxy
     {
         void PushExpression(StackEntry entry);
-        void ImportAppendTree(StackEntry entry);
+        void ImportAppendTree(StackEntry entry, bool spill = false);
         StackEntry PopExpression();
         void ImportFallThrough(BasicBlock next);
 

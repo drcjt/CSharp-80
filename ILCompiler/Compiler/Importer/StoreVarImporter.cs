@@ -29,7 +29,7 @@ namespace ILCompiler.Compiler.Importer
             }
             var localNumber = importer.ParameterCount + index;
             var node = new StoreLocalVariableEntry(localNumber, false, value);
-            importer.ImportAppendTree(node);
+            importer.ImportAppendTree(node, true);
         }
 
         private static int GetIndex(Instruction instruction)

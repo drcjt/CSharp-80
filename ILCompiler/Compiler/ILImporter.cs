@@ -45,7 +45,7 @@ namespace ILCompiler.Compiler
 
             public int? ReturnBufferArgIndex => _importer._returnBufferArgIndex;
 
-            public void ImportAppendTree(StackEntry entry) => _importer.ImportAppendTree(entry);
+            public void ImportAppendTree(StackEntry entry, bool spill = false) => _importer.ImportAppendTree(entry, spill);
             public void ImportFallThrough(BasicBlock next) => _importer.ImportFallThrough(next);
             public StackEntry PopExpression() => _importer._stack.Pop();
             public void PushExpression(StackEntry entry) => _importer._stack.Push(entry);
@@ -99,9 +99,47 @@ namespace ILCompiler.Compiler
             // TODO: add any appropriate code to handle the end of importing a basic block
         }
 
-        private void ImportAppendTree(StackEntry entry)
+        private void ImportSpillAppendTree(StackEntry entry)
         {
-            _currentBasicBlock?.Statements.Add(entry);
+            // If we have an assignment and the variable being assigned to
+            // has prior loads on the evaluation stack then we need to ensure
+            // these loads are completed before the variable is modified
+            if (entry is StoreLocalVariableEntry)
+            {
+                // TODO: Do we need to check that variable being assigned to is a struct type?
+
+                // Convert loads into assignmented to new temps
+                ImportSpillLocalReferences(entry.As<StoreLocalVariableEntry>().LocalNumber);
+            }
+            ImportAppendTree(entry);
+        }
+
+        private void ImportSpillLocalReferences(int localNumber)
+        {
+            for (int i = 0; i < _stack.Length; i++)
+            {
+                // TODO: Check if this evaluation stack entry refers to the local to spill
+                // if not then it can be skipped otherwise ...
+
+                // Create an assignment node from the spilled local var to a new temp
+                // The return value is a local var node for the new temp
+                var tempLocalVar = ImportSpillStackEntry(_stack[i], null);
+
+                // Swap out the existing local var reference for the new local var node for the temp
+                _stack[i] = tempLocalVar;
+            }
+        }
+
+        private void ImportAppendTree(StackEntry entry, bool spill = false)
+        {
+            if (spill)
+            {
+                ImportSpillAppendTree(entry);
+            }
+            else
+            {
+                _currentBasicBlock?.Statements.Add(entry);
+            }
         }
 
         private StackEntry? ImportExtractLastStmt()
