@@ -25,19 +25,19 @@ All of the demos here are recorded from running the programs in a TRS-80 emulato
 
 ### Snake
 
-See here for the C# source code [C# program running](https://github.com/drcjt/CSharp-80/tree/main/Samples/Snake)
+See here for the C# source code for [snake](https://github.com/drcjt/CSharp-80/tree/main/Samples/Snake)
 
 ![snake demo](/Documentation/snake.gif)
 
 ### Graphics Demo
 
-See here for the C# source code [C# program running](https://github.com/drcjt/CSharp-80/tree/main/Samples/Gfxdemos)
+See here for the C# source code for [graphics demo](https://github.com/drcjt/CSharp-80/tree/main/Samples/Gfxdemos)
 
 ![graphics demo](/Documentation/gfxdemos.gif)
 
 ### Netbot
 
-See here for the C# source code [C# program running](https://github.com/drcjt/CSharp-80/tree/main/Samples/Netbot)
+See here for the C# source code for [netbot](https://github.com/drcjt/CSharp-80/tree/main/Samples/Netbot)
 
 ![netbot demo](/Documentation/netbot.gif)
 
