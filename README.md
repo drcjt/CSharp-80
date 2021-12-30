@@ -16,6 +16,8 @@ can be easily turned into a native Z80 binary file using an assembler such as [z
 * Snake game is using bespoke graphics on the TRS-80 implemented via the System.Graphics.SetPixel api.
 * Performance is okay - snake is quite playable. Lots of scope for improvement here
 * No object allocation yet - arrays can be done but only by using stackalloc
+* On stack structs work including as return arguments
+* Lots of IL opcodes not implemented yet
 
 ## Demos
 
@@ -23,13 +25,21 @@ All of the demos here are recorded from running the programs in a TRS-80 emulato
 
 ### Snake
 
-The C# source for the game can be seen here [C# program running](https://github.com/drcjt/CSharp-80/tree/main/Samples/Snake) in a TRS-80 emulator:
+See here for the C# source code [C# program running](https://github.com/drcjt/CSharp-80/tree/main/Samples/Snake)
 
-![demo](/Documentation/snake.gif)
+![snake demo](/Documentation/snake.gif)
 
 ### Graphics Demo
 
+See here for the C# source code [C# program running](https://github.com/drcjt/CSharp-80/tree/main/Samples/Gfxdemos)
+
+![graphics demo](/Documentation/gfxdemos.gif)
+
 ### Netbot
+
+See here for the C# source code [C# program running](https://github.com/drcjt/CSharp-80/tree/main/Samples/Netbot)
+
+![netbot demo](/Documentation/netbot.gif)
 
 ### Continuous Integration status
 
