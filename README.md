@@ -31,13 +31,13 @@ See here for the C# source code for [snake](https://github.com/drcjt/CSharp-80/t
 
 ### Graphics Demo
 
-See here for the C# source code for [graphics demo](https://github.com/drcjt/CSharp-80/tree/main/Samples/Gfxdemos)
+See here for the C# source code for [graphics demo](https://github.com/drcjt/CSharp-80/tree/main/Samples/GfxDemos)
 
 ![graphics demo](/Documentation/gfxdemos.gif)
 
 ### Netbot
 
-See here for the C# source code for [netbot](https://github.com/drcjt/CSharp-80/tree/main/Samples/Netbot)
+See here for the C# source code for [netbot](https://github.com/drcjt/CSharp-80/tree/main/Samples/NetBot)
 
 ![netbot demo](/Documentation/netbot.gif)
 
