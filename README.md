@@ -10,12 +10,26 @@ can be easily turned into a native Z80 binary file using an assembler such as [z
 * Be able to compile the [C# Snake game](https://github.com/MichalStrehovsky/SeeSharpSnake) with minimal modifications
 * Learn more about AOT and the C# runtime
 
-## Demo
+## Current Status
 
-Current implementation supports very basic console output, short arithmetic, static methods with parameters. Here is a
-demo showing the snake game running in a TRS-80 emulator. The C# source for the game can be seen here [C# program running](https://github.com/drcjt/CSharp-80/tree/main/Samples/Snake) in a TRS-80 emulator:
+* Compiles a number of simple sample programs including a fibonacci calculator, very simple paint program, and a snake game
+* Snake game is using bespoke graphics on the TRS-80 implemented via the System.Graphics.SetPixel api.
+* Performance is okay - snake is quite playable. Lots of scope for improvement here
+* No object allocation yet - arrays can be done but only by using stackalloc
+
+## Demos
+
+All of the demos here are recorded from running the programs in a TRS-80 emulator.
+
+### Snake
+
+The C# source for the game can be seen here [C# program running](https://github.com/drcjt/CSharp-80/tree/main/Samples/Snake) in a TRS-80 emulator:
 
 ![demo](/Documentation/snake.gif)
+
+### Graphics Demo
+
+### Netbot
 
 ### Continuous Integration status
 
