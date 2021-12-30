@@ -18,7 +18,7 @@ can be easily turned into a native Z80 binary file using an assembler such as [z
 * Compiles a number of simple sample programs including a fibonacci calculator, very simple paint program, and a snake game
 * Snake game is using bespoke graphics on the TRS-80 implemented via the System.Graphics.SetPixel api.
 * Performance is okay - snake is quite playable. Lots of scope for improvement here
-* No object allocation yet - arrays can be done but only by using stackalloc
+* All allocation is stack based - arrays can be done but only by using stackalloc
 * On stack structs work including as return arguments
 * Lots of IL opcodes not implemented yet
 
