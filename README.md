@@ -1,12 +1,13 @@
 # CSharp-80
 
-This repo contains a .NET Core ahead of time compiler targetting the Z80. The compiler can compile a managed .NET Core application into an assembly language file that 
+This repo contains a .NET Core ahead of time compiler targetting the Z80 8-bit microprocessor. The compiler can compile a managed .NET Core application into an assembly language file that 
 can be easily turned into a native Z80 binary file using an assembler such as [zmac](http://48k.ca/zmac.html). To learn more about CSharp-80, see the
 [intro document](Documentation/intro-to-csharp-80.md)
 
 ## Goals
 
-* Idea is to support minimal subset of C# with tiny runtime system and target Z80 machine code to run on TRS-80 model 1
+* Idea is to support minimal subset of C# with tiny runtime system and target Z80 machine code to run on TRS-80 model 1 ![Trs-80 Model 1](./Images/trs-80-model-1.png)
+
 * Be able to compile the [C# Snake game](https://github.com/MichalStrehovsky/SeeSharpSnake) with minimal modifications
 * Learn more about AOT and the C# runtime
 
