@@ -15,7 +15,7 @@ can be easily turned into a native Z80 binary file using an assembler such as [z
 Current implementation supports very basic console output, short arithmetic, static methods with parameters. Here is a
 demo showing the snake game running in a TRS-80 emulator. The C# source for the game can be seen here [C# program running](https://github.com/drcjt/CSharp-80/tree/main/Samples/Snake) in a TRS-80 emulator:
 
-![demo](/Documentation/Snake.mp4)
+https://user-images.githubusercontent.com/5084481/147769119-d7d5aed5-dfea-468f-9010-a98487eb9187.mp4
 
 ### Continuous Integration status
 
