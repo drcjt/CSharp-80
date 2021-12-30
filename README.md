@@ -6,7 +6,7 @@ can be easily turned into a native Z80 binary file using an assembler such as [z
 
 ## Goals
 
-* Idea is to support minimal subset of C# with tiny runtime system and target Z80 machine code to run on TRS-80 model 1 ![Trs-80 Model 1](./Images/trs-80-model-1.png)
+* Idea is to support minimal subset of C# with tiny runtime system and target Z80 machine code to run on TRS-80 model 1 ![Trs-80 Model 1](./Documentation/Images/trs-80-model-1.png)
 
 * Be able to compile the [C# Snake game](https://github.com/MichalStrehovsky/SeeSharpSnake) with minimal modifications
 * Learn more about AOT and the C# runtime
