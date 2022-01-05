@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace ILCompiler.Compiler
 {
@@ -21,6 +22,71 @@ namespace ILCompiler.Compiler
 
             // Compute the immediate dominators of all basic blocks
             ComputeImmediateDominators(postOrder);
+
+            // Create the dominator tree
+            var dominatorTree = BuildDominatorTree(blocks);
+
+            // TODO: Calculate liveness
+        }
+
+        // TODO: Move to separate file
+        // TODO: Will need ability to do a pre order traversal of this tree
+        class DominatorTreeNode
+        {
+            public BasicBlock Block { get; private set; }
+            public IList<DominatorTreeNode> Children { get; set; } = new List<DominatorTreeNode>();
+
+            public DominatorTreeNode(BasicBlock block)
+            {
+                Block = block;
+            }
+        }
+
+        private DominatorTreeNode BuildDominatorTree(IList<BasicBlock> blocks)
+        {
+            _logger.LogDebug("[SsaBuilder:BuildDominatorTree])");
+
+            var nodeMap = new Dictionary<BasicBlock, DominatorTreeNode>();
+
+            DominatorTreeNode? rootNode = null;
+
+            foreach (var block in blocks)
+            {
+                var immediateDominator = block.ImmediateDominator;
+                if (immediateDominator != null)
+                {
+                    DominatorTreeNode? node;
+                    if (!nodeMap.TryGetValue(immediateDominator, out node))
+                    {
+                        node = new DominatorTreeNode(immediateDominator);
+                        nodeMap[immediateDominator] = node;
+                    }
+
+                    var childNode = new DominatorTreeNode(block);
+                    nodeMap[block] = childNode;
+                    node.Children.Add(childNode);
+                }
+                else
+                {
+                    if (!nodeMap.TryGetValue(block, out rootNode))
+                    {
+                        rootNode = new DominatorTreeNode(block);
+                        nodeMap.Add(block, rootNode);
+                    }
+                }    
+            }
+
+            foreach (var node in nodeMap)
+            {
+                var sb = new StringBuilder($"{node.Key.Label} : ");
+                foreach (var childNode in node.Value.Children)
+                {
+                    sb.Append($"{childNode.Block.Label} ");
+                }
+                _logger.LogDebug(sb.ToString());
+            }
+
+            return rootNode!;
         }
 
         private static IList<BasicBlock> TopologicalSort(BasicBlock firstBlock)
