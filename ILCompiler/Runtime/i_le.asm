@@ -10,6 +10,8 @@ i_le:
 	PUSH BC
 
 	CALL i_cmp
+	
+	CCF
 	RET C
 	
 	SCF

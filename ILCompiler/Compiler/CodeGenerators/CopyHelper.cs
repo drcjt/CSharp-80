@@ -39,20 +39,20 @@ namespace ILCompiler.Compiler.CodeGenerators
                 {
                     case 1:
                         assembler.Pop(R16.HL);
-                        assembler.Pop(R16.HL);
                         assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
+                        assembler.Pop(R16.HL);
                         break;
                     case 2:
                         assembler.Pop(R16.HL);
-                        assembler.Pop(R16.HL);
                         assembler.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
                         assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
+                        assembler.Pop(R16.HL);
                         break;
                     case 4:
-                        assembler.Pop(R16.HL);
+                        assembler.Pop(R16.HL);  // LSW
                         assembler.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
                         assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
-                        assembler.Pop(R16.HL);
+                        assembler.Pop(R16.HL);  // MSW
                         assembler.Ld(I16.IX, (short)(ixOffset + 3), R8.H);
                         assembler.Ld(I16.IX, (short)(ixOffset + 2), R8.L);
                         break;
@@ -94,18 +94,18 @@ namespace ILCompiler.Compiler.CodeGenerators
                 switch (bytesToCopy)
                 {
                     case 1:
+                        assembler.Ld(R16.HL, 0);
+                        assembler.Push(R16.HL);
                         assembler.Ld(R8.H, 0);
                         assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 3));
-                        assembler.Push(R16.HL);
-                        assembler.Ld(R16.HL, 0);
                         assembler.Push(R16.HL);
                         break;
 
                     case 2:
+                        assembler.Ld(R16.HL, 0);
+                        assembler.Push(R16.HL);
                         assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 3));
                         assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 2));
-                        assembler.Push(R16.HL);
-                        assembler.Ld(R16.HL, 0);
                         assembler.Push(R16.HL);
                         break;
 

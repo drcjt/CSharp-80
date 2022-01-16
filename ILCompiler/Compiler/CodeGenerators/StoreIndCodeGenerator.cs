@@ -10,8 +10,8 @@ namespace ILCompiler.Compiler.CodeGenerators
             var exactSize = entry.ExactSize ?? 0;
             if (exactSize > 0)
             {
-                context.Assembler.Pop(R16.HL);
-                context.Assembler.Pop(R16.HL);  // Address is stored as 32 bits but will only use lsw
+                context.Assembler.Pop(R16.HL);  // LSW
+                context.Assembler.Pop(R16.BC);  // MSW Address is stored as 32 bits but will only use lsw
 
                 context.Assembler.Push(I16.IX);
                 context.Assembler.Pop(R16.BC);

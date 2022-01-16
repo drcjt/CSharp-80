@@ -88,8 +88,8 @@ namespace ILCompiler.Compiler
 
         public void Visit(BinaryOperator entry)
         {
-            entry.Op1.Accept(this);
             entry.Op2.Accept(this);
+            entry.Op1.Accept(this);
             SetNext(entry);
         }
 

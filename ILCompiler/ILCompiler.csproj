@@ -59,8 +59,8 @@
     <EmbeddedResource Include="Runtime\CPM\cls.asm" />
     <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
     <EmbeddedResource Include="Runtime\CPM\print.asm" />
-    <EmbeddedResource Include="Runtime\i_rsh.asm" />
     <EmbeddedResource Include="Runtime\i_lsh.asm" />
+    <EmbeddedResource Include="Runtime\i_rsh.asm" />
     <EmbeddedResource Include="Runtime\keyavail.asm" />
     <EmbeddedResource Include="Runtime\setres.asm" />
     <EmbeddedResource Include="Runtime\kbdscan.asm" />

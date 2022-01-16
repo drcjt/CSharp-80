@@ -18,15 +18,14 @@
    ; uses  : af, bc, de, hl, bc', de', hl'
 
 i_div:
-    pop af
-    ex af, af'
+    pop iy
 
-    pop de
-    pop hl
     exx
-    pop de
-    pop hl
+    pop hl      ; LSW
+    pop de      ; MSW
     exx
+    pop hl      ; LSW
+    pop de      ; MSW
 
    ld a,d
    or e
@@ -36,12 +35,10 @@ i_div:
 
    call l0_small_div_32_32x32
 
-   push hl
-   push de
+   push de      ; MSW
+   push hl      ; LSW
 
-   ex af, af'
-   push af
-   ret
+   jp (iy)
 
 l0_small_div_32_32x32:
 
@@ -91,4 +88,4 @@ divide_zero_s:
 ; TODO: this should be putting some values back on the stack too!
     dec de
     scf
-    ret
+    jp (iy)

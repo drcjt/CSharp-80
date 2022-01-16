@@ -5,18 +5,18 @@
 ;
 
 i_mul:
-    pop af                  ; save return address in a'f'
-    ex af, af'
+    pop iy                  ; save return address into iy
 
-    exx                     ; populate b'c'bc
+                            ; populate bc from stack as lsw, b'c' as msw
     pop bc                  ; from stack
     exx
     pop bc
 
-    exx                     ; populate d'e'de
+    exx                     ; populate de from stack as lsw, d'e' as msw
     pop de                  ; from stack
     exx
     pop de
+    exx
 
     AND     A               ; RESET CARRY FLAG
     SBC     HL,HL           ; LOWER RESULT = 0
@@ -44,12 +44,9 @@ i_mul_2:
     DJNZ    i_mul_1
     EXX
 
+    exx
     push hl                 ; put h'l'hl
     exx                     ; onto stack
     push hl                 ; as result
-    exx
 
-    ex af, af'
-    push af
-       
-    RET
+    JP (IY)

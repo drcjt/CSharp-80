@@ -25,6 +25,13 @@ namespace Snake
             var snakeXs = stackalloc int[MAX_LENGTH];
             var snakeYs = stackalloc int[MAX_LENGTH];
 
+            // Initialise Xs & Ys to -1
+            for (int i = 0; i < MAX_LENGTH; i++)
+            {
+                snakeXs[i] = -1;
+                snakeYs[i] = -1;
+            }
+
             var startX = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenWidth / 2);
             var startY = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenHeight);
 
@@ -90,7 +97,7 @@ namespace Snake
                 foodX = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenWidth / 2);
                 foodY = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenHeight);
             }
-            while (snake.HitTest(foodX, foodY));
+            while (snake.SnakeHit(foodX, foodY));
         }
 
         public static void Main()

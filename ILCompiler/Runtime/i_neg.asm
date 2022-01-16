@@ -1,14 +1,13 @@
 i_neg:
-	pop bc	; save return address
+	pop iy	; save return address
 
-	pop de
 	pop hl
+	pop de
 	call i_neg_dehl
-	push hl
 	push de
+	push hl
 
-	push bc
-	ret
+	jp (iy)
 
 ; negate dehl
 ;

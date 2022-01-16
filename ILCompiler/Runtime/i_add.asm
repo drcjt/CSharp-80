@@ -4,32 +4,21 @@
 
 
 i_add:	
-	POP AF		; Save return address
-	EX AF, AF'
+	POP IY		; Save return address
+
+	POP HL		; LSW first
+	POP DE		; MSW next
 
 	POP BC
-	POP AF
-
-	POP DE
-	POP HL
-
-	PUSH BC		; Put BC back
-	PUSH AF		; Swap AF and BC
-
-	OR A
-
-	POP BC
-	ADC HL, BC	; Add LSW
+	ADD HL, BC	; Add LSW
+	EX DE, HL
 
 	POP BC		; Add MSW
-	EX DE, HL
 	ADC HL, BC
 	EX DE, HL	
 
-	PUSH HL		; Put result back on stack
-	PUSH DE
+				; Put result back on stack
+	PUSH DE		; MSW first
+	PUSH HL		; LSW next
 
-	EX AF, AF'	; Restore return address
-	PUSH AF
-
-	RET
+	JP (IY)

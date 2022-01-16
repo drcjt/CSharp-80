@@ -15,9 +15,9 @@ namespace ILCompiler.Compiler.CodeGenerators
                 context.Assembler.Push(I16.IX);
                 context.Assembler.Pop(R16.BC);
 
-                // Get indirect address from stack into IX
-                context.Assembler.Pop(I16.IX);  // Ignore lsw of address
-                context.Assembler.Pop(I16.IX);
+                // Get indirect address from stack into IX, pop lsw then msw
+                context.Assembler.Pop(I16.IX);  // LSW
+                context.Assembler.Pop(R16.DE);  // Ignore msw of address
 
                 var size = entry.ExactSize ?? 4;
                 CopyHelper.CopyFromIXToStack(context.Assembler, size, (short)entry.Offset);

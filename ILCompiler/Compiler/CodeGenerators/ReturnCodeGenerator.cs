@@ -20,8 +20,8 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                     // Load address of return buffer into HL
                     var variable = context.LocalVariableTable[entry.ReturnBufferArgIndex.Value];
-                    context.Assembler.Ld(R8.H, I16.IX, (short)-(variable.StackOffset - 3));
-                    context.Assembler.Ld(R8.L, I16.IX, (short)-(variable.StackOffset - 2));
+                    context.Assembler.Ld(R8.H, I16.IX, (short)-(variable.StackOffset - 1));
+                    context.Assembler.Ld(R8.L, I16.IX, (short)-(variable.StackOffset - 0));
 
                     context.Assembler.Push(I16.IX); // save IX to BC
                     context.Assembler.Pop(R16.BC);

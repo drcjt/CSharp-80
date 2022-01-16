@@ -12,28 +12,28 @@ namespace ILCompiler.Compiler.CodeGenerators
             switch (methodToCall)
             {
                 case "WriteString":
-                    context.Assembler.Pop(R16.DE);    // put argument 1 into HL
-                    context.Assembler.Pop(R16.HL);
+                    context.Assembler.Pop(R16.HL);    // put argument 1 into HL
+                    context.Assembler.Pop(R16.DE);
                     context.Assembler.Call("PRINT");
                     break;
 
                 case "WriteInt32":
-                    context.Assembler.Pop(R16.DE);
                     context.Assembler.Pop(R16.HL);
+                    context.Assembler.Pop(R16.DE);
                     context.Assembler.Call("LTOA");
                     break;
 
                 case "WriteUInt32":
-                    context.Assembler.Pop(R16.DE);
                     context.Assembler.Pop(R16.HL);
+                    context.Assembler.Pop(R16.DE);
                     context.Assembler.Call("ULTOA");
                     break;
 
                 case "WriteChar":
                     if (context.Configuration.TargetCpm)
                     {
-                        context.Assembler.Pop(R16.DE);    // chars are stored on stack as int32 so remove MSW
-                        context.Assembler.Pop(R16.HL);    // put argument 1 into HL
+                        context.Assembler.Pop(R16.HL);    // chars are stored on stack as int32 so remove MSW
+                        context.Assembler.Pop(R16.DE);    // put argument 1 into HL
 
                         context.Assembler.Push(R16.BC);     // save registers
                         context.Assembler.Push(R16.DE);
@@ -49,8 +49,8 @@ namespace ILCompiler.Compiler.CodeGenerators
                     }
                     else
                     {
-                        context.Assembler.Pop(R16.DE);    // chars are stored on stack as int32 so remove MSW
-                        context.Assembler.Pop(R16.HL);    // put argument 1 into HL
+                        context.Assembler.Pop(R16.HL);    // chars are stored on stack as int32 so remove MSW
+                        context.Assembler.Pop(R16.DE);    // put argument 1 into HL
                         context.Assembler.Ld(R8.A, R8.L); // Load low byte of argument 1 into A
                         context.Assembler.Call(0x0033); // ROM routine to display character at current cursor position
                     }

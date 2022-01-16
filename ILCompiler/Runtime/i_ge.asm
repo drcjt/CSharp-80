@@ -11,7 +11,6 @@ i_ge:
 
 	CALL i_cmp
 
-	CCF
 	RET C
 
 	SCF

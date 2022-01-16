@@ -15,42 +15,42 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             if (actualKind == StackValueKind.Int32 && desiredType == Common.TypeSystem.WellKnownType.UInt16)
             {
-                context.Assembler.Pop(R16.HL);
-                context.Assembler.Pop(R16.DE);
+                context.Assembler.Pop(R16.HL);      // LSW
+                context.Assembler.Pop(R16.DE);      // MSW
 
-                context.Assembler.Ld(R16.HL, 0);    // clear msw
+                context.Assembler.Ld(R16.DE, 0);    // clear msw
 
-                context.Assembler.Push(R16.DE);
-                context.Assembler.Push(R16.HL);
+                context.Assembler.Push(R16.DE);     // MSW
+                context.Assembler.Push(R16.HL);     // LSW
             }
             else if (actualKind == StackValueKind.Int32 && desiredType == Common.TypeSystem.WellKnownType.Int16)
             {
-                context.Assembler.Pop(R16.HL);
-                context.Assembler.Pop(R16.DE);
+                context.Assembler.Pop(R16.DE);      // LSW
+                context.Assembler.Pop(R16.HL);      // MSW
 
                 context.Assembler.Ld(R8.H, R8.D);
 
                 context.Assembler.Add(R16.HL, R16.HL);  // move sign bit into carry flag
                 context.Assembler.Sbc(R16.HL, R16.HL);  // hl is now 0 or FFFF
 
-                context.Assembler.Push(R16.DE);
-                context.Assembler.Push(R16.HL);
+                context.Assembler.Push(R16.HL);     // MSW
+                context.Assembler.Push(R16.DE);     // LSW
             }
             else if (actualKind == StackValueKind.Int32 && desiredType == WellKnownType.Byte)
             {
-                context.Assembler.Pop(R16.HL);
-                context.Assembler.Pop(R16.DE);
+                context.Assembler.Pop(R16.HL);      // LSW
+                context.Assembler.Pop(R16.DE);      // MSW
 
-                context.Assembler.Ld(R16.HL, 0);    // clear msw
-                context.Assembler.Ld(R8.D, 0);
+                context.Assembler.Ld(R16.DE, 0);    // clear msw
+                context.Assembler.Ld(R8.H, 0);
 
-                context.Assembler.Push(R16.DE);
-                context.Assembler.Push(R16.HL);
+                context.Assembler.Push(R16.DE);     // MSW
+                context.Assembler.Push(R16.HL);     // LSW
             }
             else if (actualKind == StackValueKind.Int32 && desiredType == WellKnownType.SByte)
             {
-                context.Assembler.Pop(R16.HL);
-                context.Assembler.Pop(R16.DE);
+                context.Assembler.Pop(R16.DE);      // LSW
+                context.Assembler.Pop(R16.HL);      // MSW
 
                 context.Assembler.Ld(R8.H, R8.E);
 
@@ -58,8 +58,8 @@ namespace ILCompiler.Compiler.CodeGenerators
                 context.Assembler.Sbc(R16.HL, R16.HL);  // hl is now 0000 or FFFF
                 context.Assembler.Ld(R8.D, R8.L);       // D is now 00 or FF
 
-                context.Assembler.Push(R16.DE);
-                context.Assembler.Push(R16.HL);
+                context.Assembler.Push(R16.HL);     // MSW
+                context.Assembler.Push(R16.DE);     // LSW
             }
             else
             {

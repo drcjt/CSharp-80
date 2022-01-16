@@ -4,7 +4,7 @@
 
 
 stoi:	
-	POP BC		; Save return address
+	POP IY		; Save return address
 
 	POP DE
 
@@ -12,8 +12,7 @@ stoi:
 	ADD HL, HL
 	SBC HL, HL
 
-	PUSH DE
 	PUSH HL
+	PUSH DE
 
-	PUSH BC		; Restore return address
-	RET
+	JP (IY)

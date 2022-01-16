@@ -9,20 +9,20 @@
 ;       nc = number is positive
 
 i_cmp:
-	POP BC
+	POP BC		; Save return address 1
 	EXX
 
-	POP BC
+	POP BC		; Save return address 2
 
-	POP HL
-	POP DE
+	POP HL		; LSW
+	POP DE		; MSW
 
-	PUSH BC
+	PUSH BC		;  restore return address 2
 	LD A, L
 
 	EXX
 
-	PUSH BC
+	PUSH BC		; restore return address 1
 
 	SUB L
 	LD L, A

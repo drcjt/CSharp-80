@@ -3,45 +3,31 @@
 ; Carry set if true
 
 i_eq:
-	POP DE
-	EXX
+	POP IY
 
-	POP HL
-	POP DE
+	POP HL			; LSW
+	POP DE			; MSW
 
-	POP BC
-	LD A, C
-	CP L
+	POP BC			; LSW
+	AND A			; Clear zero flag
+	SBC HL, BC
 	JR NZ, i_eq_1
 
-	LD A, B
-	CP H
-	JR NZ, i_eq_1
-
+	EX DE, HL
 	POP BC
-
-	LD A, C
-	CP E
+	SBC HL, BC
 	JR NZ, i_eq_2
 
-	LD A, B
-	CP D
-	JR NZ, i_eq_2
-
-	SCF
+	SCF				; set carry flag
 
 	JP i_eq_3
 
 i_eq_1:
 
-	POP BC
+	POP BC			; MSW
 
 i_eq_2:
+	XOR A			; Clear carry flag
 
-	XOR A
-
-i_eq_3
-	EXX
-	PUSH DE
-
-	RET
+i_eq_3:
+	JP (IY)

@@ -18,15 +18,14 @@
    ; uses  : af, bc, de, hl, bc', de', hl'
 
 i_rem_un:
-    pop af
-    ex af, af'
+    pop iy
 
-    pop de
-    pop hl
     exx
-    pop de
     pop hl
+    pop de
     exx
+    pop hl
+    pop de
 
    ld a,d
    or e
@@ -37,16 +36,14 @@ i_rem_un:
    call l0_small_divu_32_32x32
 
    exx
-   push hl
    push de
+   push hl
    exx
 
-   ex af, af'
-   push af
-   ret
+   jp (iy)
 
 i_rem_un_divide_zero:
 
     dec de
     scf
-    ret
+    jp (iy)

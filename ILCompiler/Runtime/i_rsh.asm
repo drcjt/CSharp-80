@@ -1,42 +1,40 @@
-; This routine performs the operation DEHL = DEHL << C
+; This routine performs the operation DEHL = DEHL >> C
 ;
 ; Uses: HL, DE, BC, AF, AF'
 
 
-i_lsh:	
-	POP AF		; Save return address
-	EX AF, AF'
+i_rsh:	
+	POP IY
 
-	POP BC
-	POP BC
-
-	POP DE
 	POP HL
+	POP DE
+
+	POP BC
 
 	LD A, C
 
 	OR A
-	JR Z, i_lsh_end
+	JR Z, i_rsh_end
 
 	LD B, A
 	LD A, E
 
-i_lsh_loop:
+i_rsh_loop:
 
-	ADD HL, HL
-	RLA
-	RL D
+	SRL D
+	RRA
+	RR H
+	RR L
 
 	DJNZ i_lsh_loop
 
 	LD E, A
 
-i_lsh_end:
+i_rsh_end:
 
-	PUSH HL		; Put result back on stack
-	PUSH DE
+	POP BC
 
-	EX AF, AF'	; Restore return address
-	PUSH AF
+	PUSH DE		; Put result back on stack
+	PUSH HL
 
-	RET
+	JP (IY)

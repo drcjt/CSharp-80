@@ -93,7 +93,7 @@ namespace Snake
         // TODO: This slows down as the length of the snake increases
         // need to look at optimisations in codegen to improve the
         // speed of the generated code
-        private bool SnakeHit(int newHeadX, int newHeadY)
+        public readonly bool SnakeHit(int newHeadX, int newHeadY)
         {
             var cell = _snakeTail;
             for (var i = 0; i < ActualLength; i++)

@@ -1,7 +1,6 @@
 DELAY:
-	POP HL	; return address
+	POP IY	; return address
 
-	POP BC
 	POP BC   ; delay required
 
 DELAY1:			; should be 14.65 microseconds per loop
@@ -10,5 +9,6 @@ DELAY1:			; should be 14.65 microseconds per loop
 	OR C
 	JR NZ, DELAY1
 
-	PUSH HL
-	RET
+	POP BC		; Remove msw of parameter - ignoring it
+
+	JP (IY)

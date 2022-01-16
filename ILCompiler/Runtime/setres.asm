@@ -2,15 +2,15 @@ SETRES:
 	POP BC		; SAVE RETURN ADDRESS
 
 	POP HL		; Set or Reset
-	POP HL
+	POP DE		; Ignore msw
 
 	POP DE		; Get y-coordinate into DE
-	POP DE
+	POP IY		; Ignore msw
 
 	LD A, E		; Save y into A
 
 	POP DE		; get x-coordinate into HL
-	POP DE
+	POP IY		; Ignore msw
 
 	LD D, E		; Move x to D
 	LD E, A		; Set E as y

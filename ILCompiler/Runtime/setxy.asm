@@ -1,11 +1,10 @@
 SETXY:
-	POP BC   ; return address
+	POP IY   ; return address
 
-	POP HL
-	POP HL   ; y
+	POP HL	 ; y
+	POP DE   ; ignore msw
 
-	POP DE
-	POP DE   ; x
+	POP DE	 ; x
 
 	ADD HL, HL ; multiply y by 64
 	ADD HL, HL
@@ -17,8 +16,8 @@ SETXY:
 	LD DE, 3C00H
 	ADD HL, DE
 
-	PUSH BC  ; restore return address
+	POP DE	; ignore msw of x
 
 	LD (4020H), HL	
 
-	RET
+	JP (IY)

@@ -10,7 +10,11 @@ i_lt:
 	PUSH BC
 
 	CALL i_cmp
+	JR Z, i_lt_1
+
+	CCF
 	RET C
-	
+
+i_lt_1:
 	DEC L
 	RET

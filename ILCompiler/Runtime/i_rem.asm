@@ -18,15 +18,14 @@
    ; uses  : af, bc, de, hl, bc', de', hl'
 
 i_rem:
-    pop af
-    ex af, af'
+    pop iy
 
-    pop de
-    pop hl
     exx
     pop de
     pop hl
     exx
+    pop de
+    pop hl
 
    ld a,d
    or e
@@ -41,12 +40,10 @@ i_rem:
    push de
    exx
 
-   ex af, af'
-   push af
-   ret
+   jp (iy)
 
 i_rem_divide_zero:
 
     dec de
     scf
-    ret
+    jp (iy)

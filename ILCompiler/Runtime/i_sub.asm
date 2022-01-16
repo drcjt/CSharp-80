@@ -3,31 +3,22 @@
 ; Uses: HL, DE, BC, AF, AF'
 
 i_sub:	
-	POP AF		; Save return address
-	EX AF, AF'
+	POP IY		; Save return address
 
-	POP BC
-	POP AF
-	POP DE
-	POP HL
+	POP HL		; LSW
+	POP DE		; MSW
 
-	PUSH BC
-	PUSH AF
-
-	OR A 
-
-	POP BC
+	OR A		; Clear carry
+	POP BC		; LSW
 	SBC HL, BC
 
-	POP BC
+	POP BC		; MSW
 	EX DE, HL
 	SBC HL, BC
 	EX DE, HL
 
-	PUSH HL		; Put result back on stack
-	PUSH DE
+	; Put result back on stack
+	PUSH DE		; MSW
+	PUSH HL		; LSW
 
-	EX AF, AF'	; Restore return address
-	PUSH AF
-
-	RET
+	JP (IY)

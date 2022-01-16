@@ -3,8 +3,8 @@
 WRITE:
 	POP BC	; return address
 
-	POP DE
 	POP HL
+	POP DE
 
 	PUSH BC	; put return address back
 

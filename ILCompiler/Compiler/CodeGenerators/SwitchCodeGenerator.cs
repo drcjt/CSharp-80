@@ -7,8 +7,8 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(SwitchEntry entry, CodeGeneratorContext context)
         {
-            context.Assembler.Pop(R16.HL);
-            context.Assembler.Pop(R16.HL);
+            context.Assembler.Pop(R16.HL);      // LSW
+            context.Assembler.Pop(R16.DE);      // Ignore MSW
 
             context.Assembler.Ld(R8.A, R8.L);
 
