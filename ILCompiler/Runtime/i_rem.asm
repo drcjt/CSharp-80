@@ -21,11 +21,11 @@ i_rem:
     pop iy
 
     exx
-    pop de
     pop hl
+    pop de
     exx
-    pop de
     pop hl
+    pop de
 
    ld a,d
    or e
@@ -36,8 +36,8 @@ i_rem:
    call l0_small_div_32_32x32
 
    exx
-   push hl
    push de
+   push hl
    exx
 
    jp (iy)
