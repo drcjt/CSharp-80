@@ -4,6 +4,9 @@ This repo contains a .NET Core ahead of time compiler targetting the Z80 8-bit m
 can be easily turned into a native Z80 binary file using an assembler such as [zmac](http://48k.ca/zmac.html). To learn more about CSharp-80, see the
 [intro document](Documentation/intro-to-csharp-80.md)
 
+## Credits
+This project was initally inspired heavily by the [C# Snake game](https://github.com/MichalStrehovsky/SeeSharpSnake) written by Michal Strehovský, and the idea of being able to compile this for a retro 8 bit microcomputer. The ahead of time compilere here is influenced by the .NET Foundations [CoreRT project](https://github.com/dotnet/corert) and the newer [NativeAOT](https://github.com/dotnet/runtimelab/tree/feature/NativeAOT) work in the dot net runtime. Lastly, many ideas have been drawn from the [RyuJit just in time compiler](https://github.com/dotnet/runtime/blob/main/docs/design/coreclr/jit/ryujit-overview.md) in the dot net runtime.
+
 ## Goals
 
 * Idea is to support minimal subset of C# with tiny runtime system and target Z80 machine code to run on TRS-80 model 1 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 
 namespace Matrix
 {
@@ -40,12 +41,12 @@ namespace Matrix
 
         public static int InScreenYPosition(int yPosition)
         {
-            if (yPosition >= 0 && yPosition < Height)
-                return yPosition;
+            if (yPosition >= Height)
+                return 0;
             else if (yPosition < 0)
                 return yPosition + Height;
             else
-                return 0;
+                return yPosition;
         }
     }
 }
