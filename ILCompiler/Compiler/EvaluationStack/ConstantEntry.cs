@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
     public abstract class ConstantEntry<T> : ConstantEntry where T : IConvertible
     {
-        public T Value { get; }
+        public T Value { get; set; }
 
         protected ConstantEntry(StackValueKind kind, T value, int? exactSize) : base(kind, exactSize)
         {
