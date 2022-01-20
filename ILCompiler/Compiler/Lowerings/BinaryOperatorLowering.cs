@@ -15,6 +15,7 @@ namespace ILCompiler.Compiler.Lowerings
                     break;
 
                 case Operation.Div:
+                    LowerDiv(entry);
                     // TODO: Convert division by pow of 2 into right shift
                     break;
             }
@@ -32,6 +33,19 @@ namespace ILCompiler.Compiler.Lowerings
                 {
                     mul.Operation = Operation.Lsh;
                     multiplier.Value = GetLog2(multiplier.Value);
+                }
+            }
+        }
+
+        private void LowerDiv(BinaryOperator div)
+        {
+            if (div.Op2 is Int32ConstantEntry)
+            {
+                var divisor = div.Op2.As<Int32ConstantEntry>();
+                if (IsPow2(divisor.Value))
+                {
+                    div.Operation = Operation.Rsh;
+                    divisor.Value = GetLog2(divisor.Value);
                 }
             }
         }
