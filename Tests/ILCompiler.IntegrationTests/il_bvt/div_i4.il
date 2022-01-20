@@ -21,7 +21,7 @@ try_start:
 	brfalse		FAIL
 
 
-	/* 0/-1 should throw ArithmeticException as it is not representable in the result type	
+	/* 2147483648/-1 should throw ArithmeticException as it is not representable in the result type	
 	ldc.i4		0x80000000
 	ldc.i4		0xFFFFFFFF
 	call	int32 _div::_div(int32,int32)
