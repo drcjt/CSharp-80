@@ -1,4 +1,5 @@
-﻿using ILCompiler.Interfaces;
+﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,7 @@ namespace ILCompiler.Compiler
             _logger = logger;
         }
 
-        public void Build(IList<BasicBlock> blocks)
+        public void Build(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
         {
             // Topologically sort the graph
             var postOrder = TopologicalSort(blocks[0]);
@@ -27,6 +28,90 @@ namespace ILCompiler.Compiler
             var dominatorTree = BuildDominatorTree(blocks);
 
             // TODO: Calculate liveness
+            LocalVarLiveness(blocks, localVariableTable);
+
+            // TODO: Insert Phi functions
+
+            // TODO: Rename local variables
+
+            // TODO: Print SSA form
+        }
+
+        private void LocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
+        {
+            LocalVarLivenessInit(localVariableTable);
+
+            InitBlockVarSets(blocks);
+
+            // Figure out use/def info for all basic blocks
+            PerBlockLocalVarLiveness(blocks, localVariableTable);
+            // InterBLockLocalVarLiveness()
+        }
+
+        private void PerBlockLocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
+        {
+            foreach (var block in blocks)
+            {
+                // clear current use var set
+                // clear current def var set
+
+                // Enumerate nodes in each statement in evaluation order
+                foreach (var stmt in block.Statements)
+                {
+                    for (var node = stmt; node != null; node = node.Next)
+                    {
+                        PerNodeLocalVarLiveness(node, localVariableTable);
+                    }
+                }
+
+                // Save current use var set as block's use var set
+                // Save current def var set as block's def var set
+            }
+        }
+
+        /// <summary>
+        /// Calls MarkUseDef for any local variables encountered
+        /// </summary>
+        /// <param name="node"></param>
+        private void PerNodeLocalVarLiveness(StackEntry node, IList<LocalVariableDescriptor> localVariableTable)
+        {
+            // For LocalVariableEntry, LocalVariableAddressEntry, StoreLocalVariableEntry, StoreIndEntry??, FieldAddressEntry?
+            if (node is ILocalVariable)
+            {
+                var localVarNode = (ILocalVariable)node;
+                MarkUseDef(localVarNode, localVariableTable);
+            }
+        }
+
+        private void MarkUseDef(ILocalVariable tree, IList<LocalVariableDescriptor> localVariableTable)
+        {
+            var localNumber = tree.LocalNumber;
+            var local = localVariableTable[localNumber];
+
+            // Need to get def/use from tree too
+            // So assignment is a definition, everything else is a use.
+
+            // if (isUse && not in current def set)
+            //   Add to Current Use set
+
+            // if (isDef)
+            //   Add to Current Def set
+        }
+
+        private void InitBlockVarSets(IList<BasicBlock> blocks)
+        {
+            foreach (var block in blocks)
+            {
+                // block.InitVarSets();
+            }
+        }
+
+        private void LocalVarLivenessInit(IList<LocalVariableDescriptor> localVariableTable)
+        {
+            foreach (var localVariable in localVariableTable)
+            {
+                localVariable.MustInit = false;
+            }
         }
 
         // TODO: Move to separate file

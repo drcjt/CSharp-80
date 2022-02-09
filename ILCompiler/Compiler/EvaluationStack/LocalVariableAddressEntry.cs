@@ -2,7 +2,7 @@
 
 namespace ILCompiler.Compiler.EvaluationStack
 {
-    public class LocalVariableAddressEntry : StackEntry
+    public class LocalVariableAddressEntry : StackEntry, ILocalVariable
     {
         public int LocalNumber { get; }
 

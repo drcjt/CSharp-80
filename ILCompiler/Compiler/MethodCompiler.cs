@@ -128,7 +128,7 @@ namespace ILCompiler.Compiler
                 flowgraph.SetBlockOrder(basicBlocks);
 
                 var ssaBuilder = _phaseFactory.Create<ISsaBuilder>();
-                ssaBuilder.Build(basicBlocks);
+                ssaBuilder.Build(basicBlocks, _localVariableTable);
 
                 if (_configuration.DumpIRTrees)
                 {
