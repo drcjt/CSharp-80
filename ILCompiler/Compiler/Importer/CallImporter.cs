@@ -14,14 +14,25 @@ namespace ILCompiler.Compiler.Importer
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            ImportCall(instruction, context, importer);
+        }
+
+        public static void ImportCall(Instruction instruction, ImportContext context, IILImporterProxy importer, StackEntry? newObjThis = null)
+        {
             var methodDefOrRef = instruction.Operand as IMethodDefOrRef;
             var methodToCall = methodDefOrRef.ResolveMethodDefThrow();
 
             var arguments = new List<StackEntry>();
-            for (var i = 0; i < methodToCall.Parameters.Count; i++)
+            var firstArgIndex = newObjThis != null ? 1 : 0;
+            for (var i = firstArgIndex; i < methodToCall.Parameters.Count; i++)
             {
                 var argument = importer.PopExpression();
                 arguments.Add(argument);
+            }
+            // Add the this pointer if required, e.g. if part of newobj
+            if (newObjThis != null)
+            {
+                arguments.Add(newObjThis);
             }
             arguments.Reverse();
 
@@ -80,7 +91,7 @@ namespace ILCompiler.Compiler.Importer
             }
         }
 
-        private int FixupCallStructReturn(TypeSig returnType, List<StackEntry> arguments, IILImporterProxy importer, bool hasThis)
+        static private int FixupCallStructReturn(TypeSig returnType, List<StackEntry> arguments, IILImporterProxy importer, bool hasThis)
         {
             // Create temp
             var lclNum = importer.GrabTemp(returnType.GetStackValueKind(), returnType.GetExactSize());
