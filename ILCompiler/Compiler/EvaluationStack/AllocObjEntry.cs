@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public override void Accept(IStackEntryVisitor visitor)
         {
-            visitor.Vist(this);
+            visitor.Visit(this);
         }
 
         public override StackEntry Duplicate()
