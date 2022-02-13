@@ -151,6 +151,11 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
+        public void Visit(AllocObjEntry entry)
+        {
+            SetNext(entry);
+        }
+
         private void SetNext(StackEntry entry)
         {
             if (Current != null)

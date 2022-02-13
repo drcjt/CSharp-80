@@ -23,7 +23,7 @@
         public void Visit(UnaryOperator entry);
         public void Visit(IndirectEntry entry);
         public void Visit(FieldAddressEntry entry);
-
         public void Visit(SwitchEntry entry);
+        public void Visit(AllocObjEntry entry);
     }
 }

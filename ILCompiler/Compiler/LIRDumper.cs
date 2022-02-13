@@ -156,5 +156,10 @@ namespace ILCompiler.Compiler
             _sb.AppendLine($"       ┌──▌  t{entry.Op1.TreeID}");
             _sb.AppendLine($"       switch {entry.JumpTable}");
         }
+
+        public void Visit(AllocObjEntry entry)
+        {
+            _sb.AppendLine($"       allocObj {entry.Size}");
+        }
     }
 }

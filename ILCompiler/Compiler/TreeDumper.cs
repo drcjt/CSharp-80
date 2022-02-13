@@ -173,5 +173,10 @@ namespace ILCompiler.Compiler
             entry.Op1.Accept(this);
             _indent--;
         }
+
+        public void Visit(AllocObjEntry entry)
+        {
+            Print($"allocObj {entry.Size}");
+        }
     }
 }

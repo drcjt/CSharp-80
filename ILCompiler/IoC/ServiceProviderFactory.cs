@@ -38,6 +38,8 @@ namespace ILCompiler.IoC
             services.AddTransient<ICodeGenerator, CodeGenerator>();
             services.AddCodeGenerators();
 
+            services.AddTransient<IObjectAllocator, ObjectAllocator>();
+
             services.AddSingleton<Z80Writer>();
 
             services.AddSingleton<TypeDependencyAnalyser>();

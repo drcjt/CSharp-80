@@ -92,5 +92,10 @@
         {
             _genericStackEntryVisitor.Visit<SwitchEntry>(entry);
         }
+
+        public void Visit(AllocObjEntry entry)
+        {
+            _genericStackEntryVisitor.Visit<AllocObjEntry>(entry);
+        }
     }
 }
