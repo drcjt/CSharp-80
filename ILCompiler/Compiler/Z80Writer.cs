@@ -38,16 +38,37 @@ namespace ILCompiler.Compiler
             }
         }
 
+        private short GetOrgAddress()
+        {
+            if (_configuration.IntegrationTests)
+            {
+                return 0x0000;
+            }
+            if (_configuration.TargetCpm)
+            {
+                return 0x100;
+            }
+            return 0x5200;
+        }
+
         private void OutputProlog(MethodDef entryMethod)
         {
             _out.WriteLine($"; INPUT FILE {_inputFilePath.ToUpper()}");
             _out.WriteLine($"; {DateTime.Now}");
             _out.WriteLine();
 
+            var org = GetOrgAddress();
+
+            _out.WriteLine(Instruction.Org(GetOrgAddress()));
+            _out.WriteLine(new LabelInstruction("ENTRY"));
+
+            _out.WriteLine(Instruction.Ld(R16.HL, "HEAP"));
+            _out.WriteLine(Instruction.LdInd("HEAPNEXT", R16.HL));
+
             if (!_configuration.IntegrationTests)
             {
-                _out.WriteLine(Instruction.Org((short)(_configuration.TargetCpm ? 0x0100 : 0x5200)));
-                _out.WriteLine(new LabelInstruction("ENTRY"));
+                _out.WriteLine(Instruction.Ld(R16.HL, "HEAP"));
+                _out.WriteLine(Instruction.LdInd("HEAPNEXT", R16.HL));
 
                 // Save original stack location
                 _out.WriteLine(Instruction.LdInd("ORIGSP", R16.SP));
@@ -69,13 +90,14 @@ namespace ILCompiler.Compiler
             }
             else
             {
-                _out.WriteLine(Instruction.Org(0x0000));
-                _out.WriteLine(new LabelInstruction("ENTRY"));
                 _out.WriteLine(Instruction.Call("START"));
                 _out.WriteLine(Instruction.Pop(R16.DE));
                 _out.WriteLine(Instruction.Pop(R16.HL));
                 _out.WriteLine(Instruction.Halt());
             }
+
+            // Holds the next available heap memory address for allocation
+            _out.WriteLine(Instruction.Db("  ", "HEAPNEXT"));
 
             var hasReturnCode = entryMethod.ReturnType.GetStackValueKind() == StackValueKind.Int32;
 
@@ -135,6 +157,8 @@ namespace ILCompiler.Compiler
             {
                 OutputRuntimeCode();
             }
+
+            _out.WriteLine(new LabelInstruction("HEAP"));
 
             _out.WriteLine(Instruction.End("ENTRY"));
         }

@@ -18,23 +18,40 @@ namespace ILCompiler.Compiler.Importer
 
             var declType = methodToCall.DeclaringType;
 
-            if (!declType.IsValueType)
-            {
-                throw new NotSupportedException("Newobj not supported for non value types");
-            }
-
-            // TODO: Put code here to allocate memory e.g. create an equivalent to a ryujit GT_CALL node
-
             var objType = declType.ToTypeSig();
             var objKind = objType.GetStackValueKind();
+            var objSize = objType.GetExactSize();
 
-            var lclNum = importer.GrabTemp(objKind, objType.GetExactSize());
-            var newObjThisPtr = new LocalVariableAddressEntry(lclNum);
+            if (declType.IsValueType)
+            {
+                // Allocate memory on the stack for the value type as a temp local variable
+                var lclNum = importer.GrabTemp(objKind, objSize);
+                var newObjThisPtr = new LocalVariableAddressEntry(lclNum);
 
-            CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
+                // Call the valuetype constructor
+                CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
 
-            var node = new LocalVariableEntry(lclNum, objKind, objType.GetExactSize());
-            importer.PushExpression(node);
+                var node = new LocalVariableEntry(lclNum, objKind, objSize);
+                importer.PushExpression(node);
+            }
+            else
+            {
+                // Allocate memory for object
+                var op1 = new AllocObjEntry((int)declType.ClassSize, objKind);
+
+                // Store allocated memory address into a temp local variable
+                var lclNum = importer.GrabTemp(objKind, objSize);
+                var asg = new StoreLocalVariableEntry(lclNum, false, op1);
+                importer.ImportAppendTree(asg);
+
+                // Call the constructor
+                var newObjThisPtr = new LocalVariableEntry(lclNum, objKind, objSize);
+                CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
+
+                // Push a local variable entry corresponding to the object here
+                var node = new LocalVariableEntry(lclNum, objKind, objSize);
+                importer.PushExpression(node);
+            }
         }
     }
 }

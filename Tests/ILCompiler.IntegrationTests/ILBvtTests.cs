@@ -28,7 +28,7 @@ namespace CSharp80.Tests.BVT
             z80.Start();
 
             // Validate we finished on the HALT instruction
-            Assert.AreEqual(6, z80.Registers.PC);
+            Assert.AreEqual(12, z80.Registers.PC);
 
             // Pass returns 32 bit 0 in DEHL
             Assert.AreEqual(0, z80.Registers.DE);

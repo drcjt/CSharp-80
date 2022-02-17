@@ -124,9 +124,6 @@ namespace ILCompiler.Compiler
                     _logger.LogInformation("{treedump}", treedump);
                 }
 
-                var objectAllocator = _phaseFactory.Create<IObjectAllocator>();
-                objectAllocator.DoPhase(basicBlocks);
-
                 var flowgraph = _phaseFactory.Create<IFlowgraph>();
                 flowgraph.SetBlockOrder(basicBlocks);
 

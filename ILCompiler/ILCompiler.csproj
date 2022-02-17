@@ -24,6 +24,7 @@
     <None Remove="Runtime\CPM\print.asm" />
     <None Remove="Runtime\CPM\printchr.asm" />
     <None Remove="Runtime\delay.asm" />
+    <None Remove="Runtime\heapalloc.asm" />
     <None Remove="Runtime\itoa.asm" />
     <None Remove="Runtime\i_add.asm" />
     <None Remove="Runtime\i_cmp.asm" />
@@ -59,6 +60,7 @@
     <EmbeddedResource Include="Runtime\CPM\cls.asm" />
     <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
     <EmbeddedResource Include="Runtime\CPM\print.asm" />
+    <EmbeddedResource Include="Runtime\heapalloc.asm" />
     <EmbeddedResource Include="Runtime\i_lsh.asm" />
     <EmbeddedResource Include="Runtime\i_rsh.asm" />
     <EmbeddedResource Include="Runtime\keyavail.asm" />

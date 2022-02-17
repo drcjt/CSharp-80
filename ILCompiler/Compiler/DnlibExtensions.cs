@@ -49,6 +49,20 @@ namespace ILCompiler.Compiler
             }
             else
             {
+                if (type.ElementType == ElementType.Class)
+                {
+                    var typeDefOrRef = type.TryGetTypeDefOrRef();
+                    var typeDef = typeDefOrRef.ResolveTypeDef();
+                    if (typeDef != null)
+                    {
+                        typeDef.ClassSize = 0;
+                        foreach (var field in typeDef.Fields)
+                        {
+                            field.FieldOffset = typeDef.ClassSize;
+                            typeDef.ClassSize += (uint)GetExactSize(field.FieldType);
+                        }
+                    }
+                }
                 return TypeList.GetExactSize(type.GetStackValueKind());
             }
         }
