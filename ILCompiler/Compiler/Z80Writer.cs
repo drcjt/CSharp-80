@@ -67,9 +67,6 @@ namespace ILCompiler.Compiler
 
             if (!_configuration.IntegrationTests)
             {
-                _out.WriteLine(Instruction.Ld(R16.HL, "HEAP"));
-                _out.WriteLine(Instruction.LdInd("HEAPNEXT", R16.HL));
-
                 // Save original stack location
                 _out.WriteLine(Instruction.LdInd("ORIGSP", R16.SP));
 
@@ -95,9 +92,6 @@ namespace ILCompiler.Compiler
                 _out.WriteLine(Instruction.Pop(R16.HL));
                 _out.WriteLine(Instruction.Halt());
             }
-
-            // Holds the next available heap memory address for allocation
-            _out.WriteLine(Instruction.Db("  ", "HEAPNEXT"));
 
             var hasReturnCode = entryMethod.ReturnType.GetStackValueKind() == StackValueKind.Int32;
 

@@ -2,6 +2,7 @@
 ;
 ; Uses: HL, DE
 
+HEAPNEXT:	DB '  '
 
 heapalloc:	
 	POP IY		; Save return address
