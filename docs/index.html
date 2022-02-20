@@ -11,7 +11,7 @@ body
 }
 </style> 
 
-<script type="text/javascript" src="emulator/trsemu-1.4.js"></script> 
+<script type="text/javascript" src="trsemu-1.4.js"></script> 
 
 <script type="text/javascript">
 function togglePerf()
@@ -47,12 +47,12 @@ function togglePerf()
 	<h4>Programs to Try</h4>
 	<table>
 	<tr>
-		<td><input type="button" value="Snake" onClick="trsEmu.run('|[1]{emulator/bin/snake.cmd}')"></td>
-		<td>Shoot asteroids into smaller asteroids for points</td>
+		<td><input type="button" value="Snake" onClick="trsEmu.run('|[1]{snake.cmd}')"></td>
+		<td>Snake game</td>
 	</tr>
 	<tr>
-		<td><input type="button" value="dotnet bot" onClick="trsEmu.run('emulator/bin/netbot.cmd')"></td>
-		<td>Navigate your submarine to the reactor.</td>
+		<td><input type="button" value="dotnet bot" onClick="trsEmu.run('netbot.cmd')"></td>
+		<td>Draws netbot</td>
 	</tr>
 
 	</tbody>
@@ -131,10 +131,10 @@ Holding shift:
 	You'll need to copy the Javascript and some PNG files:
 	<ul>
 	<li><a href="trsemu-1.4.js">trsemu-1.4.js</a></li>
-	<li><a href="tx/m3.png">tx/m3.png</a></li>
-	<li><a href="tx/wdot.png">tx/wdot.png</a></li>
-	<li><a href="tx/red.png">tx/red.png</a></li>
-	<li><a href="tx/grn.png">tx/grn.png</a></li>
+	<li><a href="m3.png">tx/m3.png</a></li>
+	<li><a href="wdot.png">tx/wdot.png</a></li>
+	<li><a href="red.png">tx/red.png</a></li>
+	<li><a href="grn.png">tx/grn.png</a></li>
 	</ul>
 	A minimal page would look like the following.  The performance graph
 	is optional; drop the '.perf()' call if you don't want it.
