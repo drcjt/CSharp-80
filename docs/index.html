@@ -36,14 +36,8 @@ function togglePerf()
 
  </head> 
  <body onload="trsEmu.screen('canvasparent').button('startstop').focus().run();"> 
-	<h3>TRS-80 Model III Emulator</h3>
-	<div id="canvasparent"><canvas width="512" height="384" style="border:solid 1px black; background:black"></canvas></div>
-	<br>
-	<div id="graphparent" style="display: none"><canvas width="512" height="100" style="border:solid 1px black; background:black"></canvas><br></div>
-	<input type="button" id="startstop" value="Run" onClick="trsEmu.run('toggle');">
-	<input type="button" value="Reset" onClick="trsEmu.run('reset');">
-	<input type="button" id="perf" value="Show Time Graph" onClick="togglePerf();">
-	<h4>Programs to Try</h4>
+	<h3>C# programs running on a TRS-80 Model III Emulator</h3>
+		<h4>Programs to Try</h4>
 	<table>
 	<tr>
 		<td><input type="button" value="Snake" onClick="trsEmu.run('|[1]{snake.cmd}')"></td>
@@ -56,5 +50,12 @@ function togglePerf()
 
 	</tbody>
 	</table>
+	<div id="canvasparent"><canvas width="512" height="384" style="border:solid 1px black; background:black"></canvas></div>
+	<br>
+	<div id="graphparent" style="display: none"><canvas width="512" height="100" style="border:solid 1px black; background:black"></canvas><br></div>
+	<input type="button" id="startstop" value="Run" onClick="trsEmu.run('toggle');">
+	<input type="button" value="Reset" onClick="trsEmu.run('reset');">
+	<input type="button" id="perf" value="Show Time Graph" onClick="togglePerf();">
+
  </body> 
 </html> 
