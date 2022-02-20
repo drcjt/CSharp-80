@@ -34,9 +34,9 @@ in the dot net runtime. The z80 runtime code borrows heavily from the [z88dk pro
 
 |Program|Source Code|Demo|
 |---|---|---|
-|Snake|[snake code](https://github.com/drcjt/CSharp-80/tree/main/Samples/Snake)|[snake demo](https://github.com/drcjt/CSharp-80/Documentation/snake.gif)|
-|Netbot|[netbot](https://github.com/drcjt/CSharp-80/tree/main/Samples/NetBot)|[netbot demo](https://github.com/drcjt/CSharp-80/Documentation/netbot.gif)|
-|Graphics|[graphics demo](https://github.com/drcjt/CSharp-80/tree/main/Samples/GfxDemos)|[graphics demo](https://github.com/drcjt/CSharp-80/Documentation/gfxdemos.gif)|
+|Snake|[snake code](https://github.com/drcjt/CSharp-80/tree/main/Samples/Snake)|[snake demo](https://github.com/drcjt/CSharp-80/blob/main/Documentation/snake.gif)|
+|Netbot|[netbot](https://github.com/drcjt/CSharp-80/tree/main/Samples/NetBot)|[netbot demo](https://github.com/drcjt/CSharp-80/blob/main/Documentation/netbot.gif)|
+|Graphics|[graphics demo](https://github.com/drcjt/CSharp-80/tree/main/Samples/GfxDemos)|[graphics demo](https://github.com/drcjt/CSharp-80/blob/main/Documentation/gfxdemos.gif)|
 
 All of the demos here are recorded from running the programs in a TRS-80 emulator.
 
