@@ -53,6 +53,7 @@ namespace Snake
 
         public unsafe bool Update()
         {
+            // Workout where new head of snake will go
             var newHeadX = HeadX;
             var newHeadY = HeadY;
             switch (_direction)
@@ -66,16 +67,7 @@ namespace Snake
             newHeadX = GraphicHelper.WrapAround(newHeadX, Graphics.ScreenWidth / 2);
             newHeadY = GraphicHelper.WrapAround(newHeadY, Graphics.ScreenHeight);
 
-            if (ActualLength == DesiredLength)
-            {
-                _snakeTail++;
-                _snakeTail %= _maxLength;
-            }
-            else
-            {
-                ActualLength++;
-            }
-
+            // Does new head hit body of snake?
             if (SnakeHit(newHeadX, newHeadY))
             {
                 return false;
@@ -87,6 +79,17 @@ namespace Snake
             _snakeXs[_snakeHead] = newHeadX;
             _snakeYs[_snakeHead] = newHeadY;
 
+            // Move tail of snake
+            if (ActualLength == DesiredLength)
+            {
+                _snakeTail++;
+                _snakeTail %= _maxLength;
+            }
+            else
+            {
+                ActualLength++;
+            }
+
             return true;
         }
 
@@ -95,16 +98,12 @@ namespace Snake
         // speed of the generated code
         public readonly bool SnakeHit(int newHeadX, int newHeadY)
         {
-            var cell = _snakeTail;
-            for (var i = 0; i < ActualLength; i++)
+            for (var i = 0; i < _maxLength; i++)
             {
-                cell++;
-                if (cell >= _maxLength)
-                {
-                    cell = 0;
-                }
-                if (_snakeXs[cell] == newHeadX &&
-                    _snakeYs[cell] == newHeadY)
+                if (i >= _snakeTail &&
+                    i <= _snakeHead &&
+                    _snakeXs[i] == newHeadX &&
+                    _snakeYs[i] == newHeadY)
                 {
                     return true;
                 }

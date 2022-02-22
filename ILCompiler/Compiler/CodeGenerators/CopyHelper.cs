@@ -128,5 +128,59 @@ namespace ILCompiler.Compiler.CodeGenerators
                 assembler.Add(I16.IX, R16.DE);
             }
         }
+
+        public static void CopyFromIYToStack(Assembler assembler, int size, int iyOffset = 0)
+        {
+            int changeToIX = 0;
+
+            int originalIxOffset = iyOffset;
+            iyOffset += size - 4;
+            do
+            {
+                var bytesToCopy = size > 4 ? 4 : size;
+                size -= 4;
+
+                if (iyOffset + 3 < -128)
+                {
+                    var delta = iyOffset + 3;
+                    assembler.Ld(R16.DE, (short)delta);
+                    assembler.Add(I16.IY, R16.DE);
+                    changeToIX += delta;
+
+                    iyOffset -= delta;
+                    originalIxOffset -= delta;
+                }
+
+                switch (bytesToCopy)
+                {
+                    case 1:
+                        assembler.Ld(R16.HL, 0);
+                        assembler.Push(R16.HL);
+                        assembler.Ld(R8.H, 0);
+                        assembler.Ld(R8.L, I16.IY, (short)(iyOffset + 3));
+                        assembler.Push(R16.HL);
+                        break;
+
+                    case 2:
+                        assembler.Ld(R16.HL, 0);
+                        assembler.Push(R16.HL);
+                        assembler.Ld(R8.H, I16.IY, (short)(iyOffset + 3));
+                        assembler.Ld(R8.L, I16.IY, (short)(iyOffset + 2));
+                        assembler.Push(R16.HL);
+                        break;
+
+                    case 4:
+                        assembler.Ld(R8.H, I16.IY, (short)(iyOffset + 3));
+                        assembler.Ld(R8.L, I16.IY, (short)(iyOffset + 2));
+                        assembler.Push(R16.HL);
+                        assembler.Ld(R8.H, I16.IY, (short)(iyOffset + 1));
+                        assembler.Ld(R8.L, I16.IY, (short)(iyOffset + 0));
+                        assembler.Push(R16.HL);
+                        break;
+                }
+
+                iyOffset -= 4;
+            } while (iyOffset >= originalIxOffset);
+        }
     }
 }

@@ -58,15 +58,15 @@ namespace Snake
                     }
                 }
 
-                Thread.Sleep(50);
-
-                SetPixel(s.TailX, s.TailY, Color.Black);
+                var oldTailX = s.TailX;
+                var oldTailY = s.TailY;
 
                 if (!s.Update())
                 {
                     return Result.Loss;
                 }
 
+                SetPixel(oldTailX, oldTailY, Color.Black);
                 SetPixel(s.HeadX, s.HeadY, Color.White);
 
                 if (s.HitTest(foodX, foodY))

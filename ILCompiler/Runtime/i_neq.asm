@@ -3,8 +3,7 @@
 ; Carry set if true
 
 i_neq:
-	POP DE
-	EXX
+	POP IY
 
 	POP HL
 	POP DE
@@ -38,7 +37,4 @@ i_neq_2:
 	SCF
 
 i_neq_3
-	EXX
-	PUSH DE
-
-	RET
+	JP (IY)
