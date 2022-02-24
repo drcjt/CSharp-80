@@ -160,7 +160,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(IndirectEntry entry)
         {
-            Print($"ind ");
+            Print($"ind ${entry.Offset}");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
