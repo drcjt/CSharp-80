@@ -18,9 +18,11 @@ namespace ILCompiler
         {
             try
             {
-                var serviceProvider = ServiceProviderFactory.ServiceProvider;
-                Program app = serviceProvider.GetRequiredService<Program>();
-                app.Run(args, serviceProvider);
+                using (ServiceProvider? serviceProvider = (ServiceProvider)ServiceProviderFactory.ServiceProvider)
+                {
+                    Program app = serviceProvider.GetRequiredService<Program>();
+                    app.Run(args, serviceProvider);
+                }
             }
             catch (Exception e)
             {
