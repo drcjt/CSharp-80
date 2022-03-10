@@ -1,6 +1,5 @@
 ﻿using ILCompiler.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace ILCompiler.Compiler
 {

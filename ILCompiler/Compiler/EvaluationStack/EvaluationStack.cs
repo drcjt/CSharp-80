@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public class EvaluationStack<T>
     {

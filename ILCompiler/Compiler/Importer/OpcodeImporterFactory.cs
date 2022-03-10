@@ -1,6 +1,4 @@
 ﻿using dnlib.DotNet.Emit;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace ILCompiler.Compiler.Importer
 {

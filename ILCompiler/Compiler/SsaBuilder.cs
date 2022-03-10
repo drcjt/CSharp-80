@@ -1,8 +1,6 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace ILCompiler.Compiler
@@ -158,7 +156,7 @@ namespace ILCompiler.Compiler
                         rootNode = new DominatorTreeNode(block);
                         nodeMap.Add(block, rootNode);
                     }
-                }    
+                }
             }
 
             foreach (var node in nodeMap)
@@ -251,7 +249,7 @@ namespace ILCompiler.Compiler
 
                     if (predecessorBlock != null)
                     {
-                       _logger.LogDebug($"Predecessor block is {predecessorBlock.Label}");
+                        _logger.LogDebug($"Predecessor block is {predecessorBlock.Label}");
                     }
 
                     // Intersect DOM, if computed for all predecessors

@@ -11,7 +11,7 @@ namespace ILCompiler.Compiler.Importer
 
         private static bool IsLdArg(Code code) => code == Code.Ldarg || code == Code.Ldarg_S;
         private static bool IsLdArgN(Code code) => code == Code.Ldarg_0 || code == Code.Ldarg_1 || code == Code.Ldarg_2 || code == Code.Ldarg_3;
-        
+
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {

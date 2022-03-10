@@ -3,7 +3,6 @@ using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using Z80Assembler;
 
 namespace ILCompiler.Compiler

@@ -1,6 +1,4 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
-using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace ILCompiler.Compiler
@@ -33,7 +31,7 @@ namespace ILCompiler.Compiler
 
                     statement.Accept(this);
                 }
-            }        
+            }
             return _sb.ToString();
         }
 
@@ -160,7 +158,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(IndirectEntry entry)
         {
-            Print($"ind ${entry.Offset}");
+            Print($"ind {entry.Offset}");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;

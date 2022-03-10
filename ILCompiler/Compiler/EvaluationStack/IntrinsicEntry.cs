@@ -1,5 +1,4 @@
 ﻿using ILCompiler.Common.TypeSystem.IL;
-using System.Collections.Generic;
 
 namespace ILCompiler.Compiler.EvaluationStack
 {

@@ -3,7 +3,6 @@ using ILCompiler.Common.TypeSystem;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
-using System;
 
 namespace ILCompiler.Compiler.Importer
 {

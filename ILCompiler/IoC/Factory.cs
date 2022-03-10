@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ILCompiler.IoC
+﻿namespace ILCompiler.IoC
 {
     public class Factory<T> where T : class
     {

@@ -3,7 +3,6 @@ using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
-using System;
 
 namespace ILCompiler.Compiler.Importer
 {

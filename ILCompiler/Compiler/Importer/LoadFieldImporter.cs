@@ -3,7 +3,6 @@ using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
-using System;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -21,7 +20,7 @@ namespace ILCompiler.Compiler.Importer
             var obj = importer.PopExpression();
 
             if (obj.Kind == StackValueKind.ValueType)
-            {                
+            {
                 if (obj is LocalVariableEntry)
                 {
                     obj = new LocalVariableAddressEntry((obj.As<LocalVariableEntry>()).LocalNumber);

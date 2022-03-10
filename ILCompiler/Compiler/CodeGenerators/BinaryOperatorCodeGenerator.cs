@@ -1,7 +1,5 @@
 ﻿using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
-using System;
-using System.Collections.Generic;
 using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
@@ -40,7 +38,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 {
                     context.Assembler.Call(routine);
                     // If carry set then push i4 1 else push i4 0
-                    context.Assembler.Ld(R16.HL, 0);    
+                    context.Assembler.Ld(R16.HL, 0);
                     context.Assembler.Push(R16.HL);     // MSW
 
                     context.Assembler.Ld(R16.HL, 0);

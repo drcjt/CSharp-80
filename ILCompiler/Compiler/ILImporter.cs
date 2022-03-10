@@ -4,8 +4,6 @@ using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 
 namespace ILCompiler.Compiler
 {
@@ -179,8 +177,8 @@ namespace ILCompiler.Compiler
                     {
                         return;
                     }
-                }   
-                else  if (_configuration.IgnoreUnknownCil)
+                }
+                else if (_configuration.IgnoreUnknownCil)
                 {
                     _logger.LogWarning("Unsupported IL opcode {opcode}", opcode);
                 }

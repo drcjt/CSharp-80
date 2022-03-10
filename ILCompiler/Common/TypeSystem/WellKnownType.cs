@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ILCompiler.Common.TypeSystem
+﻿namespace ILCompiler.Common.TypeSystem
 {
     public enum WellKnownType
     {

@@ -1,6 +1,5 @@
 ﻿using ILCompiler.Compiler;
 using ILCompiler.Compiler.DependencyAnalysis;
-using System.Collections.Generic;
 using Z80Assembler;
 
 namespace ILCompiler.Interfaces

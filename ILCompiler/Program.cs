@@ -2,10 +2,8 @@
 using ILCompiler.IoC;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
 using System.CommandLine;
 using System.CommandLine.Invocation;
-using System.IO;
 
 namespace ILCompiler
 {
@@ -74,7 +72,7 @@ namespace ILCompiler
 
             rootCommand.Description = "CSharp-80 compiler from C# IL to Z80 for TRS-80 Machines";
             rootCommand.Handler = CommandHandler.Create<FileInfo?, FileInfo?, Configuration>(
-                (inputFilePath, outputFile, parsedConfiguration) => 
+                (inputFilePath, outputFile, parsedConfiguration) =>
                 {
                     _inputFilePath = inputFilePath;
                     _outputFilePath = outputFile;

@@ -1,6 +1,5 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
-using System.Collections.Generic;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {

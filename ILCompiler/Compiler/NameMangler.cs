@@ -1,7 +1,5 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Interfaces;
-using System;
-using System.Collections.Generic;
 
 namespace ILCompiler.Compiler
 {

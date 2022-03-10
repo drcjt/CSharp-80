@@ -1,13 +1,11 @@
 ﻿using ILCompiler.Compiler;
 using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
-using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
 using ILCompiler.Compiler.Lowerings;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System;
 
 namespace ILCompiler.IoC
 {

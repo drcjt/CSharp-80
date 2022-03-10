@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.Lowerings
     {
         public static IServiceCollection AddLowerings(this IServiceCollection services)
         {
-            services.AddSingleton<ILowering<BinaryOperator>, BinaryOperatorLowering>(); 
+            services.AddSingleton<ILowering<BinaryOperator>, BinaryOperatorLowering>();
             return services;
         }
     }

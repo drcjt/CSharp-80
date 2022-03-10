@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ILCompiler.Compiler
+﻿namespace ILCompiler.Compiler
 {
     public enum LabelType
     {

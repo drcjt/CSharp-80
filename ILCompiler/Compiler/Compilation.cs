@@ -3,8 +3,6 @@ using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using ILCompiler.IoC;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.IO;
 
 namespace ILCompiler.Compiler
 {

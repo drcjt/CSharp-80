@@ -4,7 +4,6 @@ using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Text;
 
 namespace ILCompiler.Compiler
@@ -17,7 +16,7 @@ namespace ILCompiler.Compiler
 
         private int _parameterCount;
         private int? _returnBufferArgIndex;
-        
+
         private IList<LocalVariableDescriptor> _localVariableTable;
 
         public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory)
@@ -58,7 +57,7 @@ namespace ILCompiler.Compiler
                         Kind = kind,
                         IsTemp = false,
                         Name = body.Variables[variableIndex].Name,
-                        ExactSize =  body.Variables[variableIndex].Type.GetExactSize(),
+                        ExactSize = body.Variables[variableIndex].Type.GetExactSize(),
                     };
                     _localVariableTable.Add(local);
                 }

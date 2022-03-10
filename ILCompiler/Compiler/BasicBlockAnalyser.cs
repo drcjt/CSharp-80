@@ -1,7 +1,5 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
-using System;
-using System.Collections.Generic;
 
 namespace ILCompiler.Compiler
 {
@@ -28,7 +26,7 @@ namespace ILCompiler.Compiler
             return basicBlocks;
         }
 
-        private void CreateBasicBlock(BasicBlock[] basicBlocks,  int offset)
+        private void CreateBasicBlock(BasicBlock[] basicBlocks, int offset)
         {
             var basicBlock = basicBlocks[offset];
             if (basicBlock == null)
@@ -89,7 +87,7 @@ namespace ILCompiler.Compiler
                     case Code.Leave:
                         {
                             var target = currentInstruction.OperandAs<Instruction>();
-                            CreateBasicBlock(basicBlocks,  (int)target.Offset); // target of jump
+                            CreateBasicBlock(basicBlocks, (int)target.Offset); // target of jump
                         }
                         break;
 
@@ -101,7 +99,7 @@ namespace ILCompiler.Compiler
                                 foreach (var target in targets)
                                 {
                                     var targetOffset = target.Offset;
-                                    CreateBasicBlock(basicBlocks,  (int)targetOffset); // target of jump
+                                    CreateBasicBlock(basicBlocks, (int)targetOffset); // target of jump
                                 }
                             }
                             var nextInstructionOffset = currentOffset + currentInstruction.GetSize();

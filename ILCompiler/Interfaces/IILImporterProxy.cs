@@ -1,7 +1,6 @@
 ﻿using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler;
 using ILCompiler.Compiler.EvaluationStack;
-using System.Collections.Generic;
 
 namespace ILCompiler.Interfaces
 {
@@ -12,7 +11,7 @@ namespace ILCompiler.Interfaces
         StackEntry PopExpression();
         void ImportFallThrough(BasicBlock next);
 
-        int GrabTemp(StackValueKind kind, int? exactSize); 
+        int GrabTemp(StackValueKind kind, int? exactSize);
 
         int ParameterCount { get; }
         IList<LocalVariableDescriptor> LocalVariableTable { get; }

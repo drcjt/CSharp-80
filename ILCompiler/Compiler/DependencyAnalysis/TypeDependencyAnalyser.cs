@@ -1,6 +1,5 @@
 ﻿using dnlib.DotNet;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {

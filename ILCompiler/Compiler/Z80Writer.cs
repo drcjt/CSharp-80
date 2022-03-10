@@ -3,8 +3,6 @@ using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
-using System;
-using System.IO;
 using System.Text;
 using Z80Assembler;
 

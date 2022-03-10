@@ -1,5 +1,4 @@
 ﻿using ILCompiler.Compiler;
-using System.Collections.Generic;
 
 namespace ILCompiler.Interfaces
 {

@@ -1,5 +1,4 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.IL;
+﻿using ILCompiler.Common.TypeSystem.IL;
 
 namespace ILCompiler.Compiler
 {

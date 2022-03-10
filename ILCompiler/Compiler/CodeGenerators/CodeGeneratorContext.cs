@@ -1,7 +1,6 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
-using System.Collections.Generic;
 using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators

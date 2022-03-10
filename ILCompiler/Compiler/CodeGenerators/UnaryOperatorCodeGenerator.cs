@@ -1,5 +1,4 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
-using System;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {

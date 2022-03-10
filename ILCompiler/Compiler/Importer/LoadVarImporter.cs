@@ -5,7 +5,7 @@ using ILCompiler.Interfaces;
 namespace ILCompiler.Compiler.Importer
 {
     public class LoadVarImporter : IOpcodeImporter
-    {      
+    {
         public bool CanImport(Code code)
         {
             return code == Code.Ldloc ||

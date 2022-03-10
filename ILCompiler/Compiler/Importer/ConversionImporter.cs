@@ -3,7 +3,6 @@ using ILCompiler.Common.TypeSystem;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
-using System;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -13,10 +12,10 @@ namespace ILCompiler.Compiler.Importer
             code == Code.Conv_U4 ||
             code == Code.Conv_I4 ||
             code == Code.Conv_U2 ||
-            code == Code.Conv_I2 || 
-            code == Code.Conv_U1 || 
-            code == Code.Conv_I1 || 
-            code == Code.Conv_U || 
+            code == Code.Conv_I2 ||
+            code == Code.Conv_U1 ||
+            code == Code.Conv_I1 ||
+            code == Code.Conv_U ||
             code == Code.Conv_I;
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
@@ -34,7 +33,7 @@ namespace ILCompiler.Compiler.Importer
                 case Code.Conv_I: wellKnownType = WellKnownType.IntPtr; break;
                 default: throw new NotImplementedException($"Conversion type not supported for opcode {instruction.OpCode.Code}");
             }
-            
+
             var op1 = importer.PopExpression();
 
             // Work out if a cast is required

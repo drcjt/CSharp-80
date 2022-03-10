@@ -31,7 +31,7 @@ namespace ILCompiler.Common.TypeSystem.IL
             if (typeDef == null)
             {
                 return typeSig.IsValueType && !typeSig.IsPrimitive;
-            }    
+            }
             else
             {
                 return typeDef.IsValueType && !typeDef.IsPrimitive && !typeDef.IsEnum;
