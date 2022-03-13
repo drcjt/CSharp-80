@@ -8,6 +8,11 @@
             _genericStackEntryVisitor = genericVisitor;
         }
 
+        public void Visit(NativeIntConstantEntry entry)
+        {
+            _genericStackEntryVisitor.Visit<NativeIntConstantEntry>(entry);
+        }
+
         public void Visit(Int32ConstantEntry entry)
         {
             _genericStackEntryVisitor.Visit<Int32ConstantEntry>(entry);

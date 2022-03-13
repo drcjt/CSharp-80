@@ -40,6 +40,11 @@ namespace ILCompiler.Compiler
             _sb.AppendLine(new String(' ', _indent * 3) + "▌ " + text);
         }
 
+        public void Visit(NativeIntConstantEntry entry)
+        {
+            Print($"nativeintconst {entry.Value}");
+        }
+
         public void Visit(Int32ConstantEntry entry)
         {
             Print($"intconst {entry.Value}");

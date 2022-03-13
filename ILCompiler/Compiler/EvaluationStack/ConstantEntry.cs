@@ -52,4 +52,22 @@ namespace ILCompiler.Compiler.EvaluationStack
             visitor.Visit(this);
         }
     }
+
+    public class NativeIntConstantEntry : ConstantEntry<short>
+    {
+        public NativeIntConstantEntry(short value) : base(StackValueKind.NativeInt, value, 2)
+        {
+
+        }
+
+        public override StackEntry Duplicate()
+        {
+            return new NativeIntConstantEntry(Value);
+        }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+    }
 }

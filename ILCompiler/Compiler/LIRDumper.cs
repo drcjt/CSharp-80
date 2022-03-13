@@ -26,6 +26,11 @@ namespace ILCompiler.Compiler
             return _sb.ToString();
         }
 
+        public void Visit(NativeIntConstantEntry entry)
+        {
+            _sb.AppendLine($"t{entry.TreeID,-3} = nativeintconst {entry.Value}");
+        }
+
         public void Visit(Int32ConstantEntry entry)
         {
             _sb.AppendLine($"t{entry.TreeID,-3} = intconst {entry.Value}");
