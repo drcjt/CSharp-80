@@ -3,7 +3,7 @@
 ; Uses: HL, DE, BC, AF, AF'
 
 
-i_rsh:	
+i_rsh16:	
 	POP IY
 
 	POP HL
@@ -12,19 +12,19 @@ i_rsh:
 	LD A, C
 
 	OR A
-	JR Z, i_rsh_end
+	JR Z, i_rsh16_end
 
 	LD B, A
 
-i_rsh_loop:
+i_rsh16_loop:
 
 	RR H
 	RR L
 
-	DJNZ i_lsh_loop
+	DJNZ i_rsh16_loop
 
 
-i_rsh_end:
+i_rsh16_end:
 
 	POP BC
 

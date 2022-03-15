@@ -19,7 +19,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             { Tuple.Create(Operation.Rsh, StackValueKind.Int32), "i_rsh" },
 
             { Tuple.Create(Operation.Add, StackValueKind.NativeInt), "i_add16" },
-            { Tuple.Create(Operation.Add, StackValueKind.NativeInt), "i_mul16" },
+            { Tuple.Create(Operation.Mul, StackValueKind.NativeInt), "i_mul16" },
             { Tuple.Create(Operation.Lsh, StackValueKind.NativeInt), "i_lsh16" },
             { Tuple.Create(Operation.Rsh, StackValueKind.NativeInt), "i_rsh16" },
         };
