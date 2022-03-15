@@ -7,6 +7,10 @@
         /// </summary>
         Unknown,
         /// <summary>
+        /// An unmanaged pointer type for the platform, for Z80, this is 16 bits
+        /// </summary>
+        NativeInt,
+        /// <summary>
         /// Any signed or unsigned integer values that can be represented in 32 bits
         /// </summary>
         Int32,
@@ -14,10 +18,6 @@
         /// Any signed or unsigned integer values that can be represented in 64 bits
         /// </summary>
         Int64,
-        /// <summary>
-        /// An unmanaged pointer type for the platform, for Z80, this is 16 bits
-        /// </summary>
-        NativeInt,
         /// <summary>
         /// Any float value
         /// </summary>

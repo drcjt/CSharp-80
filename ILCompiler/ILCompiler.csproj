@@ -28,6 +28,7 @@
     <None Remove="Runtime\heapalloc.asm" />
     <None Remove="Runtime\itoa.asm" />
     <None Remove="Runtime\i_add.asm" />
+    <None Remove="Runtime\i_add16.asm" />
     <None Remove="Runtime\i_cmp.asm" />
     <None Remove="Runtime\i_div.asm" />
     <None Remove="Runtime\i_div_un.asm" />
@@ -36,13 +37,16 @@
     <None Remove="Runtime\i_gt.asm" />
     <None Remove="Runtime\i_le.asm" />
     <None Remove="Runtime\i_lsh.asm" />
+    <None Remove="Runtime\i_lsh16.asm" />
     <None Remove="Runtime\i_lt.asm" />
     <None Remove="Runtime\i_mul.asm" />
+    <None Remove="Runtime\i_mul16.asm" />
     <None Remove="Runtime\i_neg.asm" />
     <None Remove="Runtime\i_neq.asm" />
     <None Remove="Runtime\i_rem.asm" />
     <None Remove="Runtime\i_rem_un.asm" />
     <None Remove="Runtime\i_rsh.asm" />
+    <None Remove="Runtime\i_rsh16.asm" />
     <None Remove="Runtime\i_sub.asm" />
     <None Remove="Runtime\kbdscan.asm" />
     <None Remove="Runtime\keyavail.asm" />
@@ -62,7 +66,11 @@
     <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
     <EmbeddedResource Include="Runtime\CPM\print.asm" />
     <EmbeddedResource Include="Runtime\heapalloc.asm" />
+    <EmbeddedResource Include="Runtime\i_add16.asm" />
+    <EmbeddedResource Include="Runtime\i_lsh16.asm" />
     <EmbeddedResource Include="Runtime\i_lsh.asm" />
+    <EmbeddedResource Include="Runtime\i_mul16.asm" />
+    <EmbeddedResource Include="Runtime\i_rsh16.asm" />
     <EmbeddedResource Include="Runtime\i_rsh.asm" />
     <EmbeddedResource Include="Runtime\keyavail.asm" />
     <EmbeddedResource Include="Runtime\setres.asm" />
