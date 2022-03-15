@@ -9,7 +9,6 @@ namespace ILCompiler.Compiler.CodeGenerators
         private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> BinaryOperatorMappings = new()
         {
             { Tuple.Create(Operation.Add, StackValueKind.Int32), "i_add" },
-            { Tuple.Create(Operation.Add, StackValueKind.NativeInt), "i_add" },
             { Tuple.Create(Operation.Sub, StackValueKind.Int32), "i_sub" },
             { Tuple.Create(Operation.Mul, StackValueKind.Int32), "i_mul" },
             { Tuple.Create(Operation.Div, StackValueKind.Int32), "i_div" },
@@ -18,6 +17,11 @@ namespace ILCompiler.Compiler.CodeGenerators
             { Tuple.Create(Operation.Rem_Un, StackValueKind.Int32), "i_rem_un" },
             { Tuple.Create(Operation.Lsh, StackValueKind.Int32), "i_lsh" },
             { Tuple.Create(Operation.Rsh, StackValueKind.Int32), "i_rsh" },
+
+            { Tuple.Create(Operation.Add, StackValueKind.NativeInt), "i_add16" },
+            { Tuple.Create(Operation.Add, StackValueKind.NativeInt), "i_mul16" },
+            { Tuple.Create(Operation.Lsh, StackValueKind.NativeInt), "i_lsh16" },
+            { Tuple.Create(Operation.Rsh, StackValueKind.NativeInt), "i_rsh16" },
         };
 
         private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> ComparisonOperatorMappings = new()

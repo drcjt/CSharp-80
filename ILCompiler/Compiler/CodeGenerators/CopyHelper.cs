@@ -69,7 +69,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             }
         }
 
-        public static void CopyFromIXToStack(Assembler assembler, int size, int ixOffset = 0, bool restoreIX = false)
+        public static void CopyFromIXToStack(Assembler assembler, int size, int ixOffset = 0, bool restoreIX = false, bool copyLowWordOnly = false)
         {
             int changeToIX = 0;
 
@@ -94,25 +94,34 @@ namespace ILCompiler.Compiler.CodeGenerators
                 switch (bytesToCopy)
                 {
                     case 1:
-                        assembler.Ld(R16.HL, 0);
-                        assembler.Push(R16.HL);
+                        if (!copyLowWordOnly)
+                        {
+                            assembler.Ld(R16.HL, 0);
+                            assembler.Push(R16.HL);
+                        }
                         assembler.Ld(R8.H, 0);
                         assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 3));
                         assembler.Push(R16.HL);
                         break;
 
                     case 2:
-                        assembler.Ld(R16.HL, 0);
-                        assembler.Push(R16.HL);
+                        if (!copyLowWordOnly)
+                        {
+                            assembler.Ld(R16.HL, 0);
+                            assembler.Push(R16.HL);
+                        }
                         assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 3));
                         assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 2));
                         assembler.Push(R16.HL);
                         break;
 
                     case 4:
-                        assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 3));
-                        assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 2));
-                        assembler.Push(R16.HL);
+                        if (!copyLowWordOnly)
+                        {
+                            assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 3));
+                            assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 2));
+                            assembler.Push(R16.HL);
+                        }
                         assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 1));
                         assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 0));
                         assembler.Push(R16.HL);

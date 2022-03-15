@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Common.TypeSystem.IL;
 using System.Diagnostics;
 
 namespace ILCompiler.Compiler.CodeGenerators
@@ -8,10 +9,12 @@ namespace ILCompiler.Compiler.CodeGenerators
         public void GenerateCode(LocalVariableEntry entry, CodeGeneratorContext context)
         {
             var variable = context.LocalVariableTable[entry.LocalNumber];
+            var size = variable.ExactSize;
+            var copyLowWordOnly = (entry.Kind == StackValueKind.NativeInt);
 
             // Loading a local variable/argument
-            Debug.Assert(variable.ExactSize % 4 == 0);
-            CopyHelper.CopyFromIXToStack(context.Assembler, variable.ExactSize, -variable.StackOffset, restoreIX: true);
+            Debug.Assert(size % 4 == 0);
+            CopyHelper.CopyFromIXToStack(context.Assembler, size, -variable.StackOffset, restoreIX: true, copyLowWordOnly);
         }
     }
 }
