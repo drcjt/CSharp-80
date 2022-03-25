@@ -13,7 +13,6 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 case "WriteString":
                     context.Assembler.Pop(R16.HL);    // put argument 1 into HL
-                    context.Assembler.Pop(R16.DE);
                     context.Assembler.Call("PRINT");
                     break;
 
