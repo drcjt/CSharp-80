@@ -11,7 +11,6 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             // Get address of object
             context.Assembler.Pop(R16.HL);      // LSW
-            context.Assembler.Pop(R16.DE);      // MSW will be ignored
 
             // Calculate field address
             context.Assembler.Ld(R16.DE, (short)fieldOffset);
@@ -19,7 +18,6 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             // Push field address onto the stack msw first, lsw second
             context.Assembler.Ld(R16.DE, 0);
-            context.Assembler.Push(R16.DE);
             context.Assembler.Push(R16.HL);
         }
     }

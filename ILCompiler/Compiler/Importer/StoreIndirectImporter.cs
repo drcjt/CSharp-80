@@ -20,7 +20,8 @@ namespace ILCompiler.Compiler.Importer
                 throw new NotSupportedException();
             }
 
-            WellKnownType type = GetWellKnownType(instruction);
+            // TODO: Can this be optimised to copy less data if Stind_I1, Stind_I2???
+            WellKnownType type = WellKnownType.Int32;
             int exactSize = type.GetWellKnownTypeSize();
 
             importer.ImportAppendTree(new StoreIndEntry(addr, value, type, fieldOffset: 0, exactSize));

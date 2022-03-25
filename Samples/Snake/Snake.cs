@@ -75,6 +75,7 @@ namespace Snake
             // Add new head
             _snakeHead++;
             _snakeHead %= _maxLength;
+
             _snakeXs[_snakeHead] = newHeadX;
             _snakeYs[_snakeHead] = newHeadY;
 

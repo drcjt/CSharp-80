@@ -13,11 +13,11 @@ namespace ILCompiler.Compiler
                 case StackValueKind.Int64:
                     return 8;
                 case StackValueKind.ObjRef:
-                    return 4;
+                    return 2;
                 case StackValueKind.NativeInt:
-                    return 4;
+                    return 2;
                 case StackValueKind.ByRef:
-                    return 4;
+                    return 2;
                 default:
                     throw new NotImplementedException($"Kind {kind} not yet supported");
             }

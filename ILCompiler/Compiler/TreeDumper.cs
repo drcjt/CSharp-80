@@ -60,7 +60,7 @@ namespace ILCompiler.Compiler
             _indent++;
             entry.Addr.Accept(this);
             _indent--;
-            Print($"storeind");
+            Print($"storeind offset={entry.FieldOffset} size={entry.ExactSize}");
             _indent++;
             entry.Op1.Accept(this);
             _indent++;

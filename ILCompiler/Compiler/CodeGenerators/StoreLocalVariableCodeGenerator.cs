@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Common.TypeSystem.IL;
 using System.Diagnostics;
 
 namespace ILCompiler.Compiler.CodeGenerators
@@ -10,7 +11,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             var variable = context.LocalVariableTable[entry.LocalNumber];
 
             // Storing a local variable/argument
-            Debug.Assert(variable.ExactSize % 4 == 0);
+            Debug.Assert(variable.ExactSize % 2 == 0);
             CopyHelper.CopyFromStackToIX(context.Assembler, variable.ExactSize, -variable.StackOffset, restoreIX: true);
         }
     }

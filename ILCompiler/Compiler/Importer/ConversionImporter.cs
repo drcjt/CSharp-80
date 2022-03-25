@@ -42,7 +42,7 @@ namespace ILCompiler.Compiler.Importer
                 (op1.Kind == StackValueKind.Int32 && wellKnownType == WellKnownType.Byte) ||
                 (op1.Kind == StackValueKind.Int32 && wellKnownType == WellKnownType.SByte))
             {
-                op1 = new CastEntry(wellKnownType, op1);
+                op1 = new CastEntry(wellKnownType, op1, op1.Kind);
             }
 
             importer.PushExpression(op1);

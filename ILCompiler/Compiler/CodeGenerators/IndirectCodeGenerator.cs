@@ -12,11 +12,9 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 // Get indirect address from stack into IX, pop lsw then msw
                 context.Assembler.Pop(I16.IY);  // LSW
-                context.Assembler.Pop(R16.DE);  // Ignore msw of address
 
-                var size = entry.ExactSize ?? 4;
+                var size = entry.ExactSize ?? 4; // TODO: is 4 the right default size?
                 CopyHelper.CopyFromIYToStack(context.Assembler, size, (short)entry.Offset);
-
             }
             else
             {

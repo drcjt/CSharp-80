@@ -2,6 +2,7 @@
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using System.Diagnostics;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -22,6 +23,15 @@ namespace ILCompiler.Compiler.Importer
         {
             var op2 = importer.PopExpression();
             var op1 = importer.PopExpression();
+
+            if (op1.Kind == StackValueKind.NativeInt && op2.Kind == StackValueKind.Int32)
+            {
+                // Special case where we have a binary operator on an address e.g. addr + 4, or addr * 2
+                // In this case we need to alter the Int32ConstantEntry node to be 16 bit
+
+                // Insert a cast in front of the int32 to convert to int16
+                op2 = new CastEntry(Common.TypeSystem.WellKnownType.Object, op2, op1.Kind);
+            }
 
             // StackValueKind is carefully ordered to make this work
             StackValueKind kind;

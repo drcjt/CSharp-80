@@ -12,10 +12,10 @@ namespace ILCompiler.Compiler.CodeGenerators
             int originalIxOffset = ixOffset;
             do
             {
-                var bytesToCopy = totalBytesToCopy > 4 ? 4 : totalBytesToCopy;
+                var bytesToCopy = totalBytesToCopy > 2 ? 2 : totalBytesToCopy;
 
                 // offset has to be -128 to + 127
-                while (ixOffset + 3 > 127)
+                while (ixOffset + bytesToCopy > 128)
                 {
                     // Need to move IX along to keep stackOffset within -128 to +127 range
                     assembler.Ld(R16.DE, 127);
@@ -40,26 +40,21 @@ namespace ILCompiler.Compiler.CodeGenerators
                     case 1:
                         assembler.Pop(R16.HL);
                         assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
-                        assembler.Pop(R16.HL);
                         break;
                     case 2:
                         assembler.Pop(R16.HL);
                         assembler.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
                         assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
-                        assembler.Pop(R16.HL);
                         break;
                     case 4:
                         assembler.Pop(R16.HL);  // LSW
                         assembler.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
                         assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
-                        assembler.Pop(R16.HL);  // MSW
-                        assembler.Ld(I16.IX, (short)(ixOffset + 3), R8.H);
-                        assembler.Ld(I16.IX, (short)(ixOffset + 2), R8.L);
                         break;
                 }
 
-                ixOffset += 4;
-                totalBytesToCopy -= 4;
+                ixOffset += 2;
+                totalBytesToCopy -= 2;
             } while (ixOffset < size + originalIxOffset);
 
             if (changeToIX != 0 && restoreIX)
@@ -69,20 +64,20 @@ namespace ILCompiler.Compiler.CodeGenerators
             }
         }
 
-        public static void CopyFromIXToStack(Assembler assembler, int size, int ixOffset = 0, bool restoreIX = false, bool copyLowWordOnly = false)
+        public static void CopyFromIXToStack(Assembler assembler, int size, int ixOffset = 0, bool restoreIX = false)
         {
             int changeToIX = 0;
 
             int originalIxOffset = ixOffset;
-            ixOffset += size - 4;
+            ixOffset += size - 2;
             do
             {
-                var bytesToCopy = size > 4 ? 4 : size;
-                size -= 4;
+                var bytesToCopy = size > 2 ? 2 : size;
+                size -= 2;
 
-                if (ixOffset + 3 < -128)
+                if (ixOffset + bytesToCopy < -127)
                 {
-                    var delta = ixOffset + 3;
+                    var delta = ixOffset + 1;
                     assembler.Ld(R16.DE, (short)delta);
                     assembler.Add(I16.IX, R16.DE);
                     changeToIX += delta;
@@ -94,41 +89,25 @@ namespace ILCompiler.Compiler.CodeGenerators
                 switch (bytesToCopy)
                 {
                     case 1:
-                        if (!copyLowWordOnly)
-                        {
-                            assembler.Ld(R16.HL, 0);
-                            assembler.Push(R16.HL);
-                        }
                         assembler.Ld(R8.H, 0);
-                        assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 3));
+                        assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 1));
                         assembler.Push(R16.HL);
                         break;
 
                     case 2:
-                        if (!copyLowWordOnly)
-                        {
-                            assembler.Ld(R16.HL, 0);
-                            assembler.Push(R16.HL);
-                        }
-                        assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 3));
-                        assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 2));
+                        assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 1));
+                        assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 0));
                         assembler.Push(R16.HL);
                         break;
 
                     case 4:
-                        if (!copyLowWordOnly)
-                        {
-                            assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 3));
-                            assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 2));
-                            assembler.Push(R16.HL);
-                        }
                         assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 1));
                         assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 0));
                         assembler.Push(R16.HL);
                         break;
                 }
 
-                ixOffset -= 4;
+                ixOffset -= 2;
             } while (ixOffset >= originalIxOffset);
 
             if (changeToIX != 0 && restoreIX)
@@ -140,21 +119,18 @@ namespace ILCompiler.Compiler.CodeGenerators
 
         public static void CopyFromIYToStack(Assembler assembler, int size, int iyOffset = 0)
         {
-            int changeToIX = 0;
-
             int originalIxOffset = iyOffset;
-            iyOffset += size - 4;
+            iyOffset += size - 2;
             do
             {
-                var bytesToCopy = size > 4 ? 4 : size;
-                size -= 4;
+                var bytesToCopy = size > 2 ? 2 : size;
+                size -= 2;
 
-                if (iyOffset + 3 < -128)
+                if (iyOffset + bytesToCopy < -127)
                 {
-                    var delta = iyOffset + 3;
+                    var delta = iyOffset + 1;
                     assembler.Ld(R16.DE, (short)delta);
                     assembler.Add(I16.IY, R16.DE);
-                    changeToIX += delta;
 
                     iyOffset -= delta;
                     originalIxOffset -= delta;
@@ -163,32 +139,25 @@ namespace ILCompiler.Compiler.CodeGenerators
                 switch (bytesToCopy)
                 {
                     case 1:
-                        assembler.Ld(R16.HL, 0);
-                        assembler.Push(R16.HL);
                         assembler.Ld(R8.H, 0);
-                        assembler.Ld(R8.L, I16.IY, (short)(iyOffset + 3));
+                        assembler.Ld(R8.L, I16.IY, (short)(iyOffset + 1));
                         assembler.Push(R16.HL);
                         break;
 
                     case 2:
-                        assembler.Ld(R16.HL, 0);
-                        assembler.Push(R16.HL);
-                        assembler.Ld(R8.H, I16.IY, (short)(iyOffset + 3));
-                        assembler.Ld(R8.L, I16.IY, (short)(iyOffset + 2));
+                        assembler.Ld(R8.H, I16.IY, (short)(iyOffset + 1));
+                        assembler.Ld(R8.L, I16.IY, (short)(iyOffset + 0));
                         assembler.Push(R16.HL);
                         break;
 
                     case 4:
-                        assembler.Ld(R8.H, I16.IY, (short)(iyOffset + 3));
-                        assembler.Ld(R8.L, I16.IY, (short)(iyOffset + 2));
-                        assembler.Push(R16.HL);
                         assembler.Ld(R8.H, I16.IY, (short)(iyOffset + 1));
                         assembler.Ld(R8.L, I16.IY, (short)(iyOffset + 0));
                         assembler.Push(R16.HL);
                         break;
                 }
 
-                iyOffset -= 4;
+                iyOffset -= 2;
             } while (iyOffset >= originalIxOffset);
         }
     }

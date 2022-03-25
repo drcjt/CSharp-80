@@ -6,7 +6,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public int LocalNumber { get; }
 
-        public LocalVariableAddressEntry(int localNumber) : base(StackValueKind.ObjRef, 4)
+        public LocalVariableAddressEntry(int localNumber) : base(StackValueKind.NativeInt, 2)
         {
             LocalNumber = localNumber;
         }

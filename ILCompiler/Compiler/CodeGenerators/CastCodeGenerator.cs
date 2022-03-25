@@ -60,6 +60,13 @@ namespace ILCompiler.Compiler.CodeGenerators
                 context.Assembler.Push(R16.HL);     // MSW
                 context.Assembler.Push(R16.DE);     // LSW
             }
+            else if (actualKind == StackValueKind.Int32 && desiredType == WellKnownType.Object)
+            {
+                context.Assembler.Pop(R16.HL);      // LSW
+                context.Assembler.Pop(R16.DE);      // MSW
+
+                context.Assembler.Push(R16.HL);     // LSW
+            }
             else
             {
                 throw new NotImplementedException($"Implicit cast from {actualKind} to {desiredType} not supported");

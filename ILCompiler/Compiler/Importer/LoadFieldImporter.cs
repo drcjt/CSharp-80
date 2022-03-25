@@ -41,7 +41,7 @@ namespace ILCompiler.Compiler.Importer
                 }
             }
 
-            if (obj.Kind != StackValueKind.ObjRef && obj.Kind != StackValueKind.ByRef)
+            if (obj.Kind != StackValueKind.ObjRef && obj.Kind != StackValueKind.ByRef && obj.Kind != StackValueKind.NativeInt)
             {
                 throw new NotImplementedException($"LoadFieldImporter does not support {obj.Kind}");
             }

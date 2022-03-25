@@ -18,15 +18,8 @@ namespace ILCompiler.Compiler.CodeGenerators
             context.Assembler.Ld(R16.DE, (short)(-offset));
             context.Assembler.Add(R16.HL, R16.DE);
 
-            // Data on stack is always pushed as msw first, lsw second
-
-            // Push 0 to makeup full 32 bit value
-            context.Assembler.Ld(R16.DE, 0);
-            context.Assembler.Push(R16.DE);
-
             // Push address
             context.Assembler.Push(R16.HL);
-
         }
     }
 }

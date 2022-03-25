@@ -7,7 +7,10 @@ namespace MiniBCL
         public static void Main()
         {
             Console.Clear();
-            Console.WriteLine(Fibonacci(10));  // should display 55
+            for (short i = 1; i < 50; i++)
+            {
+                Console.WriteLine(Fibonacci(i));  // should display 55
+            }
         }
 
         private static short Fibonacci(short n)

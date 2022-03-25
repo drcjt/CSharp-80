@@ -14,7 +14,8 @@ namespace ILCompiler.Compiler.Importer
         {
             var type = GetWellKnownType(instruction.OpCode.Code);
             var addr = importer.PopExpression();
-            var node = new IndirectEntry(addr, StackValueKind.Int32, type.GetWellKnownTypeSize());
+            // TODO: Can this be optimised for I1 & I2??
+            var node = new IndirectEntry(addr, StackValueKind.Int32, null); // type.GetWellKnownTypeSize());
             importer.PushExpression(node);
         }
 

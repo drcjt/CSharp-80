@@ -103,7 +103,7 @@ namespace Snake
         public static void Main()
         {
             Console.Clear();
-
+            
             //FrameBuffer fb = new FrameBuffer();
             while (true)
             {

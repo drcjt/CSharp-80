@@ -10,11 +10,10 @@ namespace ILCompiler.Compiler.CodeGenerators
         {
             var variable = context.LocalVariableTable[entry.LocalNumber];
             var size = variable.ExactSize;
-            var copyLowWordOnly = (entry.Kind == StackValueKind.NativeInt);
 
             // Loading a local variable/argument
-            Debug.Assert(size % 4 == 0);
-            CopyHelper.CopyFromIXToStack(context.Assembler, size, -variable.StackOffset, restoreIX: true, copyLowWordOnly);
+            Debug.Assert(size % 2 == 0);
+            CopyHelper.CopyFromIXToStack(context.Assembler, size, -variable.StackOffset, restoreIX: true);
         }
     }
 }
