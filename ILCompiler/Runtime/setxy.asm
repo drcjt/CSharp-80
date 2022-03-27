@@ -1,5 +1,5 @@
 SETXY:
-	POP IY   ; return address
+	POP BC	; return address
 
 	POP HL	 ; y
 	POP DE   ; ignore msw
@@ -20,4 +20,5 @@ SETXY:
 
 	LD (4020H), HL	
 
-	JP (IY)
+	PUSH BC
+	RET

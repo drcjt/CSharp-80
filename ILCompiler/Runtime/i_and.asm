@@ -1,35 +1,40 @@
-; This rout; Logical And of two 32 bit values on stack
+; Logical And of two 32 bit values on stack
 ; Leaves result on the stack
 ;
-; Uses: HL, DE, BC, AF, IY
+; Uses: HL, HL', DE, BC, AF
 
 i_and:
-	pop iy
+	EXX
+	POP HL
+	EXX
 
-	pop hl
-	pop de
+	POP HL
+	POP DE
 
-	pop bc
+	POP BC
 
-	ld a, h
-	and b
-	ld h, a
+	LD A, H
+	AND B
+	LD H, A
 
-	ld a, l
-	and c
-	ld l, a
+	LD A, L
+	AND C
+	LD L, A
 
-	pop bc
+	POP BC
 
-	ld a, d
-	and b
-	ld d, a
+	LD A, D
+	AND B
+	LD D, A
 
-	ld a, e
-	and c
-	ld e, a
+	LD A, E
+	AND C
+	LD E, A
 
-	push de
-	push hl
+	PUSH DE
+	PUSH HL
 
-	jp (iy)
+	EXX
+	PUSH HL
+	EXX
+	RET

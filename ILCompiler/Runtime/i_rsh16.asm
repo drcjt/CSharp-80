@@ -1,10 +1,12 @@
 ; This routine performs the operation HL = HL >> C
 ;
-; Uses: HL, DE, BC, AF, AF'
+; Uses: HL, HL', DE, BC, AF
 
 
 i_rsh16:	
-	POP IY
+	EXX
+	POP HL
+	EXX
 
 	POP HL
 	POP BC
@@ -30,4 +32,7 @@ i_rsh16_end:
 
 	PUSH HL		; Put result back on stack
 
-	JP (IY)
+	EXX
+	PUSH HL
+	EXX
+	RET

@@ -1,11 +1,11 @@
 ; This routine adds two 16 bits numbers from the stack
 ; leaving the result on the stack as a 16 bit number
 ;
-; Uses: HL, BC, IY
+; Uses: HL, BC, DE
 
 
-i_add16:	
-	POP IY		; Save return address
+i_add16:
+	POP DE		; Save return address
 
 	POP HL		; First Arg
 	POP BC		; Second Arg
@@ -14,4 +14,5 @@ i_add16:
 				; Put result back on stack
 	PUSH HL		; LSW next
 
-	JP (IY)
+	PUSH DE
+	RET

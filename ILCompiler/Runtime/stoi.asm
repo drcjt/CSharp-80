@@ -4,7 +4,7 @@
 
 
 stoi:	
-	POP IY		; Save return address
+	POP BC		; Save return address
 
 	POP DE
 
@@ -15,4 +15,5 @@ stoi:
 	PUSH HL
 	PUSH DE
 
-	JP (IY)
+	PUSH BC
+	RET

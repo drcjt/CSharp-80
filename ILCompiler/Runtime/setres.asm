@@ -1,23 +1,27 @@
 SETRES:
-	POP BC		; SAVE RETURN ADDRESS
+	EXX
+	POP HL		; SAVE RETURN ADDRESS
+	EXX
 
 	POP HL		; Set or Reset
 	POP DE		; Ignore msw
 
 	POP DE		; Get y-coordinate into DE
-	POP IY		; Ignore msw
+	POP BC		; Ignore msw
 
 	LD A, E		; Save y into A
 
 	POP DE		; get x-coordinate into HL
-	POP IY		; Ignore msw
+	POP BC		; Ignore msw
 
 	LD D, E		; Move x to D
 	LD E, A		; Set E as y
 
-	PUSH BC		; push return address
+	EXX
+	PUSH HL		; push return address
+	EXX
 
-	LD a, L	; SET/RESET
+	LD A, L	; SET/RESET
 
 	LD HL, SETRESDATA
 	PUSH AF

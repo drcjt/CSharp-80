@@ -1,5 +1,5 @@
 DELAY:
-	POP IY	; return address
+	POP HL	; return address
 
 	POP BC   ; delay required
 
@@ -11,4 +11,4 @@ DELAY1:			; should be 14.65 microseconds per loop
 
 	POP BC		; Remove msw of parameter - ignoring it
 
-	JP (IY)
+	JP (HL)

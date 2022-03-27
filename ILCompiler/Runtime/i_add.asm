@@ -1,10 +1,12 @@
 ; This routine performs the operation DEHL = DEHL + BCAF
 ;
-; Uses: HL, DE, BC, AF, AF'
+; Uses: HL, HL', DE, BC, AF
 
 
-i_add:	
-	POP IY		; Save return address
+i_add:
+	EXX			; Save return address
+	POP HL
+	EXX
 
 	POP HL		; LSW first
 	POP DE		; MSW next
@@ -21,4 +23,7 @@ i_add:
 	PUSH DE		; MSW first
 	PUSH HL		; LSW next
 
-	JP (IY)
+	EXX
+	PUSH HL
+	EXX
+	RET
