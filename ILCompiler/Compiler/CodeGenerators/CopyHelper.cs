@@ -116,49 +116,5 @@ namespace ILCompiler.Compiler.CodeGenerators
                 assembler.Add(I16.IX, R16.DE);
             }
         }
-
-        public static void CopyFromIYToStack(Assembler assembler, int size, int iyOffset = 0)
-        {
-            int originalIxOffset = iyOffset;
-            iyOffset += size - 2;
-            do
-            {
-                var bytesToCopy = size > 2 ? 2 : size;
-                size -= 2;
-
-                if (iyOffset + bytesToCopy < -127)
-                {
-                    var delta = iyOffset + 1;
-                    assembler.Ld(R16.DE, (short)delta);
-                    assembler.Add(I16.IY, R16.DE);
-
-                    iyOffset -= delta;
-                    originalIxOffset -= delta;
-                }
-
-                switch (bytesToCopy)
-                {
-                    case 1:
-                        assembler.Ld(R8.H, 0);
-                        assembler.Ld(R8.L, I16.IY, (short)(iyOffset + 1));
-                        assembler.Push(R16.HL);
-                        break;
-
-                    case 2:
-                        assembler.Ld(R8.H, I16.IY, (short)(iyOffset + 1));
-                        assembler.Ld(R8.L, I16.IY, (short)(iyOffset + 0));
-                        assembler.Push(R16.HL);
-                        break;
-
-                    case 4:
-                        assembler.Ld(R8.H, I16.IY, (short)(iyOffset + 1));
-                        assembler.Ld(R8.L, I16.IY, (short)(iyOffset + 0));
-                        assembler.Push(R16.HL);
-                        break;
-                }
-
-                iyOffset -= 2;
-            } while (iyOffset >= originalIxOffset);
-        }
     }
 }
