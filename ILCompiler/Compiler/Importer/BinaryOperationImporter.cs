@@ -16,7 +16,8 @@ namespace ILCompiler.Compiler.Importer
                    code == Code.Div ||
                    code == Code.Rem ||
                    code == Code.Div_Un ||
-                   code == Code.Rem_Un;
+                   code == Code.Rem_Un ||
+                   code == Code.And;
         }
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)

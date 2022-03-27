@@ -12,6 +12,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         Div_Un,
         Rem,
         Rem_Un,
+        And,
         Eq,
         Ge,
         Gt,

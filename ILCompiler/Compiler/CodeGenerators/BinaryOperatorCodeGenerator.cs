@@ -15,6 +15,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             { Tuple.Create(Operation.Rem, StackValueKind.Int32), "i_rem" },
             { Tuple.Create(Operation.Div_Un, StackValueKind.Int32), "i_div_un" },
             { Tuple.Create(Operation.Rem_Un, StackValueKind.Int32), "i_rem_un" },
+            { Tuple.Create(Operation.And, StackValueKind.Int32), "i_and" },
             { Tuple.Create(Operation.Lsh, StackValueKind.Int32), "i_lsh" },
             { Tuple.Create(Operation.Rsh, StackValueKind.Int32), "i_rsh" },
 
