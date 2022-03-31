@@ -9,6 +9,7 @@ namespace ILCompiler.Compiler.CodeGenerators
         private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> BinaryOperatorMappings = new()
         {
             { Tuple.Create(Operation.Add, StackValueKind.Int32), "i_add" },
+            { Tuple.Create(Operation.Or, StackValueKind.Int32), "i_or" },
             { Tuple.Create(Operation.Sub, StackValueKind.Int32), "i_sub" },
             { Tuple.Create(Operation.Mul, StackValueKind.Int32), "i_mul" },
             { Tuple.Create(Operation.Div, StackValueKind.Int32), "i_div" },
