@@ -2,7 +2,7 @@
 {
     public class GenericStackEntryAdapter : IStackEntryVisitor
     {
-        IGenericStackEntryVisitor _genericStackEntryVisitor;
+        private readonly IGenericStackEntryVisitor _genericStackEntryVisitor;
         public GenericStackEntryAdapter(IGenericStackEntryVisitor genericVisitor)
         {
             _genericStackEntryVisitor = genericVisitor;

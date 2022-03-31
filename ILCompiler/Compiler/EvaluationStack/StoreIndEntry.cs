@@ -6,7 +6,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public StackEntry Addr { get; }
         public StackEntry Op1 { get; }
-        public uint FieldOffset;
+        public uint FieldOffset { get; }
 
         public WellKnownType TargetType { get; }
 

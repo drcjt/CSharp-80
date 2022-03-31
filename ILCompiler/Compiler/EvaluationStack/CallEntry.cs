@@ -5,7 +5,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     public class CallEntry : StackEntry
     {
         public string TargetMethod { get; }
-        public IList<StackEntry> Arguments;
+        public IList<StackEntry> Arguments { get; }
 
         public CallEntry(string targetMethod, IList<StackEntry> arguments, StackValueKind returnKind, int? returnSize) : base(returnKind, returnSize)
         {

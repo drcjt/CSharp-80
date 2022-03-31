@@ -4,7 +4,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 {
     public class FieldAddressEntry : StackEntry
     {
-        public uint Offset;
+        public uint Offset { get; }
 
         public StackEntry Op1 { get; }
 

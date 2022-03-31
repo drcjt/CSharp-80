@@ -7,13 +7,13 @@ namespace ILCompiler.Compiler.CodeGenerators
 {
     public class CodeGeneratorContext
     {
-        public Assembler Assembler = new Assembler();
-        public IList<LocalVariableDescriptor> LocalVariableTable;
+        public Assembler Assembler { get; } = new();
+        public IList<LocalVariableDescriptor> LocalVariableTable { get; }
         public int ParamsCount => _method.ParamsCount;
         public int LocalsCount => _method.LocalsCount;
         public MethodDef Method => _method.Method;
 
-        private Z80MethodCodeNode _method;
+        private readonly Z80MethodCodeNode _method;
 
         public readonly IConfiguration Configuration;
 

@@ -42,12 +42,8 @@ namespace ILCompiler.Compiler.CodeGenerators
                         assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
                         break;
                     case 2:
-                        assembler.Pop(R16.HL);
-                        assembler.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
-                        assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
-                        break;
                     case 4:
-                        assembler.Pop(R16.HL);  // LSW
+                        assembler.Pop(R16.HL);
                         assembler.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
                         assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
                         break;
@@ -95,11 +91,6 @@ namespace ILCompiler.Compiler.CodeGenerators
                         break;
 
                     case 2:
-                        assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 1));
-                        assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 0));
-                        assembler.Push(R16.HL);
-                        break;
-
                     case 4:
                         assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 1));
                         assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 0));
