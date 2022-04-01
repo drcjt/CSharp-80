@@ -5,6 +5,8 @@ namespace ILCompiler.Compiler.EvaluationStack
     public enum Operation
     {
         Neg,
+        Not,
+
         Add,
         Sub,
         Mul,
@@ -14,6 +16,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         Rem_Un,
         And,
         Or,
+
         Eq,
         Ge,
         Gt,

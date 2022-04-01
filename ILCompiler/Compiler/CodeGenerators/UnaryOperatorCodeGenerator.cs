@@ -6,13 +6,16 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(UnaryOperator entry, CodeGeneratorContext context)
         {
-            if (entry.Operation == Operation.Neg)
+            switch (entry.Operation)
             {
-                context.Assembler.Call("i_neg");
-            }
-            else
-            {
-                throw new NotImplementedException($"Unary operator {entry.Operation} not implemented");
+                case Operation.Neg:
+                    context.Assembler.Call("i_neg");
+                    break;
+                case Operation.Not:
+                    context.Assembler.Call("i_not");
+                    break;
+                default:
+                    throw new NotImplementedException($"Unary operator {entry.Operation} not implemented");
             }
         }
     }

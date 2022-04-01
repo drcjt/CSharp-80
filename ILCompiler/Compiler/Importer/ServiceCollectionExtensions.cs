@@ -23,7 +23,7 @@ namespace ILCompiler.Compiler.Importer
             services.AddSingleton<IOpcodeImporter, LoadStringImporter>();
             services.AddSingleton<IOpcodeImporter, InitobjImporter>();
             services.AddSingleton<IOpcodeImporter, ConversionImporter>();
-            services.AddSingleton<IOpcodeImporter, NegImporter>();
+            services.AddSingleton<IOpcodeImporter, UnaryOperationImporter>();
             services.AddSingleton<IOpcodeImporter, RetImporter>();
             services.AddSingleton<IOpcodeImporter, CallImporter>();
             services.AddSingleton<IOpcodeImporter, DupImporter>();
