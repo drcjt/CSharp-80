@@ -32,17 +32,26 @@ namespace Snake
                 snakeYs[i] = -1;
             }
 
+            const int bits = 128 * 48;
+            const int boardSize = (bits) / 32;
+            var board = stackalloc int[boardSize];
+
+            for (int i = 0; i < 192; i++)
+            {
+                board[i] = 0;
+            }
+
             var startX = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenWidth / 2);
             var startY = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenHeight);
 
-            Snake s = new Snake(startX, startY, snakeXs, snakeYs, MAX_LENGTH, (Direction)(_random.Next() % 4));
+            var s = new Snake(startX, startY, snakeXs, snakeYs, board, MAX_LENGTH, (Direction)(_random.Next() % 4));
 
             MakeFood(s, out int foodX, out int foodY);
             SetPixel(foodX, foodY, Color.White);
-
             SetPixel(s.HeadX, s.HeadY, Color.White);
 
-            int gameTime = Environment.TickCount;
+            SetBoardItem(board, s.HeadX, s.HeadY, true);
+
             while (true)
             {
                 if (Console.KeyAvailable)
@@ -51,10 +60,10 @@ namespace Snake
                     int kc = ki.KeyChar;
                     switch (kc)
                     {
-                        case 10: s.Course = Direction.Down; break;
-                        case 91: s.Course = Direction.Up; break;
-                        case 8: s.Course = Direction.Left; break;
-                        case 9: s.Course = Direction.Right; break;
+                        case 10: s.SetCourse(Direction.Down); break;
+                        case 91: s.SetCourse(Direction.Up); break;
+                        case 8: s.SetCourse(Direction.Left); break;
+                        case 9: s.SetCourse(Direction.Right); break;
                     }
                 }
 
@@ -69,6 +78,9 @@ namespace Snake
                 SetPixel(oldTailX, oldTailY, Color.Black);
                 SetPixel(s.HeadX, s.HeadY, Color.White);
 
+                SetBoardItem(board, oldTailX, oldTailY, false);
+                SetBoardItem(board, s.HeadX, s.HeadY, true);
+
                 if (s.HitTest(foodX, foodY))
                 {
                     if (s.Extend())
@@ -81,6 +93,8 @@ namespace Snake
                         return Result.Win;
                     }
                 }
+
+                Thread.Sleep(30);
             }
         }
 
@@ -100,15 +114,31 @@ namespace Snake
             while (snake.SnakeHit(foodX, foodY));
         }
 
-        public static void Main()
+        private static unsafe void SetBoardItem(int* board, int x, int y, bool value)
+        {
+            int bitIndex = (y * 128) + x;
+            int bit = bitIndex % 32;
+            int bitMask = 1 << bitIndex;
+
+            if (value)
+            {
+                board[bitIndex >> 5] |= bitMask;
+            }
+            else
+            {
+                board[bitIndex >> 5] &= ~bitMask;
+            }
+        }
+
+        public unsafe static void Main()
         {
             Console.Clear();
-            
+
             //FrameBuffer fb = new FrameBuffer();
             while (true)
             {
                 Game g = new Game((uint)Environment.TickCount);
-                Result result = g.Run(/* ref fb */);
+                Result result = g.Run();
 
                 if (result == Result.Win)
                 {

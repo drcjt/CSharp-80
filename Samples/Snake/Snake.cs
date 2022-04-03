@@ -4,50 +4,62 @@ namespace Snake
 {
     public unsafe struct Snake
     {
-        private int* _snakeXs;
-        private int* _snakeYs;
+        // For inspiration on data structures see here
+        // https://stackoverflow.com/questions/13094373/snake-in-assembly-what-datastructure-to-use?msclkid=277ab387ad4a11ec91846c3086c26b05
 
-        int _snakeHead;
-        int _snakeTail;
+        private readonly int* _snakeXs;
+        private readonly int* _snakeYs;
 
-        int _maxLength;
+        private int _snakeHead;
+        private int _snakeTail;
 
-        public int ActualLength;
-        public int DesiredLength;
+        private readonly int _maxLength;
+
+        private int _actualLength;
+        private int _desiredLength;
 
         private Direction _direction;
         private Direction _oldDirection;
 
-        public Direction Course
+        public void SetCourse(Direction newDirection)
         {
-            set
-            {
-                if (_oldDirection != _direction)
-                    _oldDirection = _direction;
+            if (_oldDirection != _direction)
+                _oldDirection = _direction;
 
-                // Ignore direction change of snake back on itself
-                if (_direction - value != 2 && value - _direction != 2)
-                    _direction = value;
-            }
+            // Ignore direction change of snake back on itself
+            if (_direction - newDirection != 2 && newDirection - _direction != 2)
+                _direction = newDirection;
         }
 
-        public unsafe Snake(int x, int y, int* snakeXs, int* snakeYs, int length, Direction direction)
+        private int* _board;
+
+        public unsafe Snake(int x, int y, int* snakeXs, int* snakeYs, int* board, int maxLength, Direction direction)
         {
             _direction = direction;
             _oldDirection = direction;
 
             _snakeHead = 0;
             _snakeTail = 0;
-            ActualLength = 1;
-            DesiredLength = 1;
+            _actualLength = 1;
+            _desiredLength = 1;
 
             _snakeXs = snakeXs;
             _snakeYs = snakeYs;
 
-            _maxLength = length;
-
+            _maxLength = maxLength;
             _snakeXs[0] = x;
             _snakeYs[0] = y;
+
+            _board = board;
+        }
+
+        private readonly unsafe bool GetBoardItem(int x, int y)
+        {
+            int bitIndex = (y * 128) + x;
+            int bit = bitIndex % 32;
+            int bitMask = 1 << bitIndex;
+
+            return ((_board[bitIndex >> 5]) & bitMask) != 0;
         }
 
         public unsafe bool Update()
@@ -67,7 +79,7 @@ namespace Snake
             newHeadY = GraphicHelper.WrapAround(newHeadY, Graphics.ScreenHeight);
 
             // Does new head hit body of snake?
-            if (SnakeHit(newHeadX, newHeadY))
+            if (GetBoardItem(newHeadX, newHeadY))
             {
                 return false;
             }
@@ -80,43 +92,29 @@ namespace Snake
             _snakeYs[_snakeHead] = newHeadY;
 
             // Move tail of snake
-            if (ActualLength == DesiredLength)
+            if (_actualLength == _desiredLength)
             {
                 _snakeTail++;
                 _snakeTail %= _maxLength;
             }
             else
             {
-                ActualLength++;
+                _actualLength++;
             }
 
             return true;
         }
 
-        // TODO: This slows down as the length of the snake increases
-        // need to look at optimisations in codegen to improve the
-        // speed of the generated code
         public readonly bool SnakeHit(int newHeadX, int newHeadY)
         {
-            for (var i = 0; i < _maxLength; i++)
-            {
-                if (i >= _snakeTail &&
-                    i <= _snakeHead &&
-                    _snakeXs[i] == newHeadX &&
-                    _snakeYs[i] == newHeadY)
-                {
-                    return true;
-                }
-            }
-
-            return false;
+            return GetBoardItem(newHeadX, newHeadY);
         }
 
         public bool Extend()
         {
-            if (ActualLength < _maxLength - 1)
+            if (_actualLength < _maxLength - 1)
             {
-                DesiredLength++;
+                _desiredLength++;
                 return true;
             }
             return false;
