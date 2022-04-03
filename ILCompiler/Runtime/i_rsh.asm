@@ -28,7 +28,7 @@ i_rsh_loop:
 	RR H
 	RR L
 
-	DJNZ i_lsh_loop
+	DJNZ i_rsh_loop
 
 	LD E, A
 
@@ -39,7 +39,7 @@ i_rsh_end:
 	PUSH DE		; Put result back on stack
 	PUSH HL
 
-	EXX
+	EXX 
 	PUSH HL
 	EXX
 	RET
