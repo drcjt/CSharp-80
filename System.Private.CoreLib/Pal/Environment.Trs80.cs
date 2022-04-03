@@ -18,6 +18,9 @@ namespace System
         /// </summary>
         public static int TickCount => GetTickCount() * 25;
 
+        [DllImport(Libraries.Runtime, EntryPoint = "GETDATETIME")]
+        public static extern DateTime GetDateTime();
+
         public static char NewLine => '\n';
     }
 }

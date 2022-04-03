@@ -59,6 +59,7 @@
     <None Remove="Runtime\stoi.asm" />
     <None Remove="Runtime\ticks.asm" />
     <None Remove="Runtime\TRS80\cls.asm" />
+    <None Remove="Runtime\TRS80\getdatetime.asm" />
     <None Remove="Runtime\TRS80\print.asm" />
     <None Remove="Runtime\TRS80\printchr.asm" />
     <None Remove="Runtime\write.asm" />
@@ -105,6 +106,7 @@
     <EmbeddedResource Include="Runtime\TRS80\cls.asm" />
     <EmbeddedResource Include="Runtime\TRS80\print.asm" />
     <EmbeddedResource Include="Runtime\TRS80\printchr.asm" />
+    <EmbeddedResource Include="Runtime\TRS80\getdatetime.asm" />
     <EmbeddedResource Include="Runtime\write.asm" />
   </ItemGroup>
 
