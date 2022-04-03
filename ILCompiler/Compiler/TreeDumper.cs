@@ -63,13 +63,15 @@ namespace ILCompiler.Compiler
             Print($"storeind offset={entry.FieldOffset} size={entry.ExactSize}");
             _indent++;
             entry.Op1.Accept(this);
-            _indent++;
+            _indent--;
         }
 
         public void Visit(JumpTrueEntry entry)
         {
             Print($"jumptrue {entry.TargetLabel}");
+            _indent++;
             entry.Condition.Accept(this);
+            _indent--;
         }
 
         public void Visit(JumpEntry entry)
@@ -79,7 +81,9 @@ namespace ILCompiler.Compiler
 
         public void Visit(SwitchEntry entry)
         {
+            _indent++;
             entry.Op1.Accept(this);
+            _indent--;
             Print($"switch {entry.JumpTable}");
         }
 
