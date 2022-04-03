@@ -23,7 +23,7 @@ i_rsh:
 
 i_rsh_loop:
 
-	SRL D
+	SRA D
 	RRA
 	RR H
 	RR L
