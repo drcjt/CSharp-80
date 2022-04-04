@@ -64,7 +64,7 @@ namespace MiniBCL
             }
 
             var endTime = Environment.GetDateTime();
-            var elapsedTime = DateTimeToSeconds(endTime) - DateTimeToSeconds(startTime);
+            var elapsedTime = endTime.TotalSeconds - startTime.TotalSeconds;
 
             return elapsedTime;
         }

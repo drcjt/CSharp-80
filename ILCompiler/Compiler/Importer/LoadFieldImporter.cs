@@ -15,6 +15,12 @@ namespace ILCompiler.Compiler.Importer
             var fieldDefOrRef = instruction.Operand as IField;
             var fieldDef = fieldDefOrRef.ResolveFieldDef();
 
+            // Ensure fields have all offsets calculated
+            if (fieldDef.FieldOffset == null)
+            {
+                fieldDef.DeclaringType.ToTypeSig().GetExactSize();
+            }
+
             var fieldOffset = fieldDef.FieldOffset ?? 0;
 
             var obj = importer.PopExpression();
