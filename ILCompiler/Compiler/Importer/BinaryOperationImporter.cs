@@ -8,18 +8,18 @@ namespace ILCompiler.Compiler.Importer
 {
     public class BinaryOperationImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code)
+        public bool CanImport(Code opcode)
         {
-            return code == Code.Add ||
-                   code == Code.Sub ||
-                   code == Code.Mul ||
-                   code == Code.Div ||
-                   code == Code.Rem ||
-                   code == Code.Div_Un ||
-                   code == Code.Rem_Un ||
-                   code == Code.And ||
-                   code == Code.Or ||
-                   code == Code.Mul_Ovf_Un;
+            return opcode == Code.Add ||
+                   opcode == Code.Sub ||
+                   opcode == Code.Mul ||
+                   opcode == Code.Div ||
+                   opcode == Code.Rem ||
+                   opcode == Code.Div_Un ||
+                   opcode == Code.Rem_Un ||
+                   opcode == Code.And ||
+                   opcode == Code.Or ||
+                   opcode == Code.Mul_Ovf_Un;
         }
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)

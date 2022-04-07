@@ -8,7 +8,7 @@ namespace ILCompiler.Compiler.Importer
 {
     public class LoadFieldImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Ldfld;
+        public bool CanImport(Code opcode) => opcode == Code.Ldfld;
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {

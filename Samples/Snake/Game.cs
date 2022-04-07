@@ -117,7 +117,6 @@ namespace Snake
         private static unsafe void SetBoardItem(int* board, int x, int y, bool value)
         {
             int bitIndex = (y * 128) + x;
-            int bit = bitIndex % 32;
             int bitMask = 1 << bitIndex;
 
             if (value)
@@ -154,9 +153,7 @@ namespace Snake
                 {
                     Console.WriteLine("You lose");
 
-                    Thread.Sleep(5000);
-
-                    Console.Clear();
+                    break;
                 }
 
                 //fb.Render();

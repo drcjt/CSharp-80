@@ -31,7 +31,7 @@ namespace Snake
                 _direction = newDirection;
         }
 
-        private int* _board;
+        private readonly int* _board;
 
         public unsafe Snake(int x, int y, int* snakeXs, int* snakeYs, int* board, int maxLength, Direction direction)
         {
@@ -56,7 +56,6 @@ namespace Snake
         private readonly unsafe bool GetBoardItem(int x, int y)
         {
             int bitIndex = (y * 128) + x;
-            int bit = bitIndex % 32;
             int bitMask = 1 << bitIndex;
 
             return ((_board[bitIndex >> 5]) & bitMask) != 0;

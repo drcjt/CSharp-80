@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.Importer
 {
     public class LocallocImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Localloc;
+        public bool CanImport(Code opcode) => opcode == Code.Localloc;
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
