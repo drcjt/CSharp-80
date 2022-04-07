@@ -18,7 +18,8 @@ namespace ILCompiler.Compiler.Importer
                    code == Code.Div_Un ||
                    code == Code.Rem_Un ||
                    code == Code.And ||
-                   code == Code.Or;
+                   code == Code.Or ||
+                   code == Code.Mul_Ovf_Un;
         }
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
@@ -44,7 +45,19 @@ namespace ILCompiler.Compiler.Importer
                 throw new NotSupportedException($"Binary operation on type {kind} not supported");
             }
 
-            Operation binaryOp = Operation.Add + (instruction.OpCode.Code - Code.Add);
+            Operation binaryOp;
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Mul_Ovf_Un:
+                    // For now this maps to standard multiplication as we have no exception support
+                    binaryOp = Operation.Mul;
+                    break;
+
+                default:
+                    binaryOp = Operation.Add + (instruction.OpCode.Code - Code.Add);
+                    break;
+            }
+
             var binaryExpr = new BinaryOperator(binaryOp, isComparison: false, op1, op2, kind);
             importer.PushExpression(binaryExpr);
         }
