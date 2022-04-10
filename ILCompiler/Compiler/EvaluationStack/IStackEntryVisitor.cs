@@ -26,5 +26,6 @@
         public void Visit(FieldAddressEntry entry);
         public void Visit(SwitchEntry entry);
         public void Visit(AllocObjEntry entry);
+        public void Visit(LocalHeapEntry entry);
     }
 }

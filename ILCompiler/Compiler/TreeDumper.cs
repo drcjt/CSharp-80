@@ -5,18 +5,20 @@ namespace ILCompiler.Compiler
 {
     public class TreeDumper : IStackEntryVisitor
     {
-        private static int _indent;
+        private int _indent;
 
-        private StringBuilder _sb = new StringBuilder();
+        private readonly StringBuilder _sb = new StringBuilder();
 
         public string Dump(IList<BasicBlock> blocks)
         {
+            var stmtId = 0;
+
             _sb.Clear();
             foreach (var block in blocks)
             {
-                _sb.AppendLine($"Block {block.Label}");
+                _sb.AppendLine($"BLOCK {block.Label}");
 
-                _sb.Append($"Block successors: ");
+                _sb.Append($"BLOCK SUCCESSORS: ");
                 foreach (var successor in block.Successors)
                 {
                     _sb.Append($"${successor.Label}, ");
@@ -26,10 +28,11 @@ namespace ILCompiler.Compiler
                 foreach (var statement in block.Statements)
                 {
                     _indent = 0;
-                    _sb.AppendLine("▌ stmtExpr");
+                    _sb.AppendLine($"STMT{stmtId}");
                     _indent++;
 
                     statement.Accept(this);
+                    stmtId++;
                 }
             }
             return _sb.ToString();
@@ -47,12 +50,12 @@ namespace ILCompiler.Compiler
 
         public void Visit(Int32ConstantEntry entry)
         {
-            Print($"intconst {entry.Value}");
+            Print($"CNS_INT {entry.Value}");
         }
 
         public void Visit(StringConstantEntry entry)
         {
-            Print($"strconst {entry.Value}");
+            Print($"CNS_STR {entry.Value}");
         }
 
         public void Visit(StoreIndEntry entry)
@@ -60,7 +63,7 @@ namespace ILCompiler.Compiler
             _indent++;
             entry.Addr.Accept(this);
             _indent--;
-            Print($"storeind offset={entry.FieldOffset} size={entry.ExactSize}");
+            Print($"STORE_IND offset={entry.FieldOffset} size={entry.ExactSize}");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
@@ -68,7 +71,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(JumpTrueEntry entry)
         {
-            Print($"jumptrue {entry.TargetLabel}");
+            Print($"JCMP {entry.TargetLabel}");
             _indent++;
             entry.Condition.Accept(this);
             _indent--;
@@ -76,7 +79,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(JumpEntry entry)
         {
-            Print($"jump {entry.TargetLabel}");
+            Print($"JMP {entry.TargetLabel}");
         }
 
         public void Visit(SwitchEntry entry)
@@ -84,12 +87,12 @@ namespace ILCompiler.Compiler
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
-            Print($"switch {entry.JumpTable}");
+            Print($"SWITCH {entry.JumpTable}");
         }
 
         public void Visit(ReturnEntry entry)
         {
-            Print("return");
+            Print("RETURN");
             if (entry.Return != null)
             {
                 _indent++;
@@ -111,17 +114,17 @@ namespace ILCompiler.Compiler
 
         public void Visit(LocalVariableEntry entry)
         {
-            Print($"lclVar {entry.Kind} V{entry.LocalNumber}");
+            Print($"LCL_VAR {entry.Kind} V{entry.LocalNumber}");
         }
 
         public void Visit(LocalVariableAddressEntry entry)
         {
-            Print($"lclVarAddr V{entry.LocalNumber}");
+            Print($"LCL_VAR_ADDR V{entry.LocalNumber}");
         }
 
         public void Visit(StoreLocalVariableEntry entry)
         {
-            Print($"storelcl {entry.LocalNumber}");
+            Print($"STORE_LCL_VAR {entry.LocalNumber}");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
@@ -129,7 +132,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(CallEntry entry)
         {
-            Print($"call {entry.TargetMethod}");
+            Print($"CALL {entry.TargetMethod}");
             _indent++;
             foreach (var argument in entry.Arguments)
             {
@@ -151,7 +154,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(CastEntry entry)
         {
-            Print($"cast {entry.DesiredType}");
+            Print($"CAST {entry.DesiredType}");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
@@ -167,7 +170,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(IndirectEntry entry)
         {
-            Print($"ind {entry.Offset}");
+            Print($"IND {entry.Offset}");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
@@ -175,7 +178,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(FieldAddressEntry entry)
         {
-            Print($"fieldAddr {entry.Name}");
+            Print($"FLD_ADDR {entry.Name}");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
@@ -183,7 +186,15 @@ namespace ILCompiler.Compiler
 
         public void Visit(AllocObjEntry entry)
         {
-            Print($"allocObj {entry.Size}");
+            Print($"ALLOCOBJ {entry.Size}");
+        }
+
+        public void Visit(LocalHeapEntry entry)
+        {
+            Print($"LCLHEAP");
+            _indent++;
+            entry.Op1.Accept(this);
+            _indent--;
         }
     }
 }

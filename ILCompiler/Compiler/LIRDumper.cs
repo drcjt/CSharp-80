@@ -165,5 +165,11 @@ namespace ILCompiler.Compiler
         {
             _sb.AppendLine($"       allocObj {entry.Size}");
         }
+
+        public void Visit(LocalHeapEntry entry)
+        {
+            _sb.AppendLine($"       ┌──▌  t{entry.Op1.TreeID}");
+            _sb.AppendLine($"       lclheap");
+        }
     }
 }

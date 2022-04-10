@@ -102,5 +102,10 @@
         {
             _genericStackEntryVisitor.Visit<AllocObjEntry>(entry);
         }
+
+        public void Visit(LocalHeapEntry entry)
+        {
+            _genericStackEntryVisitor.Visit<LocalHeapEntry>(entry);
+        }
     }
 }
