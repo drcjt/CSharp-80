@@ -61,9 +61,9 @@ namespace ILCompiler.Compiler.Importer
             if (code != Code.Br)
             {
                 var op2 = importer.PopExpression();
-                if (op2.Kind != StackValueKind.Int32)
+                if (op2.Kind != StackValueKind.Int32 && op2.Kind != StackValueKind.NativeInt)
                 {
-                    throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
+                    throw new NotSupportedException("Boolean comparisons only supported using int and nativeint as underlying type");
                 }
 
                 StackEntry op1;
@@ -71,18 +71,24 @@ namespace ILCompiler.Compiler.Importer
                 if (code != Code.Brfalse && code != Code.Brtrue)
                 {
                     op1 = importer.PopExpression();
-                    if (op2.Kind != StackValueKind.Int32)
-                    {
-                        throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
-                    }
                     op = Operation.Eq + (code - Code.Beq);
+
+                    // If one of the values is a native int then cast the other to be native int too
+                    if (op1.Kind == StackValueKind.NativeInt && op2.Kind == StackValueKind.Int32)
+                    {
+                        op2 = new CastEntry(Common.TypeSystem.WellKnownType.Object, op2, op1.Kind);
+                    }
+                    else if (op1.Kind == StackValueKind.Int32 && op2.Kind == StackValueKind.NativeInt)
+                    {
+                        op1 = new CastEntry(Common.TypeSystem.WellKnownType.Object, op1, op2.Kind);
+                    }
                 }
                 else
                 {
                     op1 = new Int32ConstantEntry(0);
                     op = (code == Code.Brfalse) ? Operation.Eq : Operation.Ne;
                 }
-                op1 = new BinaryOperator(op, isComparison: true, op1, op2, StackValueKind.Int32);
+                op1 = new BinaryOperator(op, isComparison: true, op1, op2, op1.Kind);
                 importer.ImportAppendTree(new JumpTrueEntry(targetBlock.Label, op1));
             }
             else

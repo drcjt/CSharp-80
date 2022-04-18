@@ -34,6 +34,9 @@ namespace ILCompiler.Compiler.CodeGenerators
             { Tuple.Create(Operation.Le, StackValueKind.Int32), "i_le" },
             { Tuple.Create(Operation.Lt, StackValueKind.Int32), "i_lt" },
             { Tuple.Create(Operation.Ne, StackValueKind.Int32), "i_neq" },
+
+            { Tuple.Create(Operation.Ne, StackValueKind.NativeInt), "i_neq16" },
+            { Tuple.Create(Operation.Eq, StackValueKind.NativeInt), "i_eq16" },
         };
 
         public void GenerateCode(BinaryOperator entry, CodeGeneratorContext context)
@@ -50,6 +53,10 @@ namespace ILCompiler.Compiler.CodeGenerators
                     context.Assembler.Ld(R16.HL, 0);
                     context.Assembler.Adc(R16.HL, R16.HL);
                     context.Assembler.Push(R16.HL);     // LSW
+                }
+                else
+                {
+                    //throw new NotImplementedException($"Binary operator {entry.Operation} for kind {entry.Kind} not yet implemented");
                 }
             }
             else
