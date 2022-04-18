@@ -3,7 +3,8 @@
 ; Carry set if true
 
 i_eq:
-	POP IY
+	POP HL
+	EXX 
 
 	POP HL			; LSW
 	POP DE			; MSW
@@ -30,4 +31,6 @@ i_eq_2:
 	XOR A			; Clear carry flag
 
 i_eq_3:
-	JP (IY)
+	EXX
+	PUSH HL
+	RET
