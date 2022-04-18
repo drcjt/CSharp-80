@@ -34,6 +34,7 @@
     <None Remove="Runtime\i_div.asm" />
     <None Remove="Runtime\i_div_un.asm" />
     <None Remove="Runtime\i_eq.asm" />
+    <None Remove="Runtime\i_eq16.asm" />
     <None Remove="Runtime\i_ge.asm" />
     <None Remove="Runtime\i_gt.asm" />
     <None Remove="Runtime\i_le.asm" />
@@ -44,6 +45,7 @@
     <None Remove="Runtime\i_mul16.asm" />
     <None Remove="Runtime\i_neg.asm" />
     <None Remove="Runtime\i_neq.asm" />
+    <None Remove="Runtime\i_neq16.asm" />
     <None Remove="Runtime\i_not.asm" />
     <None Remove="Runtime\i_or.asm" />
     <None Remove="Runtime\i_rem.asm" />
@@ -70,6 +72,8 @@
     <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
     <EmbeddedResource Include="Runtime\CPM\print.asm" />
     <EmbeddedResource Include="Runtime\heapalloc.asm" />
+    <EmbeddedResource Include="Runtime\i_eq16.asm" />
+    <EmbeddedResource Include="Runtime\i_neq.asm" />
     <EmbeddedResource Include="Runtime\i_not.asm" />
     <EmbeddedResource Include="Runtime\i_or.asm" />
     <EmbeddedResource Include="Runtime\i_and.asm" />
@@ -102,7 +106,7 @@
     <EmbeddedResource Include="Runtime\i_gt.asm" />
     <EmbeddedResource Include="Runtime\i_le.asm" />
     <EmbeddedResource Include="Runtime\i_lt.asm" />
-    <EmbeddedResource Include="Runtime\i_neq.asm" />
+    <EmbeddedResource Include="Runtime\i_neq16.asm" />
     <EmbeddedResource Include="Runtime\TRS80\cls.asm" />
     <EmbeddedResource Include="Runtime\TRS80\print.asm" />
     <EmbeddedResource Include="Runtime\TRS80\printchr.asm" />
