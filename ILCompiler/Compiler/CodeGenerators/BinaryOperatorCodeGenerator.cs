@@ -24,6 +24,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             { Tuple.Create(Operation.Mul, StackValueKind.NativeInt), "i_mul16" },
             { Tuple.Create(Operation.Lsh, StackValueKind.NativeInt), "i_lsh16" },
             { Tuple.Create(Operation.Rsh, StackValueKind.NativeInt), "i_rsh16" },
+            { Tuple.Create(Operation.And, StackValueKind.NativeInt), "i_and16" },
         };
 
         private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> ComparisonOperatorMappings = new()
@@ -67,7 +68,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
                 else
                 {
-                    throw new NotImplementedException("Binary operator not yet implemented");
+                    throw new NotImplementedException($"Binary operator {entry.Operation} for kind {entry.Kind} not yet implemented");
                 }
             }
         }

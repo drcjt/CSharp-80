@@ -30,6 +30,7 @@
     <None Remove="Runtime\i_add.asm" />
     <None Remove="Runtime\i_add16.asm" />
     <None Remove="Runtime\i_and.asm" />
+    <None Remove="Runtime\i_and16.asm" />
     <None Remove="Runtime\i_cmp.asm" />
     <None Remove="Runtime\i_div.asm" />
     <None Remove="Runtime\i_div_un.asm" />
@@ -72,6 +73,7 @@
     <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
     <EmbeddedResource Include="Runtime\CPM\print.asm" />
     <EmbeddedResource Include="Runtime\heapalloc.asm" />
+    <EmbeddedResource Include="Runtime\i_and16.asm" />
     <EmbeddedResource Include="Runtime\i_eq16.asm" />
     <EmbeddedResource Include="Runtime\i_neq.asm" />
     <EmbeddedResource Include="Runtime\i_not.asm" />
