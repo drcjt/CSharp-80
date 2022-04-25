@@ -49,6 +49,7 @@
     <None Remove="Runtime\i_neq16.asm" />
     <None Remove="Runtime\i_not.asm" />
     <None Remove="Runtime\i_or.asm" />
+    <None Remove="Runtime\i_or16.asm" />
     <None Remove="Runtime\i_rem.asm" />
     <None Remove="Runtime\i_rem_un.asm" />
     <None Remove="Runtime\i_rsh.asm" />
@@ -77,6 +78,7 @@
     <EmbeddedResource Include="Runtime\i_eq16.asm" />
     <EmbeddedResource Include="Runtime\i_neq.asm" />
     <EmbeddedResource Include="Runtime\i_not.asm" />
+    <EmbeddedResource Include="Runtime\i_or16.asm" />
     <EmbeddedResource Include="Runtime\i_or.asm" />
     <EmbeddedResource Include="Runtime\i_and.asm" />
     <EmbeddedResource Include="Runtime\i_add16.asm" />

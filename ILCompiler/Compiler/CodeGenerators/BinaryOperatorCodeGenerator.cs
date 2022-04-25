@@ -25,6 +25,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             { Tuple.Create(Operation.Lsh, StackValueKind.NativeInt), "i_lsh16" },
             { Tuple.Create(Operation.Rsh, StackValueKind.NativeInt), "i_rsh16" },
             { Tuple.Create(Operation.And, StackValueKind.NativeInt), "i_and16" },
+            { Tuple.Create(Operation.Or, StackValueKind.NativeInt), "i_or16" },
         };
 
         private static readonly Dictionary<Tuple<Operation, StackValueKind>, string> ComparisonOperatorMappings = new()
