@@ -35,15 +35,15 @@ namespace ILCompiler.Compiler.CodeGenerators
                     context.Assembler.Push(R16.BC); // restore IX
                     context.Assembler.Pop(I16.IX);
                 }
-                else if (targetType?.Kind != StackValueKind.Int32)
-                {
-                    throw new NotImplementedException($"Unsupported return type {targetType?.Kind}");
-                }
                 else
                 {
                     context.Assembler.Pop(R16.DE);            // Copy return value into DE/IY
-                    context.Assembler.Pop(I16.IY);
-                }
+
+                    if (targetType?.Kind == StackValueKind.Int32)
+                    {
+                        context.Assembler.Pop(I16.IY);
+                    }
+                }                
             }
 
             // Unwind stack frame
@@ -101,7 +101,10 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             if (hasReturnValue && !entry.ReturnBufferArgIndex.HasValue)
             {
-                context.Assembler.Push(I16.IY);
+                if (targetType?.Kind == StackValueKind.Int32)
+                {
+                    context.Assembler.Push(I16.IY);
+                }
                 context.Assembler.Push(R16.DE);
             }
 

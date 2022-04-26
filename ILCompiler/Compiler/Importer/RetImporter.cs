@@ -27,9 +27,15 @@ namespace ILCompiler.Compiler.Importer
                     retNode.ReturnBufferArgIndex = context.Method.HasThis ? 1 : 0;
                     retNode.ReturnTypeExactSize = returnType.GetExactSize();
                 }
-                else if (value.Kind != StackValueKind.Int32)
+                else
                 {
-                    throw new NotSupportedException($"Unsupported Return type {value.Kind}");
+                    if (value.Kind != StackValueKind.Int32 
+                        && value.Kind != StackValueKind.NativeInt
+                        && value.Kind != StackValueKind.ByRef
+                        && value.Kind != StackValueKind.ObjRef)
+                    {
+                        throw new NotSupportedException($"Unsupported Return type {value.Kind}");
+                    }
                 }
 
                 retNode.Return = value;
