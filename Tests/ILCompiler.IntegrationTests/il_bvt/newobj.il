@@ -20,6 +20,7 @@
 
 	newobj instance void Test::.ctor()
 	ldc.i4.0	// TODO: change to ldnull once it's implemented
+	conv.i
 	ceq
 	brtrue fail	// fail if allocated objref is 0
 

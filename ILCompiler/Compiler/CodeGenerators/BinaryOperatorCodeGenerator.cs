@@ -39,6 +39,12 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             { Tuple.Create(Operation.Ne, StackValueKind.NativeInt), "i_neq16" },
             { Tuple.Create(Operation.Eq, StackValueKind.NativeInt), "i_eq16" },
+
+            { Tuple.Create(Operation.Ne, StackValueKind.ObjRef), "i_neq16" },
+            { Tuple.Create(Operation.Eq, StackValueKind.ObjRef), "i_eq16" },
+
+            { Tuple.Create(Operation.Ne, StackValueKind.ByRef), "i_neq16" },
+            { Tuple.Create(Operation.Eq, StackValueKind.ByRef), "i_eq16" },
         };
 
         public void GenerateCode(BinaryOperator entry, CodeGeneratorContext context)
