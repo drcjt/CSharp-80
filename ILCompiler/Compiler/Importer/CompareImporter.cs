@@ -19,11 +19,14 @@ namespace ILCompiler.Compiler.Importer
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var op2 = importer.PopExpression();
-            if (op2.Kind != StackValueKind.Int32)
+            var op1 = importer.PopExpression();
+
+            // TODO: Ideally want to compare based on stackvaluekind and not implementation sizes here
+            if (TypeList.GetExactSize(op1.Kind) != TypeList.GetExactSize(op2.Kind))
             {
-                throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
+                throw new NotSupportedException($"Boolean comparisons must have same size, {op1.Kind} and {op2.Kind} have different sizes");
             }
-            StackEntry op1;
+
             Operation op = Operation.Eq;
             switch (instruction.OpCode.Code)
             {
@@ -32,12 +35,7 @@ namespace ILCompiler.Compiler.Importer
                 case Code.Clt: op = Operation.Lt; break;
                 case Code.Clt_Un: op = Operation.Lt; break;
             }
-            op1 = importer.PopExpression();
-            if (op2.Kind != StackValueKind.Int32)
-            {
-                throw new NotSupportedException("Boolean comparisons only supported using int as underlying type");
-            }
-            op1 = new BinaryOperator(op, isComparison: true, op1, op2, StackValueKind.Int32);
+            op1 = new BinaryOperator(op, isComparison: true, op1, op2, op1.Kind);
             importer.PushExpression(op1);
         }
     }
