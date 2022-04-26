@@ -44,6 +44,11 @@ namespace ILCompiler.Compiler.Importer
             {
                 op1 = new CastEntry(wellKnownType, op1, op1.Kind);
             }
+            else if ((op1.Kind == StackValueKind.Int32 && wellKnownType == WellKnownType.UIntPtr) ||
+                     (op1.Kind == StackValueKind.Int32 && wellKnownType == WellKnownType.IntPtr))
+            {
+                op1 = new CastEntry(wellKnownType, op1, StackValueKind.NativeInt);
+            }
 
             importer.PushExpression(op1);
         }

@@ -60,7 +60,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 context.Assembler.Push(R16.HL);     // MSW
                 context.Assembler.Push(R16.DE);     // LSW
             }
-            else if (actualKind == StackValueKind.Int32 && desiredType == WellKnownType.Object)
+            else if (actualKind == StackValueKind.Int32 && IsPtrType(desiredType))
             {
                 context.Assembler.Pop(R16.HL);      // LSW
                 context.Assembler.Pop(R16.DE);      // MSW
@@ -71,6 +71,13 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 throw new NotImplementedException($"Implicit cast from {actualKind} to {desiredType} not supported");
             }
+        }
+
+        private static bool IsPtrType(WellKnownType type)
+        {
+            return type == WellKnownType.Object ||
+                   type == WellKnownType.IntPtr ||
+                   type == WellKnownType.UIntPtr;
         }
     }
 }
