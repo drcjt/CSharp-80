@@ -11,14 +11,22 @@ namespace ILCompiler.Compiler.Importer
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            var op2 = importer.PopExpression().As<Int32ConstantEntry>();
+            var op2 = importer.PopExpression();
 
-            if (op2.Kind != StackValueKind.Int32)
+            var allocSize = 0;
+            if (op2 is Int32ConstantEntry)
             {
-                throw new NotSupportedException("Localloc requires int size");
+                allocSize = op2.As<Int32ConstantEntry>().Value;
             }
-
-            var allocSize = op2.Value;
+            else if (op2 is CastEntry)
+            {
+                var castOp = op2.As<CastEntry>();
+                if (castOp.Op1 is Int32ConstantEntry)
+                {
+                    // TODO: Really need to use 16 bit version of this value
+                    allocSize = castOp.Op1.As<Int32ConstantEntry>().Value;
+                }
+            }
 
             // Ensure we don't allocate less than each stack entry size
             allocSize = RoundUp(allocSize, 4);
@@ -28,7 +36,7 @@ namespace ILCompiler.Compiler.Importer
 
             var op1 = new LocalVariableAddressEntry(lclNum);
 
-            importer.PushExpression(op1);
+            importer.PushExpression(op1);            
         }
 
         /// <summary>
