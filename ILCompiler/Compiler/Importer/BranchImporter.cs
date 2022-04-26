@@ -74,6 +74,7 @@ namespace ILCompiler.Compiler.Importer
                     op1 = importer.PopExpression();
                     op = Operation.Eq + (code - Code.Beq);
 
+                    // TODO: really need to check valuetypes too as valuetype can still be int32 or int16 sized
                     if (op1.Kind != StackValueKind.ValueType && op2.Kind != StackValueKind.ValueType)
                     {
                         // If one of the values is a native int then cast the other to be native int too
