@@ -61,9 +61,10 @@ namespace ILCompiler.Compiler.Importer
             if (code != Code.Br)
             {
                 var op2 = importer.PopExpression();
-                if (op2.Kind != StackValueKind.Int32 && op2.Kind != StackValueKind.NativeInt)
+                if (op2.Kind != StackValueKind.Int32 && op2.Kind != StackValueKind.NativeInt 
+                    && op2.Kind != StackValueKind.ByRef && op2.Kind != StackValueKind.ObjRef)
                 {
-                    throw new NotSupportedException("Boolean comparisons only supported using int and nativeint as underlying type");
+                    throw new NotSupportedException($"Boolean comparisons with op2 kind of {op2.Kind} not supported");
                 }
 
                 StackEntry op1;
@@ -73,14 +74,17 @@ namespace ILCompiler.Compiler.Importer
                     op1 = importer.PopExpression();
                     op = Operation.Eq + (code - Code.Beq);
 
-                    // If one of the values is a native int then cast the other to be native int too
-                    if (op1.Kind == StackValueKind.NativeInt && op2.Kind == StackValueKind.Int32)
+                    if (op1.Kind != StackValueKind.ValueType && op2.Kind != StackValueKind.ValueType)
                     {
-                        op2 = new CastEntry(Common.TypeSystem.WellKnownType.Object, op2, op1.Kind);
-                    }
-                    else if (op1.Kind == StackValueKind.Int32 && op2.Kind == StackValueKind.NativeInt)
-                    {
-                        op1 = new CastEntry(Common.TypeSystem.WellKnownType.Object, op1, op2.Kind);
+                        // If one of the values is a native int then cast the other to be native int too
+                        if (TypeList.GetExactSize(op1.Kind) == 2 && TypeList.GetExactSize(op2.Kind) == 4)
+                        {
+                            op2 = new CastEntry(Common.TypeSystem.WellKnownType.Object, op2, op1.Kind);
+                        }
+                        else if (TypeList.GetExactSize(op1.Kind) == 4 && TypeList.GetExactSize(op2.Kind) == 2)
+                        {
+                            op1 = new CastEntry(Common.TypeSystem.WellKnownType.Object, op1, op2.Kind);
+                        }
                     }
                 }
                 else
