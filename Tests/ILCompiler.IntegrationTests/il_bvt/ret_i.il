@@ -27,7 +27,6 @@
 	ldc.i4 0xFF
 	stloc 1
 	ldloc 0
-	ldloc 1
 	ldloca 1
 	call instance int32& _ret::ret_test(int32&)
 	ldloca 1
