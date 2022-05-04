@@ -15,13 +15,19 @@ i_mul16:
     ld a, 16
 
 i_mul16_1:
-    add hl, hl
-    rl e
-    rl d
-    jp nc, i_mul16_2
-    inc de
+    srl b
+    rr c
+    jr nc, i_mul16_2
+
+    add hl, de
+
 i_mul16_2:
+    ex de,hl
+    add hl, hl
+    ex de, hl
+
     dec a
+
     jp nz, i_mul16_1
 
     push hl
