@@ -112,7 +112,7 @@ namespace ILCompiler.Compiler
                     StringBuilder sb = new StringBuilder();
                     foreach (var lclVar in _localVariableTable)
                     {
-                        sb.AppendLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Kind}");
+                        sb.AppendLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Kind} {lclVar.ExactSize}");
 
                         lclNum++;
                     }
