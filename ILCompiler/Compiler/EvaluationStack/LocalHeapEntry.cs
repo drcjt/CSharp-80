@@ -6,7 +6,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public StackEntry Op1 { get; }
 
-        public LocalHeapEntry(StackEntry op1, StackValueKind objKind) : base(objKind)
+        public LocalHeapEntry(StackEntry op1) : base(StackValueKind.NativeInt, 2)
         {
             Op1 = op1;
         }
@@ -18,7 +18,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public override StackEntry Duplicate()
         {
-            return new LocalHeapEntry(Op1, Kind);
+            return new LocalHeapEntry(Op1);
         }
     }
 }

@@ -17,22 +17,20 @@
 	stloc 0
 	ldloc 0
 	ldc.i4 0x8
-	// TODO: Uncomment when conv.i implemented
-	//conv.i
+	conv.i
 	stind.i
 	ldloc 0
 	ldind.i
 	ldc.i4 0x8
-	// TODO: Uncomment when conv.i implemented
-	//conv.i
+	conv.i
 	bne.un fail
+
 
 	ldc.i4	0x1
 	localloc
 	stloc 0
 	ldloc 0
 	ldc.i4 0x99
-
 	// TODO: Uncomment when conv.i1 implemented
 	//conv.i1
 	stind.i1
@@ -43,7 +41,6 @@
 	// TODO: Uncomment when conv.i1 implemented
 	//conv.i1
 	bne.un fail
-
 	ldc.i4	0x2
 	localloc
 	stloc 0
