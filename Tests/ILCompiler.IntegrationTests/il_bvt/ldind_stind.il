@@ -7,7 +7,7 @@
 .method public static int32 Main() {
 .entrypoint
 .maxstack 10
-.locals (int8, int16, int32)
+.locals (int8, int16, int32, int32*)
 	ldloca	0
 	ldc.i4 0x00000011
 	stind.i1
@@ -35,6 +35,21 @@
 	ldloca 2
 	ldind.i4
 	ldc.i4 0x44444444
+	ceq
+	brfalse fail
+
+	ldloca 3
+	ldloca 2
+	stind.i
+
+	ldloca 3
+	ldind.i
+	ldc.i4 0x55555555
+	stind.i4
+
+	ldloca 2
+	ldind.i4
+	ldc.i4 0x55555555
 	ceq
 	brfalse fail
 

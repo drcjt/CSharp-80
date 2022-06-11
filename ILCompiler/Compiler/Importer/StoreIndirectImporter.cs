@@ -15,13 +15,22 @@ namespace ILCompiler.Compiler.Importer
             var value = importer.PopExpression();
             var addr = importer.PopExpression();
 
-            if (value.Kind != StackValueKind.Int32)
+            if (addr.Kind != StackValueKind.NativeInt 
+                && addr.Kind != StackValueKind.ByRef
+                && addr.Kind != StackValueKind.ObjRef)
             {
-                throw new NotSupportedException();
+                throw new NotSupportedException($"Store indirect unsupported address of kind {addr.Kind}");
             }
 
-            // TODO: Can this be optimised to copy less data if Stind_I1, Stind_I2???
-            WellKnownType type = WellKnownType.Int32;
+            if (value.Kind != StackValueKind.Int32 
+                && value.Kind != StackValueKind.NativeInt
+                && value.Kind != StackValueKind.ByRef
+                && value.Kind != StackValueKind.ObjRef)
+            {
+                throw new NotSupportedException($"Cannot store indirect value of kind {value.Kind}");
+            }
+
+            WellKnownType type = GetWellKnownType(instruction);            
             int exactSize = type.GetWellKnownTypeSize();
 
             importer.ImportAppendTree(new StoreIndEntry(addr, value, type, fieldOffset: 0, exactSize));
@@ -34,7 +43,7 @@ namespace ILCompiler.Compiler.Importer
                 Code.Stind_I1 => WellKnownType.SByte,
                 Code.Stind_I2 => WellKnownType.Int16,
                 Code.Stind_I4 => WellKnownType.Int32,
-                Code.Stind_I => WellKnownType.Int32,
+                Code.Stind_I => WellKnownType.Int16,
                 _ => throw new NotImplementedException(),
             };
             return type;

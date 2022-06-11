@@ -14,8 +14,13 @@ namespace ILCompiler.Compiler.Importer
         {
             var type = GetWellKnownType(instruction.OpCode.Code);
             var addr = importer.PopExpression();
-            // TODO: Can this be optimised for I1 & I2??
-            var node = new IndirectEntry(addr, StackValueKind.Int32, null); // type.GetWellKnownTypeSize());
+
+            var exactSize = type.GetWellKnownTypeSize();
+            var desiredSize = instruction.OpCode.Code == Code.Ldind_I ? 2 : 4;
+
+            var kind = instruction.OpCode.Code == Code.Ldind_I ? StackValueKind.NativeInt : StackValueKind.Int32;
+
+            var node = new IndirectEntry(addr, kind, exactSize, desiredSize);
             importer.PushExpression(node);
         }
 
@@ -26,7 +31,7 @@ namespace ILCompiler.Compiler.Importer
                 Code.Ldind_I1 => WellKnownType.SByte,
                 Code.Ldind_I2 => WellKnownType.Int16,
                 Code.Ldind_I4 => WellKnownType.Int32,
-                Code.Ldind_I => WellKnownType.Int32,
+                Code.Ldind_I => WellKnownType.Int16,
                 _ => throw new NotImplementedException(),
             };
         }

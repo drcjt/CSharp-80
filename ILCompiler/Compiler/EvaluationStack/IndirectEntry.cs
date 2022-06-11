@@ -9,15 +9,18 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public uint Offset { get; }
 
-        public IndirectEntry(StackEntry op1, StackValueKind kind, int? exactSize, uint offset = 0) : base(kind, exactSize)
+        public int DesiredSize { get; }
+
+        public IndirectEntry(StackEntry op1, StackValueKind kind, int? exactSize, int desiredSize = 4, uint offset = 0) : base(kind, exactSize)
         {
             Op1 = op1;
             Offset = offset;
+            DesiredSize = desiredSize;
         }
 
         public override StackEntry Duplicate()
         {
-            return new IndirectEntry(Op1.Duplicate(), Kind, ExactSize, Offset);
+            return new IndirectEntry(Op1.Duplicate(), Kind, ExactSize, DesiredSize, Offset);
         }
 
         public override void Accept(IStackEntryVisitor visitor)
