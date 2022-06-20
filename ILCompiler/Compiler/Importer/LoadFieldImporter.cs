@@ -53,8 +53,9 @@ namespace ILCompiler.Compiler.Importer
             }
 
             var kind = fieldDef.FieldType.GetStackValueKind();
-            // TODO: is using a desired size of 4 correct here? What if the field is a pointer field for example
-            var node = new IndirectEntry(obj, kind, fieldDef.FieldType.GetExactSize(), 4, fieldOffset);
+            var fieldSize = fieldDef.FieldType.GetExactSize();
+
+            var node = new IndirectEntry(obj, kind, fieldSize, fieldSize, fieldOffset);
             importer.PushExpression(node);
         }
     }

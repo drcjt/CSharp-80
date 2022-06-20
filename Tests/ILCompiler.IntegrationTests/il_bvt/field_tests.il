@@ -7,13 +7,15 @@
 extends System.ValueType {
 .field public int32 X
 .field public int32 Y
+.field public int32* Ptr
 }
 .class field_tests {
 .method public static int32 Main() {
 .entrypoint
 .maxstack 10
 .locals init (
-[0] valuetype SimpleStruct 'vector'
+[0] valuetype SimpleStruct 'vector',
+[1] int32
 )
 
    ldloca.s 0
@@ -24,6 +26,13 @@ extends System.ValueType {
    ldc.i4.4
    stfld int32 SimpleStruct::Y
 
+   ldc.i4 25
+   stloc.1
+
+   ldloca.s 0
+   ldloca.s 1
+   stfld int32* SimpleStruct::Ptr   
+
    ldloc.0
    ldfld int32 SimpleStruct::X
    ldc.i4.3
@@ -33,6 +42,13 @@ extends System.ValueType {
    ldloc.0
    ldfld int32 SimpleStruct::Y
    ldc.i4.4
+   ceq
+   brfalse fail
+
+   ldloc.0
+   ldfld int32* SimpleStruct::Ptr
+   ldind.i4
+   ldloc.1
    ceq
    brfalse fail
 
