@@ -120,7 +120,7 @@ namespace CSharp80.Tests.BVT
                     var targetFilePath = Path.Combine(@".\il_bvt", Path.GetFileName(file));
                     File.Copy(file, targetFilePath, true);
 
-                    yield return new TestCaseData(file).SetName(Path.GetFileNameWithoutExtension(file));
+                    yield return new TestCaseData(targetFilePath).SetName(Path.GetFileNameWithoutExtension(targetFilePath));
                 }
             }
         }
