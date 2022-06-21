@@ -115,6 +115,11 @@ namespace CSharp80.Tests.BVT
                 var ilFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, @".\..\..\..\il_bvt");
                 var files = Directory.GetFiles(ilFilePath, "*.il");
 
+                if (!Directory.Exists(@".\il_bvt"))
+                {
+                    Directory.CreateDirectory(@".\il_bvt");
+                }
+
                 foreach (var file in files)
                 {
                     var targetFilePath = Path.Combine(@".\il_bvt", Path.GetFileName(file));
