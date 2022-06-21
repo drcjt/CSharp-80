@@ -78,7 +78,7 @@ namespace CSharp80.Tests.BVT
 
         private void Assemble(string ilFileName)
         {
-            var ilAsmPath = @"%USERPROFILE%\.nuget\packages\microsoft.netcore.ilasm\5.0.0\runtimes\native\ilasm.exe";
+            var ilAsmPath = @"%USERPROFILE%\.nuget\packages\microsoft.netcore.ilasm\6.0.0\runtimes\native\ilasm.exe";
             ilAsmPath = Environment.ExpandEnvironmentVariables(ilAsmPath);
 
             RunProcess(ilAsmPath, ilFileName);
