@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 
 namespace CSharp80.Tests.BVT
 {
@@ -65,10 +66,13 @@ namespace CSharp80.Tests.BVT
 
         private void CompileIL(string ilFileName)
         {
+            var assemblyConfigurationAttribute = typeof(ILBvtTests).Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
+            var buildConfigurationName = assemblyConfigurationAttribute?.Configuration;
+
             var asmFileName = Path.ChangeExtension(ilFileName, "asm");
             var exeFileName = Path.ChangeExtension(ilFileName, "exe");
 
-            var corelibPath = Path.Combine(SolutionPath, @".\System.Private.CoreLib\bin\debug\net6.0\System.Private.CoreLib.dll");
+            var corelibPath = Path.Combine(SolutionPath, $@".\System.Private.CoreLib\bin\{buildConfigurationName}\net6.0\System.Private.CoreLib.dll");
 
             var ilCompilerPath = @"ILCompiler.exe";
             var arguments = $"--ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {corelibPath} --outputFile {asmFileName} {exeFileName}";
