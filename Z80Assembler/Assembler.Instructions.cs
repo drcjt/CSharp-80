@@ -24,6 +24,12 @@ namespace Z80Assembler
             AddInstruction(new Instruction(Opcode.Call, string.Format("{0:X}H", target)));
         }
 
+        public void Rst(UInt16 target)
+        {
+            AddInstruction(new Instruction(Opcode.Rst, string.Format("{0:X}H", target)));
+        }
+
+
         public void Pop(Register target)
         {
             AddInstruction(new Instruction(Opcode.Pop, target.ToString()));

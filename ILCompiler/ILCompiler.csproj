@@ -67,6 +67,10 @@
     <None Remove="Runtime\TRS80\print.asm" />
     <None Remove="Runtime\TRS80\printchr.asm" />
     <None Remove="Runtime\write.asm" />
+    <None Remove="Runtime\ZXSpectrum\cls.asm" />
+    <None Remove="Runtime\ZXSpectrum\getdatetime.asm" />
+    <None Remove="Runtime\ZXSpectrum\print.asm" />
+    <None Remove="Runtime\ZXSpectrum\printchr.asm" />
   </ItemGroup>
 
   <ItemGroup>
@@ -116,6 +120,10 @@
     <EmbeddedResource Include="Runtime\TRS80\printchr.asm" />
     <EmbeddedResource Include="Runtime\TRS80\getdatetime.asm" />
     <EmbeddedResource Include="Runtime\write.asm" />
+    <EmbeddedResource Include="Runtime\ZXSpectrum\cls.asm" />
+    <EmbeddedResource Include="Runtime\ZXSpectrum\getdatetime.asm" />
+    <EmbeddedResource Include="Runtime\ZXSpectrum\print.asm" />
+    <EmbeddedResource Include="Runtime\ZXSpectrum\printchr.asm" />
   </ItemGroup>
 
   <ItemGroup>
@@ -131,7 +139,7 @@
   </ItemGroup>
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="copy /a $(ProjectDir)Runtime\*.asm $(ProjectDir)csharprt.asm&#xD;&#xA;copy /a $(ProjectDir)Runtime\CPM\*.asm $(ProjectDir)cpmrt.asm&#xD;&#xA;copy /a $(ProjectDir)Runtime\TRS80\*.asm $(ProjectDir)trs80rt.asm" />
+    <Exec Command="copy /a $(ProjectDir)Runtime\*.asm $(ProjectDir)csharprt.asm&#xD;&#xA;copy /a $(ProjectDir)Runtime\CPM\*.asm $(ProjectDir)cpmrt.asm&#xD;&#xA;copy /a $(ProjectDir)Runtime\TRS80\*.asm $(ProjectDir)trs80rt.asm&#xD;&#xA;copy /a $(ProjectDir)Runtime\ZXSpectrum\*.asm $(ProjectDir)zxspectrum.asm" />
   </Target>
 
   <Target Name="PublishAll" BeforeTargets="GenerateNuspec">

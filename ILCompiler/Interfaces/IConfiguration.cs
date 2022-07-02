@@ -1,4 +1,6 @@
-﻿namespace ILCompiler.Interfaces
+﻿using ILCompiler.Compiler;
+
+namespace ILCompiler.Interfaces
 {
     public interface IConfiguration
     {
@@ -8,7 +10,7 @@
         public bool PrintReturnCode { get; set; }
         public string CorelibPath { get; set; }
         public bool IntegrationTests { get; set; }
-        public bool TargetCpm { get; set; }
+        public TargetArchitecture TargetArchitecture { get; set; }
         public int StackStart { get; set; }
     }
 }

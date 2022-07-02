@@ -55,7 +55,7 @@ namespace Z80Assembler
             return new Instruction(Opcode.Ret);
         }
 
-        public static Instruction Org(short address)
+        public static Instruction Org(ushort address)
         {
             return new Instruction(Opcode.Org, string.Format("{0:X}H", address));
         }

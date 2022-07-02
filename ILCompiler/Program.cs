@@ -1,4 +1,5 @@
-﻿using ILCompiler.Interfaces;
+﻿using ILCompiler.Compiler;
+using ILCompiler.Interfaces;
 using ILCompiler.IoC;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -65,7 +66,7 @@ namespace ILCompiler
                 new Option<string>(new[] { "-cl", "--corelibPath" }, "Core lib path"),
                 new Option<bool>(new[] { "-it", "--integrationTests" }, "Compile for integration tests" ),
                 new Option<bool>(new[] { "-d", "--dumpIRTrees" }, "Dump IR trees"),
-                new Option<bool>(new[] { "-cpm", "--targetCpm" }, "Target Cpm"),
+                new Option<TargetArchitecture>(new[] { "-a", "--targetArchitecture" }, "Target Architecture"),
                 new Option<int>(new[] { "-ss", "--stackStart" }, "Stack Start Address"),
                 new Argument<FileInfo>("inputFilePath"),
             };
@@ -82,7 +83,7 @@ namespace ILCompiler
                     configuration.PrintReturnCode = parsedConfiguration.PrintReturnCode;
                     configuration.IntegrationTests = parsedConfiguration.IntegrationTests;
                     configuration.DontInlineRuntime = parsedConfiguration.DontInlineRuntime;
-                    configuration.TargetCpm = parsedConfiguration.TargetCpm;
+                    configuration.TargetArchitecture = parsedConfiguration.TargetArchitecture;
                     configuration.StackStart = parsedConfiguration.StackStart;
                 }
             );

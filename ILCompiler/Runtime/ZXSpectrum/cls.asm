@@ -1,0 +1,5 @@
+CLS:
+	PUSH AF
+	CALL 0DAFH
+	POP AF
+	RET

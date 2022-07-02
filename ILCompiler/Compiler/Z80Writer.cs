@@ -36,26 +36,20 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private short GetOrgAddress()
-        {
-            if (_configuration.IntegrationTests)
+        private ushort GetOrgAddress() =>
+            _configuration.TargetArchitecture switch
             {
-                return 0x0000;
-            }
-            if (_configuration.TargetCpm)
-            {
-                return 0x100;
-            }
-            return 0x5200;
-        }
+                TargetArchitecture.TRS80 => 0x5200,
+                TargetArchitecture.CPM => 0x100,
+                TargetArchitecture.ZXSpectrum => 0x8000,
+                _ => throw new ArgumentException("Invalid target architecture enum value")
+            };
 
         private void OutputProlog(MethodDef entryMethod)
         {
             _out.WriteLine($"; INPUT FILE {_inputFilePath.ToUpper()}");
             _out.WriteLine($"; {DateTime.Now}");
             _out.WriteLine();
-
-            var org = GetOrgAddress();
 
             _out.WriteLine(Instruction.Org(GetOrgAddress()));
             _out.WriteLine(new LabelInstruction("ENTRY"));
@@ -103,13 +97,13 @@ namespace ILCompiler.Compiler
             if (_configuration.DontInlineRuntime)
             {
                 _out.WriteLine("include csharprt.asm");
-                if (_configuration.TargetCpm)
+
+                switch (_configuration.TargetArchitecture)
                 {
-                    _out.WriteLine("include cpmrt.asm");
-                }
-                else
-                {
-                    _out.WriteLine("include trs80rt.asm");
+                    case TargetArchitecture.TRS80: _out.WriteLine("include trs80rt.asm"); break;
+                    case TargetArchitecture.CPM: _out.WriteLine("include cpmrt.asm"); break;
+                    case TargetArchitecture.ZXSpectrum: _out.WriteLine("include zxspectrum.asm"); break;
+                    default: throw new ArgumentException("Invalid target architecture enum value");
                 }
             }
 
@@ -201,8 +195,9 @@ namespace ILCompiler.Compiler
             string[] resourceNames = GetType().Assembly.GetManifestResourceNames();
             foreach (string resourceName in resourceNames)
             {
-                if (resourceName.StartsWith("ILCompiler.Runtime.TRS80") && _configuration.TargetCpm) continue;
-                if (resourceName.StartsWith("ILCompiler.Runtime.CPM") && !_configuration.TargetCpm) continue;
+                if (resourceName.StartsWith("ILCompiler.Runtime.TRS80") && _configuration.TargetArchitecture != TargetArchitecture.TRS80) continue;
+                if (resourceName.StartsWith("ILCompiler.Runtime.CPM") && _configuration.TargetArchitecture != TargetArchitecture.CPM) continue;
+                if (resourceName.StartsWith("ILCompiler.Runtime.ZXSpectrum") && _configuration.TargetArchitecture != TargetArchitecture.ZXSpectrum) continue;
 
                 using (Stream? stream = GetType().Assembly.GetManifestResourceStream(resourceName))
                 {
