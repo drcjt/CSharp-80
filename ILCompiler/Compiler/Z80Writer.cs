@@ -36,14 +36,20 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private ushort GetOrgAddress() =>
-            _configuration.TargetArchitecture switch
+        private ushort GetOrgAddress()
+        {
+            if (_configuration.IntegrationTests)
             {
-                TargetArchitecture.TRS80 => 0x5200,
-                TargetArchitecture.CPM => 0x100,
-                TargetArchitecture.ZXSpectrum => 0x8000,
-                _ => throw new ArgumentException("Invalid target architecture enum value")
-            };
+                return 0x0000;
+            }
+            switch (_configuration.TargetArchitecture)
+            {
+                case TargetArchitecture.TRS80: return 0x5200;
+                case TargetArchitecture.CPM: return 0x100;
+                case TargetArchitecture.ZXSpectrum: return 0x8000;
+                default: throw new ArgumentException("Invalid target architecture enum value");
+            }
+         }
 
         private void OutputProlog(MethodDef entryMethod)
         {
