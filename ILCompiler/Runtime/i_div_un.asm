@@ -18,7 +18,7 @@
    ; uses  : af, bc, de, hl, bc', de', hl'
 
 i_div_un:
-    pop iy
+    pop bc
 
     exx
     pop hl      ; LSW
@@ -26,6 +26,8 @@ i_div_un:
     exx
     pop hl      ; LSW
     pop de      ; MSW
+
+    push bc
 
    ld a,d
    or e
@@ -35,10 +37,13 @@ i_div_un:
 
    call l0_small_divu_32_32x32
 
+   pop bc
+
    push de      ; MSW
    push hl      ; LSW
 
-   jp (iy)
+   push bc
+   ret
 
 l0_small_divu_32_32x32:
 
@@ -122,4 +127,4 @@ divide_zero:
 ; TODO: this should be putting some values back on the stack too!
     dec de
     scf
-    jp (iy)
+    ret

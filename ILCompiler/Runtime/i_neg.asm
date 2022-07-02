@@ -1,5 +1,5 @@
 i_neg:
-	pop iy	; save return address
+	pop bc	; save return address
 
 	pop hl
 	pop de
@@ -7,7 +7,8 @@ i_neg:
 	push de
 	push hl
 
-	jp (iy)
+	push bc
+	ret
 
 ; negate dehl
 ;

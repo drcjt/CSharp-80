@@ -18,7 +18,7 @@
    ; uses  : af, bc, de, hl, bc', de', hl'
 
 i_rem:
-    pop iy
+    pop bc
 
     exx
     pop hl
@@ -26,6 +26,8 @@ i_rem:
     exx
     pop hl
     pop de
+
+    push bc
 
    ld a,d
    or e
@@ -35,15 +37,18 @@ i_rem:
 
    call l0_small_div_32_32x32
 
+   pop bc
+
    exx
    push de
    push hl
    exx
 
-   jp (iy)
+   push bc
+   ret
 
 i_rem_divide_zero:
 
     dec de
     scf
-    jp (iy)
+    ret

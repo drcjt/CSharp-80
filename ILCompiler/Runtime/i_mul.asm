@@ -5,7 +5,7 @@
 ;
 
 i_mul:
-    pop iy                  ; save return address into iy
+    pop hl                  ; save return address into hl
 
                             ; populate bc from stack as lsw, b'c' as msw
     pop bc                  ; from stack
@@ -17,6 +17,8 @@ i_mul:
     exx
     pop de
     exx
+
+    push hl
 
     AND     A               ; RESET CARRY FLAG
     SBC     HL,HL           ; LOWER RESULT = 0
@@ -44,9 +46,12 @@ i_mul_2:
     DJNZ    i_mul_1
     EXX
 
+    pop bc
+
     exx
     push hl                 ; put h'l'hl
     exx                     ; onto stack
     push hl                 ; as result
 
-    JP (IY)
+    push bc
+    ret

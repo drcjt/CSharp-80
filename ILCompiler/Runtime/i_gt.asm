@@ -2,7 +2,7 @@
 ; Entry: primary, secondary on stack
 ; Exit: Carry set if true
 i_gt:
-	POP IY
+	POP BC
 
 	POP HL
 	POP DE
@@ -15,6 +15,8 @@ i_gt:
 	LD A, L
 
 	EXX
+
+	PUSH BC
 
 	SUB L
 	LD L, A
@@ -52,8 +54,9 @@ i_gt_1:
 	LD HL, 1
 
 	JP NC, i_gt_nc
-	JP (IY)
+	RET
 
 i_gt_nc:
 	DEC L
-	JP (IY)
+
+	RET

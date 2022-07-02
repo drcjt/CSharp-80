@@ -37,11 +37,13 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
                 else
                 {
-                    context.Assembler.Pop(R16.DE);            // Copy return value into DE/IY
+                    context.Assembler.Pop(R16.DE);            // Copy return value into DE/DE'
 
                     if (targetType?.Kind == StackValueKind.Int32)
                     {
-                        context.Assembler.Pop(I16.IY);
+                        context.Assembler.Exx();
+                        context.Assembler.Pop(R16.DE);
+                        context.Assembler.Exx();
                     }
                 }                
             }
@@ -103,7 +105,9 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 if (targetType?.Kind == StackValueKind.Int32)
                 {
-                    context.Assembler.Push(I16.IY);
+                    context.Assembler.Exx();
+                    context.Assembler.Push(R16.DE);
+                    context.Assembler.Exx();
                 }
                 context.Assembler.Push(R16.DE);
             }

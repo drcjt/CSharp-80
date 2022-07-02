@@ -20,6 +20,7 @@
         public static readonly Opcode Add = new("Add");
         public static readonly Opcode Adc = new("Adc");
         public static readonly Opcode Ex = new("Ex");
+        public static readonly Opcode Exx = new("Exx");
         public static readonly Opcode Or = new("Or");
         public static readonly Opcode Jp = new("Jp");
         public static readonly Opcode Sbc = new("Sbc");

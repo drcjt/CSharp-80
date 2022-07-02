@@ -31,7 +31,6 @@ LTOA:
     PUSH AF
 	PUSH BC
 	PUSH DE
-    PUSH IY
 	PUSH IX
 
 	BIT 7, D        ; Test if long is negative
@@ -61,14 +60,12 @@ ULTOA:
     PUSH AF
 	PUSH BC
 	PUSH DE
-    PUSH IY
 	PUSH IX
 
 LTOA2:
 	CALL B2D32
 	CALL PRINT
 	POP IX
-	POP IY
 	POP DE
 	POP BC
 	POP AF

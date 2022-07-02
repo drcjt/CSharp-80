@@ -2,7 +2,7 @@
 ; Returns non-zero int32 on stack if key pressed
 
 KEYAVAIL:
-	POP IY	; return address
+	POP BC	; return address
 
 	LD HL, 0
 	PUSH HL
@@ -11,4 +11,5 @@ KEYAVAIL:
 	LD H, 0
 	PUSH HL
 
-	JP (IY)
+	PUSH BC
+	RET

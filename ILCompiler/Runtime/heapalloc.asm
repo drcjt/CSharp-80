@@ -5,10 +5,12 @@
 HEAPNEXT:	DB '  '
 
 heapalloc:	
-	POP IY		; Save return address
+	POP BC		; Save return address
 
 	; get size of memory to allocate
 	POP DE		; LSW first
+
+	PUSH BC		; put return address back
 
 	; Get next available heap address into HL & BC
 	LD HL, (HEAPNEXT)
@@ -19,9 +21,13 @@ heapalloc:
 	ADD HL, DE
 	LD (HEAPNEXT), HL	; Store new next available address in heap
 
+	POP HL;		Get return address
+
 	; Put address of memory allocated back on the stack
 	LD DE, 0
 	PUSH DE		; MSW first	- always 0 as we only have 64k of addressable memory
 	PUSH BC		; LSW next - allocated heap memory address
 
-	JP (IY)
+	PUSH HL;	put return address back
+
+	RET

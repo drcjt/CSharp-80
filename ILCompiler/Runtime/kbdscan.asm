@@ -1,5 +1,5 @@
 KBDSCAN:
-	POP IY	; return address
+	POP BC	; return address
 
 	CALL 2BH
 
@@ -10,4 +10,5 @@ KBDSCAN:
 	LD L, A		; The key that was pressed if any
 	PUSH HL
 
-	JP (IY)
+	PUSH BC
+	RET

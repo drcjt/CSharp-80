@@ -2,7 +2,7 @@
 ; Entry: primary, secondary on stack
 ; Exit: Carry set if true
 i_lt:
-	POP IY
+	POP BC
 
 	POP HL
 	POP DE
@@ -15,6 +15,8 @@ i_lt:
 	LD A, L
 
 	EXX
+
+	PUSH BC
 
 	SUB L
 	LD L, A
@@ -55,8 +57,8 @@ i_lt_1:
 
 	CCF
 	JP NC, i_lt_nc
-	JP (IY)
+	RET
 
 i_lt_nc:
 	DEC L
-	JP (IY)
+	RET
