@@ -1,9 +1,0 @@
-<Project>
-  <PropertyGroup>
-    <ILCompilerExe>$(MSBuildThisFileDirectory)/net6.0/ILCompiler.exe</ILCompilerExe>
-  </PropertyGroup>
-
-  <Target Name="ILCompiler" AfterTargets="PostBuildEvent">
-    <Exec Command="$(ILCompilerExe) $(TargetPath) --outputFile $(OutputPath)$(AssemblyName).asm" />
-  </Target>
-</Project>
