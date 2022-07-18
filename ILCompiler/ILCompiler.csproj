@@ -3,15 +3,13 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
 	<nullable>enable</nullable>
-	<WarningsAsErrors>Nullable</WarningsAsErrors>	  
+	<WarningsAsErrors>Nullable</WarningsAsErrors>
   </PropertyGroup>
 
   <PropertyGroup>
     <NoPackageAnalysis>true</NoPackageAnalysis>
-	<NuspecFile>ILCompiler.nuspec</NuspecFile>
 	<IntermediatePackDir>$(MSBuildProjectDirectory)/bin/$(Configuration)/publish/</IntermediatePackDir>
 	<PublishDir>$(IntermediatePackDir)$(TargetFramework)/</PublishDir>
-	<NuspecProperties>publishDir=$([MSBuild]::NormalizeDirectory($(IntermediatePackDir)))</NuspecProperties>
 	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
@@ -58,16 +56,16 @@
     <None Remove="Runtime\kbdscan.asm" />
     <None Remove="Runtime\keyavail.asm" />
     <None Remove="Runtime\l_inc_dehl.asm" />
-    <None Remove="Runtime\setres.asm" />
-    <None Remove="Runtime\setxy.asm" />
     <None Remove="Runtime\stoi.asm" />
-    <None Remove="Runtime\ticks.asm" />
     <None Remove="Runtime\TRS80\cls.asm" />
     <None Remove="Runtime\TRS80\getdatetime.asm" />
     <None Remove="Runtime\TRS80\print.asm" />
     <None Remove="Runtime\TRS80\printchr.asm" />
-    <None Remove="Runtime\write.asm" />
-    <None Remove="Runtime\ZXSpectrum\cls.asm" />
+    <None Remove="Runtime\TRS80\write.asm" />
+    <None Remove="Runtime\TRS80\ticks.asm" />
+	<None Remove="Runtime\TRS80\setres.asm" />
+	<None Remove="Runtime\TRS80\setxy.asm" />
+	<None Remove="Runtime\ZXSpectrum\cls.asm" />
     <None Remove="Runtime\ZXSpectrum\getdatetime.asm" />
     <None Remove="Runtime\ZXSpectrum\print.asm" />
     <None Remove="Runtime\ZXSpectrum\printchr.asm" />
@@ -91,11 +89,11 @@
     <EmbeddedResource Include="Runtime\i_mul16.asm" />
     <EmbeddedResource Include="Runtime\i_rsh16.asm" />
     <EmbeddedResource Include="Runtime\i_rsh.asm" />
-    <EmbeddedResource Include="Runtime\keyavail.asm" />
-    <EmbeddedResource Include="Runtime\setres.asm" />
-    <EmbeddedResource Include="Runtime\kbdscan.asm" />
+    <EmbeddedResource Include="Runtime\TRS80\keyavail.asm" />
+    <EmbeddedResource Include="Runtime\TRS80\setres.asm" />
+    <EmbeddedResource Include="Runtime\TRS80\kbdscan.asm" />
     <EmbeddedResource Include="Runtime\delay.asm" />
-    <EmbeddedResource Include="Runtime\ticks.asm" />
+    <EmbeddedResource Include="Runtime\TRS80\ticks.asm" />
     <EmbeddedResource Include="Runtime\itoa.asm" />
     <EmbeddedResource Include="Runtime\i_add.asm" />
     <EmbeddedResource Include="Runtime\i_div.asm" />
@@ -106,7 +104,7 @@
     <EmbeddedResource Include="Runtime\i_rem_un.asm" />
     <EmbeddedResource Include="Runtime\i_sub.asm" />
     <EmbeddedResource Include="Runtime\l_inc_dehl.asm" />
-    <EmbeddedResource Include="Runtime\setxy.asm" />
+    <EmbeddedResource Include="Runtime\TRS80\setxy.asm" />
     <EmbeddedResource Include="Runtime\stoi.asm" />
     <EmbeddedResource Include="Runtime\i_cmp.asm" />
     <EmbeddedResource Include="Runtime\i_eq.asm" />
@@ -119,7 +117,7 @@
     <EmbeddedResource Include="Runtime\TRS80\print.asm" />
     <EmbeddedResource Include="Runtime\TRS80\printchr.asm" />
     <EmbeddedResource Include="Runtime\TRS80\getdatetime.asm" />
-    <EmbeddedResource Include="Runtime\write.asm" />
+    <EmbeddedResource Include="Runtime\TRS80\write.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\cls.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\getdatetime.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\print.asm" />
@@ -140,13 +138,6 @@
 
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="copy /a $(ProjectDir)Runtime\*.asm $(ProjectDir)csharprt.asm&#xD;&#xA;copy /a $(ProjectDir)Runtime\CPM\*.asm $(ProjectDir)cpmrt.asm&#xD;&#xA;copy /a $(ProjectDir)Runtime\TRS80\*.asm $(ProjectDir)trs80rt.asm&#xD;&#xA;copy /a $(ProjectDir)Runtime\ZXSpectrum\*.asm $(ProjectDir)zxspectrum.asm" />
-  </Target>
-
-  <Target Name="PublishAll" BeforeTargets="GenerateNuspec">
-    <ItemGroup>
-	  <_TargetFramework Include="$(TargetFramework)" />
-	</ItemGroup>
-	<MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Publish" Properties="TargetFramework=%(_TargetFramework.Identity)" />
   </Target>
 
 </Project>
