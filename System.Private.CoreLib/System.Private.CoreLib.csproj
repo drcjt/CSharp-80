@@ -1,23 +1,46 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
 
-    <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
-    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
+		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
-    <!--Disable .NET Core SDK libs-->
-    <NoStdLib>true</NoStdLib>
-    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+		<!--Disable .NET Core SDK libs-->
+		<NoStdLib>true</NoStdLib>
+		<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
 
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-    <!-- Prevent .NET Core 3+ from generating exe -->
-    <UseAppHost>false</UseAppHost>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
-  </PropertyGroup>
+		<!-- Prevent .NET Core 3+ from generating exe -->
+		<UseAppHost>false</UseAppHost>
+		<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
 
+		<TargetPlatform>Trs80</TargetPlatform>
+		<!-- <TargetPlatform>ZXSpectrum</TargetPlatform> -->
+	</PropertyGroup>
+
+	<ItemGroup Condition="'$(TargetPlatform)' == 'ZXSpectrum'">
+		<Compile Remove="Pal\*" />
+		<Compile Include="Pal/Console.cs" />
+		<Compile Include="Pal/Console.ZXSpectrum.cs" />		
+		<Compile Include="Pal/Environment.ZXSpectrum.cs" />
+		<Compile Include="Pal/Graphics.ZXSpectrum.cs" />
+		<Compile Include="Pal/Interop.Libraries.cs" />
+		<Compile Include="Pal/Thread.ZXSpectrum.cs" />
+	</ItemGroup>
+	
+	<ItemGroup Condition="'$(TargetPlatform)' == 'Trs80'">
+		<Compile Remove="Pal\*" />	
+		<Compile Include="Pal/Console.cs" />
+		<Compile Include="Pal/Console.Trs80.cs" />
+		<Compile Include="Pal/Environment.Trs80.cs" />
+		<Compile Include="Pal/Graphics.Trs80.cs" />		
+		<Compile Include="Pal/Interop.Libraries.cs" />
+		<Compile Include="Pal/Thread.Trs80.cs" />
+	</ItemGroup>
+	
 </Project>

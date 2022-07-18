@@ -6,7 +6,7 @@ namespace System.Threading
     {
         // This delays by approx 14.65 microseconds for each delay unit
         [DllImport(Libraries.Runtime, EntryPoint = "Delay")]
-        public static unsafe extern void Delay(int delay);
+        private static unsafe extern void Delay(int delay);
 
         public static void Sleep(int delayMs)
         {
