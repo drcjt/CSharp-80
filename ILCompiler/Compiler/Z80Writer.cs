@@ -117,27 +117,39 @@ namespace ILCompiler.Compiler
 
             _out.WriteLine(Instruction.Call(_nameMangler.GetMangledMethodName(entryMethod)));
 
-            if (hasReturnCode && _configuration.PrintReturnCode)
-            {
-                // Write string "Return Code:"
-                _out.WriteLine(Instruction.Ld(R16.HL, "retcodemsg"));
-                _out.WriteLine(Instruction.Call("PRINT"));
-
-                _out.WriteLine(Instruction.Pop(R16.DE));
-                _out.WriteLine(Instruction.Pop(R16.HL));
-                _out.WriteLine(Instruction.Push(R16.HL));
-                _out.WriteLine(Instruction.Push(R16.DE));
-                _out.WriteLine(Instruction.Call("LTOA"));
-            }
-
             if (hasReturnCode)
             {
-                _out.WriteLine(Instruction.Pop(R16.BC));    // return value
-                _out.WriteLine(Instruction.Pop(R16.DE));
-                _out.WriteLine(Instruction.Pop(R16.HL));    // return address
-                _out.WriteLine(Instruction.Push(R16.DE));
-                _out.WriteLine(Instruction.Push(R16.BC));
-                _out.WriteLine(Instruction.Push(R16.HL));
+                if (_configuration.PrintReturnCode)
+                {
+
+                    // Write string "Return Code:"
+                    _out.WriteLine(Instruction.Ld(R16.HL, "retcodemsg"));
+                    _out.WriteLine(Instruction.Call("PRINT"));
+
+                    _out.WriteLine(Instruction.Pop(R16.DE));
+                    _out.WriteLine(Instruction.Pop(R16.HL));
+                    _out.WriteLine(Instruction.Push(R16.HL));
+                    _out.WriteLine(Instruction.Push(R16.DE));
+                    _out.WriteLine(Instruction.Call("LTOA"));
+                }
+                else
+                {
+                    if (_configuration.TargetArchitecture == TargetArchitecture.ZXSpectrum)
+                    {
+                        // Remove return value as not supported on ZX spectrum
+                        _out.WriteLine(Instruction.Pop(R16.BC));
+                        _out.WriteLine(Instruction.Pop(R16.DE));
+                    }
+                    else
+                    {
+                        _out.WriteLine(Instruction.Pop(R16.BC));    // return value
+                        _out.WriteLine(Instruction.Pop(R16.DE));
+                        _out.WriteLine(Instruction.Pop(R16.HL));    // return address
+                        _out.WriteLine(Instruction.Push(R16.DE));
+                        _out.WriteLine(Instruction.Push(R16.BC));
+                        _out.WriteLine(Instruction.Push(R16.HL));
+                    }
+                }
             }
 
             _out.WriteLine(Instruction.Ret());
