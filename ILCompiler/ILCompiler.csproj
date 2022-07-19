@@ -67,8 +67,12 @@
 	<None Remove="Runtime\TRS80\setxy.asm" />
 	<None Remove="Runtime\ZXSpectrum\cls.asm" />
     <None Remove="Runtime\ZXSpectrum\getdatetime.asm" />
+    <None Remove="Runtime\ZXSpectrum\getxy.asm" />
     <None Remove="Runtime\ZXSpectrum\print.asm" />
     <None Remove="Runtime\ZXSpectrum\printchr.asm" />
+    <None Remove="Runtime\ZXSpectrum\setxy.asm" />
+    <None Remove="Runtime\ZXSpectrum\ticks.asm" />
+    <None Remove="Runtime\ZXSpectrum\write.asm" />
   </ItemGroup>
 
   <ItemGroup>
@@ -122,6 +126,10 @@
     <EmbeddedResource Include="Runtime\ZXSpectrum\getdatetime.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\print.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\printchr.asm" />
+    <EmbeddedResource Include="Runtime\ZXSpectrum\getxy.asm" />
+    <EmbeddedResource Include="Runtime\ZXSpectrum\setxy.asm" />
+    <EmbeddedResource Include="Runtime\ZXSpectrum\ticks.asm" />
+    <EmbeddedResource Include="Runtime\ZXSpectrum\write.asm" />
   </ItemGroup>
 
   <ItemGroup>

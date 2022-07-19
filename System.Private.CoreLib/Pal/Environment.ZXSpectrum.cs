@@ -10,8 +10,8 @@ namespace System
         /// TODO: Write assembly code routine to use this to implement GetTickCount
         /// </summary>
         /// <returns></returns>
-        //[DllImport(Libraries.Runtime, EntryPoint = "TICKS")]
-        private static int GetFrameCount() { return 0;  }
+        [DllImport(Libraries.Runtime, EntryPoint = "TICKS")]
+        private static extern int GetFrameCount();
 
         /// <summary>
         /// Approximation to TickCount. Note that 20ms frame count is only 24 bit and will
