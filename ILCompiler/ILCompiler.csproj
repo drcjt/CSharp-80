@@ -70,6 +70,7 @@
     <None Remove="Runtime\ZXSpectrum\getxy.asm" />
     <None Remove="Runtime\ZXSpectrum\print.asm" />
     <None Remove="Runtime\ZXSpectrum\printchr.asm" />
+    <None Remove="Runtime\ZXSpectrum\setres.asm" />
     <None Remove="Runtime\ZXSpectrum\setxy.asm" />
     <None Remove="Runtime\ZXSpectrum\ticks.asm" />
     <None Remove="Runtime\ZXSpectrum\write.asm" />
@@ -127,6 +128,7 @@
     <EmbeddedResource Include="Runtime\ZXSpectrum\print.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\printchr.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\getxy.asm" />
+    <EmbeddedResource Include="Runtime\ZXSpectrum\setres.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\setxy.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\ticks.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\write.asm" />
