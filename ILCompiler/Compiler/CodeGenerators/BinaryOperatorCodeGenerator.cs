@@ -64,7 +64,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
                 else
                 {
-                    //throw new NotImplementedException($"Binary operator {entry.Operation} for kind {entry.Kind} not yet implemented");
+                    throw new NotImplementedException($"Binary operator {entry.Operation} for kind {entry.Kind} not yet implemented");
                 }
             }
             else
