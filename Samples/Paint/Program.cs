@@ -48,7 +48,7 @@ namespace Paint
                         }
                         else if (keyChar == 32)
                         {
-                            color = (int)color == (int)Color.Black ? Color.White : Color.Black;
+                            color = color == Color.Black ? Color.White : Color.Black;
                         }
 
                         Graphics.SetPixel(currentX, currentY, cursorColor);
@@ -58,7 +58,7 @@ namespace Paint
                 if (Environment.TickCount - ticks > 300)
                 {
                     Graphics.SetPixel(currentX, currentY, cursorColor);
-                    cursorColor = (int)cursorColor == (int)Color.Black ? Color.White : Color.Black;
+                    cursorColor = cursorColor == Color.Black ? Color.White : Color.Black;
                     ticks = Environment.TickCount;
                 }
             }
