@@ -56,6 +56,7 @@
     <None Remove="Runtime\kbdscan.asm" />
     <None Remove="Runtime\keyavail.asm" />
     <None Remove="Runtime\l_inc_dehl.asm" />
+    <None Remove="Runtime\newarr.asm" />
     <None Remove="Runtime\stoi.asm" />
     <None Remove="Runtime\TRS80\cls.asm" />
     <None Remove="Runtime\TRS80\getdatetime.asm" />
@@ -80,6 +81,7 @@
     <EmbeddedResource Include="Runtime\CPM\cls.asm" />
     <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
     <EmbeddedResource Include="Runtime\CPM\print.asm" />
+    <EmbeddedResource Include="Runtime\newarr.asm" />
     <EmbeddedResource Include="Runtime\heapalloc.asm" />
     <EmbeddedResource Include="Runtime\i_and16.asm" />
     <EmbeddedResource Include="Runtime\i_eq16.asm" />
