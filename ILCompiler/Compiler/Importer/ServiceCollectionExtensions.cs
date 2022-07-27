@@ -34,6 +34,7 @@ namespace ILCompiler.Compiler.Importer
             services.AddSingleton<IOpcodeImporter, LocallocImporter>();
             services.AddSingleton<IOpcodeImporter, ShiftOperationImporter>();
             services.AddSingleton<IOpcodeImporter, NewarrImporter>();
+            services.AddSingleton<IOpcodeImporter, LoadElemImporter>();
 
             return services;
         }
