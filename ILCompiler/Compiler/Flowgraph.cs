@@ -166,6 +166,13 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
+        public void Visit(IndexRefEntry entry)
+        {
+            entry.IndexOp.Accept(this);
+            entry.ArrayOp.Accept(this);
+            SetNext(entry);
+        }
+
         private void SetNext(StackEntry entry)
         {
             if (Current != null)

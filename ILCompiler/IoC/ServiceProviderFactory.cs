@@ -26,6 +26,8 @@ namespace ILCompiler.IoC
             services.AddTransient<IILImporter, ILImporter>();
             services.AddImporters();
 
+            services.AddTransient<IMorpher, Morpher>();
+
             services.AddTransient<IFlowgraph, Flowgraph>();
 
             services.AddTransient<ISsaBuilder, SsaBuilder>();
