@@ -107,5 +107,10 @@
         {
             _genericStackEntryVisitor.Visit<LocalHeapEntry>(entry);
         }
+
+        public void Visit(IndexRefEntry entry)
+        {
+            _genericStackEntryVisitor.Visit<IndexRefEntry>(entry);
+        }
     }
 }

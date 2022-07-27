@@ -123,6 +123,9 @@ namespace ILCompiler.Compiler
                     _logger.LogInformation("{treedump}", treedump);
                 }
 
+                var morpher = _phaseFactory.Create<IMorpher>();
+                morpher.Morph(basicBlocks);
+
                 var flowgraph = _phaseFactory.Create<IFlowgraph>();
                 flowgraph.SetBlockOrder(basicBlocks);
 

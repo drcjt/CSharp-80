@@ -196,5 +196,16 @@ namespace ILCompiler.Compiler
             entry.Op1.Accept(this);
             _indent--;
         }
+
+        public void Visit(IndexRefEntry entry)
+        {
+            _indent++;
+            entry.IndexOp.Accept(this);
+            _indent--;
+            Print($"[]");
+            _indent++;
+            entry.ArrayOp.Accept(this);
+            _indent--;
+        }
     }
 }

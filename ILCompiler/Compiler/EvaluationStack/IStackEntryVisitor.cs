@@ -27,5 +27,6 @@
         public void Visit(SwitchEntry entry);
         public void Visit(AllocObjEntry entry);
         public void Visit(LocalHeapEntry entry);
+        public void Visit(IndexRefEntry entry);
     }
 }

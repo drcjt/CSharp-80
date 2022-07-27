@@ -171,5 +171,10 @@ namespace ILCompiler.Compiler
             _sb.AppendLine($"       ┌──▌  t{entry.Op1.TreeID}");
             _sb.AppendLine($"       lclheap");
         }
+
+        public void Visit(IndexRefEntry entry)
+        {
+            throw new Exception("IndexRefEntry not valid in LIR");
+        }
     }
 }
