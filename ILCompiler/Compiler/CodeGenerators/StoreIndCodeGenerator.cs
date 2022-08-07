@@ -16,7 +16,15 @@ namespace ILCompiler.Compiler.CodeGenerators
                 context.Assembler.Pop(I16.IX);  
 
                 short offset = (short)entry.FieldOffset;
-                CopyHelper.CopyFromStackToIX(context.Assembler, exactSize, offset);
+
+                if (entry.TargetInHeap)
+                {
+                    CopyHelper.CopyFromStackToHeap(context.Assembler, exactSize, offset);
+                }
+                else
+                {
+                    CopyHelper.CopyFromStackToIX(context.Assembler, exactSize, offset);
+                }
 
                 context.Assembler.Push(R16.BC);
                 context.Assembler.Pop(I16.IX);

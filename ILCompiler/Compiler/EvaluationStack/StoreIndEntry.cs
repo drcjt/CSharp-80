@@ -8,6 +8,8 @@ namespace ILCompiler.Compiler.EvaluationStack
         public StackEntry Op1 { get; }
         public uint FieldOffset { get; }
 
+        public bool TargetInHeap { get; set; }
+
         public WellKnownType TargetType { get; }
 
         public StoreIndEntry(StackEntry addr, StackEntry op1, WellKnownType targetType, uint fieldOffset = 0, int? size = 4) : base(addr.Kind, size)
@@ -20,7 +22,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public override StackEntry Duplicate()
         {
-            return new StoreIndEntry(Addr, Op1.Duplicate(), TargetType, FieldOffset, ExactSize);
+            return new StoreIndEntry(Addr, Op1.Duplicate(), TargetType, FieldOffset, ExactSize) { TargetInHeap = this.TargetInHeap };
         }
 
         public override void Accept(IStackEntryVisitor visitor)

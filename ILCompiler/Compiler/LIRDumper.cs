@@ -146,7 +146,7 @@ namespace ILCompiler.Compiler
         public void Visit(IndirectEntry entry)
         {
             _sb.AppendLine($"       ┌──▌  t{entry.Op1.TreeID}");
-            _sb.AppendLine($"       ind ${entry.Offset}");
+            _sb.AppendLine($"t{entry.TreeID, -3} = ind ${entry.Offset}");
         }
 
         public void Visit(FieldAddressEntry entry)

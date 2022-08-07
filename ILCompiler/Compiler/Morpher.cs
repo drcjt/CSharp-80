@@ -1,4 +1,5 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
+﻿using ILCompiler.Common.TypeSystem;
+using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -51,7 +52,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case IndirectEntry ie:
-                    tree = new IndirectEntry(MorphTree(ie.Op1), ie.Kind, ie.ExactSize, ie.DesiredSize, ie.Offset);
+                    tree = new IndirectEntry(MorphTree(ie.Op1), ie.Kind, ie.ExactSize, ie.DesiredSize, ie.Offset) { SourceInHeap = ie.SourceInHeap };
                     break;
 
                 case IntrinsicEntry ie:
@@ -71,7 +72,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case StoreIndEntry sie:
-                    tree = new StoreIndEntry(sie.Addr, sie.Op1, sie.TargetType, sie.FieldOffset, sie.ExactSize);
+                    tree = new StoreIndEntry(sie.Addr, MorphTree(sie.Op1), sie.TargetType, sie.FieldOffset, sie.ExactSize) { TargetInHeap = sie.TargetInHeap };
                     break;
 
                 case StoreLocalVariableEntry slve:
@@ -112,11 +113,13 @@ namespace ILCompiler.Compiler
 
                 var size = new Int32ConstantEntry(tree.ElemSize);
                 addr = new BinaryOperator(Operation.Mul, isComparison: false, size, tree.IndexOp, StackValueKind.Int32);
+                addr = new CastEntry(WellKnownType.UIntPtr, addr, StackValueKind.NativeInt);
             }
 
             addr = new BinaryOperator(Operation.Add, isComparison: false, tree.ArrayOp, addr, StackValueKind.NativeInt);
 
-            addr = new IndirectEntry(addr, tree.Kind, tree.ExactSize);
+
+            addr = new IndirectEntry(addr, tree.Kind, tree.ExactSize) { SourceInHeap = true };
 
             return addr;
         }

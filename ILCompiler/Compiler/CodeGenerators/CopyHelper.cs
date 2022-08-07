@@ -1,4 +1,5 @@
-﻿using Z80Assembler;
+﻿using System.Diagnostics;
+using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -58,6 +59,35 @@ namespace ILCompiler.Compiler.CodeGenerators
                 assembler.Ld(R16.DE, (short)(-changeToIX));
                 assembler.Add(I16.IX, R16.DE);
             }
+        }
+
+        public static void CopyFromStackToHeap(Assembler assembler, int size, int ixOffset = 0, bool restoreIX = false)
+        {
+            // Currently only support int32 here
+            Debug.Assert(size == 4);
+
+            // Reverse endianness, stack is big endian, heap is little endian
+            assembler.Pop(R16.HL);
+            assembler.Ld(I16.IX, (short)(ixOffset + 3), R8.H);
+            assembler.Ld(I16.IX, (short)(ixOffset + 2), R8.L);
+
+            assembler.Pop(R16.HL);
+            assembler.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
+            assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
+        }
+
+        public static void CopyFromHeapToStack(Assembler assembler, int size, int ixOffset = 0, bool restoreIX = false)
+        {
+            // Currently only support int32 here
+            Debug.Assert(size == 4);
+
+            assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 1));
+            assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 0));
+            assembler.Push(R16.HL);
+
+            assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 3));
+            assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 2));
+            assembler.Push(R16.HL);
         }
 
         public static void CopyFromIXToStack(Assembler assembler, int size, int ixOffset = 0, bool restoreIX = false)
