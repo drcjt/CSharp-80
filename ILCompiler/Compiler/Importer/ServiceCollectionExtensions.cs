@@ -35,6 +35,7 @@ namespace ILCompiler.Compiler.Importer
             services.AddSingleton<IOpcodeImporter, ShiftOperationImporter>();
             services.AddSingleton<IOpcodeImporter, NewarrImporter>();
             services.AddSingleton<IOpcodeImporter, LoadElemImporter>();
+            services.AddSingleton<IOpcodeImporter, StoreElemImporter>();
 
             return services;
         }
