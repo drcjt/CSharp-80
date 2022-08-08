@@ -12,6 +12,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             services.AddSingleton<ICodeGenerator<CastEntry>, CastCodeGenerator>();
             services.AddSingleton<ICodeGenerator<FieldAddressEntry>, FieldAddressCodeGenerator>();
             services.AddSingleton<ICodeGenerator<Int32ConstantEntry>, Int32ConstantCodeGenerator>();
+            services.AddSingleton<ICodeGenerator<NativeIntConstantEntry>, NativeIntConstantCodeGenerator>();
             services.AddSingleton<ICodeGenerator<IntrinsicEntry>, IntrinsicCodeGenerator>();
             services.AddSingleton<ICodeGenerator<JumpEntry>, JumpCodeGenerator>();
             services.AddSingleton<ICodeGenerator<JumpTrueEntry>, JumpTrueCodeGenerator>();

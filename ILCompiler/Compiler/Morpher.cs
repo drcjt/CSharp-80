@@ -110,10 +110,9 @@ namespace ILCompiler.Compiler
             if (tree.ElemSize > 1)
             {
                 // elemSize * index
-
-                var size = new Int32ConstantEntry(tree.ElemSize);
-                addr = new BinaryOperator(Operation.Mul, isComparison: false, size, tree.IndexOp, StackValueKind.Int32);
-                addr = new CastEntry(WellKnownType.UIntPtr, addr, StackValueKind.NativeInt);
+                var size = new NativeIntConstantEntry((short)tree.ElemSize);
+                var indexOp = new CastEntry(WellKnownType.UIntPtr, tree.IndexOp, StackValueKind.NativeInt);
+                addr = new BinaryOperator(Operation.Mul, isComparison: false, size, indexOp, StackValueKind.NativeInt);
             }
 
             addr = new BinaryOperator(Operation.Add, isComparison: false, tree.ArrayOp, addr, StackValueKind.NativeInt);

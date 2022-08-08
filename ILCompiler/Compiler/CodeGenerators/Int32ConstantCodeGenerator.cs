@@ -12,19 +12,10 @@ namespace ILCompiler.Compiler.CodeGenerators
             var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
             var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
 
-            if (entry.Kind == StackValueKind.NativeInt)
-            {
-                // Native ints are only 16 bit so just push low word
-                context.Assembler.Ld(R16.HL, low);
-                context.Assembler.Push(R16.HL);
-            }
-            else
-            {
-                context.Assembler.Ld(R16.HL, high);     //MSW
-                context.Assembler.Push(R16.HL);
-                context.Assembler.Ld(R16.HL, low);      //LSW
-                context.Assembler.Push(R16.HL);
-            }
+            context.Assembler.Ld(R16.HL, high);     //MSW
+            context.Assembler.Push(R16.HL);
+            context.Assembler.Ld(R16.HL, low);      //LSW
+            context.Assembler.Push(R16.HL);
         }
     }
 }
