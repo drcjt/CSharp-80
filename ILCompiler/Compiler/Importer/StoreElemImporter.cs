@@ -22,10 +22,9 @@ namespace ILCompiler.Compiler.Importer
             if (elemSize > 1)
             {
                 // elemSize * index
-
-                var size = new Int32ConstantEntry(elemSize);
-                addr = new BinaryOperator(Operation.Mul, isComparison: false, size, indexOp, StackValueKind.Int32);
-                addr = new CastEntry(WellKnownType.UIntPtr, addr, StackValueKind.NativeInt);
+                var size = new NativeIntConstantEntry((short)elemSize);
+                indexOp = new CastEntry(WellKnownType.UIntPtr, indexOp, StackValueKind.NativeInt);
+                addr = new BinaryOperator(Operation.Mul, isComparison: false, size, indexOp, StackValueKind.NativeInt);
             }
 
             addr = new BinaryOperator(Operation.Add, isComparison: false, arrayOp, addr, StackValueKind.NativeInt);
