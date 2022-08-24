@@ -90,6 +90,81 @@ namespace ILCompiler.Compiler.CodeGenerators
             assembler.Push(R16.HL);
         }
 
+        public static void CopySmallToStack(Assembler assembler, int bytesToCopy, int ixOffset, bool signExtend)
+        {
+            Debug.Assert(bytesToCopy == 1 || bytesToCopy == 2);
+            int changeToIX = 0;
+            int originalIxOffset = ixOffset;
+
+            if (ixOffset + bytesToCopy < -127)
+            {
+                var delta = ixOffset + 1;
+                assembler.Ld(R16.DE, (short)delta);
+                assembler.Add(I16.IX, R16.DE);
+                changeToIX += delta;
+
+                ixOffset -= delta;
+            }
+
+            if (bytesToCopy == 1)
+            {
+                if (signExtend)
+                {
+                    assembler.Ld(R8.A, I16.IX, (short)(ixOffset));
+                    assembler.Ld(R8.E, R8.A);
+
+                    assembler.Add(R8.A, R8.A);
+                    assembler.Sbc(R8.A, R8.A);
+                    assembler.Ld(R8.H, R8.A);
+                    assembler.Ld(R8.L, R8.A);
+                    assembler.Push(R16.HL);
+
+                    assembler.Ld(R8.L, R8.E);
+                    assembler.Push(R16.HL);
+                }
+                else
+                {
+                    assembler.Ld(R16.HL, 0);
+                    assembler.Push(R16.HL);
+
+                    assembler.Ld(R8.H, 0);
+                    assembler.Ld(R8.L, I16.IX, (short)(ixOffset));
+                    assembler.Push(R16.HL);
+                }
+            }
+            else
+            {
+                if (signExtend)
+                {
+                    assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 1));
+                    assembler.Ld(R8.L, I16.IX, (short)(ixOffset));
+                    assembler.Push(R16.HL);
+                    assembler.Pop(R16.DE);
+
+                    assembler.Add(R16.HL, R16.HL);  // move sign bit into carry flag
+                    assembler.Sbc(R16.HL, R16.HL);  // hl is now 0000 or FFFF
+                    assembler.Push(R16.HL);
+
+                    assembler.Push(R16.DE);
+                }
+                else
+                {
+                    assembler.Ld(R16.HL, 0);
+                    assembler.Push(R16.HL);
+
+                    assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 1));
+                    assembler.Ld(R8.L, I16.IX, (short)(ixOffset));
+                    assembler.Push(R16.HL);
+                }
+            }
+
+            if (changeToIX != 0)
+            {
+                assembler.Ld(R16.DE, (short)(-changeToIX));
+                assembler.Add(I16.IX, R16.DE);
+            }
+        }
+
         public static void CopyFromIXToStack(Assembler assembler, int size, int ixOffset = 0, bool restoreIX = false)
         {
             int changeToIX = 0;

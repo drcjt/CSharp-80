@@ -2,6 +2,7 @@
 using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.IL;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace ILCompiler.Compiler
 {
@@ -10,6 +11,58 @@ namespace ILCompiler.Compiler
         public static T OperandAs<T>(this Instruction instruction)
         {
             return (T)instruction.Operand;
+        }
+
+        public static VarType GetVarType(this TypeSig typeSig)
+        {
+            var typeDefOrRef = typeSig.TryGetTypeDefOrRef();
+            var typeDef = typeDefOrRef.ResolveTypeDef();
+
+            if (typeDef != null && typeDef.IsEnum)
+            {
+                return GetVarType(typeDef.GetEnumUnderlyingType());
+            }
+
+            switch (typeSig.ElementType)
+            {
+                case ElementType.Boolean: 
+                    return VarType.Bool;
+
+                case ElementType.I1:
+                    return VarType.SByte;
+                case ElementType.U1:
+                case ElementType.Char:
+                    return VarType.Byte;
+
+                case ElementType.I2:
+                    return VarType.Short;
+                case ElementType.U2:
+                    return VarType.UShort;
+
+                case ElementType.I4:
+                    return VarType.Int;
+                case ElementType.U4:
+                    return VarType.UInt;
+
+                case ElementType.Ptr:
+                case ElementType.I:
+                    return VarType.Ptr;
+
+                case ElementType.ValueType:
+                    return VarType.Struct;
+
+                case ElementType.Class:
+                case ElementType.String:
+                case ElementType.Array:
+                case ElementType.SZArray:
+                    return VarType.Ref;
+
+                case ElementType.ByRef:
+                    return VarType.ByRef;
+
+                default:
+                    throw new NotSupportedException($"ElementType : {typeSig.ElementType} cannot be converted to VarType");
+            }
         }
 
         public static int GetExactSize(this TypeSig type)

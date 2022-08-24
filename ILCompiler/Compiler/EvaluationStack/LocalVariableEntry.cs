@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public override StackEntry Duplicate()
         {
-            return new LocalVariableEntry(LocalNumber, Kind, ExactSize);
+            return new LocalVariableEntry(LocalNumber, Kind, ExactSize) { Type = Type };
         }
 
         public override void Accept(IStackEntryVisitor visitor)

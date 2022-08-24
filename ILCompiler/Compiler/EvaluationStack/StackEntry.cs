@@ -33,6 +33,8 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public StackValueKind Kind { get; }
 
+        public VarType Type { get; set; }
+
         public int? ExactSize { get; }
 
         public StackEntry? Next { get; set; }
