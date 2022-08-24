@@ -28,11 +28,11 @@ namespace ILCompiler.Compiler
                 case ElementType.Boolean: 
                     return VarType.Bool;
 
-                case ElementType.Char:
                 case ElementType.I1:
-                    return VarType.Byte;
-                case ElementType.U1:
                     return VarType.SByte;
+                case ElementType.U1:
+                case ElementType.Char:
+                    return VarType.Byte;
 
                 case ElementType.I2:
                     return VarType.Short;

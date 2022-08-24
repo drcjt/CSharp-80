@@ -124,11 +124,11 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
                 else
                 {
-                    assembler.Ld(R8.H, 0);
-                    assembler.Ld(R8.L, I16.IX, (short)(ixOffset));
+                    assembler.Ld(R16.HL, 0);
                     assembler.Push(R16.HL);
 
-                    assembler.Ld(R16.HL, 0);
+                    assembler.Ld(R8.H, 0);
+                    assembler.Ld(R8.L, I16.IX, (short)(ixOffset));
                     assembler.Push(R16.HL);
                 }
             }
