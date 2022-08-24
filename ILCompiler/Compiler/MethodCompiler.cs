@@ -42,6 +42,7 @@ namespace ILCompiler.Compiler
                     IsTemp = false,
                     Name = method.Parameters[parameterIndex].Name,
                     ExactSize = method.Parameters[parameterIndex].Type.GetExactSize(),
+                    Type = method.Parameters[parameterIndex].Type.GetVarType(),
                 };
                 _localVariableTable.Add(local);
             }
@@ -58,6 +59,7 @@ namespace ILCompiler.Compiler
                         IsTemp = false,
                         Name = body.Variables[variableIndex].Name,
                         ExactSize = body.Variables[variableIndex].Type.GetExactSize(),
+                        Type = body.Variables[variableIndex].Type.GetVarType(),
                     };
                     _localVariableTable.Add(local);
                 }

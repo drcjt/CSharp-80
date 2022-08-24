@@ -10,21 +10,6 @@ namespace ILCompiler.Common.TypeSystem.IL
         {
             return method.HasCustomAttributes && method.CustomAttributes.IsDefined(CompilerIntrinsicAttribute);
         }
-
-        public static bool IsUnsigned(this TypeSig typeSig)
-        {
-            switch (typeSig.ElementType)
-            {
-                case ElementType.U1:
-                case ElementType.U2:
-                case ElementType.U4:
-                case ElementType.U8:
-                    return true;
-            }
-
-            return false;
-        }
-
         public static bool IsStruct(this TypeSig typeSig)
         {
             var typeDef = typeSig.TryGetTypeDef();

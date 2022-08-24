@@ -74,6 +74,11 @@ namespace Z80Assembler
             AddInstruction(new Instruction(Opcode.Sbc, target.ToString() + ", " + source.ToString()));
         }
 
+        public void Sbc(R8Type target, R8Type source)
+        {
+            AddInstruction(new Instruction(Opcode.Sbc, target.ToString() + ", " + source.ToString()));
+        }
+
         public void Cpl()
         {
             AddInstruction(new Instruction(Opcode.Cpl));

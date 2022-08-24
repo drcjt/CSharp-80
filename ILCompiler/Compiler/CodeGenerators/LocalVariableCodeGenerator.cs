@@ -11,9 +11,16 @@ namespace ILCompiler.Compiler.CodeGenerators
             var variable = context.LocalVariableTable[entry.LocalNumber];
             var size = variable.ExactSize;
 
-            // Loading a local variable/argument
-            Debug.Assert(size % 2 == 0);
-            CopyHelper.CopyFromIXToStack(context.Assembler, size, -variable.StackOffset, restoreIX: true);
+            if (variable.Type.IsSmall())
+            {
+                CopyHelper.CopySmallToStack(context.Assembler, variable.Type.IsByte() ? 1 : 2, -variable.StackOffset, !variable.Type.IsUnsigned());
+            }
+            else
+            {
+                // Loading a local variable/argument
+                Debug.Assert(size % 2 == 0);
+                CopyHelper.CopyFromIXToStack(context.Assembler, size, -variable.StackOffset, restoreIX: true);
+            }
         }
     }
 }
