@@ -27,7 +27,9 @@ namespace ILCompiler.Compiler.Importer
                 throw new NotSupportedException("Storing variables other than short, int32 ,object refs, or valuetypes not supported yet");
             }
             var localNumber = importer.ParameterCount + index;
+            var localVariable = importer.LocalVariableTable[localNumber];
             var node = new StoreLocalVariableEntry(localNumber, false, value);
+            node.Type = localVariable.Type;
             importer.ImportAppendTree(node, true);
         }
 
