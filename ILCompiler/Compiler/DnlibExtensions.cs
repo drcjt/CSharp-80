@@ -2,7 +2,6 @@
 using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.IL;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace ILCompiler.Compiler
 {

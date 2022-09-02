@@ -4,7 +4,7 @@ using ILCompiler.IoC;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.CommandLine;
-using System.CommandLine.Invocation;
+using System.CommandLine.NamingConventionBinder;
 
 namespace ILCompiler
 {
@@ -59,7 +59,7 @@ namespace ILCompiler
         {
             var rootCommand = new RootCommand
             {
-                new Option<FileInfo>(new[] { "-o", "--outputFile" }, "Output file path") { Required = true },
+                new Option<FileInfo>(new[] { "-o", "--outputFile" }, "Output file path") { IsRequired = true },
                 new Option<bool>(new[] { "-f", "--ignoreUnknownCil" }, "Ignore unknown cil"),
                 new Option<bool>(new[] { "-i", "--dontInlineRuntime" }, "Don't inline runtime assembly" ),
                 new Option<bool>(new[] { "-r", "--printReturnCode" }, "Print return code" ),
