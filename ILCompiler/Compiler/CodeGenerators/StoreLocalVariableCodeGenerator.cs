@@ -1,6 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using System.Diagnostics;
-using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -15,23 +14,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 // Copy from stack to IX truncating to required size
                 var bytesToCopy = variable.Type.IsByte() ? 1 : 2;
 
-                // pop lsw
-                context.Assembler.Pop(R16.HL);
-
-                // pop msw and ignore it as for small data types we
-                // truncate the value
-                context.Assembler.Pop(R16.DE);
-
-                var ixOffset = -variable.StackOffset;
-
-                // TODO: Deal with offset being outside of +128/-127 range that can be 
-                // used with IX indexing address mode
-
-                if (bytesToCopy == 2)
-                {
-                    context.Assembler.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
-                }
-                context.Assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
+                CopyHelper.CopyStackToSmall(context.Assembler, bytesToCopy, -variable.StackOffset);
             }
             else
             {
