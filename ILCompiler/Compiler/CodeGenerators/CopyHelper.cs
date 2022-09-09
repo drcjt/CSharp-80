@@ -7,6 +7,11 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public static void CopyFromStackToIX(Assembler assembler, int size, int ixOffset = 0, bool restoreIX = false)
         {
+            // TODO: When does it make sense to use LDIR instead??
+            // e.g. if size > 255 then we'll have to emit code to alter IX so using ldir is probably better
+            // suspect it may be much better for size > x where x is substantially less than 255 as the generated code will be quite large.
+            // For small x should we ditch using ix completely and just use HL & DE e.g. LD (HL), D??
+
             int changeToIX = 0;
 
             var totalBytesToCopy = size;
@@ -41,7 +46,6 @@ namespace ILCompiler.Compiler.CodeGenerators
                     do
                     {
                         newIxChange -= 128;
-                        changeToIX -= 128;
                         ixOffset += 128;
                         size += 128;
                     }
@@ -98,6 +102,46 @@ namespace ILCompiler.Compiler.CodeGenerators
             assembler.Ld(R8.H, I16.IX, (short)(ixOffset + 3));
             assembler.Ld(R8.L, I16.IX, (short)(ixOffset + 2));
             assembler.Push(R16.HL);
+        }
+
+        public static void CopyStackToSmall(Assembler assembler, int bytesToCopy, int ixOffset)
+        {
+            // pop lsw
+            assembler.Pop(R16.HL);
+
+            // pop msw and ignore it as for small data types we
+            // truncate the value
+            assembler.Pop(R16.DE);
+
+            short changeToIX = 0;
+            if (ixOffset + bytesToCopy - 1 > 127)
+            {
+                // Make IX larger so offset doesn't fall outside of bounds
+                changeToIX = 128;
+            }
+            if (ixOffset < -128)
+            {
+                changeToIX = -128;
+                // Make IX smaller so offset doesn't fall outside of bounds
+            }
+            if (changeToIX != 0)
+            {
+                assembler.Ld(R16.DE, changeToIX);
+                assembler.Add(I16.IX, R16.DE);
+                ixOffset -= changeToIX;
+            }
+
+            if (bytesToCopy == 2)
+            {
+                assembler.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
+            }
+            assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
+
+            if (changeToIX != 0)
+            {
+                assembler.Ld(R16.DE, (short)-changeToIX);
+                assembler.Add(I16.IX, R16.DE);
+            }
         }
 
         public static void CopySmallToStack(Assembler assembler, int bytesToCopy, int ixOffset, bool signExtend)

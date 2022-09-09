@@ -77,7 +77,8 @@ namespace CSharp80.Tests.BVT
             var ilCompilerPath = @"ILCompiler.exe";
             var arguments = $"--ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {corelibPath} --outputFile {asmFileName} {exeFileName}";
 
-            RunProcess(ilCompilerPath, arguments);
+            var compiled = RunProcess(ilCompilerPath, arguments);
+            Assert.IsTrue(compiled, "IL Failed to compile");
         }
 
         private void Assemble(string ilFileName)
@@ -88,7 +89,7 @@ namespace CSharp80.Tests.BVT
             RunProcess(ilAsmPath, ilFileName);
         }
 
-        private void RunProcess(string filename, string arguments)
+        private bool RunProcess(string filename, string arguments)
         {
             using (var process = new Process())
             {
@@ -107,8 +108,12 @@ namespace CSharp80.Tests.BVT
                     Console.WriteLine($"Process failed");
                     Console.WriteLine(output);
                     Console.WriteLine(errors);
+
+                    return false;
                 }
             }
+
+            return true;
         }
 
 
