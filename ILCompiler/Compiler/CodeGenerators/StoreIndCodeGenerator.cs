@@ -17,13 +17,20 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                 short offset = (short)entry.FieldOffset;
 
-                if (entry.TargetInHeap)
+                if (entry.Type.IsSmall())
                 {
-                    CopyHelper.CopyFromStackToHeap(context.Assembler, exactSize, offset);
+                    CopyHelper.CopyStackToSmall(context.Assembler, exactSize, offset);
                 }
                 else
                 {
-                    CopyHelper.CopyFromStackToIX(context.Assembler, exactSize, offset);
+                    if (entry.TargetInHeap)
+                    {
+                        CopyHelper.CopyFromStackToHeap(context.Assembler, exactSize, offset);
+                    }
+                    else
+                    {
+                        CopyHelper.CopyFromStackToIX(context.Assembler, exactSize, offset);
+                    }
                 }
 
                 context.Assembler.Push(R16.BC);

@@ -56,6 +56,10 @@ namespace ILCompiler.Compiler.Importer
             var fieldSize = fieldDef.FieldType.GetExactSize();
 
             var node = new IndirectEntry(obj, kind, fieldSize, fieldSize, fieldOffset);
+
+            var varType = fieldDef.DeclaringType.ToTypeSig().GetVarType();
+            node.Type = varType;
+
             importer.PushExpression(node);
         }
     }

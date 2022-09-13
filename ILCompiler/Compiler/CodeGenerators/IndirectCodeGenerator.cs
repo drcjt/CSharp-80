@@ -26,13 +26,20 @@ namespace ILCompiler.Compiler.CodeGenerators
                     context.Assembler.Push(R16.HL);
                 }
 
-                if (entry.SourceInHeap)
+                if (entry.Type.IsSmall())
                 {
-                    CopyHelper.CopyFromHeapToStack(context.Assembler, size, (short)entry.Offset, false);
+                    CopyHelper.CopySmallToStack(context.Assembler, size, (short)entry.Offset, !entry.Type.IsUnsigned());
                 }
                 else
                 {
-                    CopyHelper.CopyFromIXToStack(context.Assembler, size, (short)entry.Offset, false);
+                    if (entry.SourceInHeap)
+                    {
+                        CopyHelper.CopyFromHeapToStack(context.Assembler, size, (short)entry.Offset, false);
+                    }
+                    else
+                    {
+                        CopyHelper.CopyFromIXToStack(context.Assembler, size, (short)entry.Offset, false);
+                    }
                 }
 
                 // Restore IX
