@@ -5,76 +5,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 {
     internal class CopyHelper
     {
-        public static void CopyFromStackToIX(Assembler assembler, int size, int ixOffset = 0, bool restoreIX = false)
-        {
-            // TODO: When does it make sense to use LDIR instead??
-            // e.g. if size > 255 then we'll have to emit code to alter IX so using ldir is probably better
-            // suspect it may be much better for size > x where x is substantially less than 255 as the generated code will be quite large.
-            // For small x should we ditch using ix completely and just use HL & DE e.g. LD (HL), D??
-
-            int changeToIX = 0;
-
-            var totalBytesToCopy = size;
-            int originalIxOffset = ixOffset;
-
-            do
-            {
-                var bytesToCopy = totalBytesToCopy > 2 ? 2 : totalBytesToCopy;
-
-                // offset has to be -128 to + 127
-                if (ixOffset + bytesToCopy > 128)
-                {
-                    // Need to move IX along to keep stackOffset within -128 to +127 range
-                    short newIxChange = 0;
-                    do
-                    {
-                        newIxChange += 127;
-                        ixOffset -= 127;
-                        size -= 127;
-                    }
-                    while (ixOffset + bytesToCopy > 128);
-
-                    changeToIX += newIxChange;
-
-                    assembler.Ld(R16.DE, newIxChange);
-                    assembler.Add(I16.IX, R16.DE);
-                }
-
-                while (ixOffset < -128)
-                {
-                    short newIxChange = 0;
-                    do
-                    {
-                        newIxChange -= 128;
-                        ixOffset += 128;
-                        size += 128;
-                    }
-                    while (ixOffset < -128);
-
-                    changeToIX += newIxChange;
-
-                    assembler.Ld(R16.DE, newIxChange);
-                    assembler.Add(I16.IX, R16.DE);
-                }
-
-                assembler.Pop(R16.HL);
-                if (bytesToCopy == 2)
-                {
-                    assembler.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
-                }
-                assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
-
-                ixOffset += 2;
-                totalBytesToCopy -= 2;
-            } while (ixOffset < size + originalIxOffset);
-
-            if (changeToIX != 0 && restoreIX)
-            {
-                assembler.Ld(R16.DE, (short)(-changeToIX));
-                assembler.Add(I16.IX, R16.DE);
-            }
-        }
-
+        // TODO: merge this into CopyFromStackToIX 
         public static void CopyFromStackToHeap(Assembler assembler, int size, int ixOffset = 0, bool restoreIX = false)
         {
             // Currently only support int32 here
@@ -90,6 +21,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
         }
 
+        // TODO: merge this into CopyFromIXToStack
         public static void CopyFromHeapToStack(Assembler assembler, int size, int ixOffset = 0, bool restoreIX = false)
         {
             // Currently only support int32 here
@@ -212,6 +144,76 @@ namespace ILCompiler.Compiler.CodeGenerators
             }
 
             if (changeToIX != 0)
+            {
+                assembler.Ld(R16.DE, (short)(-changeToIX));
+                assembler.Add(I16.IX, R16.DE);
+            }
+        }
+
+        public static void CopyFromStackToIX(Assembler assembler, int size, int ixOffset = 0, bool restoreIX = false)
+        {
+            // TODO: When does it make sense to use LDIR instead??
+            // e.g. if size > 255 then we'll have to emit code to alter IX so using ldir is probably better
+            // suspect it may be much better for size > x where x is substantially less than 255 as the generated code will be quite large.
+            // For small x should we ditch using ix completely and just use HL & DE e.g. LD (HL), D??
+
+            int changeToIX = 0;
+
+            var totalBytesToCopy = size;
+            int originalIxOffset = ixOffset;
+
+            do
+            {
+                var bytesToCopy = totalBytesToCopy > 2 ? 2 : totalBytesToCopy;
+
+                // offset has to be -128 to + 127
+                if (ixOffset + bytesToCopy > 128)
+                {
+                    // Need to move IX along to keep stackOffset within -128 to +127 range
+                    short newIxChange = 0;
+                    do
+                    {
+                        newIxChange += 127;
+                        ixOffset -= 127;
+                        size -= 127;
+                    }
+                    while (ixOffset + bytesToCopy > 128);
+
+                    changeToIX += newIxChange;
+
+                    assembler.Ld(R16.DE, newIxChange);
+                    assembler.Add(I16.IX, R16.DE);
+                }
+
+                while (ixOffset < -128)
+                {
+                    short newIxChange = 0;
+                    do
+                    {
+                        newIxChange -= 128;
+                        ixOffset += 128;
+                        size += 128;
+                    }
+                    while (ixOffset < -128);
+
+                    changeToIX += newIxChange;
+
+                    assembler.Ld(R16.DE, newIxChange);
+                    assembler.Add(I16.IX, R16.DE);
+                }
+
+                assembler.Pop(R16.HL);
+                if (bytesToCopy == 2)
+                {
+                    assembler.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
+                }
+                assembler.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
+
+                ixOffset += 2;
+                totalBytesToCopy -= 2;
+            } while (ixOffset < size + originalIxOffset);
+
+            if (changeToIX != 0 && restoreIX)
             {
                 assembler.Ld(R16.DE, (short)(-changeToIX));
                 assembler.Add(I16.IX, R16.DE);
