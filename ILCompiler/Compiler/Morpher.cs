@@ -52,7 +52,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case IndirectEntry ie:
-                    tree = new IndirectEntry(MorphTree(ie.Op1), ie.Kind, ie.ExactSize, ie.DesiredSize, ie.Offset) { SourceInHeap = ie.SourceInHeap };
+                    tree = new IndirectEntry(MorphTree(ie.Op1), ie.Kind, ie.ExactSize, ie.DesiredSize, ie.Offset);
                     break;
 
                 case IntrinsicEntry ie:
@@ -118,7 +118,7 @@ namespace ILCompiler.Compiler
             addr = new BinaryOperator(Operation.Add, isComparison: false, tree.ArrayOp, addr, StackValueKind.NativeInt);
 
 
-            addr = new IndirectEntry(addr, tree.Kind, tree.ExactSize) { SourceInHeap = true };
+            addr = new IndirectEntry(addr, tree.Kind, tree.ExactSize);
 
             return addr;
         }
