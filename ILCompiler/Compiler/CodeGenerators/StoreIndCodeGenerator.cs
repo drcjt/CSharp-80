@@ -23,14 +23,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
                 else
                 {
-                    if (entry.TargetInHeap)
-                    {
-                        CopyHelper.CopyFromStackToHeap(context.Assembler, exactSize, offset);
-                    }
-                    else
-                    {
-                        CopyHelper.CopyFromStackToIX(context.Assembler, exactSize, offset);
-                    }
+                    CopyHelper.CopyFromStackToIX(context.Assembler, exactSize, offset);
                 }
 
                 context.Assembler.Push(R16.BC);

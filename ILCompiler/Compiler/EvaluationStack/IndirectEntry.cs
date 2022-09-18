@@ -11,8 +11,6 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public int DesiredSize { get; }
 
-        public bool SourceInHeap { get; set; }
-
         public IndirectEntry(StackEntry op1, StackValueKind kind, int? exactSize, int desiredSize = 4, uint offset = 0) : base(kind, exactSize)
         {
             Op1 = op1;
@@ -22,7 +20,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public override StackEntry Duplicate()
         {
-            return new IndirectEntry(Op1.Duplicate(), Kind, ExactSize, DesiredSize, Offset) { SourceInHeap = this.SourceInHeap };
+            return new IndirectEntry(Op1.Duplicate(), Kind, ExactSize, DesiredSize, Offset);
         }
 
         public override void Accept(IStackEntryVisitor visitor)

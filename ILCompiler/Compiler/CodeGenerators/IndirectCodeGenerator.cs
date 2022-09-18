@@ -32,14 +32,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
                 else
                 {
-                    if (entry.SourceInHeap)
-                    {
-                        CopyHelper.CopyFromHeapToStack(context.Assembler, size, (short)entry.Offset, false);
-                    }
-                    else
-                    {
-                        CopyHelper.CopyFromIXToStack(context.Assembler, size, (short)entry.Offset, false);
-                    }
+                    CopyHelper.CopyFromIXToStack(context.Assembler, size, (short)entry.Offset, false);
                 }
 
                 // Restore IX
