@@ -66,7 +66,8 @@ namespace CSharp80.Tests.BVT
 
         private void CompileIL(string ilFileName)
         {
-            var assemblyConfigurationAttribute = typeof(ILBvtTests).Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
+            var currentType = MethodBase.GetCurrentMethod().DeclaringType;
+            var assemblyConfigurationAttribute = currentType.Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
             var buildConfigurationName = assemblyConfigurationAttribute?.Configuration;
 
             var asmFileName = Path.ChangeExtension(ilFileName, "asm");
