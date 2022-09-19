@@ -351,4 +351,3 @@ FAIL:
 	ret
 }
 }
-.assembly div_i4{}
