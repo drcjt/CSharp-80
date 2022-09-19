@@ -96,8 +96,7 @@ namespace ILCompiler.Common.TypeSystem.Common
             var offsets = new FieldAndOffset[numInstanceFields];
 
             // For types inheriting from another type, field offsets continue on from where they left off
-            // TODO: Need to fix this
-            LayoutInt cumulativeInstanceFieldPos = new LayoutInt(0); // = ComputeBytesUsedInParentType(type);
+            LayoutInt cumulativeInstanceFieldPos = ComputeBytesUsedInParentType(type);
 
             LayoutInt largestAlignmentRequirement = LayoutInt.One;
             int fieldOrdinal = 0;
