@@ -229,7 +229,7 @@ namespace ILCompiler.Common.TypeSystem.Common
                     }
                     else
                     {
-                        throw new NotImplementedException("TODO");
+                        throw new InvalidOperationException($"Failed to resolve type def for field {fieldTypeDefOrRef.Name}");
                     }
                 }
                 else

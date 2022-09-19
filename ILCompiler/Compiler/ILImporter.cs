@@ -47,8 +47,8 @@ namespace ILCompiler.Compiler
             public void ImportFallThrough(BasicBlock next) => _importer.ImportFallThrough(next);
             public StackEntry PopExpression() => _importer._stack.Pop();
             public void PushExpression(StackEntry entry) => _importer._stack.Push(entry);
-
-            public int GrabTemp(StackValueKind kind, int? exactSize) => _importer.GrabTemp(kind, exactSize);
+                
+            public int GrabTemp(StackValueKind kind, int? exactSize, VarType type) => _importer.GrabTemp(kind, exactSize, type);
         }
 
         public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IOpcodeImporterFactory importerFactory)
@@ -201,7 +201,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private int GrabTemp(StackValueKind kind, int? exactSize)
+        private int GrabTemp(StackValueKind kind, int? exactSize, VarType type)
         {
             var temp = new LocalVariableDescriptor()
             {
@@ -209,6 +209,7 @@ namespace ILCompiler.Compiler
                 IsTemp = true,
                 Kind = kind,
                 ExactSize = exactSize ?? 0,
+                Type = type
             };
 
             _localVariableTable.Add(temp);
@@ -220,7 +221,7 @@ namespace ILCompiler.Compiler
         {
             if (tempNumber == null)
             {
-                tempNumber = GrabTemp(entry.Kind, entry.ExactSize);
+                tempNumber = GrabTemp(entry.Kind, entry.ExactSize, entry.Type);
                 var temp = _localVariableTable[tempNumber.Value];
             }
 

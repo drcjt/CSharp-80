@@ -92,7 +92,7 @@ namespace ILCompiler.Compiler.Importer
         static private int FixupCallStructReturn(TypeSig returnType, List<StackEntry> arguments, IILImporterProxy importer, bool hasThis)
         {
             // Create temp
-            var lclNum = importer.GrabTemp(returnType.GetStackValueKind(), returnType.GetExactSize());
+            var lclNum = importer.GrabTemp(returnType.GetStackValueKind(), returnType.GetExactSize(), returnType.GetVarType());
             var returnBufferPtr = new LocalVariableAddressEntry(lclNum);
 
             // Ensure return buffer parameter goes after the this parameter if present
