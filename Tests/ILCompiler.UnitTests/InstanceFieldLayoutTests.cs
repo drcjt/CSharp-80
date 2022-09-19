@@ -24,15 +24,13 @@ namespace ILCompiler.UnitTests
             var buildConfigurationName = assemblyConfigurationAttribute?.Configuration;
            
             var corelibPath = Path.Combine(SolutionPath, $@".\System.Private.CoreLib\bin\{buildConfigurationName}\net6.0\System.Private.CoreLib.dll");
-
             ModuleDefMD corlibModule = ModuleDefMD.Load(corelibPath, modCtx);
-            var corlibAssemblyRef = corlibModule.Assembly.ToAssemblyRef();
+            ((AssemblyResolver)modCtx.AssemblyResolver).AddToCache(corlibModule);
 
             var options = new ModuleCreationOptions(modCtx)
             {
-                CorLibAssemblyRef = corlibAssemblyRef
+                CorLibAssemblyRef = corlibModule.Assembly.ToAssemblyRef()
             };
-
             string inputFilePath = Path.Combine(SolutionPath, $@".\Tests\CoreTestAssembly\bin\{buildConfigurationName}\net6.0\CoreTestAssembly.dll");
             _testModule = ModuleDefMD.Load(inputFilePath, options);
         }

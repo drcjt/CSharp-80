@@ -1,4 +1,8 @@
-﻿.assembly bne_u
+﻿.assembly extern System.Private.CoreLib as mscorlib
+{
+    .ver 0:0:0:0
+}
+.assembly TestAssembly
 {
 }
 

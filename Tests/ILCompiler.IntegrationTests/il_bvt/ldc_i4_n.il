@@ -1,7 +1,9 @@
-﻿.assembly extern mscorlib
+﻿.assembly extern System.Private.CoreLib as mscorlib
 {
-    .ver 4:0:0:0
-    .publickeytoken = (B7 7A 5C 56 19 34 E0 89)
+    .ver 0:0:0:0
+}
+.assembly TestAssembly
+{
 }
 .class ldc_i4_n {
 .method public static int32 Main() {
