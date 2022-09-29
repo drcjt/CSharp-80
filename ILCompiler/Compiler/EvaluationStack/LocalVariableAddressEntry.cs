@@ -9,6 +9,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         public LocalVariableAddressEntry(int localNumber) : base(StackValueKind.NativeInt, 2)
         {
             LocalNumber = localNumber;
+            Type = VarType.Ptr;
         }
 
         public override StackEntry Duplicate()

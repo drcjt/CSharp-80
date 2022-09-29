@@ -32,7 +32,6 @@ namespace ILCompiler.Compiler.CodeGenerators
                     if (context.Configuration.TargetArchitecture == TargetArchitecture.CPM)
                     {
                         context.Assembler.Pop(R16.HL);    // chars are stored on stack as int32 so remove MSW
-                        context.Assembler.Pop(R16.DE);    // put argument 1 into HL
 
                         context.Assembler.Push(R16.BC);     // save registers
                         context.Assembler.Push(R16.DE);
@@ -49,13 +48,11 @@ namespace ILCompiler.Compiler.CodeGenerators
                     else if (context.Configuration.TargetArchitecture == TargetArchitecture.TRS80)
                     {
                         context.Assembler.Pop(R16.HL);    // chars are stored on stack as int32 so remove MSW
-                        context.Assembler.Pop(R16.DE);    // put argument 1 into HL
                         context.Assembler.Ld(R8.A, R8.L); // Load low byte of argument 1 into A
                         context.Assembler.Call(0x0033); // ROM routine to display character at current cursor position
                     } else if (context.Configuration.TargetArchitecture == TargetArchitecture.ZXSpectrum)
                     {
                         context.Assembler.Pop(R16.HL);    // chars are stored on stack as int32 so remove MSW
-                        context.Assembler.Pop(R16.DE);    // put argument 1 into HL
                         context.Assembler.Ld(R8.A, R8.L); // Load low byte of argument 1 into A
                         context.Assembler.Rst(0x0010); // ROM routine to display character at current cursor position
                     }

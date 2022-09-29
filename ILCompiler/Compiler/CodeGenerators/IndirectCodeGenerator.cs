@@ -19,13 +19,11 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                 var size = entry.ExactSize ?? 4; // TODO: is 4 the right default size?
 
-                // If size is 1 or 2 and isn't a nativeint then need to add MSW
-                if (entry.DesiredSize == 4 && size < 4)
+                if (entry.Type == VarType.Ptr)
                 {
-                    context.Assembler.Ld(R16.HL, 0);
-                    context.Assembler.Push(R16.HL);
+                    CopyHelper.CopyFromIXToStack(context.Assembler, size, (short)entry.Offset, false);
                 }
-
+                else
                 if (entry.Type.IsSmall())
                 {
                     CopyHelper.CopySmallToStack(context.Assembler, size, (short)entry.Offset, !entry.Type.IsUnsigned());

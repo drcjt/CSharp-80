@@ -15,7 +15,7 @@ namespace ILCompiler.Compiler.EvaluationStack
             IsComparison = isComparison;
             Op1 = op1;
             Op2 = op2;
-            Type = VarType.Bool;
+            Type = isComparison ? VarType.Bool : Op1.Type;
         }
 
         public override StackEntry Duplicate()

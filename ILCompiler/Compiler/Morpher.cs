@@ -53,6 +53,7 @@ namespace ILCompiler.Compiler
 
                 case IndirectEntry ie:
                     tree = new IndirectEntry(MorphTree(ie.Op1), ie.Kind, ie.ExactSize, ie.DesiredSize, ie.Offset);
+                    tree.Type = ie.Type;
                     break;
 
                 case IntrinsicEntry ie:
@@ -73,6 +74,7 @@ namespace ILCompiler.Compiler
 
                 case StoreIndEntry sie:
                     tree = new StoreIndEntry(sie.Addr, MorphTree(sie.Op1), sie.TargetType, sie.FieldOffset, sie.ExactSize) { TargetInHeap = sie.TargetInHeap };
+                    tree.Type = sie.Type;
                     break;
 
                 case StoreLocalVariableEntry slve:

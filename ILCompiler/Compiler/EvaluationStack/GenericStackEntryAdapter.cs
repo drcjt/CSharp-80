@@ -112,5 +112,10 @@
         {
             _genericStackEntryVisitor.Visit<IndexRefEntry>(entry);
         }
+
+        public void Visit(PutArgTypeEntry entry)
+        {
+            _genericStackEntryVisitor.Visit<PutArgTypeEntry>(entry);
+        }
     }
 }

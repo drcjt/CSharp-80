@@ -36,7 +36,7 @@ namespace ILCompiler.Compiler.Importer
             var fieldOffset = fieldDef.FieldOffset ?? 0;
 
             var node = new StoreIndEntry(addr, value, WellKnownType.Int32, fieldOffset, fieldSize);
-            var varType = fieldDef.DeclaringType.ToTypeSig().GetVarType();
+            var varType = fieldDef.FieldType.GetVarType();
             node.Type = varType;
 
             importer.ImportAppendTree(node);

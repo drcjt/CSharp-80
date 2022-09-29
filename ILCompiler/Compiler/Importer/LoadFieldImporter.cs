@@ -57,7 +57,7 @@ namespace ILCompiler.Compiler.Importer
 
             var node = new IndirectEntry(obj, kind, fieldSize, fieldSize, fieldOffset);
 
-            var varType = fieldDef.DeclaringType.ToTypeSig().GetVarType();
+            var varType = fieldDef.FieldType.GetVarType();
             node.Type = varType;
 
             importer.PushExpression(node);
