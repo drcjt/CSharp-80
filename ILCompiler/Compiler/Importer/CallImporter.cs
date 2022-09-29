@@ -22,9 +22,17 @@ namespace ILCompiler.Compiler.Importer
 
             var arguments = new List<StackEntry>();
             var firstArgIndex = newObjThis != null ? 1 : 0;
-            for (var i = firstArgIndex; i < methodToCall.Parameters.Count; i++)
+            var parameterCount = methodToCall.Parameters.Count;
+            for (var i = firstArgIndex; i < parameterCount; i++)
             {
                 var argument = importer.PopExpression();
+
+                var parameterVarType = methodToCall.Parameters[parameterCount - (i - firstArgIndex) - 1].Type.GetVarType();
+                if (parameterVarType.IsSmall())
+                {
+                    argument = new PutArgTypeEntry(parameterVarType, argument);
+                }
+
                 arguments.Add(argument);
             }
             // Add the this pointer if required, e.g. if part of newobj
@@ -67,6 +75,7 @@ namespace ILCompiler.Compiler.Importer
             int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetExactSize() : null;
 
             var callNode = new CallEntry(targetMethod, arguments, returnType.GetStackValueKind(), returnTypeSize);
+            callNode.Type = methodToCall.HasReturnType ? returnType.GetVarType() : VarType.Void;
 
             if (!methodToCall.HasReturnType)
             {
@@ -92,7 +101,7 @@ namespace ILCompiler.Compiler.Importer
         static private int FixupCallStructReturn(TypeSig returnType, List<StackEntry> arguments, IILImporterProxy importer, bool hasThis)
         {
             // Create temp
-            var lclNum = importer.GrabTemp(returnType.GetStackValueKind(), returnType.GetExactSize());
+            var lclNum = importer.GrabTemp(returnType.GetStackValueKind(), returnType.GetExactSize(), returnType.GetVarType());
             var returnBufferPtr = new LocalVariableAddressEntry(lclNum);
 
             // Ensure return buffer parameter goes after the this parameter if present

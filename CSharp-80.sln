@@ -45,6 +45,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Matrix", "Samples\Matrix\Ma
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Primes", "Samples\Primes\Primes.csproj", "{381DA5BD-D5D1-442E-AE36-84D1838CEF82}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreTestAssembly", "Tests\CoreTestAssembly\CoreTestAssembly.csproj", "{C324B9F0-AECA-4B96-BFA7-4DB3981D9C67}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -115,6 +117,10 @@ Global
 		{381DA5BD-D5D1-442E-AE36-84D1838CEF82}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{381DA5BD-D5D1-442E-AE36-84D1838CEF82}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{381DA5BD-D5D1-442E-AE36-84D1838CEF82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C324B9F0-AECA-4B96-BFA7-4DB3981D9C67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C324B9F0-AECA-4B96-BFA7-4DB3981D9C67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C324B9F0-AECA-4B96-BFA7-4DB3981D9C67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C324B9F0-AECA-4B96-BFA7-4DB3981D9C67}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -133,6 +139,7 @@ Global
 		{CCA0232B-E334-4AEC-BE75-37FA26837DE3} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 		{CA3B639B-5587-474D-80A3-98BAEE34CAAD} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 		{381DA5BD-D5D1-442E-AE36-84D1838CEF82} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
+		{C324B9F0-AECA-4B96-BFA7-4DB3981D9C67} = {6505E749-06C0-4B7B-8F4B-17F9B36A9095}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}

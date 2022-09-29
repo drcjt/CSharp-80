@@ -40,6 +40,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public Int32ConstantEntry(int value) : base(StackValueKind.Int32, value, 4)
         {
+            Type = VarType.Int;
         }
 
         public override StackEntry Duplicate()

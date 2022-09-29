@@ -100,7 +100,7 @@ namespace ILCompiler.Compiler
             {
                 if (localVariable.IsParameter)
                 {
-                    var argumentSize = localVariable.ExactSize;
+                    var argumentSize = Math.Max(2, localVariable.ExactSize);  // Minimum size for parameters on stack is 2 bytes
                     localVariable.ExactSize = argumentSize;
                     localVariable.StackOffset = offset + localVariable.ExactSize;
 

@@ -20,6 +20,7 @@ namespace ILCompiler.Compiler.Importer
 
             var argument = importer.LocalVariableTable[lclNum];
             var node = new LocalVariableEntry(lclNum, argument.Kind, argument.ExactSize);
+            node.Type = argument.Type;
             importer.PushExpression(node);
         }
 

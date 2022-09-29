@@ -1,5 +1,10 @@
-﻿.assembly extern legacy library mscorlib {}
-
+﻿.assembly extern System.Private.CoreLib as mscorlib
+{
+    .ver 0:0:0:0
+}
+.assembly TestAssembly
+{
+}
 
 .class public _div {
 .method public static	int32 _div(int32,int32) {
@@ -346,4 +351,3 @@ FAIL:
 	ret
 }
 }
-.assembly div_i4{}

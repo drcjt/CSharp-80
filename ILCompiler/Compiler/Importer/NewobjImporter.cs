@@ -24,7 +24,7 @@ namespace ILCompiler.Compiler.Importer
             if (declType.IsValueType)
             {
                 // Allocate memory on the stack for the value type as a temp local variable
-                var lclNum = importer.GrabTemp(objKind, objSize);
+                var lclNum = importer.GrabTemp(objKind, objSize, objType.GetVarType());
                 var newObjThisPtr = new LocalVariableAddressEntry(lclNum);
 
                 // Call the valuetype constructor
@@ -39,7 +39,7 @@ namespace ILCompiler.Compiler.Importer
                 var op1 = new AllocObjEntry((int)declType.ClassSize, objKind);
 
                 // Store allocated memory address into a temp local variable
-                var lclNum = importer.GrabTemp(objKind, objSize);
+                var lclNum = importer.GrabTemp(objKind, objSize, VarType.Ptr);
                 var asg = new StoreLocalVariableEntry(lclNum, false, op1);
                 importer.ImportAppendTree(asg);
 

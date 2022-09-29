@@ -33,7 +33,10 @@ namespace ILCompiler.Compiler.Importer
             WellKnownType type = GetWellKnownType(instruction);            
             int exactSize = type.GetWellKnownTypeSize();
 
-            importer.ImportAppendTree(new StoreIndEntry(addr, value, type, fieldOffset: 0, exactSize));
+            var node = new StoreIndEntry(addr, value, type, fieldOffset: 0, exactSize);
+            node.Type = value.Type;
+
+            importer.ImportAppendTree(node);
         }
 
         private static WellKnownType GetWellKnownType(Instruction instruction)

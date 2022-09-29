@@ -1,7 +1,10 @@
-﻿.assembly beq_i
+﻿.assembly extern System.Private.CoreLib as mscorlib
+{
+    .ver 0:0:0:0
+}
+.assembly TestAssembly
 {
 }
-
 .method public static int32 Main() {
 .entrypoint
 .maxstack 10

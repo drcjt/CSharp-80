@@ -12,6 +12,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\ILCompiler\ILCompiler.csproj" />
+    <ProjectReference Include="..\CoreTestAssembly\CoreTestAssembly.csproj">
+      <Private>False</Private>
+      <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>

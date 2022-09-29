@@ -176,5 +176,11 @@ namespace ILCompiler.Compiler
         {
             throw new Exception("IndexRefEntry not valid in LIR");
         }
+
+        public void Visit(PutArgTypeEntry entry)
+        {
+            _sb.AppendLine($"       ┌──▌  t{entry.Op1.TreeID}");
+            _sb.AppendLine($"       putarg_type {entry.ArgType}");
+        }
     }
 }

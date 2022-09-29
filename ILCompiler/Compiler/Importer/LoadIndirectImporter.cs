@@ -21,6 +21,7 @@ namespace ILCompiler.Compiler.Importer
             var kind = instruction.OpCode.Code == Code.Ldind_I ? StackValueKind.NativeInt : StackValueKind.Int32;
 
             var node = new IndirectEntry(addr, kind, exactSize, desiredSize);
+            node.Type = GetType(instruction.OpCode.Code);
             importer.PushExpression(node);
         }
 
@@ -32,6 +33,18 @@ namespace ILCompiler.Compiler.Importer
                 Code.Ldind_I2 => WellKnownType.Int16,
                 Code.Ldind_I4 => WellKnownType.Int32,
                 Code.Ldind_I => WellKnownType.Int16,
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        private VarType GetType(Code code)
+        {
+            return code switch
+            {
+                Code.Ldind_I1 => VarType.SByte,
+                Code.Ldind_I2 => VarType.Short,
+                Code.Ldind_I4 => VarType.Int,
+                Code.Ldind_I => VarType.Ptr,
                 _ => throw new NotImplementedException(),
             };
         }

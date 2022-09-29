@@ -63,7 +63,7 @@ namespace ILCompiler.Compiler
             _indent++;
             entry.Addr.Accept(this);
             _indent--;
-            Print($"STORE_IND offset={entry.FieldOffset} size={entry.ExactSize}");
+            Print($"STORE_IND offset={entry.FieldOffset} size={entry.ExactSize} vartype={entry.Type}");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
@@ -114,7 +114,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(LocalVariableEntry entry)
         {
-            Print($"LCL_VAR {entry.Kind} V{entry.LocalNumber}");
+            Print($"LCL_VAR {entry.Kind} {entry.Type} V{entry.LocalNumber}");
         }
 
         public void Visit(LocalVariableAddressEntry entry)
@@ -155,6 +155,14 @@ namespace ILCompiler.Compiler
         public void Visit(CastEntry entry)
         {
             Print($"CAST {entry.DesiredType}");
+            _indent++;
+            entry.Op1.Accept(this);
+            _indent--;
+        }
+
+        public void Visit(PutArgTypeEntry entry)
+        {
+            Print($"PUTARG_TYPE {entry.ArgType}");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;

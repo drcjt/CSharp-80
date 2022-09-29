@@ -37,13 +37,12 @@ namespace ILCompiler.Compiler
                 }
             }
             ModuleDefMD corlibModule = ModuleDefMD.Load(corlibFilePath, modCtx);
-            var corlibAssemblyRef = corlibModule.Assembly.ToAssemblyRef();
+            ((AssemblyResolver)modCtx.AssemblyResolver).AddToCache(corlibModule);
 
             var options = new ModuleCreationOptions(modCtx)
             {
-                CorLibAssemblyRef = corlibAssemblyRef
+                CorLibAssemblyRef = corlibModule.Assembly.ToAssemblyRef()
             };
-
             ModuleDefMD module = ModuleDefMD.Load(inputFilePath, options);
 
             var typesToCompile = new List<TypeDef>();
