@@ -65,7 +65,12 @@ namespace ILCompiler.Common.TypeSystem.Common
 
         public LayoutInt GetWellKnownTypeSize(TypeDef type)
         {
-            switch (type.ToTypeSig().ElementType)
+            return GetWellKnownTypeSize(type.ToTypeSig());
+        }
+
+        public LayoutInt GetWellKnownTypeSize(TypeSig type)
+        {
+            switch (type.ElementType)
             {
                 case ElementType.Void:
                     return new LayoutInt(PointerSize);
@@ -84,11 +89,15 @@ namespace ILCompiler.Common.TypeSystem.Common
                     return new LayoutInt(4);
                 case ElementType.I:
                 case ElementType.U:
+                case ElementType.Ptr:
+                case ElementType.ByRef:
+                case ElementType.Array:
+                case ElementType.SZArray:
                     return new LayoutInt(PointerSize);
             }
 
             // Add new well known types if necessary
-            throw new InvalidOperationException();
+            throw new InvalidOperationException($"Cannot get well known type size for type {type.ElementType}");
         }
 
         public LayoutInt GetWellKnownTypeAlignment(TypeDef type)

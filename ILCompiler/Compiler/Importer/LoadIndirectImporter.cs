@@ -15,13 +15,17 @@ namespace ILCompiler.Compiler.Importer
             var type = GetWellKnownType(instruction.OpCode.Code);
             var addr = importer.PopExpression();
 
+            if (addr.Type == VarType.Int)
+            {
+                var cast = new CastEntry(WellKnownType.IntPtr, addr, VarType.Ptr);
+                cast.DesiredType2 = VarType.Ptr;
+                addr = cast;
+            }
+
             var exactSize = type.GetWellKnownTypeSize();
             var desiredSize = instruction.OpCode.Code == Code.Ldind_I ? 2 : 4;
 
-            var kind = instruction.OpCode.Code == Code.Ldind_I ? StackValueKind.NativeInt : StackValueKind.Int32;
-
-            var node = new IndirectEntry(addr, kind, exactSize, desiredSize);
-            node.Type = GetType(instruction.OpCode.Code);
+            var node = new IndirectEntry(addr, GetType(instruction.OpCode.Code), exactSize, desiredSize);
             importer.PushExpression(node);
         }
 

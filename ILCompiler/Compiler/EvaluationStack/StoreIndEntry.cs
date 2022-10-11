@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public WellKnownType TargetType { get; }
 
-        public StoreIndEntry(StackEntry addr, StackEntry op1, WellKnownType targetType, uint fieldOffset = 0, int? size = 4) : base(addr.Kind, size)
+        public StoreIndEntry(StackEntry addr, StackEntry op1, WellKnownType targetType, uint fieldOffset = 0, int? size = 4) : base(VarType.Void, size)
         {
             Addr = addr;
             Op1 = op1;

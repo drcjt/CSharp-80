@@ -91,7 +91,7 @@ namespace ILCompiler.Compiler
                 _out.WriteLine(Instruction.Halt());
             }
 
-            var hasReturnCode = entryMethod.ReturnType.GetStackValueKind() == StackValueKind.Int32;
+            var hasReturnCode = entryMethod.ReturnType.GetVarType().IsInt();
 
             if (hasReturnCode && _configuration.PrintReturnCode)
             {

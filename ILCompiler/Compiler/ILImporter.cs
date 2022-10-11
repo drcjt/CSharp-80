@@ -48,7 +48,7 @@ namespace ILCompiler.Compiler
             public StackEntry PopExpression() => _importer._stack.Pop();
             public void PushExpression(StackEntry entry) => _importer._stack.Push(entry);
                 
-            public int GrabTemp(StackValueKind kind, int? exactSize, VarType type) => _importer.GrabTemp(kind, exactSize, type);
+            public int GrabTemp(VarType type, int? exactSize) => _importer.GrabTemp(type, exactSize);
         }
 
         public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IOpcodeImporterFactory importerFactory)
@@ -201,13 +201,12 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private int GrabTemp(StackValueKind kind, int? exactSize, VarType type)
+        private int GrabTemp(VarType type, int? exactSize)
         {
             var temp = new LocalVariableDescriptor()
             {
                 IsParameter = false,
                 IsTemp = true,
-                Kind = kind,
                 ExactSize = exactSize ?? 0,
                 Type = type
             };
@@ -221,14 +220,14 @@ namespace ILCompiler.Compiler
         {
             if (tempNumber == null)
             {
-                tempNumber = GrabTemp(entry.Kind, entry.ExactSize, entry.Type);
+                tempNumber = GrabTemp(entry.Type, entry.ExactSize);
                 var temp = _localVariableTable[tempNumber.Value];
             }
 
             var node = new StoreLocalVariableEntry(tempNumber.Value, false, entry);
             ImportAppendTree(node);
 
-            return new LocalVariableEntry(tempNumber.Value, entry.Kind, entry.ExactSize);
+            return new LocalVariableEntry(tempNumber.Value, entry.Type, entry.ExactSize);
         }
 
         private void MarkBasicBlock(BasicBlock basicBlock)
@@ -291,15 +290,9 @@ namespace ILCompiler.Compiler
 
                 for (int i = 0; i < entryStack.Length; i++)
                 {
-                    if (entryStack[i].Kind != _stack[i].Kind)
+                    if (entryStack[i].Type != _stack[i].Type)
                     {
                         throw new InvalidProgramException();
-                    }
-
-                    if (entryStack[i].Kind == StackValueKind.ValueType)
-                    {
-                        if (entryStack[i].Kind != _stack[i].Kind)
-                            throw new InvalidProgramException();
                     }
                 }
             }

@@ -9,10 +9,12 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(CastEntry entry, CodeGeneratorContext context)
         {
-            var actualKind = entry.Op1.Kind;
-            var desiredType = entry.DesiredType;
+            var actualType = entry.Op1.Type;
+            var desiredType = entry.DesiredType2;
 
-            if (actualKind == StackValueKind.Int32 && desiredType == Common.TypeSystem.WellKnownType.UInt16)
+            var actualTypeIsIntOrUInt = actualType == VarType.Int || actualType == VarType.UInt;
+
+            if (actualTypeIsIntOrUInt && desiredType == VarType.UShort)
             {
                 context.Assembler.Pop(R16.HL);      // LSW
                 context.Assembler.Pop(R16.DE);      // MSW
@@ -22,7 +24,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 context.Assembler.Push(R16.DE);     // MSW
                 context.Assembler.Push(R16.HL);     // LSW
             }
-            else if (actualKind == StackValueKind.Int32 && desiredType == Common.TypeSystem.WellKnownType.Int16)
+            else if (actualTypeIsIntOrUInt && desiredType == VarType.Short)
             {
                 context.Assembler.Pop(R16.DE);      // LSW
                 context.Assembler.Pop(R16.HL);      // MSW
@@ -35,7 +37,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 context.Assembler.Push(R16.HL);     // MSW
                 context.Assembler.Push(R16.DE);     // LSW
             }
-            else if (actualKind == StackValueKind.Int32 && desiredType == WellKnownType.Byte)
+            else if (actualTypeIsIntOrUInt && desiredType == VarType.Byte)
             {
                 context.Assembler.Pop(R16.HL);      // LSW
                 context.Assembler.Pop(R16.DE);      // MSW
@@ -46,7 +48,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 context.Assembler.Push(R16.DE);     // MSW
                 context.Assembler.Push(R16.HL);     // LSW
             }
-            else if (actualKind == StackValueKind.Int32 && desiredType == WellKnownType.SByte)
+            else if (actualTypeIsIntOrUInt && desiredType == VarType.SByte)
             {
                 context.Assembler.Pop(R16.DE);      // LSW
                 context.Assembler.Pop(R16.HL);      // MSW
@@ -60,24 +62,21 @@ namespace ILCompiler.Compiler.CodeGenerators
                 context.Assembler.Push(R16.HL);     // MSW
                 context.Assembler.Push(R16.DE);     // LSW
             }
-            else if (actualKind == StackValueKind.Int32 && IsPtrType(desiredType))
+            else if (actualTypeIsIntOrUInt && desiredType == VarType.Ptr)
             {
                 context.Assembler.Pop(R16.HL);      // LSW
                 context.Assembler.Pop(R16.DE);      // MSW
 
                 context.Assembler.Push(R16.HL);     // LSW
             }
+            else if (actualType == VarType.ByRef && desiredType == VarType.Ptr)
+            {
+                // Nothing to do
+            }
             else
             {
-                throw new NotImplementedException($"Implicit cast from {actualKind} to {desiredType} not supported");
+                throw new NotImplementedException($"Implicit cast from {actualType} to {desiredType} not supported");
             }
-        }
-
-        private static bool IsPtrType(WellKnownType type)
-        {
-            return type == WellKnownType.Object ||
-                   type == WellKnownType.IntPtr ||
-                   type == WellKnownType.UIntPtr;
         }
     }
 }

@@ -19,7 +19,7 @@ namespace ILCompiler.Compiler.Importer
             var lclNum = MapIlArgNum(index, importer.ReturnBufferArgIndex);
 
             var argument = importer.LocalVariableTable[lclNum];
-            var node = new LocalVariableEntry(lclNum, argument.Kind, argument.ExactSize);
+            var node = new LocalVariableEntry(lclNum, argument.Type, argument.ExactSize);
             node.Type = argument.Type;
             importer.PushExpression(node);
         }

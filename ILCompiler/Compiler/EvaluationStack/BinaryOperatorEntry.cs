@@ -9,18 +9,17 @@ namespace ILCompiler.Compiler.EvaluationStack
         public bool IsComparison { get; }
         public Operation Operation { get; set; }
 
-        public BinaryOperator(Operation operation, bool isComparison, StackEntry op1, StackEntry op2, StackValueKind kind) : base(kind, op1.ExactSize)
+        public BinaryOperator(Operation operation, bool isComparison, StackEntry op1, StackEntry op2, VarType type) : base(type, 4)
         {
             Operation = operation;
             IsComparison = isComparison;
             Op1 = op1;
             Op2 = op2;
-            Type = isComparison ? VarType.Bool : Op1.Type;
         }
 
         public override StackEntry Duplicate()
         {
-            return new BinaryOperator(Operation, IsComparison, Op1.Duplicate(), Op2.Duplicate(), Kind);
+            return new BinaryOperator(Operation, IsComparison, Op1.Duplicate(), Op2.Duplicate(), Type);
         }
 
         public override void Accept(IStackEntryVisitor visitor)

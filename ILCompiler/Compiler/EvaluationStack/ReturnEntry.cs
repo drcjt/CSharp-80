@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         {
         }
 
-        public ReturnEntry(StackEntry? returnValue, int? returnBufferArgIndex, int? returnTypeExactSize) : base(returnValue?.Kind ?? StackValueKind.Unknown)
+        public ReturnEntry(StackEntry? returnValue, int? returnBufferArgIndex, int? returnTypeExactSize) : base(returnValue?.Type ?? VarType.Void)
         {
             Return = returnValue;
             ReturnBufferArgIndex = returnBufferArgIndex;

@@ -1,5 +1,4 @@
 ﻿using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -61,10 +60,9 @@ namespace ILCompiler.Compiler.Importer
             if (code != Code.Br)
             {
                 var op2 = importer.PopExpression();
-                if (op2.Kind != StackValueKind.Int32 && op2.Kind != StackValueKind.NativeInt 
-                    && op2.Kind != StackValueKind.ByRef && op2.Kind != StackValueKind.ObjRef)
+                if (!op2.Type.IsInt() && op2.Type != VarType.Ptr && op2.Type != VarType.ByRef && op2.Type != VarType.Ref)
                 {
-                    throw new NotSupportedException($"Boolean comparisons with op2 kind of {op2.Kind} not supported");
+                    throw new NotSupportedException($"Boolean comparisons with op2 type of {op2.Type} not supported");
                 }
 
                 StackEntry op1;
@@ -75,16 +73,20 @@ namespace ILCompiler.Compiler.Importer
                     op = Operation.Eq + (code - Code.Beq);
 
                     // TODO: really need to check valuetypes too as valuetype can still be int32 or int16 sized
-                    if (op1.Kind != StackValueKind.ValueType && op2.Kind != StackValueKind.ValueType)
+                    if (op1.Type != VarType.Struct && op2.Type != VarType.Struct)
                     {
                         // If one of the values is a native int then cast the other to be native int too
-                        if (TypeList.GetExactSize(op1.Kind) == 2 && TypeList.GetExactSize(op2.Kind) == 4)
+                        if (op1.Type == VarType.Ptr && op2.Type != VarType.Ptr)
                         {
-                            op2 = new CastEntry(Common.TypeSystem.WellKnownType.Object, op2, op1.Kind);
+                            var cast = new CastEntry(Common.TypeSystem.WellKnownType.Object, op2, VarType.Ptr);
+                            cast.DesiredType2 = VarType.Ptr;
+                            op2 = cast;
                         }
-                        else if (TypeList.GetExactSize(op1.Kind) == 4 && TypeList.GetExactSize(op2.Kind) == 2)
+                        else if (op1.Type != VarType.Ptr && op2.Type == VarType.Ptr)
                         {
-                            op1 = new CastEntry(Common.TypeSystem.WellKnownType.Object, op1, op2.Kind);
+                            var cast = new CastEntry(Common.TypeSystem.WellKnownType.Object, op1, VarType.Ptr);
+                            cast.DesiredType2 = VarType.Ptr;
+                            op1 = cast;
                         }
                     }
                 }
@@ -93,7 +95,9 @@ namespace ILCompiler.Compiler.Importer
                     op1 = new Int32ConstantEntry(0);
                     op = (code == Code.Brfalse) ? Operation.Eq : Operation.Ne;
                 }
-                op1 = new BinaryOperator(op, isComparison: true, op1, op2, op1.Kind);
+
+                var binopType = op1.Type == VarType.Ptr || op2.Type == VarType.Ptr ? VarType.Ptr : VarType.Int;
+                op1 = new BinaryOperator(op, isComparison: true, op1, op2, binopType);
                 importer.ImportAppendTree(new JumpTrueEntry(targetBlock.Label, op1));
             }
             else

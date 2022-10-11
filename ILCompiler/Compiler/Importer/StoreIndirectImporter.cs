@@ -15,20 +15,12 @@ namespace ILCompiler.Compiler.Importer
             var value = importer.PopExpression();
             var addr = importer.PopExpression();
 
-            if (addr.Kind != StackValueKind.NativeInt 
-                && addr.Kind != StackValueKind.ByRef
-                && addr.Kind != StackValueKind.ObjRef)
+            if (addr.Type == VarType.Int)
             {
-                throw new NotSupportedException($"Store indirect unsupported address of kind {addr.Kind}");
-            }
-
-            if (value.Kind != StackValueKind.Int32 
-                && value.Kind != StackValueKind.NativeInt
-                && value.Kind != StackValueKind.ByRef
-                && value.Kind != StackValueKind.ObjRef)
-            {
-                throw new NotSupportedException($"Cannot store indirect value of kind {value.Kind}");
-            }
+                var cast = new CastEntry(WellKnownType.IntPtr, addr, VarType.Ptr);
+                cast.DesiredType2 = VarType.Ptr;
+                addr = cast;
+            }    
 
             WellKnownType type = GetWellKnownType(instruction);            
             int exactSize = type.GetWellKnownTypeSize();

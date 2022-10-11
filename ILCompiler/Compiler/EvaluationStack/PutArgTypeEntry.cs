@@ -5,7 +5,7 @@
         public VarType ArgType { get; }
         public StackEntry Op1 { get; }
 
-        public PutArgTypeEntry(VarType argType, StackEntry op1) : base(op1.Kind, op1.ExactSize)
+        public PutArgTypeEntry(VarType argType, StackEntry op1) : base(op1.Type, op1.ExactSize)
         {
             ArgType = argType;
             Op1 = op1;

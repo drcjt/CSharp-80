@@ -11,7 +11,10 @@ namespace ILCompiler.Compiler.Importer
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var unaryOp = Operation.Neg + (instruction.OpCode.Code - Code.Neg);
-            importer.PushExpression(new UnaryOperator(unaryOp, importer.PopExpression()));
+            var op1 = importer.PopExpression();
+            var node = new UnaryOperator(unaryOp, op1);
+
+            importer.PushExpression(node);
         }
     }
 }

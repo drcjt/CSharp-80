@@ -23,11 +23,13 @@ namespace ILCompiler.Compiler.Importer
             {
                 // elemSize * index
                 var size = new NativeIntConstantEntry((short)elemSize);
-                indexOp = new CastEntry(WellKnownType.UIntPtr, indexOp, StackValueKind.NativeInt);
-                addr = new BinaryOperator(Operation.Mul, isComparison: false, size, indexOp, StackValueKind.NativeInt);
+                var cast = new CastEntry(WellKnownType.UIntPtr, indexOp, VarType.Ptr);
+                cast.DesiredType2 = VarType.Ptr;
+                indexOp = cast;
+                addr = new BinaryOperator(Operation.Mul, isComparison: false, size, indexOp, VarType.Ptr);
             }
 
-            addr = new BinaryOperator(Operation.Add, isComparison: false, arrayOp, addr, StackValueKind.NativeInt);
+            addr = new BinaryOperator(Operation.Add, isComparison: false, arrayOp, addr, VarType.Ptr);
 
             var targetType = WellKnownType.Int32;
 

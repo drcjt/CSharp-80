@@ -6,9 +6,11 @@ namespace ILCompiler.Compiler.EvaluationStack
     public class CastEntry : StackEntry
     {
         public WellKnownType DesiredType { get; }
+
+        public VarType DesiredType2 { get; set; }
         public StackEntry Op1 { get; }
 
-        public CastEntry(WellKnownType desiredType, StackEntry op1, StackValueKind kind) : base(kind, op1.ExactSize)
+        public CastEntry(WellKnownType desiredType, StackEntry op1, VarType type) : base(type, op1.ExactSize)
         {
             DesiredType = desiredType;
             Op1 = op1;
@@ -16,7 +18,9 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public override StackEntry Duplicate()
         {
-            return new CastEntry(DesiredType, Op1.Duplicate(), Op1.Kind);
+            var duplicate = new CastEntry(DesiredType, Op1.Duplicate(), Type);
+            duplicate.DesiredType2 = DesiredType2;
+            return duplicate;
         }
 
         public override void Accept(IStackEntryVisitor visitor)

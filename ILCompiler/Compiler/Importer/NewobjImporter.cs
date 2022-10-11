@@ -1,6 +1,5 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -18,37 +17,39 @@ namespace ILCompiler.Compiler.Importer
             var declType = methodToCall.DeclaringType;
 
             var objType = declType.ToTypeSig();
-            var objKind = objType.GetStackValueKind();
+            var objVarType = objType.GetVarType();
             var objSize = objType.GetExactSize();
 
             if (declType.IsValueType)
             {
                 // Allocate memory on the stack for the value type as a temp local variable
-                var lclNum = importer.GrabTemp(objKind, objSize, objType.GetVarType());
+                var lclNum = importer.GrabTemp(objVarType, objSize);
                 var newObjThisPtr = new LocalVariableAddressEntry(lclNum);
 
                 // Call the valuetype constructor
                 CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
 
-                var node = new LocalVariableEntry(lclNum, objKind, objSize);
+                var node = new LocalVariableEntry(lclNum, objVarType, objSize);
+                node.Type = VarType.Struct;
                 importer.PushExpression(node);
             }
             else
             {
                 // Allocate memory for object
-                var op1 = new AllocObjEntry((int)declType.ClassSize, objKind);
+                var op1 = new AllocObjEntry((int)declType.ClassSize, objVarType);
 
                 // Store allocated memory address into a temp local variable
-                var lclNum = importer.GrabTemp(objKind, objSize, VarType.Ptr);
+                var lclNum = importer.GrabTemp(VarType.Ptr, objSize);
                 var asg = new StoreLocalVariableEntry(lclNum, false, op1);
                 importer.ImportAppendTree(asg);
 
                 // Call the constructor
-                var newObjThisPtr = new LocalVariableEntry(lclNum, objKind, objSize);
+                var newObjThisPtr = new LocalVariableEntry(lclNum, objVarType, objSize);
                 CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
 
                 // Push a local variable entry corresponding to the object here
-                var node = new LocalVariableEntry(lclNum, objKind, objSize);
+                var node = new LocalVariableEntry(lclNum, objVarType, objSize);
+                node.Type = VarType.Ptr;
                 importer.PushExpression(node);
             }
         }

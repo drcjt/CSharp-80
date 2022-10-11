@@ -12,14 +12,16 @@ namespace ILCompiler.Compiler.Importer
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var op2 = importer.PopExpression();
-            if (op2.Kind == StackValueKind.Int32)
+            if (op2.Type != VarType.Ptr)
             {
                 // Insert cast from int32 to nativeint as cannot localloc more
                 // space than the processor can address :)
-                op2 = new CastEntry(Common.TypeSystem.WellKnownType.Object, op2, StackValueKind.NativeInt);
+                var cast = new CastEntry(Common.TypeSystem.WellKnownType.Object, op2, VarType.Ptr);
+                cast.DesiredType2 = VarType.Ptr;
+                op2 = cast;
             }
 
-            if (op2.Kind != StackValueKind.NativeInt)
+            if (op2.Type != VarType.Ptr)
             {
                 throw new NotSupportedException("Localloc requires native int size");
             }

@@ -9,7 +9,7 @@ namespace ILCompiler.Compiler.CodeGenerators
         public void GenerateCode(ReturnEntry entry, CodeGeneratorContext context)
         {
             var targetType = entry.Return;
-            var hasReturnValue = targetType != null && targetType.Kind != StackValueKind.Unknown;
+            var hasReturnValue = targetType != null && targetType.Type != VarType.Void;
 
             if (hasReturnValue)
             {
@@ -39,7 +39,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 {
                     context.Assembler.Pop(R16.DE);            // Copy return value into DE/DE'
 
-                    if (targetType?.Kind == StackValueKind.Int32)
+                    if (targetType?.Type.IsInt() ?? false)
                     {
                         context.Assembler.Exx();
                         context.Assembler.Pop(R16.DE);
@@ -103,7 +103,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             if (hasReturnValue && !entry.ReturnBufferArgIndex.HasValue)
             {
-                if (targetType?.Kind == StackValueKind.Int32)
+                if (targetType?.Type.IsInt() ?? false)
                 {
                     context.Assembler.Exx();
                     context.Assembler.Push(R16.DE);

@@ -5,7 +5,7 @@
         public StackEntry Op1 { get; }
         public Operation Operation { get; set; }
 
-        public UnaryOperator(Operation operation, StackEntry op1) : base(op1.Kind, op1.ExactSize)
+        public UnaryOperator(Operation operation, StackEntry op1) : base(op1.Type, op1.ExactSize)
         {
             Operation = operation;
             Op1 = op1;

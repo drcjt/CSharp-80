@@ -74,7 +74,7 @@ namespace ILCompiler.Compiler.Importer
 
             int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetExactSize() : null;
 
-            var callNode = new CallEntry(targetMethod, arguments, returnType.GetStackValueKind(), returnTypeSize);
+            var callNode = new CallEntry(targetMethod, arguments, returnType.GetVarType(), returnTypeSize);
             callNode.Type = methodToCall.HasReturnType ? returnType.GetVarType() : VarType.Void;
 
             if (!methodToCall.HasReturnType)
@@ -88,7 +88,8 @@ namespace ILCompiler.Compiler.Importer
                     importer.ImportAppendTree(callNode);
 
                     // Load return buffer to stack
-                    var loadTemp = new LocalVariableEntry(returnBufferArgIndex, returnType.GetStackValueKind(), returnType.GetExactSize());
+                    var loadTemp = new LocalVariableEntry(returnBufferArgIndex, returnType.GetVarType(), returnType.GetExactSize());
+                    loadTemp.Type = returnType.GetVarType();
                     importer.PushExpression(loadTemp);
                 }
                 else
@@ -101,7 +102,7 @@ namespace ILCompiler.Compiler.Importer
         static private int FixupCallStructReturn(TypeSig returnType, List<StackEntry> arguments, IILImporterProxy importer, bool hasThis)
         {
             // Create temp
-            var lclNum = importer.GrabTemp(returnType.GetStackValueKind(), returnType.GetExactSize(), returnType.GetVarType());
+            var lclNum = importer.GrabTemp(returnType.GetVarType(), returnType.GetExactSize());
             var returnBufferPtr = new LocalVariableAddressEntry(lclNum);
 
             // Ensure return buffer parameter goes after the this parameter if present
@@ -142,7 +143,7 @@ namespace ILCompiler.Compiler.Importer
                     return false;
             }
 
-            var callNode = new IntrinsicEntry(targetMethodName, arguments, StackValueKind.Unknown);
+            var callNode = new IntrinsicEntry(targetMethodName, arguments, VarType.Void);
             importer.ImportAppendTree(callNode);
 
             return true;

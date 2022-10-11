@@ -27,7 +27,7 @@ namespace ILCompiler.Compiler.Importer
             // can use this then for other helper functions too
 
             var args = new List<StackEntry>() { new Int32ConstantEntry(arrayElementSize), op2  };
-            var node = new CallEntry("NewArr", args, StackValueKind.ObjRef, 2);
+            var node = new CallEntry("NewArr", args, VarType.Ref, 2);
             importer.PushExpression(node);
         }
     }
