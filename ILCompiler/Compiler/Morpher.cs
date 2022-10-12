@@ -1,6 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem;
-using ILCompiler.Common.TypeSystem.IL;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler
@@ -44,8 +42,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case CastEntry ce:
-                    var cast = new CastEntry(ce.DesiredType, MorphTree(ce.Op1), ce.Type);
-                    cast.DesiredType2 = ce.DesiredType2;
+                    var cast = new CastEntry(MorphTree(ce.Op1), ce.Type);
                     tree = cast;                    
                     break;
 
@@ -54,7 +51,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case IndirectEntry ie:
-                    tree = new IndirectEntry(MorphTree(ie.Op1), ie.Type, ie.ExactSize, ie.DesiredSize, ie.Offset);
+                    tree = new IndirectEntry(MorphTree(ie.Op1), ie.Type, ie.ExactSize, ie.Offset);
                     break;
 
                 case IntrinsicEntry ie:
@@ -74,7 +71,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case StoreIndEntry sie:
-                    tree = new StoreIndEntry(sie.Addr, MorphTree(sie.Op1), sie.TargetType, sie.FieldOffset, sie.ExactSize) { TargetInHeap = sie.TargetInHeap };
+                    tree = new StoreIndEntry(sie.Addr, MorphTree(sie.Op1), sie.FieldOffset, sie.ExactSize) { TargetInHeap = sie.TargetInHeap };
                     break;
 
                 case StoreLocalVariableEntry slve:
@@ -113,8 +110,7 @@ namespace ILCompiler.Compiler
             {
                 // elemSize * index
                 var size = new NativeIntConstantEntry((short)tree.ElemSize);
-                var cast = new CastEntry(WellKnownType.UIntPtr, tree.IndexOp, VarType.Ptr);
-                cast.DesiredType2 = VarType.Ptr;
+                var cast = new CastEntry(tree.IndexOp, VarType.Ptr);
                 var indexOp = cast;
                 addr = new BinaryOperator(Operation.Mul, isComparison: false, size, indexOp, VarType.Ptr);
             }

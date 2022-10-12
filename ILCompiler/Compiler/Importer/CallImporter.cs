@@ -89,7 +89,6 @@ namespace ILCompiler.Compiler.Importer
 
                     // Load return buffer to stack
                     var loadTemp = new LocalVariableEntry(returnBufferArgIndex, returnType.GetVarType(), returnType.GetExactSize());
-                    loadTemp.Type = returnType.GetVarType();
                     importer.PushExpression(loadTemp);
                 }
                 else

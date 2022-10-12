@@ -78,14 +78,12 @@ namespace ILCompiler.Compiler.Importer
                         // If one of the values is a native int then cast the other to be native int too
                         if (op1.Type == VarType.Ptr && op2.Type != VarType.Ptr)
                         {
-                            var cast = new CastEntry(Common.TypeSystem.WellKnownType.Object, op2, VarType.Ptr);
-                            cast.DesiredType2 = VarType.Ptr;
+                            var cast = new CastEntry(op2, VarType.Ptr);
                             op2 = cast;
                         }
                         else if (op1.Type != VarType.Ptr && op2.Type == VarType.Ptr)
                         {
-                            var cast = new CastEntry(Common.TypeSystem.WellKnownType.Object, op1, VarType.Ptr);
-                            cast.DesiredType2 = VarType.Ptr;
+                            var cast = new CastEntry(op1, VarType.Ptr);
                             op1 = cast;
                         }
                     }

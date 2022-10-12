@@ -1,6 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler
+﻿namespace ILCompiler.Compiler
 {
     public enum VarType
     {
@@ -59,6 +57,33 @@ namespace ILCompiler.Compiler
         public static bool IsInt(this VarType type)
         {
             return type >= VarType.Bool && type <= VarType.UInt;
+        }
+
+        public static int GetTypeSize(this VarType type)
+        {
+            switch (type)
+            {
+                case VarType.Bool:
+                case VarType.Byte:
+                case VarType.SByte:
+                    return 1;
+
+                case VarType.Short:
+                case VarType.UShort:
+                    return 2;
+
+                case VarType.Int:
+                case VarType.UInt:
+                    return 4;
+
+                case VarType.Ref:
+                case VarType.ByRef:
+                case VarType.Ptr:
+                    return 2;
+
+                default:
+                    throw new NotImplementedException($"GetTypeSize for {type} is not implemented");
+            }
         }
     }
 }

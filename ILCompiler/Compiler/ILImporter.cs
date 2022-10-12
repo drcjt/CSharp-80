@@ -1,5 +1,4 @@
 ﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
 using ILCompiler.Interfaces;
@@ -221,7 +220,6 @@ namespace ILCompiler.Compiler
             if (tempNumber == null)
             {
                 tempNumber = GrabTemp(entry.Type, entry.ExactSize);
-                var temp = _localVariableTable[tempNumber.Value];
             }
 
             var node = new StoreLocalVariableEntry(tempNumber.Value, false, entry);

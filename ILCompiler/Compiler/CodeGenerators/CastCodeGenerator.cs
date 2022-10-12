@@ -1,6 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem;
-using ILCompiler.Common.TypeSystem.IL;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
@@ -10,7 +8,7 @@ namespace ILCompiler.Compiler.CodeGenerators
         public void GenerateCode(CastEntry entry, CodeGeneratorContext context)
         {
             var actualType = entry.Op1.Type;
-            var desiredType = entry.DesiredType2;
+            var desiredType = entry.Type;
 
             var actualTypeIsIntOrUInt = actualType == VarType.Int || actualType == VarType.UInt;
 

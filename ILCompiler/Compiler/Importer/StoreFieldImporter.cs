@@ -1,6 +1,5 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -27,7 +26,7 @@ namespace ILCompiler.Compiler.Importer
             var fieldSize = fieldDef.FieldType.GetExactSize();
             var fieldOffset = fieldDef.FieldOffset ?? 0;
 
-            var node = new StoreIndEntry(addr, value, WellKnownType.Int32, fieldOffset, fieldSize);
+            var node = new StoreIndEntry(addr, value, fieldOffset, fieldSize);
 
             importer.ImportAppendTree(node);
         }

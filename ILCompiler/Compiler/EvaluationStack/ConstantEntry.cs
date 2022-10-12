@@ -1,6 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public abstract class ConstantEntry : StackEntry
     {
@@ -22,6 +20,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     public class StringConstantEntry : ConstantEntry<String>
     {
         public string Label { get; set; } = String.Empty;
+        // TODO: Should this use an exactSize of 2??
         public StringConstantEntry(string value) : base(VarType.Ptr, value, 4)
         {
         }
@@ -39,7 +38,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
     public class Int32ConstantEntry : ConstantEntry<int>
     {
-        public Int32ConstantEntry(int value) : base(VarType.Int, value, 4)
+        public Int32ConstantEntry(int value) : base(VarType.Int, value, VarType.Int.GetTypeSize())
         {
         }
 
@@ -56,7 +55,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
     public class NativeIntConstantEntry : ConstantEntry<short>
     {
-        public NativeIntConstantEntry(short value) : base(VarType.Ptr, value, 2)
+        public NativeIntConstantEntry(short value) : base(VarType.Ptr, value, VarType.Ptr.GetTypeSize())
         {
         }
 

@@ -1,5 +1,4 @@
 ﻿using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -26,7 +25,6 @@ namespace ILCompiler.Compiler.Importer
             var localNumber = importer.ParameterCount + index;
             var localVariable = importer.LocalVariableTable[localNumber];
             var node = new StoreLocalVariableEntry(localNumber, false, value);
-            node.Type = localVariable.Type;
             importer.ImportAppendTree(node, true);
         }
 

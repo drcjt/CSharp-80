@@ -1,5 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators

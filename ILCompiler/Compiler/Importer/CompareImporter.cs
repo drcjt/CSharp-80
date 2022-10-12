@@ -1,5 +1,4 @@
 ﻿using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -26,14 +25,12 @@ namespace ILCompiler.Compiler.Importer
             {
                 if (op1.Type != VarType.Ptr)
                 {
-                    var cast = new CastEntry(Common.TypeSystem.WellKnownType.Object, op1, VarType.Ptr);
-                    cast.DesiredType2 = VarType.Ptr;
+                    var cast = new CastEntry(op1, VarType.Ptr);
                     op1 = cast;
                 }
                 if (op2.Type != VarType.Ptr)
                 {
-                    var cast = new CastEntry(Common.TypeSystem.WellKnownType.Object, op2, VarType.Ptr);
-                    cast.DesiredType2 = VarType.Ptr;
+                    var cast = new CastEntry(op2, VarType.Ptr);
                     op2 = cast;
                 }
             }

@@ -1,6 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public class StoreIndEntry : StackEntry
     {
@@ -10,19 +8,16 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public bool TargetInHeap { get; set; }
 
-        public WellKnownType TargetType { get; }
-
-        public StoreIndEntry(StackEntry addr, StackEntry op1, WellKnownType targetType, uint fieldOffset = 0, int? size = 4) : base(VarType.Void, size)
+        public StoreIndEntry(StackEntry addr, StackEntry op1, uint fieldOffset = 0, int? size = 4) : base(VarType.Void, size)
         {
             Addr = addr;
             Op1 = op1;
             FieldOffset = fieldOffset;
-            TargetType = targetType;
         }
 
         public override StackEntry Duplicate()
         {
-            return new StoreIndEntry(Addr, Op1.Duplicate(), TargetType, FieldOffset, ExactSize) { TargetInHeap = this.TargetInHeap };
+            return new StoreIndEntry(Addr, Op1.Duplicate(), FieldOffset, ExactSize) { TargetInHeap = this.TargetInHeap };
         }
 
         public override void Accept(IStackEntryVisitor visitor)

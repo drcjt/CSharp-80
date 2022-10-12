@@ -134,7 +134,7 @@ namespace ILCompiler.Compiler
         public void Visit(CastEntry entry)
         {
             _sb.AppendLine($"       ┌──▌  t{entry.Op1.TreeID}");
-            _sb.AppendLine($"       cast {entry.DesiredType}");
+            _sb.AppendLine($"       cast {entry.Type}");
         }
 
         public void Visit(UnaryOperator entry)

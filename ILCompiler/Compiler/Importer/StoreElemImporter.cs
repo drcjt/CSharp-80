@@ -23,17 +23,14 @@ namespace ILCompiler.Compiler.Importer
             {
                 // elemSize * index
                 var size = new NativeIntConstantEntry((short)elemSize);
-                var cast = new CastEntry(WellKnownType.UIntPtr, indexOp, VarType.Ptr);
-                cast.DesiredType2 = VarType.Ptr;
+                var cast = new CastEntry(indexOp, VarType.Ptr);
                 indexOp = cast;
                 addr = new BinaryOperator(Operation.Mul, isComparison: false, size, indexOp, VarType.Ptr);
             }
 
             addr = new BinaryOperator(Operation.Add, isComparison: false, arrayOp, addr, VarType.Ptr);
 
-            var targetType = WellKnownType.Int32;
-
-            var op = new StoreIndEntry(addr, value, targetType) { TargetInHeap = true };
+            var op = new StoreIndEntry(addr, value) { TargetInHeap = true };
             importer.ImportAppendTree(op);
         }
     }

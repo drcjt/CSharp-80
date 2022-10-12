@@ -154,7 +154,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(CastEntry entry)
         {
-            Print($"CAST {entry.DesiredType}");
+            Print($"CAST {entry.Type}");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;

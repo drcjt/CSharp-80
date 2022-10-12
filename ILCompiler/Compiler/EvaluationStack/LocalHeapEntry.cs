@@ -6,7 +6,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public StackEntry Op1 { get; }
 
-        public LocalHeapEntry(StackEntry op1) : base(VarType.Ptr, 2)
+        public LocalHeapEntry(StackEntry op1) : base(VarType.Ptr, VarType.Ptr.GetTypeSize())
         {
             Op1 = op1;
         }

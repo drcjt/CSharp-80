@@ -1,12 +1,10 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public class LocalVariableAddressEntry : StackEntry, ILocalVariable
     {
         public int LocalNumber { get; }
 
-        public LocalVariableAddressEntry(int localNumber) : base(VarType.Ptr, 2)
+        public LocalVariableAddressEntry(int localNumber) : base(VarType.Ptr, VarType.Ptr.GetTypeSize())
         {
             LocalNumber = localNumber;
         }

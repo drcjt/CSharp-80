@@ -1,5 +1,4 @@
 ﻿using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -16,8 +15,7 @@ namespace ILCompiler.Compiler.Importer
             {
                 // Insert cast from int32 to nativeint as cannot localloc more
                 // space than the processor can address :)
-                var cast = new CastEntry(Common.TypeSystem.WellKnownType.Object, op2, VarType.Ptr);
-                cast.DesiredType2 = VarType.Ptr;
+                var cast = new CastEntry(op2, VarType.Ptr);
                 op2 = cast;
             }
 
