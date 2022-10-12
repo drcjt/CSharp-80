@@ -1,13 +1,11 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public class SwitchEntry : StackEntry
     {
         public StackEntry Op1 { get; }
         public IList<string> JumpTable { get; }
 
-        public SwitchEntry(StackEntry op1, IList<string> jumpTable) : base(StackValueKind.Unknown)
+        public SwitchEntry(StackEntry op1, IList<string> jumpTable) : base(VarType.Void)
         {
             Op1 = op1;
             JumpTable = jumpTable;

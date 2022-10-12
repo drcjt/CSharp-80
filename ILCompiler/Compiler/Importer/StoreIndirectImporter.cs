@@ -1,6 +1,4 @@
 ﻿using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -15,41 +13,30 @@ namespace ILCompiler.Compiler.Importer
             var value = importer.PopExpression();
             var addr = importer.PopExpression();
 
-            if (addr.Kind != StackValueKind.NativeInt 
-                && addr.Kind != StackValueKind.ByRef
-                && addr.Kind != StackValueKind.ObjRef)
+            if (addr.Type == VarType.Int)
             {
-                throw new NotSupportedException($"Store indirect unsupported address of kind {addr.Kind}");
-            }
+                var cast = new CastEntry(addr, VarType.Ptr);
+                addr = cast;
+            }    
 
-            if (value.Kind != StackValueKind.Int32 
-                && value.Kind != StackValueKind.NativeInt
-                && value.Kind != StackValueKind.ByRef
-                && value.Kind != StackValueKind.ObjRef)
-            {
-                throw new NotSupportedException($"Cannot store indirect value of kind {value.Kind}");
-            }
+            int exactSize = GetType(instruction.OpCode.Code).GetTypeSize();
 
-            WellKnownType type = GetWellKnownType(instruction);            
-            int exactSize = type.GetWellKnownTypeSize();
-
-            var node = new StoreIndEntry(addr, value, type, fieldOffset: 0, exactSize);
+            var node = new StoreIndEntry(addr, value, fieldOffset: 0, exactSize);
             node.Type = value.Type;
 
             importer.ImportAppendTree(node);
         }
 
-        private static WellKnownType GetWellKnownType(Instruction instruction)
+        private static VarType GetType(Code code)
         {
-            var type = instruction.OpCode.Code switch
+            return code switch
             {
-                Code.Stind_I1 => WellKnownType.SByte,
-                Code.Stind_I2 => WellKnownType.Int16,
-                Code.Stind_I4 => WellKnownType.Int32,
-                Code.Stind_I => WellKnownType.Int16,
+                Code.Stind_I1 => VarType.SByte,
+                Code.Stind_I2 => VarType.Short,
+                Code.Stind_I4 => VarType.Int,
+                Code.Stind_I => VarType.Ptr,
                 _ => throw new NotImplementedException(),
             };
-            return type;
         }
     }
 }

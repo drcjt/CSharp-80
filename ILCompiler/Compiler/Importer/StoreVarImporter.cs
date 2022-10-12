@@ -1,5 +1,4 @@
 ﻿using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -22,14 +21,10 @@ namespace ILCompiler.Compiler.Importer
             int index = GetIndex(instruction);
 
             var value = importer.PopExpression();
-            if (value.Kind != StackValueKind.Int32 && value.Kind != StackValueKind.ObjRef && value.Kind != StackValueKind.ValueType && value.Kind != StackValueKind.NativeInt)
-            {
-                throw new NotSupportedException("Storing variables other than short, int32 ,object refs, or valuetypes not supported yet");
-            }
+
             var localNumber = importer.ParameterCount + index;
             var localVariable = importer.LocalVariableTable[localNumber];
             var node = new StoreLocalVariableEntry(localNumber, false, value);
-            node.Type = localVariable.Type;
             importer.ImportAppendTree(node, true);
         }
 

@@ -1,6 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public class IndexRefEntry : StackEntry
     {
@@ -9,7 +7,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public int ElemSize { get; }
 
-        public IndexRefEntry(StackEntry indexOp, StackEntry arrayOp, int elemSize, StackValueKind kind) : base(kind)
+        public IndexRefEntry(StackEntry indexOp, StackEntry arrayOp, int elemSize, VarType type) : base(type)
         {
             IndexOp = indexOp;
             ArrayOp = arrayOp;
@@ -23,7 +21,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public override StackEntry Duplicate()
         {
-            return new IndexRefEntry(IndexOp.Duplicate(), ArrayOp.Duplicate(), ElemSize, Kind);
+            return new IndexRefEntry(IndexOp.Duplicate(), ArrayOp.Duplicate(), ElemSize, Type);
         }
     }
 }

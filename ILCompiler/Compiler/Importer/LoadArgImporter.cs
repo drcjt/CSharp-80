@@ -19,8 +19,7 @@ namespace ILCompiler.Compiler.Importer
             var lclNum = MapIlArgNum(index, importer.ReturnBufferArgIndex);
 
             var argument = importer.LocalVariableTable[lclNum];
-            var node = new LocalVariableEntry(lclNum, argument.Kind, argument.ExactSize);
-            node.Type = argument.Type;
+            var node = new LocalVariableEntry(lclNum, argument.Type, argument.ExactSize);
             importer.PushExpression(node);
         }
 
@@ -29,7 +28,7 @@ namespace ILCompiler.Compiler.Importer
         /// </summary>
         /// <param name="ilArgNum"></param>
         /// <returns></returns>
-        private int MapIlArgNum(int ilArgNum, int? returnBufferArgIndex)
+        private static int MapIlArgNum(int ilArgNum, int? returnBufferArgIndex)
         {
             if (returnBufferArgIndex.HasValue)
             {
@@ -42,7 +41,7 @@ namespace ILCompiler.Compiler.Importer
             return ilArgNum;
         }
 
-        private int GetIndex(Instruction instruction)
+        private static int GetIndex(Instruction instruction)
         {
             var code = instruction.OpCode.Code;
             int index = code - Code.Ldarg_0;

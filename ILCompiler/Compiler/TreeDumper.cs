@@ -114,7 +114,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(LocalVariableEntry entry)
         {
-            Print($"LCL_VAR {entry.Kind} {entry.Type} V{entry.LocalNumber}");
+            Print($"LCL_VAR {entry.Type} V{entry.LocalNumber}");
         }
 
         public void Visit(LocalVariableAddressEntry entry)
@@ -154,7 +154,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(CastEntry entry)
         {
-            Print($"CAST {entry.DesiredType}");
+            Print($"CAST {entry.Type}");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;

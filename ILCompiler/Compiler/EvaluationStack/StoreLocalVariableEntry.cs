@@ -8,7 +8,7 @@
 
         public bool IsParameter { get; }
 
-        public StoreLocalVariableEntry(int localNumber, bool parameter, StackEntry op1) : base(op1.Kind)
+        public StoreLocalVariableEntry(int localNumber, bool parameter, StackEntry op1) : base(VarType.Void)
         {
             LocalNumber = localNumber;
             IsParameter = parameter;

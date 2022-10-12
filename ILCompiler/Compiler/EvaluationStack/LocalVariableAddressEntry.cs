@@ -1,15 +1,12 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public class LocalVariableAddressEntry : StackEntry, ILocalVariable
     {
         public int LocalNumber { get; }
 
-        public LocalVariableAddressEntry(int localNumber) : base(StackValueKind.NativeInt, 2)
+        public LocalVariableAddressEntry(int localNumber) : base(VarType.Ptr, VarType.Ptr.GetTypeSize())
         {
             LocalNumber = localNumber;
-            Type = VarType.Ptr;
         }
 
         public override StackEntry Duplicate()

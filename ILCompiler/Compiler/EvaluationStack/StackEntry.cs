@@ -1,6 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public enum Operation
     {
@@ -31,8 +29,6 @@ namespace ILCompiler.Compiler.EvaluationStack
     // which will be the main output of the importer
     public abstract class StackEntry : IVisitableStackEntry
     {
-        public StackValueKind Kind { get; }
-
         public VarType Type { get; set; }
 
         public int? ExactSize { get; }
@@ -44,9 +40,9 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public bool Contained { get; set; }
 
-        protected StackEntry(StackValueKind kind, int? exactSize = null)
+        protected StackEntry(VarType type, int? exactSize = null)
         {
-            Kind = kind;
+            Type = type;
             ExactSize = exactSize;
             TreeID = _treeID++;
         }

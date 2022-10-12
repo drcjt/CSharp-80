@@ -1,10 +1,8 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public abstract class ConstantEntry : StackEntry
     {
-        protected ConstantEntry(StackValueKind kind, int? exactSize) : base(kind, exactSize)
+        protected ConstantEntry(VarType type, int? exactSize) : base(type, exactSize)
         {
         }
     }
@@ -13,7 +11,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     {
         public T Value { get; set; }
 
-        protected ConstantEntry(StackValueKind kind, T value, int? exactSize) : base(kind, exactSize)
+        protected ConstantEntry(VarType type, T value, int? exactSize) : base(type, exactSize)
         {
             Value = value;
         }
@@ -22,9 +20,11 @@ namespace ILCompiler.Compiler.EvaluationStack
     public class StringConstantEntry : ConstantEntry<String>
     {
         public string Label { get; set; } = String.Empty;
-        public StringConstantEntry(string value) : base(StackValueKind.ObjRef, value, 4)
+        // TODO: Should this use an exactSize of 2??
+        public StringConstantEntry(string value) : base(VarType.Ptr, value, 4)
         {
         }
+
         public override StackEntry Duplicate()
         {
             return new StringConstantEntry(Value);
@@ -38,9 +38,8 @@ namespace ILCompiler.Compiler.EvaluationStack
 
     public class Int32ConstantEntry : ConstantEntry<int>
     {
-        public Int32ConstantEntry(int value) : base(StackValueKind.Int32, value, 4)
+        public Int32ConstantEntry(int value) : base(VarType.Int, value, VarType.Int.GetTypeSize())
         {
-            Type = VarType.Int;
         }
 
         public override StackEntry Duplicate()
@@ -56,9 +55,8 @@ namespace ILCompiler.Compiler.EvaluationStack
 
     public class NativeIntConstantEntry : ConstantEntry<short>
     {
-        public NativeIntConstantEntry(short value) : base(StackValueKind.NativeInt, value, 2)
+        public NativeIntConstantEntry(short value) : base(VarType.Ptr, value, VarType.Ptr.GetTypeSize())
         {
-
         }
 
         public override StackEntry Duplicate()

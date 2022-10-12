@@ -1,5 +1,4 @@
 ﻿using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -27,22 +26,18 @@ namespace ILCompiler.Compiler.Importer
             var op1 = importer.PopExpression();
 
             // If one of the values is a native int then cast the other to be native int too
-            if (op1.Kind == StackValueKind.NativeInt && op2.Kind == StackValueKind.Int32)
+            if (op1.Type == VarType.Ptr || op2.Type == VarType.Ptr)
             {
-                op2 = new CastEntry(Common.TypeSystem.WellKnownType.Object, op2, op1.Kind);
-            }
-            else if (op1.Kind == StackValueKind.Int32 && op2.Kind == StackValueKind.NativeInt)
-            {
-                op1 = new CastEntry(Common.TypeSystem.WellKnownType.Object, op1, op2.Kind);
-            }
-
-            // StackValueKind is carefully ordered to make this work
-            StackValueKind kind;
-            kind = op1.Kind > op2.Kind ? op1.Kind : op2.Kind;
-
-            if (kind != StackValueKind.Int32 && kind != StackValueKind.NativeInt)
-            {
-                throw new NotSupportedException($"Binary operation on type {kind} not supported");
+                if (op1.Type != VarType.Ptr)
+                {
+                    var cast = new CastEntry(op1, VarType.Ptr);
+                    op1 = cast;
+                }
+                if (op2.Type != VarType.Ptr)
+                {
+                    var cast = new CastEntry(op2, VarType.Ptr);
+                    op2 = cast;
+                }
             }
 
             Operation binaryOp;
@@ -58,8 +53,20 @@ namespace ILCompiler.Compiler.Importer
                     break;
             }
 
-            var binaryExpr = new BinaryOperator(binaryOp, isComparison: false, op1, op2, kind);
+            var binaryExpr = new BinaryOperator(binaryOp, isComparison: false, op1, op2, GetResultType(op1, op2));
             importer.PushExpression(binaryExpr);
+        }
+
+        private static VarType GetResultType(StackEntry op1, StackEntry op2)
+        {
+            if (op1.Type == VarType.Ptr || op2.Type == VarType.Ptr)
+            {
+                return VarType.Ptr;
+            }
+            else
+            {
+                return VarType.Int;
+            }
         }
     }
 }

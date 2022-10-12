@@ -1,13 +1,11 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public class CallEntry : StackEntry
     {
         public string TargetMethod { get; }
         public IList<StackEntry> Arguments { get; }
 
-        public CallEntry(string targetMethod, IList<StackEntry> arguments, StackValueKind returnKind, int? returnSize) : base(returnKind, returnSize)
+        public CallEntry(string targetMethod, IList<StackEntry> arguments, VarType returnType, int? returnSize) : base(returnType, returnSize)
         {
             TargetMethod = targetMethod;
             Arguments = arguments;
@@ -15,7 +13,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public override StackEntry Duplicate()
         {
-            return new CallEntry(TargetMethod, Arguments, Kind, ExactSize);
+            return new CallEntry(TargetMethod, Arguments, Type, ExactSize);
         }
 
         public override void Accept(IStackEntryVisitor visitor)

@@ -76,12 +76,12 @@ namespace ILCompiler.Compiler
 
         public void Visit(LocalVariableEntry entry)
         {
-            _sb.AppendLine($"t{entry.TreeID,-3} = lclVar {entry.Kind} V{entry.LocalNumber}");
+            _sb.AppendLine($"t{entry.TreeID,-3} = lclVar {entry.Type} V{entry.LocalNumber}");
         }
 
         public void Visit(LocalVariableAddressEntry entry)
         {
-            _sb.AppendLine($"t{entry.TreeID,-3} = lclVarAddr {entry.Kind} V{entry.LocalNumber}");
+            _sb.AppendLine($"t{entry.TreeID,-3} = lclVarAddr {entry.Type} V{entry.LocalNumber}");
         }
 
         public void Visit(StoreLocalVariableEntry entry)
@@ -102,7 +102,7 @@ namespace ILCompiler.Compiler
                 firstArg = false;
             }
 
-            if (entry.Kind != Common.TypeSystem.IL.StackValueKind.Unknown)
+            if (entry.Type != VarType.Void)
             {
                 _sb.AppendLine($"t{entry.TreeID,-3} = call {entry.TargetMethod}");
             }
@@ -134,7 +134,7 @@ namespace ILCompiler.Compiler
         public void Visit(CastEntry entry)
         {
             _sb.AppendLine($"       ┌──▌  t{entry.Op1.TreeID}");
-            _sb.AppendLine($"       cast {entry.DesiredType}");
+            _sb.AppendLine($"       cast {entry.Type}");
         }
 
         public void Visit(UnaryOperator entry)

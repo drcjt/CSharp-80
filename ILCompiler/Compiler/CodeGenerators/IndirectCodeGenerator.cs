@@ -1,5 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
@@ -8,7 +7,7 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(IndirectEntry entry, CodeGeneratorContext context)
         {
-            if (entry.Kind == StackValueKind.Int32 || entry.Kind == StackValueKind.ValueType || entry.Kind == StackValueKind.NativeInt)
+            if (entry.Type.IsInt() || entry.Type == VarType.Struct || entry.Type == VarType.Ptr)
             {
                 // Save IX to BC
                 context.Assembler.Push(I16.IX);
@@ -23,8 +22,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 {
                     CopyHelper.CopyFromIXToStack(context.Assembler, size, (short)entry.Offset, false);
                 }
-                else
-                if (entry.Type.IsSmall())
+                else if (entry.Type.IsSmall())
                 {
                     CopyHelper.CopySmallToStack(context.Assembler, size, (short)entry.Offset, !entry.Type.IsUnsigned());
                 }
@@ -39,7 +37,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             }
             else
             {
-                throw new NotImplementedException();
+                throw new NotImplementedException($"Indirect of type {entry.Type} not supported");
             }
         }
     }

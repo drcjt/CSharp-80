@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
@@ -34,11 +35,9 @@ namespace ILCompiler.Compiler
             // Setup local variable table - includes parameters as well as locals in method
             for (int parameterIndex = 0; parameterIndex < method.Parameters.Count; parameterIndex++)
             {
-                var kind = method.Parameters[parameterIndex].Type.GetStackValueKind();
                 var local = new LocalVariableDescriptor()
                 {
                     IsParameter = true,
-                    Kind = kind,
                     IsTemp = false,
                     Name = method.Parameters[parameterIndex].Name,
                     ExactSize = method.Parameters[parameterIndex].Type.GetExactSize(),
@@ -51,11 +50,9 @@ namespace ILCompiler.Compiler
             {
                 for (int variableIndex = 0; variableIndex < body.Variables.Count; variableIndex++)
                 {
-                    var kind = body.Variables[variableIndex].Type.GetStackValueKind();
                     var local = new LocalVariableDescriptor()
                     {
                         IsParameter = false,
-                        Kind = kind,
                         IsTemp = false,
                         Name = body.Variables[variableIndex].Name,
                         ExactSize = body.Variables[variableIndex].Type.GetExactSize(),
@@ -76,12 +73,14 @@ namespace ILCompiler.Compiler
         {
             if (returnType.IsStruct())
             {
+                var target = new TargetDetails(Common.TypeSystem.Common.TargetArchitecture.Z80);
+
                 var returnBuffer = new LocalVariableDescriptor()
                 {
                     IsParameter = true,
-                    Kind = StackValueKind.ByRef,
+                    Type = VarType.ByRef,
                     IsTemp = false,
-                    ExactSize = TypeList.GetExactSize(StackValueKind.ByRef),
+                    ExactSize = target.PointerSize,
                 };
 
                 // Ensure return buffer parameter goes after the this parameter if present
@@ -114,7 +113,7 @@ namespace ILCompiler.Compiler
                     StringBuilder sb = new StringBuilder();
                     foreach (var lclVar in _localVariableTable)
                     {
-                        sb.AppendLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Kind} {lclVar.ExactSize}");
+                        sb.AppendLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Type} {lclVar.ExactSize}");
 
                         lclNum++;
                     }

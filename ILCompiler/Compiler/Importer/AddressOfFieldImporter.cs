@@ -1,6 +1,5 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -20,10 +19,9 @@ namespace ILCompiler.Compiler.Importer
 
             var obj = importer.PopExpression();
 
-
-            if (obj.Kind != StackValueKind.ObjRef && obj.Kind != StackValueKind.ByRef)
+            if (obj.Type != VarType.Ref && obj.Type != VarType.ByRef)
             {
-                throw new NotImplementedException($"LoadFieldImporter does not support {obj.Kind}");
+                throw new NotImplementedException($"LoadFieldImporter does not support {obj.Type}");
             }
 
             var node = new FieldAddressEntry(fieldDef.Name, obj, fieldDef?.FieldOffset ?? 0);

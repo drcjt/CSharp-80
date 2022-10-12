@@ -21,8 +21,7 @@ namespace ILCompiler.Compiler.Importer
             int index = GetIndex(instruction);
             var localNumber = importer.ParameterCount + index;
             var localVariable = importer.LocalVariableTable[localNumber];
-            var node = new LocalVariableEntry(localNumber, localVariable.Kind, localVariable.ExactSize);
-            node.Type = localVariable.Type;
+            var node = new LocalVariableEntry(localNumber, localVariable.Type, localVariable.ExactSize);
             importer.PushExpression(node);
         }
 

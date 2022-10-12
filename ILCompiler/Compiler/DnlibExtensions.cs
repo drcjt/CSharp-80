@@ -1,7 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
-using ILCompiler.Common.TypeSystem.IL;
 using System.Diagnostics;
 
 namespace ILCompiler.Compiler
@@ -25,6 +24,9 @@ namespace ILCompiler.Compiler
 
             switch (typeSig.ElementType)
             {
+                case ElementType.Void:
+                    return VarType.Void;
+
                 case ElementType.Boolean: 
                     return VarType.Bool;
 
@@ -95,7 +97,7 @@ namespace ILCompiler.Compiler
             }
             else
             {
-                return TypeList.GetExactSize(type.GetStackValueKind());
+                return target.GetWellKnownTypeSize(type).AsInt;
             }
         }
     }

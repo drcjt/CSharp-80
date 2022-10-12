@@ -1,6 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem;
-using ILCompiler.Common.TypeSystem.IL;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler
@@ -36,15 +34,16 @@ namespace ILCompiler.Compiler
             switch (tree)
             {
                 case CallEntry c:
-                    tree = new CallEntry(c.TargetMethod, MorphList(c.Arguments), c.Kind, c.ExactSize);
+                    tree = new CallEntry(c.TargetMethod, MorphList(c.Arguments), c.Type, c.ExactSize);
                     break;
 
                 case BinaryOperator bo:
-                    tree = new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(bo.Op1), MorphTree(bo.Op2), bo.Kind);
+                    tree = new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(bo.Op1), MorphTree(bo.Op2), bo.Type);
                     break;
 
                 case CastEntry ce:
-                    tree = new CastEntry(ce.DesiredType, MorphTree(ce.Op1), ce.Kind);
+                    var cast = new CastEntry(MorphTree(ce.Op1), ce.Type);
+                    tree = cast;                    
                     break;
 
                 case FieldAddressEntry fae:
@@ -52,12 +51,11 @@ namespace ILCompiler.Compiler
                     break;
 
                 case IndirectEntry ie:
-                    tree = new IndirectEntry(MorphTree(ie.Op1), ie.Kind, ie.ExactSize, ie.DesiredSize, ie.Offset);
-                    tree.Type = ie.Type;
+                    tree = new IndirectEntry(MorphTree(ie.Op1), ie.Type, ie.ExactSize, ie.Offset);
                     break;
 
                 case IntrinsicEntry ie:
-                    tree = new IntrinsicEntry(ie.TargetMethod, MorphList(ie.Arguments), ie.Kind);
+                    tree = new IntrinsicEntry(ie.TargetMethod, MorphList(ie.Arguments), ie.Type);
                     break;
 
                 case JumpTrueEntry jte:
@@ -73,8 +71,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case StoreIndEntry sie:
-                    tree = new StoreIndEntry(sie.Addr, MorphTree(sie.Op1), sie.TargetType, sie.FieldOffset, sie.ExactSize) { TargetInHeap = sie.TargetInHeap };
-                    tree.Type = sie.Type;
+                    tree = new StoreIndEntry(sie.Addr, MorphTree(sie.Op1), sie.FieldOffset, sie.ExactSize) { TargetInHeap = sie.TargetInHeap };
                     break;
 
                 case StoreLocalVariableEntry slve:
@@ -113,14 +110,13 @@ namespace ILCompiler.Compiler
             {
                 // elemSize * index
                 var size = new NativeIntConstantEntry((short)tree.ElemSize);
-                var indexOp = new CastEntry(WellKnownType.UIntPtr, tree.IndexOp, StackValueKind.NativeInt);
-                addr = new BinaryOperator(Operation.Mul, isComparison: false, size, indexOp, StackValueKind.NativeInt);
+                var cast = new CastEntry(tree.IndexOp, VarType.Ptr);
+                var indexOp = cast;
+                addr = new BinaryOperator(Operation.Mul, isComparison: false, size, indexOp, VarType.Ptr);
             }
 
-            addr = new BinaryOperator(Operation.Add, isComparison: false, tree.ArrayOp, addr, StackValueKind.NativeInt);
-
-
-            addr = new IndirectEntry(addr, tree.Kind, tree.ExactSize);
+            addr = new BinaryOperator(Operation.Add, isComparison: false, tree.ArrayOp, addr, VarType.Ptr);
+            addr = new IndirectEntry(addr, tree.Type, tree.ExactSize);
 
             return addr;
         }

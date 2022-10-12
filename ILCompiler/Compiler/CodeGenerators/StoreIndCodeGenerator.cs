@@ -17,7 +17,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                 short offset = (short)entry.FieldOffset;
 
-                if (entry.Type.IsSmall())
+                if (entry.Op1.Type.IsSmall())
                 {
                     CopyHelper.CopyStackToSmall(context.Assembler, exactSize, offset);
                 }

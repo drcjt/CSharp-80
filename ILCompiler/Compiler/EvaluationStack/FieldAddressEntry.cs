@@ -1,6 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public class FieldAddressEntry : StackEntry
     {
@@ -10,7 +8,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public string Name { get; }
 
-        public FieldAddressEntry(String name, StackEntry op1, uint offset) : base(StackValueKind.ObjRef, 2)
+        public FieldAddressEntry(String name, StackEntry op1, uint offset) : base(VarType.Ptr, 2)
         {
             Name = name;
             Op1 = op1;

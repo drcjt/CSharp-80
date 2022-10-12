@@ -3,8 +3,6 @@ using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
-using System.Data;
-using System.Xml.Linq;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -27,7 +25,7 @@ namespace ILCompiler.Compiler.Importer
             // can use this then for other helper functions too
 
             var args = new List<StackEntry>() { new Int32ConstantEntry(arrayElementSize), op2  };
-            var node = new CallEntry("NewArr", args, StackValueKind.ObjRef, 2);
+            var node = new CallEntry("NewArr", args, VarType.Ref, 2);
             importer.PushExpression(node);
         }
     }

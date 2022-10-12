@@ -1,6 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public class ReturnEntry : StackEntry
     {
@@ -12,7 +10,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         {
         }
 
-        public ReturnEntry(StackEntry? returnValue, int? returnBufferArgIndex, int? returnTypeExactSize) : base(returnValue?.Kind ?? StackValueKind.Unknown)
+        public ReturnEntry(StackEntry? returnValue, int? returnBufferArgIndex, int? returnTypeExactSize) : base(returnValue?.Type ?? VarType.Void)
         {
             Return = returnValue;
             ReturnBufferArgIndex = returnBufferArgIndex;

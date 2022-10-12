@@ -1,6 +1,5 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -25,7 +24,7 @@ namespace ILCompiler.Compiler.Importer
 
             var obj = importer.PopExpression();
 
-            if (obj.Kind == StackValueKind.ValueType)
+            if (obj.Type == VarType.Struct)
             {
                 if (obj is LocalVariableEntry)
                 {
@@ -47,18 +46,14 @@ namespace ILCompiler.Compiler.Importer
                 }
             }
 
-            if (obj.Kind != StackValueKind.ObjRef && obj.Kind != StackValueKind.ByRef && obj.Kind != StackValueKind.NativeInt)
+            if (obj.Type != VarType.Ref && obj.Type != VarType.ByRef && obj.Type != VarType.Ptr)
             {
-                throw new NotImplementedException($"LoadFieldImporter does not support {obj.Kind}");
+                throw new NotImplementedException($"LoadFieldImporter does not support {obj.Type}");
             }
 
-            var kind = fieldDef.FieldType.GetStackValueKind();
             var fieldSize = fieldDef.FieldType.GetExactSize();
 
-            var node = new IndirectEntry(obj, kind, fieldSize, fieldSize, fieldOffset);
-
-            var varType = fieldDef.FieldType.GetVarType();
-            node.Type = varType;
+            var node = new IndirectEntry(obj, fieldDef.FieldType.GetVarType(), fieldSize, fieldOffset);
 
             importer.PushExpression(node);
         }

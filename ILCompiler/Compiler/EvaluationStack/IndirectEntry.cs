@@ -1,6 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public class IndirectEntry : StackEntry
     {
@@ -9,18 +7,15 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public uint Offset { get; }
 
-        public int DesiredSize { get; }
-
-        public IndirectEntry(StackEntry op1, StackValueKind kind, int? exactSize, int desiredSize = 4, uint offset = 0) : base(kind, exactSize)
+        public IndirectEntry(StackEntry op1, VarType type, int? exactSize, uint offset = 0) : base(type, exactSize)
         {
             Op1 = op1;
             Offset = offset;
-            DesiredSize = desiredSize;
         }
 
         public override StackEntry Duplicate()
         {
-            return new IndirectEntry(Op1.Duplicate(), Kind, ExactSize, DesiredSize, Offset);
+            return new IndirectEntry(Op1.Duplicate(), Type, ExactSize, Offset);
         }
 
         public override void Accept(IStackEntryVisitor visitor)

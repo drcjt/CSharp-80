@@ -1,6 +1,4 @@
 ﻿using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -12,32 +10,23 @@ namespace ILCompiler.Compiler.Importer
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            var type = GetWellKnownType(instruction.OpCode.Code);
+            var type = GetType(instruction.OpCode.Code);
             var addr = importer.PopExpression();
 
-            var exactSize = type.GetWellKnownTypeSize();
-            var desiredSize = instruction.OpCode.Code == Code.Ldind_I ? 2 : 4;
+            if (addr.Type == VarType.Int)
+            {
+                var cast = new CastEntry(addr, VarType.Ptr);
+                addr = cast;
+            }
 
-            var kind = instruction.OpCode.Code == Code.Ldind_I ? StackValueKind.NativeInt : StackValueKind.Int32;
+            var exactSize = type.GetTypeSize();
 
-            var node = new IndirectEntry(addr, kind, exactSize, desiredSize);
-            node.Type = GetType(instruction.OpCode.Code);
+
+            var node = new IndirectEntry(addr, GetType(instruction.OpCode.Code), exactSize);
             importer.PushExpression(node);
         }
 
-        private WellKnownType GetWellKnownType(Code code)
-        {
-            return code switch
-            {
-                Code.Ldind_I1 => WellKnownType.SByte,
-                Code.Ldind_I2 => WellKnownType.Int16,
-                Code.Ldind_I4 => WellKnownType.Int32,
-                Code.Ldind_I => WellKnownType.Int16,
-                _ => throw new NotImplementedException(),
-            };
-        }
-
-        private VarType GetType(Code code)
+        private static VarType GetType(Code code)
         {
             return code switch
             {

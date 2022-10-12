@@ -1,5 +1,4 @@
 ﻿using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -21,11 +20,22 @@ namespace ILCompiler.Compiler.Importer
             var op2 = importer.PopExpression();
             var op1 = importer.PopExpression();
 
-            // TODO: Ideally want to compare based on stackvaluekind and not implementation sizes here
-            if (TypeList.GetExactSize(op1.Kind) != TypeList.GetExactSize(op2.Kind))
+            // If one of the values is a native int then cast the other to be native int too
+            if (op1.Type == VarType.Ptr || op2.Type == VarType.Ptr)
             {
-                throw new NotSupportedException($"Boolean comparisons must have same size, {op1.Kind} and {op2.Kind} have different sizes");
+                if (op1.Type != VarType.Ptr)
+                {
+                    var cast = new CastEntry(op1, VarType.Ptr);
+                    op1 = cast;
+                }
+                if (op2.Type != VarType.Ptr)
+                {
+                    var cast = new CastEntry(op2, VarType.Ptr);
+                    op2 = cast;
+                }
             }
+
+            // TODO: Validate type of op1/op2 are compatible here
 
             Operation op = Operation.Eq;
             switch (instruction.OpCode.Code)
@@ -35,7 +45,7 @@ namespace ILCompiler.Compiler.Importer
                 case Code.Clt: op = Operation.Lt; break;
                 case Code.Clt_Un: op = Operation.Lt; break;
             }
-            op1 = new BinaryOperator(op, isComparison: true, op1, op2, op1.Kind);
+            op1 = new BinaryOperator(op, isComparison: true, op1, op2, VarType.Int);
             importer.PushExpression(op1);
         }
     }

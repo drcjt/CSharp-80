@@ -1,6 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler
+﻿namespace ILCompiler.Compiler
 {
     public enum VarType
     {
@@ -55,26 +53,36 @@ namespace ILCompiler.Compiler
         {
             return type == VarType.Bool || type == VarType.Byte || type == VarType.UShort || type == VarType.UInt;
         }
-    }
 
-    public static class TypeList
-    {
-        public static int GetExactSize(StackValueKind kind)
+        public static bool IsInt(this VarType type)
         {
-            switch (kind)
+            return type >= VarType.Bool && type <= VarType.UInt;
+        }
+
+        public static int GetTypeSize(this VarType type)
+        {
+            switch (type)
             {
-                case StackValueKind.Int32:
+                case VarType.Bool:
+                case VarType.Byte:
+                case VarType.SByte:
+                    return 1;
+
+                case VarType.Short:
+                case VarType.UShort:
+                    return 2;
+
+                case VarType.Int:
+                case VarType.UInt:
                     return 4;
-                case StackValueKind.Int64:
-                    return 8;
-                case StackValueKind.ObjRef:
+
+                case VarType.Ref:
+                case VarType.ByRef:
+                case VarType.Ptr:
                     return 2;
-                case StackValueKind.NativeInt:
-                    return 2;
-                case StackValueKind.ByRef:
-                    return 2;
+
                 default:
-                    throw new NotImplementedException($"Kind {kind} not yet supported");
+                    throw new NotImplementedException($"GetTypeSize for {type} is not implemented");
             }
         }
     }

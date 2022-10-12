@@ -1,12 +1,10 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public class JumpEntry : StackEntry
     {
         public string TargetLabel { get; }
 
-        public JumpEntry(string targetLabel) : base(StackValueKind.Unknown)
+        public JumpEntry(string targetLabel) : base(VarType.Void)
         {
             TargetLabel = targetLabel;
         }

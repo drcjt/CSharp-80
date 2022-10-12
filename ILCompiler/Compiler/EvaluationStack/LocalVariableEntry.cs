@@ -1,18 +1,16 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public class LocalVariableEntry : StackEntry, ILocalVariable
     {
         public int LocalNumber { get; }
-        public LocalVariableEntry(int localNumber, StackValueKind kind, int? exactSize) : base(kind, exactSize)
+        public LocalVariableEntry(int localNumber, VarType type, int? exactSize) : base(type, exactSize)
         {
             LocalNumber = localNumber;
         }
 
         public override StackEntry Duplicate()
         {
-            return new LocalVariableEntry(LocalNumber, Kind, ExactSize) { Type = Type };
+            return new LocalVariableEntry(LocalNumber, Type, ExactSize) { Type = Type };
         }
 
         public override void Accept(IStackEntryVisitor visitor)

@@ -29,12 +29,12 @@ namespace ILCompiler.Compiler.Importer
                 }
                 else
                 {
-                    if (value.Kind != StackValueKind.Int32 
-                        && value.Kind != StackValueKind.NativeInt
-                        && value.Kind != StackValueKind.ByRef
-                        && value.Kind != StackValueKind.ObjRef)
+                    if (!value.Type.IsInt()
+                        && value.Type != VarType.Ptr 
+                        && value.Type != VarType.ByRef
+                        && value.Type != VarType.Ref)
                     {
-                        throw new NotSupportedException($"Unsupported Return type {value.Kind}");
+                        throw new NotSupportedException($"Unsupported Return type {value.Type}");
                     }
                 }
 

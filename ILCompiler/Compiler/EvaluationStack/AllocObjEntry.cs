@@ -1,12 +1,10 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public class AllocObjEntry : StackEntry
     {
         public int Size { get; }
 
-        public AllocObjEntry(int objSize, StackValueKind objKind) : base(objKind)
+        public AllocObjEntry(int objSize, VarType objType) : base(objType)
         {
             Size = objSize;
         }
@@ -18,7 +16,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public override StackEntry Duplicate()
         {
-            return new AllocObjEntry(Size, Kind);
+            return new AllocObjEntry(Size, Type);
         }
     }
 }

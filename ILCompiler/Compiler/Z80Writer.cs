@@ -1,5 +1,4 @@
 ﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -91,7 +90,7 @@ namespace ILCompiler.Compiler
                 _out.WriteLine(Instruction.Halt());
             }
 
-            var hasReturnCode = entryMethod.ReturnType.GetStackValueKind() == StackValueKind.Int32;
+            var hasReturnCode = entryMethod.ReturnType.GetVarType().IsInt();
 
             if (hasReturnCode && _configuration.PrintReturnCode)
             {

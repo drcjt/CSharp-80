@@ -1,5 +1,4 @@
 ﻿using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -17,7 +16,9 @@ namespace ILCompiler.Compiler.Importer
             var op1 = importer.PopExpression();
             var op2 = importer.PopExpression();
 
-            importer.PushExpression(new IndexRefEntry(op1, op2, 4, StackValueKind.Int32));
+            var node = new IndexRefEntry(op1, op2, 4, VarType.Int);
+
+            importer.PushExpression(node);
         }
     }
 }
