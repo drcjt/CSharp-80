@@ -6,8 +6,6 @@
         public StackEntry Op1 { get; }
         public uint FieldOffset { get; }
 
-        public bool TargetInHeap { get; set; }
-
         public StoreIndEntry(StackEntry addr, StackEntry op1, uint fieldOffset = 0, int? size = 4) : base(VarType.Void, size)
         {
             Addr = addr;
@@ -17,7 +15,7 @@
 
         public override StackEntry Duplicate()
         {
-            return new StoreIndEntry(Addr, Op1.Duplicate(), FieldOffset, ExactSize) { TargetInHeap = this.TargetInHeap };
+            return new StoreIndEntry(Addr, Op1.Duplicate(), FieldOffset, ExactSize);
         }
 
         public override void Accept(IStackEntryVisitor visitor)

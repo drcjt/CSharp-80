@@ -71,7 +71,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case StoreIndEntry sie:
-                    tree = new StoreIndEntry(sie.Addr, MorphTree(sie.Op1), sie.FieldOffset, sie.ExactSize) { TargetInHeap = sie.TargetInHeap };
+                    tree = new StoreIndEntry(sie.Addr, MorphTree(sie.Op1), sie.FieldOffset, sie.ExactSize);
                     break;
 
                 case StoreLocalVariableEntry slve:
@@ -105,18 +105,17 @@ namespace ILCompiler.Compiler
 
         private static StackEntry MorphArrayIndex(IndexRefEntry tree)
         {
-            StackEntry addr = tree.IndexOp;
+            var cast = new CastEntry(tree.IndexOp, VarType.Ptr);
+            StackEntry addr = cast;
             if (tree.ElemSize > 1)
             {
                 // elemSize * index
                 var size = new NativeIntConstantEntry((short)tree.ElemSize);
-                var cast = new CastEntry(tree.IndexOp, VarType.Ptr);
-                var indexOp = cast;
-                addr = new BinaryOperator(Operation.Mul, isComparison: false, size, indexOp, VarType.Ptr);
+                addr = new BinaryOperator(Operation.Mul, isComparison: false, size, addr, VarType.Ptr);
             }
 
             addr = new BinaryOperator(Operation.Add, isComparison: false, tree.ArrayOp, addr, VarType.Ptr);
-            addr = new IndirectEntry(addr, tree.Type, tree.ExactSize);
+            addr = new IndirectEntry(addr, tree.Type, tree.ElemSize);
 
             return addr;
         }

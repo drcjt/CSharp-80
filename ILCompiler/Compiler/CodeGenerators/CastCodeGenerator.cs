@@ -71,6 +71,10 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 // Nothing to do
             }
+            else if (actualType == VarType.UInt && desiredType == VarType.Int)
+            {
+                // Nothing to do
+            }
             else
             {
                 throw new NotImplementedException($"Implicit cast from {actualType} to {desiredType} not supported");
