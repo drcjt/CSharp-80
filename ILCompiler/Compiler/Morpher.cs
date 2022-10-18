@@ -67,7 +67,12 @@ namespace ILCompiler.Compiler
                     break;
 
                 case ReturnEntry re:
-                    tree = new ReturnEntry(re.Return, re.ReturnBufferArgIndex, re.ReturnTypeExactSize);
+                    var returnValue = re.Return;
+                    if (returnValue != null)
+                    {
+                        returnValue = MorphTree(returnValue);
+                    }
+                    tree = new ReturnEntry(returnValue, re.ReturnBufferArgIndex, re.ReturnTypeExactSize);
                     break;
 
                 case StoreIndEntry sie:
