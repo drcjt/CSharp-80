@@ -5,6 +5,20 @@
 .assembly TestAssembly
 {
 }
+
+.class public Test {
+.field public int32 I1
+.method public void .ctor(int32) {
+.maxstack 10
+	ldarg 0
+	call instance void [mscorlib]System.Object::.ctor()
+	ldarg 0
+	ldarg 1
+	stfld int32 Test::I1
+	ret
+}
+}
+
 .class public array_tests
 {
 .method public static int32 I8(int32, int32, int32) {
@@ -164,10 +178,42 @@
 	ret
 }
 
+.method public static int32 RefTest(int32, int32) {
+.maxstack  5
+.locals (class Test[], class Test)
+
+	ldc.i4 0x00000004
+	newarr Test
+	stloc.0
+
+	ldarg.1
+	newobj instance void Test::.ctor(int32)
+	stloc.1
+
+	ldloc.0
+	ldarg.0
+	ldloc.1
+	stelem.ref
+
+	ldloc.0
+	ldarg.0
+	ldelem.ref
+
+	ldfld int32 Test::I1
+	ldarg.1
+	ceq
+	ret
+}
+
 .method public static int32 Main() {
 .entrypoint
 .maxstack  5
 .locals ()
+
+	ldc.i4 0x00
+	ldc.i4 0x72
+	call int32 array_tests::RefTest(int32, int32)
+	brfalse FAIL
 
 	ldc.i4 0x00
 	ldc.i4 0x25

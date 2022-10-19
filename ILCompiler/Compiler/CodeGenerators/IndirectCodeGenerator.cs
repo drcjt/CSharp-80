@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(IndirectEntry entry, CodeGeneratorContext context)
         {
-            if (entry.Type.IsInt() || entry.Type == VarType.Struct || entry.Type == VarType.Ptr)
+            if (entry.Type.IsInt() || entry.Type == VarType.Struct || entry.Type == VarType.Ptr || entry.Type == VarType.Ref)
             {
                 // Save IX to BC
                 context.Assembler.Push(I16.IX);
@@ -18,7 +18,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                 var size = entry.ExactSize ?? 4; // TODO: is 4 the right default size?
 
-                if (entry.Type == VarType.Ptr)
+                if (entry.Type == VarType.Ptr || entry.Type == VarType.Ref)
                 {
                     CopyHelper.CopyFromIXToStack(context.Assembler, size, (short)entry.Offset, false);
                 }

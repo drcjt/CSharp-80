@@ -14,7 +14,8 @@ namespace ILCompiler.Compiler.Importer
                 || code == Code.Ldelem_I4
                 || code == Code.Ldelem_U1
                 || code == Code.Ldelem_U2
-                || code == Code.Ldelem_U4;
+                || code == Code.Ldelem_U4
+                || code == Code.Ldelem_Ref;
         }
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
@@ -41,6 +42,7 @@ namespace ILCompiler.Compiler.Importer
                 Code.Ldelem_U1 => VarType.Byte,
                 Code.Ldelem_U2 => VarType.UShort,
                 Code.Ldelem_U4 => VarType.UInt,
+                Code.Ldelem_Ref => VarType.Ref,
                 _ => throw new NotImplementedException(),
             };
         }

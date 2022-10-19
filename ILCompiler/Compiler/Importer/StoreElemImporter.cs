@@ -8,7 +8,7 @@ namespace ILCompiler.Compiler.Importer
 {
     public class StoreElemImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Stelem_I || code == Code.Stelem_I1 || code == Code.Stelem_I2 || code == Code.Stelem_I4;
+        public bool CanImport(Code code) => code == Code.Stelem_I || code == Code.Stelem_I1 || code == Code.Stelem_I2 || code == Code.Stelem_I4 || code == Code.Stelem_Ref;
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
@@ -16,7 +16,7 @@ namespace ILCompiler.Compiler.Importer
             var elemSize = elemType.GetTypeSize();
 
             var value = importer.PopExpression();
-            if (value.Type != elemType)
+            if (value.Type != elemType && elemType != VarType.Ref)
             {
                 value = new CastEntry(value, elemType);
             }
@@ -47,6 +47,7 @@ namespace ILCompiler.Compiler.Importer
                 Code.Stelem_I2 => VarType.Short,
                 Code.Stelem_I4 => VarType.Int,
                 Code.Stelem_I => VarType.Ptr,
+                Code.Stelem_Ref => VarType.Ref,
                 _ => throw new NotImplementedException(),
             };
         }
