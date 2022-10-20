@@ -13,6 +13,12 @@ newarr:
 	POP BC		; array size
 	POP HL
 
+	; Put array size into heap at next available location
+	LD HL, (HEAPNEXT)
+	LD (HL), C
+	INC HL
+	LD (HL), B
+
 	EXX
 	PUSH HL
 	EXX 
@@ -40,6 +46,7 @@ newarr_nomul16:
 
 	; Get next available heap address into DE & BC
 	LD DE, (HEAPNEXT)
+
 	PUSH DE
 	POP BC
 
@@ -50,9 +57,7 @@ newarr_nomul16:
 	POP HL;		Get return address
 
 	; Put address of memory allocated back on the stack
-	LD DE, 0
-	PUSH DE		; MSW first	- always 0 as we only have 64k of addressable memory
-	PUSH BC		; LSW next - allocated heap memory address
+	PUSH BC		; allocated heap memory address
 
 	PUSH HL;	put return address back
 
