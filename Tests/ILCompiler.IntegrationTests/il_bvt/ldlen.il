@@ -14,10 +14,10 @@
 .maxstack  5
 .locals ()
 
-	ldc.i4 0x04
-	ldc.i4 0x04
+	ldc.i4 0xFF
 	newarr [mscorlib]System.Int32
 	ldlen
+	ldc.i4 0xFF
 	ceq
 	brfalse FAIL
 

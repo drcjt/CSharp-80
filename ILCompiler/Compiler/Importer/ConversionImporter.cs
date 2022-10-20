@@ -49,7 +49,8 @@ namespace ILCompiler.Compiler.Importer
                 op1 = cast;
             }
 
-            op1.Type = GetType(instruction.OpCode.Code);
+            // TODO: Work out why this was added
+            //op1.Type = GetType(instruction.OpCode.Code);
 
             importer.PushExpression(op1);
         }

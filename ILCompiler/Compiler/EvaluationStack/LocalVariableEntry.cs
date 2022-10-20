@@ -10,7 +10,7 @@
 
         public override StackEntry Duplicate()
         {
-            return new LocalVariableEntry(LocalNumber, Type, ExactSize) { Type = Type };
+            return new LocalVariableEntry(LocalNumber, Type, ExactSize);
         }
 
         public override void Accept(IStackEntryVisitor visitor)

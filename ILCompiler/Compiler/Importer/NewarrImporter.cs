@@ -24,7 +24,7 @@ namespace ILCompiler.Compiler.Importer
             // could leverage existing CallEntry node to call arbitrary helper functions
             // can use this then for other helper functions too
 
-            var args = new List<StackEntry>() { new Int32ConstantEntry(arrayElementSize), op2  };
+            var args = new List<StackEntry>() { op2, new Int32ConstantEntry(arrayElementSize)  };
             var node = new CallEntry("NewArr", args, VarType.Ref, 2);
             importer.PushExpression(node);
         }
