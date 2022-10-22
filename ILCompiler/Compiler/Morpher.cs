@@ -76,7 +76,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case StoreIndEntry sie:
-                    tree = new StoreIndEntry(sie.Addr, MorphTree(sie.Op1), sie.FieldOffset, sie.ExactSize);
+                    tree = new StoreIndEntry(MorphTree(sie.Addr), MorphTree(sie.Op1), sie.FieldOffset, sie.ExactSize);
                     break;
 
                 case StoreLocalVariableEntry slve:
@@ -122,7 +122,7 @@ namespace ILCompiler.Compiler
             // addr + arraySizeOffset + (elemSize * index)
             var arraySizeOffset = new NativeIntConstantEntry(2);
             addr = new BinaryOperator(Operation.Add, isComparison: false, addr, arraySizeOffset, VarType.Ptr);
-            addr = new BinaryOperator(Operation.Add, isComparison: false, tree.ArrayOp, addr, VarType.Ptr);
+            addr = new BinaryOperator(Operation.Add, isComparison: false, MorphTree(tree.ArrayOp), addr, VarType.Ptr);
             addr = new IndirectEntry(addr, tree.Type, tree.ElemSize);
 
             return addr;
