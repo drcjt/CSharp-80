@@ -14,11 +14,8 @@ namespace ILCompiler.Compiler.Importer
         {
             var op2 = importer.PopExpression();
 
-            var typeDefOrRef = instruction.Operand as ITypeDefOrRef;
-            var typeDef = typeDefOrRef.ResolveTypeDefThrow();
-
-            var arrayElementType = typeDef.ToTypeSig();
-            var arrayElementSize = arrayElementType.GetHeapValueSize();
+            var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
+            var arrayElementSize = typeSig.GetExactSize();
 
             // Instead of creating new node type specifically for arrays
             // could leverage existing CallEntry node to call arbitrary helper functions
