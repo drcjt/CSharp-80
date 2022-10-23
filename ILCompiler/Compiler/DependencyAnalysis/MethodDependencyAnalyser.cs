@@ -30,7 +30,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         case Code.Call:
                             var methodDefOrRef = currentInstruction.Operand as IMethodDefOrRef;
                             var methodDef = methodDefOrRef.ResolveMethodDef();
-                            if (methodDef != null)
+                            if (methodDef != null && methodDef != _method)
                             {
                                 dependsOnMethods.Add(methodDef);
                             }
