@@ -4,8 +4,8 @@ public static class AckermannTest
 {
     public static int Main()
     {
-        int NUM = 8;
-        var ackermannValue = Ackermann(3, 3);
+        int NUM = 3;
+        var ackermannValue = Ackermann(3, NUM);
 
         if (ackermannValue == 61)
         {
