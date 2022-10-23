@@ -32,6 +32,8 @@ namespace DirectedTests
 
             z80.Start();
 
+            Console.WriteLine($"Test {assemblyFileName} ran in {z80.TStatesElapsedSinceStart} T-states");
+
             // Validate we finished on the HALT instruction
             Assert.AreEqual(12, z80.Registers.PC);
 
