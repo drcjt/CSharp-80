@@ -18,7 +18,41 @@ namespace ILCompiler.Compiler.Importer
         public static void ImportCall(Instruction instruction, ImportContext context, IILImporterProxy importer, StackEntry? newObjThis = null)
         {
             var methodDefOrRef = instruction.Operand as IMethodDefOrRef;
-            var methodToCall = methodDefOrRef.ResolveMethodDefThrow();
+
+            if (methodDefOrRef == null)
+            {
+                throw new InvalidOperationException("Newobj importer called with Operand which isn't a IMethodDefOrRef");
+            }
+
+            var isArrayMethod = false;
+            MethodDef methodToCall;
+            if (methodDefOrRef.DeclaringType.ToTypeSig().IsArray)
+            {
+                var declaringTypeDef = methodDefOrRef.DeclaringType.ResolveTypeDef();
+                var methodName = methodDefOrRef.Name;
+                switch (methodName)
+                {
+                    case "Set":
+                        methodToCall = new MethodDefUser("Set", methodDefOrRef.MethodSig);
+                        declaringTypeDef.Methods.Add(methodToCall);
+                        break;
+                    case "Get":
+                        methodToCall = new MethodDefUser("Get", methodDefOrRef.MethodSig);
+                        declaringTypeDef.Methods.Add(methodToCall);
+                        break;
+                    case "Address":
+                        methodToCall = new MethodDefUser("Address", methodDefOrRef.MethodSig);
+                        declaringTypeDef.Methods.Add(methodToCall);
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Unknown array intrinsic method {methodName}");
+                }
+                isArrayMethod = true;
+            }
+            else
+            {
+                methodToCall = methodDefOrRef.ResolveMethodDefThrow();
+            }
 
             var arguments = new List<StackEntry>();
             var firstArgIndex = newObjThis != null ? 1 : 0;
@@ -43,7 +77,7 @@ namespace ILCompiler.Compiler.Importer
             arguments.Reverse();
 
             // Intrinsic calls
-            if (methodToCall.IsIntrinsic())
+            if (methodToCall.IsIntrinsic() || isArrayMethod)
             {
                 if (!ImportIntrinsicCall(methodToCall, arguments, importer))
                 {
@@ -138,6 +172,16 @@ namespace ILCompiler.Compiler.Importer
                         };
                     }
                     break;
+
+                case "Get":
+                    throw new NotImplementedException("Multidimensional arrays not supported");
+                    break;
+                case "Set":
+                    throw new NotImplementedException("Multidimensional arrays not supported");
+                    break;
+                case "Address":
+                    throw new NotImplementedException("Multidimensional arrays not supported");
+                    break;
                 default:
                     return false;
             }
@@ -148,7 +192,7 @@ namespace ILCompiler.Compiler.Importer
             return true;
         }
 
-        private static bool IsTypeName(MethodDef method, string typeNamespace, string typeName)
+        private static bool IsTypeName(IMethodDefOrRef method, string typeNamespace, string typeName)
         {
             var metadataType = method.DeclaringType;
             if (metadataType == null)

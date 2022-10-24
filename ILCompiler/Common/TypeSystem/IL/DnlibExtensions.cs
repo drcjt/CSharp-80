@@ -6,7 +6,7 @@ namespace ILCompiler.Common.TypeSystem.IL
     {
         private const string CompilerIntrinsicAttribute = "System.Runtime.CompilerServices.IntrinsicAttribute";
 
-        public static bool IsIntrinsic(this MethodDef method)
+        public static bool IsIntrinsic(this IMethodDefOrRef method)
         {
             return method.HasCustomAttributes && method.CustomAttributes.IsDefined(CompilerIntrinsicAttribute);
         }
