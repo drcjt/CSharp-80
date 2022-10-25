@@ -18,7 +18,41 @@ namespace ILCompiler.Compiler.Importer
         public static void ImportCall(Instruction instruction, ImportContext context, IILImporterProxy importer, StackEntry? newObjThis = null)
         {
             var methodDefOrRef = instruction.Operand as IMethodDefOrRef;
-            var methodToCall = methodDefOrRef.ResolveMethodDefThrow();
+
+            if (methodDefOrRef == null)
+            {
+                throw new InvalidOperationException("Newobj importer called with Operand which isn't a IMethodDefOrRef");
+            }
+
+            var isArrayMethod = false;
+            MethodDef methodToCall;
+            if (methodDefOrRef.DeclaringType.ToTypeSig().IsArray)
+            {
+                var declaringTypeDef = methodDefOrRef.DeclaringType.ResolveTypeDef();
+                var methodName = methodDefOrRef.Name;
+                switch (methodName)
+                {
+                    case "Set":
+                        methodToCall = new MethodDefUser("Set", methodDefOrRef.MethodSig);
+                        declaringTypeDef.Methods.Add(methodToCall);
+                        break;
+                    case "Get":
+                        methodToCall = new MethodDefUser("Get", methodDefOrRef.MethodSig);
+                        declaringTypeDef.Methods.Add(methodToCall);
+                        break;
+                    case "Address":
+                        methodToCall = new MethodDefUser("Address", methodDefOrRef.MethodSig);
+                        declaringTypeDef.Methods.Add(methodToCall);
+                        break;
+                    default:
+                        throw new InvalidOperationException($"Unknown array intrinsic method {methodName}");
+                }
+                isArrayMethod = true;
+            }
+            else
+            {
+                methodToCall = methodDefOrRef.ResolveMethodDefThrow();
+            }
 
             var arguments = new List<StackEntry>();
             var firstArgIndex = newObjThis != null ? 1 : 0;
@@ -43,7 +77,7 @@ namespace ILCompiler.Compiler.Importer
             arguments.Reverse();
 
             // Intrinsic calls
-            if (methodToCall.IsIntrinsic())
+            if (methodToCall.IsIntrinsic() || isArrayMethod)
             {
                 if (!ImportIntrinsicCall(methodToCall, arguments, importer))
                 {
@@ -113,12 +147,6 @@ namespace ILCompiler.Compiler.Importer
 
         private static bool ImportIntrinsicCall(MethodDef methodToCall, IList<StackEntry> arguments, IILImporterProxy importer)
         {
-            // Not yet implemented methods with non void return type
-            if (methodToCall.HasReturnType)
-            {
-                throw new NotSupportedException();
-            }
-
             // Map method name to string that code generator will understand
             var targetMethodName = "";
             switch (methodToCall.Name)
@@ -138,6 +166,62 @@ namespace ILCompiler.Compiler.Importer
                         };
                     }
                     break;
+
+                case "Get":
+                    {
+                        // first parameter = this, remaining parameters = indices
+                        var valueType = methodToCall.Parameters[1].Type;
+                        var elemSize = valueType.GetExactSize();
+                        var rank = methodToCall.Parameters.Count - 1;
+
+                        // Calculate indices multipled together
+                        StackEntry indexOp = new CastEntry(arguments[1], VarType.Ptr);
+                        for (var dimension = 1; dimension < rank; dimension++)
+                        {
+                            var nextIndexOp = new CastEntry(arguments[dimension + 1], VarType.Ptr);
+                            indexOp = new BinaryOperator(Operation.Mul, isComparison: false, indexOp, nextIndexOp, VarType.Ptr);
+                        }
+                        // Multiply by elemSize
+                        var size = new NativeIntConstantEntry((short)elemSize);
+                        indexOp = new BinaryOperator(Operation.Mul, isComparison: false, indexOp, size, VarType.Ptr);
+
+                        // Add address of array
+                        var addr = new BinaryOperator(Operation.Add, isComparison: false, indexOp, arguments[0], VarType.Ptr);
+
+                        var op = new IndirectEntry(addr, valueType.GetVarType(), elemSize);
+                        importer.PushExpression(op);
+
+                        return true;
+                    }
+                case "Set":
+                    {
+                        // first parameter = this, second parameter = value, remaining parameters = indices
+                        var valueType = methodToCall.Parameters[1].Type;
+                        var elemSize = valueType.GetExactSize();
+                        var rank = methodToCall.Parameters.Count - 2;
+
+                        // Calculate indices multipled together
+                        StackEntry indexOp = new CastEntry(arguments[1], VarType.Ptr);
+                        for (var dimension = 1; dimension < rank; dimension++)
+                        {
+                            var nextIndexOp = new CastEntry(arguments[dimension + 1], VarType.Ptr);
+                            indexOp = new BinaryOperator(Operation.Mul, isComparison: false, indexOp, nextIndexOp, VarType.Ptr);
+                        }
+                        // Multiply by elemSize
+                        var size = new NativeIntConstantEntry((short)elemSize);
+                        indexOp = new BinaryOperator(Operation.Mul, isComparison: false, indexOp, size, VarType.Ptr);
+
+                        // Add address of array
+                        var addr = new BinaryOperator(Operation.Add, isComparison: false, indexOp, arguments[0], VarType.Ptr);
+
+                        var op = new StoreIndEntry(addr, arguments[rank + 1], 0, elemSize);
+                        importer.ImportAppendTree(op);
+
+                        return true;
+                    }
+                case "Address":
+                    throw new NotImplementedException("Multidimensional arrays not supported");
+                    break;
                 default:
                     return false;
             }
@@ -148,7 +232,7 @@ namespace ILCompiler.Compiler.Importer
             return true;
         }
 
-        private static bool IsTypeName(MethodDef method, string typeNamespace, string typeName)
+        private static bool IsTypeName(IMethodDefOrRef method, string typeNamespace, string typeName)
         {
             var metadataType = method.DeclaringType;
             if (metadataType == null)
