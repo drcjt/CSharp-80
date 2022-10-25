@@ -2,6 +2,8 @@
 using dnlib.DotNet.Emit;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using System.ComponentModel.DataAnnotations;
+using System.Net.Http.Headers;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -22,14 +24,26 @@ namespace ILCompiler.Compiler.Importer
 
             if (declaringTypeSig.IsArray)
             {
-                // TODO: Multidimensional arrays
-                // Need to extract element type and number of dimensions
-
+                // Extract element type and number of dimensions
                 var arraySig = declaringTypeSig.ToArraySig();
                 var rank = arraySig.Rank;
                 var elemType = arraySig.Next;   // TODO: Is this the right way to determine the element type?
+                var elemSize = elemType.GetExactSize();
 
-                throw new NotImplementedException("Multidimensional arrays not supported");
+                // Calculate size of dimensions e.g. dim1 * dim2 * dim3 * ...
+
+                // TODO: currently does not allocate space for array bounds at all
+                StackEntry sizeOp = importer.PopExpression();
+                for (var dimension = 1; dimension < rank; dimension++)
+                {
+                    var dimensionOp = importer.PopExpression();
+                    sizeOp = new BinaryOperator(Operation.Mul, isComparison: false, sizeOp, dimensionOp, VarType.Ptr);
+                }
+
+                // Create node to new up the array
+                var args = new List<StackEntry>() { sizeOp, new Int32ConstantEntry(elemSize) };
+                var node = new CallEntry("NewArr", args, VarType.Ref, 2);
+                importer.PushExpression(node);
             }
             else
             {
