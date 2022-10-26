@@ -1,3 +1,5 @@
+https://github.com/drcjt/csharp-80/actions/workflows/build.yml/badge.svg
+
 # CSharp-80
 
 This repo contains a .NET Core ahead of time compiler targetting the Z80 8-bit microprocessor. The compiler can compile a managed .NET Core application into an assembly language file that 
@@ -39,10 +41,3 @@ in the dot net runtime. The z80 runtime code borrows heavily from the [z88dk pro
 |Graphics|[graphics demo](https://github.com/drcjt/CSharp-80/tree/main/Samples/GfxDemos)|[graphics demo](https://github.com/drcjt/CSharp-80/blob/main/Documentation/gfxdemos.gif)|
 
 All of the demos here are recorded from running the programs in a TRS-80 emulator.
-
-### Continuous Integration status
-
-| | |
-| --- | --- |
-| **Build** | [![Build status](https://img.shields.io/appveyor/ci/drcjt/csharp-80.svg)](https://ci.appveyor.com/project/drcjt/csharp-80) |
-[![Build History](https://buildstats.info/appveyor/chart/drcjt/csharp-80)](https://ci.appveyor.com/project/drcjt/csharp-80)
