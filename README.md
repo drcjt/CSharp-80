@@ -1,6 +1,6 @@
-https://github.com/drcjt/csharp-80/actions/workflows/build.yml/badge.svg
-
 # CSharp-80
+
+![Build Status](https://github.com/drcjt/csharp-80/actions/workflows/build.yml/badge.svg)
 
 This repo contains a .NET Core ahead of time compiler targetting the Z80 8-bit microprocessor. The compiler can compile a managed .NET Core application into an assembly language file that 
 can be easily turned into a native Z80 binary file using an assembler such as [zmac](http://48k.ca/zmac.html). To learn more about CSharp-80, see the
