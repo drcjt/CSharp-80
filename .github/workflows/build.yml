@@ -13,7 +13,7 @@ jobs:
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: Workflow.SDKVersion
+          dotnet-version: '7.0.x'
 
       - name: Install dependencies
         run: dotnet restore
