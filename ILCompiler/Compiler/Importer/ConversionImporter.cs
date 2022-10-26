@@ -48,6 +48,11 @@ namespace ILCompiler.Compiler.Importer
                 var cast = new CastEntry(op1, VarType.Ptr);
                 op1 = cast;
             }
+            else if (op1.Type == VarType.Ptr && (desiredType == VarType.UInt || desiredType == VarType.Int))
+            {
+                var cast = new CastEntry(op1, desiredType);
+                op1 = cast;
+            }
 
             // TODO: Work out why this was added
             //op1.Type = GetType(instruction.OpCode.Code);

@@ -75,6 +75,13 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 // Nothing to do
             }
+            else if (actualType == VarType.Ptr && (desiredType == VarType.UInt || desiredType == VarType.Int))
+            {
+                context.Assembler.Pop(R16.HL);
+                context.Assembler.Ld(R16.DE, 0);    // clear msw
+                context.Assembler.Push(R16.DE);
+                context.Assembler.Push(R16.HL);
+            }
             else
             {
                 throw new NotImplementedException($"Implicit cast from {actualType} to {desiredType} not supported");
