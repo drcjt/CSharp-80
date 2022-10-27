@@ -1,6 +1,5 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem;
-using ILCompiler.Common.TypeSystem.IL;
+﻿using dnlib.DotNet;
+using dnlib.DotNet.Emit;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -8,17 +7,27 @@ namespace ILCompiler.Compiler.Importer
 {
     public class StoreElemImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Stelem_I || code == Code.Stelem_I1 || code == Code.Stelem_I2 || code == Code.Stelem_I4 || code == Code.Stelem_Ref;
+        public bool CanImport(Code code) => code == Code.Stelem_I || code == Code.Stelem_I1 || code == Code.Stelem_I2 || code == Code.Stelem_I4 || code == Code.Stelem_Ref || code == Code.Stelem;
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            var elemType = GetType(instruction.OpCode.Code);
-            var elemSize = elemType.GetTypeSize();
-
             var value = importer.PopExpression();
-            if (value.Type != elemType && elemType != VarType.Ref)
+
+            int elemSize;
+            if (instruction.OpCode.Code == Code.Stelem) 
             {
-                value = new CastEntry(value, elemType);
+                var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
+                elemSize = typeSig.GetExactSize();
+            }
+            else
+            {
+                var elemType = GetType(instruction.OpCode.Code);
+                elemSize = elemType.GetTypeSize();
+
+                if (value.Type != elemType && elemType != VarType.Ref)
+                {
+                    value = new CastEntry(value, elemType);
+                }
             }
 
             var indexOp = importer.PopExpression();
@@ -54,6 +63,5 @@ namespace ILCompiler.Compiler.Importer
                 _ => throw new NotImplementedException(),
             };
         }
-
     }
 }

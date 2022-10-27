@@ -240,7 +240,7 @@ namespace ILCompiler.Common.TypeSystem.Common
             }
             else
             {
-                if (fieldTypeSig.IsArray)
+                if (fieldTypeSig.IsSZArray)
                 {
                     result.Size = _target.LayoutPointerSize;
                     result.Alignment = _target.LayoutPointerSize;
