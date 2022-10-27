@@ -30,8 +30,19 @@ namespace ILCompiler.Compiler.Importer
                 var elemType = arraySig.Next;   // TODO: Is this the right way to determine the element type?
                 var elemSize = elemType.GetExactSize();
 
-                // Calculate size of dimensions e.g. dim1 * dim2 * dim3 * ...
+                // Need to call helper to create MD array
+                // The helper should take as arguments:
+                //   * Number of dimensions
+                //   * Elem Size
+                //   * Size of each dimension
+                // If we arrange the arguments such that the last item on the stack is the number of dimensions
+                // then the helper can easily pop off each dimensions size.
 
+                // Helper should calculate required size for the array
+                // e.g. size of dimensions multipled together * elem size + (number of dimensions * 2)
+                // This assumes dimension size can be no bigger than a short
+
+                // Calculate size of dimensions e.g. dim1 * dim2 * dim3 * ...
                 // TODO: currently does not allocate space for array bounds at all
                 StackEntry sizeOp = importer.PopExpression();
                 for (var dimension = 1; dimension < rank; dimension++)
