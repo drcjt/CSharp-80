@@ -19,6 +19,21 @@
 }
 }
 
+.class public sealed _struct extends System.ValueType
+{
+	.field public int32 X
+	.field public int32 Y
+
+	.method public instance void .ctor (int32 x)
+	{
+		.maxstack 8
+		ldarg.0
+		ldarg.1
+		stfld int32 _struct::X
+		ret
+	}
+}
+
 .class public array_tests
 {
 .method public static int32 I8(int32, int32, int32) {
@@ -204,6 +219,34 @@
 	ceq
 	ret
 }
+
+.method public static int32 StructTest(int32, int32, int32) {
+.maxstack  5
+.locals (valuetype _struct[], valuetype _struct)
+
+	ldc.i4 0x00000004
+	newarr Test
+	stloc.0
+
+	ldarg.1
+	call instance void _struct::.ctor(int32, int32)
+	stloc.1
+
+	ldloc.0
+	ldarg.0
+	ldloc.1
+	stelem _struct
+
+	ldloc.0
+	ldarg.0
+	ldelem _struct
+
+	ldfld int32 _struct::X
+	ldarg.2
+	ceq
+	ret
+}
+
 
 .method public static int32 Main() {
 .entrypoint

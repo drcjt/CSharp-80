@@ -1,4 +1,5 @@
-﻿using dnlib.DotNet.Emit;
+﻿using dnlib.DotNet;
+using dnlib.DotNet.Emit;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -15,7 +16,8 @@ namespace ILCompiler.Compiler.Importer
                 || code == Code.Ldelem_U1
                 || code == Code.Ldelem_U2
                 || code == Code.Ldelem_U4
-                || code == Code.Ldelem_Ref;
+                || code == Code.Ldelem_Ref
+                || code == Code.Ldelem;
         }
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
@@ -23,10 +25,21 @@ namespace ILCompiler.Compiler.Importer
             var op1 = importer.PopExpression();
             var op2 = importer.PopExpression();
 
-            var elemType = GetType(instruction.OpCode.Code);
-            var exactSize = elemType.GetTypeSize();
+            int elemSize;
+            VarType elemType;
+            if (instruction.OpCode.Code == Code.Ldelem)
+            {
+                var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
+                elemType = typeSig.GetVarType();
+                elemSize = typeSig.GetExactSize();
+            }
+            else
+            {
+                elemType = GetType(instruction.OpCode.Code);
+                elemSize = elemType.GetTypeSize();
+            }
 
-            var node = new IndexRefEntry(op1, op2, exactSize, elemType);
+            var node = new IndexRefEntry(op1, op2, elemSize, elemType);
 
             importer.PushExpression(node);
         }
