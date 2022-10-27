@@ -174,6 +174,11 @@ namespace ILCompiler.Compiler.Importer
                         var elemSize = valueType.GetExactSize();
                         var rank = methodToCall.Parameters.Count - 1;
 
+                        // Arrays are stored in row-major order see https://github.com/stakx/ecma-335/blob/master/docs/i.8.9.1-array-types.md
+
+                        // Calculation should follow details here https://en.wikipedia.org/wiki/Row-_and_column-major_order
+                        // The calcualtion below is incorrect
+
                         // Calculate indices multipled together
                         StackEntry indexOp = new CastEntry(arguments[1], VarType.Ptr);
                         for (var dimension = 1; dimension < rank; dimension++)
@@ -200,6 +205,11 @@ namespace ILCompiler.Compiler.Importer
                         var elemSize = valueType.GetExactSize();
                         var rank = methodToCall.Parameters.Count - 2;
 
+                        // Arrays are stored in row-major order see https://github.com/stakx/ecma-335/blob/master/docs/i.8.9.1-array-types.md
+
+                        // Calculation should follow details here https://en.wikipedia.org/wiki/Row-_and_column-major_order
+                        // The calcualtion below is incorrect
+
                         // Calculate indices multipled together
                         StackEntry indexOp = new CastEntry(arguments[1], VarType.Ptr);
                         for (var dimension = 1; dimension < rank; dimension++)
@@ -221,7 +231,6 @@ namespace ILCompiler.Compiler.Importer
                     }
                 case "Address":
                     throw new NotImplementedException("Multidimensional arrays not supported");
-                    break;
                 default:
                     return false;
             }
