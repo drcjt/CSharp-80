@@ -6,7 +6,7 @@ ITOA:
 	JR Z, CONV2
 
 	LD A, '-'
-	CALL 33H
+    CALL PRINTCHR
 
 	XOR A
 	SUB L
