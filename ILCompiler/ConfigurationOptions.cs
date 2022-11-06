@@ -11,8 +11,8 @@ namespace ILCompiler
         public readonly Option<string> CoreLibPathOption = new(new[] { "-cl", "--corelibPath" }, "Core lib path");
         public readonly Option<bool> IntegrationTestsOption = new(new[] { "-it", "--integrationTests" }, "Compile for integration tests");
         public readonly Option<bool> DumpIRTreesOption = new(new[] { "-d", "--dumpIRTrees" }, "Dump IR trees");
-        public readonly Option<TargetArchitecture> TargetArchitectureOption = new(new[] { "-a", "--targetArchitecture" }, "Target Architecture");
-        public readonly Option<int> StackStartOption = new(new[] { "-ss", "--stackStart" }, "Stack Start Address");
+        public readonly Option<TargetArchitecture> TargetArchitectureOption = new(new[] { "-a", "--targetArchitecture" }, getDefaultValue : () => TargetArchitecture.TRS80, "Target Architecture");
+        public readonly Option<int> StackStartOption = new(new[] { "-ss", "--stackStart" }, getDefaultValue: () => 0x7fff, "Stack Start Address");
 
         public void AddToCommand(Command command)
         {
