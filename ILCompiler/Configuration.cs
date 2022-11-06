@@ -11,7 +11,7 @@ namespace ILCompiler
         public bool PrintReturnCode { get; set; } = true;
         public string CorelibPath { get; set; } = string.Empty;
         public bool IntegrationTests { get; set; }
-        public TargetArchitecture TargetArchitecture { get; set; } = TargetArchitecture.TRS80;
-        public int StackStart { get; set; } = 0xffff;
+        public TargetArchitecture TargetArchitecture { get; set; }
+        public int StackStart { get; set; }
     }
 }
