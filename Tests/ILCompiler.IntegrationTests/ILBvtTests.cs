@@ -73,7 +73,7 @@ namespace CSharp80.Tests.BVT
             var asmFileName = Path.ChangeExtension(ilFileName, "asm");
             var exeFileName = Path.ChangeExtension(ilFileName, "exe");
 
-            var corelibPath = Path.Combine(SolutionPath, $@".\System.Private.CoreLib\bin\{buildConfigurationName}\net6.0\System.Private.CoreLib.dll");
+            var corelibPath = Path.Combine(SolutionPath, $@".\System.Private.CoreLib\bin\{buildConfigurationName}\net7.0\System.Private.CoreLib.dll");
 
             var ilCompilerPath = @"ILCompiler.exe";
             var arguments = $"--ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {corelibPath} --outputFile {asmFileName} {exeFileName}";
