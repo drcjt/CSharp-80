@@ -9,7 +9,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         public bool IsComparison { get; }
         public Operation Operation { get; set; }
 
-        public BinaryOperator(Operation operation, bool isComparison, StackEntry op1, StackEntry op2, VarType type) : base(type, 4)
+        public BinaryOperator(Operation operation, bool isComparison, StackEntry op1, StackEntry op2, VarType type) : base(type, type.GetTypeSize())
         {
             Operation = operation;
             IsComparison = isComparison;
