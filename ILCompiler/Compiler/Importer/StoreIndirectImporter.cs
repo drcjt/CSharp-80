@@ -6,7 +6,7 @@ namespace ILCompiler.Compiler.Importer
 {
     public class StoreIndirectImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Stind_I1 || code == Code.Stind_I2 || code == Code.Stind_I4 || code == Code.Stind_I;
+        public bool CanImport(Code code) => code == Code.Stind_I1 || code == Code.Stind_I2 || code == Code.Stind_I4 || code == Code.Stind_I || code == Code.Stind_Ref;
 
         public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
@@ -35,6 +35,7 @@ namespace ILCompiler.Compiler.Importer
                 Code.Stind_I2 => VarType.Short,
                 Code.Stind_I4 => VarType.Int,
                 Code.Stind_I => VarType.Ptr,
+                Code.Stind_Ref => VarType.Ref,
                 _ => throw new NotImplementedException(),
             };
         }
