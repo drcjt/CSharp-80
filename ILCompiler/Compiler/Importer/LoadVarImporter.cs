@@ -6,33 +6,33 @@ namespace ILCompiler.Compiler.Importer
 {
     public class LoadVarImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            return code == Code.Ldloc ||
-                   code == Code.Ldloc_S ||
-                   code == Code.Ldloc_0 ||
-                   code == Code.Ldloc_1 ||
-                   code == Code.Ldloc_2 ||
-                   code == Code.Ldloc_3;
-        }
+            int index;
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Ldloc_0:
+                case Code.Ldloc_1:
+                case Code.Ldloc_2:
+                case Code.Ldloc_3:
+                    index = instruction.OpCode.Code - Code.Ldloc_0;
+                    break;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
-        {
-            int index = GetIndex(instruction);
+                case Code.Ldloc:
+                case Code.Ldloc_S:
+                    index = (instruction.OperandAs<Local>()).Index;
+                    break;
+
+                default:
+                    return false;
+            }
+
             var localNumber = importer.ParameterCount + index;
             var localVariable = importer.LocalVariableTable[localNumber];
             var node = new LocalVariableEntry(localNumber, localVariable.Type, localVariable.ExactSize);
             importer.PushExpression(node);
-        }
 
-        private static int GetIndex(Instruction instruction)
-        {
-            int index = instruction.OpCode.Code switch
-            {
-                Code.Ldloc or Code.Ldloc_S => (instruction.OperandAs<Local>()).Index,
-                _ => instruction.OpCode.Code - Code.Ldloc_0,
-            };
-            return index;
+            return true;
         }
     }
 }

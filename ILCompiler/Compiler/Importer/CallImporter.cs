@@ -6,11 +6,11 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class CallImporter : IOpcodeImporter
+    public class CallImporter : SingleOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Call;
+        protected override Code Code { get; } = Code.Call;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             ImportCall(instruction, context, importer);
         }

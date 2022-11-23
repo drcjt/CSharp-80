@@ -6,10 +6,34 @@ namespace ILCompiler.Compiler.Importer
 {
     public class StoreIndirectImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Stind_I1 || code == Code.Stind_I2 || code == Code.Stind_I4 || code == Code.Stind_I || code == Code.Stind_Ref;
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            VarType type;
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Stind_I1:
+                    type = VarType.SByte;
+                    break;
+
+                case Code.Stind_I2:
+                    type = VarType.Short;
+                    break;
+
+                case Code.Stind_I4:
+                    type = VarType.Int;
+                    break;
+
+                case Code.Stind_I:
+                    type = VarType.Ptr;
+                    break;
+
+                case Code.Stind_Ref:
+                    type = VarType.Ref;
+                    break;
+
+                default:
+                    return false;
+            }
             var value = importer.PopExpression();
             var addr = importer.PopExpression();
 
@@ -19,25 +43,14 @@ namespace ILCompiler.Compiler.Importer
                 addr = cast;
             }    
 
-            int exactSize = GetType(instruction.OpCode.Code).GetTypeSize();
+            int exactSize = type.GetTypeSize();
 
             var node = new StoreIndEntry(addr, value, fieldOffset: 0, exactSize);
             node.Type = value.Type;
 
             importer.ImportAppendTree(node);
-        }
 
-        private static VarType GetType(Code code)
-        {
-            return code switch
-            {
-                Code.Stind_I1 => VarType.SByte,
-                Code.Stind_I2 => VarType.Short,
-                Code.Stind_I4 => VarType.Int,
-                Code.Stind_I => VarType.Ptr,
-                Code.Stind_Ref => VarType.Ref,
-                _ => throw new NotImplementedException(),
-            };
+            return true;
         }
     }
 }

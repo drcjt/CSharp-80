@@ -5,11 +5,11 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class RetImporter : IOpcodeImporter
+    public class RetImporter : SingleOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Ret;
+        protected override Code Code { get; } = Code.Ret;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var retNode = new ReturnEntry();
             if (context.Method.HasReturnType)

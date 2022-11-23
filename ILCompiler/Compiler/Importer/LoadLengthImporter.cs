@@ -4,14 +4,11 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    internal class LoadLengthImporter : IOpcodeImporter
+    internal class LoadLengthImporter : SingleOpcodeImporter
     {
-        public bool CanImport(Code code)
-        {
-            return code == Code.Ldlen;
-        }
+        protected override Code Code { get; } = Code.Ldlen;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var op1 = importer.PopExpression();
             var node = new IndirectEntry(op1, VarType.UShort, 2);

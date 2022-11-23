@@ -1,4 +1,5 @@
-﻿using dnlib.DotNet.Emit;
+﻿using dnlib.DotNet;
+using dnlib.DotNet.Emit;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -6,17 +7,27 @@ namespace ILCompiler.Compiler.Importer
 {
     public class CompareImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            return code == Code.Ceq ||
-                   code == Code.Cgt ||
-                   code == Code.Cgt_Un ||
-                   code == Code.Clt ||
-                   code == Code.Cgt_Un;
-        }
+            Operation op;
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Ceq:
+                    op = Operation.Eq;
+                    break;
+                case Code.Clt:
+                case Code.Clt_Un:
+                    op = Operation.Lt;
+                    break;
+                case Code.Cgt:
+                case Code.Cgt_Un:
+                    op = Operation.Gt;
+                    break;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
-        {
+                default:
+                    return false;
+            }
+
             var op2 = importer.PopExpression();
             var op1 = importer.PopExpression();
 
@@ -37,16 +48,10 @@ namespace ILCompiler.Compiler.Importer
 
             // TODO: Validate type of op1/op2 are compatible here
 
-            Operation op = Operation.Eq;
-            switch (instruction.OpCode.Code)
-            {
-                case Code.Cgt: op = Operation.Gt; break;
-                case Code.Cgt_Un: op = Operation.Gt; break;
-                case Code.Clt: op = Operation.Lt; break;
-                case Code.Clt_Un: op = Operation.Lt; break;
-            }
             op1 = new BinaryOperator(op, isComparison: true, op1, op2, VarType.Int);
             importer.PushExpression(op1);
+
+            return true;
         }
     }
 }

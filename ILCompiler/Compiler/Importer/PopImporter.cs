@@ -4,11 +4,11 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class PopImporter : IOpcodeImporter
+    public class PopImporter : SingleOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Pop;
+        protected override Code Code { get; } = Code.Pop;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var op1 = importer.PopExpression();
 

@@ -4,11 +4,11 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class SwitchImporter : IOpcodeImporter
+    public class SwitchImporter : SingleOpcodeImporter
     {
-        public bool CanImport(Code opcode) => opcode == Code.Switch;
+        protected override Code Code { get; } = Code.Switch;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var fallthroughBlock = context.FallThroughBlock;
 

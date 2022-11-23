@@ -7,20 +7,34 @@ namespace ILCompiler.Compiler.Importer
 {
     public class LoadArgImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => IsLdArg(code) || IsLdArgN(code);
-
-        private static bool IsLdArg(Code code) => code == Code.Ldarg || code == Code.Ldarg_S;
-        private static bool IsLdArgN(Code code) => code == Code.Ldarg_0 || code == Code.Ldarg_1 || code == Code.Ldarg_2 || code == Code.Ldarg_3;
-
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            var index = GetIndex(instruction);
+            int index;
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Ldarg_0:
+                case Code.Ldarg_1:
+                case Code.Ldarg_2:
+                case Code.Ldarg_3:
+                    index = instruction.OpCode.Code - Code.Ldarg_0;
+                    break;
+
+                case Code.Ldarg:
+                case Code.Ldarg_S:
+                    index = (instruction.OperandAs<Parameter>()).Index;
+                    break;
+
+                default:
+                    return false;
+            }
+
             var lclNum = MapIlArgNum(index, importer.ReturnBufferArgIndex);
 
             var argument = importer.LocalVariableTable[lclNum];
             var node = new LocalVariableEntry(lclNum, argument.Type, argument.ExactSize);
             importer.PushExpression(node);
+
+            return true;
         }
 
         /// <summary>
@@ -39,18 +53,6 @@ namespace ILCompiler.Compiler.Importer
             }
 
             return ilArgNum;
-        }
-
-        private static int GetIndex(Instruction instruction)
-        {
-            var code = instruction.OpCode.Code;
-            int index = code - Code.Ldarg_0;
-            if (IsLdArg(code))
-            {
-                index = (instruction.OperandAs<Parameter>()).Index;
-            }
-
-            return index;
         }
     }
 }

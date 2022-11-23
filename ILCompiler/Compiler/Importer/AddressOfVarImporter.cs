@@ -6,14 +6,17 @@ namespace ILCompiler.Compiler.Importer
 {
     public class AddressOfVarImporter : IOpcodeImporter
     {
-        public bool CanImport(Code opcode)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            return opcode == Code.Ldloca || opcode == Code.Ldloca_S;
-        }
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
-        {
-            importer.PushExpression(new LocalVariableAddressEntry(importer.ParameterCount + (instruction.OperandAs<Local>()).Index));
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Ldloca:
+                case Code.Ldloca_S:
+                    importer.PushExpression(new LocalVariableAddressEntry(importer.ParameterCount + (instruction.OperandAs<Local>()).Index));
+                    return true;
+                default:
+                    return false;
+            }
         }
     }
 }

@@ -5,14 +5,11 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class AddressOfFieldImporter : IOpcodeImporter
+    public class AddressOfFieldImporter : SingleOpcodeImporter
     {
-        public bool CanImport(Code opcode)
-        {
-            return opcode == Code.Ldflda;
-        }
+        protected override Code Code { get; } = Code.Ldflda;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var fieldDefOrRef = instruction.Operand as IField;
             var fieldDef = fieldDefOrRef.ResolveFieldDef();

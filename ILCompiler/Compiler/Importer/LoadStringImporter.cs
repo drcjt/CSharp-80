@@ -4,11 +4,11 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class LoadStringImporter : IOpcodeImporter
+    public class LoadStringImporter : SingleOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Ldstr;
+        protected override Code Code { get; } = Code.Ldstr;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             importer.PushExpression(new StringConstantEntry(instruction.OperandAs<string>()));
         }

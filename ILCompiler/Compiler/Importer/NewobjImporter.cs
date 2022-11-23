@@ -2,16 +2,14 @@
 using dnlib.DotNet.Emit;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
-using System.ComponentModel.DataAnnotations;
-using System.Net.Http.Headers;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class NewobjImporter : IOpcodeImporter
+    public class NewobjImporter : SingleOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Newobj;
+        protected override Code Code { get; } = Code.Newobj;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             var methodDefOrRef = instruction.Operand as IMethodDefOrRef;
 

@@ -7,14 +7,22 @@ namespace ILCompiler.Compiler.Importer
 {
     public class LoadArgAddressImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Ldarga || code == Code.Ldarga_S;
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            var index = (instruction.OperandAs<Parameter>()).Index;
-            var lclNum = MapIlArgNum(index, importer.ReturnBufferArgIndex);
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Ldarga:
+                case Code.Ldarga_S:
+                    var index = (instruction.OperandAs<Parameter>()).Index;
+                    var lclNum = MapIlArgNum(index, importer.ReturnBufferArgIndex);
 
-            importer.PushExpression(new LocalVariableAddressEntry(lclNum));
+                    importer.PushExpression(new LocalVariableAddressEntry(lclNum));
+
+                    return true;
+
+                default:
+                    return false;
+            }
         }
 
         /// <summary>

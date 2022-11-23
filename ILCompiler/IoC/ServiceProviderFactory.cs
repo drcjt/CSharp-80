@@ -54,7 +54,6 @@ namespace ILCompiler.IoC
             services.AddSingleton<IConfiguration, Configuration>();
             services.AddSingleton<INameMangler, NameMangler>();
 
-            services.AddSingleton<IOpcodeImporterFactory, OpcodeImporterFactory>();
             services.AddSingleton<ICodeGeneratorFactory, CodeGeneratorFactory>();
             services.AddSingleton<ILoweringFactory, LoweringFactory>();
         }

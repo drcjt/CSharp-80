@@ -3,11 +3,11 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class NopImporter : IOpcodeImporter
+    public class NopImporter : SingleOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Nop;
+        protected override Code Code { get; } = Code.Nop;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             // Nothing to do
         }

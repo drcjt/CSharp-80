@@ -7,57 +7,67 @@ namespace ILCompiler.Compiler.Importer
 {
     internal class LoadElemImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            return code == Code.Ldelem_I 
-                || code == Code.Ldelem_I1 
-                || code == Code.Ldelem_I2 
-                || code == Code.Ldelem_I4
-                || code == Code.Ldelem_U1
-                || code == Code.Ldelem_U2
-                || code == Code.Ldelem_U4
-                || code == Code.Ldelem_Ref
-                || code == Code.Ldelem;
-        }
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
-        {
-            var op1 = importer.PopExpression();
-            var op2 = importer.PopExpression();
-
-            int elemSize;
             VarType elemType;
-            if (instruction.OpCode.Code == Code.Ldelem)
+            int elemSize = 0;
+            switch (instruction.OpCode.Code)
             {
-                var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-                elemType = typeSig.GetVarType();
-                elemSize = typeSig.GetExactSize();
+                case Code.Ldelem:
+                    var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
+                    elemType = typeSig.GetVarType();
+                    elemSize = typeSig.GetExactSize();
+                    break;
+
+                case Code.Ldelem_I:
+                    elemType = VarType.Ptr;
+                    break;
+
+                case Code.Ldelem_I1:
+                    elemType = VarType.SByte;
+                    break;
+
+                case Code.Ldelem_U1:
+                    elemType = VarType.Byte;
+                    break;
+
+                case Code.Ldelem_I2:
+                    elemType = VarType.Short;
+                    break;
+
+                case Code.Ldelem_U2:
+                    elemType = VarType.UShort;
+                    break;
+
+                case Code.Ldelem_I4:
+                    elemType = VarType.Int;
+                    break;
+
+                case Code.Ldelem_U4:
+                    elemType = VarType.UInt;
+                    break;
+
+                case Code.Ldelem_Ref:
+                    elemType = VarType.Ref;
+                    break;
+
+                default:
+                    return false;
             }
-            else
+
+            if (instruction.OpCode.Code != Code.Ldelem)
             {
-                elemType = GetType(instruction.OpCode.Code);
                 elemSize = elemType.GetTypeSize();
             }
+
+            var op1 = importer.PopExpression();
+            var op2 = importer.PopExpression();
 
             var node = new IndexRefEntry(op1, op2, elemSize, elemType);
 
             importer.PushExpression(node);
-        }
 
-        private static VarType GetType(Code code)
-        {
-            return code switch
-            {
-                Code.Ldelem_I1 => VarType.SByte,
-                Code.Ldelem_I2 => VarType.Short,
-                Code.Ldelem_I4 => VarType.Int,
-                Code.Ldelem_I => VarType.Ptr,
-                Code.Ldelem_U1 => VarType.Byte,
-                Code.Ldelem_U2 => VarType.UShort,
-                Code.Ldelem_U4 => VarType.UInt,
-                Code.Ldelem_Ref => VarType.Ref,
-                _ => throw new NotImplementedException(),
-            };
+            return true;
         }
     }
 }
