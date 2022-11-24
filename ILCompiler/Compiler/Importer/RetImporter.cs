@@ -7,10 +7,10 @@ namespace ILCompiler.Compiler.Importer
 {
     public class RetImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Ret;
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode != OpCodes.Ret) return false;
+
             var retNode = new ReturnEntry();
             if (context.Method.HasReturnType)
             {
@@ -42,6 +42,8 @@ namespace ILCompiler.Compiler.Importer
             }
             importer.ImportAppendTree(retNode);
             context.StopImporting = true;
+
+            return true;
         }
     }
 }

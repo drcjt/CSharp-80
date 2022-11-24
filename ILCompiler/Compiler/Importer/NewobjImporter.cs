@@ -2,17 +2,15 @@
 using dnlib.DotNet.Emit;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
-using System.ComponentModel.DataAnnotations;
-using System.Net.Http.Headers;
 
 namespace ILCompiler.Compiler.Importer
 {
     public class NewobjImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Newobj;
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Newobj) return false;
+
             var methodDefOrRef = instruction.Operand as IMethodDefOrRef;
 
             if (methodDefOrRef == null)
@@ -98,6 +96,8 @@ namespace ILCompiler.Compiler.Importer
                     importer.PushExpression(node);
                 }
             }
+
+            return true;
         }
     }
 }

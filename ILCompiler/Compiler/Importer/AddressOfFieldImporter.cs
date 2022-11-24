@@ -7,13 +7,10 @@ namespace ILCompiler.Compiler.Importer
 {
     public class AddressOfFieldImporter : IOpcodeImporter
     {
-        public bool CanImport(Code opcode)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            return opcode == Code.Ldflda;
-        }
+            if (instruction.OpCode.Code != Code.Ldflda) return false;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
-        {
             var fieldDefOrRef = instruction.Operand as IField;
             var fieldDef = fieldDefOrRef.ResolveFieldDef();
 
@@ -27,6 +24,8 @@ namespace ILCompiler.Compiler.Importer
             var node = new FieldAddressEntry(fieldDef.Name, obj, fieldDef?.FieldOffset ?? 0);
 
             importer.PushExpression(node);
+
+            return true;
         }
     }
 }

@@ -6,11 +6,12 @@ namespace ILCompiler.Compiler.Importer
 {
     public class LoadStringImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Ldstr;
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Ldstr) return false;
+
             importer.PushExpression(new StringConstantEntry(instruction.OperandAs<string>()));
+            return true;
         }
     }
 }

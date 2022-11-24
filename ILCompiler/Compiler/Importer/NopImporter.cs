@@ -5,11 +5,12 @@ namespace ILCompiler.Compiler.Importer
 {
     public class NopImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Nop;
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Nop) return false;
+
             // Nothing to do
+            return true;
         }
     }
 }

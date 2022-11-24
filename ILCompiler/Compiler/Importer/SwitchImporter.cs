@@ -6,10 +6,10 @@ namespace ILCompiler.Compiler.Importer
 {
     public class SwitchImporter : IOpcodeImporter
     {
-        public bool CanImport(Code opcode) => opcode == Code.Switch;
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Switch) return false;
+
             var fallthroughBlock = context.FallThroughBlock;
 
             var op1 = importer.PopExpression();
@@ -37,6 +37,8 @@ namespace ILCompiler.Compiler.Importer
             }
 
             context.StopImporting = true;
+
+            return true;
         }
     }
 }

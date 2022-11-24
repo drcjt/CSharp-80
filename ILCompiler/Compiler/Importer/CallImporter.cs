@@ -8,11 +8,12 @@ namespace ILCompiler.Compiler.Importer
 {
     public class CallImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Call;
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Call) return false;
+
             ImportCall(instruction, context, importer);
+            return true;
         }
 
         public static void ImportCall(Instruction instruction, ImportContext context, IILImporterProxy importer, StackEntry? newObjThis = null)

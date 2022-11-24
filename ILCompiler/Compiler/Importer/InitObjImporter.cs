@@ -5,12 +5,13 @@ namespace ILCompiler.Compiler.Importer
 {
     public class InitobjImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Initobj;
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Initobj) return false;
+
             // TODO: Need to implement this
             importer.PopExpression();
+            return true;
         }
     }
 }

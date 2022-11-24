@@ -6,19 +6,25 @@ namespace ILCompiler.Compiler.Importer
 {
     public class StoreVarImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            return code == Code.Stloc ||
-                   code == Code.Stloc_S ||
-                   code == Code.Stloc_0 ||
-                   code == Code.Stloc_1 ||
-                   code == Code.Stloc_2 ||
-                   code == Code.Stloc_3;
-        }
+            int index;
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Stloc_0:
+                case Code.Stloc_1:
+                case Code.Stloc_2:
+                case Code.Stloc_3:
+                    index = instruction.OpCode.Code - Code.Stloc_0;
+                    break;
+                case Code.Stloc:
+                case Code.Stloc_S:
+                    index = (instruction.OperandAs<Local>()).Index;
+                    break;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
-        {
-            int index = GetIndex(instruction);
+                default:
+                    return false;
+            }
 
             var value = importer.PopExpression();
 
@@ -26,16 +32,8 @@ namespace ILCompiler.Compiler.Importer
             var localVariable = importer.LocalVariableTable[localNumber];
             var node = new StoreLocalVariableEntry(localNumber, false, value);
             importer.ImportAppendTree(node, true);
-        }
 
-        private static int GetIndex(Instruction instruction)
-        {
-            var index = instruction.OpCode.Code switch
-            {
-                Code.Stloc or Code.Stloc_S => (instruction.OperandAs<Local>()).Index,
-                _ => instruction.OpCode.Code - Code.Stloc_0,
-            };
-            return index;
+            return true;
         }
     }
 }

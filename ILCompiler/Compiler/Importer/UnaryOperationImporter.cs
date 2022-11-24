@@ -6,15 +6,24 @@ namespace ILCompiler.Compiler.Importer
 {
     public class UnaryOperationImporter : IOpcodeImporter
     {
-        public bool CanImport(Code opcode) => opcode == Code.Neg || opcode == Code.Not;
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            var unaryOp = Operation.Neg + (instruction.OpCode.Code - Code.Neg);
+            Operation unaryOp;
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Neg:
+                case Code.Not:
+                    unaryOp = Operation.Neg + (instruction.OpCode.Code - Code.Neg);
+                    break;
+                default:
+                    return false;
+            }
             var op1 = importer.PopExpression();
             var node = new UnaryOperator(unaryOp, op1);
 
             importer.PushExpression(node);
+
+            return true;
         }
     }
 }

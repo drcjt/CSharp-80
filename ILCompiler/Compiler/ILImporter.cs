@@ -24,7 +24,7 @@ namespace ILCompiler.Compiler
 
         private readonly EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
 
-        private readonly IOpcodeImporterFactory _importerFactory;
+        private readonly IEnumerable<IOpcodeImporter> _importers;
         private readonly ILImporterProxy _importerProxy;
 
         private class ILImporterProxy : IILImporterProxy
@@ -50,13 +50,13 @@ namespace ILCompiler.Compiler
             public int GrabTemp(VarType type, int? exactSize) => _importer.GrabTemp(type, exactSize);
         }
 
-        public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IOpcodeImporterFactory importerFactory)
+        public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers)
         {
             _configuration = configuration;
             _basicBlocks = Array.Empty<BasicBlock>();
             _logger = logger;
             _nameMangler = nameMangler;
-            _importerFactory = importerFactory;
+            _importers = importers;
 
             _importerProxy = new ILImporterProxy(this);
         }
@@ -164,14 +164,21 @@ namespace ILCompiler.Compiler
                 currentIndex++;
 
                 var opcode = currentInstruction.OpCode.Code;
+                var fallthroughBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null;
+                var importContext = new ImportContext(block, fallthroughBlock, _method, _nameMangler);
 
-                var importer = _importerFactory.GetImporter(opcode);
-
-                if (importer != null)
+                var imported = false;
+                foreach (var importer in _importers)
                 {
-                    var fallthroughBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null;
-                    var importContext = new ImportContext(block, fallthroughBlock, _method, _nameMangler);
-                    importer.Import(currentInstruction, importContext, _importerProxy);
+                    if (importer.Import(currentInstruction, importContext, _importerProxy))
+                    {
+                        imported = true;
+                        break;
+                    }
+                }
+
+                if (imported)
+                {
                     if (importContext.StopImporting)
                     {
                         return;

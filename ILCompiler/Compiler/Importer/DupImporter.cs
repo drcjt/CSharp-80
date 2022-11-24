@@ -6,10 +6,10 @@ namespace ILCompiler.Compiler.Importer
 {
     public class DupImporter : IOpcodeImporter
     {
-        public bool CanImport(Code opcode) => opcode == Code.Dup;
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Dup) return false;
+
             var op1 = importer.PopExpression();
 
             // TODO: Consider optimising this for cases where type is simple
@@ -24,6 +24,8 @@ namespace ILCompiler.Compiler.Importer
             var node2 = new LocalVariableEntry(lclNum, op1.Type, op1.ExactSize);
             importer.PushExpression(node1);
             importer.PushExpression(node2);
+
+            return true;
         }
     }
 }

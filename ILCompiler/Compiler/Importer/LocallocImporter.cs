@@ -6,10 +6,10 @@ namespace ILCompiler.Compiler.Importer
 {
     public class LocallocImporter : IOpcodeImporter
     {
-        public bool CanImport(Code opcode) => opcode == Code.Localloc;
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Localloc) return false;
+
             var op2 = importer.PopExpression();
             if (op2.Type != VarType.Ptr)
             {
@@ -27,6 +27,8 @@ namespace ILCompiler.Compiler.Importer
             var op1 = new LocalHeapEntry(op2);
 
             importer.PushExpression(op1);
+
+            return true;
         }
     }
 }

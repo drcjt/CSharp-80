@@ -6,35 +6,44 @@ namespace ILCompiler.Compiler.Importer
 {
     public class ConversionImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) =>
-            code == Code.Conv_U4 ||
-            code == Code.Conv_I4 ||
-            code == Code.Conv_U2 ||
-            code == Code.Conv_I2 ||
-            code == Code.Conv_U1 ||
-            code == Code.Conv_I1 ||
-            code == Code.Conv_U ||
-            code == Code.Conv_I;
-
-        private static VarType GetType(Code code)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            return code switch
+            VarType desiredType;
+            switch (instruction.OpCode.Code)
             {
-                Code.Conv_U4 => VarType.UInt,
-                Code.Conv_I4 => VarType.Int,
-                Code.Conv_U2 => VarType.UShort,
-                Code.Conv_I2 => VarType.Short,
-                Code.Conv_U1 => VarType.Byte,
-                Code.Conv_I1 => VarType.SByte,
-                Code.Conv_U => VarType.Ptr,
-                Code.Conv_I => VarType.Ptr,
-                _ => throw new NotImplementedException(),
-            };
-        }
+                case Code.Conv_I:
+                case Code.Conv_U:
+                    desiredType = VarType.Ptr;
+                    break;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
-        {
-            var desiredType = GetType(instruction.OpCode.Code);
+                case Code.Conv_U4:
+                    desiredType = VarType.UInt;
+                    break;
+
+                case Code.Conv_I4:
+                    desiredType = VarType.Int;
+                    break;
+
+                case Code.Conv_U2:
+                    desiredType = VarType.UShort;
+                    break;
+
+                case Code.Conv_I2:
+                    desiredType = VarType.Short;
+                    break;
+
+                case Code.Conv_U1:
+                    desiredType = VarType.Byte;
+                    break;
+
+                case Code.Conv_I1:
+                    desiredType = VarType.SByte;
+                    break;
+
+                default:
+                    return false;
+            }
+
             var op1 = importer.PopExpression();
 
             // Work out if a cast is required
@@ -58,6 +67,8 @@ namespace ILCompiler.Compiler.Importer
             //op1.Type = GetType(instruction.OpCode.Code);
 
             importer.PushExpression(op1);
+
+            return true;
         }
     }
 }

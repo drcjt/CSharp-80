@@ -5,7 +5,6 @@ namespace ILCompiler.Compiler.Importer
 {
     public interface IOpcodeImporter
     {
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer);
-        public bool CanImport(Code opcode);
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer);
     }
 }

@@ -6,19 +6,26 @@ namespace ILCompiler.Compiler.Importer
 {
     public class ShiftOperationImporter : IOpcodeImporter
     {
-        public bool CanImport(Code opcode)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            return opcode == Code.Shl || opcode == Code.Shr;
-        }
+            Operation shiftOp;
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Shl:
+                case Code.Shr:
+                    shiftOp = Operation.Lsh + (instruction.OpCode.Code - Code.Shl);
+                    break;
 
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
-        {
+                default:
+                    return false;
+            }
             var op2 = importer.PopExpression();
             var op1 = importer.PopExpression(); // operand to be shifted
 
-            var shiftOp = Operation.Lsh + (instruction.OpCode.Code - Code.Shl);
             var binaryExpr = new BinaryOperator(shiftOp, isComparison: false, op1, op2, VarType.Int);
             importer.PushExpression(binaryExpr);
+
+            return true;
         }
     }
 }

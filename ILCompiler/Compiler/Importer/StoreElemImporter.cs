@@ -7,21 +7,40 @@ namespace ILCompiler.Compiler.Importer
 {
     public class StoreElemImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code) => code == Code.Stelem_I || code == Code.Stelem_I1 || code == Code.Stelem_I2 || code == Code.Stelem_I4 || code == Code.Stelem_Ref || code == Code.Stelem;
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            VarType elemType;
+            int elemSize = 0;
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Stelem:
+                    var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
+                    elemType = typeSig.GetVarType();
+                    elemSize = typeSig.GetExactSize();
+                    break;
+                case Code.Stelem_I:
+                    elemType = VarType.Ptr;
+                    break;
+                case Code.Stelem_I1:
+                    elemType = VarType.Byte;
+                    break;
+                case Code.Stelem_I2:
+                    elemType = VarType.Short;
+                    break;
+                case Code.Stelem_I4:
+                    elemType = VarType.Int;
+                    break;
+                case Code.Stelem_Ref:
+                    elemType = VarType.Ref;
+                    break;
+
+                default:
+                    return false;
+            }
             var value = importer.PopExpression();
 
-            int elemSize;
-            if (instruction.OpCode.Code == Code.Stelem) 
+            if (instruction.OpCode.Code != Code.Stelem) 
             {
-                var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-                elemSize = typeSig.GetExactSize();
-            }
-            else
-            {
-                var elemType = GetType(instruction.OpCode.Code);
                 elemSize = elemType.GetTypeSize();
 
                 if (value.Type != elemType && elemType != VarType.Ref)
@@ -49,19 +68,8 @@ namespace ILCompiler.Compiler.Importer
 
             var op = new StoreIndEntry(addr, value, 0, elemSize);
             importer.ImportAppendTree(op);
-        }
 
-        private static VarType GetType(Code code)
-        {
-            return code switch
-            {
-                Code.Stelem_I1 => VarType.SByte,
-                Code.Stelem_I2 => VarType.Short,
-                Code.Stelem_I4 => VarType.Int,
-                Code.Stelem_I => VarType.Ptr,
-                Code.Stelem_Ref => VarType.Ref,
-                _ => throw new NotImplementedException(),
-            };
+            return true;
         }
     }
 }

@@ -6,20 +6,11 @@ namespace ILCompiler.Compiler.Importer
 {
     public class BranchImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            switch (code)
+            var code = instruction.OpCode.Code;
+            switch (instruction.OpCode.Code)
             {
-                case Code.Br_S:
-                case Code.Blt_S:
-                case Code.Bgt_S:
-                case Code.Ble_S:
-                case Code.Bge_S:
-                case Code.Beq_S:
-                case Code.Bne_Un_S:
-                case Code.Brfalse_S:
-                case Code.Brtrue_S:
-
                 case Code.Br:
                 case Code.Blt:
                 case Code.Bgt:
@@ -29,17 +20,8 @@ namespace ILCompiler.Compiler.Importer
                 case Code.Bne_Un:
                 case Code.Brfalse:
                 case Code.Brtrue:
-                    return true;
-            }
+                    break;
 
-            return false;
-        }
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
-        {
-            var code = instruction.OpCode.Code;
-            switch (code)
-            {
                 case Code.Br_S:
                 case Code.Blt_S:
                 case Code.Bgt_S:
@@ -51,7 +33,11 @@ namespace ILCompiler.Compiler.Importer
                 case Code.Brtrue_S:
                     code += (Code.Br - Code.Br_S);
                     break;
+
+                default:
+                    return false;
             }
+
             var target = instruction.OperandAs<Instruction>();
 
             var targetBlock = importer.BasicBlocks[(int)target.Offset];
@@ -112,6 +98,8 @@ namespace ILCompiler.Compiler.Importer
             }
 
             context.StopImporting = true;
+
+            return true;
         }
     }
 }

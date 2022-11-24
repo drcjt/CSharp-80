@@ -6,38 +6,39 @@ namespace ILCompiler.Compiler.Importer
 {
     public class LoadIntImporter : IOpcodeImporter
     {
-        public bool CanImport(Code code)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            return code == Code.Ldc_I4_M1 ||
-                   code == Code.Ldc_I4_0 ||
-                   code == Code.Ldc_I4_1 ||
-                   code == Code.Ldc_I4_2 ||
-                   code == Code.Ldc_I4_3 ||
-                   code == Code.Ldc_I4_4 ||
-                   code == Code.Ldc_I4_5 ||
-                   code == Code.Ldc_I4_6 ||
-                   code == Code.Ldc_I4_7 ||
-                   code == Code.Ldc_I4_8 ||
-                   code == Code.Ldc_I4 ||
-                   code == Code.Ldc_I4_S;
-        }
-
-        public void Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
-        {
-            importer.PushExpression(new Int32ConstantEntry(checked((int)GetValue(instruction))));
-        }
-
-        private static long GetValue(Instruction instruction)
-        {
-            var code = instruction.OpCode.Code;
-            var value = code switch
+            long value;
+            switch (instruction.OpCode.Code)
             {
-                Code.Ldc_I4_M1 => -1,
-                Code.Ldc_I4 => (int)instruction.Operand,
-                Code.Ldc_I4_S => (sbyte)instruction.Operand,
-                _ => code - Code.Ldc_I4_0,
-            };
-            return value;
+                case Code.Ldc_I4_M1:
+                    value = -1;
+                    break;
+                case Code.Ldc_I4:
+                    value = (int)instruction.Operand;
+                    break;
+                case Code.Ldc_I4_S:
+                    value = (sbyte)instruction.Operand;
+                    break;
+
+                case Code.Ldc_I4_0:
+                case Code.Ldc_I4_1:
+                case Code.Ldc_I4_2:
+                case Code.Ldc_I4_3:
+                case Code.Ldc_I4_4:
+                case Code.Ldc_I4_5:
+                case Code.Ldc_I4_6:
+                case Code.Ldc_I4_7:
+                case Code.Ldc_I4_8:
+                    value = instruction.OpCode.Code - Code.Ldc_I4_0;
+                    break;
+
+                default:
+                    return false;
+            }
+            importer.PushExpression(new Int32ConstantEntry(checked((int)value)));
+
+            return true;
         }
     }
 }
