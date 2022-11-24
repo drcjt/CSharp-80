@@ -4,12 +4,12 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class PopImporter : SingleOpcodeImporter
+    public class PopImporter : IOpcodeImporter
     {
-        protected override Code Code { get; } = Code.Pop;
-
-        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Pop) return false;
+
             var op1 = importer.PopExpression();
 
             // Need to spill result removed from stack to a temp that will never be used
@@ -18,6 +18,8 @@ namespace ILCompiler.Compiler.Importer
 
             // ctor has no return type so just append the tree
             importer.ImportAppendTree(node);
+
+            return true;
         }
     }
 }

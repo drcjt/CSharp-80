@@ -5,12 +5,12 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class NewarrImporter : SingleOpcodeImporter
+    public class NewarrImporter : IOpcodeImporter
     {
-        protected override Code Code { get; } = Code.Newarr;
-
-        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Newarr) return false;
+
             var op2 = importer.PopExpression();
 
             var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
@@ -23,6 +23,8 @@ namespace ILCompiler.Compiler.Importer
             var args = new List<StackEntry>() { op2, new Int32ConstantEntry(arrayElementSize) };
             var node = new CallEntry("NewArr", args, VarType.Ref, 2);
             importer.PushExpression(node);
+
+            return true;
         }
     }
 }

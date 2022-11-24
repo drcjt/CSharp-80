@@ -4,12 +4,12 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class SwitchImporter : SingleOpcodeImporter
+    public class SwitchImporter : IOpcodeImporter
     {
-        protected override Code Code { get; } = Code.Switch;
-
-        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Switch) return false;
+
             var fallthroughBlock = context.FallThroughBlock;
 
             var op1 = importer.PopExpression();
@@ -37,6 +37,8 @@ namespace ILCompiler.Compiler.Importer
             }
 
             context.StopImporting = true;
+
+            return true;
         }
     }
 }

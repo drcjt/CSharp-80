@@ -5,12 +5,12 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class NewobjImporter : SingleOpcodeImporter
+    public class NewobjImporter : IOpcodeImporter
     {
-        protected override Code Code { get; } = Code.Newobj;
-
-        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Newobj) return false;
+
             var methodDefOrRef = instruction.Operand as IMethodDefOrRef;
 
             if (methodDefOrRef == null)
@@ -96,6 +96,8 @@ namespace ILCompiler.Compiler.Importer
                     importer.PushExpression(node);
                 }
             }
+
+            return true;
         }
     }
 }

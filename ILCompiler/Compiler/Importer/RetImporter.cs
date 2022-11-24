@@ -5,12 +5,12 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class RetImporter : SingleOpcodeImporter
+    public class RetImporter : IOpcodeImporter
     {
-        protected override Code Code { get; } = Code.Ret;
-
-        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode != OpCodes.Ret) return false;
+
             var retNode = new ReturnEntry();
             if (context.Method.HasReturnType)
             {
@@ -42,6 +42,8 @@ namespace ILCompiler.Compiler.Importer
             }
             importer.ImportAppendTree(retNode);
             context.StopImporting = true;
+
+            return true;
         }
     }
 }

@@ -5,12 +5,12 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class AddressOfFieldImporter : SingleOpcodeImporter
+    public class AddressOfFieldImporter : IOpcodeImporter
     {
-        protected override Code Code { get; } = Code.Ldflda;
-
-        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Ldflda) return false;
+
             var fieldDefOrRef = instruction.Operand as IField;
             var fieldDef = fieldDefOrRef.ResolveFieldDef();
 
@@ -24,6 +24,8 @@ namespace ILCompiler.Compiler.Importer
             var node = new FieldAddressEntry(fieldDef.Name, obj, fieldDef?.FieldOffset ?? 0);
 
             importer.PushExpression(node);
+
+            return true;
         }
     }
 }

@@ -3,13 +3,14 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class NopImporter : SingleOpcodeImporter
+    public class NopImporter : IOpcodeImporter
     {
-        protected override Code Code { get; } = Code.Nop;
-
-        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Nop) return false;
+
             // Nothing to do
+            return true;
         }
     }
 }

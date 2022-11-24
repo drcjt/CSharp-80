@@ -3,14 +3,15 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class InitobjImporter : SingleOpcodeImporter
+    public class InitobjImporter : IOpcodeImporter
     {
-        protected override Code Code { get; } = Code.Initobj;
-
-        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Initobj) return false;
+
             // TODO: Need to implement this
             importer.PopExpression();
+            return true;
         }
     }
 }

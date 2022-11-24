@@ -5,12 +5,12 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class StoreFieldImporter : SingleOpcodeImporter
+    public class StoreFieldImporter : IOpcodeImporter
     {
-        protected override Code Code { get; } = Code.Stfld;
-
-        protected override void ImportOpcode(Instruction instruction, ImportContext context, IILImporterProxy importer)
+        public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
+            if (instruction.OpCode.Code != Code.Stfld) return false;
+
             var fieldDef = instruction.OperandAs<FieldDef>();
 
             var value = importer.PopExpression();
@@ -29,6 +29,8 @@ namespace ILCompiler.Compiler.Importer
             var node = new StoreIndEntry(addr, value, fieldOffset, fieldSize);
 
             importer.ImportAppendTree(node);
+
+            return true;
         }
     }
 }
