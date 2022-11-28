@@ -79,7 +79,7 @@ namespace ILCompiler.Compiler.Importer
                 else
                 {
                     // Allocate memory for object
-                    var op1 = new AllocObjEntry((int)declType.ClassSize, objVarType);
+                    var op1 = new AllocObjEntry(objSize, objVarType);
 
                     // Store allocated memory address into a temp local variable
                     var lclNum = importer.GrabTemp(VarType.Ptr, objSize);

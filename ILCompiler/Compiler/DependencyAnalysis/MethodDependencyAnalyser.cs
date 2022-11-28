@@ -28,6 +28,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     {
                         case Code.Newobj:
                         case Code.Call:
+                        case Code.Callvirt:
                             var methodDefOrRef = currentInstruction.Operand as IMethodDefOrRef;
                             var methodDef = methodDefOrRef.ResolveMethodDef();
                             if (methodDef != null && methodDef != _method)

@@ -57,6 +57,7 @@ namespace ILCompiler.Compiler
                 case ElementType.String:
                 case ElementType.Array:
                 case ElementType.SZArray:
+                case ElementType.Object:
                     return VarType.Ref;
 
                 case ElementType.ByRef:

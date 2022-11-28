@@ -10,10 +10,16 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            if (instruction.OpCode.Code != Code.Call) return false;
+            switch (instruction.OpCode.Code)
+            {
+                case Code.Call:
+                case Code.Callvirt:
+                    ImportCall(instruction, context, importer);
+                    return true;
 
-            ImportCall(instruction, context, importer);
-            return true;
+                default:
+                    return false;
+            }
         }
 
         public static void ImportCall(Instruction instruction, ImportContext context, IILImporterProxy importer, StackEntry? newObjThis = null)
@@ -232,6 +238,10 @@ namespace ILCompiler.Compiler.Importer
                     }
                 case "Address":
                     throw new NotImplementedException("Multidimensional arrays not supported");
+
+                case "get_Chars":
+                    throw new NotImplementedException("get_Chars not implemented yet");
+
                 default:
                     return false;
             }

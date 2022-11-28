@@ -1,6 +1,6 @@
 ﻿namespace System
 {
-    public class Attribute
+    public abstract class Attribute
     {
     }
 }
