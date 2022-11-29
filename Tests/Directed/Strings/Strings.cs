@@ -6,15 +6,11 @@ public static class AckermannTest
     {
         var testString = "Testing 1,2,3";
 
-        var fifthCharacter = testString[4];
+        if (testString.Length != 13) return 1;
 
-        if (fifthCharacter == 'i')
-        {
-            return 0;
-        }
-        else
-        {
-            return 1;
-        }
+        var fifthCharacter = testString[4];
+        if (fifthCharacter != 'i') return 1;
+
+        return 0;
     }
 }
