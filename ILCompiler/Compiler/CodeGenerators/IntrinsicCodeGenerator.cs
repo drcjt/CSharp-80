@@ -13,6 +13,8 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 case "WriteString":
                     context.Assembler.Pop(R16.HL);    // put argument 1 into HL
+                    context.Assembler.Inc(R16.HL);    // Skip over string length
+                    context.Assembler.Inc(R16.HL);
                     context.Assembler.Call("PRINT");
                     break;
 

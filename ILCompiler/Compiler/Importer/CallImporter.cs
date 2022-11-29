@@ -240,7 +240,15 @@ namespace ILCompiler.Compiler.Importer
                     throw new NotImplementedException("Multidimensional arrays not supported");
 
                 case "get_Chars":
-                    throw new NotImplementedException("get_Chars not implemented yet");
+                    {
+                        var arrayOp = arguments[0];
+                        var indexOp = arguments[1];
+
+                        var node = new IndexRefEntry(indexOp, arrayOp, 1, VarType.Byte);
+                        importer.PushExpression(node);
+
+                        return true;
+                    }
 
                 default:
                     return false;
