@@ -163,7 +163,16 @@ namespace ILCompiler.Compiler
             foreach (var keyValuePair in _labelsToStringData)
             {
                 assembler.AddInstruction(new LabelInstruction(keyValuePair.Key));
-                foreach (var ch in keyValuePair.Value)
+
+                var stringData = keyValuePair.Value;
+
+                byte lsb = (byte)(stringData.Length & 0xFF);
+                byte msb = (byte)((stringData.Length >> 8) & 0xFF);
+
+                assembler.Db(lsb);
+                assembler.Db(msb);
+
+                foreach (var ch in stringData)
                 {
                     assembler.Db((byte)ch);
                 }
