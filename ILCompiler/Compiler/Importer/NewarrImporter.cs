@@ -14,6 +14,7 @@ namespace ILCompiler.Compiler.Importer
             var op2 = importer.PopExpression();
 
             var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
+            typeSig = context.Method.ResolveType(typeSig);
             var arrayElementSize = typeSig.GetExactSize();
 
             // Instead of creating new node type specifically for arrays

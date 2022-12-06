@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.Common;
 using Microsoft.Extensions.Logging;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
@@ -15,21 +16,26 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public Z80MethodCodeNode AnalyseDependencies(IList<TypeDef> types, MethodDef root)
         {
             var nodesByFullMethodName = new Dictionary<string, Z80MethodCodeNode>();
-            var dependencies = new Dictionary<Z80MethodCodeNode, IList<MethodDef>>();
+            var dependencies = new Dictionary<Z80MethodCodeNode, IList<IMethod>>();
             foreach (var type in types)
             {
                 _logger.LogDebug("Analysing dependencies for Type {type.Name}", type.Name);
 
                 foreach (var method in type.Methods)
                 {
-                    var methodCodeNode = new Z80MethodCodeNode(method);
-
-                    if (!nodesByFullMethodName.ContainsKey(method.FullName))
+                    // Only analyse non generic methods
+                    if (!method.HasGenericParameters)
                     {
-                        nodesByFullMethodName.Add(method.FullName, methodCodeNode);
+                        var methodDef = new MethodDesc(method);
+                        var methodCodeNode = new Z80MethodCodeNode(methodDef);
 
-                        var dependencyAnalyser = new MethodDependencyAnalyser(method);
-                        dependencies[methodCodeNode] = dependencyAnalyser.FindCallTargets();
+                        if (!nodesByFullMethodName.ContainsKey(method.FullName))
+                        {
+                            nodesByFullMethodName.Add(method.FullName, methodCodeNode);
+
+                            var dependencyAnalyser = new MethodDependencyAnalyser(method);
+                            dependencies[methodCodeNode] = dependencyAnalyser.FindCallTargets();
+                        }
                     }
                 }
             }
@@ -37,9 +43,32 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             foreach (var dependency in dependencies)
             {
                 var dependentNodes = new List<Z80MethodCodeNode>();
-                foreach (var dependentMethodDef in dependency.Value)
+                foreach (var dependentMethod in dependency.Value)
                 {
-                    dependentNodes.Add(nodesByFullMethodName[dependentMethodDef.FullName]);
+                    var dependentMethodFullName = dependentMethod.FullName;
+                    if (dependentMethod.IsMethodSpec)
+                    {
+                        var methodSpec = (MethodSpec)dependentMethod;
+                        if (!nodesByFullMethodName.ContainsKey(methodSpec.FullName))
+                        {
+                            IList<TypeSig> genericArguments = methodSpec.GenericInstMethodSig.GenericArguments;
+                            var genericMethod = methodSpec.Method.ResolveMethodDef();
+                            if (genericMethod != null)
+                            {
+                                var method = new InstantiatedMethod(genericMethod, genericArguments, methodSpec.FullName);
+                                var instantiatedMethodCodeNode = new Z80MethodCodeNode(method);
+                                nodesByFullMethodName[methodSpec.FullName] = instantiatedMethodCodeNode;
+                            }
+                        }
+
+                        dependentMethodFullName = methodSpec.FullName;
+                    }
+
+                    var dependentNode = nodesByFullMethodName[dependentMethodFullName];
+                    if (!dependentNodes.Contains(dependentNode))
+                    {
+                        dependentNodes.Add(dependentNode);
+                    }
                 }
 
                 dependency.Key.Dependencies = dependentNodes;

@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using Z80Assembler;
@@ -11,7 +12,7 @@ namespace ILCompiler.Compiler.CodeGenerators
         public IList<LocalVariableDescriptor> LocalVariableTable { get; }
         public int ParamsCount => _method.ParamsCount;
         public int LocalsCount => _method.LocalsCount;
-        public MethodDef Method => _method.Method;
+        public MethodDesc Method => _method.Method;
 
         private readonly Z80MethodCodeNode _method;
 

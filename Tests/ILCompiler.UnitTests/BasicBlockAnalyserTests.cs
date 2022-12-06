@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -10,13 +11,14 @@ namespace ILCompiler.Tests
     [TestFixture]
     class BasicBlockAnalyserTests
     {
-        private static MethodDef BuildMethod(IList<Instruction> instructions)
+        private static MethodDesc BuildMethod(IList<Instruction> instructions)
         {
             instructions.UpdateInstructionOffsets();
-            return new MethodDefUser
+            var methodDef = new MethodDefUser
             {
                 Body = new CilBody(true, instructions, new List<ExceptionHandler>(), new List<Local>())
             };
+            return new MethodDesc(methodDef);
         }
 
         [Test]

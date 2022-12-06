@@ -1,13 +1,14 @@
 ﻿using dnlib.DotNet;
 using Z80Assembler;
+using ILCompiler.Common.TypeSystem.Common;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class Z80MethodCodeNode
     {
-        public MethodDef Method { get; }
+        public MethodDesc Method { get; }
 
-        public Z80MethodCodeNode(MethodDef method)
+        public Z80MethodCodeNode(MethodDesc method)
         {
             Method = method;
             ParamsCount = method.Parameters.Count;

@@ -28,37 +28,37 @@ namespace ILCompiler.Compiler
             _phaseFactory = phaseFactory;
         }
 
-        private void SetupLocalVariableTable(MethodDef method)
+        private void SetupLocalVariableTable(MethodDesc method)
         {
-            var body = method.MethodBody as CilBody;
+            var body = method.Body;
 
             // Setup local variable table - includes parameters as well as locals in method
-            for (int parameterIndex = 0; parameterIndex < method.Parameters.Count; parameterIndex++)
+            foreach (var parameter in method.Parameters)
             {
                 var local = new LocalVariableDescriptor()
                 {
                     IsParameter = true,
                     IsTemp = false,
-                    Name = method.Parameters[parameterIndex].Name,
-                    ExactSize = method.Parameters[parameterIndex].Type.GetExactSize(),
-                    Type = method.Parameters[parameterIndex].Type.GetVarType(),
+                    Name = parameter.Name,
+                    ExactSize = parameter.Type.GetExactSize(),
+                    Type = parameter.Type.GetVarType(),
                 };
                 _localVariableTable.Add(local);
             }
 
             if (body != null)
             {
-                for (int variableIndex = 0; variableIndex < body.Variables.Count; variableIndex++)
+                foreach (var local in method.Locals)
                 {
-                    var local = new LocalVariableDescriptor()
+                    var localVariableDescriptor = new LocalVariableDescriptor()
                     {
                         IsParameter = false,
                         IsTemp = false,
-                        Name = body.Variables[variableIndex].Name,
-                        ExactSize = body.Variables[variableIndex].Type.GetExactSize(),
-                        Type = body.Variables[variableIndex].Type.GetVarType(),
+                        Name = local.Name,
+                        ExactSize = local.Type.GetExactSize(),
+                        Type = local.Type.GetVarType(),
                     };
-                    _localVariableTable.Add(local);
+                    _localVariableTable.Add(localVariableDescriptor);
                 }
             }
 
@@ -94,11 +94,12 @@ namespace ILCompiler.Compiler
         public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode)
         {
             var method = methodCodeNodeNeedingCode.Method;
+
             _parameterCount = method.Parameters.Count;
 
             SetupLocalVariableTable(method);
 
-            if (!method.IsIntrinsic() && !method.IsPinvokeImpl)
+            if (!method.IsIntrinsic && !method.IsPInvokeImpl)
             {
                 var ilImporter = _phaseFactory.Create<IILImporter>();
 
