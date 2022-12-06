@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler
@@ -9,15 +10,30 @@ namespace ILCompiler.Compiler
 
         private static int nextMethodId = 0;
 
+        public string GetMangledMethodName(MethodSpec method)
+        {
+            return GetMangledMethodName(method.FullName);
+        }
+
         public string GetMangledMethodName(MethodDef method)
         {
-            if (_mangledMethodNames.TryGetValue(method.FullName, out string? mangledName))
+            return GetMangledMethodName(method.FullName);
+        }
+
+        public string GetMangledMethodName(MethodDesc method)
+        {
+            return GetMangledMethodName(method.FullName);
+        }
+
+        private string GetMangledMethodName(string fullName)
+        {
+            if (_mangledMethodNames.TryGetValue(fullName, out string? mangledName))
             {
                 return mangledName;
             }
 
             mangledName = $"m{nextMethodId++}";
-            _mangledMethodNames.Add(method.FullName, mangledName);
+            _mangledMethodNames.Add(fullName, mangledName);
 
             return mangledName;
         }

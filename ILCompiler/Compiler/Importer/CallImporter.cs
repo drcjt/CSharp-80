@@ -1,8 +1,10 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -24,31 +26,31 @@ namespace ILCompiler.Compiler.Importer
 
         public static void ImportCall(Instruction instruction, ImportContext context, IILImporterProxy importer, StackEntry? newObjThis = null)
         {
-            var methodDefOrRef = instruction.Operand as IMethodDefOrRef;
+            var method = instruction.Operand as IMethod;
 
-            if (methodDefOrRef == null)
+            if (method == null)
             {
-                throw new InvalidOperationException("Newobj importer called with Operand which isn't a IMethodDefOrRef");
+                throw new InvalidOperationException("Newobj importer called with Operand which isn't a IMethod");
             }
 
             var isArrayMethod = false;
             MethodDef methodToCall;
-            if (methodDefOrRef.DeclaringType.ToTypeSig().IsArray)
+            if (method.DeclaringType.ToTypeSig().IsArray)
             {
-                var declaringTypeDef = methodDefOrRef.DeclaringType.ResolveTypeDef();
-                var methodName = methodDefOrRef.Name;
+                var declaringTypeDef = method.DeclaringType.ResolveTypeDef();
+                var methodName = method.Name;
                 switch (methodName)
                 {
                     case "Set":
-                        methodToCall = new MethodDefUser("Set", methodDefOrRef.MethodSig);
+                        methodToCall = new MethodDefUser("Set", method.MethodSig);
                         declaringTypeDef.Methods.Add(methodToCall);
                         break;
                     case "Get":
-                        methodToCall = new MethodDefUser("Get", methodDefOrRef.MethodSig);
+                        methodToCall = new MethodDefUser("Get", method.MethodSig);
                         declaringTypeDef.Methods.Add(methodToCall);
                         break;
                     case "Address":
-                        methodToCall = new MethodDefUser("Address", methodDefOrRef.MethodSig);
+                        methodToCall = new MethodDefUser("Address", method.MethodSig);
                         declaringTypeDef.Methods.Add(methodToCall);
                         break;
                     default:
@@ -58,9 +60,9 @@ namespace ILCompiler.Compiler.Importer
             }
             else
             {
-                methodToCall = methodDefOrRef.ResolveMethodDefThrow();
+                methodToCall = method.ResolveMethodDefThrow();
             }
-
+            
             var arguments = new List<StackEntry>();
             var firstArgIndex = newObjThis != null ? 1 : 0;
             var parameterCount = methodToCall.Parameters.Count;
@@ -68,7 +70,15 @@ namespace ILCompiler.Compiler.Importer
             {
                 var argument = importer.PopExpression();
 
-                var parameterVarType = methodToCall.Parameters[parameterCount - (i - firstArgIndex) - 1].Type.GetVarType();
+                var parameter = methodToCall.Parameters[parameterCount - (i - firstArgIndex) - 1];
+                var parameterType = parameter.Type;
+                if (parameter.Type.IsGenericMethodParameter)
+                {
+                    var methodSpec = (MethodSpec)method;
+                    parameterType = GenericTypeInstantiator.Instantiate(parameterType, methodSpec.GenericInstMethodSig.GenericArguments);
+                }
+
+                var parameterVarType = parameterType.GetVarType();
                 if (parameterVarType.IsSmall())
                 {
                     argument = new PutArgTypeEntry(parameterVarType, argument);
@@ -94,7 +104,12 @@ namespace ILCompiler.Compiler.Importer
             }
 
             string targetMethod;
-            if (methodToCall.IsPinvokeImpl)
+            if (methodToCall.HasGenericParameters)
+            {
+                var methodSpec = (MethodSpec)method;
+                targetMethod = context.NameMangler.GetMangledMethodName(methodSpec);
+            }
+            else if (methodToCall.IsPinvokeImpl)
             {
                 targetMethod = methodToCall.ImplMap.Name;
             }

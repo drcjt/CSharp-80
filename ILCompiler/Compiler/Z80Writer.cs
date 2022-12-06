@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -50,7 +51,7 @@ namespace ILCompiler.Compiler
             }
          }
 
-        private void OutputProlog(MethodDef entryMethod)
+        private void OutputProlog(MethodDesc entryMethod)
         {
             _out.WriteLine($"; INPUT FILE {_inputFilePath.ToUpper()}");
             _out.WriteLine($"; {DateTime.Now}");
@@ -90,7 +91,8 @@ namespace ILCompiler.Compiler
                 _out.WriteLine(Instruction.Halt());
             }
 
-            var hasReturnCode = entryMethod.ReturnType.GetVarType().IsInt();
+            var returnType = entryMethod.ReturnType;
+            var hasReturnCode = returnType != null && returnType.GetVarType().IsInt();
 
             if (hasReturnCode && _configuration.PrintReturnCode)
             {
@@ -179,9 +181,9 @@ namespace ILCompiler.Compiler
 
                 if (node.Dependencies != null)
                 {
-                    foreach (var dependentNodes in node.Dependencies)
+                    foreach (var dependentNode in node.Dependencies)
                     {
-                        OutputCodeForNode(dependentNodes);
+                        OutputCodeForNode(dependentNode);
                     }
                 }
                 node.CodeEmitted = true;

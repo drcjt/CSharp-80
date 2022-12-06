@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
@@ -8,10 +9,10 @@ namespace ILCompiler.Compiler.Importer
         public BasicBlock CurrentBlock { get; }
         public BasicBlock? FallThroughBlock { get; }
         public bool StopImporting { get; set; }
-        public MethodDef Method { get; }
+        public MethodDesc Method { get; }
         public INameMangler NameMangler { get; }
 
-        public ImportContext(BasicBlock currentBlock, BasicBlock? fallthroughBlock, MethodDef method, INameMangler nameMangler)
+        public ImportContext(BasicBlock currentBlock, BasicBlock? fallthroughBlock, MethodDesc method, INameMangler nameMangler)
         {
             CurrentBlock = currentBlock;
             FallThroughBlock = fallthroughBlock;

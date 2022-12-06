@@ -15,6 +15,7 @@ namespace ILCompiler.Compiler.Importer
             {
                 case Code.Ldelem:
                     var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
+                    typeSig = context.Method.ResolveType(typeSig);
                     elemType = typeSig.GetVarType();
                     elemSize = typeSig.GetExactSize();
                     break;

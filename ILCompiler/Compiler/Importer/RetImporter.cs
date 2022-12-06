@@ -15,7 +15,6 @@ namespace ILCompiler.Compiler.Importer
             if (context.Method.HasReturnType)
             {
                 var returnType = context.Method.ReturnType;
-
                 var value = importer.PopExpression();
 
                 if (returnType.IsStruct())
@@ -30,7 +29,7 @@ namespace ILCompiler.Compiler.Importer
                 else
                 {
                     if (!value.Type.IsInt()
-                        && value.Type != VarType.Ptr 
+                        && value.Type != VarType.Ptr
                         && value.Type != VarType.ByRef
                         && value.Type != VarType.Ref)
                     {

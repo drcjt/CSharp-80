@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
 using ILCompiler.Interfaces;
@@ -12,7 +13,7 @@ namespace ILCompiler.Compiler
         private readonly ILogger<ILImporter> _logger;
         private readonly INameMangler _nameMangler;
 
-        private MethodDef _method = null!;
+        private MethodDesc _method = null!;
         private IList<LocalVariableDescriptor> _localVariableTable = null!;
 
         private BasicBlock[] _basicBlocks;
@@ -245,7 +246,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDef method, IList<LocalVariableDescriptor> localVariableTable)
+        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, IList<LocalVariableDescriptor> localVariableTable)
         {
             _parameterCount = parameterCount;
             _returnBufferArgIndex = returnBufferArgIndex;

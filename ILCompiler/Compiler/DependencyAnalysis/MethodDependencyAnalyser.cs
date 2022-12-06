@@ -12,9 +12,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             _method = method;
         }
 
-        public IList<MethodDef> FindCallTargets()
+        public IList<IMethod> FindCallTargets()
         {
-            var dependsOnMethods = new List<MethodDef>();
+            var dependsOnMethods = new List<IMethod>();
             var currentIndex = 0;
             var currentOffset = 0;
 
@@ -29,11 +29,22 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         case Code.Newobj:
                         case Code.Call:
                         case Code.Callvirt:
-                            var methodDefOrRef = currentInstruction.Operand as IMethodDefOrRef;
-                            var methodDef = methodDefOrRef.ResolveMethodDef();
-                            if (methodDef != null && methodDef != _method)
+                            var method = currentInstruction.Operand as IMethod;
+
+                            if (method != null)
                             {
-                                dependsOnMethods.Add(methodDef);
+                                if (method.IsMethodSpec)
+                                {
+                                    dependsOnMethods.Add(method);
+                                }
+                                else
+                                {
+                                    var methodDef = method.ResolveMethodDef();
+                                    if (methodDef != null && methodDef != _method)
+                                    {
+                                        dependsOnMethods.Add(methodDef);
+                                    }
+                                }
                             }
                             break;
                     }

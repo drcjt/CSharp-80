@@ -1,13 +1,13 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
+﻿using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 
 namespace ILCompiler.Compiler
 {
     public class BasicBlockAnalyser
     {
-        private readonly MethodDef _method;
+        private readonly MethodDesc _method;
 
-        public BasicBlockAnalyser(MethodDef method)
+        public BasicBlockAnalyser(MethodDesc method)
         {
             _method = method;
         }
