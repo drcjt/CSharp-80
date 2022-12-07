@@ -1,6 +1,6 @@
 ﻿using System;
 
-public static class AckermannTest
+public static class StringsTest
 {
     public static int Main()
     {

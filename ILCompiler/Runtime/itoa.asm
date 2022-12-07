@@ -22,7 +22,7 @@ UITOA:
 CONV2:
 
 	CALL B2D16
-	CALL PRINT
+	CALL UTF8PRINT
 	POP IX
 	RET
 
@@ -64,7 +64,7 @@ ULTOA:
 
 LTOA2:
 	CALL B2D32
-	CALL PRINT
+	CALL UTF8PRINT
 	POP IX
 	POP DE
 	POP BC
@@ -177,3 +177,13 @@ B2DEXPL: RLD
 B2DINV:  DS 8            ; space for 64-bit input value (LSB first)
 B2DBUF:  DS 20           ; space for 20 decimal digits
 B2DEND:  DS 1            ; space for terminating 0
+
+UTF8PRINT:
+	LD A, (HL)
+	CP 0
+	JR Z, UTF8PRINTEND
+    CALL PRINTCHR
+	INC HL
+	JR UTF8PRINT
+UTF8PRINTEND:
+	RET
