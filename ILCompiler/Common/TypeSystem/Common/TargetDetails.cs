@@ -77,7 +77,7 @@ namespace ILCompiler.Common.TypeSystem.Common
                 case ElementType.Boolean:
                     return new LayoutInt(1);
                 case ElementType.Char:
-                    return new LayoutInt(1);    // TODO: Should really be 2
+                    return new LayoutInt(2);
                 case ElementType.I1:
                 case ElementType.U1:
                     return new LayoutInt(1);

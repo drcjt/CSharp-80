@@ -259,7 +259,7 @@ namespace ILCompiler.Compiler.Importer
                         var arrayOp = arguments[0];
                         var indexOp = arguments[1];
 
-                        var node = new IndexRefEntry(indexOp, arrayOp, 1, VarType.Byte);
+                        var node = new IndexRefEntry(indexOp, arrayOp, 2, VarType.UShort);
                         importer.PushExpression(node);
 
                         return true;

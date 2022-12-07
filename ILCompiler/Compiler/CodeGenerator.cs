@@ -175,7 +175,9 @@ namespace ILCompiler.Compiler
                 foreach (var ch in stringData)
                 {
                     assembler.Db((byte)ch);
+                    assembler.Db((byte)0x00);
                 }
+                assembler.Db(0);
                 assembler.Db(0);
             }
         }

@@ -38,12 +38,12 @@ namespace ILCompiler.Common.TypeSystem.IL
                 switch (typeSig.ElementType)
                 {
                     case ElementType.Boolean:
-                    case ElementType.Char:
                     case ElementType.I1:
                     case ElementType.U1:
                         return 1;
                     case ElementType.I2:
                     case ElementType.U2:
+                    case ElementType.Char:
                         return 2;
                     case ElementType.I4:
                     case ElementType.U4:

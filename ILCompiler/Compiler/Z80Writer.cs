@@ -96,7 +96,8 @@ namespace ILCompiler.Compiler
 
             if (hasReturnCode && _configuration.PrintReturnCode)
             {
-                _out.WriteLine(Instruction.Db("Return Code:", "retcodemsg"));
+                _out.WriteLine(Instruction.Db("R e t u r n   C o d e : ", "retcodemsg"));
+                _out.WriteLine(Instruction.Db(0));
                 _out.WriteLine(Instruction.Db(0));
             }
 
