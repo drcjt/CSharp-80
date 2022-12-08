@@ -27,8 +27,21 @@ public static class Simple_Generic_Method_Test
         return arr;
     }
 
+    private static void Swap<T>(ref T a, ref T b)
+    {
+        T temp = a;
+        a = b;
+        b = temp;
+    }
+
     public static int Main()
     {
+        int x = 12;
+        int y = 17;
+        Swap<int>(ref x, ref y);
+        if (x != 17) return 1;
+        if (y != 12) return 1;
+
         var iarray = new int[5] { 1, 2, 3, 4, 5 };
         Reverse<int>(iarray);
 
