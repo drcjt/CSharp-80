@@ -1,4 +1,5 @@
-﻿using dnlib.DotNet.Emit;
+﻿using dnlib.DotNet;
+using dnlib.DotNet.Emit;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -29,6 +30,12 @@ namespace ILCompiler.Compiler.Importer
 
                 case Code.Stind_Ref:
                     type = VarType.Ref;
+                    break;
+
+                case Code.Stobj:
+                    var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
+                    typeSig = context.Method.ResolveType(typeSig);
+                    type = typeSig.GetVarType();
                     break;
 
                 default:
