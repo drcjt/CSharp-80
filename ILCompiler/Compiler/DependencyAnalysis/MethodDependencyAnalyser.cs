@@ -1,13 +1,14 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class MethodDependencyAnalyser
     {
-        private readonly MethodDef _method;
+        private readonly MethodDesc _method;
 
-        public MethodDependencyAnalyser(MethodDef method)
+        public MethodDependencyAnalyser(MethodDesc method)
         {
             _method = method;
         }
@@ -30,7 +31,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         case Code.Call:
                         case Code.Callvirt:
                             var method = currentInstruction.Operand as IMethod;
-
                             if (method != null)
                             {
                                 if (method.IsMethodSpec)
@@ -40,7 +40,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                                 else
                                 {
                                     var methodDef = method.ResolveMethodDef();
-                                    if (methodDef != null && methodDef != _method)
+                                    if (methodDef != null)
                                     {
                                         dependsOnMethods.Add(methodDef);
                                     }

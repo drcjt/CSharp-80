@@ -13,68 +13,74 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             _logger = logger;
         }
 
-        public Z80MethodCodeNode AnalyseDependencies(IList<TypeDef> types, MethodDef root)
+        private IDictionary<string, Z80MethodCodeNode> _codeNodesByFullMethodName = new Dictionary<string, Z80MethodCodeNode>();
+
+        public Z80MethodCodeNode GetDependenciesForMethod(IMethod method)
         {
-            var nodesByFullMethodName = new Dictionary<string, Z80MethodCodeNode>();
-            var dependencies = new Dictionary<Z80MethodCodeNode, IList<IMethod>>();
-            foreach (var type in types)
+            _logger.LogDebug($"Analysing dependencies for Method {method.Name}");
+
+            Z80MethodCodeNode codeNode;
+            MethodDef methodDef;
+            bool dependenciesAlreadyAnalysed = true;
+            if (method.IsMethodDef)
             {
-                _logger.LogDebug("Analysing dependencies for Type {type.Name}", type.Name);
+                methodDef = method.ResolveMethodDefThrow();
 
-                foreach (var method in type.Methods)
+                if (!_codeNodesByFullMethodName.ContainsKey(methodDef.FullName))
                 {
-                    // Only analyse non generic methods
-                    if (!method.HasGenericParameters)
-                    {
-                        var methodDef = new MethodDesc(method);
-                        var methodCodeNode = new Z80MethodCodeNode(methodDef);
-
-                        if (!nodesByFullMethodName.ContainsKey(method.FullName))
-                        {
-                            nodesByFullMethodName.Add(method.FullName, methodCodeNode);
-
-                            var dependencyAnalyser = new MethodDependencyAnalyser(method);
-                            dependencies[methodCodeNode] = dependencyAnalyser.FindCallTargets();
-                        }
-                    }
+                    codeNode = new Z80MethodCodeNode(new MethodDesc(methodDef));
+                    _codeNodesByFullMethodName[methodDef.FullName] = codeNode;
+                    dependenciesAlreadyAnalysed = false;
                 }
+                codeNode = _codeNodesByFullMethodName[methodDef.FullName];
+            }
+            else if (method.IsMethodSpec)
+            {
+                var methodSpec = (MethodSpec)method;
+                IList<TypeSig> genericArguments = methodSpec.GenericInstMethodSig.GenericArguments;
+                methodDef = methodSpec.Method.ResolveMethodDefThrow();
+
+                if (!_codeNodesByFullMethodName.ContainsKey(methodSpec.FullName))
+                {
+                    var instantiatedMethodCodeNode = new Z80MethodCodeNode(new InstantiatedMethod(methodDef, genericArguments, methodSpec.FullName));
+                    _codeNodesByFullMethodName[methodSpec.FullName] = instantiatedMethodCodeNode;
+                    dependenciesAlreadyAnalysed = false;
+                }
+                codeNode = _codeNodesByFullMethodName[methodSpec.FullName];
+            }
+            else
+            {
+                throw new NotImplementedException();
             }
 
-            foreach (var dependency in dependencies)
+            if (!dependenciesAlreadyAnalysed)
             {
-                var dependentNodes = new List<Z80MethodCodeNode>();
-                foreach (var dependentMethod in dependency.Value)
-                {
-                    var dependentMethodFullName = dependentMethod.FullName;
-                    if (dependentMethod.IsMethodSpec)
-                    {
-                        var methodSpec = (MethodSpec)dependentMethod;
-                        if (!nodesByFullMethodName.ContainsKey(methodSpec.FullName))
-                        {
-                            IList<TypeSig> genericArguments = methodSpec.GenericInstMethodSig.GenericArguments;
-                            var genericMethod = methodSpec.Method.ResolveMethodDef();
-                            if (genericMethod != null)
-                            {
-                                var method = new InstantiatedMethod(genericMethod, genericArguments, methodSpec.FullName);
-                                var instantiatedMethodCodeNode = new Z80MethodCodeNode(method);
-                                nodesByFullMethodName[methodSpec.FullName] = instantiatedMethodCodeNode;
-                            }
-                        }
-
-                        dependentMethodFullName = methodSpec.FullName;
-                    }
-
-                    var dependentNode = nodesByFullMethodName[dependentMethodFullName];
-                    if (!dependentNodes.Contains(dependentNode))
-                    {
-                        dependentNodes.Add(dependentNode);
-                    }
-                }
-
-                dependency.Key.Dependencies = dependentNodes;
+                AnalyzeDependenciesForMethodCodeNode(codeNode);
             }
 
-            return nodesByFullMethodName[root.FullName];
+            return codeNode;
+        }
+
+        private void AnalyzeDependenciesForMethodCodeNode(Z80MethodCodeNode codeNode)
+        {
+            codeNode.Dependencies = new List<Z80MethodCodeNode>();
+
+            var dependencyAnalyser = new MethodDependencyAnalyser(codeNode.Method);
+            var dependencies = dependencyAnalyser.FindCallTargets();
+
+            foreach (var dependentMethod in dependencies)
+            {
+                if (!_codeNodesByFullMethodName.TryGetValue(dependentMethod.FullName, out var dependenciesForMethod))
+                {
+                    dependenciesForMethod = GetDependenciesForMethod(dependentMethod);
+                }
+                codeNode.Dependencies.Add(dependenciesForMethod);
+            }
+        }
+
+        public Z80MethodCodeNode AnalyseDependencies(MethodDef root)
+        {
+            return GetDependenciesForMethod(root);
         }
     }
 }

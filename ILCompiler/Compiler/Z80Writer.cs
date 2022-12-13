@@ -173,6 +173,7 @@ namespace ILCompiler.Compiler
         {
             if (!node.CodeEmitted)
             {
+                node.CodeEmitted = true;
                 if (node.MethodCode != null)
                 {
                     _out.WriteLine($"; {node.Method.FullName}");
@@ -187,7 +188,6 @@ namespace ILCompiler.Compiler
                         OutputCodeForNode(dependentNode);
                     }
                 }
-                node.CodeEmitted = true;
             }
         }
 
