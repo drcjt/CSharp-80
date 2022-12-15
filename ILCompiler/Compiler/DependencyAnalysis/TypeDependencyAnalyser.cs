@@ -15,13 +15,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private IDictionary<string, Z80MethodCodeNode> _codeNodesByFullMethodName = new Dictionary<string, Z80MethodCodeNode>();
 
-        public Z80MethodCodeNode GetDependenciesForMethod(IMethod method)
+        public Z80MethodCodeNode GetRootDependencyNode(IMethod method)
         {
-            _logger.LogDebug($"Analysing dependencies for Method {method.Name}");
-
             Z80MethodCodeNode codeNode;
             MethodDef methodDef;
-            bool dependenciesAlreadyAnalysed = true;
             if (method.IsMethodDef)
             {
                 methodDef = method.ResolveMethodDefThrow();
@@ -30,7 +27,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 {
                     codeNode = new Z80MethodCodeNode(new MethodDesc(methodDef));
                     _codeNodesByFullMethodName[methodDef.FullName] = codeNode;
-                    dependenciesAlreadyAnalysed = false;
                 }
                 codeNode = _codeNodesByFullMethodName[methodDef.FullName];
             }
@@ -44,7 +40,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 {
                     var instantiatedMethodCodeNode = new Z80MethodCodeNode(new InstantiatedMethod(methodDef, genericArguments, methodSpec.FullName));
                     _codeNodesByFullMethodName[methodSpec.FullName] = instantiatedMethodCodeNode;
-                    dependenciesAlreadyAnalysed = false;
                 }
                 codeNode = _codeNodesByFullMethodName[methodSpec.FullName];
             }
@@ -52,35 +47,30 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 throw new NotImplementedException();
             }
-
-            if (!dependenciesAlreadyAnalysed)
-            {
-                AnalyzeDependenciesForMethodCodeNode(codeNode);
-            }
-
             return codeNode;
         }
 
         private void AnalyzeDependenciesForMethodCodeNode(Z80MethodCodeNode codeNode)
         {
-            codeNode.Dependencies = new List<Z80MethodCodeNode>();
-
-            var dependencyAnalyser = new MethodDependencyAnalyser(codeNode.Method);
-            var dependencies = dependencyAnalyser.FindCallTargets();
+            codeNode.Analysed = true;
+            var dependencyAnalyser = new DependencyAnalyser(codeNode.Method, _codeNodesByFullMethodName);
+            var dependencies = dependencyAnalyser.FindDependencies();
 
             foreach (var dependentMethod in dependencies)
             {
-                if (!_codeNodesByFullMethodName.TryGetValue(dependentMethod.FullName, out var dependenciesForMethod))
+                if (dependentMethod is Z80MethodCodeNode && !dependentMethod.Analysed)
                 {
-                    dependenciesForMethod = GetDependenciesForMethod(dependentMethod);
+                    AnalyzeDependenciesForMethodCodeNode((Z80MethodCodeNode)dependentMethod);
                 }
-                codeNode.Dependencies.Add(dependenciesForMethod);
+                codeNode.Dependencies.Add(dependentMethod);
             }
         }
 
         public Z80MethodCodeNode AnalyseDependencies(MethodDef root)
         {
-            return GetDependenciesForMethod(root);
+            var rootCodeNode = GetRootDependencyNode(root);
+            AnalyzeDependenciesForMethodCodeNode(rootCodeNode);
+            return rootCodeNode;
         }
     }
 }

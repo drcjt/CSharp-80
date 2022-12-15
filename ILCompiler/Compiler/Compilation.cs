@@ -66,7 +66,10 @@ namespace ILCompiler.Compiler
                 {
                     foreach (var dependentNode in node.Dependencies)
                     {
-                        CompileNode(dependentNode);
+                        if (dependentNode is Z80MethodCodeNode)
+                        {
+                            CompileNode((Z80MethodCodeNode)dependentNode);
+                        }
                     }
                 }
             }
