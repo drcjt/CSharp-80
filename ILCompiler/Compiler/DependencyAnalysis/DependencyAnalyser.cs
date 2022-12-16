@@ -7,15 +7,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
     public class DependencyAnalyser
     {
         private readonly MethodDesc _method;
-
         private readonly IList<IDependencyNode> _dependencies = new List<IDependencyNode>();
+        private readonly NodeFactory _nodeFactory;
 
-        private IDictionary<string, Z80MethodCodeNode> _codeNodesByFullMethodName;
-
-        public DependencyAnalyser(MethodDesc method, IDictionary<string, Z80MethodCodeNode> codeNodesByFullMethodName)
+        public DependencyAnalyser(MethodDesc method, NodeFactory nodeFactory)
         {
             _method = method;
-            _codeNodesByFullMethodName = codeNodesByFullMethodName;
+            _nodeFactory = nodeFactory;
         }
 
         public IList<IDependencyNode> FindDependencies()
@@ -87,7 +85,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 if (declaringType != null)
                 {
-                    _dependencies.Add(new EEType(declaringType));
+                    _dependencies.Add(_nodeFactory.TypeNode(declaringType));
                 }
             }
         }
@@ -97,33 +95,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             var method = instruction.Operand as IMethod;
             if (method != null)
             {
-                if (method.IsMethodSpec)
+                var methodNode = _nodeFactory.MethodNode(method);
+                if (methodNode != null)
                 {
-                    var methodSpec = (MethodSpec)method;
-                    IList<TypeSig> genericArguments = methodSpec.GenericInstMethodSig.GenericArguments;
-                    var methodDef = methodSpec.Method.ResolveMethodDefThrow();
-
-                    if (!_codeNodesByFullMethodName.TryGetValue(methodSpec.FullName, out var methodNode))
-                    {
-                        methodNode = new Z80MethodCodeNode(new InstantiatedMethod(methodDef, genericArguments, methodSpec.FullName));
-                        _codeNodesByFullMethodName[methodSpec.FullName] = methodNode;
-                    }
-
                     _dependencies.Add(methodNode);
-                }
-                else
-                {
-                    var methodDef = method.ResolveMethodDef();
-                    if (methodDef != null)
-                    {
-                        if (!_codeNodesByFullMethodName.TryGetValue(methodDef.FullName, out var methodNode))
-                        {
-                            methodNode = new Z80MethodCodeNode(new MethodDesc(methodDef));
-                            _codeNodesByFullMethodName[methodDef.FullName] = methodNode;
-                        }
-
-                        _dependencies.Add(methodNode);
-                    }
                 }
             }
         }

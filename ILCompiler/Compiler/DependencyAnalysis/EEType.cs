@@ -2,7 +2,7 @@
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
-    internal class EEType : IDependencyNode
+    public class EEType : IDependencyNode
     {
         public bool Analysed { get; set; }
 
