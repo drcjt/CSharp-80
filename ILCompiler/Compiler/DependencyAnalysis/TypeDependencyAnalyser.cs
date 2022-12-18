@@ -17,6 +17,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private void AnalyzeDependenciesForMethodCodeNode(Z80MethodCodeNode codeNode)
         {
             codeNode.Analysed = true;
+
             var dependencyAnalyser = new DependencyAnalyser(codeNode.Method, _nodeFactory);
             var dependencies = dependencyAnalyser.FindDependencies();
 
@@ -34,6 +35,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             var rootCodeNode = _nodeFactory.MethodNode(root);
             AnalyzeDependenciesForMethodCodeNode(rootCodeNode);
+
             return rootCodeNode;
         }
     }

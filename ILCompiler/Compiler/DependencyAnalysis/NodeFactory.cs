@@ -5,14 +5,14 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class NodeFactory
     {
-        private IDictionary<string, EEType> _typeNodesByFullName = new Dictionary<string, EEType>();
+        private IDictionary<string, EETypeNode> _typeNodesByFullName = new Dictionary<string, EETypeNode>();
         private IDictionary<string, Z80MethodCodeNode> _methodNodesByFullName = new Dictionary<string, Z80MethodCodeNode>();
         
-        public EEType TypeNode(TypeDef type)
+        public EETypeNode TypeNode(TypeDef type)
         {
             if (!_typeNodesByFullName.TryGetValue(type.FullName, out var typeNode))
             {
-                typeNode = new EEType(type);
+                typeNode = new EETypeNode(type);
                 _typeNodesByFullName[type.FullName] = typeNode;
             }
 

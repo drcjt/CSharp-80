@@ -202,6 +202,8 @@ namespace ILCompiler.Compiler
 
             OutputProlog(root.Method);
 
+            OutputNodes(root);
+
             OutputCodeForNode(root);
 
             OutputEpilog();
@@ -209,6 +211,18 @@ namespace ILCompiler.Compiler
             _out.Dispose();
 
             _logger.LogDebug($"Written compiled file to {_outputFilePath}");
+        }
+
+        private void OutputNodes(Z80MethodCodeNode node) 
+        {
+            var dependencies = DependencyNodeHelpers.GetFlattenedDependencies(node);
+            foreach (var dependentNode in dependencies)
+            {
+                if (dependentNode is EETypeNode)
+                {
+                    // TODO: If the type has static fields then need to reserve space for these fields
+                }
+            }
         }
 
         private void OutputRuntimeCode()
