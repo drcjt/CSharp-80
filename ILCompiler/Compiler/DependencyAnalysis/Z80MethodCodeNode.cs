@@ -1,11 +1,11 @@
-﻿using dnlib.DotNet;
+﻿using ILCompiler.Common.TypeSystem.Common;
 using Z80Assembler;
-using ILCompiler.Common.TypeSystem.Common;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
-    public class Z80MethodCodeNode
+    public class Z80MethodCodeNode : IDependencyNode
     {
+        public bool Analysed { get; set; }
         public MethodDesc Method { get; }
 
         public Z80MethodCodeNode(MethodDesc method)
@@ -13,11 +13,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             Method = method;
             ParamsCount = method.Parameters.Count;
             LocalsCount = method.Body?.Variables.Count ?? 0;
+            Dependencies = new List<IDependencyNode>();
         }
 
         public IList<Instruction>? MethodCode { get; set; }
 
-        public IList<Z80MethodCodeNode>? Dependencies { get; set; }
+        public IList<IDependencyNode> Dependencies { get; set; }
 
         public bool CodeEmitted { get; set; }
 

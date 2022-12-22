@@ -173,6 +173,7 @@ namespace ILCompiler.Compiler
         {
             if (!node.CodeEmitted)
             {
+                node.CodeEmitted = true;
                 if (node.MethodCode != null)
                 {
                     _out.WriteLine($"; {node.Method.FullName}");
@@ -184,10 +185,12 @@ namespace ILCompiler.Compiler
                 {
                     foreach (var dependentNode in node.Dependencies)
                     {
-                        OutputCodeForNode(dependentNode);
+                        if (dependentNode is Z80MethodCodeNode)
+                        {
+                            OutputCodeForNode((Z80MethodCodeNode)dependentNode);
+                        }
                     }
                 }
-                node.CodeEmitted = true;
             }
         }
 
@@ -199,6 +202,8 @@ namespace ILCompiler.Compiler
 
             OutputProlog(root.Method);
 
+            OutputNodes(root);
+
             OutputCodeForNode(root);
 
             OutputEpilog();
@@ -206,6 +211,18 @@ namespace ILCompiler.Compiler
             _out.Dispose();
 
             _logger.LogDebug($"Written compiled file to {_outputFilePath}");
+        }
+
+        private void OutputNodes(Z80MethodCodeNode node) 
+        {
+            var dependencies = DependencyNodeHelpers.GetFlattenedDependencies(node);
+            foreach (var dependentNode in dependencies)
+            {
+                if (dependentNode is EETypeNode)
+                {
+                    // TODO: If the type has static fields then need to reserve space for these fields
+                }
+            }
         }
 
         private void OutputRuntimeCode()

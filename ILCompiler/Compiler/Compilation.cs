@@ -45,11 +45,7 @@ namespace ILCompiler.Compiler
             };
             ModuleDefMD module = ModuleDefMD.Load(inputFilePath, options);
 
-            var typesToCompile = new List<TypeDef>();
-            typesToCompile.AddRange(corlibModule.Types);
-            typesToCompile.AddRange(module.Types);
-
-            var rootNode = _typeDependencyAnalyser.AnalyseDependencies(typesToCompile, module.EntryPoint);
+            var rootNode = _typeDependencyAnalyser.AnalyseDependencies(module.EntryPoint);
 
             CompileNode(rootNode);
 
@@ -70,7 +66,10 @@ namespace ILCompiler.Compiler
                 {
                     foreach (var dependentNode in node.Dependencies)
                     {
-                        CompileNode(dependentNode);
+                        if (dependentNode is Z80MethodCodeNode)
+                        {
+                            CompileNode((Z80MethodCodeNode)dependentNode);
+                        }
                     }
                 }
             }
