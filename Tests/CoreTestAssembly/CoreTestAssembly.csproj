@@ -21,6 +21,14 @@
 	  <OutputType>Library</OutputType>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;0169</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;0169</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
   </ItemGroup>
