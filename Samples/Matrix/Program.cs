@@ -8,7 +8,7 @@ namespace Matrix
         const int Width = 20;
         public unsafe static void Main()
         {
-            var random = new Random((uint)Environment.TickCount);
+            var random = new Random();
 
 
             // TODO: Cannot use width here as this generates IL using
@@ -17,7 +17,7 @@ namespace Matrix
 
             for (int x = 0; x < Width; x++)
             {
-                y[x] = (int)random.Next() % Height;
+                y[x] = random.Next(Height);
             }
 
             Console.Clear();

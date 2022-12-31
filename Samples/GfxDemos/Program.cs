@@ -19,17 +19,17 @@ namespace GfxDemos
         {
             Console.Clear();
 
-            Random random = new Random((uint)Environment.TickCount);
+            Random random = new Random();
 
             for (int i = 0; i < 10; i++)
             {
-                var x = ((byte)random.Next()) % 128;
-                var y = ((byte)random.Next()) % 48;
+                var x = random.Next(128);
+                var y = random.Next(48);
 
-                var width = ((byte)random.Next()) % (128 - x);
-                var height = ((byte)random.Next()) % (48 - y);
+                var width = random.Next(128) % (128 - x);
+                var height = random.Next(48) % (48 - y);
 
-                Graphics.DrawEllipse(x, y, width, height);
+                Graphics.DrawEllipse(Pens.White, x, y, width, height);
             }
         }
 
@@ -37,19 +37,19 @@ namespace GfxDemos
         {
             Console.Clear();
 
-            Random random = new Random((uint)Environment.TickCount);
+            Random random = new Random();
 
             int loops = 5;
             while (loops > 0)
             {
                 for (int i = 0; i < 50; i++)
                 {
-                    Graphics.SetPixel((byte)random.Next() % Graphics.ScreenWidth, (byte)random.Next() % Graphics.ScreenHeight, Color.White);
+                    Graphics.SetPixel(random.Next(Graphics.ScreenWidth), random.Next(Graphics.ScreenHeight), Color.White);
                 }
 
                 for (int i = 0; i < 250; i++)
                 {
-                    Graphics.SetPixel((byte)random.Next() % Graphics.ScreenWidth, (byte)random.Next() % Graphics.ScreenHeight, Color.Black);
+                    Graphics.SetPixel(random.Next(Graphics.ScreenWidth), random.Next(Graphics.ScreenHeight), Color.Black);
                 }
 
                 loops--;
@@ -60,14 +60,14 @@ namespace GfxDemos
         {
             Console.Clear();
 
-            Random random = new Random((uint)Environment.TickCount);
+            Random random = new Random();
 
             for (int i = 0; i < 30; i++)
             {
-                int x = (byte)random.Next() % Graphics.ScreenWidth;
-                int y = (byte)random.Next() % Graphics.ScreenHeight;
+                int x = random.Next(Graphics.ScreenWidth);
+                int y = random.Next(Graphics.ScreenHeight);
 
-                Graphics.DrawLine(0, 0, x, y);
+                Graphics.DrawLine(Pens.White, 0, 0, x, y);
             }
         }
     }
