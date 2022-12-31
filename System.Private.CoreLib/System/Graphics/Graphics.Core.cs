@@ -52,161 +52,101 @@
             }
         }
 
-        // TODO: This isn't working properly yet
-        public static void DrawEllipse(int x0, int y0, int x1, int y1)
+        /// <summary>
+        /// Draws an ellipse within the specified bounding box
+        /// </summary>
+        /// <param name="x">The x-coordinate of the upper-left corner of the bounding rectangle that defines the ellipse.</param>
+        /// <param name="y">The y-coordinate of the upper-left corner of the bounding rectangle that defines the ellipse.</param>
+        /// <param name="width">Width of the bounding rectangle that defines the ellipse.</param>
+        /// <param name="height">Height of the bounding rectangle that defines the ellipse.</param>
+        public static void DrawEllipse(int x, int y, int width, int height)
         {
             int xb, yb, xc, yc;
 
-            yb = yc = (y0 + y1) / 2;
-            int qb = (y0 < y1) ? (y1 - y0) : (y0 - y1);
+            // Calculate height
+            yb = yc = (2 * y + height) / 2;
+            int qb = height; // (y0 < y1) ? (y1 - y0) : (y0 - y1);
             int qy = qb;
             int dy = qb / 2;
             if (qb % 2 != 0)
             {
+                // Bounding box has even pixel height
                 yc++;
             }
 
-            xb = xc = (x0 + x1) / 2;
-            int qa = (x0 < x1) ? (x1 - x0) : (x0 - x1);
+            // Calculate width
+            xb = xc = (2 * x + width) / 2;
+            int qa = width; // (x0 < x1) ? (x1 - x0) : (x0 - x1);
+
+            int qasqr = qa * qa;
+            int qbsqr = qb * qb;
+
+            int qa2 = 2 * qasqr;
+            int qa3 = 3 * qasqr;
+            int qa4 = 4 * qasqr;
+            int qa8 = 8 * qasqr;
+
+            int qb2 = 2 * qbsqr;
+            int qb3 = 3 * qbsqr;
+            int qb8 = 8 * qbsqr;
+            int qb4 = 4 * qbsqr;
+
             int qx = qa % 2;
             int dx = 0;
-            int qt = (qa * qa) + (qb * qb) - (2 * qa * qa * qb);
+            int qt = qasqr + qbsqr - 2 * qasqr * qb;
             if (qx != 0)
             {
+                // Bounding box has even pixel width
                 xc++;
-                qt += 3 * qb * qb;
+                qt += qb3;
             }
 
+            // Start at (dx, dy) = (0, b) and iterate until (a, 0) is reached
             while (qy >= 0 && qx <= qa)
             {
+                // Draw the new points
                 DrawPoint(xb - dx, yb - dy);
                 if (dx != 0 || xb != xc)
                 {
                     DrawPoint(xc + dx, yb - dy);
                     if (dy != 0 || yb != yc)
-                    {
                         DrawPoint(xc + dx, yc + dy);
-                    }
                 }
                 if (dy != 0 || yb != yc)
                 {
                     DrawPoint(xb - dx, yc + dy);
                 }
 
-                if (qt + (2 * qb * qb * qx) + (3 * qb * qb) <= 0 ||
-                    qt + (2 * qa * qa * qy) - (qa * qa) <= 0)
+                // If a (+1, 0) step stays inside the ellipse, do it
+                if (qt + qb2 * qx + qb3 <= 0 || qt + qa2 * qy - qasqr <= 0)
                 {
-                    qt += (8 * qb * qb) + (4 * qb * qb * qx);
+                    qt += qb8 + qb4 * qx;
                     dx++;
                     qx += 2;
+                    // If a (0, -1) step stays outside the ellipse, do it
                 }
-                else if (qt - (2 * qa * qa * qy) + (3 * qa * qa) > 0)
+                else if (qt - qa2 * qy + qa3 > 0)
                 {
-                    qt += (8 * qa * qa) - (4 * qa * qa * qy);
+                    qt += qa8 - qa4 * qy;
                     dy--;
                     qy -= 2;
+                    // Else step (+1, -1)
                 }
                 else
                 {
-                    qt += (8 * qb * qb) + (4 * qb * qb * qx) + (8 * qa * qa) - (4 * qa * qa * qy);
+                    qt += qb8 + qb4 * qx + qa8 - qa4 * qy;
                     dx++;
                     qx += 2;
                     dy--;
                     qy -= 2;
                 }
-            }
+            }   // End of while loop
+            return;
         }
 
         private static void DrawPoint(int x, int y)
         {
             SetPixel(x, y);
-            //Console.Write(x);
-            //Console.Write(", ");
-            //Console.WriteLine(y);
-        }
-
-
-        // TODO: This isn't working properly yet
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="x">The x-coordinate of the upper-left corner of the bounding rectangle that defines the ellipse.</param>
-        /// <param name="y">The y-coordinate of the upper-left corner of the bounding rectangle that defines the ellipse.</param>
-        /// <param name="width">Width of the bounding rectangle that defines the ellipse.</param>
-        /// <param name="height">Height of the bounding rectangle that defines the ellipse.</param>
-        public static void DrawEllipse2(int x, int y, int width, int height)
-        {
-            // TODO: Consider using Modified McIlroy algorithm as per https://stackoverflow.com/questions/2914807/plot-ellipse-from-rectangle
-
-            int xradius = width / 2;
-            int yradius = height / 2;
-
-            int cx = x + xradius;
-            int cy = y + yradius;
-
-            var twoasquare = 2 * xradius * xradius;
-            var twobsquare = 2 * yradius * yradius;
-            var xp = xradius;
-            var yp = 0;
-            var xchange = yradius * yradius * (1 - 2 * xradius);
-            var ychange = xradius * xradius;
-            var ellipseerror = 0;
-            var stoppingx = twobsquare * xradius;
-            var stoppingy = 0;
-
-            while (stoppingx >= stoppingy)
-            {
-                Plot4EllipsePoints(cx, cy, xp, yp);
-                yp++;
-                stoppingy += twoasquare;
-                ellipseerror += ychange;
-                ychange += twoasquare;
-                if ((2 * ellipseerror + xchange) > 0)
-                {
-                    xp--;
-                    stoppingx -= twobsquare;
-                    ellipseerror -= xchange;
-                    xchange -= twobsquare;
-                }
-            }
-
-            xp = 0;
-            yp = yradius;
-            xchange = yradius * yradius;
-            ychange = xradius * xradius * (1 - 2 * yradius);
-            ellipseerror = 0;
-            stoppingx = 0;
-            stoppingy = twoasquare * yradius;
-            while (stoppingx <= stoppingy)
-            {
-                Plot4EllipsePoints(cx, cy, xp, yp);
-                xp++;
-                stoppingx += twobsquare;
-                ellipseerror += xchange;
-                xchange += twobsquare;
-                if ((2 * ellipseerror + ychange) > 0)
-                {
-                    yp--;
-                    stoppingy -= twoasquare;
-                    ellipseerror -= ychange;
-                    ychange -= twoasquare;
-                }
-            }
-        }
-
-        private static void Plot4EllipsePoints(int cx, int cy, int x, int y)
-        {
-            SetPixel(cx + x, cy + y);
-            SetPixel(cx - x, cy + y);
-            SetPixel(cx - x, cy - y);
-            SetPixel(cx + x, cy - y);
-
-            /*
-            Console.WriteLine($"{cx + x}, {cy + y}");
-            Console.WriteLine($"{cx - x}, {cy + y}");
-            Console.WriteLine($"{cx - x}, {cy - y}");
-            Console.WriteLine($"{cx + x}, {cy - y}");
-            */
         }
     }
 }

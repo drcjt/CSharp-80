@@ -9,8 +9,27 @@ namespace GfxDemos
         {
             while (true)
             {
+                RandomCircles();
                 StarBurst();
                 StarField();
+            }
+        }
+
+        public static void RandomCircles()
+        {
+            Console.Clear();
+
+            Random random = new Random((uint)Environment.TickCount);
+
+            for (int i = 0; i < 10; i++)
+            {
+                var x = ((byte)random.Next()) % 128;
+                var y = ((byte)random.Next()) % 48;
+
+                var width = ((byte)random.Next()) % (128 - x);
+                var height = ((byte)random.Next()) % (48 - y);
+
+                Graphics.DrawEllipse(x, y, width, height);
             }
         }
 
