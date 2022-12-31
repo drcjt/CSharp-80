@@ -5,43 +5,44 @@
         /// <summary>
         /// Draws a line connecting the two points specified by the coordinate points
         /// </summary>
-        /// <param name="x0">The x-coordinate of the first point</param>
-        /// <param name="y0">The y-coordinate of the first point</param>
-        /// <param name="x1">The x-coordinate of the second point</param>
-        /// <param name="y1">The y-coordinate of the second point</param>
-        public static void DrawLine(int x0, int y0, int x1, int y1)
+        /// <param name="pen">Pen that determines the color, width, and style of the line.</param>
+        /// <param name="x1">The x-coordinate of the first point</param>
+        /// <param name="y1">The y-coordinate of the first point</param>
+        /// <param name="x2">The x-coordinate of the second point</param>
+        /// <param name="y2">The y-coordinate of the second point</param>
+        public static void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
         {
             // Bresenhams algorithm
-            bool steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0);
+            bool steep = Math.Abs(y2 - y1) > Math.Abs(x2 - x1);
             if (steep)
             {
-                int t = x0; // swap x0 and y0
-                x0 = y0;
-                y0 = t;
-                t = x1; // swap x1 and y1
+                int t = x1; // swap x0 and y0
                 x1 = y1;
                 y1 = t;
+                t = x2; // swap x1 and y1
+                x2 = y2;
+                y2 = t;
             }
-            if (x0 > x1)
+            if (x1 > x2)
             {
-                int t = x0; // swap x0 and x1
-                x0 = x1;
-                x1 = t;
-                t = y0; // swap y0 and y1
-                y0 = y1;
-                y1 = t;
+                int t = x1; // swap x0 and x1
+                x1 = x2;
+                x2 = t;
+                t = y1; // swap y0 and y1
+                y1 = y2;
+                y2 = t;
             }
 
-            int dx = x1 - x0;
-            int dy = Math.Abs(y1 - y0);
+            int dx = x2 - x1;
+            int dy = Math.Abs(y2 - y1);
             int error = dx / 2;
             int ystep = -1;
-            if (y0 < y1) ystep = 1;
+            if (y1 < y2) ystep = 1;
 
-            int y = y0;
-            for (int x = x0; x <= x1; x++)
+            int y = y1;
+            for (int x = x1; x <= x2; x++)
             {
-                SetPixel(steep ? y : x, steep ? x : y);
+                SetPixel(steep ? y : x, steep ? x : y, pen.Color);
 
                 error -= dy;
                 if (error < 0)
@@ -55,11 +56,12 @@
         /// <summary>
         /// Draws an ellipse within the specified bounding box
         /// </summary>
+        /// <param name="pen">Pen that determines the color, width, and style of the ellipse.</param>
         /// <param name="x">The x-coordinate of the upper-left corner of the bounding rectangle that defines the ellipse.</param>
         /// <param name="y">The y-coordinate of the upper-left corner of the bounding rectangle that defines the ellipse.</param>
         /// <param name="width">Width of the bounding rectangle that defines the ellipse.</param>
         /// <param name="height">Height of the bounding rectangle that defines the ellipse.</param>
-        public static void DrawEllipse(int x, int y, int width, int height)
+        public static void DrawEllipse(Pen pen, int x, int y, int width, int height)
         {
             int xb, yb, xc, yc;
 
@@ -105,16 +107,16 @@
             while (qy >= 0 && qx <= qa)
             {
                 // Draw the new points
-                DrawPoint(xb - dx, yb - dy);
+                DrawPoint(pen, xb - dx, yb - dy);
                 if (dx != 0 || xb != xc)
                 {
-                    DrawPoint(xc + dx, yb - dy);
+                    DrawPoint(pen,xc + dx, yb - dy);
                     if (dy != 0 || yb != yc)
-                        DrawPoint(xc + dx, yc + dy);
+                        DrawPoint(pen, xc + dx, yc + dy);
                 }
                 if (dy != 0 || yb != yc)
                 {
-                    DrawPoint(xb - dx, yc + dy);
+                    DrawPoint(pen, xb - dx, yc + dy);
                 }
 
                 // If a (+1, 0) step stays inside the ellipse, do it
@@ -144,9 +146,9 @@
             return;
         }
 
-        private static void DrawPoint(int x, int y)
+        private static void DrawPoint(Pen pen, int x, int y)
         {
-            SetPixel(x, y);
+            SetPixel(x, y, pen.Color);
         }
     }
 }
