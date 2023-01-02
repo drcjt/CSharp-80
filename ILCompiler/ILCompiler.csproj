@@ -61,6 +61,7 @@
     <None Remove="Runtime\TRS80\cls.asm" />
     <None Remove="Runtime\TRS80\getdatetime.asm" />
     <None Remove="Runtime\TRS80\printchr.asm" />
+    <None Remove="Runtime\TRS80\readline.asm" />
     <None Remove="Runtime\TRS80\write.asm" />
     <None Remove="Runtime\TRS80\ticks.asm" />
 	<None Remove="Runtime\TRS80\setres.asm" />
@@ -121,6 +122,7 @@
     <EmbeddedResource Include="Runtime\TRS80\cls.asm" />
     <EmbeddedResource Include="Runtime\TRS80\printchr.asm" />
     <EmbeddedResource Include="Runtime\TRS80\getdatetime.asm" />
+    <EmbeddedResource Include="Runtime\TRS80\readline.asm" />
     <EmbeddedResource Include="Runtime\TRS80\write.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\cls.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\getdatetime.asm" />
