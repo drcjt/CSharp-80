@@ -32,8 +32,10 @@ namespace ILCompiler.Compiler.CodeGenerators
             { Tuple.Create(Operation.Eq, VarType.Int), "i_eq" },
             { Tuple.Create(Operation.Ge, VarType.Int), "i_ge" },
             { Tuple.Create(Operation.Gt, VarType.Int), "i_gt" },
+            { Tuple.Create(Operation.Gt_Un, VarType.Int), "i_gt_un" },
             { Tuple.Create(Operation.Le, VarType.Int), "i_le" },
             { Tuple.Create(Operation.Lt, VarType.Int), "i_lt" },
+            { Tuple.Create(Operation.Lt_Un, VarType.Int), "i_lt_un" },
             { Tuple.Create(Operation.Ne, VarType.Int), "i_neq" },
 
             { Tuple.Create(Operation.Ne, VarType.Ptr), "i_neq16" },
