@@ -16,12 +16,16 @@ namespace ILCompiler.Compiler.Importer
                     op = Operation.Eq;
                     break;
                 case Code.Clt:
-                case Code.Clt_Un:
                     op = Operation.Lt;
                     break;
+                case Code.Clt_Un:
+                    op = Operation.Lt_Un;
+                    break;
                 case Code.Cgt:
-                case Code.Cgt_Un:
                     op = Operation.Gt;
+                    break;
+                case Code.Cgt_Un:
+                    op = Operation.Gt_Un;
                     break;
 
                 default:
