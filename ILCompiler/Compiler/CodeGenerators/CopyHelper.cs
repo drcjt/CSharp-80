@@ -200,7 +200,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 var bytesToCopy = size > 2 ? 2 : size;
                 size -= 2;
 
-                if (ixOffset + bytesToCopy < -127)
+                if (ixOffset + bytesToCopy <= 127)
                 {
                     var delta = ixOffset + 1;
                     assembler.Ld(R16.DE, (short)delta);
