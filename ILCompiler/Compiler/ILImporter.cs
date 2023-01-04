@@ -1,5 +1,4 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.Common;
+﻿using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
 using ILCompiler.Interfaces;
@@ -286,21 +285,24 @@ namespace ILCompiler.Compiler
 
             if (entryStack != null)
             {
-                // Check the entry stack and the current stack are equivalent,
-                // i.e. have same length and elements are identical
+                // III.1.8.1.3 Merging Stack States
 
+                // The number of slots in each stack state must be the same
                 if (entryStack.Length != _stack.Length)
                 {
                     throw new InvalidProgramException();
                 }
 
+                //  ECMA Common Language Infrastructure(CLI) standard, V6, Partition III, CIL Instruction Set
+                // in section III.1.8.1.3 "Merging stack states", describes how stack states should be merged.
+                // For the case where the types are assignable either way (e.g. as for int32 and native int),
+                // the merging must keep the first type found.
                 for (int i = 0; i < entryStack.Length; i++)
                 {
+                    // TODO: Use Compatibility function from ECMA standard here
                     if (entryStack[i].Type != _stack[i].Type)
                     {
-                        // FIXME: This comparison needs to be more intelligent. For example
-                        // If one branch has bool and the other int then this is okay
-                        // throw new InvalidProgramException();
+                        //throw new InvalidProgramException();
                     }
                 }
             }
