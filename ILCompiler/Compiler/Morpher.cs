@@ -94,6 +94,10 @@ namespace ILCompiler.Compiler
                 case IndexRefEntry indexRefEntry:
                     tree = MorphArrayIndex(indexRefEntry);
                     break;
+
+                case PutArgTypeEntry putArgTypeEntry:
+                    tree = new PutArgTypeEntry(putArgTypeEntry.ArgType, MorphTree(putArgTypeEntry.Op1));
+                    break;
             }
             return tree;
         }
