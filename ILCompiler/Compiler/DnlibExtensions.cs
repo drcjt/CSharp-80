@@ -68,11 +68,53 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public static int GetExactSize(this TypeSig type)
+        /// <summary>
+        /// The number of bytes required when allocating this type on the heap
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static int GetInstanceByteCount(this TypeSig type)
         {
             var target = new TargetDetails(Common.TypeSystem.Common.TargetArchitecture.Z80);
             var fieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
+            var typeDefOrRef = type.ToTypeDefOrRef();
+            var typeDef = typeDefOrRef.ResolveTypeDef();
+
+            var computedLayout = fieldLayoutAlgorithm.ComputeInstanceLayout(typeDef);
+
+            if (computedLayout.Offsets != null)
+            {
+                foreach (var fieldAndOffset in computedLayout.Offsets)
+                {
+                    Debug.Assert(fieldAndOffset.Field.DeclaringType == typeDef);
+                    fieldAndOffset.Field.FieldOffset = (uint)fieldAndOffset.Offset.AsInt;
+                }
+            }
+
+            if (type.ElementType == ElementType.Class)
+            {
+                typeDef.ClassSize = (uint)computedLayout.FieldSize.AsInt;
+            }
+
+            var instanceByteCountUnaligned = computedLayout.ByteCountUnaligned;
+            var instanceByteAlignment = computedLayout.ByteCountAlignment;
+            var instanceByteCount = LayoutInt.AlignUp(instanceByteCountUnaligned, instanceByteAlignment, target);
+
+            return instanceByteCount.AsInt;
+        }
+
+
+        /// <summary>
+        /// The number of bytes required to hold a field of this type
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public static int GetInstanceFieldSize(this TypeSig type)
+        {
+            var target = new TargetDetails(Common.TypeSystem.Common.TargetArchitecture.Z80);
+            var fieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
+          
             var typeDefOrRef = type.TryGetTypeDefOrRef();
             var typeDef = typeDefOrRef.ResolveTypeDef();
 

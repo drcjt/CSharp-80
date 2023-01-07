@@ -15,7 +15,7 @@ namespace ILCompiler.Compiler.Importer
 
             var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
             typeSig = context.Method.ResolveType(typeSig);
-            var arrayElementSize = typeSig.GetExactSize();
+            var arrayElementSize = typeSig.GetInstanceFieldSize();
 
             // Instead of creating new node type specifically for arrays
             // could leverage existing CallEntry node to call arbitrary helper functions

@@ -117,7 +117,7 @@ namespace ILCompiler.Common.TypeSystem.Common
             switch (Architecture)
             {
                 case TargetArchitecture.Z80:
-                    return new LayoutInt(4);
+                    return new LayoutInt(2);
                 default:
                     throw new NotSupportedException();
             }

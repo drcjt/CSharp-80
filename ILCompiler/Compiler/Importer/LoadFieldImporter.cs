@@ -17,7 +17,7 @@ namespace ILCompiler.Compiler.Importer
             // Ensure fields have all offsets calculated
             if (fieldDef.FieldOffset == null)
             {
-                fieldDef.DeclaringType.ToTypeSig().GetExactSize();
+                fieldDef.DeclaringType.ToTypeSig().GetInstanceFieldSize();
             }
 
             var fieldOffset = fieldDef.FieldOffset ?? 0;
@@ -51,7 +51,7 @@ namespace ILCompiler.Compiler.Importer
                 throw new NotImplementedException($"LoadFieldImporter does not support {obj.Type}");
             }
 
-            var fieldSize = fieldDef.FieldType.GetExactSize();
+            var fieldSize = fieldDef.FieldType.GetInstanceFieldSize();
 
             var node = new IndirectEntry(obj, fieldDef.FieldType.GetVarType(), fieldSize, fieldOffset);
 

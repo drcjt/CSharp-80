@@ -24,7 +24,7 @@ namespace ILCompiler.Compiler.Importer
                     // copy struct on top of stack to the 
                     // return buffer.
                     retNode.ReturnBufferArgIndex = context.Method.HasThis ? 1 : 0;
-                    retNode.ReturnTypeExactSize = returnType.GetExactSize();
+                    retNode.ReturnTypeExactSize = returnType.GetInstanceFieldSize();
                 }
                 else
                 {

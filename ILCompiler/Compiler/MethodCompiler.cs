@@ -40,7 +40,7 @@ namespace ILCompiler.Compiler
                     IsParameter = true,
                     IsTemp = false,
                     Name = parameter.Name,
-                    ExactSize = parameter.Type.GetExactSize(),
+                    ExactSize = parameter.Type.GetInstanceFieldSize(),
                     Type = parameter.Type.GetVarType(),
                 };
                 _localVariableTable.Add(local);
@@ -55,7 +55,7 @@ namespace ILCompiler.Compiler
                         IsParameter = false,
                         IsTemp = false,
                         Name = local.Name,
-                        ExactSize = local.Type.GetExactSize(),
+                        ExactSize = local.Type.GetInstanceFieldSize(),
                         Type = local.Type.GetVarType(),
                     };
                     _localVariableTable.Add(localVariableDescriptor);

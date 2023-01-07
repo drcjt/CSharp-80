@@ -17,7 +17,7 @@ namespace ILCompiler.Compiler.Importer
                     var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
                     typeSig = context.Method.ResolveType(typeSig);
                     elemType = typeSig.GetVarType();
-                    elemSize = typeSig.GetExactSize();
+                    elemSize = typeSig.GetInstanceFieldSize();
                     break;
                 case Code.Stelem_I:
                     elemType = VarType.Ptr;

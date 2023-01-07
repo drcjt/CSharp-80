@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <Nullable>disable</Nullable>
+	 <Nullable>enable</Nullable>
 
     <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
@@ -18,19 +18,16 @@
 	  <!-- Prevent .NET Core 3+ from generating exe -->
 	  <UseAppHost>false</UseAppHost>
 
-	  <OutputType>Library</OutputType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn></NoWarn>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <NoWarn></NoWarn>
+	  <OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
+    <ProjectReference Include="..\..\ILCompiler\ILCompiler.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="$(SolutionDir)ILCompiler\$(OutDir)ILCompiler.exe --ignoreUnknownCil --outputFile $(TargetDir)$(TargetName).asm $(TargetPath)&#xD;&#xA;call $(SolutionDir)\tools\get-tools.cmd&#xD;&#xA;$(SolutionDir)\tools\zmac.exe -l --oo cmd -o $(TargetDir)\$(TargetName).cmd  $(TargetDir)\$(TargetName).asm &gt; $(TargetDir)\$(TargetName).lst" />
+  </Target>
   
 </Project>

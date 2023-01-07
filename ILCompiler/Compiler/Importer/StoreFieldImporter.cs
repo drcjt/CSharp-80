@@ -19,11 +19,11 @@ namespace ILCompiler.Compiler.Importer
             // Ensure fields have all offsets calculated
             if (fieldDef.FieldOffset == null)
             {
-                fieldDef.DeclaringType.ToTypeSig().GetExactSize();
+                fieldDef.DeclaringType.ToTypeSig().GetInstanceFieldSize();
             }
 
             // TODO: Can this be removed
-            var fieldSize = fieldDef.FieldType.GetExactSize();
+            var fieldSize = fieldDef.FieldType.GetInstanceFieldSize();
             var fieldOffset = fieldDef.FieldOffset ?? 0;
 
             var node = new StoreIndEntry(addr, value, fieldOffset, fieldSize);
