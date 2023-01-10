@@ -26,7 +26,7 @@ namespace ILCompiler.Compiler.Importer
                 var arraySig = declaringTypeSig.ToArraySig();
                 var rank = arraySig.Rank;
                 var elemType = arraySig.Next;   // TODO: Is this the right way to determine the element type?
-                var elemSize = elemType.GetExactSize();
+                var elemSize = elemType.GetInstanceFieldSize();
 
                 // Need to call helper to create MD array
                 // The helper should take as arguments:
@@ -61,7 +61,7 @@ namespace ILCompiler.Compiler.Importer
 
                 var objType = declType.ToTypeSig();
                 var objVarType = objType.GetVarType();
-                var objSize = objType.GetExactSize();
+                var objSize = objType.GetInstanceFieldSize();
 
                 if (declType.IsValueType)
                 {
@@ -78,15 +78,18 @@ namespace ILCompiler.Compiler.Importer
                 }
                 else
                 {
+                    // Determine required size on GC heap
+                    var allocSize = objType.GetInstanceByteCount();
+
                     // Allocate memory for object
-                    var op1 = new AllocObjEntry(objSize, objVarType);
+                    var op1 = new AllocObjEntry(allocSize, objVarType);
 
                     // Store allocated memory address into a temp local variable
                     var lclNum = importer.GrabTemp(VarType.Ptr, objSize);
                     var asg = new StoreLocalVariableEntry(lclNum, false, op1);
                     importer.ImportAppendTree(asg);
 
-                    // Call the constructor
+                    // Call the constructor                    
                     var newObjThisPtr = new LocalVariableEntry(lclNum, objVarType, objSize);
                     CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
 

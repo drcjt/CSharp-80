@@ -128,7 +128,7 @@ namespace ILCompiler.Compiler.Importer
                 }
             }
 
-            int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetExactSize() : null;
+            int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetInstanceFieldSize() : null;
 
             var callNode = new CallEntry(targetMethod, arguments, returnType.GetVarType(), returnTypeSize);
             callNode.Type = methodToCall.HasReturnType ? returnType.GetVarType() : VarType.Void;
@@ -144,7 +144,7 @@ namespace ILCompiler.Compiler.Importer
                     importer.ImportAppendTree(callNode);
 
                     // Load return buffer to stack
-                    var loadTemp = new LocalVariableEntry(returnBufferArgIndex, returnType.GetVarType(), returnType.GetExactSize());
+                    var loadTemp = new LocalVariableEntry(returnBufferArgIndex, returnType.GetVarType(), returnType.GetInstanceFieldSize());
                     importer.PushExpression(loadTemp);
                 }
                 else
@@ -157,7 +157,7 @@ namespace ILCompiler.Compiler.Importer
         static private int FixupCallStructReturn(TypeSig returnType, List<StackEntry> arguments, IILImporterProxy importer, bool hasThis)
         {
             // Create temp
-            var lclNum = importer.GrabTemp(returnType.GetVarType(), returnType.GetExactSize());
+            var lclNum = importer.GrabTemp(returnType.GetVarType(), returnType.GetInstanceFieldSize());
             var returnBufferPtr = new LocalVariableAddressEntry(lclNum);
 
             // Ensure return buffer parameter goes after the this parameter if present
@@ -193,7 +193,7 @@ namespace ILCompiler.Compiler.Importer
                     {
                         // first parameter = this, remaining parameters = indices
                         var valueType = methodToCall.Parameters[1].Type;
-                        var elemSize = valueType.GetExactSize();
+                        var elemSize = valueType.GetInstanceFieldSize();
                         var rank = methodToCall.Parameters.Count - 1;
 
                         // Arrays are stored in row-major order see https://github.com/stakx/ecma-335/blob/master/docs/i.8.9.1-array-types.md
@@ -224,7 +224,7 @@ namespace ILCompiler.Compiler.Importer
                     {
                         // first parameter = this, second parameter = value, remaining parameters = indices
                         var valueType = methodToCall.Parameters[1].Type;
-                        var elemSize = valueType.GetExactSize();
+                        var elemSize = valueType.GetInstanceFieldSize();
                         var rank = methodToCall.Parameters.Count - 2;
 
                         // Arrays are stored in row-major order see https://github.com/stakx/ecma-335/blob/master/docs/i.8.9.1-array-types.md
@@ -246,7 +246,7 @@ namespace ILCompiler.Compiler.Importer
                         // Add address of array
                         var addr = new BinaryOperator(Operation.Add, isComparison: false, indexOp, arguments[0], VarType.Ptr);
 
-                        var op = new StoreIndEntry(addr, arguments[rank + 1], 0, elemSize);
+                        var op = new StoreIndEntry(addr, arguments[rank + 1], valueType.GetVarType(), 0, elemSize);
                         importer.ImportAppendTree(op);
 
                         return true;

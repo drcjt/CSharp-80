@@ -119,7 +119,7 @@ namespace ILCompiler.Common.TypeSystem.Common
             }
 
             SizeAndAlignment instanceByteSizeAndAlignment;
-            var instanceSizeAndAlignment = ComputeInstanceSize(type, cumulativeInstanceFieldPos, largestAlignmentRequirement, 0 /* TODO: Fix this */, out instanceByteSizeAndAlignment);
+            var instanceSizeAndAlignment = ComputeInstanceSize(type, cumulativeInstanceFieldPos, largestAlignmentRequirement, (int)(type?.ClassSize ?? 0), out instanceByteSizeAndAlignment);
 
             ComputedInstanceFieldLayout computedLayout = new ComputedInstanceFieldLayout();
             computedLayout.FieldAlignment = instanceSizeAndAlignment.Alignment;
@@ -145,7 +145,7 @@ namespace ILCompiler.Common.TypeSystem.Common
                 instanceSize = LayoutInt.One;
             }
 
-            if (classLayoutSize != 0)
+            if (classLayoutSize > 0)
             {
                 LayoutInt parentSize;
                 if (type.IsValueType)
@@ -156,7 +156,7 @@ namespace ILCompiler.Common.TypeSystem.Common
                 {
                     var baseType = type.GetBaseType(true);
                     var baseTypeDef = baseType.ResolveTypeDef();
-                    parentSize = new LayoutInt(baseTypeDef.ClassSize); //parentSize = type.BaseType.InstanceByteCountUnaligned;
+                    parentSize = new LayoutInt(baseTypeDef?.ClassSize ?? 0); //parentSize = type.BaseType.InstanceByteCountUnaligned;
                 }
                 LayoutInt specifiedInstanceSize = parentSize + new LayoutInt(classLayoutSize);
                 instanceSize = LayoutInt.Max(specifiedInstanceSize, instanceSize);

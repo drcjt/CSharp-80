@@ -1,6 +1,5 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Common.TypeSystem.Common;
-using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using System.IO;
 using System.Reflection;
@@ -22,7 +21,7 @@ namespace ILCompiler.UnitTests
             var currentType = MethodBase.GetCurrentMethod().DeclaringType;
             var assemblyConfigurationAttribute = currentType.Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
             var buildConfigurationName = assemblyConfigurationAttribute?.Configuration;
-           
+
             var corelibPath = Path.Combine(SolutionPath, $@".\System.Private.CoreLib\bin\{buildConfigurationName}\net7.0\System.Private.CoreLib.dll");
             ModuleDefMD corlibModule = ModuleDefMD.Load(corelibPath, modCtx);
             ((AssemblyResolver)modCtx.AssemblyResolver).AddToCache(corlibModule);
@@ -35,8 +34,68 @@ namespace ILCompiler.UnitTests
             _testModule = ModuleDefMD.Load(inputFilePath, options);
         }
 
+
         [Test]
         public void TestSequentialTypeLayout()
+        {
+            var typeDef = _testModule.Find("CoreTestAssembly.Class1", false);
+
+            var target = new TargetDetails(TargetArchitecture.Z80);
+            var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
+
+            var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDef);
+
+            // Byte count
+            // MyInt            4
+            // MyBool           1 + 1 padding
+            // MyChar           2
+            // MyString         2
+            // MyByteArray      2
+            // MyClass1SelfRef  2
+            // -------------------
+            //                  14 
+
+            var instanceByteCountUnaligned = computedFieldLayout.ByteCountUnaligned;
+            var instanceByteAlignment = computedFieldLayout.ByteCountAlignment;
+            var instanceByteCount = LayoutInt.AlignUp(instanceByteCountUnaligned, instanceByteAlignment, target);
+
+            Assert.AreEqual(14, instanceByteCount.AsInt);
+
+            foreach (var fieldAndOffset in computedFieldLayout.Offsets)
+            {
+                var field = fieldAndOffset.Field;
+                if (field.IsStatic)
+                    continue;
+
+                switch (field.Name)
+                {
+                    case "MyInt":
+                        Assert.AreEqual(0, fieldAndOffset.Offset.AsInt);
+                        break;
+                    case "MyBool":
+                        Assert.AreEqual(4, fieldAndOffset.Offset.AsInt);
+                        break;
+                    case "MyChar":
+                        Assert.AreEqual(6, fieldAndOffset.Offset.AsInt);
+                        break;
+                    case "MyString":
+                        Assert.AreEqual(8, fieldAndOffset.Offset.AsInt);
+                        break;
+                    case "MyByteArray":
+                        Assert.AreEqual(10, fieldAndOffset.Offset.AsInt);
+                        break;
+                    case "MyClass1SelfRef":
+                        Assert.AreEqual(12, fieldAndOffset.Offset.AsInt);
+                        break;
+                    default:
+                        Assert.Fail();
+                        break;
+                }
+            }
+        }
+
+        [Test]
+        public void TestSequentialTypeLayoutStruct()
         {
             var typeDef = _testModule.Find("CoreTestAssembly.Struct0", false);
 
@@ -44,6 +103,21 @@ namespace ILCompiler.UnitTests
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
             var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDef);
+
+            // Byte count
+            // bool     b1      1
+            // bool     b2      1
+            // bool     b3      1 + 1 padding for int alignment
+            // int      i1      4
+            // string   s1      2 + 2 padding for int alignment
+            // -------------------
+            //                  12
+
+            var instanceByteCountUnaligned = computedFieldLayout.ByteCountUnaligned;
+            var instanceByteAlignment = computedFieldLayout.ByteCountAlignment;
+            var instanceByteCount = LayoutInt.AlignUp(instanceByteCountUnaligned, instanceByteAlignment, target);
+
+            Assert.AreEqual(12, instanceByteCount.AsInt);
 
             foreach (var fieldAndOffset in computedFieldLayout.Offsets)
             {
@@ -74,5 +148,48 @@ namespace ILCompiler.UnitTests
                 }
             }
         }
+
+        [Test]
+        public void TestSequentialTypeLayoutStructEmbedded()
+        {
+            var typeDef = _testModule.Find("CoreTestAssembly.Struct1", false);
+
+            var target = new TargetDetails(TargetArchitecture.Z80);
+            var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
+
+            var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDef);
+
+            // Byte count
+            // struct   MyStruct0   12
+            // bool     MyBool      1 + 3 for int aligment
+            // -----------------------
+            //                      16
+
+            var instanceByteCountUnaligned = computedFieldLayout.ByteCountUnaligned;
+            var instanceByteAlignment = computedFieldLayout.ByteCountAlignment;
+            var instanceByteCount = LayoutInt.AlignUp(instanceByteCountUnaligned, instanceByteAlignment, target);
+
+            Assert.AreEqual(16, instanceByteCount.AsInt);
+
+            foreach (var fieldAndOffset in computedFieldLayout.Offsets)
+            {
+                var field = fieldAndOffset.Field;
+                if (field.IsStatic)
+                    continue;
+
+                switch (field.Name)
+                {
+                    case "MyStruct0":
+                        Assert.AreEqual(0, fieldAndOffset.Offset.AsInt);
+                        break;
+                    case "MyBool":
+                        Assert.AreEqual(12, fieldAndOffset.Offset.AsInt);
+                        break;
+                    default:
+                        Assert.Fail();
+                        break;
+                }
+            }
+        }
     }
-}   
+}
