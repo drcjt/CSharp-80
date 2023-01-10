@@ -76,7 +76,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case StoreIndEntry sie:
-                    tree = new StoreIndEntry(MorphTree(sie.Addr), MorphTree(sie.Op1), sie.FieldOffset, sie.ExactSize);
+                    tree = new StoreIndEntry(MorphTree(sie.Addr), MorphTree(sie.Op1), sie.Type, sie.FieldOffset, sie.ExactSize);
                     break;
 
                 case StoreLocalVariableEntry slve:

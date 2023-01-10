@@ -246,7 +246,7 @@ namespace ILCompiler.Compiler.Importer
                         // Add address of array
                         var addr = new BinaryOperator(Operation.Add, isComparison: false, indexOp, arguments[0], VarType.Ptr);
 
-                        var op = new StoreIndEntry(addr, arguments[rank + 1], 0, elemSize);
+                        var op = new StoreIndEntry(addr, arguments[rank + 1], valueType.GetVarType(), 0, elemSize);
                         importer.ImportAppendTree(op);
 
                         return true;

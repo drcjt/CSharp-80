@@ -8,93 +8,75 @@ namespace Wumpus
 
         public Room[] Neighbours;
 
-        public bool HasPit;
-        public bool HasBats;
-        public bool HasWumpus;
+        public bool HasPit = false;
+        public bool HasBats = false;
 
         public Room(int roomNumber)
         {
             Number = roomNumber;
             Neighbours = new Room[3];
-
-            /*
-            HasPit = false;
-            HasBats = false;
-            HasWumpus = false;
-            */
         }
 
         private bool HasDraft()
         {
-            for (var i = 0; i < Neighbours.Length; i++) 
-            {
-                var neighbour = Neighbours[i];
-                if (neighbour.HasPit) return true;
-            }
+            if (Neighbours[0].HasPit) return true;
+            if (Neighbours[1].HasPit) return true;
+            if (Neighbours[1].HasPit) return true;
 
             return false;
         }
 
         private bool HearsBats()
         {
-            for (var i = 0; i < Neighbours.Length; i++)
-            {
-                var neighbour = Neighbours[i];
-                if (neighbour.HasBats) return true;
-            }
+            if (Neighbours[0].HasBats) return true;
+            if (Neighbours[1].HasBats) return true;
+            if (Neighbours[1].HasBats) return true;
 
             return false;
         }
 
-        private bool CanSmellWumpus()
+        private bool CanSmellWumpus(Room wumpusRoom)
         {
-            for (var i = 0; i < Neighbours.Length; i++)
-            {
-                var neighbour = Neighbours[i];
-                if (neighbour.HasWumpus) return true;
-            }
-
+            if (Neighbours[0] == wumpusRoom) return true;
+            if (Neighbours[1] == wumpusRoom) return true;
+            if (Neighbours[1] == wumpusRoom) return true;
+            
             return false;
         }
-
 
         public bool IsNeighbour(int room)
         {
-            for (var i = 0; i < Neighbours.Length; i++)
-            {
-                var neighbour = Neighbours[i];
-                if (neighbour.Number == room) return true;
-            }
+            if (Neighbours[0].Number == room) return true;
+            if (Neighbours[1].Number == room) return true;
+            if (Neighbours[2].Number == room) return true;
 
             return false;
         }
 
-        public void Print()
+        public void Print(Room wumpusRoom)
         {
-            Console.Write("You are in room ");
+            Console.Write("YOU ARE IN ROOM  ");
             Console.WriteLine(Number);
 
-            Console.Write("There are passages to rooms ");
+            Console.Write("TUNNELS LEAD TO  ");
             Console.Write(Neighbours[0].Number);
-            Console.Write(", ");
+            Console.Write("  ");
             Console.Write(Neighbours[1].Number);
-            Console.Write(", and ");
+            Console.Write("  ");
             Console.WriteLine(Neighbours[2].Number);
 
             if (HasDraft())
             {
-                Console.WriteLine("~You can feel a draft~");
+                Console.WriteLine("I FEEL A DRAFT!");
             }
             if (HearsBats())
             {
-                Console.WriteLine("*Squeak* *Squeak* There must be bats nearby.");
+                Console.WriteLine("BATS NEARBY!");
             }
-            if (CanSmellWumpus())
+            if (CanSmellWumpus(wumpusRoom))
             {
                 Console.WriteLine("I SMELL A WUMPUS!");
             }
-
-
         }
     }
 }

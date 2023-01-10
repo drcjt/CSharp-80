@@ -26,7 +26,7 @@ namespace ILCompiler.Compiler.Importer
             var fieldSize = fieldDef.FieldType.GetInstanceFieldSize();
             var fieldOffset = fieldDef.FieldOffset ?? 0;
 
-            var node = new StoreIndEntry(addr, value, fieldOffset, fieldSize);
+            var node = new StoreIndEntry(addr, value, fieldDef.FieldType.GetVarType(), fieldOffset, fieldSize);
 
             importer.ImportAppendTree(node);
 

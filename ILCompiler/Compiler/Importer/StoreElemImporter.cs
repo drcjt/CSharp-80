@@ -67,7 +67,7 @@ namespace ILCompiler.Compiler.Importer
             addr = new BinaryOperator(Operation.Add, isComparison: false, addr, arraySizeOffset, VarType.Ptr);
             addr = new BinaryOperator(Operation.Add, isComparison: false, arrayOp, addr, VarType.Ptr);
 
-            var op = new StoreIndEntry(addr, value, 0, elemSize);
+            var op = new StoreIndEntry(addr, value, elemType, 0, elemSize);
             importer.ImportAppendTree(op);
 
             return true;
