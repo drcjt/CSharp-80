@@ -85,7 +85,7 @@ namespace ILCompiler.Compiler.Importer
                     var op1 = new AllocObjEntry(allocSize, objVarType);
 
                     // Store allocated memory address into a temp local variable
-                    var lclNum = importer.GrabTemp(VarType.Ptr, objSize);
+                    var lclNum = importer.GrabTemp(VarType.Ref, objSize);
                     var asg = new StoreLocalVariableEntry(lclNum, false, op1);
                     importer.ImportAppendTree(asg);
 
@@ -95,7 +95,7 @@ namespace ILCompiler.Compiler.Importer
 
                     // Push a local variable entry corresponding to the object here
                     var node = new LocalVariableEntry(lclNum, objVarType, objSize);
-                    node.Type = VarType.Ptr;
+                    node.Type = VarType.Ref;
                     importer.PushExpression(node);
                 }
             }
