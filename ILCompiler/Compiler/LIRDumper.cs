@@ -155,6 +155,11 @@ namespace ILCompiler.Compiler
             _sb.AppendLine($"       fieldAddr {entry.Name}");
         }
 
+        public void Visit(StaticFieldEntry entry)
+        {
+            _sb.AppendLine($"       staticField {entry.Name}");
+        }
+
         public void Visit(SwitchEntry entry)
         {
             _sb.AppendLine($"       ┌──▌  t{entry.Op1.TreeID}");

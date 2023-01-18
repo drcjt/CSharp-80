@@ -125,6 +125,11 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
+        public void Visit(StaticFieldEntry entry)
+        {
+            SetNext(entry);
+        }
+
         public void Visit(CallEntry entry)
         {
             foreach (var argument in entry.Arguments)

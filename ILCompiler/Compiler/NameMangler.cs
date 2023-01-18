@@ -10,6 +10,11 @@ namespace ILCompiler.Compiler
 
         private static int nextMethodId = 0;
 
+        private readonly Dictionary<String, String> _mangledFieldNames = new Dictionary<String, String>();
+
+        private static int nextFieldId = 0;
+
+
         public string GetMangledMethodName(MethodSpec method)
         {
             return GetMangledMethodName(method.FullName);
@@ -34,6 +39,24 @@ namespace ILCompiler.Compiler
 
             mangledName = $"m{nextMethodId++}";
             _mangledMethodNames.Add(fullName, mangledName);
+
+            return mangledName;
+        }
+
+        public string GetMangledFieldName(FieldDef field)
+        {
+            return GetMangledFieldName(field.FullName);
+        }
+
+        private string GetMangledFieldName(string fullName)
+        {
+            if (_mangledFieldNames.TryGetValue(fullName, out string? mangledName))
+            {
+                return mangledName;
+            }
+
+            mangledName = $"f{nextFieldId++}";
+            _mangledFieldNames.Add(fullName, mangledName);
 
             return mangledName;
         }

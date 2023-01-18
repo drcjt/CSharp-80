@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler.Importer
             if (instruction.OpCode.Code != Code.Ldflda) return false;
 
             var fieldDefOrRef = instruction.Operand as IField;
-            var fieldDef = fieldDefOrRef.ResolveFieldDef();
+            var fieldDef = fieldDefOrRef.ResolveFieldDefThrow();
 
             var obj = importer.PopExpression();
 

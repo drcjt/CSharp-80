@@ -9,12 +9,25 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            if (instruction.OpCode.Code != Code.Stfld) return false;
+            if (instruction.OpCode.Code != Code.Stfld && instruction.OpCode.Code != Code.Stsfld) return false;
 
-            var fieldDef = instruction.OperandAs<FieldDef>();
+            var isStoreStatic = instruction.OpCode == OpCodes.Stsfld;
+
+            var fieldDefOrRef = instruction.Operand as IField;
+            var fieldDef = fieldDefOrRef.ResolveFieldDefThrow();
 
             var value = importer.PopExpression();
-            var addr = importer.PopExpression();
+
+            StackEntry addr;
+            if (isStoreStatic)
+            {
+                var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDef);
+                addr = new StaticFieldEntry(mangledFieldName);
+            }
+            else
+            {
+                addr = importer.PopExpression();
+            }
 
             // Ensure fields have all offsets calculated
             if (fieldDef.FieldOffset == null)

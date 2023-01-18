@@ -192,6 +192,11 @@ namespace ILCompiler.Compiler
             _indent--;
         }
 
+        public void Visit(StaticFieldEntry entry)
+        {
+            Print($"STATIC_FLD {entry.Name}");
+        }
+
         public void Visit(AllocObjEntry entry)
         {
             Print($"ALLOCOBJ {entry.Size}");
