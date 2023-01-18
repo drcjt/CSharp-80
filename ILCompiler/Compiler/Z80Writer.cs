@@ -3,6 +3,7 @@ using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Z80Assembler;
 
@@ -220,7 +221,25 @@ namespace ILCompiler.Compiler
             {
                 if (dependentNode is EETypeNode)
                 {
-                    // TODO: If the type has static fields then need to reserve space for these fields
+                    // If the type has static fields then need to reserve space for these fields
+
+                    var typeNode = (EETypeNode)dependentNode;
+                    var typeDef = typeNode.Type;
+                    foreach (var field in typeDef.Fields)
+                    {
+                        if (field.IsStatic)
+                        {
+                            var fieldSize = field.FieldType.GetInstanceFieldSize();
+                            _logger.LogDebug($"Reserving {fieldSize} bytes for static field {field.FullName}");
+
+                            // Need to mangle full field name here
+                            _out.WriteLine(new LabelInstruction(_nameMangler.GetMangledFieldName(field)));
+                            for (var i = 0; i < fieldSize; i++)
+                            {
+                                _out.WriteLine(Instruction.Db(0));
+                            }
+                        }
+                    }
                 }
             }
         }

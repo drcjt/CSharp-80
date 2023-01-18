@@ -28,7 +28,7 @@
         public void Visit(AllocObjEntry entry);
         public void Visit(LocalHeapEntry entry);
         public void Visit(IndexRefEntry entry);
-
         public void Visit(PutArgTypeEntry entry);
+        public void Visit(StaticFieldEntry entry);
     }
 }

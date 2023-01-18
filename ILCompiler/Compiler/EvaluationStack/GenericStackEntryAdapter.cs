@@ -117,5 +117,10 @@
         {
             _genericStackEntryVisitor.Visit<PutArgTypeEntry>(entry);
         }
+
+        public void Visit(StaticFieldEntry entry)
+        {
+            _genericStackEntryVisitor.Visit<StaticFieldEntry>(entry);
+        }
     }
 }

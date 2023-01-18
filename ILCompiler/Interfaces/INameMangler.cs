@@ -8,5 +8,6 @@ namespace ILCompiler.Interfaces
         public string GetMangledMethodName(MethodSpec method);
         public string GetMangledMethodName(MethodDef method);
         public string GetMangledMethodName(MethodDesc method);
+        public string GetMangledFieldName(FieldDef field);
     }
 }

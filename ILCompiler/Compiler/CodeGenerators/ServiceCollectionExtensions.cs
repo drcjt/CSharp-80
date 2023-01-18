@@ -28,6 +28,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             services.AddSingleton<ICodeGenerator<AllocObjEntry>, AllocObjCodeGenerator>();
             services.AddSingleton<ICodeGenerator<LocalHeapEntry>, LocalHeapCodeGenerator>();
             services.AddSingleton<ICodeGenerator<PutArgTypeEntry>, PutArgTypeCodeGenerator>();
+            services.AddSingleton<ICodeGenerator<StaticFieldEntry>,  StaticFieldCodeGenerator>();
 
             return services;
         }

@@ -67,7 +67,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private void ImportFieldAccess(Instruction instruction, bool isStatic)
         {
             var fieldDefOrRef = instruction.Operand as IField;
-            var fieldDef = fieldDefOrRef.ResolveFieldDef();
+            var fieldDef = fieldDefOrRef.ResolveFieldDefThrow();
 
             if (isStatic || fieldDef.IsStatic)
             {
