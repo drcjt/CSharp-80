@@ -72,7 +72,7 @@ namespace Wumpus
             {
                 Console.Write("NO. OF ROOMS(1-5)? ");
                 numberOfShots = int.Parse(Console.ReadLine());
-            } while (numberOfShots < 1 && numberOfShots > 5);
+            } while (numberOfShots < 1 || numberOfShots > 5);
 
             var roomNumbersToShoot = new int[numberOfShots];
             for (int shot = 0; shot < numberOfShots; shot++)
