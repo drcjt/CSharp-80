@@ -9,5 +9,5 @@ WRITE:
 	PUSH BC	; put return address back
 
 	LD A, L
-	RST 2
+	RST 0x10
 	RET

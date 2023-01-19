@@ -72,6 +72,7 @@
     <None Remove="Runtime\ZXSpectrum\getdatetime.asm" />
     <None Remove="Runtime\ZXSpectrum\getxy.asm" />
     <None Remove="Runtime\ZXSpectrum\printchr.asm" />
+    <None Remove="Runtime\ZXSpectrum\readline.asm" />
     <None Remove="Runtime\ZXSpectrum\setres.asm" />
     <None Remove="Runtime\ZXSpectrum\setxy.asm" />
     <None Remove="Runtime\ZXSpectrum\ticks.asm" />
@@ -132,6 +133,7 @@
     <EmbeddedResource Include="Runtime\ZXSpectrum\getdatetime.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\printchr.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\getxy.asm" />
+    <EmbeddedResource Include="Runtime\ZXSpectrum\readline.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\setres.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\setxy.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\ticks.asm" />
