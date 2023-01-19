@@ -4,6 +4,9 @@ namespace System
 {
     public static partial class Console
     {
+        [DllImport(Libraries.Runtime, EntryPoint = "READLINE")]
+        public static unsafe extern String ReadLine();
+
         [DllImport(Libraries.Runtime, EntryPoint = "SetXY")]
         private static unsafe extern void SetConsoleCursorPosition(sbyte x, sbyte y);
         public static unsafe void SetCursorPosition(int x, int y) 
