@@ -234,10 +234,7 @@ namespace ILCompiler.Compiler
 
                             // Need to mangle full field name here
                             _out.WriteLine(new LabelInstruction(_nameMangler.GetMangledFieldName(field)));
-                            for (var i = 0; i < fieldSize; i++)
-                            {
-                                _out.WriteLine(Instruction.Db(0));
-                            }
+                            _out.WriteLine(Instruction.Defs(fieldSize));
                         }
                     }
                 }
