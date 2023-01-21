@@ -184,5 +184,10 @@ namespace Z80Assembler
         {
             return new Instruction(Opcode.Db, b.ToString());
         }
+
+        public static Instruction Defs(int size)
+        {
+            return new Instruction(Opcode.Defs, size.ToString());
+        }
     }
 }
