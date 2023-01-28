@@ -88,6 +88,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Regression", "Tests\Regress
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wumpus", "Samples\Wumpus\Wumpus.csproj", "{AF4B760D-8F47-4124-909E-6824CD552A74}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Checksum", "Samples\Checksum\Checksum.csproj", "{DED0524E-1E8A-4601-82A0-1909150C72F1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -214,6 +216,10 @@ Global
 		{AF4B760D-8F47-4124-909E-6824CD552A74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AF4B760D-8F47-4124-909E-6824CD552A74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AF4B760D-8F47-4124-909E-6824CD552A74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DED0524E-1E8A-4601-82A0-1909150C72F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DED0524E-1E8A-4601-82A0-1909150C72F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DED0524E-1E8A-4601-82A0-1909150C72F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DED0524E-1E8A-4601-82A0-1909150C72F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -250,6 +256,7 @@ Global
 		{6414E18E-EA46-48A3-810A-15D73E875A09} = {190AA2D7-1957-4ED1-BC6A-5D5BB6B049C9}
 		{7AF3ADE5-D2EF-4210-ADF2-537A86E5D64C} = {190AA2D7-1957-4ED1-BC6A-5D5BB6B049C9}
 		{AF4B760D-8F47-4124-909E-6824CD552A74} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
+		{DED0524E-1E8A-4601-82A0-1909150C72F1} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}

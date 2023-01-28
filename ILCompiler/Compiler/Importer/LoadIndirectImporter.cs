@@ -18,6 +18,9 @@ namespace ILCompiler.Compiler.Importer
                 case Code.Ldind_I1:
                     type = VarType.SByte;
                     break;
+                case Code.Ldind_U1:
+                    type = VarType.Byte;
+                    break;
                 case Code.Ldind_I2:
                     type = VarType.Short;
                     break;

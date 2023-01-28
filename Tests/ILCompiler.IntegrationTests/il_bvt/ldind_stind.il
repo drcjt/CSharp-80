@@ -16,6 +16,16 @@
 	stind.i1
 
 	ldloca 0
+	ldind.u1
+	ldc.i4 0x00000011
+	ceq
+	brfalse fail
+
+	ldloca	0
+	ldc.i4 0x00000011
+	stind.i1
+
+	ldloca 0
 	ldind.i1
 	ldc.i4 0x00000011
 	ceq
