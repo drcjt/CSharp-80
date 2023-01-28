@@ -1,5 +1,4 @@
-﻿using ILCompiler.Compiler.Importer;
-using System;
+﻿using System;
 using System.Drawing;
 
 namespace GfxDemos
@@ -10,15 +9,8 @@ namespace GfxDemos
         {
             Console.Clear();
 
-            var black = Pens.Black;
-            Console.WriteLine((int)black.Color);
-            Console.WriteLine((int)Color.Black);
-
-            Graphics.DrawLine(Pens.White, 0, 10, 127, 10);
-            Graphics.DrawLine(Pens.Black, 0, 10, 127, 10);
-
-            Graphics.SetPixel(0, 10, Color.Black);
-            /*
+            // TODO: Remove this when static constructors work
+            Pen blackPen = new Pen(Color.Black);
 
             while (true)
             {
@@ -26,9 +18,8 @@ namespace GfxDemos
                 StarBurst();
                 StarField();
                 Spiral(Pens.White);
-                FillScreen(Pens.Black);
+                FillScreen(blackPen);
             }
-            */
         }
 
         public static void FillScreen(Pen pen)
