@@ -13,42 +13,36 @@
         public static void DrawLine(Pen pen, int x1, int y1, int x2, int y2)
         {
             // Bresenhams algorithm
-            bool steep = Math.Abs(y2 - y1) > Math.Abs(x2 - x1);
-            if (steep)
+            int w = x2 - x1;
+            int h = y2 - y1;
+            int dx1 = 0, dy1 = 0, dx2 = 0, dy2 = 0;
+            if (w < 0) dx1 = -1; else if (w > 0) dx1 = 1;
+            if (h < 0) dy1 = -1; else if (h > 0) dy1 = 1;
+            if (w < 0) dx2 = -1; else if (w > 0) dx2 = 1;
+            int longest = Math.Abs(w);
+            int shortest = Math.Abs(h);
+            if (!(longest>shortest))
             {
-                int t = x1; // swap x0 and y0
-                x1 = y1;
-                y1 = t;
-                t = x2; // swap x1 and y1
-                x2 = y2;
-                y2 = t;
+                longest = Math.Abs(h);
+                shortest = Math.Abs(w);
+                if (h < 0) dy2 = -1; else if (h > 0) dy2 = 1;
+                dx2 = 0;
             }
-            if (x1 > x2)
+            int numerator = longest >> 1;
+            for (int i = 0; i <= longest; i++)
             {
-                int t = x1; // swap x0 and x1
-                x1 = x2;
-                x2 = t;
-                t = y1; // swap y0 and y1
-                y1 = y2;
-                y2 = t;
-            }
-
-            int dx = x2 - x1;
-            int dy = Math.Abs(y2 - y1);
-            int error = dx / 2;
-            int ystep = -1;
-            if (y1 < y2) ystep = 1;
-
-            int y = y1;
-            for (int x = x1; x <= x2; x++)
-            {
-                SetPixel(steep ? y : x, steep ? x : y, pen.Color);
-
-                error -= dy;
-                if (error < 0)
+                SetPixel(x1, y1, pen.Color);
+                numerator += shortest;
+                if (!(numerator < longest))
                 {
-                    y += ystep;
-                    error += dx;
+                    numerator -= longest;
+                    x1 += dx1;
+                    y1 += dy1;
+                }
+                else
+                {
+                    x1 += dx2;
+                    y1 += dy2;
                 }
             }
         }

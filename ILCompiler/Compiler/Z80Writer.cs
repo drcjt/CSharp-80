@@ -118,6 +118,8 @@ namespace ILCompiler.Compiler
 
             _out.WriteLine(new LabelInstruction("START"));
 
+            // TODO: Call static constructors here
+
             _out.WriteLine(Instruction.Call(_nameMangler.GetMangledMethodName(entryMethod)));
 
             if (hasReturnCode)
