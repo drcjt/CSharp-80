@@ -236,7 +236,9 @@ namespace ILCompiler.Compiler
 
                             // Need to mangle full field name here
                             _out.WriteLine(new LabelInstruction(_nameMangler.GetMangledFieldName(field)));
-                            _out.WriteLine(Instruction.Defs(fieldSize));
+
+                            // Emit fieldSize bytes with value 0
+                            _out.WriteLine(Instruction.Dc(fieldSize, 0));
                         }
                     }
                 }

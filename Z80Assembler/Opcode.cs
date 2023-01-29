@@ -33,6 +33,7 @@
         public static readonly Opcode End = new("End", true);
         public static readonly Opcode Db = new("Db", true);
         public static readonly Opcode Defs = new("Defs", true);
+        public static readonly Opcode Dc = new("Dc", true);
 
         public override string ToString()
         {
