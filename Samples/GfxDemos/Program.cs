@@ -6,11 +6,8 @@ namespace GfxDemos
     public static class Program
     {
         public static void Main()
-        {
+        {            
             Console.Clear();
-
-            // TODO: Remove this when static constructors work
-            Pen blackPen = new Pen(Color.Black);
 
             while (true)
             {
@@ -18,7 +15,7 @@ namespace GfxDemos
                 StarBurst();
                 StarField();
                 Spiral(Pens.White);
-                FillScreen(blackPen);
+                FillScreen(Pens.Black);
             }
         }
 

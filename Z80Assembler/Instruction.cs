@@ -189,5 +189,11 @@ namespace Z80Assembler
         {
             return new Instruction(Opcode.Defs, size.ToString());
         }
+
+        public static Instruction Dc(int count, int value)
+        {
+            return new Instruction(Opcode.Dc, count.ToString() + ", " + value.ToString());
+        }
+
     }
 }
