@@ -55,7 +55,7 @@
 
     public class NativeIntConstantEntry : ConstantEntry<short>
     {
-        public NativeIntConstantEntry(short value) : base(VarType.Ptr, value, VarType.Ptr.GetTypeSize())
+        public NativeIntConstantEntry(short value, VarType type = VarType.Ptr) : base(type, value, VarType.Ptr.GetTypeSize())
         {
         }
 

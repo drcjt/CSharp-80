@@ -11,7 +11,10 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.OpCode != OpCodes.Ret) return false;
 
-            var retNode = new ReturnEntry();
+            StackEntry? returnValue = null;
+            int? returnBufferArgIndex = null;
+            int? returnTypeExactSize = null;
+
             if (context.Method.HasReturnType)
             {
                 var returnType = context.Method.ReturnType;
@@ -23,8 +26,8 @@ namespace ILCompiler.Compiler.Importer
                     // so that code gen can generate code to
                     // copy struct on top of stack to the 
                     // return buffer.
-                    retNode.ReturnBufferArgIndex = context.Method.HasThis ? 1 : 0;
-                    retNode.ReturnTypeExactSize = returnType.GetInstanceFieldSize();
+                    returnBufferArgIndex = context.Method.HasThis ? 1 : 0;
+                    returnTypeExactSize = returnType.GetInstanceFieldSize();
                 }
                 else
                 {
@@ -37,8 +40,10 @@ namespace ILCompiler.Compiler.Importer
                     }
                 }
 
-                retNode.Return = value;
+                returnValue = value;
             }
+
+            var retNode = new ReturnEntry(returnValue, returnBufferArgIndex, returnTypeExactSize);
             importer.ImportAppendTree(retNode);
             context.StopImporting = true;
 

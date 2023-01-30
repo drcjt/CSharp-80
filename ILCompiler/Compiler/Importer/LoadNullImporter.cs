@@ -10,8 +10,7 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.OpCode.Code != Code.Ldnull) return false;
 
-            var node = new NativeIntConstantEntry(0);
-            node.Type = VarType.Ref;
+            var node = new NativeIntConstantEntry(0, VarType.Ref);
             importer.PushExpression(node);
 
             return true;

@@ -2,9 +2,9 @@
 {
     public class ReturnEntry : StackEntry
     {
-        public StackEntry? Return { get; set; }
-        public int? ReturnBufferArgIndex { get; set; }
-        public int? ReturnTypeExactSize { get; set; }
+        public StackEntry? Return { get; }
+        public int? ReturnBufferArgIndex { get; }
+        public int? ReturnTypeExactSize { get; }
 
         public ReturnEntry() : this(null, null, null)
         {

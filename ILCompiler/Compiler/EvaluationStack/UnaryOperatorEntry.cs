@@ -3,7 +3,7 @@
     public class UnaryOperator : StackEntry
     {
         public StackEntry Op1 { get; }
-        public Operation Operation { get; set; }
+        public Operation Operation { get; }
 
         public UnaryOperator(Operation operation, StackEntry op1) : base(op1.Type, op1.ExactSize)
         {
