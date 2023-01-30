@@ -72,8 +72,7 @@ namespace ILCompiler.Compiler.Importer
                     // Call the valuetype constructor
                     CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
 
-                    var node = new LocalVariableEntry(lclNum, objVarType, objSize);
-                    node.Type = VarType.Struct;
+                    var node = new LocalVariableEntry(lclNum, VarType.Struct, objSize);
                     importer.PushExpression(node);
                 }
                 else
@@ -94,8 +93,7 @@ namespace ILCompiler.Compiler.Importer
                     CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
 
                     // Push a local variable entry corresponding to the object here
-                    var node = new LocalVariableEntry(lclNum, objVarType, objSize);
-                    node.Type = VarType.Ref;
+                    var node = new LocalVariableEntry(lclNum, VarType.Ref, objSize);
                     importer.PushExpression(node);
                 }
             }

@@ -130,8 +130,8 @@ namespace ILCompiler.Compiler.Importer
 
             int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetInstanceFieldSize() : null;
 
-            var callNode = new CallEntry(targetMethod, arguments, returnType.GetVarType(), returnTypeSize);
-            callNode.Type = methodToCall.HasReturnType ? returnType.GetVarType() : VarType.Void;
+            var returnVarType = methodToCall.HasReturnType ? returnType.GetVarType() : VarType.Void;
+            var callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize);
 
             if (!methodToCall.HasReturnType)
             {

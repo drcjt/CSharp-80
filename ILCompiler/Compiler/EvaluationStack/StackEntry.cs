@@ -32,7 +32,7 @@
     // which will be the main output of the importer
     public abstract class StackEntry : IVisitableStackEntry
     {
-        public VarType Type { get; set; }
+        public VarType Type { get; }
 
         public int? ExactSize { get; }
 

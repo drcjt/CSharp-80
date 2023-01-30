@@ -52,8 +52,7 @@ namespace ILCompiler.Compiler.Importer
 
             int exactSize = type.GetTypeSize();
 
-            var node = new StoreIndEntry(addr, value, type, fieldOffset: 0, exactSize);
-            node.Type = value.Type;
+            var node = new StoreIndEntry(addr, value, value.Type, fieldOffset: 0, exactSize);
 
             importer.ImportAppendTree(node);
 
