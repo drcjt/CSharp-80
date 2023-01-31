@@ -97,9 +97,10 @@ namespace ILCompiler.Compiler
 
             if (hasReturnCode && _configuration.PrintReturnCode)
             {
-                _out.WriteLine(Instruction.Db("R e t u r n   C o d e : ", "retcodemsg"));
-                _out.WriteLine(Instruction.Db(0));
-                _out.WriteLine(Instruction.Db(0));
+                _out.WriteLine(new LabelInstruction("retcodemsg"));
+                _out.WriteLine(Instruction.Db(12));
+                _out.WriteLine(Instruction.Db(0)); // Length of message
+                _out.WriteLine(Instruction.Db("R e t u r n   C o d e : "));
             }
 
             // Include the runtime assembly code
@@ -126,15 +127,13 @@ namespace ILCompiler.Compiler
             {
                 if (_configuration.PrintReturnCode)
                 {
-
                     // Write string "Return Code:"
                     _out.WriteLine(Instruction.Ld(R16.HL, "retcodemsg"));
                     _out.WriteLine(Instruction.Call("PRINT"));
 
-                    _out.WriteLine(Instruction.Pop(R16.DE));
+                    // Write return code
                     _out.WriteLine(Instruction.Pop(R16.HL));
-                    _out.WriteLine(Instruction.Push(R16.HL));
-                    _out.WriteLine(Instruction.Push(R16.DE));
+                    _out.WriteLine(Instruction.Pop(R16.DE));
                     _out.WriteLine(Instruction.Call("LTOA"));
                 }
                 else

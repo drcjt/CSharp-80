@@ -175,7 +175,7 @@ namespace Z80Assembler
             return new Instruction(Opcode.Jp, label);
         }
 
-        public static Instruction Db(string data, string label)
+        public static Instruction Db(string data, string label = "")
         {
             return new Instruction(label, Opcode.Db, $"'{data}'");
         }
