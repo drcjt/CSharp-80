@@ -1,10 +1,21 @@
 PRINT:
+	LD E, (HL)	; Get string length into DE
+	INC HL
+	LD D, (HL)
+	INC HL
+
+	LD B, E		; Mystery fast loop calculus
+	DEC DE
+	INC D
+
+PRINTLOOP:
 	LD A, (HL)
-	CP 0
-	JR Z, PRINTEND
 	CALL PRINTCHR
+	INC HL			; Chars are utf-16 so skip 2 bytes
 	INC HL
-	INC HL
-	JR PRINT
-PRINTEND:
+
+	DJNZ PRINTLOOP
+	DEC D
+	JP NZ, PRINTLOOP
+
 	RET
