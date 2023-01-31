@@ -16,14 +16,13 @@ namespace ILCompiler.Compiler.Lowerings
 
                 case Operation.Div:
                     LowerDiv(entry);
-                    // TODO: Convert division by pow of 2 into right shift
                     break;
             }
 
             return null;
         }
 
-        private void LowerMul(BinaryOperator mul)
+        private static void LowerMul(BinaryOperator mul)
         {
             // Convert multiplication by power of 2 into a left shift
             if (mul.Op2 is Int32ConstantEntry)
@@ -37,7 +36,7 @@ namespace ILCompiler.Compiler.Lowerings
             }
         }
 
-        private void LowerDiv(BinaryOperator div)
+        private static void LowerDiv(BinaryOperator div)
         {
             if (div.Op2 is Int32ConstantEntry)
             {
