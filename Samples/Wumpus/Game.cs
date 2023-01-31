@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Wumpus
 {
@@ -21,17 +22,19 @@ namespace Wumpus
         public Game()
         {
             _rooms = new CaveBuilder().Build();
+
+            ResetGame();
         }
 
         public void Play()
         {
             while (true)
             {
-                ResetGame();
                 while (!_resetGame)
                 {
                     RunTheGame();
                 }
+                ResetGame();
             }
         }
 
@@ -219,6 +222,7 @@ namespace Wumpus
 
         private int RandomRoom() => _rand.Next(20);
 
+        [MemberNotNull(nameof(_wumpusRoom), nameof(_currentRoom))]
         private void ResetGame()
         {
             for (var i = 0; i < _rooms.Length; i++)
