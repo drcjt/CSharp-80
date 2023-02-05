@@ -12,14 +12,17 @@ READLINE:
 	; Now need to heap alloc a proper dotnet string and copy characters
 	; String has 2 bytes for length, followed by characters which are utf-16 so 2 bytes per character
 
-	; Put actual entered string length into BC
+	; Put actual entered string length into BC	
 	LD C, B
 	LD B, 0
 
 	PUSH BC	; Save actual entered string size
 
-	INC C	; Add 2 bytes as String heap objects use first 2 bytes to hold length of string
-	INC C
+	; Required size = (actual size + 1) * 2, as we need 2 initial bytes tos hold the length
+	; and then each character itself will need 2 bytes as we are using utf-16
+	INC C	; Add 1
+	SLA C	; Multiply size by 2
+	RL D
 
 	; Allocate string object on heap
 	PUSH BC
