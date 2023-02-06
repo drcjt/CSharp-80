@@ -51,7 +51,7 @@
 	ldc.i4 0x44444444
 	stind.i4
 
-	ldloca.2
+	ldloca 2
 	ldind.u4
 	ldc.i4 0x44444444
 	ceq
