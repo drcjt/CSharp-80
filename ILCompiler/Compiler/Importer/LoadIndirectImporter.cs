@@ -24,6 +24,12 @@ namespace ILCompiler.Compiler.Importer
                 case Code.Ldind_I2:
                     type = VarType.Short;
                     break;
+                case Code.Ldind_U2:
+                    type = VarType.UShort;
+                    break;
+                case Code.Ldind_U4:
+                    type = VarType.UInt;
+                    break;
                 case Code.Ldind_I4:
                     type = VarType.Int;
                     break;

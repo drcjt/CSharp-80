@@ -20,9 +20,9 @@ READLINE:
 
 	; Required size = (actual size + 1) * 2, as we need 2 initial bytes tos hold the length
 	; and then each character itself will need 2 bytes as we are using utf-16
-	INC C	; Add 1
+	INC BC	; Add 1
 	SLA C	; Multiply size by 2
-	RL D
+	RL B
 
 	; Allocate string object on heap
 	PUSH BC

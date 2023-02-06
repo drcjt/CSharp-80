@@ -87,6 +87,8 @@ namespace ILCompiler.Common.TypeSystem.Common
                 case ElementType.I4:
                 case ElementType.U4:
                     return new LayoutInt(4);
+                case ElementType.Pinned:
+                    return GetWellKnownTypeSize(type.Next);
                 case ElementType.I:
                 case ElementType.U:
                 case ElementType.Ptr:

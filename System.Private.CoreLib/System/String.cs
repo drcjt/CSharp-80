@@ -1,8 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace System
+﻿namespace System
 {
-    public sealed class String
+    public sealed partial class String
     {
         // The layout of the string type is a contract with the compiler
 
