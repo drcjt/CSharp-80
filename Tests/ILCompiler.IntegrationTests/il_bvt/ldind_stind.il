@@ -36,14 +36,26 @@
 	stind.i2
 
 	ldloca 1
-	ldind.i2
+	ldind.u2
 	ldc.i4 0x00002222
 	ceq
 	brfalse fail
 
+	ldloca 1
+	ldind.i2
+	ldc.i4 0x00002222
+	ceq
+	brfalse fail
+	
 	ldloca 2
 	ldc.i4 0x44444444
 	stind.i4
+
+	ldloca 2
+	ldind.u4
+	ldc.i4 0x44444444
+	ceq
+	brfalse fail
 
 	ldloca 2
 	ldind.i4

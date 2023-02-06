@@ -60,6 +60,9 @@ namespace ILCompiler.Compiler
                 case ElementType.Object:
                     return VarType.Ref;
 
+                case ElementType.Pinned:
+                    return GetVarType(typeSig.Next);
+
                 case ElementType.ByRef:
                     return VarType.ByRef;
 
