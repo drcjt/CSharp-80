@@ -1,11 +1,11 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
 
 namespace System.Runtime
 {
     public static class RuntimeImports
     {
-
-        [DllImport(Libraries.Runtime, EntryPoint = "NewString")]
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        [RuntimeImport("NewString")]
         public static unsafe extern string NewString(int length);
     }
 }

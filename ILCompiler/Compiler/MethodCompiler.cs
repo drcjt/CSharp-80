@@ -95,61 +95,72 @@ namespace ILCompiler.Compiler
         {
             var method = methodCodeNodeNeedingCode.Method;
 
+            if (method.HasCustomAttribute("System.Runtime", "RuntimeImportAttribute"))
+            {
+                return;
+            }
+            if (method.IsPInvokeImpl)
+            {
+                return;
+            }
+            if (method.IsIntrinsic)
+            {
+                return;
+            }
+
+
             _parameterCount = method.Parameters.Count;
 
             SetupLocalVariableTable(method);
 
-            if (!method.IsIntrinsic && !method.IsPInvokeImpl)
+            var ilImporter = _phaseFactory.Create<IILImporter>();
+
+            // Main phases of the compiler live here
+            var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _localVariableTable);
+
+            if (_configuration.DumpIRTrees)
             {
-                var ilImporter = _phaseFactory.Create<IILImporter>();
+                _logger.LogInformation("METHOD: {methodFullName}", method.FullName);
 
-                // Main phases of the compiler live here
-                var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _localVariableTable);
-
-                if (_configuration.DumpIRTrees)
+                int lclNum = 0;
+                StringBuilder sb = new StringBuilder();
+                foreach (var lclVar in _localVariableTable)
                 {
-                    _logger.LogInformation("METHOD: {methodFullName}", method.FullName);
+                    sb.AppendLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Type} {lclVar.ExactSize}");
 
-                    int lclNum = 0;
-                    StringBuilder sb = new StringBuilder();
-                    foreach (var lclVar in _localVariableTable)
-                    {
-                        sb.AppendLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Type} {lclVar.ExactSize}");
-
-                        lclNum++;
-                    }
-                    _logger.LogInformation("{localVars}", sb.ToString());
-
-                    var treeDumper = new TreeDumper();
-                    var treedump = treeDumper.Dump(basicBlocks);
-                    _logger.LogInformation("{treedump}", treedump);
+                    lclNum++;
                 }
+                _logger.LogInformation("{localVars}", sb.ToString());
 
-                var morpher = _phaseFactory.Create<IMorpher>();
-                morpher.Morph(basicBlocks);
-
-                var flowgraph = _phaseFactory.Create<IFlowgraph>();
-                flowgraph.SetBlockOrder(basicBlocks);
-
-                var ssaBuilder = _phaseFactory.Create<ISsaBuilder>();
-                ssaBuilder.Build(basicBlocks, _localVariableTable);
-
-                if (_configuration.DumpIRTrees)
-                {
-                    // Dump LIR here
-                    var lirDumper = new LIRDumper();
-                    var lirDump = lirDumper.Dump(basicBlocks);
-                    _logger.LogInformation("{lirDump}", lirDump);
-                }
-
-                // Lower
-                var lowering = _phaseFactory.Create<ILowering>();
-                lowering.Run(basicBlocks);
-
-                var codeGenerator = _phaseFactory.Create<ICodeGenerator>();
-                var instructions = codeGenerator.Generate(basicBlocks, _localVariableTable, methodCodeNodeNeedingCode);
-                methodCodeNodeNeedingCode.MethodCode = instructions;
+                var treeDumper = new TreeDumper();
+                var treedump = treeDumper.Dump(basicBlocks);
+                _logger.LogInformation("{treedump}", treedump);
             }
+
+            var morpher = _phaseFactory.Create<IMorpher>();
+            morpher.Morph(basicBlocks);
+
+            var flowgraph = _phaseFactory.Create<IFlowgraph>();
+            flowgraph.SetBlockOrder(basicBlocks);
+
+            var ssaBuilder = _phaseFactory.Create<ISsaBuilder>();
+            ssaBuilder.Build(basicBlocks, _localVariableTable);
+
+            if (_configuration.DumpIRTrees)
+            {
+                // Dump LIR here
+                var lirDumper = new LIRDumper();
+                var lirDump = lirDumper.Dump(basicBlocks);
+                _logger.LogInformation("{lirDump}", lirDump);
+            }
+
+            // Lower
+            var lowering = _phaseFactory.Create<ILowering>();
+            lowering.Run(basicBlocks);
+
+            var codeGenerator = _phaseFactory.Create<ICodeGenerator>();
+            var instructions = codeGenerator.Generate(basicBlocks, _localVariableTable, methodCodeNodeNeedingCode);
+            methodCodeNodeNeedingCode.MethodCode = instructions;
         }
     }
 }

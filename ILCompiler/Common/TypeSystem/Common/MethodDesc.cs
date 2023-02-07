@@ -38,5 +38,7 @@ namespace ILCompiler.Common.TypeSystem.Common
         public string Name => _methodDef.Name;
 
         public CilBody Body => _methodDef.Body;
+
+        public bool HasCustomAttribute(string attributeNamespace, string attributeName) => _methodDef.HasCustomAttribute(attributeNamespace, attributeName);
     }
 }

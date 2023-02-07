@@ -10,6 +10,12 @@ namespace ILCompiler.Common.TypeSystem.IL
         {
             return method.HasCustomAttributes && method.CustomAttributes.IsDefined(CompilerIntrinsicAttribute);
         }
+
+        public static bool HasCustomAttribute(this IMethodDefOrRef method, string attributeNamespace, string attributeName)
+        {
+            return method.HasCustomAttributes && method.CustomAttributes.IsDefined(attributeNamespace + "." + attributeName);
+        }
+
         public static bool IsStruct(this TypeSig typeSig)
         {
             var typeDef = typeSig.TryGetTypeDef();
