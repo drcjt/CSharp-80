@@ -113,6 +113,15 @@ namespace ILCompiler.Compiler.Importer
             {
                 targetMethod = methodToCall.ImplMap.Name;
             }
+            else if (methodToCall.IsInternalCall && methodToCall.HasCustomAttribute("System.Runtime", "RuntimeImportAttribute"))
+            {
+                var entryPoint = methodToCall.CustomAttributes[0].ConstructorArguments[0].Value as UTF8String;
+                if (entryPoint is null)
+                {
+                    throw new NotSupportedException("RuntimeImport missing entrypoint");
+                }
+                targetMethod = entryPoint.String;
+            }
             else
             {
                 targetMethod = context.NameMangler.GetMangledMethodName(methodToCall);
