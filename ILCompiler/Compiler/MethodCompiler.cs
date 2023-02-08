@@ -97,6 +97,7 @@ namespace ILCompiler.Compiler
 
             if (method.HasCustomAttribute("System.Runtime", "RuntimeImportAttribute"))
             {
+                methodCodeNodeNeedingCode.MethodCode = GetMethodCodeFromResource(method.Name);
                 return;
             }
             if (method.IsPInvokeImpl)
@@ -160,7 +161,42 @@ namespace ILCompiler.Compiler
 
             var codeGenerator = _phaseFactory.Create<ICodeGenerator>();
             var instructions = codeGenerator.Generate(basicBlocks, _localVariableTable, methodCodeNodeNeedingCode);
-            methodCodeNodeNeedingCode.MethodCode = instructions;
+            methodCodeNodeNeedingCode.MethodCode = GetMethodCode(instructions);
+        }
+
+        private static string GetMethodCode(IList<Z80Assembler.Instruction> instructions)
+        {
+            var sb = new StringBuilder();
+            foreach (var instruction in instructions)
+            {
+                sb.AppendLine(instruction.ToString());
+            }
+            return sb.ToString();
+        }
+
+        private string GetMethodCodeFromResource(string methodName)
+        {
+            var resourceName = $"ILCompiler.Native.Runtime.{methodName}.asm";
+            var resource = GetEmbeddedResource(resourceName);
+            if (resource != null) return resource;
+
+            throw new ArgumentException($"No embedded resource {resourceName} for Method {methodName}");
+        }
+
+        private string? GetEmbeddedResource(string resourceName)
+        {
+            using (Stream? stream = GetType().Assembly.GetManifestResourceStream(resourceName))
+            {
+                if (stream != null)
+                {
+                    using (var reader = new StreamReader(stream))
+                    {
+                        return reader.ReadToEnd();
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }
