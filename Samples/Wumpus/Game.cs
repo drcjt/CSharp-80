@@ -156,6 +156,7 @@ namespace Wumpus
 
         private static char ReadChar()
         {
+            // TODO: This might result in out of memory due to ReadLine allocating on the heap
             string s = Console.ReadLine();
             if (s.Length > 0)
             {

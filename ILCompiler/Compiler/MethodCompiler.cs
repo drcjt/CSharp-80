@@ -18,7 +18,7 @@ namespace ILCompiler.Compiler
         private int _parameterCount;
         private int? _returnBufferArgIndex;
 
-        private IList<LocalVariableDescriptor> _localVariableTable;
+        private readonly IList<LocalVariableDescriptor> _localVariableTable;
 
         public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory)
         {
@@ -124,7 +124,7 @@ namespace ILCompiler.Compiler
                 _logger.LogInformation("METHOD: {methodFullName}", method.FullName);
 
                 int lclNum = 0;
-                StringBuilder sb = new StringBuilder();
+                StringBuilder sb = new();
                 foreach (var lclVar in _localVariableTable)
                 {
                     sb.AppendLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Type} {lclVar.ExactSize}");
@@ -185,15 +185,11 @@ namespace ILCompiler.Compiler
 
         private string? GetEmbeddedResource(string resourceName)
         {
-            using (Stream? stream = GetType().Assembly.GetManifestResourceStream(resourceName))
+            using Stream? stream = GetType().Assembly.GetManifestResourceStream(resourceName);
+            if (stream != null)
             {
-                if (stream != null)
-                {
-                    using (var reader = new StreamReader(stream))
-                    {
-                        return reader.ReadToEnd();
-                    }
-                }
+                using var reader = new StreamReader(stream);
+                return reader.ReadToEnd();
             }
 
             return null;

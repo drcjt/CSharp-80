@@ -40,14 +40,14 @@ namespace ILCompiler.Compiler
             {
                 return 0x0000;
             }
-            switch (_configuration.TargetArchitecture)
+            return _configuration.TargetArchitecture switch
             {
-                case TargetArchitecture.TRS80: return 0x5200;
-                case TargetArchitecture.CPM: return 0x100;
-                case TargetArchitecture.ZXSpectrum: return 0x8000;
-                default: throw new ArgumentException("Invalid target architecture enum value");
-            }
-         }
+                TargetArchitecture.TRS80 => 0x5200,
+                TargetArchitecture.CPM => 0x100,
+                TargetArchitecture.ZXSpectrum => 0x8000,
+                _ => throw new ArgumentException("Invalid target architecture value"),
+            };
+        }
 
         private void OutputProlog(MethodDesc entryMethod)
         {
@@ -110,7 +110,7 @@ namespace ILCompiler.Compiler
                     case TargetArchitecture.TRS80: _out.WriteLine("include trs80rt.asm"); break;
                     case TargetArchitecture.CPM: _out.WriteLine("include cpmrt.asm"); break;
                     case TargetArchitecture.ZXSpectrum: _out.WriteLine("include zxspectrum.asm"); break;
-                    default: throw new ArgumentException("Invalid target architecture enum value");
+                    default: throw new ArgumentException("Invalid target architecture value");
                 }
             }
 
@@ -184,9 +184,9 @@ namespace ILCompiler.Compiler
                 {
                     foreach (var dependentNode in node.Dependencies)
                     {
-                        if (dependentNode is Z80MethodCodeNode)
+                        if (dependentNode is Z80MethodCodeNode z80MethodCodeNode)
                         {
-                            OutputCodeForNode((Z80MethodCodeNode)dependentNode);
+                            OutputCodeForNode(z80MethodCodeNode);
                         }
                     }
                 }
@@ -209,7 +209,7 @@ namespace ILCompiler.Compiler
 
             _out.Dispose();
 
-            _logger.LogDebug($"Written compiled file to {_outputFilePath}");
+            _logger.LogDebug("Written compiled file to {_outputFilePath}", _outputFilePath);
         }
 
         private void OutputNodes(Z80MethodCodeNode node) 
@@ -217,18 +217,16 @@ namespace ILCompiler.Compiler
             var dependencies = DependencyNodeHelpers.GetFlattenedDependencies(node);
             foreach (var dependentNode in dependencies)
             {
-                if (dependentNode is EETypeNode)
+                // If the type has static fields then need to reserve space for these fields
+                if (dependentNode is EETypeNode typeNode)
                 {
-                    // If the type has static fields then need to reserve space for these fields
-
-                    var typeNode = (EETypeNode)dependentNode;
                     var typeDef = typeNode.Type;
                     foreach (var field in typeDef.Fields)
                     {
                         if (field.IsStatic)
                         {
                             var fieldSize = field.FieldType.GetInstanceFieldSize();
-                            _logger.LogDebug($"Reserving {fieldSize} bytes for static field {field.FullName}");
+                            _logger.LogDebug("Reserving {fieldSize} bytes for static field {field.FullName}", fieldSize, field.FullName);
 
                             // Need to mangle full field name here
                             _out.WriteLine(new LabelInstruction(_nameMangler.GetMangledFieldName(field)));
@@ -253,15 +251,11 @@ namespace ILCompiler.Compiler
                 if (resourceName.StartsWith("ILCompiler.Runtime.CPM") && _configuration.TargetArchitecture != TargetArchitecture.CPM) continue;
                 if (resourceName.StartsWith("ILCompiler.Runtime.ZXSpectrum") && _configuration.TargetArchitecture != TargetArchitecture.ZXSpectrum) continue;
 
-                using (Stream? stream = GetType().Assembly.GetManifestResourceStream(resourceName))
+                using Stream? stream = GetType().Assembly.GetManifestResourceStream(resourceName);
+                if (stream != null)
                 {
-                    if (stream != null)
-                    {
-                        using (var reader = new StreamReader(stream))
-                        {
-                            _out.Write(reader.ReadToEnd());
-                        }
-                    }
+                    using var reader = new StreamReader(stream);
+                    _out.Write(reader.ReadToEnd());
                 }
             }
         }
