@@ -16,7 +16,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             Dependencies = new List<IDependencyNode>();
         }
 
-        public IList<Instruction>? MethodCode { get; set; }
+        public string? MethodCode { get; set; }
 
         public IList<IDependencyNode> Dependencies { get; set; }
 
