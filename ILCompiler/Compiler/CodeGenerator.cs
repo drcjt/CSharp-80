@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler
         private readonly ICodeGeneratorFactory _codeGeneratorFactory;
         private readonly IConfiguration _configuration;
 
-        private readonly Dictionary<string, string> _labelsToStringData = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _labelsToStringData = new();
 
         private CodeGeneratorContext _context = null!;
 
@@ -67,7 +67,7 @@ namespace ILCompiler.Compiler
         private void AssignFrameOffsets()
         {
             // First process the arguments
-            var totalArgumentsSize = AssignFrameOffsetsToArgs();
+            var totalArgumentsSize = AssignFrameOffsetsToArguments();
 
             // Calculate the frame offsets for local variables
             AssignFrameOffsetsToLocals();
@@ -91,7 +91,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private int AssignFrameOffsetsToArgs()
+        private int AssignFrameOffsetsToArguments()
         {
             var totalArgumentsSize = 0;
             var offset = 0;
@@ -137,7 +137,7 @@ namespace ILCompiler.Compiler
         // TODO: Consider making this a separate phase
         private void GenerateStringMap(IList<BasicBlock> blocks)
         {
-            // Process all stack entrys and extract string definitions to populate the string map
+            // Process all nodes in the basic blocks and extract string definitions to populate the string map
             foreach (var block in blocks)
             {
                 var currentNode = block.FirstNode;

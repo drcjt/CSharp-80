@@ -33,8 +33,6 @@ namespace MiniBCL
 
         private static short Fibonacci(short n)
         {
-            // TODO: this fails to work correctly in release configuration
-            // result is 512 instead of 55 with n = 10??
             short result = 0;
             short b = 1;
             // In N steps, compute Fibonacci sequence iteratively.
