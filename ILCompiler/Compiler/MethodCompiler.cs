@@ -97,7 +97,6 @@ namespace ILCompiler.Compiler
 
             if (method.HasCustomAttribute("System.Runtime", "RuntimeImportAttribute"))
             {
-                methodCodeNodeNeedingCode.MethodCode = GetMethodCodeFromResource(method.Name);
                 return;
             }
             if (method.IsPInvokeImpl)
@@ -108,7 +107,6 @@ namespace ILCompiler.Compiler
             {
                 return;
             }
-
 
             _parameterCount = method.Parameters.Count;
 
@@ -172,27 +170,6 @@ namespace ILCompiler.Compiler
                 sb.AppendLine(instruction.ToString());
             }
             return sb.ToString();
-        }
-
-        private string GetMethodCodeFromResource(string methodName)
-        {
-            var resourceName = $"ILCompiler.Native.Runtime.{methodName}.asm";
-            var resource = GetEmbeddedResource(resourceName);
-            if (resource != null) return resource;
-
-            throw new ArgumentException($"No embedded resource {resourceName} for Method {methodName}");
-        }
-
-        private string? GetEmbeddedResource(string resourceName)
-        {
-            using Stream? stream = GetType().Assembly.GetManifestResourceStream(resourceName);
-            if (stream != null)
-            {
-                using var reader = new StreamReader(stream);
-                return reader.ReadToEnd();
-            }
-
-            return null;
         }
     }
 }

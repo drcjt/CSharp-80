@@ -246,7 +246,6 @@ namespace ILCompiler.Compiler
             string[] resourceNames = GetType().Assembly.GetManifestResourceNames();
             foreach (string resourceName in resourceNames)
             {
-                if (!resourceName.StartsWith("ILCompiler.Runtime")) continue;
                 if (resourceName.StartsWith("ILCompiler.Runtime.TRS80") && _configuration.TargetArchitecture != TargetArchitecture.TRS80) continue;
                 if (resourceName.StartsWith("ILCompiler.Runtime.CPM") && _configuration.TargetArchitecture != TargetArchitecture.CPM) continue;
                 if (resourceName.StartsWith("ILCompiler.Runtime.ZXSpectrum") && _configuration.TargetArchitecture != TargetArchitecture.ZXSpectrum) continue;
