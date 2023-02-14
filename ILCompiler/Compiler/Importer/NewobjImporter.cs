@@ -51,7 +51,7 @@ namespace ILCompiler.Compiler.Importer
 
                 // Create node to new up the array
                 var args = new List<StackEntry>() { sizeOp, new Int32ConstantEntry(elemSize) };
-                var node = new CallEntry("NewArr", args, VarType.Ref, 2);
+                var node = new CallEntry("NewArray", args, VarType.Ref, 2);
                 importer.PushExpression(node);
             }
             else

@@ -11,7 +11,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             context.Assembler.Ld(R16.HL, (short)entry.Size);
             context.Assembler.Push(R16.HL);
-            context.Assembler.Call("heapalloc");
+            context.Assembler.Call("NewObject");
         }
     }
 }

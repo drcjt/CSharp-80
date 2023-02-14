@@ -22,7 +22,6 @@
     <None Remove="Runtime\CPM\cls.asm" />
     <None Remove="Runtime\CPM\printchr.asm" />
     <None Remove="Runtime\delay.asm" />
-    <None Remove="Runtime\heapalloc.asm" />
     <None Remove="Runtime\itoa.asm" />
     <None Remove="Runtime\i_add.asm" />
     <None Remove="Runtime\i_add16.asm" />
@@ -57,7 +56,8 @@
     <None Remove="Runtime\kbdscan.asm" />
     <None Remove="Runtime\keyavail.asm" />
     <None Remove="Runtime\l_inc_dehl.asm" />
-    <None Remove="Runtime\newarr.asm" />
+    <None Remove="Runtime\NewArray.asm" />
+    <None Remove="Runtime\NewObject.asm" />
     <None Remove="Runtime\NewString.asm" />
     <None Remove="Runtime\print.asm" />
     <None Remove="Runtime\stoi.asm" />
@@ -87,8 +87,8 @@
     <EmbeddedResource Include="Runtime\i_lt_un.asm" />
     <EmbeddedResource Include="Runtime\NewString.asm" />
     <EmbeddedResource Include="Runtime\print.asm" />
-    <EmbeddedResource Include="Runtime\newarr.asm" />
-    <EmbeddedResource Include="Runtime\heapalloc.asm" />
+    <EmbeddedResource Include="Runtime\NewArray.asm" />
+    <EmbeddedResource Include="Runtime\NewObject.asm" />
     <EmbeddedResource Include="Runtime\i_and16.asm" />
     <EmbeddedResource Include="Runtime\i_eq16.asm" />
     <EmbeddedResource Include="Runtime\i_neq.asm" />

@@ -18,7 +18,7 @@ NewString:
 
 	PUSH BC
 
-	CALL HEAPALLOC	; Allocate object
+	CALL NewObject	; Allocate object
 
 	POP HL		; Address of new object as 32 bits
 	POP BC
