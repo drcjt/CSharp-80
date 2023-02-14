@@ -2,7 +2,7 @@
 ;
 ; Uses: HL, DE
 
-heapalloc:	
+NewObject:	
 	POP BC		; Save return address
 
 	; get size of memory to allocate

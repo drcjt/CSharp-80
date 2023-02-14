@@ -70,7 +70,7 @@ READOVER:
 
 	; Allocate string object on heap
 	PUSH BC
-	CALL HEAPALLOC
+	CALL NewObject
 
 	POP HL		; Pointer to heap allocated string
 	POP DE		; Ignore MSW as will be 0 on 16 bit architectures

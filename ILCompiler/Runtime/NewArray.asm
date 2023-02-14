@@ -2,7 +2,7 @@
 ;
 ; Uses: HL, DE
 
-newarr:	
+NewArray:	
 	EXX
 	POP HL		; Save return address
 	EXX
