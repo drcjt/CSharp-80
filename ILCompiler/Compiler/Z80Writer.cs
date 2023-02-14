@@ -1,9 +1,7 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.Common;
+﻿using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
-using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Z80Assembler;
 
@@ -14,16 +12,20 @@ namespace ILCompiler.Compiler
         private readonly IConfiguration _configuration;
         private readonly INameMangler _nameMangler;
         private readonly ILogger<Z80Writer> _logger;
+        private readonly NativeDependencyAnalyser _nativeDependencyAnalyser;
 
         private string _inputFilePath = null!;
         private string _outputFilePath = null!;
         private StreamWriter _out = null!;
 
-        public Z80Writer(IConfiguration configuration, INameMangler nameMangler, ILogger<Z80Writer> logger)
+        private readonly ISet<string> _calls = new HashSet<string>();
+
+        public Z80Writer(IConfiguration configuration, INameMangler nameMangler, ILogger<Z80Writer> logger, NativeDependencyAnalyser nativeDependencyAnalyser)
         {
             _configuration = configuration;
             _nameMangler = nameMangler;
             _logger = logger;
+            _nativeDependencyAnalyser = nativeDependencyAnalyser;
         }
 
         private void OutputMethodNode(Z80MethodCodeNode methodCodeNode)
@@ -31,6 +33,7 @@ namespace ILCompiler.Compiler
             if (methodCodeNode.MethodCode != null)
             {
                 _out.Write(methodCodeNode.MethodCode);
+                _calls.UnionWith(NativeDependencyAnalyser.GetMethodCalls(methodCodeNode.MethodCode));
             }
         }
 
@@ -89,6 +92,8 @@ namespace ILCompiler.Compiler
                 _out.WriteLine(Instruction.Halt());
             }
 
+            _out.WriteLine(Instruction.Db("  ", "HEAPNEXT"));
+
             var returnType = entryMethod.ReturnType;
             var hasReturnCode = returnType != null && returnType.GetVarType().IsInt();
 
@@ -132,6 +137,7 @@ namespace ILCompiler.Compiler
                     _out.WriteLine(Instruction.Pop(R16.HL));
                     _out.WriteLine(Instruction.Pop(R16.DE));
                     _out.WriteLine(Instruction.Call("LTOA"));
+                    _calls.Add("LTOA");
                 }
                 else
                 {
@@ -162,6 +168,8 @@ namespace ILCompiler.Compiler
             {
                 OutputRuntimeCode();
             }
+
+            _out.WriteLine();
 
             _out.WriteLine(new LabelInstruction("HEAP"));
 
@@ -212,7 +220,7 @@ namespace ILCompiler.Compiler
             _logger.LogDebug("Written compiled file to {_outputFilePath}", _outputFilePath);
         }
 
-        private void OutputNodes(Z80MethodCodeNode node) 
+        private void OutputNodes(Z80MethodCodeNode node)
         {
             var dependencies = DependencyNodeHelpers.GetFlattenedDependencies(node);
             foreach (var dependentNode in dependencies)
@@ -243,18 +251,16 @@ namespace ILCompiler.Compiler
         {
             _out.WriteLine();
             _out.WriteLine("; **** Runtime starts here");
-            string[] resourceNames = GetType().Assembly.GetManifestResourceNames();
-            foreach (string resourceName in resourceNames)
-            {
-                if (resourceName.StartsWith("ILCompiler.Runtime.TRS80") && _configuration.TargetArchitecture != TargetArchitecture.TRS80) continue;
-                if (resourceName.StartsWith("ILCompiler.Runtime.CPM") && _configuration.TargetArchitecture != TargetArchitecture.CPM) continue;
-                if (resourceName.StartsWith("ILCompiler.Runtime.ZXSpectrum") && _configuration.TargetArchitecture != TargetArchitecture.ZXSpectrum) continue;
 
+            var nativeResourceNames = _nativeDependencyAnalyser.GetNativeResourceNames(_calls);
+            foreach (string resourceName in nativeResourceNames)
+            {
                 using Stream? stream = GetType().Assembly.GetManifestResourceStream(resourceName);
                 if (stream != null)
                 {
                     using var reader = new StreamReader(stream);
                     _out.Write(reader.ReadToEnd());
+                    _out.WriteLine();
                 }
             }
         }
