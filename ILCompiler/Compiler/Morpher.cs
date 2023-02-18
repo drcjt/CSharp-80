@@ -34,7 +34,7 @@ namespace ILCompiler.Compiler
             switch (tree)
             {
                 case CallEntry c:
-                    tree = new CallEntry(c.TargetMethod, MorphList(c.Arguments), c.Type, c.ExactSize);
+                    tree = new CallEntry(c.TargetMethod, MorphList(c.Arguments), c.Type, c.ExactSize, c.IsInternalCall);
                     break;
 
                 case BinaryOperator bo:

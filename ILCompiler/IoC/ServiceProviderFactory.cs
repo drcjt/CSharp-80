@@ -1,4 +1,5 @@
-﻿using ILCompiler.Compiler;
+﻿using ILCompiler.Common.TypeSystem.IL;
+using ILCompiler.Compiler;
 using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.Importer;
@@ -45,6 +46,8 @@ namespace ILCompiler.IoC
             services.AddSingleton<Z80Writer>();
 
             services.AddSingleton<TypeDependencyAnalyser>();
+
+            services.AddSingleton<RTILProvider>();
 
             ServiceProvider = services.BuildServiceProvider();
         }

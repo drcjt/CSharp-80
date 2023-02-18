@@ -14,18 +14,20 @@ namespace ILCompiler.Compiler
         private readonly IConfiguration _configuration;
         private readonly ILogger<MethodCompiler> _logger;
         private readonly IPhaseFactory _phaseFactory;
+        private readonly ILProvider _ilProvider;
 
         private int _parameterCount;
         private int? _returnBufferArgIndex;
 
         private readonly IList<LocalVariableDescriptor> _localVariableTable;
 
-        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory)
+        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory, RTILProvider ilProvider)
         {
             _configuration = configuration;
             _logger = logger;
             _localVariableTable = new List<LocalVariableDescriptor>();
             _phaseFactory = phaseFactory;
+            _ilProvider = ilProvider;
         }
 
         private void SetupLocalVariableTable(MethodDesc method)
@@ -99,13 +101,19 @@ namespace ILCompiler.Compiler
             {
                 return;
             }
-            if (method.IsPInvokeImpl)
+            if (method.IsPInvokeImpl || method.IsInternalCall)
             {
                 return;
             }
             if (method.IsIntrinsic)
             {
-                return;
+                var methodIL = _ilProvider.GetMethodIL(method);
+                if (methodIL == null)
+                {
+                    return;
+                }
+
+                method.Body = methodIL;
             }
 
             _parameterCount = method.Parameters.Count;

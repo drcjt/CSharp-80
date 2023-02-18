@@ -11,11 +11,13 @@ namespace ILCompiler.Common.TypeSystem.Common
         public MethodDesc(MethodDef methodDef)
         {
             _methodDef = methodDef;
+            Body = methodDef.Body;
         }
 
         public bool IsIntrinsic => _methodDef.IsIntrinsic();
 
         public bool IsPInvokeImpl => _methodDef.IsPinvokeImpl;
+        public bool IsInternalCall => _methodDef.IsInternalCall;
 
         public virtual TypeSig ResolveType(TypeSig type) => type;
 
@@ -35,9 +37,11 @@ namespace ILCompiler.Common.TypeSystem.Common
 
         public virtual string FullName => _methodDef.FullName;
 
+        public TypeDef DeclaringType => _methodDef.DeclaringType;
+
         public string Name => _methodDef.Name;
 
-        public CilBody Body => _methodDef.Body;
+        public CilBody Body { get; set; }
 
         public bool HasCustomAttribute(string attributeNamespace, string attributeName) => _methodDef.HasCustomAttribute(attributeNamespace, attributeName);
     }
