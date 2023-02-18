@@ -26,17 +26,22 @@ namespace System
 
     public static partial class Console
     {
-        [Intrinsic]
-        public static void Write(Int32 value) { }
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public static extern void Write(Int32 value);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public static extern void Write(uint value);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        public static extern void Write(String str);
 
         [Intrinsic]
-        public static void Write(uint value) { }
-
-        [Intrinsic]
-        public static void Write(String str) { }
-
-        [Intrinsic]
-        public static void Write(char c) { }
+        public static void Write(char c) 
+        {
+            // This is still intrinsic as it allows for the native
+            // code to be inlined
+            throw new Exception();
+        }
 
         [DllImport(Libraries.Runtime, EntryPoint = "CLS")]
         public static unsafe extern void Clear();

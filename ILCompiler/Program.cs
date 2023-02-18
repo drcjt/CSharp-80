@@ -1,5 +1,4 @@
-﻿using ILCompiler.Compiler;
-using ILCompiler.Interfaces;
+﻿using ILCompiler.Interfaces;
 using ILCompiler.IoC;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,11 +15,9 @@ namespace ILCompiler
         {
             try
             {
-                using (ServiceProvider? serviceProvider = (ServiceProvider)ServiceProviderFactory.ServiceProvider)
-                {
-                    Program app = serviceProvider.GetRequiredService<Program>();
-                    app.Run(args, serviceProvider);
-                }
+                using ServiceProvider? serviceProvider = (ServiceProvider)ServiceProviderFactory.ServiceProvider;
+                Program app = serviceProvider.GetRequiredService<Program>();
+                app.Run(args, serviceProvider);
             }
             catch (Exception e)
             {

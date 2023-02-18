@@ -132,6 +132,7 @@ namespace ILCompiler.Compiler
                     // Write string "Return Code:"
                     _out.WriteLine(Instruction.Ld(R16.HL, "retcodemsg"));
                     _out.WriteLine(Instruction.Call("PRINT"));
+                    _calls.Add("PRINT");
 
                     // Write return code
                     _out.WriteLine(Instruction.Pop(R16.HL));

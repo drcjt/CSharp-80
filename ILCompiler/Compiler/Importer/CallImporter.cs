@@ -26,9 +26,7 @@ namespace ILCompiler.Compiler.Importer
 
         public static void ImportCall(Instruction instruction, ImportContext context, IILImporterProxy importer, StackEntry? newObjThis = null)
         {
-            var method = instruction.Operand as IMethod;
-
-            if (method == null)
+            if (instruction.Operand is not IMethod method)
             {
                 throw new InvalidOperationException("Newobj importer called with Operand which isn't a IMethod");
             }
@@ -96,11 +94,10 @@ namespace ILCompiler.Compiler.Importer
             // Intrinsic calls
             if (methodToCall.IsIntrinsic() || isArrayMethod)
             {
-                if (!ImportIntrinsicCall(methodToCall, arguments, importer))
+                if (ImportIntrinsicCall(methodToCall, arguments, importer))
                 {
-                    throw new NotSupportedException("Unknown intrinsic");
+                    return;
                 }
-                return;
             }
 
             string targetMethod;
@@ -113,14 +110,9 @@ namespace ILCompiler.Compiler.Importer
             {
                 targetMethod = methodToCall.ImplMap.Name;
             }
-            else if (methodToCall.IsInternalCall && methodToCall.HasCustomAttribute("System.Runtime", "RuntimeImportAttribute"))
+            else if (methodToCall.IsInternalCall)
             {
-                var entryPoint = methodToCall.CustomAttributes[0].ConstructorArguments[0].Value as UTF8String;
-                if (entryPoint is null)
-                {
-                    throw new NotSupportedException("RuntimeImport missing entrypoint");
-                }
-                targetMethod = entryPoint.String;
+                targetMethod = ImportInternalCall(methodToCall, arguments, importer);
             }
             else
             {
@@ -140,7 +132,7 @@ namespace ILCompiler.Compiler.Importer
             int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetInstanceFieldSize() : null;
 
             var returnVarType = methodToCall.HasReturnType ? returnType.GetVarType() : VarType.Void;
-            var callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize);
+            var callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize, methodToCall.IsInternalCall);
 
             if (!methodToCall.HasReturnType)
             {
@@ -176,28 +168,62 @@ namespace ILCompiler.Compiler.Importer
             return lclNum;
         }
 
+        private static string ImportInternalCall(MethodDef methodToCall, IList<StackEntry> arguments, IILImporterProxy importer)
+        {
+            if (!methodToCall.HasCustomAttribute("System.Runtime", "RuntimeImportAttribute"))
+            {
+                // Simplistic mapping between method and native routine name
+                if (IsTypeName(methodToCall, "System", "Console"))
+                {
+                    var argtype = methodToCall.Parameters[0].Type;
+                    return argtype.FullName switch
+                    {
+                        "System.String" => "PRINT",
+                        "System.Int32" => "LTOA",
+                        "System.UInt32" => "ULTOA",
+                        _ => throw new NotSupportedException("Unknown internal call"),
+                    };
+                }
+                throw new NotSupportedException("Unknown internal call");
+            }
+            else
+            {
+                if (methodToCall.CustomAttributes[0].ConstructorArguments[0].Value is not UTF8String entryPoint)
+                {
+                    throw new NotSupportedException("RuntimeImport missing entrypoint");
+                }
+                return entryPoint.String;
+            }
+        }
+
+        /// <summary>
+        /// Try to import a call to an intrinsic method
+        /// </summary>
+        /// <param name="methodToCall">intrinsic method being called</param>
+        /// <param name="arguments">arguments if any</param>
+        /// <param name="importer">importer used when generating IR</param>
+        /// <returns>true if IR generated to replace call, false otherwise</returns>
+        /// <exception cref="NotImplementedException"></exception>
         private static bool ImportIntrinsicCall(MethodDef methodToCall, IList<StackEntry> arguments, IILImporterProxy importer)
         {
             // Map method name to string that code generator will understand
-            var targetMethodName = "";
-            switch (methodToCall.Name)
+            var targetMethodName = methodToCall.Name;
+            switch (targetMethodName)
             {
-                // TODO: Suspect this won't stay as an intrinsic but at least we have the mechanism for instrincs
                 case "Write":
                     if (IsTypeName(methodToCall, "System", "Console"))
                     {
                         var argtype = methodToCall.Parameters[0].Type;
                         targetMethodName = argtype.FullName switch
                         {
-                            "System.String" => "WriteString",
-                            "System.Int32" => "WriteInt32",
-                            "System.UInt32" => "WriteUInt32",
                             "System.Char" => "WriteChar",
                             _ => throw new NotSupportedException(),
                         };
+                        var callNode = new IntrinsicEntry(targetMethodName, arguments, VarType.Void);
+                        importer.ImportAppendTree(callNode);
+                        return true;
                     }
                     break;
-
                 case "Get":
                     {
                         // first parameter = this, remaining parameters = indices
@@ -208,7 +234,7 @@ namespace ILCompiler.Compiler.Importer
                         // Arrays are stored in row-major order see https://github.com/stakx/ecma-335/blob/master/docs/i.8.9.1-array-types.md
 
                         // Calculation should follow details here https://en.wikipedia.org/wiki/Row-_and_column-major_order
-                        // The calcualtion below is incorrect
+                        // The calculation below is incorrect
 
                         // Calculate indices multipled together
                         StackEntry indexOp = new CastEntry(arguments[1], VarType.Ptr);
@@ -273,15 +299,9 @@ namespace ILCompiler.Compiler.Importer
 
                         return true;
                     }
-
-                default:
-                    return false;
             }
-
-            var callNode = new IntrinsicEntry(targetMethodName, arguments, VarType.Void);
-            importer.ImportAppendTree(callNode);
-
-            return true;
+            // Treat as normal call
+            return false;
         }
 
         private static bool IsTypeName(IMethodDefOrRef method, string typeNamespace, string typeName)

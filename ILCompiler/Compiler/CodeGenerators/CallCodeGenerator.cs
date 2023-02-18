@@ -6,6 +6,20 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(CallEntry entry, CodeGeneratorContext context)
         {
+            if (entry.IsInternalCall)
+            {
+                if (entry.Arguments.Count > 0)
+                {
+                    // Pass first argument in HL for 2 bytes or less
+                    // and in HL, DE for larger datatypes
+                    var argument = entry.Arguments[0];
+                    context.Assembler.Pop(Z80Assembler.R16.HL);
+                    if (argument.Type == VarType.Int || argument.Type == VarType.UInt)
+                    {
+                        context.Assembler.Pop(Z80Assembler.R16.DE);
+                    }
+                }
+            }
             context.Assembler.Call(entry.TargetMethod);
         }
     }
