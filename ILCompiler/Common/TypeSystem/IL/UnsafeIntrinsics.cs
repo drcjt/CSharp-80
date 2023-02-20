@@ -10,6 +10,8 @@ namespace ILCompiler.Common.TypeSystem.IL
         {
             switch (method.Name)
             {
+                case "As":
+                    return EmitAs(method);
                 case "AsPointer":
                     return EmitAsPointer(method);
                 case "SizeOf":
@@ -21,6 +23,18 @@ namespace ILCompiler.Common.TypeSystem.IL
             }
 
             return null;
+        }
+
+        private static CilBody? EmitAs(MethodDesc method) 
+        {
+            var body = new CilBody();
+
+            body.Instructions.Add(OpCodes.Ldarg_0.ToInstruction());
+            body.Instructions.Add(OpCodes.Ret.ToInstruction());
+
+            body.UpdateInstructionOffsets();
+
+            return body;
         }
 
         private static CilBody? EmitAsPointer(MethodDesc method)
@@ -40,8 +54,7 @@ namespace ILCompiler.Common.TypeSystem.IL
         {
             var body = new CilBody();
 
-            body.Instructions.Add(OpCodes.Ldc_I4_0.ToInstruction()); // Replace with code below when Sizeof supported
-            //body.Instructions.Add(OpCodes.Sizeof.ToInstruction(method.ResolveType(new GenericMVar(0)).ToTypeDefOrRef()));
+            body.Instructions.Add(OpCodes.Sizeof.ToInstruction(method.ResolveType(new GenericMVar(0)).ToTypeDefOrRef()));
             body.Instructions.Add(OpCodes.Ret.ToInstruction());
 
             body.UpdateInstructionOffsets();
@@ -54,8 +67,7 @@ namespace ILCompiler.Common.TypeSystem.IL
             var body = new CilBody();
 
             body.Instructions.Add(OpCodes.Ldarg_1.ToInstruction());
-            body.Instructions.Add(OpCodes.Ldc_I4_0.ToInstruction()); // Replace with code below when Sizeof supported
-            //body.Instructions.Add(OpCodes.Sizeof.ToInstruction(method.ResolveType(new GenericMVar(0)).ToTypeDefOrRef()));
+            body.Instructions.Add(OpCodes.Sizeof.ToInstruction(method.ResolveType(new GenericMVar(0)).ToTypeDefOrRef()));
             body.Instructions.Add(OpCodes.Conv_I.ToInstruction());
             body.Instructions.Add(OpCodes.Mul.ToInstruction());
             body.Instructions.Add(OpCodes.Ldarg_0.ToInstruction());

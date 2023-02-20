@@ -16,6 +16,15 @@ namespace Internal.Runtime.CompilerServices
         }
 
         [Intrinsic]
+        public static ref TTo As<TFrom, TTo>(ref TFrom source)
+        {
+            throw new Exception();
+
+            // ldarg.0
+            // ret
+        }
+
+        [Intrinsic]
         public static ref T AddByteOffset<T>(ref T source, IntPtr byteOffset)
         {
             throw new Exception();
