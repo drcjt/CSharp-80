@@ -39,6 +39,7 @@ namespace ILCompiler.Compiler.Importer
             services.AddSingleton<IOpcodeImporter, LoadLengthImporter>();
             services.AddSingleton<IOpcodeImporter, LoadArgAddressImporter>();
             services.AddSingleton<IOpcodeImporter, LoadNullImporter>();
+            services.AddSingleton<IOpcodeImporter, SizeOfImporter>();
 
             return services;
         }
