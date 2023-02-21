@@ -95,11 +95,22 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             var method = instruction.Operand as IMethod;
             if (method != null)
             {
-                var methodNode = _nodeFactory.MethodNode(method);
-                if (methodNode != null)
+                Z80MethodCodeNode methodNode;
+                if (method.IsMethodSpec && _method is InstantiatedMethod)
                 {
-                    _dependencies.Add(methodNode);
+                    // If call is to a generic method and the calling method has type parameters then we
+                    // use these to resolve the generic type parameters of the method being called
+                    var methodParameters = ((InstantiatedMethod)_method).GenericParameters;
+
+                    var methodSpec = (MethodSpec)method;
+                    methodNode = _nodeFactory.MethodNode(methodSpec, methodParameters);
                 }
+                else
+                {
+                    methodNode = _nodeFactory.MethodNode(method);
+                }
+
+                _dependencies.Add(methodNode);
             }
         }
     }

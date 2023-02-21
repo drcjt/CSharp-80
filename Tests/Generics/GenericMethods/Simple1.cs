@@ -34,6 +34,11 @@ public static class Simple_Generic_Method_Test
         b = temp;
     }
 
+    private static void SwapIndirect<T>(ref T a, ref T b)
+    {
+        Swap<T>(ref a, ref b);
+    }
+
     public static int Main()
     {
         int x = 12;
@@ -41,6 +46,10 @@ public static class Simple_Generic_Method_Test
         Swap<int>(ref x, ref y);
         if (x != 17) return 1;
         if (y != 12) return 1;
+
+        SwapIndirect<int>(ref x, ref y);
+        if (x != 12) return 1;
+        if (y != 17) return 1;
 
         var iarray = new int[5] { 1, 2, 3, 4, 5 };
         Reverse<int>(iarray);

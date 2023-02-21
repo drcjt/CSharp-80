@@ -19,21 +19,25 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return typeNode;
         }
 
+        public Z80MethodCodeNode MethodNode(MethodSpec methodSpec, IList<TypeSig> genericArguments)
+        {
+            var methodDef = methodSpec.Method.ResolveMethodDefThrow();
+
+            if (!_methodNodesByFullName.TryGetValue(methodSpec.FullName, out var methodNode))
+            {
+                methodNode = new Z80MethodCodeNode(new InstantiatedMethod(methodDef, genericArguments, methodSpec.FullName));
+                _methodNodesByFullName[methodSpec.FullName] = methodNode;
+            }
+
+            return methodNode;
+        }
+
         public Z80MethodCodeNode MethodNode(IMethod method)
         {
             if (method.IsMethodSpec)
             {
                 var methodSpec = (MethodSpec)method;
-                IList<TypeSig> genericArguments = methodSpec.GenericInstMethodSig.GenericArguments;
-                var methodDef = methodSpec.Method.ResolveMethodDefThrow();
-
-                if (!_methodNodesByFullName.TryGetValue(methodSpec.FullName, out var methodNode))
-                {
-                    methodNode = new Z80MethodCodeNode(new InstantiatedMethod(methodDef, genericArguments, methodSpec.FullName));
-                    _methodNodesByFullName[methodSpec.FullName] = methodNode;
-                }
-
-                return methodNode;
+                return MethodNode(methodSpec, methodSpec.GenericInstMethodSig.GenericArguments);
             }
             else
             {
