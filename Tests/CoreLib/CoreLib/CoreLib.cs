@@ -13,6 +13,8 @@
 
             result = result && Int32Tests.Parse_Valid();
 
+            result = result && StringTests.NewStringTests();
+
             return result ? 0 : 1;
         }
     }
