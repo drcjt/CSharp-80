@@ -18,6 +18,8 @@ namespace ILCompiler.Common.TypeSystem.Common
 
         public override TypeSig ReturnType => GenericTypeInstantiator.Instantiate(_methodDef.ReturnType, _genericParameters);
 
+        public IList<TypeSig> GenericParameters => _genericParameters;
+
         public override TypeSig ResolveType(TypeSig type)
         {
             return GenericTypeInstantiator.Instantiate(type, _genericParameters);
