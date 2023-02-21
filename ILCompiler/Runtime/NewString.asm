@@ -3,16 +3,12 @@
 ; Uses: HL, DE, BC
 
 NewString:	
-	POP HL		; Save return address
+	PUSH HL		; Length passed in HL
+	POP BC
 
-	POP BC		; Get size of string to allocate
-	POP DE
+	PUSH BC		; Save original size
 
-	PUSH HL		; Save return address on stack
-
-	PUSH BC		; Same original size
-
-	INC BC
+	INC BC		; Multiply size by 2 as using UTF-16 so 2 bytes per character
 	SLA C
 	RL B
 
