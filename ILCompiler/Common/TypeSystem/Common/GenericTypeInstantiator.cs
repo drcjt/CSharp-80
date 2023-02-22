@@ -4,6 +4,30 @@ namespace ILCompiler.Common.TypeSystem.Common
 {
     internal class GenericTypeInstantiator
     {
+        public static TypeSig Instantiate(TypeSig type, IMethod calleeMethod, MethodDesc callerMethod) 
+        {
+            if (type.ContainsGenericParameter) 
+            {
+                IList<TypeSig> callerMethodGenericParameters = new List<TypeSig>();
+                if (callerMethod is InstantiatedMethod method)
+                {
+                    callerMethodGenericParameters = method.GenericParameters;
+                }
+
+                var resolvedGenericParameters = new List<TypeSig>();
+                foreach (var genericParameter in ((MethodSpec)calleeMethod).GenericInstMethodSig.GenericArguments)
+                {
+                    resolvedGenericParameters.Add(GenericTypeInstantiator.Instantiate(genericParameter, callerMethodGenericParameters));
+                }
+
+                return Instantiate(type, resolvedGenericParameters);
+            }
+            else
+            {
+                return type;
+            }
+        }
+
         public static TypeSig Instantiate(TypeSig type, IList<TypeSig> genericMethodParameters)
         {
             TypeSig result = type;

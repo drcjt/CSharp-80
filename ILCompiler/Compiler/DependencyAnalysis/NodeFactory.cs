@@ -19,14 +19,28 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return typeNode;
         }
 
-        public Z80MethodCodeNode MethodNode(MethodSpec methodSpec, IList<TypeSig> genericArguments)
+        public Z80MethodCodeNode MethodNode(MethodSpec calleeMethod, MethodDesc callerMethod)
         {
-            var methodDef = methodSpec.Method.ResolveMethodDefThrow();
+            var calleeMethodDef = calleeMethod.Method.ResolveMethodDefThrow();
 
-            if (!_methodNodesByFullName.TryGetValue(methodSpec.FullName, out var methodNode))
+            IList<TypeSig> callerMethodGenericParameters = new List<TypeSig>();
+            if (callerMethod is InstantiatedMethod method)
             {
-                methodNode = new Z80MethodCodeNode(new InstantiatedMethod(methodDef, genericArguments, methodSpec.FullName));
-                _methodNodesByFullName[methodSpec.FullName] = methodNode;
+                callerMethodGenericParameters = method.GenericParameters;
+            }
+
+            var resolvedGenericParameters = new List<TypeSig>();
+            foreach (var genericParameter in ((MethodSpec)calleeMethod).GenericInstMethodSig.GenericArguments)
+            {
+                resolvedGenericParameters.Add(GenericTypeInstantiator.Instantiate(genericParameter, callerMethodGenericParameters));
+            }
+
+            var calleeMethodFullName = FullNameFactory.MethodFullName(calleeMethodDef.DeclaringType?.FullName, calleeMethodDef.Name, calleeMethodDef.MethodSig, null, resolvedGenericParameters);
+
+            if (!_methodNodesByFullName.TryGetValue(calleeMethodFullName, out var methodNode))
+            {
+                methodNode = new Z80MethodCodeNode(new InstantiatedMethod(calleeMethodDef, resolvedGenericParameters, calleeMethodFullName));
+                _methodNodesByFullName[calleeMethodFullName] = methodNode;
             }
 
             return methodNode;
@@ -34,22 +48,14 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public Z80MethodCodeNode MethodNode(IMethod method)
         {
-            if (method.IsMethodSpec)
+            var methodDef = method.ResolveMethodDefThrow();
+            if (!_methodNodesByFullName.TryGetValue(methodDef.FullName, out var methodNode))
             {
-                var methodSpec = (MethodSpec)method;
-                return MethodNode(methodSpec, methodSpec.GenericInstMethodSig.GenericArguments);
+                methodNode = new Z80MethodCodeNode(new MethodDesc(methodDef));
+                _methodNodesByFullName[methodDef.FullName] = methodNode;
             }
-            else
-            {
-                var methodDef = method.ResolveMethodDefThrow();
-                if (!_methodNodesByFullName.TryGetValue(methodDef.FullName, out var methodNode))
-                {
-                    methodNode = new Z80MethodCodeNode(new MethodDesc(methodDef));
-                    _methodNodesByFullName[methodDef.FullName] = methodNode;
-                }
 
-                return methodNode;
-            }
+            return methodNode;
         }
     }
 }
