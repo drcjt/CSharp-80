@@ -96,14 +96,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             if (method != null)
             {
                 Z80MethodCodeNode methodNode;
-                if (method.IsMethodSpec && _method is InstantiatedMethod)
+                if (method.IsMethodSpec)
                 {
-                    // If call is to a generic method and the calling method has type parameters then we
-                    // use these to resolve the generic type parameters of the method being called
-                    var methodParameters = ((InstantiatedMethod)_method).GenericParameters;
-
-                    var methodSpec = (MethodSpec)method;
-                    methodNode = _nodeFactory.MethodNode(methodSpec, methodParameters);
+                    methodNode = _nodeFactory.MethodNode((MethodSpec)method, _method);
                 }
                 else
                 {

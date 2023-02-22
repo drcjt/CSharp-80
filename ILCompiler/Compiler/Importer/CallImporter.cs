@@ -4,7 +4,6 @@ using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -70,12 +69,8 @@ namespace ILCompiler.Compiler.Importer
 
                 var parameter = methodToCall.Parameters[parameterCount - (i - firstArgIndex) - 1];
                 var parameterType = parameter.Type;
-                if (parameter.Type.IsGenericMethodParameter)
-                {
-                    var methodSpec = (MethodSpec)method;
-                    parameterType = GenericTypeInstantiator.Instantiate(parameterType, methodSpec.GenericInstMethodSig.GenericArguments);
-                }
 
+                parameterType = GenericTypeInstantiator.Instantiate(parameterType, method, context.Method);
                 var parameterVarType = parameterType.GetVarType();
                 if (parameterVarType.IsSmall())
                 {
@@ -103,8 +98,7 @@ namespace ILCompiler.Compiler.Importer
             string targetMethod;
             if (methodToCall.HasGenericParameters)
             {
-                var methodSpec = (MethodSpec)method;
-                targetMethod = context.NameMangler.GetMangledMethodName(methodSpec);
+                targetMethod = context.NameMangler.GetMangledMethodName((MethodSpec)method, context.Method);
             }
             else if (methodToCall.IsPinvokeImpl)
             {
@@ -120,7 +114,7 @@ namespace ILCompiler.Compiler.Importer
             }
 
             int returnBufferArgIndex = 0;
-            var returnType = methodToCall.ReturnType;
+            var returnType = GenericTypeInstantiator.Instantiate(methodToCall.ReturnType, method, context.Method);
             if (methodToCall.HasReturnType)
             {
                 if (returnType.IsStruct())
