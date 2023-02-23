@@ -3,19 +3,20 @@
     public static class CoreLib
     {
         public static int Main()
-        {
-            var result = true;
+        {          
+            CharTests.IsBetweenCharTests();
             
-            result = result && CharTests.IsBetweenCharTests();
-            
-            result = result && CharTests.IsAsciiDigit_WithAsciiDigits_ReturnsTrue();
-            result = result && CharTests.IsAsciiDigit_WithNonAsciiDigits_ReturnsFalse();
+            CharTests.IsAsciiDigit_WithAsciiDigits_ReturnsTrue();
+            CharTests.IsAsciiDigit_WithNonAsciiDigits_ReturnsFalse();
 
-            result = result && Int32Tests.Parse_Valid();
+            Int32Tests.Parse_Valid();
 
-            result = result && StringTests.NewStringTests();
+            StringTests.NewStringTests();
 
-            return result ? 0 : 1;
+            UnsafeTests.SizeOfTests();
+            UnsafeTests.RefAs();
+
+            return 0;
         }
     }
 }

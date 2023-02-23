@@ -35,7 +35,7 @@ namespace RegressionTests
             Console.WriteLine($"Test {assemblyFileName} ran in {z80.TStatesElapsedSinceStart} T-states");
 
             // Validate we finished on the HALT instruction
-            Assert.AreEqual(12, z80.Registers.PC);
+            Assert.AreEqual(0x76, z80.Memory[z80.Registers.PC - 1]);
 
             // Pass returns 32 bit 0 in DEHL
             Assert.AreEqual(0, z80.Registers.DE);

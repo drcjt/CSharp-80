@@ -4,14 +4,10 @@ namespace CoreLib
 {
     public class StringTests
     {
-        public static bool NewStringTests()
+        public static void NewStringTests()
         {
-            var result = true;
-
             string newString = RuntimeImports.NewString(25);
-            result = result && newString.Length == 25;
-
-            return result;
+            Assert.Equals(25, newString.Length);
         }
     }
 }
