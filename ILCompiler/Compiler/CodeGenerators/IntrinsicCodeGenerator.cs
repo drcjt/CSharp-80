@@ -39,6 +39,19 @@ namespace ILCompiler.Compiler.CodeGenerators
                         context.Assembler.Rst(0x0010); // ROM routine to display character at current cursor position
                     }
                     break;
+
+                case "Exit":
+                    if (context.Configuration.IntegrationTests)
+                    {
+                        context.Assembler.Pop(R16.HL);
+                        context.Assembler.Pop(R16.DE);
+                        context.Assembler.Halt();
+                    }
+                    else
+                    {
+                        context.Assembler.Call("EXIT");
+                    }
+                    break;
             }
         }
     }

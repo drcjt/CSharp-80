@@ -1,0 +1,10 @@
+EXIT:
+	POP BC ; return address
+
+	LD HL, RETCODEMSG
+	CALL PRINT
+	POP HL
+	POP DE
+	CALL LTOA
+	LD SP, (ORIGSP)
+	RET

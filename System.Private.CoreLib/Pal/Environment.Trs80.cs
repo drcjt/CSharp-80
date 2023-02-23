@@ -2,7 +2,7 @@
 
 namespace System
 {
-    public static class Environment
+    public static partial class Environment
     {
         /// <summary>
         /// The TRS80 Model 1 25ms heartbeat seems to go up to only approx 15200 before cycling back to 0

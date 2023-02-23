@@ -204,6 +204,14 @@ namespace ILCompiler.Compiler.Importer
             var targetMethodName = methodToCall.Name;
             switch (targetMethodName)
             {
+                case "_Exit":
+                    if (IsTypeName(methodToCall, "System", "Environment"))
+                    {
+                        var callNode = new IntrinsicEntry("Exit", arguments, VarType.Void);
+                        importer.ImportAppendTree(callNode);
+                        return true;
+                    }
+                    break;
                 case "Write":
                     if (IsTypeName(methodToCall, "System", "Console"))
                     {
