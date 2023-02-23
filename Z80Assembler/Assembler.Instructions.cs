@@ -35,6 +35,11 @@ namespace Z80Assembler
             AddInstruction(new Instruction(Opcode.Pop, target.ToString()));
         }
 
+        public void Halt()
+        {
+            AddInstruction(new Instruction(Opcode.Halt));
+        }
+
         public void Exx()
         {
             AddInstruction(new Instruction(Opcode.Exx));
