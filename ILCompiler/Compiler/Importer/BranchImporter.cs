@@ -13,6 +13,7 @@ namespace ILCompiler.Compiler.Importer
             {
                 case Code.Br:
                 case Code.Blt:
+                case Code.Blt_Un:
                 case Code.Bgt:
                 case Code.Ble:
                 case Code.Bge:
@@ -24,6 +25,7 @@ namespace ILCompiler.Compiler.Importer
 
                 case Code.Br_S:
                 case Code.Blt_S:
+                case Code.Blt_Un_S:
                 case Code.Bgt_S:
                 case Code.Ble_S:
                 case Code.Bge_S:
@@ -77,7 +79,7 @@ namespace ILCompiler.Compiler.Importer
                 else
                 {
                     op1 = new Int32ConstantEntry(0);
-                    op = (code == Code.Brfalse) ? Operation.Eq : Operation.Ne;
+                    op = (code == Code.Brfalse) ? Operation.Eq : Operation.Ne_Un;
                 }
 
                 var binopType = op1.Type == VarType.Ptr || op2.Type == VarType.Ptr ? VarType.Ptr : VarType.Int;

@@ -20,12 +20,14 @@
         Gt,
         Le,
         Lt,
-        Ne,
+        Ne_Un,
+        Ge_Un,
+        Gt_Un,
+        Le_Un,
+        Lt_Un,
+
         Lsh,
         Rsh,
-
-        Gt_Un,
-        Lt_Un,
     }
 
     // StackEntry and subclasses represent the tree oriented high level intermediate representation

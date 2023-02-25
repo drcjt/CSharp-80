@@ -36,15 +36,16 @@ namespace ILCompiler.Compiler.CodeGenerators
             { Tuple.Create(Operation.Le, VarType.Int), "i_le" },
             { Tuple.Create(Operation.Lt, VarType.Int), "i_lt" },
             { Tuple.Create(Operation.Lt_Un, VarType.Int), "i_lt_un" },
-            { Tuple.Create(Operation.Ne, VarType.Int), "i_neq" },
+            { Tuple.Create(Operation.Ne_Un, VarType.Int), "i_neq" },
 
-            { Tuple.Create(Operation.Ne, VarType.Ptr), "i_neq16" },
+            { Tuple.Create(Operation.Ne_Un, VarType.Ptr), "i_neq16" },
             { Tuple.Create(Operation.Eq, VarType.Ptr), "i_eq16" },
+            { Tuple.Create(Operation.Lt_Un, VarType.Ptr), "i_lt_un16" },
 
-            { Tuple.Create(Operation.Ne, VarType.Ref), "i_neq16" },
+            { Tuple.Create(Operation.Ne_Un, VarType.Ref), "i_neq16" },
             { Tuple.Create(Operation.Eq, VarType.Ref), "i_eq16" },
 
-            { Tuple.Create(Operation.Ne, VarType.ByRef), "i_neq16" },
+            { Tuple.Create(Operation.Ne_Un, VarType.ByRef), "i_neq16" },
             { Tuple.Create(Operation.Eq, VarType.ByRef), "i_eq16" },
         };
 
