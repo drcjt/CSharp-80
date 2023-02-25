@@ -41,7 +41,8 @@
     <None Remove="Runtime\i_lsh16.asm" />
     <None Remove="Runtime\i_lt.asm" />
     <None Remove="Runtime\i_lt_un.asm" />
-    <None Remove="Runtime\i_mul.asm" />
+    <None Remove="Runtime\i_lt_un16.asm" />
+	<None Remove="Runtime\i_mul.asm" />
     <None Remove="Runtime\i_mul16.asm" />
     <None Remove="Runtime\i_neg.asm" />
     <None Remove="Runtime\i_neq.asm" />
@@ -87,6 +88,7 @@
     <EmbeddedResource Include="Runtime\exit.asm" />
     <EmbeddedResource Include="Runtime\i_gt_un.asm" />
     <EmbeddedResource Include="Runtime\i_lt_un.asm" />
+    <EmbeddedResource Include="Runtime\i_lt_un16.asm" />
     <EmbeddedResource Include="Runtime\NewString.asm" />
     <EmbeddedResource Include="Runtime\print.asm" />
     <EmbeddedResource Include="Runtime\NewArray.asm" />
