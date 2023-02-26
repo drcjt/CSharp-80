@@ -61,6 +61,7 @@ namespace ILCompiler.Common.TypeSystem.IL
                         return 8;
                     case ElementType.Ptr:
                     case ElementType.I:
+                    case ElementType.U:
                         return 2;
                     case ElementType.ValueType:
                         var typeSize = 0;

@@ -1,19 +1,30 @@
-﻿public static class Regression
+﻿namespace Regression
 {
-    public static int Main()
+    public static class Regression
     {
-        Bug87();
+        public static int Main()
+        {
+            Bug87();
 
-        return 0;
-    }
+            nuint testValue = 123;
+            Assert.Equals(testValue, MethodCall_WithNuintParameter_CompilesWithoutErrors(testValue));
 
-    public static void Bug87()
-    {
-        char[] test = new char[1] { 'a' };
-        Bug87_Method(test[0]);
-    }
+            return 0;
+        }
 
-    private static void Bug87_Method(char ch)
-    {
+        public static void Bug87()
+        {
+            char[] test = new char[1] { 'a' };
+            Bug87_Method(test[0]);
+        }
+
+        private static void Bug87_Method(char ch)
+        {
+        }
+
+        private static nuint MethodCall_WithNuintParameter_CompilesWithoutErrors(nuint n)
+        {
+            return n;
+        }
     }
 }

@@ -48,6 +48,7 @@ namespace ILCompiler.Compiler
 
                 case ElementType.Ptr:
                 case ElementType.I:
+                case ElementType.U:
                     return VarType.Ptr;
 
                 case ElementType.ValueType:
