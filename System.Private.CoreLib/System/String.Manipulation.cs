@@ -1,4 +1,5 @@
-﻿using System.Runtime;
+﻿using Internal.Runtime.CompilerServices;
+using System.Runtime;
 
 namespace System
 {
@@ -15,17 +16,11 @@ namespace System
         }
 
         private unsafe static void FillStringChecked(string dest, int destPos, string src)
-        {
-            // TODO: Reimplement using unsafe intrinsics
-            fixed (char* destPtr = &(dest._firstChar))
-            {
-                var destination = destPtr + destPos;
-
-                fixed (char* srcPtr = &(src._firstChar))
-                {
-                    Buffer.Memmove((byte*)destination, (byte*)srcPtr, src.Length * 2);
-                }
-            }
+        {     
+            Buffer.Memmove(
+                ref Unsafe.Add(ref dest._firstChar, destPos),
+                ref src._firstChar,
+                (uint)src.Length);
         }
     }
 }
