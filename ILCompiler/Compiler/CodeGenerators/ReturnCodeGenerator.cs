@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using System.Xml;
 using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
@@ -48,6 +49,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             }
 
             // Unwind stack frame
+            var localsSize = 0;
             var tempCount = 0;
             foreach (var localVariable in context.LocalVariableTable)
             {
@@ -55,12 +57,40 @@ namespace ILCompiler.Compiler.CodeGenerators
                 {
                     tempCount++;
                 }
+                if (!localVariable.IsParameter)
+                {
+                    localsSize += localVariable.ExactSize;
+                }
             }
 
             if (context.ParamsCount > 0 || (context.LocalsCount + tempCount) > 0)
             {
                 if (context.LocalsCount + tempCount > 0)
                 {
+                    if (context.Configuration.IntegrationTests && !context.Method.LocallocUsed)
+                    {
+                        // Validate we haven't got any under/over flow on stack
+                        // Assert that localsSize + SP - IX = 0
+
+                        // TODO: also need to factor in any localalloc space allocated
+                        // this is why localloc integration test fails with this code enabled
+
+                        context.Assembler.Ld(R16.HL, (short)localsSize);
+                        context.Assembler.Add(R16.HL, R16.SP);
+
+                        context.Assembler.Push(I16.IX);
+                        context.Assembler.Pop(R16.BC);
+
+                        context.Assembler.Sbc(R16.HL, R16.BC);
+
+                        var unwindLabel = context.NameMangler.GetUniqueName();
+                        context.Assembler.Jp(Condition.Zero, unwindLabel);
+
+                        context.Assembler.Halt();
+
+                        context.Assembler.AddInstruction(new LabelInstruction(unwindLabel));
+                    }
+
                     context.Assembler.Ld(R16.SP, I16.IX);     // Move SP to before locals
                 }
                 context.Assembler.Pop(I16.IX);            // Remove IX

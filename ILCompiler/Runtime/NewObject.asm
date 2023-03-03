@@ -22,10 +22,7 @@ NewObject:
 	POP HL;		Get return address
 
 	; Put address of memory allocated back on the stack
-	LD DE, 0
-	PUSH DE		; MSW first	- always 0 as we only have 64k of addressable memory
-	PUSH BC		; LSW next - allocated heap memory address
+	PUSH BC		; allocated heap memory address
 
 	PUSH HL;	put return address back
-
 	RET

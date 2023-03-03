@@ -50,6 +50,11 @@ namespace ILCompiler.Compiler.Importer
                 addr = cast;
             }    
 
+            if (type.IsSmall() && !value.Type.IsSmall())
+            {
+                value = new CastEntry(value, type);
+            }
+
             int exactSize = type.GetTypeSize();
 
             var node = new StoreIndEntry(addr, value, value.Type, fieldOffset: 0, exactSize);

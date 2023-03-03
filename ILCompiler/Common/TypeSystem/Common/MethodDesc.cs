@@ -14,6 +14,7 @@ namespace ILCompiler.Common.TypeSystem.Common
             Body = methodDef.Body;
         }
 
+        public bool LocallocUsed { get; set; } = false;
         public bool IsIntrinsic => _methodDef.IsIntrinsic();
 
         public bool IsPInvokeImpl => _methodDef.IsPinvokeImpl;

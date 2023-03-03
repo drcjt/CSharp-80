@@ -29,7 +29,6 @@ READLINE:
 	CALL NewObject
 
 	POP HL		; Pointer to heap allocated string
-	POP DE		; Ignore MSW as will be 0 on 16 bit architectures
 	POP BC		; Length of string
 	POP DE		; Return Address
 

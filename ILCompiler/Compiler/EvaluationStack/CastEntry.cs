@@ -4,7 +4,7 @@
     {
         public StackEntry Op1 { get; }
 
-        public CastEntry(StackEntry op1, VarType type) : base(type, op1.ExactSize)
+        public CastEntry(StackEntry op1, VarType type) : base(type, type.GetTypeSize() /*op1.ExactSize */)
         {
             Op1 = op1;
         }

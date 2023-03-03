@@ -28,7 +28,7 @@ namespace ILCompiler.Compiler
 
         public IList<Instruction> Generate(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable, Z80MethodCodeNode methodCodeNode)
         {
-            _context = new CodeGeneratorContext(localVariableTable, methodCodeNode, _configuration);
+            _context = new CodeGeneratorContext(localVariableTable, methodCodeNode, _configuration, _nameMangler);
 
             AssignFrameOffsets();
 
