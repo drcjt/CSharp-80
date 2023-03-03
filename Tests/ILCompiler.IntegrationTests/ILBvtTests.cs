@@ -39,6 +39,8 @@ namespace CSharp80.Tests.BVT
 
             z80.Memory.SetContents(0, program);
 
+            var originalStackPointer = z80.StartOfStack;
+
             z80.Start();
 
             // Validate we finished on the HALT instruction
@@ -47,6 +49,9 @@ namespace CSharp80.Tests.BVT
             // Pass returns 32 bit 0 in DEHL
             Assert.AreEqual(0, z80.Registers.DE);
             Assert.AreEqual(0, z80.Registers.HL);
+
+            // Make sure stack pointer ends up at original place
+            Assert.AreEqual(originalStackPointer, z80.Registers.SP);
 
         }
 

@@ -19,6 +19,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             context.Assembler.Cpl();
             context.Assembler.Ld(R8.H, R8.A);
 
+            // TODO: Use sbc instead to avoid need to negate HL
             context.Assembler.Add(R16.HL, R16.SP);
             context.Assembler.Ld(R16.SP, R16.HL);
 

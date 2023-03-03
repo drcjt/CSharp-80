@@ -28,6 +28,11 @@ namespace ILCompiler.Compiler.Importer
 
             importer.PushExpression(op1);
 
+            // The frame pointer may not be back to the original value at the end of the method
+            // even if the frame size is 0 as localloc may have modified it so we will have to
+            // reset it.
+            context.Method.LocallocUsed = true;
+
             return true;
         }
     }

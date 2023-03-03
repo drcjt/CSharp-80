@@ -17,7 +17,6 @@ NewString:
 	CALL NewObject	; Allocate object
 
 	POP HL		; Address of new object as 32 bits
-	POP BC
 
 	POP BC		; Restore original size
 

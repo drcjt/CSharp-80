@@ -68,6 +68,11 @@ namespace ILCompiler.Compiler
             return GetMangledFieldName(field.FullName);
         }
 
+        public string GetUniqueName()
+        {
+            return $"u{nextFieldId++}";
+        }
+
         private string GetMangledFieldName(string fullName)
         {
             if (_mangledFieldNames.TryGetValue(fullName, out string? mangledName))
