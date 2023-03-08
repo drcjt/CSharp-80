@@ -1,12 +1,12 @@
-; This routine performs the operation DEHL = DEHL + BCAF
+; This routine allocates a new object with the specified size on top of the stack
 ;
-; Uses: HL, DE
+; Uses: HL, DE, BC
 
 NewObject:	
 	POP BC		; Save return address
 
 	; get size of memory to allocate
-	POP DE		; LSW first
+	POP DE
 
 	PUSH BC		; put return address back
 

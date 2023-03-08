@@ -16,6 +16,19 @@ namespace ILCompiler.Common.TypeSystem.IL
             return method.HasCustomAttributes && method.CustomAttributes.IsDefined(attributeNamespace + "." + attributeName);
         }
 
+        public static IMethod? FindMethodEndsWith(this TypeDef type, string name)
+        {
+            foreach (var method in type.Methods)
+            {
+                if (method.FullName.EndsWith(name))
+                {
+                    return method;
+                }
+            }
+
+            return null;
+        }
+
         public static bool IsStruct(this TypeSig typeSig)
         {
             var typeDef = typeSig.TryGetTypeDef();
