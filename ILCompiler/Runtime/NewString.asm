@@ -13,10 +13,8 @@ NewString:
 	RL B
 
 	PUSH BC
-
 	CALL NewObject	; Allocate object
-
-	POP HL		; Address of new object as 32 bits
+	POP HL		; Address of new object
 
 	POP BC		; Restore original size
 

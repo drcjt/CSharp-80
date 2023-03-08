@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -77,24 +78,47 @@ namespace ILCompiler.Compiler.Importer
                 }
                 else
                 {
-                    // Determine required size on GC heap
-                    var allocSize = objType.GetInstanceByteCount();
+                    if (methodToCall.DeclaringType.FullName == "System.String" && 
+                        methodToCall.IsInternalCall &&
+                        methodToCall.HasCustomAttribute("System.Diagnostics.CodeAnalysis", "DynamicDependencyAttribute"))
+                    {
+                        // String constructors marked as dynamic dependencies simply
+                        // call the referred method which will deal with allocation and
+                        // construction.
+                        var dependentTypeAttribute = methodToCall.CustomAttributes.Find("System.Diagnostics.CodeAnalysis.DynamicDependencyAttribute");
 
-                    // Allocate memory for object
-                    var op1 = new AllocObjEntry(allocSize, objVarType);
+                        var dependentMethodName = dependentTypeAttribute.ConstructorArguments[0].Value.ToString();
+                        if (dependentMethodName == null) throw new InvalidOperationException("DynamicDependencyAttribute missing method name");
 
-                    // Store allocated memory address into a temp local variable
-                    var lclNum = importer.GrabTemp(VarType.Ref, objSize);
-                    var asg = new StoreLocalVariableEntry(lclNum, false, op1);
-                    importer.ImportAppendTree(asg);
+                        var dependentMethod = methodToCall.DeclaringType.FindMethodEndsWith(dependentMethodName);
 
-                    // Call the constructor                    
-                    var newObjThisPtr = new LocalVariableEntry(lclNum, objVarType, objSize);
-                    CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
+                        // Replace the method to call in the instruction with the one referred to by the dynamic dependency attribute
+                        instruction.Operand = dependentMethod;
 
-                    // Push a local variable entry corresponding to the object here
-                    var node = new LocalVariableEntry(lclNum, VarType.Ref, objSize);
-                    importer.PushExpression(node);
+                        // Call the dynamic dependency method
+                        CallImporter.ImportCall(instruction, context, importer, null);
+                    }
+                    else
+                    {
+                        // Determine required size on GC heap
+                        var allocSize = objType.GetInstanceByteCount();
+
+                        // Allocate memory for object
+                        var op1 = new AllocObjEntry(allocSize, objVarType);
+
+                        // Store allocated memory address into a temp local variable
+                        var lclNum = importer.GrabTemp(VarType.Ref, objSize);
+                        var asg = new StoreLocalVariableEntry(lclNum, false, op1);
+                        importer.ImportAppendTree(asg);
+
+                        // Call the constructor                    
+                        var newObjThisPtr = new LocalVariableEntry(lclNum, objVarType, objSize);
+                        CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
+
+                        // Push a local variable entry corresponding to the object here
+                        var node = new LocalVariableEntry(lclNum, VarType.Ref, objSize);
+                        importer.PushExpression(node);
+                    }
                 }
             }
 

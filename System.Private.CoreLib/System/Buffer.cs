@@ -6,7 +6,6 @@ namespace System
     {
         internal static void Memmove<T>(ref T destination, ref T source, nuint elementCount)
         {
-            //_Memmove(ref destination, ref source, elementCount);
             Memmove(ref Unsafe.As<T, byte>(ref destination), ref Unsafe.As<T, byte>(ref source), elementCount * (nuint)Unsafe.SizeOf<T>());
         }
 

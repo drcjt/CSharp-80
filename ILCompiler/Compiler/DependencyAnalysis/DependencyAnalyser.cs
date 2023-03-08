@@ -1,6 +1,7 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Common.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
@@ -96,12 +97,28 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             if (method != null)
             {
                 Z80MethodCodeNode methodNode;
+
                 if (method.IsMethodSpec)
                 {
                     methodNode = _nodeFactory.MethodNode((MethodSpec)method, _method);
                 }
                 else
                 {
+                    var methodDef = method.ResolveMethodDefThrow();
+                    if (methodDef.HasCustomAttribute("System.Diagnostics.CodeAnalysis", "DynamicDependencyAttribute"))
+                    {
+                        // For dynamic dependencies we need to include the method referred to as part of the dependencies
+                        // of the overall method being analysed
+                        var dependentTypeAttribute = methodDef.CustomAttributes.Find("System.Diagnostics.CodeAnalysis.DynamicDependencyAttribute");
+
+                        var dependentMethodName = dependentTypeAttribute.ConstructorArguments[0].Value.ToString();
+                        if (dependentMethodName == null) throw new InvalidOperationException("DynamicDependencyAttribute missing method name");
+
+                        var dependentMethod = methodDef.DeclaringType.FindMethodEndsWith(dependentMethodName);
+                        if (dependentMethod == null) throw new InvalidOperationException($"Cannot find dynamic dependency {dependentMethodName}");
+
+                        method = dependentMethod;
+                    }
                     methodNode = _nodeFactory.MethodNode(method);
                 }
 
