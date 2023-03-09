@@ -17,6 +17,21 @@ NewObject:
 
 	; Move next available heap address by size of object to allocate
 	ADD HL, DE
+
+	; Check if Heap has collided with stack
+	PUSH HL	
+
+	PUSH HL
+	POP DE		; DE = HeapNext
+
+	LD HL, -100		; Need to leave bit of a gap
+	ADD HL, SP		; HL = SP - 100
+
+	AND A		; clear carry flag
+	SBC HL, DE	; HL = (SP - 100) - HEAPNEXT
+	JR C, NewObject_NoSpace
+
+	POP HL
 	LD (HEAPNEXT), HL	; Store new next available address in heap
 
 	POP HL;		Get return address
@@ -25,4 +40,13 @@ NewObject:
 	PUSH BC		; allocated heap memory address
 
 	PUSH HL;	put return address back
+	RET
+
+NewObject_NoSpace:
+
+	LD HL, OOM_MSG
+	CALL PRINT
+
+	; Panic exit
+	LD SP, (ORIGSP)
 	RET

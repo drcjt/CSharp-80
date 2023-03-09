@@ -80,9 +80,6 @@ namespace ILCompiler.Compiler
 
                 // Return to the operating system
                 _out.WriteLine(Instruction.Ret());
-
-                // Holds the original stack location
-                _out.WriteLine(Instruction.Db("  ", "ORIGSP"));
             }
             else
             {
@@ -91,8 +88,17 @@ namespace ILCompiler.Compiler
                 _out.WriteLine(Instruction.Pop(R16.HL));
                 _out.WriteLine(Instruction.Halt());
             }
+            // Holds the original stack location
+            _out.WriteLine(Instruction.Db("  ", "ORIGSP"));
 
+            // Holds next free heap location
             _out.WriteLine(Instruction.Db("  ", "HEAPNEXT"));
+
+            // Out of memory message
+            _out.WriteLine(new LabelInstruction("OOM_MSG"));
+            _out.WriteLine(Instruction.Db(13));
+            _out.WriteLine(Instruction.Db(0)); // Length of message
+            _out.WriteLine(Instruction.Db("O u t   o f   m e m o r y "));
 
             var returnType = entryMethod.ReturnType;
             var hasReturnCode = returnType != null && returnType.GetVarType().IsInt();
