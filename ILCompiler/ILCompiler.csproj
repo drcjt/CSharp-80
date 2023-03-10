@@ -22,7 +22,6 @@
     <None Remove="Runtime\CPM\cls.asm" />
     <None Remove="Runtime\CPM\printchr.asm" />
     <None Remove="Runtime\delay.asm" />
-    <None Remove="Runtime\envexit.asm" />
     <None Remove="Runtime\GCGetTotalMemory.asm" />
     <None Remove="Runtime\itoa.asm" />
     <None Remove="Runtime\i_add.asm" />
@@ -86,7 +85,6 @@
   <ItemGroup>
     <EmbeddedResource Include="Runtime\CPM\cls.asm" />
     <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
-    <EmbeddedResource Include="Runtime\envexit.asm" />
     <EmbeddedResource Include="Runtime\i_gt_un.asm" />
     <EmbeddedResource Include="Runtime\i_lt_un.asm" />
     <EmbeddedResource Include="Runtime\i_lt_un16.asm" />

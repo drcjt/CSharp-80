@@ -41,7 +41,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                     break;
 
                 case "Exit":
-                    context.Assembler.Jp(context.Configuration.IntegrationTests ? "EXIT" : "ENVEXIT");
+                    context.Assembler.Jp("EXITRETCODE");
                     break;
             }
         }
