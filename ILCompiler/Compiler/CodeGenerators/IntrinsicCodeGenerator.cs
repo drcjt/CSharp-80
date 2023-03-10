@@ -41,16 +41,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                     break;
 
                 case "Exit":
-                    if (context.Configuration.IntegrationTests)
-                    {
-                        context.Assembler.Pop(R16.HL);
-                        context.Assembler.Pop(R16.DE);
-                        context.Assembler.Halt();
-                    }
-                    else
-                    {
-                        context.Assembler.Call("EXIT");
-                    }
+                    context.Assembler.Jp(context.Configuration.IntegrationTests ? "EXIT" : "ENVEXIT");
                     break;
             }
         }

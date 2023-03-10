@@ -75,15 +75,16 @@ namespace ILCompiler.Compiler
                 // Start the program
                 _out.WriteLine(Instruction.Call("START"));
 
-                // Restore the original stack
+                // Restore the original stack and return to the OS
+                _out.WriteLine(new LabelInstruction("EXIT"));
                 _out.WriteLine(Instruction.LdInd(R16.SP, "ORIGSP"));
-
-                // Return to the operating system
                 _out.WriteLine(Instruction.Ret());
             }
             else
             {
                 _out.WriteLine(Instruction.Call("START"));
+
+                _out.WriteLine(new LabelInstruction("EXIT"));
                 _out.WriteLine(Instruction.Pop(R16.DE));
                 _out.WriteLine(Instruction.Pop(R16.HL));
                 _out.WriteLine(Instruction.Halt());

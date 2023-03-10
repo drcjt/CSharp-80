@@ -48,5 +48,4 @@ NewObject_NoSpace:
 	CALL PRINT
 
 	; Panic exit
-	LD SP, (ORIGSP)
-	RET
+	JP EXIT
