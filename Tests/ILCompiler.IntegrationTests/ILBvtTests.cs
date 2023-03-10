@@ -11,6 +11,8 @@ namespace CSharp80.Tests.BVT
     [TestFixture]
     public class ILBvtTests
     {
+        private const int StackStart = UInt16.MaxValue;
+
         [Test]
         [TestCaseSource(typeof(ILBvtTests), nameof(IlBvtTestCaseData))]
         public void IlBvtTest(string ilFileName)
@@ -39,19 +41,17 @@ namespace CSharp80.Tests.BVT
 
             z80.Memory.SetContents(0, program);
 
-            var originalStackPointer = z80.StartOfStack;
-
             z80.Start();
 
             // Validate we finished on the HALT instruction
-            Assert.AreEqual(12, z80.Registers.PC);
+            Assert.AreEqual(19, z80.Registers.PC);
 
             // Pass returns 32 bit 0 in DEHL
             Assert.AreEqual(0, z80.Registers.DE);
             Assert.AreEqual(0, z80.Registers.HL);
 
             // Make sure stack pointer ends up at original place
-            Assert.AreEqual(originalStackPointer, z80.Registers.SP);
+            Assert.AreEqual(StackStart, (ushort)z80.Registers.SP);
 
         }
 
@@ -81,7 +81,7 @@ namespace CSharp80.Tests.BVT
             var corelibPath = Path.Combine(SolutionPath, $@".\System.Private.CoreLib\bin\{buildConfigurationName}\net7.0\System.Private.CoreLib.dll");
 
             var ilCompilerPath = @"ILCompiler.exe";
-            var arguments = $"--ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {corelibPath} --outputFile {asmFileName} {exeFileName}";
+            var arguments = $"--ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {corelibPath} --outputFile {asmFileName} {exeFileName} --stackStart {StackStart}";
 
             var compiled = RunProcess(ilCompilerPath, arguments);
             Assert.IsTrue(compiled, "IL Failed to compile");

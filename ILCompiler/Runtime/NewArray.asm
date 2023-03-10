@@ -83,5 +83,4 @@ newarr_oom:
 	CALL PRINT
 
 	; Panic exit
-	LD SP, (ORIGSP)
-	RET
+	JP EXIT

@@ -52,6 +52,9 @@ namespace ILCompiler.Compiler
             };
         }
 
+        private const string Entry = "ENTRY";
+        private const string Heap = "HEAP";
+
         private void OutputProlog(MethodDesc entryMethod)
         {
             _out.WriteLine($"; INPUT FILE {_inputFilePath.ToUpper()}");
@@ -59,56 +62,57 @@ namespace ILCompiler.Compiler
             _out.WriteLine();
 
             _out.WriteLine(Instruction.Org(GetOrgAddress()));
-            _out.WriteLine(new LabelInstruction("ENTRY"));
+            OutputLabel(Entry);
 
-            _out.WriteLine(Instruction.Ld(R16.HL, "HEAP"));
+            _out.WriteLine(Instruction.Ld(R16.HL, Heap));
             _out.WriteLine(Instruction.LdInd("HEAPNEXT", R16.HL));
 
-            if (!_configuration.IntegrationTests)
+            // Save original stack location
+            _out.WriteLine(Instruction.LdInd("ORIGSP", R16.SP));
+
+            // Relocate the stack
+            _out.WriteLine(Instruction.Ld(R16.SP, (short)_configuration.StackStart));
+
+            // Start the program
+            _out.WriteLine(Instruction.Jp("START"));
+
+            // Restore the original stack and return to the OS
+            OutputLabel("EXITRETCODE");
+
+            var returnType = entryMethod.ReturnType;
+            var hasReturnCode = returnType != null && returnType.GetVarType().IsInt();
+
+            if (!_configuration.IntegrationTests && hasReturnCode)
             {
-                // Save original stack location
-                _out.WriteLine(Instruction.LdInd("ORIGSP", R16.SP));
+                OutputReturnCodeHandler();
+            }
 
-                // Relocate the stack
-                _out.WriteLine(Instruction.Ld(R16.SP, (short)_configuration.StackStart));
-
-                // Start the program
-                _out.WriteLine(Instruction.Call("START"));
-
-                // Restore the original stack
+            OutputLabel("EXIT");
+            if (!_configuration.IntegrationTests)
+            { 
+                // Reset stack pointer and return to OS
                 _out.WriteLine(Instruction.LdInd(R16.SP, "ORIGSP"));
-
-                // Return to the operating system
                 _out.WriteLine(Instruction.Ret());
             }
             else
             {
-                _out.WriteLine(Instruction.Call("START"));
+                // Move return code to HL/DE and Halt
                 _out.WriteLine(Instruction.Pop(R16.DE));
                 _out.WriteLine(Instruction.Pop(R16.HL));
                 _out.WriteLine(Instruction.Halt());
             }
+
             // Holds the original stack location
             _out.WriteLine(Instruction.Db("  ", "ORIGSP"));
 
             // Holds next free heap location
             _out.WriteLine(Instruction.Db("  ", "HEAPNEXT"));
 
-            // Out of memory message
-            _out.WriteLine(new LabelInstruction("OOM_MSG"));
-            _out.WriteLine(Instruction.Db(13));
-            _out.WriteLine(Instruction.Db(0)); // Length of message
-            _out.WriteLine(Instruction.Db("O u t   o f   m e m o r y "));
-
-            var returnType = entryMethod.ReturnType;
-            var hasReturnCode = returnType != null && returnType.GetVarType().IsInt();
-
+            // Output messages
+            OutputOOMMessage();
             if (hasReturnCode && _configuration.PrintReturnCode)
             {
-                _out.WriteLine(new LabelInstruction("retcodemsg"));
-                _out.WriteLine(Instruction.Db(12));
-                _out.WriteLine(Instruction.Db(0)); // Length of message
-                _out.WriteLine(Instruction.Db("R e t u r n   C o d e : "));
+                OutputReturnCodeMessage();
             }
 
             // Include the runtime assembly code
@@ -125,48 +129,64 @@ namespace ILCompiler.Compiler
                 }
             }
 
-            _out.WriteLine(new LabelInstruction("START"));
-
+            OutputLabel("START");
             // TODO: Call static constructors here
-
             _out.WriteLine(Instruction.Call(_nameMangler.GetMangledMethodName(entryMethod)));
+            _out.WriteLine(Instruction.Jp("EXITRETCODE"));
+        }
 
-            if (hasReturnCode)
+        private void OutputOOMMessage()
+        {
+            OutputLabel("OOM_MSG");
+            _out.WriteLine(Instruction.Db(13));
+            _out.WriteLine(Instruction.Db(0)); // Length of message
+            _out.WriteLine(Instruction.Db("O u t   o f   m e m o r y "));
+        }
+
+        private const string RetCodeMsgLabel = "RETCODEMSG";
+        private void OutputReturnCodeMessage()
+        {
+            OutputLabel(RetCodeMsgLabel);
+            _out.WriteLine(Instruction.Db(12));
+            _out.WriteLine(Instruction.Db(0)); // Length of message
+            _out.WriteLine(Instruction.Db("R e t u r n   C o d e : "));
+        }
+
+        private void OutputLabel(string label) => _out.WriteLine(new LabelInstruction(label));
+
+        private void OutputReturnCodeHandler()
+        {
+            if (_configuration.PrintReturnCode)
             {
-                if (_configuration.PrintReturnCode)
-                {
-                    // Write string "Return Code:"
-                    _out.WriteLine(Instruction.Ld(R16.HL, "retcodemsg"));
-                    _out.WriteLine(Instruction.Call("PRINT"));
-                    _calls.Add("PRINT");
+                // Write string "Return Code:"
+                _out.WriteLine(Instruction.Ld(R16.HL, RetCodeMsgLabel));
+                _out.WriteLine(Instruction.Call("PRINT"));
+                _calls.Add("PRINT");
 
-                    // Write return code
-                    _out.WriteLine(Instruction.Pop(R16.HL));
+                // Write return code
+                _out.WriteLine(Instruction.Pop(R16.HL));
+                _out.WriteLine(Instruction.Pop(R16.DE));
+                _out.WriteLine(Instruction.Call("LTOA"));
+                _calls.Add("LTOA");
+            }
+            else
+            {
+                if (_configuration.TargetArchitecture == TargetArchitecture.ZXSpectrum)
+                {
+                    // Remove return value as not supported on ZX spectrum
+                    _out.WriteLine(Instruction.Pop(R16.BC));
                     _out.WriteLine(Instruction.Pop(R16.DE));
-                    _out.WriteLine(Instruction.Call("LTOA"));
-                    _calls.Add("LTOA");
                 }
                 else
                 {
-                    if (_configuration.TargetArchitecture == TargetArchitecture.ZXSpectrum)
-                    {
-                        // Remove return value as not supported on ZX spectrum
-                        _out.WriteLine(Instruction.Pop(R16.BC));
-                        _out.WriteLine(Instruction.Pop(R16.DE));
-                    }
-                    else
-                    {
-                        _out.WriteLine(Instruction.Pop(R16.BC));    // return value
-                        _out.WriteLine(Instruction.Pop(R16.DE));
-                        _out.WriteLine(Instruction.Pop(R16.HL));    // return address
-                        _out.WriteLine(Instruction.Push(R16.DE));
-                        _out.WriteLine(Instruction.Push(R16.BC));
-                        _out.WriteLine(Instruction.Push(R16.HL));
-                    }
+                    _out.WriteLine(Instruction.Pop(R16.BC));    // return value
+                    _out.WriteLine(Instruction.Pop(R16.DE));
+                    _out.WriteLine(Instruction.Pop(R16.HL));    // return address
+                    _out.WriteLine(Instruction.Push(R16.DE));
+                    _out.WriteLine(Instruction.Push(R16.BC));
+                    _out.WriteLine(Instruction.Push(R16.HL));
                 }
             }
-
-            _out.WriteLine(Instruction.Ret());
         }
 
         private void OutputEpilog()
@@ -178,9 +198,8 @@ namespace ILCompiler.Compiler
 
             _out.WriteLine();
 
-            _out.WriteLine(new LabelInstruction("HEAP"));
-
-            _out.WriteLine(Instruction.End("ENTRY"));
+            OutputLabel(Heap);
+            _out.WriteLine(Instruction.End(Entry));
         }
 
         private void OutputCodeForNode(Z80MethodCodeNode node)
@@ -191,7 +210,6 @@ namespace ILCompiler.Compiler
                 if (node.MethodCode != null)
                 {
                     _out.WriteLine($"; {node.Method.FullName}");
-
                     OutputMethodNode(node);
                 }
 
@@ -212,17 +230,16 @@ namespace ILCompiler.Compiler
         {
             _inputFilePath = inputFilePath;
             _outputFilePath = outputFilePath;
-            _out = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, false), Encoding.ASCII);
 
-            OutputProlog(root.Method);
+            using (_out = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, false), Encoding.ASCII))
+            {
+                OutputProlog(root.Method);
 
-            OutputNodes(root);
+                OutputNodes(root);
+                OutputCodeForNode(root);
 
-            OutputCodeForNode(root);
-
-            OutputEpilog();
-
-            _out.Dispose();
+                OutputEpilog();
+            }
 
             _logger.LogDebug("Written compiled file to {_outputFilePath}", _outputFilePath);
         }
@@ -244,7 +261,7 @@ namespace ILCompiler.Compiler
                             _logger.LogDebug("Reserving {fieldSize} bytes for static field {field.FullName}", fieldSize, field.FullName);
 
                             // Need to mangle full field name here
-                            _out.WriteLine(new LabelInstruction(_nameMangler.GetMangledFieldName(field)));
+                            OutputLabel(_nameMangler.GetMangledFieldName(field));
 
                             // Emit fieldSize bytes with value 0
                             _out.WriteLine(Instruction.Dc(fieldSize, 0));
