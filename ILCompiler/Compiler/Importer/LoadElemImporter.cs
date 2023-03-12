@@ -64,7 +64,7 @@ namespace ILCompiler.Compiler.Importer
             var op1 = importer.PopExpression();
             var op2 = importer.PopExpression();
 
-            var node = new IndexRefEntry(op1, op2, elemSize, elemType);
+            var node = new IndexRefEntry(op1, op2, elemSize, elemType, 0);
 
             importer.PushExpression(node);
 

@@ -154,9 +154,16 @@ namespace ILCompiler.Common.TypeSystem.Common
                 }
                 else
                 {
-                    var baseType = type.GetBaseType(true);
-                    var baseTypeDef = baseType.ResolveTypeDef();
-                    parentSize = new LayoutInt(baseTypeDef?.ClassSize ?? 0); //parentSize = type.BaseType.InstanceByteCountUnaligned;
+                    if (type.BaseType != null)
+                    {
+                        var baseType = type.GetBaseType(true);
+                        var baseTypeDef = baseType.ResolveTypeDef();
+                        parentSize = LayoutInt.Max(alignment, baseTypeDef.InstanceByteCountUnaligned(this));
+                    }
+                    else
+                    {
+                        parentSize = new LayoutInt(0);
+                    }    
                 }
                 LayoutInt specifiedInstanceSize = parentSize + new LayoutInt(classLayoutSize);
                 instanceSize = LayoutInt.Max(specifiedInstanceSize, instanceSize);
@@ -178,13 +185,13 @@ namespace ILCompiler.Common.TypeSystem.Common
             {
                 result.Size = _target.LayoutPointerSize;
                 result.Alignment = _target.LayoutPointerSize;
-                /*
-                // TODO: work out what this should be using dnlib
-                if (type.HasBaseType)
+
+                if (type.BaseType != null)
                 {
-                    alignment = LayoutInt.Max(alignment, type.BaseType.InstanceByteAlignment);
+                    var baseType = type.GetBaseType(true);
+                    var baseTypeDef = baseType.ResolveTypeDef();
+                    alignment = LayoutInt.Max(alignment, baseTypeDef.InstanceByteAlignment(this));
                 }
-                */
             }
 
             alignment = _target.GetObjectAlignment(alignment);
@@ -195,17 +202,15 @@ namespace ILCompiler.Common.TypeSystem.Common
             return result;
         }
 
-        private static LayoutInt ComputeBytesUsedInParentType(TypeDef type)
+        private LayoutInt ComputeBytesUsedInParentType(TypeDef type)
         {
             LayoutInt cumulativeInstanceFieldPos = LayoutInt.Zero;
 
-            // TODO: Work out how to do this using dnlib
-            /*
-            if (!type.IsValueType && type.HasBaseType)
+            if (!type.IsValueType && type.BaseType != null)
             {
-                cumulativeInstanceFieldPos = type.BaseType.InstanceByteCountUnaligned;
+                var resolvedType = type.BaseType.ResolveTypeDef();
+                cumulativeInstanceFieldPos = resolvedType.InstanceByteCountUnaligned(this);
             }
-            */
 
             return cumulativeInstanceFieldPos;
         }
@@ -223,9 +228,8 @@ namespace ILCompiler.Common.TypeSystem.Common
 
                     if (fieldType != null)
                     {
-                        var computedLayout = ComputeInstanceLayout(fieldType);
-                        result.Size = computedLayout.FieldSize;
-                        result.Alignment = computedLayout.FieldAlignment;
+                        result.Size = fieldType.InstanceFieldSize(this);
+                        result.Alignment = fieldType.InstanceFieldAlignment(this);
                     }
                     else
                     {

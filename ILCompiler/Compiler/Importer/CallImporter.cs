@@ -293,10 +293,12 @@ namespace ILCompiler.Compiler.Importer
 
                 case "get_Chars":
                     {
+                        const short StringCharsOffset = 2;
+
                         var arrayOp = arguments[0];
                         var indexOp = arguments[1];
 
-                        var node = new IndexRefEntry(indexOp, arrayOp, 2, VarType.UShort);
+                        var node = new IndexRefEntry(indexOp, arrayOp, 2, VarType.UShort, StringCharsOffset);
                         importer.PushExpression(node);
 
                         return true;

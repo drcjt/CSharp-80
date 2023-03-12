@@ -1,4 +1,7 @@
 PRINT:
+	LD BC, 2		; Add base size
+	ADD HL, BC
+
 	LD E, (HL)	; Get string length into DE
 	INC HL
 	LD D, (HL)

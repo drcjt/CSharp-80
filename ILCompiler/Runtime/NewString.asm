@@ -2,17 +2,21 @@
 ;
 ; Uses: HL, DE, BC
 
+; TODO: Use this in readline too
+STRING_BASE_SIZE		EQU	2
+
 NewString:	
-	PUSH HL		; Length passed in HL
-	POP BC
+	PUSH HL		; Save original size
 
-	PUSH BC		; Save original size
+	; Compute overall size (align(base size + (element size * elements), 4))
+	INC HL		; Multiply elements * element size
+	SLA L
+	RL H
 
-	INC BC		; Multiply size by 2 as using UTF-16 so 2 bytes per character
-	SLA C
-	RL B
+	LD BC, STRING_BASE_SIZE		; Add base size
+	ADD HL, BC
 
-	PUSH BC
+	PUSH HL
 	CALL NewObject	; Allocate object
 	POP HL		; Address of new object
 
@@ -21,6 +25,9 @@ NewString:
 	POP DE		; Get return address
 
 	PUSH HL		; Return value is address of new string
+	
+	INC HL		; Skip base size
+	INC HL
 
 	LD (HL), C	; Set the size for the new string in the first 2 bytes
 	INC HL

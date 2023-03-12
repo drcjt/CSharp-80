@@ -85,7 +85,7 @@ namespace ILCompiler.Compiler
             var typeDefOrRef = type.ToTypeDefOrRef();
             var typeDef = typeDefOrRef.ResolveTypeDef();
 
-            var computedLayout = fieldLayoutAlgorithm.ComputeInstanceLayout(typeDef);
+            var computedLayout = typeDef.InstanceFieldLayout(fieldLayoutAlgorithm);
 
             if (computedLayout.Offsets != null)
             {
@@ -124,8 +124,7 @@ namespace ILCompiler.Compiler
 
             if (typeDef != null) 
             {
-                var computedLayout = fieldLayoutAlgorithm.ComputeInstanceLayout(typeDef);
-
+                var computedLayout = typeDef.InstanceFieldLayout(fieldLayoutAlgorithm);
                 if (computedLayout.Offsets != null)
                 {
                     foreach (var fieldAndOffset in computedLayout.Offsets)
