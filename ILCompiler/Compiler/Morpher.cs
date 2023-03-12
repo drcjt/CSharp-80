@@ -123,9 +123,9 @@ namespace ILCompiler.Compiler
                 addr = new BinaryOperator(Operation.Mul, isComparison: false, size, addr, VarType.Ptr);
             }
 
-            // addr + arraySizeOffset + (elemSize * index)
-            var arraySizeOffset = new NativeIntConstantEntry(2);
-            addr = new BinaryOperator(Operation.Add, isComparison: false, addr, arraySizeOffset, VarType.Ptr);
+            // addr + arraySizeOffset + firstElemOffset + (elemSize * index)
+            var offset = new NativeIntConstantEntry((short)(2 + tree.FirstElementOffset));
+            addr = new BinaryOperator(Operation.Add, isComparison: false, addr, offset, VarType.Ptr);
             addr = new BinaryOperator(Operation.Add, isComparison: false, MorphTree(tree.ArrayOp), addr, VarType.Ptr);
             addr = new IndirectEntry(addr, tree.Type, tree.ElemSize);
 

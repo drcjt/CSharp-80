@@ -35,6 +35,9 @@ READLINE:
 	PUSH DE		; Save return address
 	PUSH HL		; Save pointer to string object on heap
 
+	INC HL		; Add base size
+	INC HL
+
 	; Put length into first 2 bytes of string object
 	LD (HL), C
 	INC HL

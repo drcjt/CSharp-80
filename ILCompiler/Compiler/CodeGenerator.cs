@@ -166,6 +166,10 @@ namespace ILCompiler.Compiler
 
                 var stringData = keyValuePair.Value;
 
+                // TODO: This needs to the EEType for String
+                assembler.Db(0);
+                assembler.Db(0);
+
                 byte lsb = (byte)(stringData.Length & 0xFF);
                 byte msb = (byte)((stringData.Length >> 8) & 0xFF);
 

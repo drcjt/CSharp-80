@@ -43,9 +43,10 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDef);
+            var computedFieldLayout = typeDef.InstanceFieldLayout(metadataFieldLayoutAlgorithm);
 
             // Byte count
+            // Base Class       2 + 2 padding
             // MyInt            4
             // MyBool           1 + 1 padding
             // MyChar           2
@@ -53,13 +54,13 @@ namespace ILCompiler.UnitTests
             // MyByteArray      2
             // MyClass1SelfRef  2
             // -------------------
-            //                  14 
+            //                  18 
 
             var instanceByteCountUnaligned = computedFieldLayout.ByteCountUnaligned;
             var instanceByteAlignment = computedFieldLayout.ByteCountAlignment;
             var instanceByteCount = LayoutInt.AlignUp(instanceByteCountUnaligned, instanceByteAlignment, target);
 
-            Assert.AreEqual(14, instanceByteCount.AsInt);
+            Assert.AreEqual(18, instanceByteCount.AsInt);
 
             foreach (var fieldAndOffset in computedFieldLayout.Offsets)
             {
@@ -70,22 +71,22 @@ namespace ILCompiler.UnitTests
                 switch (field.Name)
                 {
                     case "MyInt":
-                        Assert.AreEqual(0, fieldAndOffset.Offset.AsInt);
-                        break;
-                    case "MyBool":
                         Assert.AreEqual(4, fieldAndOffset.Offset.AsInt);
                         break;
-                    case "MyChar":
-                        Assert.AreEqual(6, fieldAndOffset.Offset.AsInt);
-                        break;
-                    case "MyString":
+                    case "MyBool":
                         Assert.AreEqual(8, fieldAndOffset.Offset.AsInt);
                         break;
-                    case "MyByteArray":
+                    case "MyChar":
                         Assert.AreEqual(10, fieldAndOffset.Offset.AsInt);
                         break;
-                    case "MyClass1SelfRef":
+                    case "MyString":
                         Assert.AreEqual(12, fieldAndOffset.Offset.AsInt);
+                        break;
+                    case "MyByteArray":
+                        Assert.AreEqual(14, fieldAndOffset.Offset.AsInt);
+                        break;
+                    case "MyClass1SelfRef":
+                        Assert.AreEqual(16, fieldAndOffset.Offset.AsInt);
                         break;
                     default:
                         Assert.Fail();
@@ -102,7 +103,7 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDef);
+            var computedFieldLayout = typeDef.InstanceFieldLayout(metadataFieldLayoutAlgorithm);
 
             // Byte count
             // bool     b1      1
@@ -157,7 +158,7 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDef);
+            var computedFieldLayout = typeDef.InstanceFieldLayout(metadataFieldLayoutAlgorithm);
 
             // Byte count
             // struct   MyStruct0   12
