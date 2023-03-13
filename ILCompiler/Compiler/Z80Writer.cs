@@ -143,10 +143,9 @@ namespace ILCompiler.Compiler
             _out.WriteLine(Instruction.Db("O u t   o f   m e m o r y "));
         }
 
-        private const string RetCodeMsgLabel = "RETCODEMSG";
         private void OutputReturnCodeMessage()
         {
-            OutputLabel(RetCodeMsgLabel);
+            OutputLabel("RETCODEMSG");
             _out.WriteLine(Instruction.Db(12));
             _out.WriteLine(Instruction.Db(0)); // Length of message
             _out.WriteLine(Instruction.Db("R e t u r n   C o d e : "));
@@ -159,7 +158,7 @@ namespace ILCompiler.Compiler
             if (_configuration.PrintReturnCode)
             {
                 // Write string "Return Code:"
-                _out.WriteLine(Instruction.Ld(R16.HL, RetCodeMsgLabel));
+                _out.WriteLine(Instruction.Ld(R16.HL, "RETCODEMSG - 2"));
                 _out.WriteLine(Instruction.Call("PRINT"));
                 _calls.Add("PRINT");
 

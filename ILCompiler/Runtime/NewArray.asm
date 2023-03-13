@@ -79,7 +79,7 @@ newarr_nomul16:
 	RET
 
 newarr_oom:
-	LD HL, OOM_MSG
+	LD HL, OOM_MSG - 2
 	CALL PRINT
 
 	; Panic exit

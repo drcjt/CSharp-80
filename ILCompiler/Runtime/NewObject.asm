@@ -44,7 +44,7 @@ NewObject:
 
 NewObject_NoSpace:
 
-	LD HL, OOM_MSG
+	LD HL, OOM_MSG - 2
 	CALL PRINT
 
 	; Panic exit
