@@ -62,31 +62,73 @@ namespace ILCompiler.UnitTests
 
             Assert.AreEqual(18, instanceByteCount.AsInt);
 
-            foreach (var fieldAndOffset in computedFieldLayout.Offsets)
+            foreach (var f in typeDef.Fields)
             {
-                var field = fieldAndOffset.Field;
-                if (field.IsStatic)
+                if (f.IsStatic)
                     continue;
 
-                switch (field.Name)
+                var fieldOffset = GetFieldOffset(computedFieldLayout.Offsets, f.Name);
+
+                switch (f.Name)
                 {
                     case "MyInt":
-                        Assert.AreEqual(4, fieldAndOffset.Offset.AsInt);
+                        Assert.AreEqual(4, fieldOffset);
                         break;
                     case "MyBool":
-                        Assert.AreEqual(8, fieldAndOffset.Offset.AsInt);
+                        Assert.AreEqual(8, fieldOffset);
                         break;
                     case "MyChar":
-                        Assert.AreEqual(10, fieldAndOffset.Offset.AsInt);
+                        Assert.AreEqual(10, fieldOffset);
                         break;
                     case "MyString":
-                        Assert.AreEqual(12, fieldAndOffset.Offset.AsInt);
+                        Assert.AreEqual(12, fieldOffset);
                         break;
                     case "MyByteArray":
-                        Assert.AreEqual(14, fieldAndOffset.Offset.AsInt);
+                        Assert.AreEqual(14, fieldOffset);
                         break;
                     case "MyClass1SelfRef":
-                        Assert.AreEqual(16, fieldAndOffset.Offset.AsInt);
+                        Assert.AreEqual(16, fieldOffset);
+                        break;
+                    default:
+                        Assert.Fail();
+                        break;
+                }
+            }
+        }
+
+        [Test]
+        public void TestSequentialTypeLayoutInheritance()
+        {
+            var typeDef = _testModule.Find("CoreTestAssembly.Class2", false);
+
+            var target = new TargetDetails(TargetArchitecture.Z80);
+            var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
+
+            var computedFieldLayout = typeDef.InstanceFieldLayout(metadataFieldLayoutAlgorithm);
+
+            // Byte count
+            // Base Class       18
+            // MyInt2           4 + 2 byte padding to make int field start on 4 byte alignment
+            // -------------------
+            //                  24
+
+            var instanceByteCountUnaligned = computedFieldLayout.ByteCountUnaligned;
+            var instanceByteAlignment = computedFieldLayout.ByteCountAlignment;
+            var instanceByteCount = LayoutInt.AlignUp(instanceByteCountUnaligned, instanceByteAlignment, target);
+
+            Assert.AreEqual(24, instanceByteCount.AsInt);
+
+            foreach (var f in typeDef.Fields)
+            {
+                if (f.IsStatic)
+                    continue;
+
+                var fieldOffset = GetFieldOffset(computedFieldLayout.Offsets, f.Name);
+
+                switch (f.Name)
+                {
+                    case "MyInt2":
+                        Assert.AreEqual(20, fieldOffset);
                         break;
                     default:
                         Assert.Fail();
@@ -120,28 +162,29 @@ namespace ILCompiler.UnitTests
 
             Assert.AreEqual(12, instanceByteCount.AsInt);
 
-            foreach (var fieldAndOffset in computedFieldLayout.Offsets)
+            foreach (var f in typeDef.Fields)
             {
-                var field = fieldAndOffset.Field;
-                if (field.IsStatic)
+                if (f.IsStatic)
                     continue;
 
-                switch (field.Name)
+                var fieldOffset = GetFieldOffset(computedFieldLayout.Offsets, f.Name);
+
+                switch (f.Name)
                 {
                     case "b1":
-                        Assert.AreEqual(0, fieldAndOffset.Offset.AsInt);
+                        Assert.AreEqual(0, fieldOffset);
                         break;
                     case "b2":
-                        Assert.AreEqual(1, fieldAndOffset.Offset.AsInt);
+                        Assert.AreEqual(1, fieldOffset);
                         break;
                     case "b3":
-                        Assert.AreEqual(2, fieldAndOffset.Offset.AsInt);
+                        Assert.AreEqual(2, fieldOffset);
                         break;
                     case "i1":
-                        Assert.AreEqual(4, fieldAndOffset.Offset.AsInt);
+                        Assert.AreEqual(4, fieldOffset);
                         break;
                     case "s1":
-                        Assert.AreEqual(8, fieldAndOffset.Offset.AsInt);
+                        Assert.AreEqual(8, fieldOffset);
                         break;
                     default:
                         Assert.Fail();
@@ -162,7 +205,7 @@ namespace ILCompiler.UnitTests
 
             // Byte count
             // struct   MyStruct0   12
-            // bool     MyBool      1 + 3 for int aligment
+            // bool     MyBool      1 + 3 for int alignment
             // -----------------------
             //                      16
 
@@ -172,25 +215,39 @@ namespace ILCompiler.UnitTests
 
             Assert.AreEqual(16, instanceByteCount.AsInt);
 
-            foreach (var fieldAndOffset in computedFieldLayout.Offsets)
+            foreach (var f in typeDef.Fields)
             {
-                var field = fieldAndOffset.Field;
-                if (field.IsStatic)
+                if (f.IsStatic)
                     continue;
 
-                switch (field.Name)
+                var fieldOffset = GetFieldOffset(computedFieldLayout.Offsets, f.Name);
+
+                switch (f.Name)
                 {
                     case "MyStruct0":
-                        Assert.AreEqual(0, fieldAndOffset.Offset.AsInt);
+                        Assert.AreEqual(0, fieldOffset);
                         break;
                     case "MyBool":
-                        Assert.AreEqual(12, fieldAndOffset.Offset.AsInt);
+                        Assert.AreEqual(12, fieldOffset);
                         break;
                     default:
                         Assert.Fail();
                         break;
                 }
             }
+        }
+
+        private int GetFieldOffset(FieldAndOffset[] fieldAndOffsets, string fieldName)
+        {
+            foreach (var fieldAndOffset in fieldAndOffsets)
+            {
+                if (fieldAndOffset.Field.Name == fieldName)
+                {
+                    return fieldAndOffset.Offset.AsInt;
+                }
+            }
+
+            throw new InvalidDataException();
         }
     }
 }
