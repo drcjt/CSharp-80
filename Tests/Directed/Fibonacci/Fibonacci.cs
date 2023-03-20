@@ -1,21 +1,24 @@
-﻿public static class FibonacciTest
+﻿namespace Fibonacci
 {
-    public static int Fibonacci(int n)
+    public static class Tests
     {
-        if (n < 2)
+        public static int Fibonacci(int n)
         {
-            return 1;
-        }
-        return Fibonacci(n - 2) + Fibonacci(n - 1);
-    }
-
-    public static int Main()
-    {
-        if (Fibonacci(16) != 1597)
-        {
-            return 1;
+            if (n < 2)
+            {
+                return 1;
+            }
+            return Fibonacci(n - 2) + Fibonacci(n - 1);
         }
 
-        return 0;
+        public static int Main()
+        {
+            if (Fibonacci(16) != 1597)
+            {
+                return 1;
+            }
+
+            return 0;
+        }
     }
 }

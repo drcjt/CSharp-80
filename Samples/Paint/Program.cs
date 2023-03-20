@@ -50,6 +50,11 @@ namespace Paint
                         {
                             color = color == Color.Black ? Color.White : Color.Black;
                         }
+                        else if (keyChar == 81)
+                        {
+                            // Press Q to quit
+                            break;
+                        }
 
                         Graphics.SetPixel(currentX, currentY, cursorColor);
                     }

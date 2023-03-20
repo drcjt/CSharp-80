@@ -22,7 +22,7 @@ namespace Matrix
 
             Console.Clear();
 
-            while (true)
+            for (int run = 0; run < 100; run++)
             {
                 for (int x = 0; x < Width; x++)
                 {

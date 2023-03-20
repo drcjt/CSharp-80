@@ -9,7 +9,7 @@ namespace GfxDemos
         {            
             Console.Clear();
 
-            while (true)
+            for (int run = 0; run < 10; run++)
             {
                 RandomCircles();
                 StarBurst();

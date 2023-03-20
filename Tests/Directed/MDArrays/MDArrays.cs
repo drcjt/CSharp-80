@@ -1,51 +1,54 @@
 ﻿using System;
 
-public static class Simple_MDArray_Test
+namespace SimpleMDArray
 {
-    public static int Main()
+    public static class Tests
     {
-        // TODO: Reinstate this when MD arrays are implemented properly
-        /*
-        int SIZE = 10;
-
-        Int32[,,] foo = new Int32[SIZE, SIZE, SIZE];
-        int i, j, k, m;
-        int sum = 0;
-
-        for (i = 0; i < SIZE; i++)
+        public static int Main()
         {
-            for (j = 0; j < SIZE; j++)
-            {
-                for (k = 0; k < SIZE; k++)
-                {
-                    foo[i, j, k] = i * j * k;
-                }
-            }
-        }
+            // TODO: Reinstate this when MD arrays are implemented properly
+            /*
+            int SIZE = 10;
 
-        for (i = 0; i < SIZE; i++)
-        {
-            for (j = 0; j < i; j++)
+            Int32[,,] foo = new Int32[SIZE, SIZE, SIZE];
+            int i, j, k, m;
+            int sum = 0;
+
+            for (i = 0; i < SIZE; i++)
             {
-                for (k = 0; k < j; k++)
+                for (j = 0; j < SIZE; j++)
                 {
-                    for (m = 0; m < k; m++)
+                    for (k = 0; k < SIZE; k++)
                     {
-                        sum += foo[i, j, k];
+                        foo[i, j, k] = i * j * k;
                     }
                 }
             }
-        }
-        if (sum == 35958)
-        {
+
+            for (i = 0; i < SIZE; i++)
+            {
+                for (j = 0; j < i; j++)
+                {
+                    for (k = 0; k < j; k++)
+                    {
+                        for (m = 0; m < k; m++)
+                        {
+                            sum += foo[i, j, k];
+                        }
+                    }
+                }
+            }
+            if (sum == 35958)
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
+            */
+
             return 0;
         }
-        else
-        {
-            return 1;
-        }
-        */
-
-        return 0;
     }
 }
