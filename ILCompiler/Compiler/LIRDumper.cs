@@ -117,13 +117,10 @@ namespace ILCompiler.Compiler
             var firstArg = true;
             foreach (var argument in entry.Arguments)
             {
-                if (firstArg)
-                {
-                    _sb.Append("       ");
-                    _sb.Append(firstArg ? "┌──▌" : "├──▌");
-                    _sb.Append("  ");
-                    _sb.AppendLine($"t{argument.TreeID}");
-                }
+                _sb.Append("       ");
+                _sb.Append(firstArg ? "┌──▌" : "├──▌");
+                _sb.Append("  ");
+                _sb.AppendLine($"t{argument.TreeID}");
                 firstArg = false;
             }
 
