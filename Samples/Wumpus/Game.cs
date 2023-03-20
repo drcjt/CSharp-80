@@ -10,6 +10,7 @@ namespace Wumpus
     internal class Game
     {
         private bool _resetGame = true;
+        private bool _playAgain = true;
         private bool _gameOver = false;
 
         private readonly Room[] _rooms;
@@ -28,9 +29,9 @@ namespace Wumpus
 
         public void Play()
         {
-            while (true)
+            while (_playAgain)
             {
-                while (!_resetGame)
+                while (!_resetGame && _playAgain)
                 {
                     RunTheGame();
                 }
@@ -126,11 +127,14 @@ namespace Wumpus
 
             MoveWumpus();
 
-            // Ammo check
-            if (_arrows == 0)
+            if (!_gameOver)
             {
-                Console.WriteLine("HA HA HA - YOU LOSE!");
-                PlayAgain();
+                // Ammo check
+                if (_arrows == 0)
+                {
+                    Console.WriteLine("HA HA HA - YOU LOSE!");
+                    PlayAgain();
+                }
             }
         }
 
@@ -213,12 +217,10 @@ namespace Wumpus
         {
             _gameOver = true;
 
-            Console.Write("SAME SET-UP (Y-N)? ");
+            Console.Write("SAME SET-UP (Y-N) OR QUIT (Q)? ");
             var ch = ReadChar();
-            if (ch != 'Y')
-            {
-                _resetGame = false;
-            }
+            _resetGame = ch != 'Y';            
+            _playAgain = ch != 'Q';
         }
 
         private int RandomRoom() => _rand.Next(20);

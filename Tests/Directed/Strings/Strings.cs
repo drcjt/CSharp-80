@@ -1,16 +1,19 @@
 ﻿using System;
 
-public static class StringsTest
+namespace Strings
 {
-    public static int Main()
+    public static class Tests
     {
-        var testString = "Testing 1,2,3";
+        public static int Main()
+        {
+            var testString = "Testing 1,2,3";
 
-        if (testString.Length != 13) return 1;
+            if (testString.Length != 13) return 1;
 
-        var fifthCharacter = testString[4];
-        if (fifthCharacter != 'i') return 1;
+            var fifthCharacter = testString[4];
+            if (fifthCharacter != 'i') return 1;
 
-        return 0;
+            return 0;
+        }
     }
 }

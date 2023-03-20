@@ -91,8 +91,6 @@ namespace MiniBCL
             Graphics.DrawLine(whitePen, 16, y + 35, 22, y + 35);
             Graphics.DrawLine(whitePen, 9, y + 36, 13, y + 36);
             Graphics.DrawLine(whitePen, 16, y + 36, 22, y + 36);
-
-            while (true) ;
         }
     }
 }
