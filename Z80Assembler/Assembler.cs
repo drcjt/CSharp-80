@@ -28,9 +28,5 @@ namespace Z80Assembler
         {
             Instructions.Add(instruction);
         }
-
-        public void Assemble(ICodeWriter writer)
-        {
-        }
     }
 }

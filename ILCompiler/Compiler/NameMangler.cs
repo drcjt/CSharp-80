@@ -8,11 +8,11 @@ namespace ILCompiler.Compiler
     {
         private readonly Dictionary<String, String> _mangledMethodNames = new Dictionary<String, String>();
 
-        private static int nextMethodId = 0;
+        private int nextMethodId = 0;
 
         private readonly Dictionary<String, String> _mangledFieldNames = new Dictionary<String, String>();
 
-        private static int nextFieldId = 0;
+        private int nextFieldId = 0;
 
 
         public string GetMangledMethodName(MethodSpec method)

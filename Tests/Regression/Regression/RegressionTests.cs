@@ -18,8 +18,9 @@
             Bug87_Method(test[0]);
         }
 
-        private static void Bug87_Method(char ch)
+        private static char Bug87_Method(char ch)
         {
+            return ch;
         }
 
         private static nuint MethodCall_WithNuintParameter_CompilesWithoutErrors(nuint n)

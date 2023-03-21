@@ -12,6 +12,8 @@
             _inherited = true;
         }
 
+        public AttributeTargets ValidOn => _attributeTarget;
+
         public bool AllowMultiple
         {
             get => _allowMultiple;

@@ -11,7 +11,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public Z80MethodCodeNode(MethodDesc method)
         {
             Method = method;
-            ParamsCount = method.Parameters.Count;
+            ParamsCount = method.Parameters().Count;
             LocalsCount = method.Body?.Variables.Count ?? 0;
             Dependencies = new List<IDependencyNode>();
         }
