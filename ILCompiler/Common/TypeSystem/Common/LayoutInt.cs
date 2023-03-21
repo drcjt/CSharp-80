@@ -6,8 +6,8 @@ namespace ILCompiler.Common.TypeSystem.Common
     {
         public int Value { get; private set; }
 
-        public static LayoutInt Zero = new LayoutInt(0);
-        public static LayoutInt One = new LayoutInt(1);
+        public static readonly LayoutInt Zero = new LayoutInt(0);
+        public static readonly LayoutInt One = new LayoutInt(1);
 
         public LayoutInt(int value)
         {

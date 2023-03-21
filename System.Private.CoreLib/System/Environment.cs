@@ -7,7 +7,7 @@ namespace System
         [Intrinsic]
         private static void _Exit(int exitCode)
         {
-
+            throw new Exception();
         }
 
         public static void Exit(int exitCode) => _Exit(exitCode);

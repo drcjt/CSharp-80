@@ -35,7 +35,7 @@ namespace ILCompiler.Compiler
             var body = method.Body;
 
             // Setup local variable table - includes parameters as well as locals in method
-            foreach (var parameter in method.Parameters)
+            foreach (var parameter in method.Parameters())
             {
                 var local = new LocalVariableDescriptor()
                 {
@@ -50,7 +50,7 @@ namespace ILCompiler.Compiler
 
             if (body != null)
             {
-                foreach (var local in method.Locals)
+                foreach (var local in method.Locals())
                 {
                     var localVariableDescriptor = new LocalVariableDescriptor()
                     {
@@ -116,7 +116,7 @@ namespace ILCompiler.Compiler
                 method.Body = methodIL;
             }
 
-            _parameterCount = method.Parameters.Count;
+            _parameterCount = method.Parameters().Count;
 
             SetupLocalVariableTable(method);
 

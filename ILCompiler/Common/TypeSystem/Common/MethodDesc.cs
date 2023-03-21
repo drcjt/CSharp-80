@@ -24,9 +24,11 @@ namespace ILCompiler.Common.TypeSystem.Common
 
         public ParameterList ParameterList => _methodDef.Parameters;
 
-        public virtual IList<Parameter> Parameters => _methodDef.Parameters.ToList<Parameter>();
+        //public virtual IList<Parameter> Parameters => _methodDef.Parameters.ToList<Parameter>();
 
-        public virtual IList<Local> Locals => _methodDef.Body.Variables.ToList<Local>();
+        public virtual IList<Parameter> Parameters() => _methodDef.Parameters.ToList<Parameter>();
+
+        public virtual IList<Local> Locals() => _methodDef.Body.Variables.ToList<Local>();
 
         public MethodBody MethodBody => _methodDef.MethodBody;
 

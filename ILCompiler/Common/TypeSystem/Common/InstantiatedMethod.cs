@@ -25,35 +25,29 @@ namespace ILCompiler.Common.TypeSystem.Common
             return GenericTypeInstantiator.Instantiate(type, _genericParameters);
         }
 
-        public override IList<Local> Locals
+        public override IList<Local> Locals()
         {
-            get
+            var instantiatedLocals = new List<Local>();
+            foreach (var local in _methodDef.Body.Variables)
             {
-                var instantiatedLocals = new List<Local>();
-                foreach (var local in _methodDef.Body.Variables)
-                {
-                    var instantiatedType = GenericTypeInstantiator.Instantiate(local.Type, _genericParameters);
-                    var instantiatedLocal = new Local(instantiatedType, local.Name, local.Index);
-                    instantiatedLocals.Add(instantiatedLocal);
-                }
-                return instantiatedLocals;
+                var instantiatedType = GenericTypeInstantiator.Instantiate(local.Type, _genericParameters);
+                var instantiatedLocal = new Local(instantiatedType, local.Name, local.Index);
+                instantiatedLocals.Add(instantiatedLocal);
             }
+            return instantiatedLocals;
         }
 
-        public override IList<Parameter> Parameters
+        public override IList<Parameter> Parameters()
         {
-            get
+            var instantiatedParameters = new List<Parameter>();
+            foreach (var param in _methodDef.Parameters)
             {
-                var instantiatedParameters = new List<Parameter>();
-                foreach (var param in _methodDef.Parameters)
-                {
-                    var instantiatedType = GenericTypeInstantiator.Instantiate(param.Type, _genericParameters);
-                    var instantiatedParameter = new Parameter(param.Index, instantiatedType);
-                    instantiatedParameters.Add(instantiatedParameter);
-                }
-
-                return instantiatedParameters;
+                var instantiatedType = GenericTypeInstantiator.Instantiate(param.Type, _genericParameters);
+                var instantiatedParameter = new Parameter(param.Index, instantiatedType);
+                instantiatedParameters.Add(instantiatedParameter);
             }
+
+            return instantiatedParameters;
         }
     }
 }

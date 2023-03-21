@@ -3,12 +3,10 @@
     public class Opcode
     {
         private readonly string _name;
-        private readonly bool _pseudo;
 
-        public Opcode(string name, bool pseudo = false)
+        public Opcode(string name)
         {
             _name = name;
-            _pseudo = pseudo;
         }
 
         public static readonly Opcode Ret = new("Ret");
@@ -29,11 +27,11 @@
         public static readonly Opcode Dec = new("Dec");
         public static readonly Opcode Cpl = new("Cpl");
 
-        public static readonly Opcode Org = new("Org", true);
-        public static readonly Opcode End = new("End", true);
-        public static readonly Opcode Db = new("Db", true);
-        public static readonly Opcode Defs = new("Defs", true);
-        public static readonly Opcode Dc = new("Dc", true);
+        public static readonly Opcode Org = new("Org");
+        public static readonly Opcode End = new("End");
+        public static readonly Opcode Db = new("Db");
+        public static readonly Opcode Defs = new("Defs");
+        public static readonly Opcode Dc = new("Dc");
 
         public override string ToString()
         {
