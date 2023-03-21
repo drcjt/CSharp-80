@@ -73,7 +73,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --configuration Release --no-restore --collect:"XPlat Code Coverage" --logger:trx
+        run: dotnet test --configuration Release --no-restore --collect:"XPlat Code Coverage;Format=opencover" --logger:trx
 
       - name: Sonarqube end analysis
         env:
