@@ -42,6 +42,8 @@ namespace ILCompiler
 
             if (result == 0 && _inputFilePath != null && _outputFilePath != null)
             {
+                _logger.LogDebug("Compiling {inputFilePath} to {outputFilePath}", _inputFilePath.FullName, _outputFilePath.FullName);
+
                 var compiler = serviceProvider.GetRequiredService<ICompilation>();
                 compiler.Compile(_inputFilePath.FullName, _outputFilePath.FullName);
             }
