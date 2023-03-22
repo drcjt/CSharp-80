@@ -86,7 +86,7 @@ namespace CSharp80.Tests.BVT
             Assert.AreEqual(0, compiled, "IL Failed to compile");
         }
 
-        private void Assemble(string ilFileName)
+        private static void Assemble(string ilFileName)
         {
             var ilAsmPath = @"%USERPROFILE%\.nuget\packages\microsoft.netcore.ilasm\6.0.0\runtimes\native\ilasm.exe";
             ilAsmPath = Environment.ExpandEnvironmentVariables(ilAsmPath);
@@ -94,7 +94,7 @@ namespace CSharp80.Tests.BVT
             RunProcess(ilAsmPath, ilFileName);
         }
 
-        private bool RunProcess(string filename, string arguments)
+        private static bool RunProcess(string filename, string arguments)
         {
             using (var process = new Process())
             {

@@ -80,7 +80,7 @@ namespace RegressionTests
             Assert.AreEqual(0, compiled, "IL Failed to compile");
         }
 
-        private bool RunProcess(string filename, string arguments)
+        private static bool RunProcess(string filename, string arguments)
         {
             using (var process = new Process())
             {
