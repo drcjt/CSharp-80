@@ -65,8 +65,8 @@ namespace RegressionTests
 
         private void CompileIL(string ilFileName)
         {
-            var currentType = MethodBase.GetCurrentMethod().DeclaringType;
-            var assemblyConfigurationAttribute = currentType.Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
+            var currentType = MethodBase.GetCurrentMethod()?.DeclaringType;
+            var assemblyConfigurationAttribute = currentType?.Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
             var buildConfigurationName = assemblyConfigurationAttribute?.Configuration;
 
             var asmFileName = Path.ChangeExtension(ilFileName, "asm");
