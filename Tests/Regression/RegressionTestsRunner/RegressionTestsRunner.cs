@@ -14,6 +14,9 @@ namespace RegressionTests
         [TestCaseSource(typeof(RegressionTestsRunner), nameof(RegressionTestsCaseData))]
         public void RegressionTest(string testname)
         {
+            CompileIL(testname);
+            Zmac(testname);
+
             RunTest(testname);
         }
 

@@ -14,6 +14,9 @@ namespace GenericsTests
         [TestCaseSource(typeof(GenericsTestsRunner), nameof(GenericsTestsCaseData))]
         public void GenericsTest(string testname)
         {
+            CompileIL(testname);
+            Zmac(testname);
+
             RunTest(testname);
         }
 
