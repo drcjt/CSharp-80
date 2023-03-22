@@ -1,6 +1,4 @@
-﻿using ILCompiler.IoC;
-using Konamiman.Z80dotNet;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Konamiman.Z80dotNet;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
