@@ -1,4 +1,6 @@
-﻿using Konamiman.Z80dotNet;
+﻿using ILCompiler.IoC;
+using Konamiman.Z80dotNet;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -80,11 +82,10 @@ namespace CSharp80.Tests.BVT
 
             var corelibPath = Path.Combine(SolutionPath, $@".\System.Private.CoreLib\bin\{buildConfigurationName}\net7.0\System.Private.CoreLib.dll");
 
-            var ilCompilerPath = @"ILCompiler.exe";
             var arguments = $"--ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {corelibPath} --outputFile {asmFileName} {exeFileName} --stackStart {StackStart}";
+            var compiled = ILCompiler.Program.Main(arguments.Split(' '));
 
-            var compiled = RunProcess(ilCompilerPath, arguments);
-            Assert.IsTrue(compiled, "IL Failed to compile");
+            Assert.AreEqual(0, compiled, "IL Failed to compile");
         }
 
         private void Assemble(string ilFileName)
