@@ -12,9 +12,20 @@ namespace ILCompiler.IoC
 {
     public static class ServiceProviderFactory
     {
-        public static IServiceProvider ServiceProvider { get; }
+        private static IServiceProvider? _serviceProvider;
+        public static IServiceProvider ServiceProvider 
+        { 
+            get 
+            {
+                if (_serviceProvider == null)
+                {
+                    _serviceProvider = CreateServiceProviderFactory();
+                }
+                return _serviceProvider;
+            } 
+        }
 
-        static ServiceProviderFactory()
+        public static IServiceProvider CreateServiceProviderFactory()
         {
             var services = new ServiceCollection();
             ConfigureServices(services);
@@ -49,7 +60,9 @@ namespace ILCompiler.IoC
 
             services.AddSingleton<RTILProvider>();
 
-            ServiceProvider = services.BuildServiceProvider();
+            _serviceProvider = services.BuildServiceProvider();
+
+            return ServiceProvider;
         }
 
         private static void ConfigureServices(ServiceCollection services)

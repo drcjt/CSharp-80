@@ -15,7 +15,7 @@ namespace ILCompiler
         {
             try
             {
-                using ServiceProvider? serviceProvider = (ServiceProvider)ServiceProviderFactory.ServiceProvider;
+                var serviceProvider = ServiceProviderFactory.CreateServiceProviderFactory();
                 Program app = serviceProvider.GetRequiredService<Program>();
                 app.Run(args, serviceProvider);
             }
