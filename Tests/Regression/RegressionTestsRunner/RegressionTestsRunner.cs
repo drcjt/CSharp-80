@@ -1,15 +1,22 @@
 ﻿using Konamiman.Z80dotNet;
 using NUnit.Framework;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace RegressionTests
 {
     [TestFixture]
     public class RegressionTestsRunner
     {
+        private const int StackStart = UInt16.MaxValue;
+
         [Test]
         [TestCaseSource(typeof(RegressionTestsRunner), nameof(RegressionTestsCaseData))]
         public void RegressionTest(string testname)
         {
+            CompileIL(testname);
+            Zmac(testname);
+
             RunTest(testname);
         }
 
@@ -40,6 +47,64 @@ namespace RegressionTests
             // Pass returns 32 bit 0 in DEHL
             Assert.AreEqual(0, z80.Registers.DE);
             Assert.AreEqual(0, z80.Registers.HL);
+        }
+
+        private readonly string SolutionPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @".\..\..\..\..\..\..");
+
+        private void Zmac(string ilFileName)
+        {
+            var asmFileName = Path.ChangeExtension(ilFileName, "asm");
+            var cimFileName = Path.ChangeExtension(ilFileName, "cim");
+
+            var zmacPath = Path.Combine(SolutionPath, @".\tools\zmac.exe");
+
+            var arguments = $"--oo cim -o {cimFileName} {asmFileName}";
+
+            RunProcess(zmacPath, arguments);
+        }
+
+        private void CompileIL(string ilFileName)
+        {
+            var currentType = MethodBase.GetCurrentMethod()?.DeclaringType;
+            var assemblyConfigurationAttribute = currentType?.Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
+            var buildConfigurationName = assemblyConfigurationAttribute?.Configuration;
+
+            var asmFileName = Path.ChangeExtension(ilFileName, "asm");
+            var exeFileName = Path.ChangeExtension(ilFileName, "dll");
+
+            var corelibPath = Path.Combine(SolutionPath, $@".\System.Private.CoreLib\bin\{buildConfigurationName}\net7.0\System.Private.CoreLib.dll");
+
+            var arguments = $"--ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {corelibPath} --outputFile {asmFileName} {exeFileName} --stackStart {StackStart}";
+            var compiled = ILCompiler.Program.Main(arguments.Split(' '));
+
+            Assert.AreEqual(0, compiled, "IL Failed to compile");
+        }
+
+        private static bool RunProcess(string filename, string arguments)
+        {
+            using (var process = new Process())
+            {
+                process.StartInfo.FileName = filename;
+                process.StartInfo.Arguments = arguments;
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.Start();
+                process.WaitForExit();
+
+                if (process.ExitCode != 0)
+                {
+                    var output = process.StandardOutput.ReadToEnd();
+                    var errors = process.StandardError.ReadToEnd();
+
+                    Console.WriteLine($"Process failed");
+                    Console.WriteLine(output);
+                    Console.WriteLine(errors);
+
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private static IEnumerable<TestCaseData> RegressionTestsCaseData

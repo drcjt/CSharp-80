@@ -25,9 +25,5 @@
     <ProjectReference Include="..\..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
     <ProjectReference Include="..\..\..\ILCompiler\ILCompiler.csproj" />
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="$(SolutionDir)ILCompiler\$(OutDir)ILCompiler.exe --ignoreUnknownCil --integrationTests true --outputFile $(TargetDir)$(TargetName).asm $(TargetPath)&#xD;&#xA;call $(SolutionDir)\tools\get-tools.cmd&#xD;&#xA;$(SolutionDir)\tools\zmac.exe -l --oo cim -o $(TargetDir)\$(TargetName).cim  $(TargetDir)\$(TargetName).asm &gt; $(TargetDir)\$(TargetName).lst" />
-  </Target>
   
 </Project>
