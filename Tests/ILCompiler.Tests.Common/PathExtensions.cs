@@ -1,6 +1,6 @@
-﻿namespace GenericsTests
+﻿namespace ILCompiler.Tests.Common
 {
-    internal static class PathExtensions
+    public static class PathExtensions
     {
         public static string RemoveDirectories(this string path, int parentCount)
         {
@@ -27,6 +27,5 @@
 
             return result;
         }
-
     }
 }
