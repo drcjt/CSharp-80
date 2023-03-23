@@ -73,7 +73,15 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --configuration Release --no-restore --collect:"XPlat Code Coverage;Format=opencover" --logger:trx
+        run: dotnet test --configuration Release --no-restore --collect:"XPlat Code Coverage;Format=opencover" --logger:trx --results-directory "TestResults"
+
+      - name: Upload dotnet test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: dotnet-results
+          path: TestResults
+        # Use always() to always run this step to publish test results when there are test failures
+        if: ${{ always() }}
 
       - name: Sonarqube end analysis
         env:
