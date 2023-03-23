@@ -5,10 +5,12 @@ namespace ILCompiler.Tests.Common
 {
     public class Z80TestRunner
     {
-        public static void RunTest(string assemblyFileName, bool ilBvt = false)
+        public static bool RunTest(string assemblyFileName, bool ilBvt = false)
         {
             var program = File.ReadAllBytes(assemblyFileName);
             RunTest(program, assemblyFileName, ilBvt);
+
+            return true;
         }
 
         private static void RunTest(byte[]? z80Bytes, string testName, bool ilBvt)

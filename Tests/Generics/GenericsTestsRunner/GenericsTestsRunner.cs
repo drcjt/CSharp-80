@@ -13,7 +13,7 @@ namespace GenericsTests
         public void GenericsTest(string testname)
         {
             ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(testname);
-            Z80TestRunner.RunTest(testname);
+            Assert.IsTrue(Z80TestRunner.RunTest(testname));
         }
 
         private readonly string SolutionPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @".\..\..\..\..\..\..");
