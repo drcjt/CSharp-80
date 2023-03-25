@@ -87,7 +87,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: benchmark-results
-          path: benchmark-results
+          path: benchmark-results.txt
         # Use always() to always run this step to publish benchmark results when there are test failures
         if: ${{ always() }}
 
