@@ -13,7 +13,7 @@
         {
             using (StreamWriter sw = File.AppendText(_benchmarkResultsPath))
             {
-                sw.WriteLine($"{testName}, {tStates}");
+                sw.WriteLine($"{testName}, {tStates}, {DateTime.Now}");
             }
         }
     }
