@@ -5,7 +5,18 @@ namespace ILCompiler.Tests.Common
 {
     public class Z80TestRunner
     {
-        public static bool RunTest(string assemblyFileName, bool ilBvt = false)
+        private string _solutionPath = "";
+        public Z80TestRunner(string solutionPath)
+        {
+            _solutionPath = Path.GetFullPath(solutionPath);
+        }
+
+        public static Z80TestRunner Create(string solutionPath)
+        {
+            return new Z80TestRunner(solutionPath);
+        }
+
+        public bool RunTest(string assemblyFileName, bool ilBvt = false)
         {
             var program = File.ReadAllBytes(assemblyFileName);
             RunTest(program, assemblyFileName, ilBvt);
@@ -13,7 +24,7 @@ namespace ILCompiler.Tests.Common
             return true;
         }
 
-        private static void RunTest(byte[]? z80Bytes, string testName, bool ilBvt)
+        private void RunTest(byte[]? z80Bytes, string testName, bool ilBvt)
         {
             var z80 = new Z80Processor();
 
@@ -28,6 +39,9 @@ namespace ILCompiler.Tests.Common
             //z80.BeforeInstructionExecution += Z80_BeforeInstructionExecution;
 
             z80.Start();
+
+            BenchmarkWriter bw = new BenchmarkWriter(_solutionPath);
+            bw.WriteBenchmark(testName.Replace(_solutionPath, ""), z80.TStatesElapsedSinceStart);
 
             Console.WriteLine($"Test {testName} ran in {z80.TStatesElapsedSinceStart} T-states");
 
