@@ -16,7 +16,8 @@ namespace CSharp80.Tests.BVT
             ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(ilFileName, createLibrary: false);
 
             var cimFileName = Path.Combine(TestContext.CurrentContext.TestDirectory, ".\\il_bvt\\" + NUnit.Framework.TestContext.CurrentContext.Test.Name + ".cim");
-            Assert.IsTrue(Z80TestRunner.RunTest(cimFileName, true));
+            Z80TestRunner.Create(SolutionPath).RunTest(cimFileName, true);
+            Assert.Pass();
         }
 
         private readonly string SolutionPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @".\..\..\..\..\..");

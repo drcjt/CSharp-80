@@ -28,7 +28,7 @@
   </ItemGroup>	
 	
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="echo call $(TargetDir)..\..\..\build_il.bat $(SolutionDir) $(OutDir) $(TargetDir) $(Configuration)" />
+    <Exec Command="echo call $(TargetDir)..\..\..\build_il.bat $(OutDir)" />
   </Target>
 
 </Project>
