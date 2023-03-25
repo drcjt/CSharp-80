@@ -229,10 +229,35 @@ namespace ILCompiler.Compiler
 
             if (_context.LocalsCount + tempCount > 0)
             {
-                // Reserve space on stack for locals
-                assembler.Ld(R16.HL, (short)-localsSize);
-                assembler.Add(R16.HL, R16.SP);
-                assembler.Ld(R16.SP, R16.HL);
+                if (_context.Method.Body.InitLocals)
+                {
+                    // Reserve and zero space on stack for locals
+                    assembler.Ld(R16.BC, (short)(localsSize / 2));
+                    assembler.Ld(R16.HL, 0);
+
+                    var initLoopLabel = _context.NameMangler.GetUniqueName();
+                    _context.Assembler.AddInstruction(new LabelInstruction(initLoopLabel));
+
+                    assembler.Push(R16.HL);
+                    assembler.Dec(R16.BC);
+                    assembler.Ld(R8.A, R8.B);
+                    assembler.Or(R8.C);
+                    assembler.Jp(Condition.NonZero, initLoopLabel);
+
+                    if (localsSize % 2 != 0)
+                    {
+                        // Need to zero last byte here
+                        assembler.Push(R16.HL);
+                        assembler.Inc(R16.SP);
+                    }
+                }                
+                else
+                {
+                    // Reserve space on stack for locals
+                    assembler.Ld(R16.HL, (short)-localsSize);
+                    assembler.Add(R16.HL, R16.SP);
+                    assembler.Ld(R16.SP, R16.HL);
+                }
             }
         }
 
