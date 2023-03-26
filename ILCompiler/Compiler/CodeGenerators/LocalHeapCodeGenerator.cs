@@ -7,34 +7,40 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(LocalHeapEntry entry, CodeGeneratorContext context)
         {
-            // Use the 16 bit size on top of the stack to determine the amount of localloc to do
-
-            context.Assembler.Pop(R16.HL);  // amount of space to localloc
-
             if (context.Method.Body.InitLocals)
             {
                 // Reserve and zero space on stack
-                context.Assembler.Push(R16.HL);
+                // Use the 16 bit size on top of the stack to determine the amount of localloc to do
                 context.Assembler.Pop(R16.BC);
-                context.Assembler.Ld(R16.HL, 0);
 
-                var initLoopLabel = context.NameMangler.GetUniqueName();
-                context.Assembler.AddInstruction(new LabelInstruction(initLoopLabel));
-
-                context.Assembler.Push(R16.HL);
-                context.Assembler.Dec(R16.BC);
-                context.Assembler.Dec(R16.BC);      // TODO: Divide BC by 2 earlier to avoid having to do this
-                context.Assembler.Ld(R8.A, R8.B);
-                context.Assembler.Or(R8.C);
-                context.Assembler.Jp(Condition.NonZero, initLoopLabel);
-
+                // Move SP to HL
                 context.Assembler.Ld(R16.HL, 0);
                 context.Assembler.Add(R16.HL, R16.SP);
 
-                // TODO: Need to Zero last byte if size to allocate is odd number of bytes
+                // Start of Zeroing loop
+                var initLoopLabel = context.NameMangler.GetUniqueName();
+                context.Assembler.AddInstruction(new LabelInstruction(initLoopLabel));
+
+                // Zero a byte
+                context.Assembler.LdInd(R16.HL, 0);
+
+                // Move to next byte to zero remembering that stack grows downwards
+                context.Assembler.Dec(R16.HL);
+
+                // Decrement byte count
+                context.Assembler.Dec(R16.BC);
+
+                // More bytes to zero then loop
+                context.Assembler.Jp(Condition.NonZero, initLoopLabel);
+
+                // Set SP to resulting HL
+                context.Assembler.Ld(R16.SP, R16.HL);
             }
             else
             {
+                // Use the 16 bit size on top of the stack to determine the amount of localloc to do
+                context.Assembler.Pop(R16.HL);
+
                 // Negate HL i.e. HL = -HL
                 context.Assembler.Ld(R8.A, R8.L);
                 context.Assembler.Cpl();
