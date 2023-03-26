@@ -132,6 +132,16 @@ namespace Z80Assembler
             AddInstruction(new Instruction(Opcode.Ld, "(" + target.ToString() + "), " + source.ToString()));
         }
 
+        public void LdInd(R16Type target, short source)
+        {
+            AddInstruction(new Instruction(Opcode.Ld, "(" + target.ToString() + "), " + source.ToString()));
+        }
+
+        public void Ldir()
+        {
+            AddInstruction(new Instruction(Opcode.Ldir));
+        }
+
         public void Ex(Register target, Register source)
         {
             AddInstruction(new Instruction(Opcode.Ex, target.ToString() + ", " + source.ToString()));

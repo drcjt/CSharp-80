@@ -13,6 +13,7 @@
         public static readonly Opcode Push = new("Push");
         public static readonly Opcode Pop = new("Pop");
         public static readonly Opcode Ld = new("Ld");
+        public static readonly Opcode Ldir = new("Ldir");
         public static readonly Opcode Call = new("Call");
         public static readonly Opcode Rst = new("Rst");
         public static readonly Opcode Add = new("Add");
