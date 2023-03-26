@@ -234,6 +234,8 @@ namespace ILCompiler.Compiler
                     // Reserve and zero space on stack for locals
                     assembler.Ld(R16.HL, 0);
 
+                    // TODO: This really needs to only initialise local vars that aren't
+                    // already explicitly assigned by later code. CSharp will generate a CS0165 use of unassigned local var error
                     if (localsSize > 1)
                     {
                         assembler.Ld(R16.BC, (short)(localsSize / 2));
