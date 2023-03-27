@@ -24,7 +24,7 @@ namespace ILCompiler.Tests.Common
             return true;
         }
 
-        private byte[] GetNonZeroBytes()
+        private static byte[] GetNonZeroBytes()
         {
             var nonZeroBytes = new byte[UInt16.MaxValue];
             Array.Fill<byte>(nonZeroBytes, 0xff);
