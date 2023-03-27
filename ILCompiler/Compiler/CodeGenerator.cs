@@ -233,6 +233,32 @@ namespace ILCompiler.Compiler
                 assembler.Ld(R16.HL, (short)-localsSize);
                 assembler.Add(R16.HL, R16.SP);
                 assembler.Ld(R16.SP, R16.HL);
+                
+                if (_context.Method.Body.InitLocals)
+                {
+                    // TODO: This should loop through the locals and only init those flagged as must init
+                    // but this requires SSA and use/def analysis which we don't have yet.
+                    // So for now just init all the locals
+
+                    assembler.Ld(R16.BC, (short)localsSize);
+
+                    assembler.Push(I16.IX);
+                    assembler.Pop(R16.HL);
+
+                    var initLoopLabel = _context.NameMangler.GetUniqueName();
+                    _context.Assembler.AddInstruction(new LabelInstruction(initLoopLabel));
+
+                    assembler.Dec(R16.HL);  // Stack grows downwards so need to move to next byte first
+
+                    assembler.LdInd(R16.HL, 0);
+
+                    assembler.Dec(R16.BC);
+
+                    assembler.Ld(R8.A, R8.B);
+                    assembler.Or(R8.C);
+
+                    assembler.Jp(Condition.NonZero, initLoopLabel);
+                }
             }
         }
 

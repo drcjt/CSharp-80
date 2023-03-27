@@ -24,6 +24,14 @@ namespace ILCompiler.Tests.Common
             return true;
         }
 
+        private static byte[] GetNonZeroBytes()
+        {
+            var nonZeroBytes = new byte[UInt16.MaxValue];
+            Array.Fill<byte>(nonZeroBytes, 0xff);
+
+            return nonZeroBytes;
+        }
+
         private void RunTest(byte[]? z80Bytes, string testName, bool ilBvt)
         {
             var z80 = new Z80Processor();
@@ -34,6 +42,13 @@ namespace ILCompiler.Tests.Common
             // on halt
             z80.AutoStopOnRetWithStackEmpty = false;
 
+
+            // Start out with all memory set to 0xff
+            // makes sure no tests happen to pass just because
+            // memory contains zeros to begin with
+            z80.Memory.SetContents(0, GetNonZeroBytes());
+
+            // Load the program bytes
             z80.Memory.SetContents(0, z80Bytes);
 
             //z80.BeforeInstructionExecution += Z80_BeforeInstructionExecution;
