@@ -72,7 +72,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                         // Validate we haven't got any under/over flow on stack
                         // Assert that localsSize + SP - IX = 0
 
-                        // TODO: also need to factor in any localalloc space allocated
+                        // TODO: also need to factor in any localloc space allocated
                         // this is why localloc integration test fails with this code enabled
 
                         context.Assembler.Ld(R16.HL, (short)localsSize);

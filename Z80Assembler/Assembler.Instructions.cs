@@ -152,6 +152,11 @@ namespace Z80Assembler
             AddInstruction(new Instruction(Opcode.Or, target.ToString()));
         }
 
+        public void And(R8Type target)
+        {
+            AddInstruction(new Instruction(Opcode.And, target.ToString()));
+        }
+
         public void Jp(Condition condition, string label)
         {
             AddInstruction(new Instruction(Opcode.Jp, condition + " , " + label));
