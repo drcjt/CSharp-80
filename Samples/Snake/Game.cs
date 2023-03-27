@@ -2,6 +2,8 @@
 using System.Drawing;
 using System.Threading;
 
+[module: System.Runtime.CompilerServices.SkipLocalsInit]
+
 namespace Snake
 {
     struct Game
