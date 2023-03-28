@@ -11,9 +11,6 @@
 .maxstack 10
 .locals (native int)
 
-/*
-// TODO: This isn't right as stind.i is going to try and store a native int 
-// into the 1 byte allocated on the stack but needs 2 bytes.
 	ldc.i4 0x1
 	localloc
 	stloc 0
@@ -26,7 +23,6 @@
 	ldc.i4 0x8
 	conv.i
 	bne.un fail
-*/
 
 	ldc.i4	0x1
 	localloc

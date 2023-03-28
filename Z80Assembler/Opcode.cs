@@ -28,6 +28,8 @@
         public static readonly Opcode Inc = new("Inc");
         public static readonly Opcode Dec = new("Dec");
         public static readonly Opcode Cpl = new("Cpl");
+        public static readonly Opcode Rr = new("Rr");
+        public static readonly Opcode Srl = new("Srl");
 
         public static readonly Opcode Org = new("Org");
         public static readonly Opcode End = new("End");
