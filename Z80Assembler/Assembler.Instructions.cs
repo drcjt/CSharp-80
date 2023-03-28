@@ -152,6 +152,15 @@ namespace Z80Assembler
             AddInstruction(new Instruction(Opcode.Or, target.ToString()));
         }
 
+        public void RotateRight(R8Type target)
+        {
+            AddInstruction(new Instruction(Opcode.Rr, target.ToString()));
+        }
+        public void ShiftRightLogical(R8Type target)
+        {
+            AddInstruction(new Instruction(Opcode.Srl, target.ToString()));
+        }
+
         public void And(R8Type target)
         {
             AddInstruction(new Instruction(Opcode.And, target.ToString()));
