@@ -31,12 +31,15 @@ namespace ILCompiler.Compiler.CodeGenerators
                 // Divide BC by 2
                 context.Assembler.ShiftRightLogical(R8.B);
                 context.Assembler.RotateRight(R8.C);
+                context.Assembler.ShiftRightLogical(R8.B);
+                context.Assembler.RotateRight(R8.C);
 
                 // Start of Zeroing loop
                 var initLoopLabel = context.NameMangler.GetUniqueName();
                 context.Assembler.AddInstruction(new LabelInstruction(initLoopLabel));
 
-                // Zero a byte
+                // Zero two zero bytes
+                context.Assembler.Push(R16.HL);
                 context.Assembler.Push(R16.HL);
 
                 // Decrement byte count
