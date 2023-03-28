@@ -1,8 +1,17 @@
-﻿namespace ILCompiler.Tests.Common
+﻿using System.Text.Json;
+
+namespace ILCompiler.Tests.Common
 {
     internal class BenchmarkWriter
     {
-        private string _benchmarkResultsPath;
+        private class BenchmarkData
+        {
+            public string Name { get; set; } = "Undefined";
+            public string Unit { get; set; } = "Undefined";
+            public int Value { get; set; }
+        }
+
+        private readonly string _benchmarkResultsPath;
 
         public BenchmarkWriter(string solutionPath)
         { 
@@ -11,10 +20,25 @@
 
         public void WriteBenchmark(string testName, ulong tStates)
         {
-            using (StreamWriter sw = File.AppendText(_benchmarkResultsPath))
+            var benchmarks = new List<BenchmarkData>();
+            if (File.Exists(_benchmarkResultsPath))
             {
-                sw.WriteLine($"{testName}, {tStates}, {DateTime.Now}");
+                using (FileStream benchmarkFile = File.OpenRead(_benchmarkResultsPath)) 
+                {
+                    benchmarks = JsonSerializer.Deserialize<List<BenchmarkData>>(benchmarkFile);
+                }
             }
+            
+            if (benchmarks == null)
+            {
+                throw new NullReferenceException($"Deserialization of benchmark file {_benchmarkResultsPath} failed");
+            }
+
+            benchmarks.Add(new BenchmarkData() { Name = testName, Unit = "T-States", Value = (int)tStates });
+
+            var json = JsonSerializer.Serialize<List<BenchmarkData>>(benchmarks);
+
+            File.WriteAllText(_benchmarkResultsPath, json);
         }
     }
 }
