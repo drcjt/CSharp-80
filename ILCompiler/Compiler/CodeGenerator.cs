@@ -236,6 +236,7 @@ namespace ILCompiler.Compiler
                 
                 if (_context.Method.Body.InitLocals)
                 {
+                    /*
                     // TODO: This should loop through the locals and only init those flagged as must init
                     // but this requires SSA and use/def analysis which we don't have yet.
                     // So for now just init all the locals
@@ -258,6 +259,7 @@ namespace ILCompiler.Compiler
                     assembler.Or(R8.C);
 
                     assembler.Jp(Condition.NonZero, initLoopLabel);
+                    */
                 }
             }
         }
