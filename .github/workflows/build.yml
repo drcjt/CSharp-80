@@ -117,4 +117,3 @@ jobs:
           output-file-path: benchmark-results.txt
           external-data-json-path: ./cache/benchmark-data.json
           fail-on-alert: true
-	    
