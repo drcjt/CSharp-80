@@ -20,12 +20,18 @@ namespace ILCompiler.Tests.Common
 
         public void WriteBenchmark(string testName, ulong tStates)
         {
+            var serializeOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = true
+            };
+
             var benchmarks = new List<BenchmarkData>();
             if (File.Exists(_benchmarkResultsPath))
             {
                 using (FileStream benchmarkFile = File.OpenRead(_benchmarkResultsPath)) 
                 {
-                    benchmarks = JsonSerializer.Deserialize<List<BenchmarkData>>(benchmarkFile);
+                    benchmarks = JsonSerializer.Deserialize<List<BenchmarkData>>(benchmarkFile, serializeOptions);
                 }
             }
             
@@ -36,7 +42,7 @@ namespace ILCompiler.Tests.Common
 
             benchmarks.Add(new BenchmarkData() { Name = testName, Unit = "T-States", Value = (int)tStates });
 
-            var json = JsonSerializer.Serialize<List<BenchmarkData>>(benchmarks);
+            var json = JsonSerializer.Serialize<List<BenchmarkData>>(benchmarks, serializeOptions);
 
             File.WriteAllText(_benchmarkResultsPath, json);
         }
