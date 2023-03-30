@@ -200,16 +200,17 @@ namespace ILCompiler.Compiler.CodeGenerators
                 var bytesToCopy = size > 2 ? 2 : size;
                 size -= 2;
 
-                // TODO: Check why this can't be simplified to ixOffset < 128
-                if (ixOffset + bytesToCopy <= 127)
+                // IX offset must lie between -128 to +127
+                if (ixOffset < -128)
                 {
-                    var delta = ixOffset + 1;
-                    assembler.Ld(R16.DE, (short)delta);
+                    // Move IX so new offset will be 126/127
+                    var delta = -ixOffset + 126;
+                    assembler.Ld(R16.DE, (short)-delta);
                     assembler.Add(I16.IX, R16.DE);
-                    changeToIX += delta;
+                    changeToIX -= delta;
 
-                    ixOffset -= delta;
-                    originalIxOffset -= delta;
+                    ixOffset += delta;
+                    originalIxOffset += delta;
                 }
 
                 if (bytesToCopy == 1)
