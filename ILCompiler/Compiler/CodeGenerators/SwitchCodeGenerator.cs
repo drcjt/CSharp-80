@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
-using Z80Assembler;
+﻿using ILCompiler.Compiler.Emit;
+using ILCompiler.Compiler.EvaluationStack;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -7,19 +7,19 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(SwitchEntry entry, CodeGeneratorContext context)
         {
-            context.Assembler.Pop(R16.HL);      // LSW
-            context.Assembler.Pop(R16.DE);      // Ignore MSW
+            context.Emitter.Pop(R16.HL);      // LSW
+            context.Emitter.Pop(R16.DE);      // Ignore MSW
 
-            context.Assembler.Ld(R8.A, R8.L);
+            context.Emitter.Ld(R8.A, R8.L);
 
             for (int targetIndex = 0; targetIndex < entry.JumpTable.Count; targetIndex++)
             {
-                context.Assembler.Or(R8.A);
-                context.Assembler.Jp(Condition.Zero, entry.JumpTable[targetIndex]);
+                context.Emitter.Or(R8.A);
+                context.Emitter.Jp(Condition.Zero, entry.JumpTable[targetIndex]);
 
                 if (targetIndex < entry.JumpTable.Count - 1)
                 {
-                    context.Assembler.Dec(R8.A);
+                    context.Emitter.Dec(R8.A);
                 }
             }
         }

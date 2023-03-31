@@ -1,9 +1,9 @@
 ﻿using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysis;
+using ILCompiler.Compiler.Emit;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text;
-using Z80Assembler;
 
 namespace ILCompiler.Compiler
 {

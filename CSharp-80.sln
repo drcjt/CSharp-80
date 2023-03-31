@@ -17,8 +17,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{793A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sample", "Samples\Sample\Sample.csproj", "{34DDF008-1399-4B78-BDD1-087481927C63}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Z80Assembler", "Z80Assembler\Z80Assembler.csproj", "{0BFBDADF-5068-47E4-AA60-F8A87A67988D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fib", "Samples\Fib\Fib.csproj", "{1C5765B4-0448-46C3-8BD5-39168A53F21A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Math", "Samples\Math\Math.csproj", "{03AAC148-E232-4A40-BDFC-095E561FCE7C}"
@@ -92,7 +90,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Checksum", "Samples\Checksu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hello", "Samples\Hello\Hello.csproj", "{4244B994-8103-44EB-9303-16E1296310FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ILCompiler.Tests.Common", "Tests\ILCompiler.Tests.Common\ILCompiler.Tests.Common.csproj", "{6324EF38-D339-4A78-AEED-A41537E8DD92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILCompiler.Tests.Common", "Tests\ILCompiler.Tests.Common\ILCompiler.Tests.Common.csproj", "{6324EF38-D339-4A78-AEED-A41537E8DD92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -112,10 +110,6 @@ Global
 		{34DDF008-1399-4B78-BDD1-087481927C63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34DDF008-1399-4B78-BDD1-087481927C63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34DDF008-1399-4B78-BDD1-087481927C63}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0BFBDADF-5068-47E4-AA60-F8A87A67988D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0BFBDADF-5068-47E4-AA60-F8A87A67988D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0BFBDADF-5068-47E4-AA60-F8A87A67988D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0BFBDADF-5068-47E4-AA60-F8A87A67988D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1C5765B4-0448-46C3-8BD5-39168A53F21A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1C5765B4-0448-46C3-8BD5-39168A53F21A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C5765B4-0448-46C3-8BD5-39168A53F21A}.Release|Any CPU.ActiveCfg = Release|Any CPU

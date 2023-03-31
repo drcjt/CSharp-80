@@ -1,13 +1,10 @@
-﻿using System.Collections.Generic;
-
-namespace Z80Assembler
+﻿namespace ILCompiler.Compiler.Emit
 {
-    public partial class Assembler
+    public partial class Emitter
     {
         public IList<Instruction> Instructions { get; }
-        ulong _currentLabelId;
 
-        public Assembler()
+        public Emitter()
         {
             Instructions = new List<Instruction>();
         }
@@ -15,13 +12,6 @@ namespace Z80Assembler
         public void Reset()
         {
             Instructions.Clear();
-        }
-
-        public Label CreateLabel(string name)
-        {
-            _currentLabelId++;
-            var label = new Label(name, _currentLabelId);
-            return label;
         }
 
         public void AddInstruction(Instruction instruction)

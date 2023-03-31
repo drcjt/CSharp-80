@@ -1,6 +1,6 @@
 ﻿using ILCompiler.Compiler;
 using ILCompiler.Compiler.DependencyAnalysis;
-using Z80Assembler;
+using ILCompiler.Compiler.Emit;
 
 namespace ILCompiler.Interfaces
 {

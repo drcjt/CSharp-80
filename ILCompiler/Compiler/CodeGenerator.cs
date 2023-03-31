@@ -1,9 +1,9 @@
 ﻿using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
+using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
-using Z80Assembler;
 
 namespace ILCompiler.Compiler
 {
@@ -35,18 +35,18 @@ namespace ILCompiler.Compiler
             var methodInstructions = new List<Instruction>();
 
             GenerateStringMap(blocks);
-            GenerateStringData(_context.Assembler);
+            GenerateStringData(_context.Emitter);
 
-            _context.Assembler.AddInstruction(new LabelInstruction(_nameMangler.GetMangledMethodName(_context.Method)));
+            _context.Emitter.AddInstruction(new LabelInstruction(_nameMangler.GetMangledMethodName(_context.Method)));
 
-            GenerateProlog(_context.Assembler);
-            methodInstructions.AddRange(_context.Assembler.Instructions);
+            GenerateProlog(_context.Emitter);
+            methodInstructions.AddRange(_context.Emitter.Instructions);
 
             foreach (var block in blocks)
             {
-                _context.Assembler.Reset();
+                _context.Emitter.Reset();
 
-                _context.Assembler.AddInstruction(new LabelInstruction(block.Label));
+                _context.Emitter.AddInstruction(new LabelInstruction(block.Label));
 
                 var visitorAdapter = new GenericStackEntryAdapter(this);
 
@@ -57,8 +57,8 @@ namespace ILCompiler.Compiler
                     currentNode = currentNode.Next;
                 }
 
-                Optimize(_context.Assembler.Instructions);
-                methodInstructions.AddRange(_context.Assembler.Instructions);
+                Optimize(_context.Emitter.Instructions);
+                methodInstructions.AddRange(_context.Emitter.Instructions);
             }
 
             return methodInstructions;
@@ -157,33 +157,33 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void GenerateStringData(Assembler assembler)
+        private void GenerateStringData(Emitter emitter)
         {
             // TODO: Need to eliminate duplicate strings
             foreach (var keyValuePair in _labelsToStringData)
             {
-                assembler.AddInstruction(new LabelInstruction(keyValuePair.Key));
+                emitter.AddInstruction(new LabelInstruction(keyValuePair.Key));
 
                 var stringData = keyValuePair.Value;
 
                 // TODO: This needs to the EEType for String
-                assembler.Db(0);
-                assembler.Db(0);
+                emitter.Db(0);
+                emitter.Db(0);
 
                 byte lsb = (byte)(stringData.Length & 0xFF);
                 byte msb = (byte)((stringData.Length >> 8) & 0xFF);
 
-                assembler.Db(lsb);
-                assembler.Db(msb);
+                emitter.Db(lsb);
+                emitter.Db(msb);
 
                 foreach (var ch in stringData)
                 {
-                    assembler.Db((byte)ch);
-                    assembler.Db((byte)0x00);
+                    emitter.Db((byte)ch);
+                    emitter.Db((byte)0x00);
                 }
             }
         }
-        private void GenerateProlog(Assembler assembler)
+        private void GenerateProlog(Emitter emitter)
         {
             // Stack frame looks like this:
             //
@@ -222,17 +222,17 @@ namespace ILCompiler.Compiler
 
             if (_context.ParamsCount > 0 || (_context.LocalsCount + tempCount) > 0)
             {
-                assembler.Push(I16.IX);
-                assembler.Ld(I16.IX, 0);
-                assembler.Add(I16.IX, R16.SP);
+                emitter.Push(I16.IX);
+                emitter.Ld(I16.IX, 0);
+                emitter.Add(I16.IX, R16.SP);
             }
 
             if (_context.LocalsCount + tempCount > 0)
             {
                 // Reserve space on stack for locals
-                assembler.Ld(R16.HL, (short)-localsSize);
-                assembler.Add(R16.HL, R16.SP);
-                assembler.Ld(R16.SP, R16.HL);
+                emitter.Ld(R16.HL, (short)-localsSize);
+                emitter.Add(R16.HL, R16.SP);
+                emitter.Ld(R16.SP, R16.HL);
                 
                 if (_context.Method.Body.InitLocals)
                 {
@@ -241,24 +241,24 @@ namespace ILCompiler.Compiler
                     // but this requires SSA and use/def analysis which we don't have yet.
                     // So for now just init all the locals
 
-                    assembler.Ld(R16.BC, (short)localsSize);
+                    emitter.Ld(R16.BC, (short)localsSize);
 
-                    assembler.Push(I16.IX);
-                    assembler.Pop(R16.HL);
+                    emitter.Push(I16.IX);
+                    emitter.Pop(R16.HL);
 
                     var initLoopLabel = _context.NameMangler.GetUniqueName();
-                    _context.Assembler.AddInstruction(new LabelInstruction(initLoopLabel));
+                    _context.Emitter.AddInstruction(new LabelInstruction(initLoopLabel));
 
-                    assembler.Dec(R16.HL);  // Stack grows downwards so need to move to next byte first
+                    emitter.Dec(R16.HL);  // Stack grows downwards so need to move to next byte first
 
-                    assembler.LdInd(R16.HL, 0);
+                    emitter.LdInd(R16.HL, 0);
 
-                    assembler.Dec(R16.BC);
+                    emitter.Dec(R16.BC);
 
-                    assembler.Ld(R8.A, R8.B);
-                    assembler.Or(R8.C);
+                    emitter.Ld(R8.A, R8.B);
+                    emitter.Or(R8.C);
 
-                    assembler.Jp(Condition.NonZero, initLoopLabel);
+                    emitter.Jp(Condition.NonZero, initLoopLabel);
                     */
                 }
             }

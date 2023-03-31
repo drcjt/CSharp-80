@@ -1,4 +1,4 @@
-﻿namespace Z80Assembler
+﻿namespace ILCompiler.Compiler.Emit
 {
     public class LabelInstruction : Instruction
     {

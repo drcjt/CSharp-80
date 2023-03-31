@@ -1,7 +1,6 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 
-namespace Z80Assembler
+namespace ILCompiler.Compiler.Emit
 {
     public class Instruction
     {
@@ -70,11 +69,6 @@ namespace Z80Assembler
             return new Instruction(Opcode.Call, label);
         }
 
-        public static Instruction Call(UInt16 target)
-        {
-            return new Instruction(Opcode.Call, string.Format("{0:X}H", target));
-        }
-
         public static Instruction Pop(Register target)
         {
             return new Instruction(Opcode.Pop, target.ToString());
@@ -90,49 +84,9 @@ namespace Z80Assembler
             return new Instruction(Opcode.End, label);
         }
 
-        public static Instruction Inc(Register target)
-        {
-            return new Instruction(Opcode.Inc, target.ToString());
-        }
-
-        public static Instruction Add(Register target, Register source)
-        {
-            return new Instruction(Opcode.Add, target.ToString() + ", " + source.ToString());
-        }
-
-        public static Instruction Adc(Register target, Register source)
-        {
-            return new Instruction(Opcode.Adc, target.ToString() + ", " + source.ToString());
-        }
-
-        public static Instruction Sbc(R16Type target, R16Type source)
-        {
-            return new Instruction(Opcode.Sbc, target.ToString() + ", " + source.ToString());
-        }
-
-        public static Instruction Ld(R8Type target, R8Type source)
-        {
-            return new Instruction(Opcode.Ld, target.ToString() + ", " + source.ToString());
-        }
-
         public static Instruction Ld(Register target, short source)
         {
             return new Instruction(Opcode.Ld, target.ToString() + ", " + source);
-        }
-
-        public static Instruction Ld(R8Type target, I16Type source, short offset)
-        {
-            return new Instruction(Opcode.Ld, target.ToString() + ", (" + source.ToString() + string.Format("{0:+#;-#;+0}", offset) + ")");
-        }
-
-        public static Instruction Ld(I16Type target, short offset, R8Type source)
-        {
-            return new Instruction(Opcode.Ld, "(" + target.ToString() + string.Format("{0:+#;-#;+0}", offset) + "), " + source.ToString());
-        }
-
-        public static Instruction Ld(Register target, Register source)
-        {
-            return new Instruction(Opcode.Ld, target.ToString() + ", " + source.ToString());
         }
 
         public static Instruction Ld(R16Type target, string label)
@@ -153,21 +107,6 @@ namespace Z80Assembler
         public static Instruction LdInd(string label, Register source)
         {
             return new Instruction(Opcode.Ld, "(" + label + "), " + source.ToString());
-        }
-
-        public static Instruction Ex(Register target, Register source)
-        {
-            return new Instruction(Opcode.Ex, target.ToString() + ", " + source.ToString());
-        }
-
-        public static Instruction Or(R8Type target, R8Type source)
-        {
-            return new Instruction(Opcode.Or, target.ToString() + ", " + source.ToString());
-        }
-
-        public static Instruction Jp(Condition condition, string label)
-        {
-            return new Instruction(Opcode.Jp, condition + " , " + label);
         }
 
         public static Instruction Jp(string label)

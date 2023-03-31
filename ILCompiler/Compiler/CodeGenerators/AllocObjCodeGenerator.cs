@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
-using Z80Assembler;
+﻿using ILCompiler.Compiler.Emit;
+using ILCompiler.Compiler.EvaluationStack;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -9,9 +9,9 @@ namespace ILCompiler.Compiler.CodeGenerators
         {
             // Allocate memory on the heap using simple zero GC/increment a pointer approach
 
-            context.Assembler.Ld(R16.HL, (short)entry.Size);
-            context.Assembler.Push(R16.HL);
-            context.Assembler.Call("NewObject");
+            context.Emitter.Ld(R16.HL, (short)entry.Size);
+            context.Emitter.Push(R16.HL);
+            context.Emitter.Call("NewObject");
         }
     }
 }

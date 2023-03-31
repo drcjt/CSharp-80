@@ -1,6 +1,5 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
-using System.Xml;
-using Z80Assembler;
+﻿using ILCompiler.Compiler.Emit;
+using ILCompiler.Compiler.EvaluationStack;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -19,31 +18,31 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                     // Load address of return buffer into HL
                     var variable = context.LocalVariableTable[entry.ReturnBufferArgIndex.Value];
-                    context.Assembler.Ld(R8.H, I16.IX, (short)-(variable.StackOffset - 1));
-                    context.Assembler.Ld(R8.L, I16.IX, (short)-(variable.StackOffset - 0));
+                    context.Emitter.Ld(R8.H, I16.IX, (short)-(variable.StackOffset - 1));
+                    context.Emitter.Ld(R8.L, I16.IX, (short)-(variable.StackOffset - 0));
 
-                    context.Assembler.Push(I16.IX); // save IX to BC
-                    context.Assembler.Pop(R16.BC);
+                    context.Emitter.Push(I16.IX); // save IX to BC
+                    context.Emitter.Pop(R16.BC);
 
-                    context.Assembler.Push(R16.HL); // Move HL to IX
-                    context.Assembler.Pop(I16.IX);
+                    context.Emitter.Push(R16.HL); // Move HL to IX
+                    context.Emitter.Pop(I16.IX);
 
                     // Copy struct to the return buffer
                     var returnTypeExactSize = entry.ReturnTypeExactSize ?? 0;
-                    CopyHelper.CopyFromStackToIX(context.Assembler, returnTypeExactSize);
+                    CopyHelper.CopyFromStackToIX(context.Emitter, returnTypeExactSize);
 
-                    context.Assembler.Push(R16.BC); // restore IX
-                    context.Assembler.Pop(I16.IX);
+                    context.Emitter.Push(R16.BC); // restore IX
+                    context.Emitter.Pop(I16.IX);
                 }
                 else
                 {
-                    context.Assembler.Pop(R16.DE);            // Copy return value into DE/DE'
+                    context.Emitter.Pop(R16.DE);            // Copy return value into DE/DE'
 
                     if (targetType?.Type.IsInt() ?? false)
                     {
-                        context.Assembler.Exx();
-                        context.Assembler.Pop(R16.DE);
-                        context.Assembler.Exx();
+                        context.Emitter.Exx();
+                        context.Emitter.Pop(R16.DE);
+                        context.Emitter.Exx();
                     }
                 }                
             }
@@ -75,25 +74,25 @@ namespace ILCompiler.Compiler.CodeGenerators
                         // TODO: also need to factor in any localloc space allocated
                         // this is why localloc integration test fails with this code enabled
 
-                        context.Assembler.Ld(R16.HL, (short)localsSize);
-                        context.Assembler.Add(R16.HL, R16.SP);
+                        context.Emitter.Ld(R16.HL, (short)localsSize);
+                        context.Emitter.Add(R16.HL, R16.SP);
 
-                        context.Assembler.Push(I16.IX);
-                        context.Assembler.Pop(R16.BC);
+                        context.Emitter.Push(I16.IX);
+                        context.Emitter.Pop(R16.BC);
 
-                        context.Assembler.Sbc(R16.HL, R16.BC);
+                        context.Emitter.Sbc(R16.HL, R16.BC);
 
                         var unwindLabel = context.NameMangler.GetUniqueName();
-                        context.Assembler.Jp(Condition.Zero, unwindLabel);
+                        context.Emitter.Jp(Condition.Zero, unwindLabel);
 
-                        context.Assembler.Halt();
+                        context.Emitter.Halt();
 
-                        context.Assembler.AddInstruction(new LabelInstruction(unwindLabel));
+                        context.Emitter.AddInstruction(new LabelInstruction(unwindLabel));
                     }
 
-                    context.Assembler.Ld(R16.SP, I16.IX);     // Move SP to before locals
+                    context.Emitter.Ld(R16.SP, I16.IX);     // Move SP to before locals
                 }
-                context.Assembler.Pop(I16.IX);            // Remove IX
+                context.Emitter.Pop(I16.IX);            // Remove IX
 
                 if (context.ParamsCount > 0)
                 {
@@ -111,38 +110,38 @@ namespace ILCompiler.Compiler.CodeGenerators
                     // will probably be better for 1 or maybe 2 32bit parameters.
 
                     // Work out start of params so we can reset SP after removing return address
-                    context.Assembler.Ld(R16.HL, 0);
-                    context.Assembler.Add(R16.HL, R16.SP);
-                    context.Assembler.Ld(R16.BC, (short)(2 + totalParametersSize));
-                    context.Assembler.Add(R16.HL, R16.BC);
+                    context.Emitter.Ld(R16.HL, 0);
+                    context.Emitter.Add(R16.HL, R16.SP);
+                    context.Emitter.Ld(R16.BC, (short)(2 + totalParametersSize));
+                    context.Emitter.Add(R16.HL, R16.BC);
                 }
 
-                context.Assembler.Pop(R16.BC);      // Store return address in BC
+                context.Emitter.Pop(R16.BC);      // Store return address in BC
 
                 if (context.ParamsCount > 0)
                 {
                     // Remove parameters from stack
-                    context.Assembler.Ld(R16.SP, R16.HL);
+                    context.Emitter.Ld(R16.SP, R16.HL);
                 }
             }
             else
             {
-                context.Assembler.Pop(R16.BC);      // Store return address in BC
+                context.Emitter.Pop(R16.BC);      // Store return address in BC
             }
 
             if (hasReturnValue && !entry.ReturnBufferArgIndex.HasValue)
             {
                 if (targetType?.Type.IsInt() ?? false)
                 {
-                    context.Assembler.Exx();
-                    context.Assembler.Push(R16.DE);
-                    context.Assembler.Exx();
+                    context.Emitter.Exx();
+                    context.Emitter.Push(R16.DE);
+                    context.Emitter.Exx();
                 }
-                context.Assembler.Push(R16.DE);
+                context.Emitter.Push(R16.DE);
             }
 
-            context.Assembler.Push(R16.BC);
-            context.Assembler.Ret();
+            context.Emitter.Push(R16.BC);
+            context.Emitter.Ret();
         }
     }
 }
