@@ -3,7 +3,6 @@
     public partial class Emitter
     {
         public IList<Instruction> Instructions { get; }
-        ulong _currentLabelId;
 
         public Emitter()
         {
