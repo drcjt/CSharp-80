@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
-using Z80Assembler;
+﻿using ILCompiler.Compiler.Emit;
+using ILCompiler.Compiler.EvaluationStack;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -12,14 +12,14 @@ namespace ILCompiler.Compiler.CodeGenerators
             var offset = localVariable.StackOffset;
 
             // Calculate and push the actual 16 bit address
-            context.Assembler.Push(I16.IX);
-            context.Assembler.Pop(R16.HL);
+            context.Emitter.Push(I16.IX);
+            context.Emitter.Pop(R16.HL);
 
-            context.Assembler.Ld(R16.DE, (short)(-offset));
-            context.Assembler.Add(R16.HL, R16.DE);
+            context.Emitter.Ld(R16.DE, (short)(-offset));
+            context.Emitter.Add(R16.HL, R16.DE);
 
             // Push address
-            context.Assembler.Push(R16.HL);
+            context.Emitter.Push(R16.HL);
         }
     }
 }

@@ -1,6 +1,5 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
-using ILCompiler.Common.TypeSystem.IL;
-using Z80Assembler;
+﻿using ILCompiler.Compiler.Emit;
+using ILCompiler.Compiler.EvaluationStack;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -12,10 +11,10 @@ namespace ILCompiler.Compiler.CodeGenerators
             var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
             var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
 
-            context.Assembler.Ld(R16.HL, high);     //MSW
-            context.Assembler.Push(R16.HL);
-            context.Assembler.Ld(R16.HL, low);      //LSW
-            context.Assembler.Push(R16.HL);
+            context.Emitter.Ld(R16.HL, high);     //MSW
+            context.Emitter.Push(R16.HL);
+            context.Emitter.Ld(R16.HL, low);      //LSW
+            context.Emitter.Push(R16.HL);
         }
     }
 }

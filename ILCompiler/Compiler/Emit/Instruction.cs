@@ -1,7 +1,6 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 
-namespace Z80Assembler
+namespace ILCompiler.Compiler.Emit
 {
     public class Instruction
     {

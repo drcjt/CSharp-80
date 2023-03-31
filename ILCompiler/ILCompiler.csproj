@@ -154,10 +154,6 @@
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>
 
-  <ItemGroup>
-	  <ProjectReference Include="..\Z80Assembler\Z80Assembler.csproj" />
-  </ItemGroup>
-
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     <Exec Command="copy /a $(ProjectDir)Runtime\*.asm $(ProjectDir)csharprt.asm&#xD;&#xA;copy /a $(ProjectDir)Runtime\CPM\*.asm $(ProjectDir)cpmrt.asm&#xD;&#xA;copy /a $(ProjectDir)Runtime\TRS80\*.asm $(ProjectDir)trs80rt.asm&#xD;&#xA;copy /a $(ProjectDir)Runtime\ZXSpectrum\*.asm $(ProjectDir)zxspectrum.asm" />
   </Target>

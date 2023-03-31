@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace Z80Assembler
+﻿namespace ILCompiler.Compiler.Emit
 {
-    public partial class Assembler
+    public partial class Emitter
     {
         public void Ret()
         {

@@ -1,14 +1,13 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.Common;
+﻿using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysis;
+using ILCompiler.Compiler.Emit;
 using ILCompiler.Interfaces;
-using Z80Assembler;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
     public class CodeGeneratorContext
     {
-        public Assembler Assembler { get; } = new();
+        public Emitter Emitter { get; } = new();
         public IList<LocalVariableDescriptor> LocalVariableTable { get; }
         public int ParamsCount => _method.ParamsCount;
         public int LocalsCount => _method.LocalsCount;

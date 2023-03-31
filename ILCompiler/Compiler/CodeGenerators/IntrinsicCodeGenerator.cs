@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
-using Z80Assembler;
+﻿using ILCompiler.Compiler.Emit;
+using ILCompiler.Compiler.EvaluationStack;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -13,35 +13,35 @@ namespace ILCompiler.Compiler.CodeGenerators
                 case "WriteChar":
                     if (context.Configuration.TargetArchitecture == TargetArchitecture.CPM)
                     {
-                        context.Assembler.Pop(R16.HL);    // chars are stored on stack as int32 so remove MSW
+                        context.Emitter.Pop(R16.HL);    // chars are stored on stack as int32 so remove MSW
 
-                        context.Assembler.Push(R16.BC);     // save registers
-                        context.Assembler.Push(R16.DE);
-                        context.Assembler.Push(R16.HL);
+                        context.Emitter.Push(R16.BC);     // save registers
+                        context.Emitter.Push(R16.DE);
+                        context.Emitter.Push(R16.HL);
 
-                        context.Assembler.Ld(R8.C, 2);      // Call CPM BDOS C_WRITE console write
-                        context.Assembler.Ld(R8.E, R8.L);   // character to write goes into E
-                        context.Assembler.Call(0x05);       // call BDOS C_WRITE
+                        context.Emitter.Ld(R8.C, 2);      // Call CPM BDOS C_WRITE console write
+                        context.Emitter.Ld(R8.E, R8.L);   // character to write goes into E
+                        context.Emitter.Call(0x05);       // call BDOS C_WRITE
 
-                        context.Assembler.Pop(R16.HL);      // restore registers
-                        context.Assembler.Pop(R16.DE);
-                        context.Assembler.Pop(R16.BC);
+                        context.Emitter.Pop(R16.HL);      // restore registers
+                        context.Emitter.Pop(R16.DE);
+                        context.Emitter.Pop(R16.BC);
                     }
                     else if (context.Configuration.TargetArchitecture == TargetArchitecture.TRS80)
                     {
-                        context.Assembler.Pop(R16.HL);    // chars are stored on stack as int32 so remove MSW
-                        context.Assembler.Ld(R8.A, R8.L); // Load low byte of argument 1 into A
-                        context.Assembler.Call(0x0033); // ROM routine to display character at current cursor position
+                        context.Emitter.Pop(R16.HL);    // chars are stored on stack as int32 so remove MSW
+                        context.Emitter.Ld(R8.A, R8.L); // Load low byte of argument 1 into A
+                        context.Emitter.Call(0x0033); // ROM routine to display character at current cursor position
                     } else if (context.Configuration.TargetArchitecture == TargetArchitecture.ZXSpectrum)
                     {
-                        context.Assembler.Pop(R16.HL);    // chars are stored on stack as int32 so remove MSW
-                        context.Assembler.Ld(R8.A, R8.L); // Load low byte of argument 1 into A
-                        context.Assembler.Rst(0x0010); // ROM routine to display character at current cursor position
+                        context.Emitter.Pop(R16.HL);    // chars are stored on stack as int32 so remove MSW
+                        context.Emitter.Ld(R8.A, R8.L); // Load low byte of argument 1 into A
+                        context.Emitter.Rst(0x0010); // ROM routine to display character at current cursor position
                     }
                     break;
 
                 case "Exit":
-                    context.Assembler.Jp("EXITRETCODE");
+                    context.Emitter.Jp("EXITRETCODE");
                     break;
             }
         }

@@ -1,5 +1,4 @@
 ﻿using ILCompiler.Common.TypeSystem.Common;
-using Z80Assembler;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {

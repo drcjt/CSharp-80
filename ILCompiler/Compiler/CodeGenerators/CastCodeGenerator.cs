@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
-using Z80Assembler;
+﻿using ILCompiler.Compiler.Emit;
+using ILCompiler.Compiler.EvaluationStack;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -14,58 +14,58 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             if (actualTypeIsIntOrUInt && desiredType == VarType.UShort)
             {
-                context.Assembler.Pop(R16.HL);      // LSW
-                context.Assembler.Pop(R16.DE);      // MSW
+                context.Emitter.Pop(R16.HL);      // LSW
+                context.Emitter.Pop(R16.DE);      // MSW
 
-                context.Assembler.Ld(R16.DE, 0);    // clear msw
+                context.Emitter.Ld(R16.DE, 0);    // clear msw
 
-                context.Assembler.Push(R16.DE);     // MSW
-                context.Assembler.Push(R16.HL);     // LSW
+                context.Emitter.Push(R16.DE);     // MSW
+                context.Emitter.Push(R16.HL);     // LSW
             }
             else if (actualTypeIsIntOrUInt && desiredType == VarType.Short)
             {
-                context.Assembler.Pop(R16.DE);      // LSW
-                context.Assembler.Pop(R16.HL);      // MSW
+                context.Emitter.Pop(R16.DE);      // LSW
+                context.Emitter.Pop(R16.HL);      // MSW
 
-                context.Assembler.Ld(R8.H, R8.D);
+                context.Emitter.Ld(R8.H, R8.D);
 
-                context.Assembler.Add(R16.HL, R16.HL);  // move sign bit into carry flag
-                context.Assembler.Sbc(R16.HL, R16.HL);  // hl is now 0 or FFFF
+                context.Emitter.Add(R16.HL, R16.HL);  // move sign bit into carry flag
+                context.Emitter.Sbc(R16.HL, R16.HL);  // hl is now 0 or FFFF
 
-                context.Assembler.Push(R16.HL);     // MSW
-                context.Assembler.Push(R16.DE);     // LSW
+                context.Emitter.Push(R16.HL);     // MSW
+                context.Emitter.Push(R16.DE);     // LSW
             }
             else if (actualTypeIsIntOrUInt && desiredType == VarType.Byte)
             {
-                context.Assembler.Pop(R16.HL);      // LSW
-                context.Assembler.Pop(R16.DE);      // MSW
+                context.Emitter.Pop(R16.HL);      // LSW
+                context.Emitter.Pop(R16.DE);      // MSW
 
-                context.Assembler.Ld(R16.DE, 0);    // clear msw
-                context.Assembler.Ld(R8.H, 0);
+                context.Emitter.Ld(R16.DE, 0);    // clear msw
+                context.Emitter.Ld(R8.H, 0);
 
-                context.Assembler.Push(R16.DE);     // MSW
-                context.Assembler.Push(R16.HL);     // LSW
+                context.Emitter.Push(R16.DE);     // MSW
+                context.Emitter.Push(R16.HL);     // LSW
             }
             else if (actualTypeIsIntOrUInt && desiredType == VarType.SByte)
             {
-                context.Assembler.Pop(R16.DE);      // LSW
-                context.Assembler.Pop(R16.HL);      // MSW
+                context.Emitter.Pop(R16.DE);      // LSW
+                context.Emitter.Pop(R16.HL);      // MSW
 
-                context.Assembler.Ld(R8.H, R8.E);
+                context.Emitter.Ld(R8.H, R8.E);
 
-                context.Assembler.Add(R16.HL, R16.HL);  // move sign bit into carry flag
-                context.Assembler.Sbc(R16.HL, R16.HL);  // hl is now 0000 or FFFF
-                context.Assembler.Ld(R8.D, R8.L);       // D is now 00 or FF
+                context.Emitter.Add(R16.HL, R16.HL);  // move sign bit into carry flag
+                context.Emitter.Sbc(R16.HL, R16.HL);  // hl is now 0000 or FFFF
+                context.Emitter.Ld(R8.D, R8.L);       // D is now 00 or FF
 
-                context.Assembler.Push(R16.HL);     // MSW
-                context.Assembler.Push(R16.DE);     // LSW
+                context.Emitter.Push(R16.HL);     // MSW
+                context.Emitter.Push(R16.DE);     // LSW
             }
             else if (actualTypeIsIntOrUInt && desiredType == VarType.Ptr)
             {
-                context.Assembler.Pop(R16.HL);      // LSW
-                context.Assembler.Pop(R16.DE);      // MSW
+                context.Emitter.Pop(R16.HL);      // LSW
+                context.Emitter.Pop(R16.DE);      // MSW
 
-                context.Assembler.Push(R16.HL);     // LSW
+                context.Emitter.Push(R16.HL);     // LSW
             }
             else if (actualType == VarType.ByRef && desiredType == VarType.Ptr)
             {
@@ -77,10 +77,10 @@ namespace ILCompiler.Compiler.CodeGenerators
             }
             else if (actualType == VarType.Ptr && (desiredType == VarType.UInt || desiredType == VarType.Int))
             {
-                context.Assembler.Pop(R16.HL);
-                context.Assembler.Ld(R16.DE, 0);    // clear msw
-                context.Assembler.Push(R16.DE);
-                context.Assembler.Push(R16.HL);
+                context.Emitter.Pop(R16.HL);
+                context.Emitter.Ld(R16.DE, 0);    // clear msw
+                context.Emitter.Push(R16.DE);
+                context.Emitter.Push(R16.HL);
             }
             else
             {

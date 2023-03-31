@@ -170,7 +170,7 @@ namespace ILCompiler.Compiler
             methodCodeNodeNeedingCode.MethodCode = GetMethodCode(instructions);
         }
 
-        private static string GetMethodCode(IList<Z80Assembler.Instruction> instructions)
+        private static string GetMethodCode(IList<ILCompiler.Compiler.Emit.Instruction> instructions)
         {
             var sb = new StringBuilder();
             foreach (var instruction in instructions)

@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
-using Z80Assembler;
+﻿using ILCompiler.Compiler.Emit;
+using ILCompiler.Compiler.EvaluationStack;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -60,14 +60,14 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                 if (ComparisonOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, op1Type), out string? routine))
                 {
-                    context.Assembler.Call(routine);
+                    context.Emitter.Call(routine);
                     // If carry set then push i4 1 else push i4 0
-                    context.Assembler.Ld(R16.HL, 0);
-                    context.Assembler.Push(R16.HL);     // MSW
+                    context.Emitter.Ld(R16.HL, 0);
+                    context.Emitter.Push(R16.HL);     // MSW
 
-                    context.Assembler.Ld(R16.HL, 0);
-                    context.Assembler.Adc(R16.HL, R16.HL);
-                    context.Assembler.Push(R16.HL);     // LSW
+                    context.Emitter.Ld(R16.HL, 0);
+                    context.Emitter.Adc(R16.HL, R16.HL);
+                    context.Emitter.Push(R16.HL);     // LSW
                 }
                 else
                 {
@@ -78,7 +78,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 if (BinaryOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, operatorType), out string? routine))
                 {
-                    context.Assembler.Call(routine);
+                    context.Emitter.Call(routine);
                 }
                 else
                 {
