@@ -7,11 +7,6 @@
             AddInstruction(new Instruction(Opcode.Ret));
         }
 
-        public void Org(short address)
-        {
-            AddInstruction(new Instruction(Opcode.Org, string.Format("{0:X}H", address)));
-        }
-
         public void Call(string label)
         {
             AddInstruction(new Instruction(Opcode.Call, label));
@@ -48,15 +43,6 @@
             AddInstruction(new Instruction(Opcode.Push, target.ToString()));
         }
 
-        public void End(string label)
-        {
-            AddInstruction(new Instruction(Opcode.End, label));
-        }
-
-        public void Inc(Register target)
-        {
-            AddInstruction(new Instruction(Opcode.Inc, target.ToString()));
-        }
         public void Dec(Register target)
         {
             AddInstruction(new Instruction(Opcode.Dec, target.ToString()));
@@ -80,11 +66,6 @@
         public void Sbc(R8Type target, R8Type source)
         {
             AddInstruction(new Instruction(Opcode.Sbc, target.ToString() + ", " + source.ToString()));
-        }
-
-        public void Cpl()
-        {
-            AddInstruction(new Instruction(Opcode.Cpl));
         }
 
         public void Ld(R8Type target, R8Type source)
@@ -125,26 +106,6 @@
             AddInstruction(new Instruction(Opcode.Ld, target.ToString() + ", " + label));
         }
 
-        public void LdInd(R16Type target, R8Type source)
-        {
-            AddInstruction(new Instruction(Opcode.Ld, "(" + target.ToString() + "), " + source.ToString()));
-        }
-
-        public void LdInd(R16Type target, short source)
-        {
-            AddInstruction(new Instruction(Opcode.Ld, "(" + target.ToString() + "), " + source.ToString()));
-        }
-
-        public void Ldir()
-        {
-            AddInstruction(new Instruction(Opcode.Ldir));
-        }
-
-        public void Ex(Register target, Register source)
-        {
-            AddInstruction(new Instruction(Opcode.Ex, target.ToString() + ", " + source.ToString()));
-        }
-
         public void Or(R8Type target)
         {
             AddInstruction(new Instruction(Opcode.Or, target.ToString()));
@@ -172,11 +133,6 @@
         public void Jp(string label)
         {
             AddInstruction(new Instruction(Opcode.Jp, label));
-        }
-
-        public void Db(string data, string label)
-        {
-            AddInstruction(new Instruction(label, Opcode.Db, $"'{data}'"));
         }
 
         public void Db(byte b)
