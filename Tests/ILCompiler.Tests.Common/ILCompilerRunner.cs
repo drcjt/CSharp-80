@@ -7,8 +7,8 @@ namespace ILCompiler.Tests.Common
     {
         public const int StackStart = UInt16.MaxValue;
 
-        private string _corelibPath;
-        private Assembler _assembler;
+        private readonly string _corelibPath;
+
         public ILCompilerRunner(string solutionPath)
         {
             var currentType = MethodBase.GetCurrentMethod()?.DeclaringType;
@@ -16,8 +16,6 @@ namespace ILCompiler.Tests.Common
             var buildConfigurationName = assemblyConfigurationAttribute?.Configuration;
 
             _corelibPath = Path.Combine(solutionPath, $@".\System.Private.CoreLib\bin\{buildConfigurationName}\net7.0\System.Private.CoreLib.dll");
-
-            _assembler = Assembler.Create(solutionPath);
         }
 
         public static ILCompilerRunner Create(string solutionPath)
@@ -28,7 +26,6 @@ namespace ILCompiler.Tests.Common
         public void CompileILAndAssemble(string ilFileName, bool createLibrary = true)
         {
             CompileIL(ilFileName, createLibrary);
-            _assembler.Assemble(ilFileName);
         }
 
         public void CompileIL(string ilFileName, bool createLibrary = true)
@@ -36,7 +33,7 @@ namespace ILCompiler.Tests.Common
             var asmFileName = Path.ChangeExtension(ilFileName, "asm");
             var exeFileName = Path.ChangeExtension(ilFileName, createLibrary ? "dll" : "exe");
 
-            var arguments = $"--ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {_corelibPath} --outputFile {asmFileName} {exeFileName} --stackStart {StackStart}";
+            var arguments = $"-ao cim --ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {_corelibPath} --outputFile {asmFileName} {exeFileName} --stackStart {StackStart}";
 
             var compiled = ILCompiler.Program.Main(arguments.Split(' '));
 
