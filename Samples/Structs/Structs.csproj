@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="$(SolutionDir)ILCompiler\$(OutDir)ILCompiler.exe --ignoreUnknownCil --outputFile $(TargetDir)$(TargetName).asm $(TargetPath)&#xD;&#xA;call $(SolutionDir)\tools\get-tools.cmd&#xD;&#xA;$(SolutionDir)\tools\zmac.exe -l --oo cmd -o $(TargetDir)\$(TargetName).cmd  $(TargetDir)\$(TargetName).asm &gt; $(TargetDir)\$(TargetName).lst" />
+    <Exec Command="$(SolutionDir)ILCompiler\$(OutDir)ILCompiler.exe --ignoreUnknownCil --outputFile $(TargetDir)$(TargetName).asm $(TargetPath)" />
   </Target>
   
 </Project>
