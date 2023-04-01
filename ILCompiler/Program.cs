@@ -46,6 +46,9 @@ namespace ILCompiler
 
                 var compiler = serviceProvider.GetRequiredService<ICompilation>();
                 compiler.Compile(_inputFilePath.FullName, _outputFilePath.FullName);
+
+                var assembler = serviceProvider.GetRequiredService<IZ80Assembler>();
+                assembler.Assemble(_outputFilePath.FullName);
             }
             else
             {
@@ -80,6 +83,10 @@ namespace ILCompiler
                     configuration.DontInlineRuntime = parsedConfiguration.DontInlineRuntime;
                     configuration.TargetArchitecture = parsedConfiguration.TargetArchitecture;
                     configuration.StackStart = parsedConfiguration.StackStart;
+                    configuration.AssemblerArguments = parsedConfiguration.AssemblerArguments;
+                    configuration.NoAssemble = parsedConfiguration.NoAssemble;
+                    configuration.AssemblerOutput = parsedConfiguration.AssemblerOutput;
+                    configuration.NoListFile = parsedConfiguration.NoListFile;
                 },
                 inputFileArgument, outputFileOption, configurationBinder
             );

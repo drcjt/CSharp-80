@@ -12,5 +12,9 @@ namespace ILCompiler.Interfaces
         public bool IntegrationTests { get; set; }
         public TargetArchitecture TargetArchitecture { get; set; }
         public int StackStart { get; set; }
+        public string AssemblerArguments { get; set; }
+        public bool NoAssemble { get; set; }
+        public string AssemblerOutput { get; set; }
+        public bool NoListFile { get; set; }
     }
 }
