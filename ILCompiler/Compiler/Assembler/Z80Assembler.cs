@@ -1,5 +1,5 @@
 ﻿using ILCompiler.Interfaces;
-using System.Diagnostics;
+using System.Text;
 
 namespace ILCompiler.Compiler.Z80Assembler
 {
@@ -59,13 +59,14 @@ namespace ILCompiler.Compiler.Z80Assembler
                 outputPaths.Add(Path.ChangeExtension(assemblyFileName, outputType));
             }
 
-            var arguments = $"{_configuration.AssemblerArguments} --oo {string.Join(",", outputTypes)}";
+            var builder = new StringBuilder();
+            builder.Append($"{_configuration.AssemblerArguments} --oo {string.Join(",", outputTypes)}");
             foreach (var outputPath in outputPaths)
             {
-                arguments += $" -o {outputPath}";
+                builder.Append($" -o {outputPath}");
             }
-            arguments += $" {Path.GetFullPath(assemblyFileName)}";
-            return arguments;
+            builder.Append($" {Path.GetFullPath(assemblyFileName)}");
+            return builder.ToString();
         }
 
         private static string GetOutputType(TargetArchitecture targetArchitecture) 
@@ -76,7 +77,7 @@ namespace ILCompiler.Compiler.Z80Assembler
                 TargetArchitecture.ZXSpectrum => "tap",
                 TargetArchitecture.CPM => "hex",
                 _ => throw new ArgumentOutOfRangeException(nameof(targetArchitecture), $"Invalid target architecture value {targetArchitecture}"),
-            }; ;
+            };
         }
 
         private static void DownloadAssembler(string zmacPath)
