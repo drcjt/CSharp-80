@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Interfaces;
+using System.Diagnostics;
 
 namespace ILCompiler.Compiler.Z80Assembler
 {
@@ -40,13 +41,7 @@ namespace ILCompiler.Compiler.Z80Assembler
             if (_configuration.AssemblerOutput == string.Empty)
             {
                 // Determine output type based on the target architecture
-                outputTypes.Add(_configuration.TargetArchitecture switch
-                {
-                    TargetArchitecture.TRS80 => "cmd",
-                    TargetArchitecture.ZXSpectrum => "tap",
-                    TargetArchitecture.CPM => "hex",
-                    _ => throw new ArgumentOutOfRangeException(nameof(TargetArchitecture), $"Unknown Target Architecture {_configuration.TargetArchitecture}")
-                });
+                outputTypes.Add(GetOutputType(_configuration.TargetArchitecture));
             }
             else
             {
@@ -71,6 +66,17 @@ namespace ILCompiler.Compiler.Z80Assembler
             }
             arguments += $" {Path.GetFullPath(assemblyFileName)}";
             return arguments;
+        }
+
+        private static string GetOutputType(TargetArchitecture targetArchitecture) 
+        {
+            return targetArchitecture switch
+            {
+                TargetArchitecture.TRS80 => "cmd",
+                TargetArchitecture.ZXSpectrum => "tap",
+                TargetArchitecture.CPM => "hex",
+                _ => throw new ArgumentOutOfRangeException(nameof(targetArchitecture), $"Invalid target architecture value {targetArchitecture}"),
+            }; ;
         }
 
         private static void DownloadAssembler(string zmacPath)

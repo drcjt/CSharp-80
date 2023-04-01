@@ -2,7 +2,7 @@
 
 namespace ILCompiler.Compiler.Z80Assembler
 {
-    internal class ProcessRunner
+    internal static class ProcessRunner
     {
         internal static bool RunProcess(string filename, string arguments)
         {
