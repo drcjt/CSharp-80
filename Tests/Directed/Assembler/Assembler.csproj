@@ -22,12 +22,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
-    <ProjectReference Include="..\..\ILCompiler\ILCompiler.csproj" />
+    <ProjectReference Include="..\..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
+    <ProjectReference Include="..\..\..\ILCompiler\ILCompiler.csproj" />
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="$(SolutionDir)ILCompiler\$(OutDir)ILCompiler.exe --ignoreUnknownCil --outputFile $(TargetDir)$(TargetName).asm $(TargetPath)" />
-  </Target>
   
 </Project>

@@ -13,6 +13,9 @@ namespace ILCompiler
         public readonly Option<bool> DumpIRTreesOption = new(new[] { "-d", "--dumpIRTrees" }, "Dump IR trees");
         public readonly Option<TargetArchitecture> TargetArchitectureOption = new(new[] { "-a", "--targetArchitecture" }, getDefaultValue : () => TargetArchitecture.TRS80, "Target Architecture");
         public readonly Option<int> StackStartOption = new(new[] { "-ss", "--stackStart" }, getDefaultValue: () => 0xa000, "Stack Start Address");
+        public readonly Option<string> AssemblerArguments = new(new[] { "-aa", "--assemblerArguments" }, "Assembler arguments");
+        public readonly Option<string> AssemblerOutput = new(new[] { "-ao", "--assemblerOutput" }, "Assembler output type");
+        public readonly Option<bool> NoListFile = new(new[] { "-nl", "--noListFile" }, "No list file");
 
         public void AddToCommand(Command command)
         {
@@ -24,6 +27,9 @@ namespace ILCompiler
             command.AddOption(DumpIRTreesOption);
             command.AddOption(TargetArchitectureOption);
             command.AddOption(StackStartOption);
+            command.AddOption(AssemblerArguments);
+            command.AddOption(AssemblerOutput);
+            command.AddOption(NoListFile);
         }
     }
 }

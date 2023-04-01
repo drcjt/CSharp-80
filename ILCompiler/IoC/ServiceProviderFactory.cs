@@ -4,6 +4,7 @@ using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.Importer;
 using ILCompiler.Compiler.Lowerings;
+using ILCompiler.Compiler.Z80Assembler;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -69,6 +70,7 @@ namespace ILCompiler.IoC
         {
             services.AddLogging(configure => configure.AddConsole()).AddTransient<Program>();
             services.AddSingleton<ICompilation, Compilation>();
+            services.AddSingleton<IZ80Assembler, Z80Assembler>();
             services.AddSingleton<IConfiguration, Configuration>();
             services.AddSingleton<INameMangler, NameMangler>();
 

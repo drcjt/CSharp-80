@@ -23,7 +23,10 @@ namespace ILCompiler
                 IntegrationTests = bindingContext.ParseResult.GetValueForOption(_configurationOptions.IntegrationTestsOption),
                 DumpIRTrees = bindingContext.ParseResult.GetValueForOption(_configurationOptions.DumpIRTreesOption),
                 TargetArchitecture = bindingContext.ParseResult.GetValueForOption(_configurationOptions.TargetArchitectureOption),
-                StackStart = bindingContext.ParseResult.GetValueForOption(_configurationOptions.StackStartOption)
+                StackStart = bindingContext.ParseResult.GetValueForOption(_configurationOptions.StackStartOption),
+                AssemblerArguments = bindingContext.ParseResult.GetValueForOption(_configurationOptions.AssemblerArguments) ?? "",
+                AssemblerOutput = bindingContext.ParseResult.GetValueForOption(_configurationOptions.AssemblerOutput) ?? "",
+                NoListFile = bindingContext.ParseResult.GetValueForOption(_configurationOptions.NoListFile),
             };
         }
     }

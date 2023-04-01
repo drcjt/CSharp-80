@@ -12,8 +12,12 @@ namespace DirectedTests
         [TestCaseSource(typeof(DirectedTestsRunner), nameof(DirectedTestsCaseData))]
         public void DirectedTest(string testname)
         {
-            ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(testname);
-            Z80TestRunner.Create(SolutionPath).RunTest(testname);
+            var isAssemblerTests = testname.EndsWith("Assembler.cim");
+            ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(testname, outputCim: !isAssemblerTests, deleteAssembler: isAssemblerTests);
+            if (!isAssemblerTests)
+            {
+                Z80TestRunner.Create(SolutionPath).RunTest(testname);
+            }
 
             Assert.Pass();
         }

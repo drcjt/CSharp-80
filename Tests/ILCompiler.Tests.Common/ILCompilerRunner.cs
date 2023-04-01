@@ -6,9 +6,10 @@ namespace ILCompiler.Tests.Common
     public class ILCompilerRunner
     {
         public const int StackStart = UInt16.MaxValue;
+        private const string ZmacExe = "zmac.exe";
 
-        private string _corelibPath;
-        private Assembler _assembler;
+        private readonly string _corelibPath;
+
         public ILCompilerRunner(string solutionPath)
         {
             var currentType = MethodBase.GetCurrentMethod()?.DeclaringType;
@@ -16,8 +17,6 @@ namespace ILCompiler.Tests.Common
             var buildConfigurationName = assemblyConfigurationAttribute?.Configuration;
 
             _corelibPath = Path.Combine(solutionPath, $@".\System.Private.CoreLib\bin\{buildConfigurationName}\net7.0\System.Private.CoreLib.dll");
-
-            _assembler = Assembler.Create(solutionPath);
         }
 
         public static ILCompilerRunner Create(string solutionPath)
@@ -25,18 +24,29 @@ namespace ILCompiler.Tests.Common
             return new ILCompilerRunner(solutionPath);
         }
 
-        public void CompileILAndAssemble(string ilFileName, bool createLibrary = true)
+        public void CompileILAndAssemble(string ilFileName, bool createLibrary = true, bool outputCim = true, bool deleteAssembler = false)
         {
-            CompileIL(ilFileName, createLibrary);
-            _assembler.Assemble(ilFileName);
+            // If test requires assembler to not already have been downloaded then delete it first
+            if (deleteAssembler)
+            {
+                var ilCompilerApplicationDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ILCompiler");
+                var zmacPath = Path.Combine(ilCompilerApplicationDirectory, ZmacExe);
+                if (File.Exists(zmacPath))
+                {
+                    File.Delete(zmacPath);
+                }
+            }
+
+            CompileIL(ilFileName, createLibrary, outputCim);
         }
 
-        public void CompileIL(string ilFileName, bool createLibrary = true)
+        private void CompileIL(string ilFileName, bool createLibrary, bool outputCim)
         {
             var asmFileName = Path.ChangeExtension(ilFileName, "asm");
             var exeFileName = Path.ChangeExtension(ilFileName, createLibrary ? "dll" : "exe");
 
-            var arguments = $"--ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {_corelibPath} --outputFile {asmFileName} {exeFileName} --stackStart {StackStart}";
+            var arguments = outputCim ? "-ao cim " : "";
+            arguments += $"--ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {_corelibPath} --outputFile {asmFileName} {exeFileName} --stackStart {StackStart}";
 
             var compiled = ILCompiler.Program.Main(arguments.Split(' '));
 
