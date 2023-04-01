@@ -15,11 +15,6 @@ namespace ILCompiler.Compiler.Z80Assembler
 
         public void Assemble(string assemblyFileName)
         {
-            if (_configuration.NoAssemble)
-            {
-                return;
-            }
-
             var ilCompilerApplicationDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ILCompiler");
             var zmacPath = Path.Combine(ilCompilerApplicationDirectory, ZmacExe);
 

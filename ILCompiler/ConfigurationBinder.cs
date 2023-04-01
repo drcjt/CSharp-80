@@ -25,7 +25,6 @@ namespace ILCompiler
                 TargetArchitecture = bindingContext.ParseResult.GetValueForOption(_configurationOptions.TargetArchitectureOption),
                 StackStart = bindingContext.ParseResult.GetValueForOption(_configurationOptions.StackStartOption),
                 AssemblerArguments = bindingContext.ParseResult.GetValueForOption(_configurationOptions.AssemblerArguments) ?? "",
-                NoAssemble = bindingContext.ParseResult.GetValueForOption(_configurationOptions.NoAssemble),
                 AssemblerOutput = bindingContext.ParseResult.GetValueForOption(_configurationOptions.AssemblerOutput) ?? "",
                 NoListFile = bindingContext.ParseResult.GetValueForOption(_configurationOptions.NoListFile),
             };

@@ -84,7 +84,6 @@ namespace ILCompiler
                     configuration.TargetArchitecture = parsedConfiguration.TargetArchitecture;
                     configuration.StackStart = parsedConfiguration.StackStart;
                     configuration.AssemblerArguments = parsedConfiguration.AssemblerArguments;
-                    configuration.NoAssemble = parsedConfiguration.NoAssemble;
                     configuration.AssemblerOutput = parsedConfiguration.AssemblerOutput;
                     configuration.NoListFile = parsedConfiguration.NoListFile;
                 },
