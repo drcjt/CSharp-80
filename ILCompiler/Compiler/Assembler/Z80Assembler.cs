@@ -3,7 +3,7 @@ using System.Text;
 
 namespace ILCompiler.Compiler.Z80Assembler
 {
-    internal class Z80Assembler : IZ80Assembler
+    public class Z80Assembler : IZ80Assembler
     {
         private readonly IConfiguration _configuration;
         private const string ZmacUrl = "https://github.com/gp48k/zmac/raw/master/zmac.exe";
@@ -38,7 +38,7 @@ namespace ILCompiler.Compiler.Z80Assembler
         private string BuildArguments(string assemblyFileName)
         {
             var outputTypes = new List<string>();
-            if (_configuration.AssemblerOutput == string.Empty)
+            if (string.IsNullOrEmpty(_configuration.AssemblerOutput))
             {
                 // Determine output type based on the target architecture
                 outputTypes.Add(GetOutputType(_configuration.TargetArchitecture));
