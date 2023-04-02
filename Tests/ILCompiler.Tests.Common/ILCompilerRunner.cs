@@ -24,29 +24,17 @@ namespace ILCompiler.Tests.Common
             return new ILCompilerRunner(solutionPath);
         }
 
-        public void CompileILAndAssemble(string ilFileName, bool createLibrary = true, bool outputCim = true, bool deleteAssembler = false)
+        public void CompileILAndAssemble(string ilFileName, bool createLibrary = true)
         {
-            // If test requires assembler to not already have been downloaded then delete it first
-            if (deleteAssembler)
-            {
-                var ilCompilerApplicationDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ILCompiler");
-                var zmacPath = Path.Combine(ilCompilerApplicationDirectory, ZmacExe);
-                if (File.Exists(zmacPath))
-                {
-                    File.Delete(zmacPath);
-                }
-            }
-
-            CompileIL(ilFileName, createLibrary, outputCim);
+            CompileIL(ilFileName, createLibrary);
         }
 
-        private void CompileIL(string ilFileName, bool createLibrary, bool outputCim)
+        private void CompileIL(string ilFileName, bool createLibrary)
         {
             var asmFileName = Path.ChangeExtension(ilFileName, "asm");
             var exeFileName = Path.ChangeExtension(ilFileName, createLibrary ? "dll" : "exe");
 
-            var arguments = outputCim ? "-ao cim " : "";
-            arguments += $"--ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {_corelibPath} --outputFile {asmFileName} {exeFileName} --stackStart {StackStart}";
+            string arguments = $"-ao cim --ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {_corelibPath} --outputFile {asmFileName} {exeFileName} --stackStart {StackStart}";
 
             var compiled = ILCompiler.Program.Main(arguments.Split(' '));
 

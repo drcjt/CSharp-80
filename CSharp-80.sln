@@ -92,8 +92,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hello", "Samples\Hello\Hell
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILCompiler.Tests.Common", "Tests\ILCompiler.Tests.Common\ILCompiler.Tests.Common.csproj", "{6324EF38-D339-4A78-AEED-A41537E8DD92}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Assembler", "Tests\Directed\Assembler\Assembler.csproj", "{F89888CC-2006-4236-AF7E-52DA947BBFDB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -228,10 +226,6 @@ Global
 		{6324EF38-D339-4A78-AEED-A41537E8DD92}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6324EF38-D339-4A78-AEED-A41537E8DD92}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6324EF38-D339-4A78-AEED-A41537E8DD92}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F89888CC-2006-4236-AF7E-52DA947BBFDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F89888CC-2006-4236-AF7E-52DA947BBFDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F89888CC-2006-4236-AF7E-52DA947BBFDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F89888CC-2006-4236-AF7E-52DA947BBFDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -271,7 +265,6 @@ Global
 		{DED0524E-1E8A-4601-82A0-1909150C72F1} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 		{4244B994-8103-44EB-9303-16E1296310FD} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 		{6324EF38-D339-4A78-AEED-A41537E8DD92} = {6505E749-06C0-4B7B-8F4B-17F9B36A9095}
-		{F89888CC-2006-4236-AF7E-52DA947BBFDB} = {BA9F8E73-7E2E-4E47-A614-CF6D8AD8445D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}
