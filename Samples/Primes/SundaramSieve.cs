@@ -36,7 +36,7 @@ namespace Primes
                 }
             }
 
-            for (var i = 1; i < k; i++)
+            for (var i = 1; i <= k; i++)
             {
                 if (temp[i] == 1)
                 {
