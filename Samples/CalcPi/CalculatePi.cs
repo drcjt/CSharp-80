@@ -35,16 +35,13 @@ namespace CalculatePi
                     uint num = (uint)(length - j - 1);
                     uint dem = num * 2 + 1;
 
-                    var temp = x[j] + carry;
-                    x[j] = temp;
-                    //x[j] += carry;
+                    x[j] += carry;
 
                     uint q = x[j] / dem;
                     r[j] = x[j] % dem;
 
                     carry = q * num;
                 }
-
 
                 pi[i] = (x[length - 1] / 10);
 
