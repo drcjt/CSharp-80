@@ -14,7 +14,7 @@
             Instructions.Clear();
         }
 
-        public void AddInstruction(Instruction instruction)
+        public void EmitInstruction(Instruction instruction)
         {
             Instructions.Add(instruction);
         }

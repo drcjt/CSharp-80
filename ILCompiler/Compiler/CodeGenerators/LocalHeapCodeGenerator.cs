@@ -36,7 +36,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                 // Start of Zeroing loop
                 var initLoopLabel = context.NameMangler.GetUniqueName();
-                context.Emitter.AddInstruction(new LabelInstruction(initLoopLabel));
+                context.Emitter.EmitInstruction(new LabelInstruction(initLoopLabel));
 
                 // Zero two zero bytes
                 context.Emitter.Push(R16.HL);
