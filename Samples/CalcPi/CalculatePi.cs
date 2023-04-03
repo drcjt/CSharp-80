@@ -45,7 +45,7 @@ namespace CalculatePi
 
                 pi[i] = (x[length - 1] / 10);
 
-                r[length - 1] = x[length - 1] % 10; ;
+                r[length - 1] = x[length - 1] % 10;
 
                 for (int j = 0; j < length; j++)
                     x[j] = r[j] * 10;
