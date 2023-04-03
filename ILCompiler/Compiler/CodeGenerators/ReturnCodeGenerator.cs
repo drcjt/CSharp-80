@@ -87,7 +87,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                         context.Emitter.Halt();
 
-                        context.Emitter.AddInstruction(new LabelInstruction(unwindLabel));
+                        context.Emitter.EmitInstruction(new LabelInstruction(unwindLabel));
                     }
 
                     context.Emitter.Ld(R16.SP, I16.IX);     // Move SP to before locals

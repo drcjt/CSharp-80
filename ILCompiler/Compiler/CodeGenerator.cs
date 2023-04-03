@@ -37,7 +37,7 @@ namespace ILCompiler.Compiler
             GenerateStringMap(blocks);
             GenerateStringData(_context.Emitter);
 
-            _context.Emitter.AddInstruction(new LabelInstruction(_nameMangler.GetMangledMethodName(_context.Method)));
+            _context.Emitter.EmitInstruction(new LabelInstruction(_nameMangler.GetMangledMethodName(_context.Method)));
 
             GenerateProlog(_context.Emitter);
             methodInstructions.AddRange(_context.Emitter.Instructions);
@@ -46,7 +46,7 @@ namespace ILCompiler.Compiler
             {
                 _context.Emitter.Reset();
 
-                _context.Emitter.AddInstruction(new LabelInstruction(block.Label));
+                _context.Emitter.EmitInstruction(new LabelInstruction(block.Label));
 
                 var visitorAdapter = new GenericStackEntryAdapter(this);
 
@@ -162,7 +162,7 @@ namespace ILCompiler.Compiler
             // TODO: Need to eliminate duplicate strings
             foreach (var keyValuePair in _labelsToStringData)
             {
-                emitter.AddInstruction(new LabelInstruction(keyValuePair.Key));
+                emitter.EmitInstruction(new LabelInstruction(keyValuePair.Key));
 
                 var stringData = keyValuePair.Value;
 
