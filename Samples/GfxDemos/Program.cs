@@ -44,7 +44,7 @@ namespace GfxDemos
         {
             Console.Clear();
 
-            Random random = new Random();
+            Random random = new Random(); // NOSONAR
 
             for (int i = 0; i < 10; i++)
             {
@@ -62,7 +62,7 @@ namespace GfxDemos
         {
             Console.Clear();
 
-            Random random = new Random();
+            Random random = new Random(); // NOSONAR
 
             for (int i = 0; i < 50; i++)
             {
@@ -74,7 +74,7 @@ namespace GfxDemos
         {
             Console.Clear();
 
-            Random random = new Random();
+            Random random = new Random(); // NOSONAR
 
             int centerX = Graphics.ScreenWidth / 2;
             int centerY = Graphics.ScreenHeight / 2;

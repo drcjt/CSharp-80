@@ -10,8 +10,7 @@ namespace Matrix
         const int Width = 20;
         public unsafe static void Main()
         {
-            var random = new Random();
-
+            var random = new Random(); // NOSONAR
 
             // TODO: Cannot use width here as this generates IL using
             // the mul.ovf.un opcode which is not supported yet ..
