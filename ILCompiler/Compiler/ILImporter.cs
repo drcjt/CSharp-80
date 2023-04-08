@@ -229,7 +229,7 @@ namespace ILCompiler.Compiler
                 tempNumber = GrabTemp(entry.Type, entry.ExactSize);
             }
 
-            var node = new StoreLocalVariableEntry(tempNumber.Value, false, entry);
+            var node = new StoreLocalVariableEntry(tempNumber.Value, false, entry.Duplicate());
             ImportAppendTree(node);
 
             return new LocalVariableEntry(tempNumber.Value, entry.Type, entry.ExactSize);
