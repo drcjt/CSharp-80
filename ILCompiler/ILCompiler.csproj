@@ -58,6 +58,7 @@
     <None Remove="Runtime\kbdscan.asm" />
     <None Remove="Runtime\keyavail.asm" />
     <None Remove="Runtime\l_inc_dehl.asm" />
+    <None Remove="Runtime\Memset.asm" />
     <None Remove="Runtime\NewArray.asm" />
     <None Remove="Runtime\NewObject.asm" />
     <None Remove="Runtime\NewString.asm" />
@@ -89,6 +90,7 @@
     <EmbeddedResource Include="Runtime\i_lt_un.asm" />
     <EmbeddedResource Include="Runtime\i_lt_un16.asm" />
     <EmbeddedResource Include="Runtime\GCGetTotalMemory.asm" />
+    <EmbeddedResource Include="Runtime\Memset.asm" />
     <EmbeddedResource Include="Runtime\NewString.asm" />
     <EmbeddedResource Include="Runtime\print.asm" />
     <EmbeddedResource Include="Runtime\NewArray.asm" />
