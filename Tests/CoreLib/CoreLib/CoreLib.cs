@@ -3,7 +3,7 @@
     public static class CoreLib
     {
         public static int Main()
-        {          
+        {   
             CharTests.IsBetweenCharTests();
             
             CharTests.IsAsciiDigit_WithAsciiDigits_ReturnsTrue();
@@ -15,6 +15,8 @@
 
             UnsafeTests.SizeOfTests();
             UnsafeTests.RefAs();
+
+            UnsafeTests.InitBlockTests();
 
             return 0;
         }

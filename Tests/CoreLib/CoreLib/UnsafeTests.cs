@@ -16,6 +16,27 @@ namespace CoreLib
             Assert.Equals(8, Unsafe.SizeOf<Byte4Short2>());
         }
 
+        private static unsafe void InitBlockStack(int numBytes, byte value)
+        {
+            byte* stackPtr = stackalloc byte[numBytes];
+            Unsafe.InitBlock(stackPtr, value, (uint)numBytes);
+            for (int i = 0; i < numBytes; i++) 
+            {
+                Assert.Equals(value, stackPtr[i]);
+            }
+        }
+
+        public unsafe static void InitBlockTests()
+        {
+            // TODO: Fix this when bug with stackalloc of size 0 fixed
+            // InitBlockStack(0, 1);
+            InitBlockStack(1, 1);
+            InitBlockStack(10, 0);           
+            InitBlockStack(10, 2);
+            InitBlockStack(10, 255);
+            InitBlockStack(1000, 255);
+        }
+
         public static void RefAs()
         {
             TestBytes testBytes = new TestBytes();
