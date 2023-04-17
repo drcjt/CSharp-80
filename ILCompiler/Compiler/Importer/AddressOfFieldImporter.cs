@@ -9,21 +9,36 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            if (instruction.OpCode.Code != Code.Ldflda) return false;
+            if (instruction.OpCode.Code != Code.Ldflda && instruction.OpCode.Code != Code.Ldsflda) return false;
+
+            var isLoadStatic = instruction.OpCode == OpCodes.Ldsflda;
 
             var fieldDefOrRef = instruction.Operand as IField;
             var fieldDef = fieldDefOrRef.ResolveFieldDefThrow();
 
-            var obj = importer.PopExpression();
-
-            if (obj.Type != VarType.Ref && obj.Type != VarType.ByRef)
+            // Ensure fields have all offsets calculated
+            if (fieldDef.FieldOffset == null)
             {
-                throw new NotImplementedException($"LoadFieldImporter does not support {obj.Type}");
+                fieldDef.DeclaringType.ToTypeSig().GetInstanceFieldSize();
             }
 
-            var node = new FieldAddressEntry(fieldDef.Name, obj, fieldDef?.FieldOffset ?? 0);
+            if (isLoadStatic)
+            {
+                var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDef);
+                importer.PushExpression(new StaticFieldEntry(mangledFieldName));
+            }
+            else
+            {
+                var obj = importer.PopExpression();
 
-            importer.PushExpression(node);
+                if (obj.Type != VarType.Ref && obj.Type != VarType.ByRef)
+                {
+                    throw new NotImplementedException($"LoadFieldImporter does not support {obj.Type}");
+                }
+
+                var node = new FieldAddressEntry(fieldDef.Name, obj, fieldDef?.FieldOffset ?? 0);
+                importer.PushExpression(node);
+            }
 
             return true;
         }
