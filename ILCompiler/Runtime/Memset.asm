@@ -32,6 +32,11 @@ Memset:
 	INC DE
 	DEC BC
 
+	LD A, B
+	OR C
+
+	RET Z
+
 	LDIR
 
 	RET
