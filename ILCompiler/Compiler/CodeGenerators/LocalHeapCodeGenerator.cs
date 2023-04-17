@@ -11,6 +11,13 @@ namespace ILCompiler.Compiler.CodeGenerators
             // Use the 16 bit size on top of the stack to determine the amount of localloc to do
             context.Emitter.Pop(R16.HL);
 
+            var endLabel = context.NameMangler.GetUniqueName();
+
+            // Test if size is 0 and return null if it is
+            context.Emitter.Ld(R8.A, R8.H);
+            context.Emitter.Or(R8.L);
+            context.Emitter.Jp(Condition.Zero, endLabel);
+
             // Round up number of bytes to allocate to a StackAlign boundary
             // BC = (HL + (StackAlign - 1)) & ~(StackAlign - 1)
             context.Emitter.Ld(R16.DE, (short)(StackAlign - 1));
@@ -64,6 +71,8 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                 context.Emitter.Ld(R16.SP, R16.HL);
             }
+
+            context.Emitter.EmitInstruction(new LabelInstruction(endLabel));
 
             // Push address of newly allocated space
             context.Emitter.Push(R16.HL);

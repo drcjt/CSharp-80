@@ -11,7 +11,15 @@
 
             Assert.Equals(1, Bug210_SpillStack());
 
+            Assert.Equals(0, Bug206(0));
+
             return 0;
+        }
+
+        public unsafe static nuint Bug206(int count)
+        {
+            byte* b = stackalloc byte[count];
+            return ((nuint)b);
         }
 
         public static void Bug87()
