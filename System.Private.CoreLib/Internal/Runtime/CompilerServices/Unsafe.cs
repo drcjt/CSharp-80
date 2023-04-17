@@ -61,5 +61,17 @@ namespace Internal.Runtime.CompilerServices
         {
             throw new Exception();
         }
+
+        [Intrinsic]
+        public static void InitBlock(void* startAddress, byte value, uint byteCount)
+        {
+            throw new Exception();
+
+            // ldarg.0
+            // ldarg.1
+            // ldarg.2
+            // initblk
+            // ret
+        }
     }
 }

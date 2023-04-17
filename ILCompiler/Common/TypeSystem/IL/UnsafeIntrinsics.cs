@@ -11,21 +11,23 @@ namespace ILCompiler.Common.TypeSystem.IL
             switch (method.Name)
             {
                 case "As":
-                    return EmitAs(method);
+                    return EmitAs();
                 case "AsPointer":
-                    return EmitAsPointer(method);
+                    return EmitAsPointer();
                 case "SizeOf":
                     return EmitSizeOf(method);
                 case "Add":
                     return EmitAdd(method);
                 case "AddByteOffset":
                     return EmitAddByteOffset(method);
+                case "InitBlock":
+                    return EmitInitBlock();
             }
 
             return null;
         }
 
-        private static CilBody? EmitAs(MethodDesc method) 
+        private static CilBody? EmitAs() 
         {
             var body = new CilBody();
 
@@ -37,7 +39,7 @@ namespace ILCompiler.Common.TypeSystem.IL
             return body;
         }
 
-        private static CilBody? EmitAsPointer(MethodDesc method)
+        private static CilBody? EmitAsPointer()
         {
             var body = new CilBody();
 
@@ -60,6 +62,21 @@ namespace ILCompiler.Common.TypeSystem.IL
             body.UpdateInstructionOffsets();
 
             return body;            
+        }
+
+        private static CilBody? EmitInitBlock()
+        {
+            var body = new CilBody();
+
+            body.Instructions.Add(OpCodes.Ldarg_0.ToInstruction());
+            body.Instructions.Add(OpCodes.Ldarg_1.ToInstruction());
+            body.Instructions.Add(OpCodes.Ldarg_2.ToInstruction());
+            body.Instructions.Add(OpCodes.Initblk.ToInstruction());
+            body.Instructions.Add(OpCodes.Ret.ToInstruction());
+
+            body.UpdateInstructionOffsets();
+
+            return body;
         }
 
         private static CilBody? EmitAdd(MethodDesc method)
