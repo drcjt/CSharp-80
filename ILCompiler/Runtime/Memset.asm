@@ -1,4 +1,4 @@
-; This routine allocates a new object with the specified size on top of the stack
+; Write a specific value into a block of memory
 ;
 ; Uses: HL, DE, BC, AF, BC'
 
