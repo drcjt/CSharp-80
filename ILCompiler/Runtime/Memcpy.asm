@@ -1,17 +1,14 @@
-; Write a specific value into a block of memory
+; Copy data from source address to destination address
 ;
 ; Uses: HL, DE, BC, AF, BC'
 
-Memset:	
+Memcpy:	
 	EXX
 	POP BC		; Save return address
 	EXX
 
-	POP HL		; Destination address
-
-	POP DE		; Initial value
-	POP AF
-
+	POP HL		; Source address
+	POP DE		; Destination address
 	POP BC		; Count
 	POP AF
 
@@ -24,19 +21,6 @@ Memset:
 
 	RET Z		; Nothing to do if count is zero
 
-	LD A, E
-	LD D, H
-	LD E, L
-
-	LD (HL), A
-	INC DE
-	DEC BC
-
-	LD A, B
-	OR C
-
-	RET Z
-
-	LDIR
+	LDIR 
 
 	RET
