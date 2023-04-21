@@ -4,8 +4,7 @@
 
 
 i_add:
-	EXX			; Save return address
-	POP HL
+	POP HL		; Save return address
 	EXX
 
 	POP HL		; LSW first
@@ -17,13 +16,10 @@ i_add:
 
 	POP BC		; Add MSW
 	ADC HL, BC
-	EX DE, HL	
 
 				; Put result back on stack
-	PUSH DE		; MSW first
-	PUSH HL		; LSW next
+	PUSH HL		; MSW first
+	PUSH DE		; LSW next
 
 	EXX
-	PUSH HL
-	EXX
-	RET
+	JP (HL)

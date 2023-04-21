@@ -3,8 +3,7 @@
 ; Uses: HL, HL', DE, BC, AF
 
 i_sub:	
-	EXX			; Save return address
-	POP HL
+	POP HL		; Save return address
 	EXX
 
 	POP HL		; LSW
@@ -17,13 +16,10 @@ i_sub:
 	POP BC		; MSW
 	EX DE, HL
 	SBC HL, BC
-	EX DE, HL
 
 	; Put result back on stack
-	PUSH DE		; MSW
-	PUSH HL		; LSW
+	PUSH HL		; MSW
+	PUSH DE		; LSW
 
 	EXX
-	PUSH HL
-	EXX
-	RET
+	JP (HL)
