@@ -4,20 +4,19 @@
 ; Uses: HL, DE, BC, AF
 
 i_or16:
-	POP BC
-
 	POP HL
+
+	POP BC
 	POP DE
 
-	LD A, H
+	LD A, B
 	OR D
-	LD H, A
+	LD B, A
 
-	LD A, L
+	LD A, C
 	OR E
-	LD L, A
-
-	PUSH HL
+	LD C, A
 
 	PUSH BC
-	RET
+
+	JP (HL)

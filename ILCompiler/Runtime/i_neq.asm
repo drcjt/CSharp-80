@@ -39,5 +39,4 @@ i_neq_2:
 
 i_neq_3
 	EXX
-	PUSH HL
-	RET
+	JP (HL)

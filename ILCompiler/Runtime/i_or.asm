@@ -4,7 +4,6 @@
 ; Uses: HL, HL', DE, BC, AF
 
 i_or:
-	EXX
 	POP HL
 	EXX
 
@@ -35,6 +34,4 @@ i_or:
 	PUSH HL
 
 	EXX
-	PUSH HL
-	EXX
-	RET
+	JP (HL)

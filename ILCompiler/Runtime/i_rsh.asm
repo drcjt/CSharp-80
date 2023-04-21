@@ -4,7 +4,6 @@
 
 
 i_rsh:	
-	EXX
 	POP HL
 	EXX
 
@@ -40,6 +39,4 @@ i_rsh_end:
 	PUSH HL
 
 	EXX 
-	PUSH HL
-	EXX
-	RET
+	JP (HL)
