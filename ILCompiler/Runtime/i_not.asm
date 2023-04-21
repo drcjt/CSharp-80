@@ -4,18 +4,18 @@
 ; Uses: HL, DE, BC, AF
 
 i_not:
-	POP BC
-
 	POP HL
+
+	POP BC
 	POP DE
 
-	LD A, L
+	LD A, C
 	CPL
-	LD L, A
+	LD C, A
 
-	LD A, H
+	LD A, B
 	CPL
-	LD H, A
+	LD B, A
 
 	LD A, E
 	CPL
@@ -26,7 +26,6 @@ i_not:
 	LD D, A
    
 	PUSH DE
-	PUSH HL
-
 	PUSH BC
-	RET
+
+	JP (HL)

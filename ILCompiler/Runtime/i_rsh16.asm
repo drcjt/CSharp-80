@@ -4,7 +4,6 @@
 
 
 i_rsh16:	
-	EXX
 	POP HL
 	EXX
 
@@ -33,6 +32,4 @@ i_rsh16_end:
 	PUSH HL		; Put result back on stack
 
 	EXX
-	PUSH HL
-	EXX
-	RET
+	JP (HL)

@@ -92,8 +92,9 @@ namespace ILCompiler.Compiler.CodeGenerators
                 {
                     emitter.Ld(R8.H, I16.IX, (short)(ixOffset + 1));
                     emitter.Ld(R8.L, I16.IX, (short)(ixOffset));
-                    emitter.Push(R16.HL);
-                    emitter.Pop(R16.DE);
+
+                    emitter.Ld(R8.D, R8.H);
+                    emitter.Ld(R8.E, R8.L);
 
                     emitter.Add(R16.HL, R16.HL);  // move sign bit into carry flag
                     emitter.Sbc(R16.HL, R16.HL);  // hl is now 0000 or FFFF

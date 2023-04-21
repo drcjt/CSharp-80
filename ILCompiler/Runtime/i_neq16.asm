@@ -3,16 +3,16 @@
 ; Carry set if true
 
 i_neq16:
-	POP BC		; Save return address
+	POP HL		; Save return address
 
-	POP HL
+	POP BC
 	POP DE
 
-	LD A, L
+	LD A, C
 	CP E
 	JR NZ, i_neq16_1
 
-	LD A, H
+	LD A, B
 	CP D
 	JR NZ, i_neq16_1
 
@@ -22,5 +22,4 @@ i_neq16_1:
 	SCF
 
 i_neq16_2
-	PUSH BC
-	RET
+	JP (HL)

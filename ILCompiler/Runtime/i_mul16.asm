@@ -4,7 +4,6 @@
 ; Low word of result (hl) is placed back on the stack
 
 i_mul16:
-    exx
     pop hl                  ; save return address into hl'
     exx
 
@@ -33,6 +32,4 @@ i_mul16_2:
     push hl
     
     exx
-    PUSH HL
-    EXX
-    RET
+    JP (HL)
