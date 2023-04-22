@@ -92,6 +92,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ILCompiler.Tests.Common", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CalcPi", "Samples\CalcPi\CalcPi.csproj", "{9FD822CD-E7DE-4B06-BD2A-B6EDFF6A4B34}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Primes", "Tests\Directed\Primes\Primes.csproj", "{F58273F9-A2F4-4B7A-A717-DD9A82B7DE81}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -226,6 +228,10 @@ Global
 		{9FD822CD-E7DE-4B06-BD2A-B6EDFF6A4B34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9FD822CD-E7DE-4B06-BD2A-B6EDFF6A4B34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9FD822CD-E7DE-4B06-BD2A-B6EDFF6A4B34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F58273F9-A2F4-4B7A-A717-DD9A82B7DE81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F58273F9-A2F4-4B7A-A717-DD9A82B7DE81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F58273F9-A2F4-4B7A-A717-DD9A82B7DE81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F58273F9-A2F4-4B7A-A717-DD9A82B7DE81}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -265,6 +271,7 @@ Global
 		{4244B994-8103-44EB-9303-16E1296310FD} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 		{6324EF38-D339-4A78-AEED-A41537E8DD92} = {6505E749-06C0-4B7B-8F4B-17F9B36A9095}
 		{9FD822CD-E7DE-4B06-BD2A-B6EDFF6A4B34} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
+		{F58273F9-A2F4-4B7A-A717-DD9A82B7DE81} = {BA9F8E73-7E2E-4E47-A614-CF6D8AD8445D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}
