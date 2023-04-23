@@ -55,5 +55,8 @@ namespace System
 
         [DllImport(Libraries.Runtime, EntryPoint = "KbdScan")]
         private static unsafe extern int KbdScan();
+
+        public static int WindowHeight { get { return 16; } }
+        public static int WindowWidth { get { return 64; } }
     }
 }
