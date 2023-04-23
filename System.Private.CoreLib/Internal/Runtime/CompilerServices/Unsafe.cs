@@ -73,5 +73,17 @@ namespace Internal.Runtime.CompilerServices
             // initblk
             // ret
         }
+
+        [Intrinsic]
+        public static void CopyBlock(void* destination, void* source, uint byteCount)
+        {
+            throw new Exception();
+
+            // ldarg.0
+            // ldarg.1
+            // ldarg.2
+            // cpblk
+            // ret
+        }
     }
 }

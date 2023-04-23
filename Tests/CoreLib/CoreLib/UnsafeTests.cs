@@ -37,6 +37,36 @@ namespace CoreLib
             InitBlockStack(1000, 255);
         }
 
+        private static unsafe void CopyBlockStack(int numBytes)
+        {
+            byte* source = stackalloc byte[numBytes];
+            byte* destination = stackalloc byte[numBytes];
+
+            for (int i = 0; i < numBytes; i++)
+            {
+                byte value = (byte)(i & 255);
+                source[i] = value;
+            }
+
+            Unsafe.CopyBlock(destination, source, (uint)numBytes);
+
+            for (int i = 0; i < numBytes; i++)
+            {
+                byte value = (byte)(i & 255);
+                Assert.Equals(value, destination[i]);
+                Assert.Equals(source[i], destination[i]);
+            }
+        }
+
+        public unsafe static void CopyBlockTests()
+        {
+            CopyBlockStack(0);
+            CopyBlockStack(1);
+            CopyBlockStack(10);
+            CopyBlockStack(100);
+            CopyBlockStack(1000);
+        }
+
         public static void RefAs()
         {
             TestBytes testBytes = new TestBytes();

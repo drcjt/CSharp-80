@@ -17,6 +17,7 @@
             UnsafeTests.RefAs();
 
             UnsafeTests.InitBlockTests();
+            UnsafeTests.CopyBlockTests();
 
             return 0;
         }

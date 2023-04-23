@@ -7,8 +7,8 @@ Memcpy:
 	POP BC		; Save return address
 	EXX
 
-	POP HL		; Source address
 	POP DE		; Destination address
+	POP HL		; Source address
 	POP BC		; Count
 	POP AF
 

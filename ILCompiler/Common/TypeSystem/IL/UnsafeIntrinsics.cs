@@ -22,6 +22,8 @@ namespace ILCompiler.Common.TypeSystem.IL
                     return EmitAddByteOffset(method);
                 case "InitBlock":
                     return EmitInitBlock();
+                case "CopyBlock":
+                    return EmitCopyBlock();
             }
 
             return null;
@@ -72,6 +74,21 @@ namespace ILCompiler.Common.TypeSystem.IL
             body.Instructions.Add(OpCodes.Ldarg_1.ToInstruction());
             body.Instructions.Add(OpCodes.Ldarg_2.ToInstruction());
             body.Instructions.Add(OpCodes.Initblk.ToInstruction());
+            body.Instructions.Add(OpCodes.Ret.ToInstruction());
+
+            body.UpdateInstructionOffsets();
+
+            return body;
+        }
+
+        private static CilBody? EmitCopyBlock()
+        {
+            var body = new CilBody();
+
+            body.Instructions.Add(OpCodes.Ldarg_0.ToInstruction());
+            body.Instructions.Add(OpCodes.Ldarg_1.ToInstruction());
+            body.Instructions.Add(OpCodes.Ldarg_2.ToInstruction());
+            body.Instructions.Add(OpCodes.Cpblk.ToInstruction());
             body.Instructions.Add(OpCodes.Ret.ToInstruction());
 
             body.UpdateInstructionOffsets();
