@@ -5,10 +5,10 @@ namespace Life
 {
     public unsafe class CellMap
     {
-        private byte* _cells;
-        private int _width;
-        private int _height;
-        private int _lengthInBytes;
+        private readonly byte* _cells;
+        private readonly int _width;
+        private readonly int _height;
+        private readonly int _lengthInBytes;
 
         public CellMap(int h, int w, byte* cells)
         {
