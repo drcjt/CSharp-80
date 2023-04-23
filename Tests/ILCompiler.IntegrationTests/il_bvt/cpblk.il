@@ -31,8 +31,8 @@
 	ceq
 	brfalse fail
 
-	ldsflda int32 _cpblk::DATA
 	ldsflda int32 _cpblk::DATA2
+	ldsflda int32 _cpblk::DATA
 	ldc.i4 4
 	cpblk
 
