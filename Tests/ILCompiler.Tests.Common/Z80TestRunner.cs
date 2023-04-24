@@ -16,10 +16,10 @@ namespace ILCompiler.Tests.Common
             return new Z80TestRunner(solutionPath);
         }
 
-        public bool RunTest(string assemblyFileName, bool ilBvt = false)
+        public bool RunTest(string assemblyFileName, bool ilBvt = false, bool benchmark = true)
         {
             var program = File.ReadAllBytes(assemblyFileName);
-            RunTest(program, assemblyFileName, ilBvt);
+            RunTest(program, assemblyFileName, ilBvt, benchmark);
 
             return true;
         }
@@ -32,7 +32,7 @@ namespace ILCompiler.Tests.Common
             return nonZeroBytes;
         }
 
-        private void RunTest(byte[]? z80Bytes, string testName, bool ilBvt)
+        private void RunTest(byte[]? z80Bytes, string testName, bool ilBvt, bool benchmark)
         {
             var z80 = new Z80Processor();
 
@@ -55,8 +55,17 @@ namespace ILCompiler.Tests.Common
 
             z80.Start();
 
-            BenchmarkWriter bw = new BenchmarkWriter(_solutionPath);
-            bw.WriteBenchmark(testName.Replace(_solutionPath, ""), z80.TStatesElapsedSinceStart);
+            if (benchmark)
+            {
+                BenchmarkWriter bw = new BenchmarkWriter(_solutionPath);
+                bw.WriteBenchmark(testName.Replace(_solutionPath, ""), z80.TStatesElapsedSinceStart);
+            }
+            else
+            {
+                // Remove any existing benchmark file if benchmarking no longer required
+                var benchmarkResultsPath = Path.Combine(_solutionPath, "benchmark-results.txt");
+                File.Delete(benchmarkResultsPath);
+            }
 
             Console.WriteLine($"Test {testName} ran in {z80.TStatesElapsedSinceStart} T-states");
 
