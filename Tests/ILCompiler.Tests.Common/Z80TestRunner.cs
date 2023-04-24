@@ -60,12 +60,6 @@ namespace ILCompiler.Tests.Common
                 BenchmarkWriter bw = new BenchmarkWriter(_solutionPath);
                 bw.WriteBenchmark(testName.Replace(_solutionPath, ""), z80.TStatesElapsedSinceStart);
             }
-            else
-            {
-                // Remove any existing benchmark file if benchmarking no longer required
-                var benchmarkResultsPath = Path.Combine(_solutionPath, "benchmark-results.txt");
-                File.Delete(benchmarkResultsPath);
-            }
 
             Console.WriteLine($"Test {testName} ran in {z80.TStatesElapsedSinceStart} T-states");
 
