@@ -1,4 +1,7 @@
-﻿namespace ILCompiler.Compiler.Emit
+﻿using System.Net;
+using System.Reflection.Emit;
+
+namespace ILCompiler.Compiler.Emit
 {
     public partial class Emitter
     {
@@ -104,6 +107,16 @@
         public void Ld(R16Type target, string label)
         {
             EmitInstruction(new Instruction(Opcode.Ld, target.ToString() + ", " + label));
+        }
+
+        public void LdFromMemory(R16Type target, short address)
+        {
+            EmitInstruction(new Instruction(Opcode.Ld, target.ToString() + ", (" + address.ToString() + ")"));
+        }
+
+        public void LdToMemory(R16Type target, R8Type source)
+        {
+            EmitInstruction(new Instruction(Opcode.Ld, "(" + target.ToString() + "), " + source.ToString()));
         }
 
         public void Or(R8Type target)
