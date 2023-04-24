@@ -11,7 +11,7 @@ namespace CoreLibTests
         public void CoreLibTest(string testname)
         {
             ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(testname);
-            Z80TestRunner.Create(SolutionPath).RunTest(testname);
+            Z80TestRunner.Create(SolutionPath).RunTest(testname, false, false);
 
             Assert.Pass();
         }
