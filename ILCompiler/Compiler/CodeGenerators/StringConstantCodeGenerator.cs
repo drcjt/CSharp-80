@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
+using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -8,8 +8,8 @@ namespace ILCompiler.Compiler.CodeGenerators
         public void GenerateCode(StringConstantEntry entry, CodeGeneratorContext context)
         {
             // TODO: Currently obj refs can only be strings
-            context.Emitter.Ld(R16.HL, entry.Label);     // LSW
-            context.Emitter.Push(R16.HL);
+            context.Emitter.Ld(HL, entry.Label);     // LSW
+            context.Emitter.Push(HL);
         }
     }
 }

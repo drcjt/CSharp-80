@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
+using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -11,10 +11,10 @@ namespace ILCompiler.Compiler.CodeGenerators
             var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
             var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
 
-            context.Emitter.Ld(R16.HL, high);     //MSW
-            context.Emitter.Push(R16.HL);
-            context.Emitter.Ld(R16.HL, low);      //LSW
-            context.Emitter.Push(R16.HL);
+            context.Emitter.Ld(HL, high);     //MSW
+            context.Emitter.Push(HL);
+            context.Emitter.Ld(HL, low);      //LSW
+            context.Emitter.Push(HL);
         }
     }
 }

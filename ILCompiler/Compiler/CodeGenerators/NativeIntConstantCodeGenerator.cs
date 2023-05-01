@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
+using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -11,8 +11,8 @@ namespace ILCompiler.Compiler.CodeGenerators
             var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
 
             // Native ints are only 16 bit so just push low word
-            context.Emitter.Ld(R16.HL, low);
-            context.Emitter.Push(R16.HL);
+            context.Emitter.Ld(HL, low);
+            context.Emitter.Push(HL);
         }
     }
 }

@@ -1,14 +1,25 @@
 ﻿namespace ILCompiler.Compiler.Emit
 {
-    public abstract class Register
+    public enum Register
     {
-        protected Register(string name)
-        {
-            Name = name;
-        }
+        None,
+        A,
+        F,
+        B,
+        C,
+        D,
+        E,
+        H,
+        L,
 
-        public string Name { get; }
+        AF,
+        BC,
+        DE,
+        HL,
 
-        public override string ToString() => Name;
+        SP,
+        IX,
+        IY,
+        PC,
     }
 }

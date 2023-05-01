@@ -1,5 +1,6 @@
 ﻿using ILCompiler.Compiler.Emit;
 using System.Diagnostics;
+using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -8,11 +9,11 @@ namespace ILCompiler.Compiler.CodeGenerators
         public static void CopyStackToSmall(Emitter emitter, int bytesToCopy, int ixOffset)
         {
             // pop lsw
-            emitter.Pop(R16.HL);
+            emitter.Pop(HL);
 
             // pop msw and ignore it as for small data types we
             // truncate the value
-            emitter.Pop(R16.DE);
+            emitter.Pop(DE);
 
             short changeToIX = 0;
             if (ixOffset + bytesToCopy - 1 > 127)
@@ -27,21 +28,21 @@ namespace ILCompiler.Compiler.CodeGenerators
             }
             if (changeToIX != 0)
             {
-                emitter.Ld(R16.DE, changeToIX);
-                emitter.Add(I16.IX, R16.DE);
+                emitter.Ld(DE, changeToIX);
+                emitter.Add(IX, DE);
                 ixOffset -= changeToIX;
             }
 
             if (bytesToCopy == 2)
             {
-                emitter.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
+                emitter.Ld(__[IX + (short)(ixOffset + 1)], H);
             }
-            emitter.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
+            emitter.Ld(__[IX + (short)(ixOffset + 0)], L);
 
             if (changeToIX != 0)
             {
-                emitter.Ld(R16.DE, (short)-changeToIX);
-                emitter.Add(I16.IX, R16.DE);
+                emitter.Ld(DE, (short)-changeToIX);
+                emitter.Add(IX, DE);
             }
         }
 
@@ -53,8 +54,8 @@ namespace ILCompiler.Compiler.CodeGenerators
             if (ixOffset + bytesToCopy < -127)
             {
                 var delta = ixOffset + 1;
-                emitter.Ld(R16.DE, (short)delta);
-                emitter.Add(I16.IX, R16.DE);
+                emitter.Ld(DE, (short)delta);
+                emitter.Add(IX, DE);
                 changeToIX += delta;
 
                 ixOffset -= delta;
@@ -64,59 +65,59 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 if (signExtend)
                 {
-                    emitter.Ld(R8.A, I16.IX, (short)(ixOffset));
-                    emitter.Ld(R8.E, R8.A);
+                    emitter.Ld(A, __[IX + (short)(ixOffset)]);
+                    emitter.Ld(E, A);
 
-                    emitter.Add(R8.A, R8.A);
-                    emitter.Sbc(R8.A, R8.A);
-                    emitter.Ld(R8.H, R8.A);
-                    emitter.Ld(R8.L, R8.A);
-                    emitter.Push(R16.HL);
+                    emitter.Add(A, A);
+                    emitter.Sbc(A, A);
+                    emitter.Ld(H, A);
+                    emitter.Ld(L, A);
+                    emitter.Push(HL);
 
-                    emitter.Ld(R8.L, R8.E);
-                    emitter.Push(R16.HL);
+                    emitter.Ld(L, E);
+                    emitter.Push(HL);
                 }
                 else
                 {
-                    emitter.Ld(R16.HL, 0);
-                    emitter.Push(R16.HL);
+                    emitter.Ld(HL, 0);
+                    emitter.Push(HL);
 
-                    emitter.Ld(R8.H, 0);
-                    emitter.Ld(R8.L, I16.IX, (short)(ixOffset));
-                    emitter.Push(R16.HL);
+                    emitter.Ld(H, 0);
+                    emitter.Ld(L, __[IX + (short)(ixOffset)]);
+                    emitter.Push(HL);
                 }
             }
             else
             {
                 if (signExtend)
                 {
-                    emitter.Ld(R8.H, I16.IX, (short)(ixOffset + 1));
-                    emitter.Ld(R8.L, I16.IX, (short)(ixOffset));
+                    emitter.Ld(H, __[IX + (short)(ixOffset + 1)]);
+                    emitter.Ld(L, __[IX + (short)(ixOffset)]);
 
-                    emitter.Ld(R8.D, R8.H);
-                    emitter.Ld(R8.E, R8.L);
+                    emitter.Ld(D, H);
+                    emitter.Ld(E, L);
 
-                    emitter.Add(R16.HL, R16.HL);  // move sign bit into carry flag
-                    emitter.Sbc(R16.HL, R16.HL);  // hl is now 0000 or FFFF
-                    emitter.Push(R16.HL);
+                    emitter.Add(HL, HL);  // move sign bit into carry flag
+                    emitter.Sbc(HL, HL);  // hl is now 0000 or FFFF
+                    emitter.Push(HL);
 
-                    emitter.Push(R16.DE);
+                    emitter.Push(DE);
                 }
                 else
                 {
-                    emitter.Ld(R16.HL, 0);
-                    emitter.Push(R16.HL);
+                    emitter.Ld(HL, 0);
+                    emitter.Push(HL);
 
-                    emitter.Ld(R8.H, I16.IX, (short)(ixOffset + 1));
-                    emitter.Ld(R8.L, I16.IX, (short)(ixOffset));
-                    emitter.Push(R16.HL);
+                    emitter.Ld(H, __[IX + (short)(ixOffset + 1)]);
+                    emitter.Ld(L, __[IX + (short)(ixOffset)]);
+                    emitter.Push(HL);
                 }
             }
 
             if (changeToIX != 0)
             {
-                emitter.Ld(R16.DE, (short)(-changeToIX));
-                emitter.Add(I16.IX, R16.DE);
+                emitter.Ld(DE, (short)(-changeToIX));
+                emitter.Add(IX, DE);
             }
         }
 
@@ -151,8 +152,8 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                     changeToIX += newIxChange;
 
-                    emitter.Ld(R16.DE, newIxChange);
-                    emitter.Add(I16.IX, R16.DE);
+                    emitter.Ld(DE, newIxChange);
+                    emitter.Add(IX, DE);
                 }
 
                 while (ixOffset < -128)
@@ -168,16 +169,16 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                     changeToIX += newIxChange;
 
-                    emitter.Ld(R16.DE, newIxChange);
-                    emitter.Add(I16.IX, R16.DE);
+                    emitter.Ld(DE, newIxChange);
+                    emitter.Add(IX, DE);
                 }
 
-                emitter.Pop(R16.HL);
+                emitter.Pop(HL);
                 if (bytesToCopy == 2)
                 {
-                    emitter.Ld(I16.IX, (short)(ixOffset + 1), R8.H);
+                    emitter.Ld(__[IX + (short)(ixOffset + 1)], H);
                 }
-                emitter.Ld(I16.IX, (short)(ixOffset + 0), R8.L);
+                emitter.Ld(__[IX + (short)(ixOffset + 0)], L);
 
                 ixOffset += 2;
                 totalBytesToCopy -= 2;
@@ -185,8 +186,8 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             if (changeToIX != 0 && restoreIX)
             {
-                emitter.Ld(R16.DE, (short)(-changeToIX));
-                emitter.Add(I16.IX, R16.DE);
+                emitter.Ld(DE, (short)(-changeToIX));
+                emitter.Add(IX, DE);
             }
         }
 
@@ -206,8 +207,8 @@ namespace ILCompiler.Compiler.CodeGenerators
                 {
                     // Move IX so new offset will be 126/127
                     var delta = -ixOffset + 126;
-                    emitter.Ld(R16.DE, (short)-delta);
-                    emitter.Add(I16.IX, R16.DE);
+                    emitter.Ld(DE, (short)-delta);
+                    emitter.Add(IX, DE);
                     changeToIX -= delta;
 
                     ixOffset += delta;
@@ -216,23 +217,23 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                 if (bytesToCopy == 1)
                 {
-                    emitter.Ld(R8.H, 0);
-                    emitter.Ld(R8.L, I16.IX, (short)(ixOffset + 1));
+                    emitter.Ld(H, 0);
+                    emitter.Ld(L, __[IX + (short)(ixOffset + 1)]);
                 }
                 else
                 {
-                    emitter.Ld(R8.H, I16.IX, (short)(ixOffset + 1));
-                    emitter.Ld(R8.L, I16.IX, (short)(ixOffset + 0));
+                    emitter.Ld(H, __[IX + (short)(ixOffset + 1)]);
+                    emitter.Ld(L, __[IX + (short)(ixOffset + 0)]);
                 }
-                emitter.Push(R16.HL);
+                emitter.Push(HL);
 
                 ixOffset -= 2;
             } while (ixOffset >= originalIxOffset);
 
             if (changeToIX != 0 && restoreIX)
             {
-                emitter.Ld(R16.DE, (short)(-changeToIX));
-                emitter.Add(I16.IX, R16.DE);
+                emitter.Ld(DE, (short)(-changeToIX));
+                emitter.Add(IX, DE);
             }
         }
     }

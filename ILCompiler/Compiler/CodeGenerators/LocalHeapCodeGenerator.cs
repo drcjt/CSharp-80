@@ -1,5 +1,6 @@
 ﻿using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.EvaluationStack;
+using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -9,73 +10,73 @@ namespace ILCompiler.Compiler.CodeGenerators
         public void GenerateCode(LocalHeapEntry entry, CodeGeneratorContext context)
         {
             // Use the 16 bit size on top of the stack to determine the amount of localloc to do
-            context.Emitter.Pop(R16.HL);
+            context.Emitter.Pop(HL);
 
             var endLabel = context.NameMangler.GetUniqueName();
 
             // Test if size is 0 and return null if it is
-            context.Emitter.Ld(R8.A, R8.H);
-            context.Emitter.Or(R8.L);
-            context.Emitter.Jp(Condition.Zero, endLabel);
+            context.Emitter.Ld(A, H);
+            context.Emitter.Or(L);
+            context.Emitter.Jp(Condition.Z, endLabel);
 
             // Round up number of bytes to allocate to a StackAlign boundary
             // BC = (HL + (StackAlign - 1)) & ~(StackAlign - 1)
-            context.Emitter.Ld(R16.DE, (short)(StackAlign - 1));
-            context.Emitter.Add(R16.HL, R16.DE);
-            context.Emitter.Ld(R16.DE, (short)~(StackAlign - 1));
-            context.Emitter.Ld(R8.A, R8.H);
-            context.Emitter.And(R8.D);
-            context.Emitter.Ld(R8.B, R8.A);
-            context.Emitter.Ld(R8.A, R8.L);
-            context.Emitter.And(R8.E);
-            context.Emitter.Ld(R8.C, R8.A);
+            context.Emitter.Ld(DE, (short)(StackAlign - 1));
+            context.Emitter.Add(HL, DE);
+            context.Emitter.Ld(DE, (short)~(StackAlign - 1));
+            context.Emitter.Ld(A, H);
+            context.Emitter.And(D);
+            context.Emitter.Ld(B, A);
+            context.Emitter.Ld(A, L);
+            context.Emitter.And(E);
+            context.Emitter.Ld(C, A);
 
             if (context.Method.Body.InitLocals)
             {
                 // zero space on stack
-                context.Emitter.Ld(R16.HL, 0);
+                context.Emitter.Ld(HL, 0);
 
                 // Divide BC by 2
-                context.Emitter.ShiftRightLogical(R8.B);
-                context.Emitter.RotateRight(R8.C);
-                context.Emitter.ShiftRightLogical(R8.B);
-                context.Emitter.RotateRight(R8.C);
+                context.Emitter.Srl(B);
+                context.Emitter.Rr(C);
+                context.Emitter.Srl(B);
+                context.Emitter.Rr(C);
 
                 // Start of Zeroing loop
                 var initLoopLabel = context.NameMangler.GetUniqueName();
-                context.Emitter.EmitInstruction(new LabelInstruction(initLoopLabel));
+                context.Emitter.CreateLabel(initLoopLabel);
 
                 // Zero two zero bytes
-                context.Emitter.Push(R16.HL);
-                context.Emitter.Push(R16.HL);
+                context.Emitter.Push(HL);
+                context.Emitter.Push(HL);
 
                 // Decrement byte count
-                context.Emitter.Dec(R16.BC);
+                context.Emitter.Dec(BC);
 
-                context.Emitter.Ld(R8.A, R8.B);
-                context.Emitter.Or(R8.C);
+                context.Emitter.Ld(A, B);
+                context.Emitter.Or(C);
 
                 // More bytes to zero then loop
-                context.Emitter.Jp(Condition.NonZero, initLoopLabel);
+                context.Emitter.Jp(Condition.NZ, initLoopLabel);
 
-                context.Emitter.Ld(R16.HL, 0);
-                context.Emitter.Add(R16.HL, R16.SP);
+                context.Emitter.Ld(HL, 0);
+                context.Emitter.Add(HL, SP);
             }
             else
             {
-                context.Emitter.Ld(R16.HL, 0);
-                context.Emitter.Add(R16.HL, R16.SP);
+                context.Emitter.Ld(HL, 0);
+                context.Emitter.Add(HL, SP);
 
-                context.Emitter.And(R8.A);
-                context.Emitter.Sbc(R16.HL, R16.BC);
+                context.Emitter.And(A);
+                context.Emitter.Sbc(HL, BC);
 
-                context.Emitter.Ld(R16.SP, R16.HL);
+                context.Emitter.Ld(SP, HL);
             }
 
-            context.Emitter.EmitInstruction(new LabelInstruction(endLabel));
+            context.Emitter.CreateLabel(endLabel);
 
             // Push address of newly allocated space
-            context.Emitter.Push(R16.HL);
+            context.Emitter.Push(HL);
         }
     }
 }

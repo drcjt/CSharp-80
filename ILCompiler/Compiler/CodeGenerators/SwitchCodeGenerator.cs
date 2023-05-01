@@ -1,5 +1,6 @@
 ﻿using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.EvaluationStack;
+using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -7,19 +8,19 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(SwitchEntry entry, CodeGeneratorContext context)
         {
-            context.Emitter.Pop(R16.HL);      // LSW
-            context.Emitter.Pop(R16.DE);      // Ignore MSW
+            context.Emitter.Pop(HL);      // LSW
+            context.Emitter.Pop(DE);      // Ignore MSW
 
-            context.Emitter.Ld(R8.A, R8.L);
+            context.Emitter.Ld(A, L);
 
             for (int targetIndex = 0; targetIndex < entry.JumpTable.Count; targetIndex++)
             {
-                context.Emitter.Or(R8.A);
-                context.Emitter.Jp(Condition.Zero, entry.JumpTable[targetIndex]);
+                context.Emitter.Or(A);
+                context.Emitter.Jp(Condition.Z, entry.JumpTable[targetIndex]);
 
                 if (targetIndex < entry.JumpTable.Count - 1)
                 {
-                    context.Emitter.Dec(R8.A);
+                    context.Emitter.Dec(A);
                 }
             }
         }

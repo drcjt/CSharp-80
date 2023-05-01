@@ -4,6 +4,7 @@ using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
+using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler
 {
@@ -37,7 +38,7 @@ namespace ILCompiler.Compiler
             GenerateStringMap(blocks);
             GenerateStringData(_context.Emitter);
 
-            _context.Emitter.EmitInstruction(new LabelInstruction(_nameMangler.GetMangledMethodName(_context.Method)));
+            _context.Emitter.CreateLabel(_nameMangler.GetMangledMethodName(_context.Method));
 
             GenerateProlog(_context.Emitter);
             methodInstructions.AddRange(_context.Emitter.Instructions);
@@ -46,7 +47,7 @@ namespace ILCompiler.Compiler
             {
                 _context.Emitter.Reset();
 
-                _context.Emitter.EmitInstruction(new LabelInstruction(block.Label));
+                _context.Emitter.CreateLabel(block.Label);
 
                 var visitorAdapter = new GenericStackEntryAdapter(this);
 
@@ -162,7 +163,7 @@ namespace ILCompiler.Compiler
             // TODO: Need to eliminate duplicate strings
             foreach (var keyValuePair in _labelsToStringData)
             {
-                emitter.EmitInstruction(new LabelInstruction(keyValuePair.Key));
+                emitter.CreateLabel(keyValuePair.Key);
 
                 var stringData = keyValuePair.Value;
 
@@ -222,17 +223,17 @@ namespace ILCompiler.Compiler
 
             if (_context.ParamsCount > 0 || (_context.LocalsCount + tempCount) > 0)
             {
-                emitter.Push(I16.IX);
-                emitter.Ld(I16.IX, 0);
-                emitter.Add(I16.IX, R16.SP);
+                emitter.Push(IX);
+                emitter.Ld(IX, 0);
+                emitter.Add(IX, SP);
             }
 
             if (_context.LocalsCount + tempCount > 0)
             {
                 // Reserve space on stack for locals
-                emitter.Ld(R16.HL, (short)-localsSize);
-                emitter.Add(R16.HL, R16.SP);
-                emitter.Ld(R16.SP, R16.HL);
+                emitter.Ld(HL, (short)-localsSize);
+                emitter.Add(HL, SP);
+                emitter.Ld(SP, HL);
                 
                 if (_context.Method.Body.InitLocals)
                 {
@@ -241,24 +242,24 @@ namespace ILCompiler.Compiler
                     // but this requires SSA and use/def analysis which we don't have yet.
                     // So for now just init all the locals
 
-                    emitter.Ld(R16.BC, (short)localsSize);
+                    emitter.Ld(Bc, (short)localsSize);
 
-                    emitter.Push(I16.IX);
-                    emitter.Pop(R16.HL);
+                    emitter.Push(Ix);
+                    emitter.Pop(Hl);
 
                     var initLoopLabel = _context.NameMangler.GetUniqueName();
-                    _context.Emitter.AddInstruction(new LabelInstruction(initLoopLabel));
+                    emitter.CreateLabel(initLoopLabel);
 
-                    emitter.Dec(R16.HL);  // Stack grows downwards so need to move to next byte first
+                    emitter.Dec(Hl);  // Stack grows downwards so need to move to next byte first
 
-                    emitter.LdInd(R16.HL, 0);
+                    emitter.Ld(__[Hl], 0);
 
-                    emitter.Dec(R16.BC);
+                    emitter.Dec(Bc);
 
-                    emitter.Ld(R8.A, R8.B);
-                    emitter.Or(R8.C);
+                    emitter.Ld(A, B);
+                    emitter.Or(C);
 
-                    emitter.Jp(Condition.NonZero, initLoopLabel);
+                    emitter.Jp(Condition.NZ, initLoopLabel);
                     */
                 }
             }
@@ -278,7 +279,7 @@ namespace ILCompiler.Compiler
             do
             {
                 if (lastInstruction?.Opcode == Opcode.Push && currentInstruction.Opcode == Opcode.Pop
-                    && lastInstruction?.Operands == currentInstruction.Operands)
+                    && lastInstruction?.Op0?.Register == currentInstruction.Op0?.Register)
                 {
                     // Eliminate Push followed by Pop
                     instructions.RemoveAt(count - 1);

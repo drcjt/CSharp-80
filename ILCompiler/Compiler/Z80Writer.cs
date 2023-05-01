@@ -4,6 +4,7 @@ using ILCompiler.Compiler.Emit;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text;
+using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler
 {
@@ -61,111 +62,103 @@ namespace ILCompiler.Compiler
             _out.WriteLine($"; {DateTime.Now}");
             _out.WriteLine();
 
-            _out.WriteLine(Instruction.Org(GetOrgAddress()));
-            OutputLabel(Entry);
+            var emitter = new Emitter();
 
-            _out.WriteLine(Instruction.Ld(R16.HL, Heap));
-            _out.WriteLine(Instruction.LdInd("HEAPNEXT", R16.HL));
+            emitter.Org(GetOrgAddress());
+            emitter.CreateLabel(Entry);
+
+            //OutputLabel(Entry);
+
+            emitter.Ld(HL, Heap);
+            emitter.Ld(__["HEAPNEXT"], HL);
 
             // Save original stack location
-            _out.WriteLine(Instruction.LdInd("ORIGSP", R16.SP));
+            emitter.Ld(__["ORIGSP"], SP);
 
             // Relocate the stack
-            _out.WriteLine(Instruction.Ld(R16.SP, (short)_configuration.StackStart));
+            emitter.Ld(SP, (short)_configuration.StackStart);
 
             // Start the program
-            _out.WriteLine(Instruction.Jp("START"));
+            emitter.Jp("START");
 
             // Restore the original stack and return to the OS
-            OutputLabel("EXITRETCODE");
+            emitter.CreateLabel("EXITRETCODE");
 
             var returnType = entryMethod.ReturnType;
             var hasReturnCode = returnType != null && returnType.GetVarType().IsInt();
 
             if (!_configuration.IntegrationTests && hasReturnCode)
             {
-                OutputReturnCodeHandler();
+                OutputReturnCodeHandler(emitter);
             }
 
-            OutputLabel("EXIT");
+            emitter.CreateLabel("EXIT");
             if (!_configuration.IntegrationTests)
-            { 
+            {
                 // Reset stack pointer and return to OS
-                _out.WriteLine(Instruction.LdInd(R16.SP, "ORIGSP"));
-                _out.WriteLine(Instruction.Ret());
+                emitter.Ld(SP, __["ORIGSP"]);
+                emitter.Ret();
             }
             else
             {
                 // Move return code to HL/DE and Halt
-                _out.WriteLine(Instruction.Pop(R16.DE));
-                _out.WriteLine(Instruction.Pop(R16.HL));
-                _out.WriteLine(Instruction.Halt());
+                emitter.Pop(DE);
+                emitter.Pop(HL);
+                emitter.Halt();
             }
 
             // Holds the original stack location
-            _out.WriteLine(Instruction.Db("  ", "ORIGSP"));
+            emitter.Db("ORIGSP", "  ");
 
             // Holds next free heap location
-            _out.WriteLine(Instruction.Db("  ", "HEAPNEXT"));
+            emitter.Db("HEAPNEXT", "  ");
 
             // Output messages
-            OutputOOMMessage();
+            OutputOOMMessage(emitter);
             if (hasReturnCode && _configuration.PrintReturnCode)
             {
-                OutputReturnCodeMessage();
+                OutputReturnCodeMessage(emitter);
             }
 
-            // Include the runtime assembly code
-            if (_configuration.DontInlineRuntime)
-            {
-                _out.WriteLine("include csharprt.asm");
-
-                switch (_configuration.TargetArchitecture)
-                {
-                    case TargetArchitecture.TRS80: _out.WriteLine("include trs80rt.asm"); break;
-                    case TargetArchitecture.CPM: _out.WriteLine("include cpmrt.asm"); break;
-                    case TargetArchitecture.ZXSpectrum: _out.WriteLine("include zxspectrum.asm"); break;
-                    default: throw new ArgumentException("Invalid target architecture value");
-                }
-            }
-
-            OutputLabel("START");
+            emitter.CreateLabel("START");
             // TODO: Call static constructors here
-            _out.WriteLine(Instruction.Call(_nameMangler.GetMangledMethodName(entryMethod)));
-            _out.WriteLine(Instruction.Jp("EXITRETCODE"));
+            emitter.Call(_nameMangler.GetMangledMethodName(entryMethod));
+            emitter.Jp("EXITRETCODE");
+
+            _out.WriteLine(emitter.ToString());
         }
 
-        private void OutputOOMMessage()
+        private void OutputOOMMessage(Emitter emitter)
         {
-            OutputLabel("OOM_MSG");
-            _out.WriteLine(Instruction.Db(13));
-            _out.WriteLine(Instruction.Db(0)); // Length of message
-            _out.WriteLine(Instruction.Db("O u t   o f   m e m o r y "));
+            emitter.CreateLabel("OOM_MSG");
+            emitter.Db(13);
+            emitter.Db(0); // Length of message
+            emitter.Db("O u t   o f   m e m o r y ");
         }
 
-        private void OutputReturnCodeMessage()
+        private void OutputReturnCodeMessage(Emitter emitter)
         {
-            OutputLabel("RETCODEMSG");
-            _out.WriteLine(Instruction.Db(12));
-            _out.WriteLine(Instruction.Db(0)); // Length of message
-            _out.WriteLine(Instruction.Db("R e t u r n   C o d e : "));
+            emitter.CreateLabel("RETCODEMSG");
+            emitter.Db(12);
+            emitter.Db(0); // Length of message
+            emitter.Db("R e t u r n   C o d e : ");
         }
 
-        private void OutputLabel(string label) => _out.WriteLine(new LabelInstruction(label));
+        private void OutputLabel(string label) => _out.WriteLine(Instruction.Create(label));
 
-        private void OutputReturnCodeHandler()
+        private void OutputReturnCodeHandler(Emitter emitter)
         {
             if (_configuration.PrintReturnCode)
             {
                 // Write string "Return Code:"
-                _out.WriteLine(Instruction.Ld(R16.HL, "RETCODEMSG - 2"));
-                _out.WriteLine(Instruction.Call("PRINT"));
+                emitter.Ld(HL, "RETCODEMSG - 2");
+                emitter.Call("PRINT");
                 _calls.Add("PRINT");
 
                 // Write return code
-                _out.WriteLine(Instruction.Pop(R16.HL));
-                _out.WriteLine(Instruction.Pop(R16.DE));
-                _out.WriteLine(Instruction.Call("LTOA"));
+                emitter.Pop(HL);
+                emitter.Pop(DE);
+                emitter.Call("LTOA");
                 _calls.Add("LTOA");
             }
             else
@@ -173,32 +166,32 @@ namespace ILCompiler.Compiler
                 if (_configuration.TargetArchitecture == TargetArchitecture.ZXSpectrum)
                 {
                     // Remove return value as not supported on ZX spectrum
-                    _out.WriteLine(Instruction.Pop(R16.BC));
-                    _out.WriteLine(Instruction.Pop(R16.DE));
+                    emitter.Pop(BC);
+                    emitter.Pop(DE);
                 }
                 else
                 {
-                    _out.WriteLine(Instruction.Pop(R16.BC));    // return value
-                    _out.WriteLine(Instruction.Pop(R16.DE));
-                    _out.WriteLine(Instruction.Pop(R16.HL));    // return address
-                    _out.WriteLine(Instruction.Push(R16.DE));
-                    _out.WriteLine(Instruction.Push(R16.BC));
-                    _out.WriteLine(Instruction.Push(R16.HL));
+                    emitter.Pop(BC);    // return value
+                    emitter.Pop(DE);
+                    emitter.Pop(HL);    // return address
+                    emitter.Push(DE);
+                    emitter.Push(BC);
+                    emitter.Push(HL);
                 }
             }
         }
 
         private void OutputEpilog()
         {
-            if (!_configuration.DontInlineRuntime)
-            {
-                OutputRuntimeCode();
-            }
+            OutputRuntimeCode();
 
             _out.WriteLine();
 
-            OutputLabel(Heap);
-            _out.WriteLine(Instruction.End(Entry));
+            var emitter = new Emitter();
+            emitter.CreateLabel(Heap);
+            emitter.End(Entry);
+
+            _out.Write(emitter.ToString());
         }
 
         private void OutputCodeForNode(Z80MethodCodeNode node)
@@ -263,7 +256,7 @@ namespace ILCompiler.Compiler
                             OutputLabel(_nameMangler.GetMangledFieldName(field));
 
                             // Emit fieldSize bytes with value 0
-                            _out.WriteLine(Instruction.Dc(fieldSize, 0));
+                            _out.WriteLine(Instruction.Create(Opcode.Dc, (ushort)fieldSize, 0));
                         }
                     }
                 }

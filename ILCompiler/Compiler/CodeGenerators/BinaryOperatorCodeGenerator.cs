@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
+using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -62,16 +62,16 @@ namespace ILCompiler.Compiler.CodeGenerators
                 {
                     context.Emitter.Call(routine);
                     // If carry set then push i4 1 else push i4 0
-                    context.Emitter.Ld(R16.HL, 0);
-                    context.Emitter.Push(R16.HL);     // MSW
+                    context.Emitter.Ld(HL, 0);
+                    context.Emitter.Push(HL);     // MSW
 
-                    context.Emitter.Ld(R16.HL, 0);
-                    context.Emitter.Adc(R16.HL, R16.HL);
-                    context.Emitter.Push(R16.HL);     // LSW
+                    context.Emitter.Ld(HL, 0);
+                    context.Emitter.Adc(HL, HL);
+                    context.Emitter.Push(HL);     // LSW
                 }
                 else
                 {
-                    throw new NotImplementedException($"Binary operator {entry.Operation} for type {entry.Type} not yet implemented");
+                    throw new NotImplementedException($"Binary operator {entry.Operation} for type {op1Type} not yet implemented");
                 }
             }
             else
@@ -82,7 +82,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
                 else
                 {
-                    throw new NotImplementedException($"Binary operator {entry.Operation} for type {entry.Type} not yet implemented");
+                    throw new NotImplementedException($"Binary operator {entry.Operation} for type {operatorType} not yet implemented");
                 }
             }
         }

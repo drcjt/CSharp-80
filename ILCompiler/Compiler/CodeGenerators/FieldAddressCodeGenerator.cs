@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
+using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -10,15 +10,15 @@ namespace ILCompiler.Compiler.CodeGenerators
             var fieldOffset = entry.Offset;
 
             // Get address of object
-            context.Emitter.Pop(R16.HL);      // LSW
+            context.Emitter.Pop(HL);      // LSW
 
             // Calculate field address
-            context.Emitter.Ld(R16.DE, (short)fieldOffset);
-            context.Emitter.Add(R16.HL, R16.DE);
+            context.Emitter.Ld(DE, (short)fieldOffset);
+            context.Emitter.Add(HL, DE);
 
             // Push field address onto the stack msw first, lsw second
-            context.Emitter.Ld(R16.DE, 0);
-            context.Emitter.Push(R16.HL);
+            context.Emitter.Ld(DE, 0);
+            context.Emitter.Push(HL);
         }
     }
 }

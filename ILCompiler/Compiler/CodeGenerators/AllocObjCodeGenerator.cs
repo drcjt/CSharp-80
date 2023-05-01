@@ -1,5 +1,6 @@
-﻿using ILCompiler.Compiler.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
+using static ILCompiler.Compiler.Emit.Registers;
+
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -9,8 +10,8 @@ namespace ILCompiler.Compiler.CodeGenerators
         {
             // Allocate memory on the heap using simple zero GC/increment a pointer approach
 
-            context.Emitter.Ld(R16.HL, (short)entry.Size);
-            context.Emitter.Push(R16.HL);
+            context.Emitter.Ld(HL, (ushort)entry.Size);
+            context.Emitter.Push(HL);
             context.Emitter.Call("NewObject");
         }
     }

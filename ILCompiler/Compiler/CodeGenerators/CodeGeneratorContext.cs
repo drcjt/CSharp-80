@@ -1,7 +1,7 @@
 ﻿using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysis;
-using ILCompiler.Compiler.Emit;
 using ILCompiler.Interfaces;
+using ILCompiler.Compiler.Emit;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
