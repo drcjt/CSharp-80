@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
+using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -9,8 +9,8 @@ namespace ILCompiler.Compiler.CodeGenerators
         {
             var mangledFieldName = entry.Name;
 
-            context.Emitter.Ld(R16.HL, mangledFieldName);
-            context.Emitter.Push(R16.HL);
+            context.Emitter.Ld(HL, mangledFieldName);
+            context.Emitter.Push(HL);
         }
     }
 }

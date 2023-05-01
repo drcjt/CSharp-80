@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
+using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -10,11 +10,11 @@ namespace ILCompiler.Compiler.CodeGenerators
             if (entry.Type.IsInt() || entry.Type == VarType.Struct || entry.Type == VarType.Ptr || entry.Type == VarType.Ref)
             {
                 // Save IX to BC
-                context.Emitter.Push(I16.IX);
-                context.Emitter.Pop(R16.BC);
+                context.Emitter.Push(IX);
+                context.Emitter.Pop(BC);
 
                 // Get indirect address from stack into IX
-                context.Emitter.Pop(I16.IX);
+                context.Emitter.Pop(IX);
 
                 var size = entry.ExactSize ?? 4; // TODO: is 4 the right default size?
 
@@ -32,8 +32,8 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
 
                 // Restore IX
-                context.Emitter.Push(R16.BC);
-                context.Emitter.Pop(I16.IX);
+                context.Emitter.Push(BC);
+                context.Emitter.Pop(IX);
             }
             else
             {

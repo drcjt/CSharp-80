@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
+using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -10,10 +10,10 @@ namespace ILCompiler.Compiler.CodeGenerators
             var exactSize = entry.ExactSize ?? 0;
             if (exactSize > 0)
             {
-                context.Emitter.Push(I16.IX);
-                context.Emitter.Pop(R16.BC);
+                context.Emitter.Push(IX);
+                context.Emitter.Pop(BC);
 
-                context.Emitter.Pop(I16.IX);  
+                context.Emitter.Pop(IX);  
 
                 short offset = (short)entry.FieldOffset;
 
@@ -26,8 +26,8 @@ namespace ILCompiler.Compiler.CodeGenerators
                     CopyHelper.CopyFromStackToIX(context.Emitter, exactSize, offset);
                 }
 
-                context.Emitter.Push(R16.BC);
-                context.Emitter.Pop(I16.IX);
+                context.Emitter.Push(BC);
+                context.Emitter.Pop(IX);
             }
         }
     }

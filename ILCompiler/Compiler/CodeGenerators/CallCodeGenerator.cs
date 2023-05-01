@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
+using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -14,10 +14,10 @@ namespace ILCompiler.Compiler.CodeGenerators
                     // Pass first argument in HL for 2 bytes or less
                     // and in HL, DE for larger datatypes
                     var argument = entry.Arguments[0];
-                    context.Emitter.Pop(R16.HL);
+                    context.Emitter.Pop(HL);
                     if (argument.Type == VarType.Int || argument.Type == VarType.UInt)
                     {
-                        context.Emitter.Pop(R16.DE);
+                        context.Emitter.Pop(DE);
                     }
                 }
             }
