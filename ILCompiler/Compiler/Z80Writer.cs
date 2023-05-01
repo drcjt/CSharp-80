@@ -67,8 +67,6 @@ namespace ILCompiler.Compiler
             emitter.Org(GetOrgAddress());
             emitter.CreateLabel(Entry);
 
-            //OutputLabel(Entry);
-
             emitter.Ld(HL, Heap);
             emitter.Ld(__["HEAPNEXT"], HL);
 
@@ -128,7 +126,7 @@ namespace ILCompiler.Compiler
             _out.WriteLine(emitter.ToString());
         }
 
-        private void OutputOOMMessage(Emitter emitter)
+        private static void OutputOOMMessage(Emitter emitter)
         {
             emitter.CreateLabel("OOM_MSG");
             emitter.Db(13);
@@ -136,7 +134,7 @@ namespace ILCompiler.Compiler
             emitter.Db("O u t   o f   m e m o r y ");
         }
 
-        private void OutputReturnCodeMessage(Emitter emitter)
+        private static void OutputReturnCodeMessage(Emitter emitter)
         {
             emitter.CreateLabel("RETCODEMSG");
             emitter.Db(12);

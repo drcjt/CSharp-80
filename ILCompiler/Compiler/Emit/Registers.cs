@@ -1,6 +1,6 @@
 ﻿namespace ILCompiler.Compiler.Emit
 {
-    public class Registers
+    public static class Registers
     {
         public static readonly MemoryOperandFactory __ = new MemoryOperandFactory();
 

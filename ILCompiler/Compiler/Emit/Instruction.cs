@@ -24,6 +24,13 @@ namespace ILCompiler.Compiler.Emit
 
             stringBuilder.Append('\t');
 
+            FormatOpcode(stringBuilder);
+
+            return stringBuilder.ToString();
+        }
+
+        private void FormatOpcode(StringBuilder stringBuilder)
+        {
             if (Opcode != Opcode.None)
             {
                 stringBuilder.Append(Opcode.ToString().ToUpper());
@@ -46,8 +53,6 @@ namespace ILCompiler.Compiler.Emit
                     Op1.FormatOperand(stringBuilder);
                 }
             }
-
-            return stringBuilder.ToString();
         }
 
         public static Instruction Create(string label)
@@ -66,15 +71,6 @@ namespace ILCompiler.Compiler.Emit
         public static Instruction Create(Opcode opcode, string target)
             => new() { Opcode = opcode, Op0 = new() { Label = target } };
 
-        public static Instruction CreateBranch(Opcode opcode, string target) 
-            => new() { Opcode = opcode, Op0 = new() { Label = target } };
-
-        public static Instruction CreateBranch(Opcode opcode, Condition condition, string target)
-            => new() { Opcode = opcode, Condition = condition, Op0 = new() { Label = target } };
-
-        public static Instruction CreateBranch(Opcode opcode, ushort target)
-            => new() { Opcode = opcode, Op0 = new() { Immediate = target } };
-
         public static Instruction Create(Opcode opcode, ushort target)
             => new() { Opcode = opcode, Op0 = new() { Immediate = target } };
 
@@ -90,6 +86,13 @@ namespace ILCompiler.Compiler.Emit
             => new() { Opcode = opcode, Op0 = new() { Register = target }, Op1 = new() { Label = source } };
         public static Instruction Create(Opcode opcode, ushort count, ushort value)
             => new() { Opcode = opcode, Op0 = new() { Immediate = count }, Op1 = new() { Immediate = value } };
+
+        public static Instruction CreateBranch(Opcode opcode, string target)
+    => new() { Opcode = opcode, Op0 = new() { Label = target } };
+        public static Instruction CreateBranch(Opcode opcode, Condition condition, string target)
+            => new() { Opcode = opcode, Condition = condition, Op0 = new() { Label = target } };
+        public static Instruction CreateBranch(Opcode opcode, ushort target)
+            => new() { Opcode = opcode, Op0 = new() { Immediate = target } };
 
         public static Instruction CreateDeclareByte(Opcode opcode, string data, string label)
             => new() { Label = label, Opcode = opcode, Op0 = new() { Data = data } };
