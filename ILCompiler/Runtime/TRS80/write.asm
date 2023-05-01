@@ -9,8 +9,4 @@ WRITE:
 	PUSH BC	; put return address back
 
 	LD A, L
-
-	LD HL, (0x4020)
-	LD (HL), A
-
-	RET
+	JP 33H
