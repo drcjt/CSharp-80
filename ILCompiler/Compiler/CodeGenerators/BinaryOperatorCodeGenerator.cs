@@ -76,7 +76,15 @@ namespace ILCompiler.Compiler.CodeGenerators
             }
             else
             {
-                if (BinaryOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, operatorType), out string? routine))
+                if (operatorType == VarType.Ptr && entry.Operation == Operation.Add)
+                {
+                    // Inline 16 bit adds to avoid overhead of call 
+                    context.Emitter.Pop(HL);
+                    context.Emitter.Pop(BC);
+                    context.Emitter.Add(HL, BC);
+                    context.Emitter.Push(HL);
+                }
+                else if (BinaryOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, operatorType), out string? routine))
                 {
                     context.Emitter.Call(routine);
                 }
