@@ -10,24 +10,19 @@ i_mul16:
     pop bc
     pop de
 
-    ld hl, 0
-    ld a, 16
+    ld a, b
+    ld b, 16
 
 i_mul16_1:
-    srl b
-    rr c
+    add hl, hl
+    sla c
+    rla
     jr nc, i_mul16_2
 
     add hl, de
 
 i_mul16_2:
-    ex de,hl
-    add hl, hl
-    ex de, hl
-
-    dec a
-
-    jp nz, i_mul16_1
+    djnz i_mul16_1
 
     push hl
     
