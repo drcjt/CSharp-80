@@ -81,6 +81,32 @@
 }
 
 
+.method public static int32 IUsingLdElema(int32, int32, int32) {
+.maxstack  5
+.locals (int16[])
+
+	ldc.i4 0x00000004
+	newarr [mscorlib]System.Int16
+	stloc 0
+
+	ldloc 0
+	ldarg.0
+	ldelema int32
+	ldarg.1
+	conv.i
+	stind.i
+
+	ldloc 0
+	ldarg.0
+	ldelem.i
+
+	ldarg.2
+	conv.i
+	ceq
+	ret
+}
+
+
 .method public static int32 I(int32, int32, int32) {
 .maxstack  5
 .locals (int16[])
@@ -317,6 +343,19 @@
 	ldc.i4 0x0000ffff
 	call int32 array_tests::I(int32, int32, int32)
 	brfalse FAIL
+
+	ldc.i4 0x00
+	ldc.i4 0x00007fff
+	ldc.i4 0x00007fff
+	call int32 array_tests::IUsingLdElema(int32, int32, int32)
+	brfalse FAIL
+
+	ldc.i4 0x01
+	ldc.i4 0x0000ffff
+	ldc.i4 0x0000ffff
+	call int32 array_tests::IUsingLdElema(int32, int32, int32)
+	brfalse FAIL
+
 
 	ldc.i4 0x00
 	ldc.i4 0x7fffffff
