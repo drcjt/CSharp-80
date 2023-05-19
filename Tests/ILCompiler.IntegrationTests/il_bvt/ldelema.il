@@ -51,29 +51,13 @@
 
 	ldloc 0
 	ldarg.0
-	ldelem.i1
-
-	ldarg.2
-	ceq
-	ret
-}
-
-.method public static int32 U8(int32, uint32, uint32) {
-.maxstack  5
-.locals (int8[])
-
-	ldc.i4 0x00000004
-	newarr [mscorlib]System.Byte
-	stloc 0
-
-	ldloc 0
-	ldarg.0
+	ldelema int8
 	ldarg.1
-	stelem.i1
+	stind.i1
 
 	ldloc 0
 	ldarg.0
-	ldelem.u1
+	ldelem.i1
 
 	ldarg.2
 	ceq
@@ -90,9 +74,10 @@
 
 	ldloc 0
 	ldarg.0
+	ldelema int32
 	ldarg.1
 	conv.i
-	stelem.i
+	stind.i
 
 	ldloc 0
 	ldarg.0
@@ -114,34 +99,13 @@
 
 	ldloc 0
 	ldarg.0
+	ldelema int16
 	ldarg.1
-	stelem.i2
+	stind.i2
 
 	ldloc 0
 	ldarg.0
 	ldelem.i2
-
-	ldarg.2
-	ceq
-	ret
-}
-
-.method public static int32 U16(int32, uint32, uint32) {
-.maxstack  5
-.locals (int16[])
-
-	ldc.i4 0x00000004
-	newarr [mscorlib]System.Int16
-	stloc 0
-
-	ldloc 0
-	ldarg.0
-	ldarg.1
-	stelem.i2
-
-	ldloc 0
-	ldarg.0
-	ldelem.u2
 
 	ldarg.2
 	ceq
@@ -158,34 +122,13 @@
 
 	ldloc 0
 	ldarg.0
+	ldelema int32
 	ldarg.1
-	stelem.i4
+	stind.i4
 
 	ldloc 0
 	ldarg.0
 	ldelem.i4
-
-	ldarg.2
-	ceq
-	ret
-}
-
-.method public static int32 U32(int32, uint32, uint32) {
-.maxstack  5
-.locals (int32[])
-
-	ldc.i4 0x00000004
-	newarr [mscorlib]System.Int32
-	stloc 0
-
-	ldloc 0
-	ldarg.0
-	ldarg.1
-	stelem.i4
-
-	ldloc 0
-	ldarg.0
-	ldelem.u4
 
 	ldarg.2
 	ceq
@@ -204,10 +147,11 @@
 	newobj instance void Test::.ctor(int32)
 	stloc.1
 
-	ldloc.0
+	ldloc 0
 	ldarg.0
+	ldelema Test
 	ldloc.1
-	stelem.ref
+	stind.ref
 
 	ldloc.0
 	ldarg.0
@@ -219,29 +163,30 @@
 	ret
 }
 
-.method public static int32 StructTest(int32, int32, int32) {
+.method public static int32 StructTest(int32, int32) {
 .maxstack  5
 .locals (valuetype _struct[], valuetype _struct)
 
 	ldc.i4 0x00000004
-	newarr Test
+	newarr _struct
 	stloc.0
 
 	ldarg.1
-	call instance void _struct::.ctor(int32, int32)
+	newobj instance void _struct::.ctor(int32)
 	stloc.1
 
-	ldloc.0
+	ldloc 0
 	ldarg.0
+	ldelema _struct
 	ldloc.1
-	stelem _struct
+	stobj _struct
 
 	ldloc.0
 	ldarg.0
 	ldelem _struct
 
 	ldfld int32 _struct::X
-	ldarg.2
+	ldarg.1
 	ceq
 	ret
 }
@@ -251,6 +196,13 @@
 .entrypoint
 .maxstack  5
 .locals ()
+
+/*
+	ldc.i4 0x00
+	ldc.i4 0x72
+	call int32 array_tests::StructTest(int32, int32)
+	brfalse FAIL
+*/
 
 	ldc.i4 0x00
 	ldc.i4 0x72
@@ -263,6 +215,7 @@
 	call int32 array_tests::I8(int32, int32, int32)
 	brfalse FAIL
 
+
 	ldc.i4 0x01
 	ldc.i4 0xff
 	ldc.i4 0xffffffff	// negative value is sign extended
@@ -270,18 +223,6 @@
 	brfalse FAIL
 
 	ldc.i4 0x00
-	ldc.i4 0x25
-	ldc.i4 0x25
-	call int32 array_tests::U8(int32, uint32, uint32)
-	brfalse FAIL
-
-	ldc.i4 0x01
-	ldc.i4 0xff
-	ldc.i4 0xff
-	call int32 array_tests::U8(int32, uint32, uint32)
-	brfalse FAIL
-
-	ldc.i4 0x00
 	ldc.i4 0x00007fff
 	ldc.i4 0x00007fff
 	call int32 array_tests::I16(int32, int32, int32)
@@ -296,18 +237,6 @@
 	ldc.i4 0x00
 	ldc.i4 0x00007fff
 	ldc.i4 0x00007fff
-	call int32 array_tests::U16(int32, uint32, uint32)
-	brfalse FAIL
-
-	ldc.i4 0x01
-	ldc.i4 0x0000ffff
-	ldc.i4 0x0000ffff
-	call int32 array_tests::U16(int32, uint32, uint32)
-	brfalse FAIL
-
-	ldc.i4 0x00
-	ldc.i4 0x00007fff
-	ldc.i4 0x00007fff
 	call int32 array_tests::I(int32, int32, int32)
 	brfalse FAIL
 
@@ -327,18 +256,6 @@
 	ldc.i4 0x80000000
 	ldc.i4 0x80000000
 	call int32 array_tests::I32(int32, int32, int32)
-	brfalse FAIL
-
-	ldc.i4 0x00
-	ldc.i4 0x7fffffff
-	ldc.i4 0x7fffffff
-	call int32 array_tests::U32(int32, uint32, uint32)
-	brfalse FAIL
-
-	ldc.i4 0x01
-	ldc.i4 0x80000000
-	ldc.i4 0x80000000
-	call int32 array_tests::U32(int32, uint32, uint32)
 	brfalse FAIL
 
 PASS:

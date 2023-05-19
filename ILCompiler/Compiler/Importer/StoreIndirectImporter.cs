@@ -10,6 +10,7 @@ namespace ILCompiler.Compiler.Importer
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             VarType type;
+            int exactSize = 0;
             switch (instruction.OpCode.Code)
             {
                 case Code.Stind_I1:
@@ -36,11 +37,18 @@ namespace ILCompiler.Compiler.Importer
                     var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
                     typeSig = context.Method.ResolveType(typeSig);
                     type = typeSig.GetVarType();
+                    exactSize  = typeSig.GetInstanceFieldSize();
                     break;
 
                 default:
                     return false;
             }
+
+            if (instruction.OpCode.Code != Code.Stobj)
+            {
+                exactSize = type.GetTypeSize();
+            }
+
             var value = importer.PopExpression();
             var addr = importer.PopExpression();
 
@@ -54,8 +62,6 @@ namespace ILCompiler.Compiler.Importer
             {
                 value = new CastEntry(value, type);
             }
-
-            int exactSize = type.GetTypeSize();
 
             var node = new StoreIndEntry(addr, value, value.Type, fieldOffset: 0, exactSize);
 
