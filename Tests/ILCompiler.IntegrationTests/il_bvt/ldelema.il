@@ -197,12 +197,10 @@
 .maxstack  5
 .locals ()
 
-/*
 	ldc.i4 0x00
 	ldc.i4 0x72
 	call int32 array_tests::StructTest(int32, int32)
 	brfalse FAIL
-*/
 
 	ldc.i4 0x00
 	ldc.i4 0x72
