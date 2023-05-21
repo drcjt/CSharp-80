@@ -9,7 +9,7 @@
 
         public int ElemSize { get; }
 
-        public IndexRefEntry(StackEntry indexOp, StackEntry arrayOp, int elemSize, VarType type, short firstElementOffset) : base(type)
+        public IndexRefEntry(StackEntry indexOp, StackEntry arrayOp, int elemSize, VarType type, short firstElementOffset) : base(type, elemSize)
         {
             IndexOp = indexOp;
             ArrayOp = arrayOp;
