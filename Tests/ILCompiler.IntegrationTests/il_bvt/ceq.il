@@ -5,34 +5,22 @@
 .assembly TestAssembly
 {
 }
-.class public _cgt {
+.class public _ceq {
 
 .method public static int32 Main() {
 .entrypoint
 .maxstack 10
 
-	ldc.i4 0x7FFFFFFF
-	ldc.i4 0x00000001
-	cgt
+	ldc.i4 0x1234ABCD
+	ldc.i4 0x1234ABCD
+	ceq
 	brfalse fail
 
-	ldc.i4 0xFFFFFFFF
-	ldc.i4 0x00000001
-	cgt.un
-	brfalse fail
-
-	ldc.i4 0xFFFFFFFF
+	ldc.i4 0x1234ABCD
 	conv.u
-	ldc.i4 0x00000001
+	ldc.i4 0x1234ABCD
 	conv.u
-	cgt.un
-	brfalse fail
-
-	ldc.i4 0xFFFFFFFF
-	conv.u
-	ldc.i4 0x00000001
-	conv.u
-	cgt
+	ceq
 	brfalse fail
 
 pass:

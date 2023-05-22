@@ -20,6 +20,13 @@
 	clt.un
 	brfalse fail
 
+	ldc.i4 0x00000001
+	conv.u
+	ldc.i4 0xFFFFFFFF
+	conv.u
+	clt.un
+	brfalse fail
+
 pass:
 	ldc.i4 0x0000
 	ret
