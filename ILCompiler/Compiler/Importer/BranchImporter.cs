@@ -15,8 +15,11 @@ namespace ILCompiler.Compiler.Importer
                 case Code.Blt:
                 case Code.Blt_Un:
                 case Code.Bgt:
+                case Code.Bgt_Un:
                 case Code.Ble:
+                case Code.Ble_Un:
                 case Code.Bge:
+                case Code.Bge_Un:
                 case Code.Beq:
                 case Code.Bne_Un:
                 case Code.Brfalse:
@@ -27,8 +30,11 @@ namespace ILCompiler.Compiler.Importer
                 case Code.Blt_S:
                 case Code.Blt_Un_S:
                 case Code.Bgt_S:
+                case Code.Bgt_Un_S:
                 case Code.Ble_S:
+                case Code.Ble_Un_S:
                 case Code.Bge_S:
+                case Code.Bge_Un_S:
                 case Code.Beq_S:
                 case Code.Bne_Un_S:
                 case Code.Brfalse_S:
