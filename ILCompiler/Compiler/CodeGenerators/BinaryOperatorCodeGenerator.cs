@@ -40,7 +40,11 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             { Tuple.Create(Operation.Ne_Un, VarType.Ptr), "i_neq16" },
             { Tuple.Create(Operation.Eq, VarType.Ptr), "i_eq16" },
-            { Tuple.Create(Operation.Lt_Un, VarType.Ptr), "i_lt_un16" },
+            { Tuple.Create(Operation.Lt_Un, VarType.Ptr), "i_lt16" },
+            { Tuple.Create(Operation.Le_Un, VarType.Ptr), "i_le16" },
+            { Tuple.Create(Operation.Gt_Un, VarType.Ptr), "i_gt16" },
+            { Tuple.Create(Operation.Gt, VarType.Ptr), "i_gt16" },
+            { Tuple.Create(Operation.Ge, VarType.Ptr), "i_ge16" },
 
             { Tuple.Create(Operation.Ne_Un, VarType.Ref), "i_neq16" },
             { Tuple.Create(Operation.Eq, VarType.Ref), "i_eq16" },

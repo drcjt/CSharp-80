@@ -7,26 +7,28 @@
 }
 .method public static int32 Main() {
 .entrypoint
-.locals (int32*, int32*)
+.locals (int32, int32*, int32*)
 
-	ldloc 0
+	ldloca.s 0
+	stloc 1
+	ldloca.s 0
 	ldc.i4 0x2
 	add
-	stloc 1
+	stloc 2
 
-	ldloc 0
 	ldloc 1
+	ldloc 2
 	ble.un next0
 	br fail
 
 next0:
 
+	ldloc 2
 	ldloc 1
-	ldloc 0
 	ble.un fail
 
-	ldloc 0
-	ldloc 0
+	ldloc 1
+	ldloc 1
 	ble.un pass
 	br fail
 
