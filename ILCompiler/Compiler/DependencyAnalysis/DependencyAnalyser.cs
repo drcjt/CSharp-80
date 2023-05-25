@@ -82,12 +82,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     return;
                 }
 
-                var declaringType = fieldDef.DeclaringType;
-
-                if (declaringType != null)
-                {
-                    _dependencies.Add(_nodeFactory.TypeNode(declaringType));
-                }
+                _dependencies.Add(_nodeFactory.TypeNode(fieldDef));
             }
         }
 
