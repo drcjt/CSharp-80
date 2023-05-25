@@ -239,24 +239,18 @@ namespace ILCompiler.Compiler
             var dependencies = DependencyNodeHelpers.GetFlattenedDependencies(node);
             foreach (var dependentNode in dependencies)
             {
-                // If the type has static fields then need to reserve space for these fields
-                if (dependentNode is EETypeNode typeNode)
+                // For static field dependencies we need to reserve appropriate space for the field
+                if (dependentNode is StaticsNode typeNode)
                 {
-                    var typeDef = typeNode.Type;
-                    foreach (var field in typeDef.Fields)
-                    {
-                        if (field.IsStatic)
-                        {
-                            var fieldSize = field.FieldType.GetInstanceFieldSize();
-                            _logger.LogDebug("Reserving {fieldSize} bytes for static field {field.FullName}", fieldSize, field.FullName);
+                    var field = typeNode.Field;
+                    var fieldSize = field.FieldType.GetInstanceFieldSize();
+                    _logger.LogDebug("Reserving {fieldSize} bytes for static field {field.FullName}", fieldSize, field.FullName);
 
-                            // Need to mangle full field name here
-                            OutputLabel(_nameMangler.GetMangledFieldName(field));
+                    // Need to mangle full field name here
+                    OutputLabel(_nameMangler.GetMangledFieldName(field));
 
-                            // Emit fieldSize bytes with value 0
-                            _out.WriteLine(Instruction.Create(Opcode.Dc, (ushort)fieldSize, 0));
-                        }
-                    }
+                    // Emit fieldSize bytes with value 0
+                    _out.WriteLine(Instruction.Create(Opcode.Dc, (ushort)fieldSize, 0));
                 }
             }
         }

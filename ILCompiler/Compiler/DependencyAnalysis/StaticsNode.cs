@@ -2,17 +2,17 @@
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
-    public class EETypeNode : IDependencyNode
+    public class StaticsNode : IDependencyNode
     {
         public bool Analysed { get; set; }
 
         public bool Compiled { get; set; }
 
-        public TypeDef Type { get; private set; }
+        public FieldDef Field { get; private set; }
 
-        public EETypeNode(TypeDef type)
+        public StaticsNode(FieldDef field)
         {
-            Type = type;
+            Field = field;
             Dependencies = new List<IDependencyNode>();
         }
 

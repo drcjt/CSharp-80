@@ -5,18 +5,18 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class NodeFactory
     {
-        private IDictionary<string, EETypeNode> _typeNodesByFullName = new Dictionary<string, EETypeNode>();
+        private IDictionary<string, StaticsNode> _staticNodesByFullName = new Dictionary<string, StaticsNode>();
         private IDictionary<string, Z80MethodCodeNode> _methodNodesByFullName = new Dictionary<string, Z80MethodCodeNode>();
         
-        public EETypeNode TypeNode(TypeDef type)
+        public StaticsNode TypeNode(FieldDef field)
         {
-            if (!_typeNodesByFullName.TryGetValue(type.FullName, out var typeNode))
+            if (!_staticNodesByFullName.TryGetValue(field.FullName, out var staticNode))
             {
-                typeNode = new EETypeNode(type);
-                _typeNodesByFullName[type.FullName] = typeNode;
+                staticNode = new StaticsNode(field);
+                _staticNodesByFullName[field.FullName] = staticNode;
             }
 
-            return typeNode;
+            return staticNode;
         }
 
         public Z80MethodCodeNode MethodNode(MethodSpec calleeMethod, MethodDesc callerMethod)
