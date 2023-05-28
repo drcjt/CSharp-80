@@ -2,7 +2,7 @@
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
-    internal class DgmlWriter : IDisposable, IDependencyGraphNodeVisitor, IDependencyGraphEdgeVisitor
+    internal sealed class DgmlWriter : IDisposable, IDependencyGraphNodeVisitor, IDependencyGraphEdgeVisitor
     {
         private readonly XmlWriter _xmlWrite;
         private bool _done = false;
@@ -69,7 +69,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
         }
 
-        void IDisposable.Dispose()
+        public void Dispose()
         {
             Close();
         }

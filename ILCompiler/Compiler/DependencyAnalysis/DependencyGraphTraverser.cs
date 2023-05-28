@@ -7,7 +7,7 @@
         private readonly IDependencyGraphNodeVisitor _nodeVisitor;
         private readonly IDependencyGraphEdgeVisitor _edgeVisitor;
 
-        private IDependencyNode _root;
+        private readonly IDependencyNode _root;
 
         public DependencyGraphTraverser(IDependencyGraphNodeVisitor nodeVisitor, IDependencyGraphEdgeVisitor edgeVisitor, IDependencyNode root)
         {
