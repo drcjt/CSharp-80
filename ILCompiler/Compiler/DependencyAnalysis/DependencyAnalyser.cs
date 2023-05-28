@@ -88,6 +88,37 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportCall(Instruction instruction)
         {
+            if (instruction.OpCode.Code == Code.Newobj)
+            {
+                if (instruction.Operand is not IMethodDefOrRef methodDefOrRef)
+                {
+                    throw new InvalidOperationException("Newobj called with Operand which isn't a IMethodDefOrRef");
+                }
+
+                var declaringTypeSig = methodDefOrRef.DeclaringType.ToTypeSig();
+
+                if (declaringTypeSig.IsArray)
+                {
+                    // TODO: Will need to review this when changing NewArray assembly to take EEType instead of size
+                }
+                else
+                {
+                    var methodToCall = methodDefOrRef.ResolveMethodDefThrow();
+                    var declType = methodToCall.DeclaringType;
+
+                    var objType = declType.ToTypeSig();
+
+                    if (!declType.IsValueType)
+                    {
+                        // Determine required size on GC heap
+                        var allocSize = objType.GetInstanceByteCount();
+
+                        var constructedEETypeNode = new ConstructedEETypeNode(declType, allocSize);
+                        _dependencies.Add(constructedEETypeNode);
+                    }
+                }
+            }
+
             var method = instruction.Operand as IMethod;
             if (method != null)
             {
