@@ -5,8 +5,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class NodeFactory
     {
-        private IDictionary<string, StaticsNode> _staticNodesByFullName = new Dictionary<string, StaticsNode>();
-        private IDictionary<string, Z80MethodCodeNode> _methodNodesByFullName = new Dictionary<string, Z80MethodCodeNode>();
+        private readonly IDictionary<string, StaticsNode> _staticNodesByFullName = new Dictionary<string, StaticsNode>();
+        private readonly IDictionary<string, Z80MethodCodeNode> _methodNodesByFullName = new Dictionary<string, Z80MethodCodeNode>();
         
         public StaticsNode TypeNode(FieldDef field)
         {
