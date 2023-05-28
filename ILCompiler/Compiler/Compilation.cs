@@ -55,7 +55,7 @@ namespace ILCompiler.Compiler
             _z80Writer.OutputCode(rootNode, inputFilePath, outputFilePath);
         }
 
-        private void WriteDependencyLog(string fileName, IDependencyNode root)
+        private static void WriteDependencyLog(string fileName, IDependencyNode root)
         {
             using (FileStream dgmlOutput = new FileStream(fileName, FileMode.Create))
             {

@@ -48,25 +48,29 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             if (!_done)
             {
                 _done = true;
-                _xmlWrite.WriteStartElement("Properties");
-                {
-                    _xmlWrite.WriteStartElement("Property");
-                    _xmlWrite.WriteAttributeString("Id", "Label");
-                    _xmlWrite.WriteAttributeString("Label", "Label");
-                    _xmlWrite.WriteAttributeString("DataType", "String");
-                    _xmlWrite.WriteEndElement();
 
-                    _xmlWrite.WriteStartElement("Property");
-                    _xmlWrite.WriteAttributeString("Id", "Reason");
-                    _xmlWrite.WriteAttributeString("Label", "Reason");
-                    _xmlWrite.WriteAttributeString("DataType", "String");
-                    _xmlWrite.WriteEndElement();
-                }
+                _xmlWrite.WriteStartElement("Properties");
+                WritePropertyElements();
                 _xmlWrite.WriteEndElement();
 
                 _xmlWrite.WriteEndElement();
                 _xmlWrite.WriteEndDocument();
             }
+        }
+
+        private void WritePropertyElements()
+        {
+            _xmlWrite.WriteStartElement("Property");
+            _xmlWrite.WriteAttributeString("Id", "Label");
+            _xmlWrite.WriteAttributeString("Label", "Label");
+            _xmlWrite.WriteAttributeString("DataType", "String");
+            _xmlWrite.WriteEndElement();
+
+            _xmlWrite.WriteStartElement("Property");
+            _xmlWrite.WriteAttributeString("Id", "Reason");
+            _xmlWrite.WriteAttributeString("Label", "Reason");
+            _xmlWrite.WriteAttributeString("DataType", "String");
+            _xmlWrite.WriteEndElement();
         }
 
         public void Dispose()
