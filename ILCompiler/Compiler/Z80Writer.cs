@@ -225,7 +225,8 @@ namespace ILCompiler.Compiler
             {
                 OutputProlog(root.Method);
 
-                OutputNodes(root);
+                OutputStatics(root);
+                OutputEETypes(root);
                 OutputCodeForNode(root);
 
                 OutputEpilog();
@@ -234,7 +235,7 @@ namespace ILCompiler.Compiler
             _logger.LogDebug("Written compiled file to {_outputFilePath}", _outputFilePath);
         }
 
-        private void OutputNodes(Z80MethodCodeNode node)
+        private void OutputStatics(Z80MethodCodeNode node)
         {
             var dependencies = DependencyNodeHelpers.GetFlattenedDependencies(node);
             foreach (var dependentNode in dependencies)
@@ -251,6 +252,39 @@ namespace ILCompiler.Compiler
 
                     // Emit fieldSize bytes with value 0
                     _out.WriteLine(Instruction.Create(Opcode.Dc, (ushort)fieldSize, 0));
+
+                }
+            }
+        }
+
+        private void OutputEETypes(Z80MethodCodeNode node)
+        {
+            var eeTypes = new List<string>();
+
+            var dependencies = DependencyNodeHelpers.GetFlattenedDependencies(node);
+            foreach (var dependentNode in dependencies)
+            {
+                // For static field dependencies we need to reserve appropriate space for the field
+                if (dependentNode is ConstructedEETypeNode typeNode)
+                {
+                    var eeMangledTypeName = _nameMangler.GetMangledTypeName(typeNode.Type);
+
+                    if (!eeTypes.Contains(eeMangledTypeName))
+                    {
+                        eeTypes.Add(eeMangledTypeName);
+
+                        // Need to mangle full field name here
+                        OutputLabel(eeMangledTypeName);
+
+                        // Emit data for EEType here
+                        var baseSize = typeNode.BaseSize;
+
+                        byte lsb = (byte)(baseSize & 0xFF);
+                        byte msb = (byte)((baseSize >> 8) & 0xFF);
+
+                        _out.WriteLine(Instruction.Create(Opcode.Db, lsb, 0));
+                        _out.WriteLine(Instruction.Create(Opcode.Db, msb, 0));
+                    }
                 }
             }
         }
