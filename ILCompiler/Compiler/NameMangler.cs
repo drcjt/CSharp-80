@@ -85,7 +85,7 @@ namespace ILCompiler.Compiler
             }
 
             mangledName = $"t{nextTypeId++}";
-            _mangledMethodNames.Add(fullName, mangledName);
+            _mangledTypeNames.Add(fullName, mangledName);
 
             return mangledName;
         }
