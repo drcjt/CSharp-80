@@ -79,7 +79,7 @@ namespace ILCompiler.Compiler
 
         private string GetMangledTypeName(string fullName)
         {
-            if (_mangledMethodNames.TryGetValue(fullName, out string? mangledName))
+            if (_mangledTypeNames.TryGetValue(fullName, out string? mangledName))
             {
                 return mangledName;
             }
