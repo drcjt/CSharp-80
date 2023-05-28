@@ -10,6 +10,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public FieldDef Field { get; private set; }
 
+        public string Name => Field.FullName;
+
         public StaticsNode(FieldDef field)
         {
             Field = field;

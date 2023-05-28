@@ -47,9 +47,21 @@ namespace ILCompiler.Compiler
 
             var rootNode = _typeDependencyAnalyser.AnalyseDependencies(module.EntryPoint);
 
+            // Write dgml version of dependency graph
+            WriteDependencyLog(Path.ChangeExtension(inputFilePath, ".dgml"), rootNode);
+
             CompileNode(rootNode);
 
             _z80Writer.OutputCode(rootNode, inputFilePath, outputFilePath);
+        }
+
+        private static void WriteDependencyLog(string fileName, IDependencyNode root)
+        {
+            using (FileStream dgmlOutput = new FileStream(fileName, FileMode.Create))
+            {
+                DgmlWriter.WriteDependencyGraphToStream(dgmlOutput, root);
+                dgmlOutput.Flush();
+            }
         }
 
         private void CompileNode(Z80MethodCodeNode node)

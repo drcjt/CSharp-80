@@ -6,6 +6,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
     {
         public bool Analysed { get; set; }
         public MethodDesc Method { get; }
+        public string Name => Method.FullName;
 
         public Z80MethodCodeNode(MethodDesc method)
         {
