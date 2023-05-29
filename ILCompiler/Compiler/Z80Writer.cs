@@ -282,8 +282,8 @@ namespace ILCompiler.Compiler
                         byte lsb = (byte)(baseSize & 0xFF);
                         byte msb = (byte)((baseSize >> 8) & 0xFF);
 
-                        _out.WriteLine(Instruction.Create(Opcode.Db, lsb, 0));
-                        _out.WriteLine(Instruction.Create(Opcode.Db, msb, 0));
+                        _out.WriteLine(Instruction.Create(Opcode.Db, lsb));
+                        _out.WriteLine(Instruction.Create(Opcode.Db, msb));
                     }
                 }
             }
