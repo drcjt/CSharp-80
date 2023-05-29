@@ -26,7 +26,7 @@ READLINE:
 
 	; Allocate string object on heap
 	PUSH BC
-	CALL NewObject
+	CALL NewObjectTemp
 
 	POP HL		; Pointer to heap allocated string
 	POP BC		; Length of string

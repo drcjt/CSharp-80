@@ -17,7 +17,7 @@ NewString:
 	ADD HL, BC
 
 	PUSH HL
-	CALL NewObject	; Allocate object
+	CALL NewObjectTemp	; Allocate object
 	POP HL		; Address of new object
 
 	POP BC		; Restore original size

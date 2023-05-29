@@ -66,6 +66,7 @@
     <None Remove="Runtime\Memset.asm" />
     <None Remove="Runtime\NewArray.asm" />
     <None Remove="Runtime\NewObject.asm" />
+    <None Remove="Runtime\NewObjectTemp.asm" />
     <None Remove="Runtime\NewString.asm" />
     <None Remove="Runtime\print.asm" />
     <None Remove="Runtime\stoi.asm" />
@@ -100,6 +101,7 @@
     <EmbeddedResource Include="Runtime\GCGetTotalMemory.asm" />
     <EmbeddedResource Include="Runtime\Memcpy.asm" />
     <EmbeddedResource Include="Runtime\Memset.asm" />
+    <EmbeddedResource Include="Runtime\NewObjectTemp.asm" />
     <EmbeddedResource Include="Runtime\NewString.asm" />
     <EmbeddedResource Include="Runtime\print.asm" />
     <EmbeddedResource Include="Runtime\NewArray.asm" />

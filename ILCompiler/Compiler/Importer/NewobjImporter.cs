@@ -100,11 +100,10 @@ namespace ILCompiler.Compiler.Importer
                     }
                     else
                     {
-                        // Determine required size on GC heap
-                        var allocSize = objType.GetInstanceByteCount();
-
                         // Allocate memory for object
-                        var op1 = new AllocObjEntry(allocSize, objVarType);
+                        var mangledEETypeName = context.NameMangler.GetMangledTypeName(declType);
+
+                        var op1 = new AllocObjEntry(mangledEETypeName, objVarType);
 
                         // Store allocated memory address into a temp local variable
                         var lclNum = importer.GrabTemp(VarType.Ref, objSize);
