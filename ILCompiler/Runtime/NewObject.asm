@@ -1,26 +1,35 @@
-; This routine allocates a new object with the specified size on top of the stack
+; This routine allocates a new object using the EE Type pointer on top of the stack
 ;
-; Uses: HL, DE, BC
+; Uses: HL, DE, BC, IX
 
 NewObject:	
 	POP BC		; Save return address
 
-	; get size of memory to allocate
+	;get EE Type pointer into DE
 	POP DE
+
+	; Put address of allocated memory onto stack
+	LD HL, (HEAPNEXT)
+	PUSH HL
 
 	PUSH BC		; put return address back
 
-	; Get next available heap address into HL & BC
-	LD HL, (HEAPNEXT)
-	PUSH HL
-	POP BC
+	PUSH IX		; Save IX
+
+	PUSH DE		; Move DE into IX
+	POP IX
+
+	; Load base size into DE
+	LD D, (IX+1)
+	LD E, (IX+0)
 
 	; Move next available heap address by size of object to allocate
 	ADD HL, DE
 
-	; Check if Heap has collided with stack
+	; Save HeapNext
 	PUSH HL	
 
+	; Check if Heap has collided with stack
 	PUSH HL
 	POP DE		; DE = HeapNext
 
@@ -31,15 +40,18 @@ NewObject:
 	SBC HL, DE	; HL = (SP - 100) - HEAPNEXT
 	JR C, NewObject_NoSpace
 
+	; Store new next available address in HEAPNEXT	
 	POP HL
-	LD (HEAPNEXT), HL	; Store new next available address in heap
+	LD (HEAPNEXT), HL	;
 
-	POP HL;		Get return address
+	PUSH IX		; Move EE Type pointer into BC
+	POP BC
+	LD (HL), B	; Set EE Type pointer in newly allocated space
+	INC HL
+	LD (HL), C
 
-	; Put address of memory allocated back on the stack
-	PUSH BC		; allocated heap memory address
+	POP IX		; Restore IX
 
-	PUSH HL;	put return address back
 	RET
 
 NewObject_NoSpace:
