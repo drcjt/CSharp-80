@@ -19,36 +19,43 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public IList<IDependencyNode> FindDependencies()
         {
-            var currentIndex = 0;
-            var currentOffset = 0;
-
-            if (_method.Body != null)
+            if (!_method.IsIntrinsic)
             {
-                while (currentIndex < _method.Body.Instructions.Count)
+                var currentIndex = 0;
+                var currentOffset = 0;
+
+                if (_method.Body != null)
                 {
-                    var currentInstruction = _method.Body.Instructions[currentIndex];
-
-                    switch (currentInstruction.OpCode.Code)
+                    while (currentIndex < _method.Body.Instructions.Count)
                     {
-                        case Code.Newobj:
-                        case Code.Call:
-                        case Code.Callvirt:
-                            ImportCall(currentInstruction);
-                            break;
+                        var currentInstruction = _method.Body.Instructions[currentIndex];
+
+                        switch (currentInstruction.OpCode.Code)
+                        {
+                            case Code.Newobj:
+                            case Code.Call:
+                            case Code.Callvirt:
+                                ImportCall(currentInstruction);
+                                break;
+
+                            case Code.Newarr:
+                                ImportNewArray(currentInstruction);
+                                break;
 
 
-                        case Code.Ldsfld:
-                        case Code.Ldsflda:
-                            ImportLoadField(currentInstruction, true);
-                            break;
+                            case Code.Ldsfld:
+                            case Code.Ldsflda:
+                                ImportLoadField(currentInstruction, true);
+                                break;
 
-                        case Code.Stsfld:
-                            ImportStoreField(currentInstruction, true);
-                            break;
-                            
+                            case Code.Stsfld:
+                                ImportStoreField(currentInstruction, true);
+                                break;
+
+                        }
+                        currentOffset += currentInstruction.GetSize();
+                        currentIndex++;
                     }
-                    currentOffset += currentInstruction.GetSize();
-                    currentIndex++;
                 }
             }
 
@@ -82,8 +89,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     return;
                 }
 
-                _dependencies.Add(_nodeFactory.TypeNode(fieldDef));
+                _dependencies.Add(_nodeFactory.StaticsNode(fieldDef));
             }
+        }
+
+        private void ImportNewArray(Instruction instruction)
+        {
+            var elemTypeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
+            var elemTypeDef = (instruction.Operand as ITypeDefOrRef).ResolveTypeDefThrow();
+            var allocSize = elemTypeSig.GetInstanceByteCount();
+
+            _dependencies.Add(_nodeFactory.ConstructedEETypeNode(elemTypeDef, allocSize));
         }
 
         private void ImportCall(Instruction instruction)
@@ -151,8 +167,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     // Determine required size on GC heap
                     var allocSize = objType.GetInstanceByteCount();
 
-                    var constructedEETypeNode = new ConstructedEETypeNode(declType, allocSize);
-                    _dependencies.Add(constructedEETypeNode);
+                    _dependencies.Add(_nodeFactory.ConstructedEETypeNode(declType, allocSize));
                 }
             }
         }
