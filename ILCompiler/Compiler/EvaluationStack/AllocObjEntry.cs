@@ -5,9 +5,10 @@
         public int Size { get; }
         public string MangledEETypeName { get; }
 
-        public AllocObjEntry(string mangledEETypeName, VarType objType) : base(objType)
+        public AllocObjEntry(string mangledEETypeName, int objSize, VarType objType) : base(objType)
         {
             MangledEETypeName = mangledEETypeName;
+            Size = objSize;
         }
 
         public override void Accept(IStackEntryVisitor visitor)
@@ -17,7 +18,7 @@
 
         public override StackEntry Duplicate()
         {
-            return new AllocObjEntry(MangledEETypeName, Type);
+            return new AllocObjEntry(MangledEETypeName, Size, Type);
         }
     }
 }
