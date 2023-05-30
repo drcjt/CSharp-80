@@ -7,8 +7,20 @@ namespace ILCompiler.Compiler.DependencyAnalysis
     {
         private readonly IDictionary<string, StaticsNode> _staticNodesByFullName = new Dictionary<string, StaticsNode>();
         private readonly IDictionary<string, Z80MethodCodeNode> _methodNodesByFullName = new Dictionary<string, Z80MethodCodeNode>();
-        
-        public StaticsNode TypeNode(FieldDef field)
+        private readonly IDictionary<string, ConstructedEETypeNode> _constructedEETypeNodesByFullName = new Dictionary<string, ConstructedEETypeNode>();
+
+        public ConstructedEETypeNode ConstructedEETypeNode(TypeDef type, int size)
+        {
+            if (!_constructedEETypeNodesByFullName.TryGetValue(type.FullName, out var constructedEETypeNode))
+            {
+                constructedEETypeNode = new ConstructedEETypeNode(type, size);
+                _constructedEETypeNodesByFullName[type.FullName] = constructedEETypeNode;
+            }
+
+            return constructedEETypeNode;
+        }
+
+        public StaticsNode StaticsNode(FieldDef field)
         {
             if (!_staticNodesByFullName.TryGetValue(field.FullName, out var staticNode))
             {
