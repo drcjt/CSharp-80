@@ -137,7 +137,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
             if (declaringTypeSig.IsArray)
             {
-                // TODO: Will need to review this when changing NewArray assembly to take EEType instead of size
+                // TODO: Will need to review this when changing NewArray assembly routine to take EEType instead of size
             }
             else
             {
