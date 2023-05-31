@@ -1,9 +1,11 @@
-<p align="left"><img src="./Documentation/Images/csharp80logo.png" width="784"/></p>
+<p align="left"><img src="./Documentation/Images/CSharp80Logo.png" width="784"/></p>
 
 ![Build Status](https://github.com/drcjt/csharp-80/actions/workflows/build.yml/badge.svg)
 
 This repo contains a .NET ahead of time compiler targetting the Z80 8-bit microprocessor. Thec ompiler converts managed .NET applications into assembly language which is subsequently assembled using the [zmac](http://48k.ca/zmac.html) assembler. To learn more about CSharp-80, see the
 [intro document](Documentation/intro-to-csharp-80.md)
+
+Try out the samples applications [here](https://drcjt.github.io/CSharp-80/index.html)
 
 ## Credits
 This project was initally inspired heavily by the [C# Snake game](https://github.com/MichalStrehovsky/SeeSharpSnake) written by Michal Strehovský, and the 
@@ -25,7 +27,6 @@ in the dot net runtime. The z80 runtime code borrows heavily from the [z88dk pro
 
 ## Current Status
 
-* Try out the samples applications [here](https://drcjt.github.io/CSharp-80/index.html)
 * Compiles a number of sample programs including
     - Fibonacci
     - Simple paint program
