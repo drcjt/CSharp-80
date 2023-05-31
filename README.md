@@ -2,7 +2,7 @@
 
 ![Build Status](https://github.com/drcjt/csharp-80/actions/workflows/build.yml/badge.svg)
 
-This repo contains a .NET ahead of time compiler targetting the Z80 8-bit microprocessor. Thec ompiler converts managed .NET applications into assembly language which is subsequently assembled using the [zmac](http://48k.ca/zmac.html) assembler. To learn more about CSharp-80, see the
+This repo contains a .NET ahead of time compiler targetting the Z80 8-bit microprocessor. The compiler converts managed .NET applications into assembly language which is subsequently assembled using the [zmac](http://48k.ca/zmac.html) assembler. To learn more about CSharp-80, see the
 [intro document](Documentation/intro-to-csharp-80.md)
 
 Try out the samples applications [here](https://drcjt.github.io/CSharp-80/index.html)
