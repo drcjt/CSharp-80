@@ -1,9 +1,8 @@
-# CSharp-80
+<p align="left"><img src="./Documentation/Images/csharp80logo.png" width="784"/></p>
 
 ![Build Status](https://github.com/drcjt/csharp-80/actions/workflows/build.yml/badge.svg)
 
-This repo contains a .NET Core ahead of time compiler targetting the Z80 8-bit microprocessor. The compiler can compile a managed .NET Core application into an assembly language file that 
-can be easily turned into a native Z80 binary file using an assembler such as [zmac](http://48k.ca/zmac.html). To learn more about CSharp-80, see the
+This repo contains a .NET ahead of time compiler targetting the Z80 8-bit microprocessor. Thec ompiler converts managed .NET applications into assembly language which is subsequently assembled using the [zmac](http://48k.ca/zmac.html) assembler. To learn more about CSharp-80, see the
 [intro document](Documentation/intro-to-csharp-80.md)
 
 ## Credits
@@ -15,29 +14,32 @@ in the dot net runtime. The z80 runtime code borrows heavily from the [z88dk pro
 
 ## Goals
 
-* Idea is to support minimal subset of C# with tiny runtime system and target Z80 machine code to run on TRS-80 model 1 
-
-[<p align="center"><img src="./Documentation/Images/trs-80-model-1.png" width="250"/></p>](trs-80-model-1.png)
-
-* Be able to compile the [C# Snake game](https://github.com/MichalStrehovsky/SeeSharpSnake) with minimal modifications
+* Idea is to support minimal subset of C# with tiny runtime system and target Z80 processor
+* Runtime support for a number of computers including
+  - TRS-80 Model I/III <p align="center"><img src="./Documentation/Images/trs-80-model-1.png" width="250"/></p>
+  - ZX Spectrum
+  - CPM 
+* Compile the [C# Snake game](https://github.com/MichalStrehovsky/SeeSharpSnake) with minimal modifications
+* Have a range of sample applications for classic 8-bit computer programs
 * Learn more about AOT and the C# runtime
 
 ## Current Status
 
-* Try out snake [here](https://drcjt.github.io/CSharp-80/index.html)
-* Compiles a number of simple sample programs including a fibonacci calculator, very simple paint program, and a snake game
-* Snake game is using bespoke graphics on the TRS-80 implemented via the System.Graphics.SetPixel api.
+* Try out the samples applications [here](https://drcjt.github.io/CSharp-80/index.html)
+* Compiles a number of sample programs including
+    - Fibonacci
+    - Simple paint program
+    - Snake game
+    - Life
+    - Towers of Hanoi
+    - Prime number via several algorithms
+    - Hunt the Wumpus
+    - Netbot
+    - Graphics demo
+    - Calculate digits of Pi
+* Snake, Paint, Netbot, Graphics demo use bespoke graphics for the TRS-80 using a custom System.Graphics code
 * Performance is okay - snake is quite playable. Lots of scope for improvement here
-* All allocation is stack based - arrays can be done but only by using stackalloc
-* On stack structs work including as return arguments
+* Allocation on both stack and heap is supported
+* No Garbage collection
 * Lots of IL opcodes not implemented yet
-
-## Demos
-
-|Program|Source Code|Demo|
-|---|---|---|
-|Snake|[snake code](https://github.com/drcjt/CSharp-80/tree/main/Samples/Snake)|[snake demo](https://github.com/drcjt/CSharp-80/blob/main/Documentation/snake.gif)|
-|Netbot|[netbot](https://github.com/drcjt/CSharp-80/tree/main/Samples/NetBot)|[netbot demo](https://github.com/drcjt/CSharp-80/blob/main/Documentation/netbot.gif)|
-|Graphics|[graphics demo](https://github.com/drcjt/CSharp-80/tree/main/Samples/GfxDemos)|[graphics demo](https://github.com/drcjt/CSharp-80/blob/main/Documentation/gfxdemos.gif)|
-
-All of the demos here are recorded from running the programs in a TRS-80 emulator.
+* Platform support is limited for ZX Spectrum and CPM but text based samples should work fine
