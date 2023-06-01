@@ -80,7 +80,6 @@ namespace ILCompiler
                     configuration.IgnoreUnknownCil = parsedConfiguration.IgnoreUnknownCil;
                     configuration.PrintReturnCode = parsedConfiguration.PrintReturnCode;
                     configuration.IntegrationTests = parsedConfiguration.IntegrationTests;
-                    configuration.DontInlineRuntime = parsedConfiguration.DontInlineRuntime;
                     configuration.TargetArchitecture = parsedConfiguration.TargetArchitecture;
                     configuration.StackStart = parsedConfiguration.StackStart;
                     configuration.AssemblerArguments = parsedConfiguration.AssemblerArguments;
