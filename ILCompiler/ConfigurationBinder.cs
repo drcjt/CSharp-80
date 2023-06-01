@@ -17,7 +17,6 @@ namespace ILCompiler
             return new Configuration
             {
                 IgnoreUnknownCil = bindingContext.ParseResult.GetValueForOption(_configurationOptions.IgnoreUnknownCilOption),
-                DontInlineRuntime = bindingContext.ParseResult.GetValueForOption(_configurationOptions.DontInlineRuntimeOption),
                 PrintReturnCode = bindingContext.ParseResult.GetValueForOption(_configurationOptions.PrintReturnCodeOption),
                 CorelibPath = bindingContext.ParseResult.GetValueForOption(_configurationOptions.CoreLibPathOption) ?? "",
                 IntegrationTests = bindingContext.ParseResult.GetValueForOption(_configurationOptions.IntegrationTestsOption),
