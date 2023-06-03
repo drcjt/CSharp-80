@@ -14,8 +14,6 @@ namespace Paint
 
             Graphics.SetPixel(currentX, currentY, Color.White);
 
-            int ticks = Environment.TickCount;
-
             Color color = Color.White;
             Color cursorColor = Color.White;
             while (true)
@@ -56,16 +54,17 @@ namespace Paint
                             break;
                         }
 
+                        if (currentX < 0) currentX = Graphics.ScreenWidth;
+                        if (currentY < 0) currentY = Graphics.ScreenHeight;
+                        if (currentY > Graphics.ScreenHeight) currentY = 0;
+                        if (currentX > Graphics.ScreenWidth) currentX = 0;
+
                         Graphics.SetPixel(currentX, currentY, cursorColor);
                     }
                 }
 
-                if (Environment.TickCount - ticks > 300)
-                {
-                    Graphics.SetPixel(currentX, currentY, cursorColor);
-                    cursorColor = cursorColor == Color.Black ? Color.White : Color.Black;
-                    ticks = Environment.TickCount;
-                }
+                cursorColor = (Environment.TickCount & 256) != 0 ? Color.Black : Color.White;
+                Graphics.SetPixel(currentX, currentY, cursorColor);
             }
         }
     }
