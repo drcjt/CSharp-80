@@ -116,6 +116,26 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 if (method.IsMethodSpec)
                 {
+                    var methodDef = method.ResolveMethodDefThrow();
+
+                    if (methodDef.IsIntrinsic())
+                    {
+                        if (methodDef.DeclaringType.Name == "EETypePtr" && methodDef.DeclaringType.Namespace == "System" && methodDef.Name == "EETypePtrOf")
+                        {
+                            // Need to add constructed dependency on T
+                            var genericParameters = ((MethodSpec)method).GenericInstMethodSig.GenericArguments;
+                            var typeParam = genericParameters[0].TryGetTypeDefOrRef();
+                            var typeDef = typeParam.ResolveTypeDef();
+
+                            var objType = typeDef.ToTypeSig();
+
+                            // Determine required size on GC heap
+                            var allocSize = objType.GetInstanceByteCount();
+
+                            _dependencies.Add(_nodeFactory.ConstructedEETypeNode(typeDef, allocSize));
+                        }
+                    }
+
                     methodNode = _nodeFactory.MethodNode((MethodSpec)method, _method);
                 }
                 else
@@ -135,6 +155,14 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                         method = dependentMethod;
                     }
+                    if (methodDef.IsIntrinsic())
+                    {
+                        if (methodDef.DeclaringType.Name == "EETypePtr" && methodDef.DeclaringType.Namespace == "System" && methodDef.Name == "EETypePtrOf")
+                        {
+
+                        }
+                    }
+
                     methodNode = _nodeFactory.MethodNode(method);
                 }
 
