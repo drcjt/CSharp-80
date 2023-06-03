@@ -55,13 +55,21 @@
 
     public class NativeIntConstantEntry : ConstantEntry<short>
     {
+        public string SymbolName { get; private set; } = String.Empty;
         public NativeIntConstantEntry(short value, VarType type = VarType.Ptr) : base(type, value, VarType.Ptr.GetTypeSize())
         {
         }
 
+        public NativeIntConstantEntry(string symbol, VarType type = VarType.Ptr) : base(type, 0, VarType.Ptr.GetTypeSize())
+        {
+            SymbolName = symbol;
+        }
+
         public override StackEntry Duplicate()
         {
-            return new NativeIntConstantEntry(Value);
+            var duplicate = new NativeIntConstantEntry(Value);
+            duplicate.SymbolName = SymbolName;
+            return duplicate;
         }
 
         public override void Accept(IStackEntryVisitor visitor)

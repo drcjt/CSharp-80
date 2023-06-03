@@ -7,11 +7,19 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(NativeIntConstantEntry entry, CodeGeneratorContext context)
         {
-            var value = (entry as NativeIntConstantEntry).Value;
-            var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
+            if (entry.SymbolName != String.Empty)
+            {
+                context.Emitter.Ld(HL, entry.SymbolName);
+            }
+            else
+            {
+                var value = (entry as NativeIntConstantEntry).Value;
+                var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
 
-            // Native ints are only 16 bit so just push low word
-            context.Emitter.Ld(HL, low);
+                // Native ints are only 16 bit so just push low word
+                context.Emitter.Ld(HL, low);
+            }
+
             context.Emitter.Push(HL);
         }
     }
