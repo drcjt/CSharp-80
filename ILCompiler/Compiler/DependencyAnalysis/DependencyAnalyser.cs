@@ -155,14 +155,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                         method = dependentMethod;
                     }
-                    if (methodDef.IsIntrinsic())
-                    {
-                        if (methodDef.DeclaringType.Name == "EETypePtr" && methodDef.DeclaringType.Namespace == "System" && methodDef.Name == "EETypePtrOf")
-                        {
-
-                        }
-                    }
-
                     methodNode = _nodeFactory.MethodNode(method);
                 }
 
