@@ -11,11 +11,6 @@ namespace System
             _value = value;
         }
 
-        internal IntPtr ToPointer()
-        {
-            return _value;
-        }
-
         [Intrinsic]
         public static EETypePtr EETypePtrOf<T>()
         {
