@@ -7,7 +7,7 @@ namespace System
     {
         public unsafe static string Concat(string str0, string str1)
         {
-            string result = RuntimeImports.NewString(str0.Length + str1.Length);
+            string result = RuntimeImports.NewString(EETypePtr.EETypePtrOf<String>(), str0.Length + str1.Length);
 
             FillStringChecked(result, 0, str0);
             FillStringChecked(result, str0.Length, str1);

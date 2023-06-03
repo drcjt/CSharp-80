@@ -89,7 +89,7 @@ namespace ILCompiler.Compiler.Importer
             // Intrinsic calls
             if (methodToCall.IsIntrinsic() || isArrayMethod)
             {
-                if (ImportIntrinsicCall(methodToCall, arguments, importer))
+                if (ImportIntrinsicCall(methodToCall, arguments, importer, method, context))
                 {
                     return;
                 }
@@ -198,12 +198,26 @@ namespace ILCompiler.Compiler.Importer
         /// <param name="importer">importer used when generating IR</param>
         /// <returns>true if IR generated to replace call, false otherwise</returns>
         /// <exception cref="NotImplementedException"></exception>
-        private static bool ImportIntrinsicCall(MethodDef methodToCall, IList<StackEntry> arguments, IILImporterProxy importer)
+        private static bool ImportIntrinsicCall(MethodDef methodToCall, IList<StackEntry> arguments, IILImporterProxy importer, IMethod method, ImportContext context)
         {
             // Map method name to string that code generator will understand
             var targetMethodName = methodToCall.Name;
             switch (targetMethodName)
             {
+                case "EETypePtrOf":
+                    if (IsTypeName(methodToCall, "System", "EETypePtr"))
+                    {
+                        var genericParameters = ((MethodSpec)method).GenericInstMethodSig.GenericArguments;
+                        var typeParam = genericParameters[0].TryGetTypeDefOrRef();
+                        var typeDef = typeParam.ResolveTypeDef();
+                        var mangledEETypeName = context.NameMangler.GetMangledTypeName(typeDef);
+
+                        importer.PushExpression(new NativeIntConstantEntry(mangledEETypeName));
+
+                        return true;
+                    }
+                    break;
+
                 case "_Exit":
                     if (IsTypeName(methodToCall, "System", "Environment"))
                     {
