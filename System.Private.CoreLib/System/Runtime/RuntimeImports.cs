@@ -6,6 +6,6 @@ namespace System.Runtime
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         [RuntimeImport("NewString")]
-        public static unsafe extern string NewString(int length);
+        public static unsafe extern string NewString(EETypePtr pEEType, int length);
     }
 }

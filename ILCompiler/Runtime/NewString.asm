@@ -3,36 +3,48 @@
 ; Uses: HL, DE, BC
 
 ; TODO: Use this in readline too
-STRING_BASE_SIZE		EQU	2
+STRING_BASE_SIZE		EQU 4	; EE TYPE + SIZE = 4 bytes
 
 NewString:	
-	PUSH HL		; Save original size
 
-	; Compute overall size (align(base size + (element size * elements), 4))
-	INC HL		; Multiply elements * element size
+	; On entry HL = original size, stack has EEType
+
+	POP DE		; Return Address
+	POP BC		; EEType
+	PUSH DE		; Restore Return Address
+
+	PUSH HL		; Original Size
+
+	; Compute overall size (align(base size + (element size * elements), 4))	
+	INC HL
 	SLA L
 	RL H
 
-	LD BC, STRING_BASE_SIZE		; Add base size
-	ADD HL, BC
+	; Add base string size
+	LD DE, STRING_BASE_SIZE
+	ADD HL, DE
 
-	PUSH HL
-	CALL NewObjectTemp	; Allocate object
-	POP HL		; Address of new object
+	; Move size in bytes to DE
+	LD D, H
+	LD E, L
 
-	POP BC		; Restore original size
+	; Allocate the string on the heap and set the EEType
+	CALL NEWOBJECT
 
-	POP DE		; Get return address
+	POP HL		; Address of allocated string
+	POP BC		; Original size
 
-	PUSH HL		; Return value is address of new string
-	
-	INC HL		; Skip base size
+	POP DE		; Save return address
+
+	PUSH HL		; Address of allocated string
+
+	INC HL		; skip EE Type
 	INC HL
 
-	LD (HL), C	; Set the size for the new string in the first 2 bytes
+	LD (HL), C	; Set the size for the new string
 	INC HL
 	LD (HL), B
 
-	PUSH DE		; Restore return address
+	PUSH DE		; Restores return address
 
 	RET

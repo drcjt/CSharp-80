@@ -1,4 +1,5 @@
-﻿using System.Runtime;
+﻿using System;
+using System.Runtime;
 
 namespace CoreLib
 {
@@ -6,7 +7,7 @@ namespace CoreLib
     {
         public static void NewStringTests()
         {
-            string newString = RuntimeImports.NewString(25);
+            string newString = RuntimeImports.NewString(EETypePtr.EETypePtrOf<String>(), 25);
             Assert.Equals(25, newString.Length);
         }
     }

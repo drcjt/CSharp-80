@@ -11,12 +11,10 @@ namespace System
             _value = value;
         }
 
-        /* TODO : Need to implement this
         [Intrinsic]
-        internal static EETypePtr EETypePtrOf<T>()
+        public static EETypePtr EETypePtrOf<T>()
         {
             throw new Exception();
         }
-        */
     }
 }
