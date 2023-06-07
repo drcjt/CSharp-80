@@ -2,45 +2,37 @@
 ;
 ; Uses: HL, DE, BC
 ;
-; On entry: BC = EETypePtr, DE = size to be allocated
+; On Entry: BC = EETypePtr, DE = size to allocate
+; On Exit: HL = pointer to allocated object
+
+OFFSET_BASESIZE		EQU 0
 
 NewObject:	
-	; Put address of allocated memory onto stack
+
+	; Allocate and check if hit stack
+
 	LD HL, (HEAPNEXT)
-	PUSH HL
-
-	; Move next available heap address by size of object to allocate
 	ADD HL, DE
-	PUSH HL
+	OR A
+	SBC HL, SP
+	JR NC, AllocFailed
+	ADD HL, SP
 
-	; Check if Heap has collided with stack
-	PUSH HL
-	POP DE		; DE = HeapNext
-
-	LD HL, -100		; Need to leave bit of a gap
-	ADD HL, SP		; HL = SP - 100
-
-	AND A		; clear carry flag
-	SBC HL, DE	; HL = (SP - 100) - HEAPNEXT
-	JR C, NewObject_NoSpace
-
-	; Store new next available address in HEAPNEXT	
-	POP HL
 	LD (HEAPNEXT), HL
 
-	; Swap address of allocated memory and return address
-	POP HL	; Address of allocated memory
-	POP DE	; Return address
-	PUSH HL
-	PUSH DE
+	; Calculate new object pointer
+	OR A
+	SBC HL, DE
 
-	LD (HL), B	; Set EE Type pointer in newly allocated space
-	INC HL
+	; Set the new object's EETypePtr
 	LD (HL), C
+	INC HL
+	LD (HL), B
+	DEC HL
 
 	RET
 
-NewObject_NoSpace:
+AllocFailed:
 
 	LD HL, OOM_MSG - 2
 	CALL PRINT

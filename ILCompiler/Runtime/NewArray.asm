@@ -2,85 +2,81 @@
 ;
 ; Uses: HL, DE
 
-NewArray:	
-	EXX
-	POP HL		; Save return address
-	EXX
+; On entry on stack: EETypePtr, element size, element count
 
-	POP DE		; element size
+; CHANGE THIS TO BE JUST LIKE NEWSTRING BUT CALCULATION FOR SIZE MUST USE ELEM SIZE INSTEAD OF HAVING THIS HARDCODED AS 2
+; e.g. size = (element count * element size) + 4 ; 2 bytes for eetypeptr and 2 bytes for length
+
+NewArray:
+	; Save return address
+	POP AF
+	EX AF, AF'
+
+	; EETypePtr
 	POP HL
 
-	POP BC		; array size
-	POP HL
+	; Element Size
+	POP BC
+	POP AF
 
-	; Put array size into heap at next available location
-	LD HL, (HEAPNEXT)
-	LD (HL), C
-	INC HL
-	LD (HL), B
+	; Element Count
+	POP DE
+	POP AF
 
-	EXX
+	; Save EETypePtr & Element Count
+	PUSH DE
 	PUSH HL
-	EXX 
+
+	; HL = EETypePtr
+	; BC = Element Size
+	; DE = Element Count
 
 	; Multipy size (DE) by element size (BC)
 	LD A, 16
 	LD HL, 0
-
 newarr_mul16loop:
 	ADD HL, HL
-	rl e
-	rl d
-	jp nc, newarr_nomul16
-	add hl, bc
-	jp nc, newarr_nomul16
-	inc de
+	RL E
+	RL D
+	JP NC, newarr_nomul16
+	ADD HL, BC
+	JP NC, newarr_nomul16
+	INC DE
 newarr_nomul16:
-	dec a
-	jp nz, newarr_mul16loop
+	DEC A
+	JP NZ, newarr_mul16loop
 
-	; hl now has size of array to be allocated
-	; Add 2 bytes to hold the array size
-	inc hl
-	inc hl
+	; HL = size in bytes of elements
+	; BC = Element Size
+	; DE = 0
 
-	; Get next available heap address into DE & BC
-	LD DE, (HEAPNEXT)
-
-	PUSH DE
-	POP BC
-
-	; Move next available heap address by size of object to allocate
+	; Add 4 to HL to cater for EETypePtr and element count
+	LD DE, 4
 	ADD HL, DE
 
-	; Check if Heap has collided with stack
-	PUSH HL	
+	LD D, H
+	LD E, L
 
+	POP BC
+
+	; DE = size to allocate
+	; BC = EETypePtr
+	; Allocate object
+	CALL NEWOBJECT
+
+	; HL = ptr to new object
+
+	POP DE
 	PUSH HL
-	POP DE		; DE = HeapNext
 
-	LD HL, -100		; Need to leave bit of a gap
-	ADD HL, SP		; HL = SP - 100
+	; Set the new object's element count
+	INC HL
+	INC HL
+	LD (HL), E
+	INC HL
+	LD (HL), D
 
-	AND A		; clear carry flag
-	SBC HL, DE	; HL = (SP - 100) - HEAPNEXT
-	JR C, newarr_oom
-
-	POP HL
-	LD (HEAPNEXT), HL	; Store new next available address in heap
-
-	POP HL;		Get return address
-
-	; Put address of memory allocated back on the stack
-	PUSH BC		; allocated heap memory address
-
-	PUSH HL;	put return address back
+	EX AF, AF'
+	PUSH AF		; Restore return address
 
 	RET
-
-newarr_oom:
-	LD HL, OOM_MSG - 2
-	CALL PRINT
-
-	; Panic exit
-	JP EXIT

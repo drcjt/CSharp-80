@@ -10,8 +10,10 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.OpCode.Code != Code.Ldlen) return false;
 
-            var op1 = importer.PopExpression();
-            var node = new IndirectEntry(op1, VarType.UShort, 2);
+            var addr = importer.PopExpression();
+            var arraySizeOffset = new NativeIntConstantEntry(2);
+            addr = new BinaryOperator(Operation.Add, isComparison: false, addr, arraySizeOffset, VarType.Ptr);
+            var node = new IndirectEntry(addr, VarType.UShort, 2);
             importer.PushExpression(node);
             return true;
         }

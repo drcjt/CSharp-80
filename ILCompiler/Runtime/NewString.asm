@@ -1,50 +1,48 @@
-; Create a new string of the specified length
+; Allocate a new string
 ;
-; Uses: HL, DE, BC
+; Uses: HL, BC, DE
+;
+; On entry: HL = element count, EETypePtr on stack
+; On exit: HL = pointer to allocated object
 
-; TODO: Use this in readline too
-STRING_BASE_SIZE		EQU 4	; EE TYPE + SIZE = 4 bytes
+NewString:
 
-NewString:	
+	; Save return address
+	POP AF
+	EX AF, AF'
 
-	; On entry HL = original size, stack has EEType
+	; EETypePtr
+	POP BC
 
-	POP DE		; Return Address
-	POP BC		; EEType
-	PUSH DE		; Restore Return Address
-
-	PUSH HL		; Original Size
-
-	; Compute overall size (align(base size + (element size * elements), 4))	
-	INC HL
-	SLA L
-	RL H
-
-	; Add base string size
-	LD DE, STRING_BASE_SIZE
-	ADD HL, DE
-
-	; Move size in bytes to DE
+	; Move element count to DE
 	LD D, H
 	LD E, L
 
-	; Allocate the string on the heap and set the EEType
+	; Save element count
+	PUSH HL
+
+	; Compute overall size (base size + (element size * elements)) where element size = 2, base size = 4
+	INC DE
+	INC DE
+	SLA E
+	RL D
+
+	; Allocate object
 	CALL NEWOBJECT
 
-	POP HL		; Address of allocated string
-	POP BC		; Original size
+	; HL = pointer to allocated object
 
-	POP DE		; Save return address
+	POP DE
+	PUSH HL
 
-	PUSH HL		; Address of allocated string
-
-	INC HL		; skip EE Type
+	; Set the new object's element count
 	INC HL
-
-	LD (HL), C	; Set the size for the new string
 	INC HL
-	LD (HL), B
+	LD (HL), E
+	INC HL
+	LD (HL), D
 
-	PUSH DE		; Restores return address
+	EX AF, AF'
+	PUSH AF		; Restore return address
 
 	RET
