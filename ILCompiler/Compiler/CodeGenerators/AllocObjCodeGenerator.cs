@@ -12,6 +12,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             context.Emitter.Ld(BC, entry.MangledEETypeName);
             context.Emitter.Ld(DE, (ushort)entry.Size);
             context.Emitter.Call("NewObject");
+            context.Emitter.Push(HL);
         }
     }
 }

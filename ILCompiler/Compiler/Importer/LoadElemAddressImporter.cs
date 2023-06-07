@@ -33,7 +33,7 @@ namespace ILCompiler.Compiler.Importer
             }
 
             // addr + arraySizeOffset + (elemSize * index)
-            var arraySizeOffset = new NativeIntConstantEntry(2);
+            var arraySizeOffset = new NativeIntConstantEntry(4);
             addr = new BinaryOperator(Operation.Add, isComparison: false, addr, arraySizeOffset, VarType.Ptr);
             addr = new BinaryOperator(Operation.Add, isComparison: false, op2, addr, VarType.Ptr);
 
