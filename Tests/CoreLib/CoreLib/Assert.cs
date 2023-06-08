@@ -4,7 +4,7 @@ namespace CoreLib
 {
     internal static class Assert
     {
-        public static void Equals(bool expected, bool actual)
+        public static void AreEquals(bool expected, bool actual)
         {
             if (expected != actual)
             {
@@ -12,9 +12,17 @@ namespace CoreLib
             }
         }
 
-        public static void Equals(int expected, int actual)
+        public static void AreEquals(int expected, int actual)
         {
             if (expected != actual)
+            {
+                Environment.Exit(1);
+            }
+        }
+
+        public static void AreNotEquals(int expected, int actual)
+        {
+            if (expected == actual)
             {
                 Environment.Exit(1);
             }

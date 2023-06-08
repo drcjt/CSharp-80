@@ -8,7 +8,7 @@ namespace CoreLib
         {
             var chars = new char[25];
             string newString = new String(chars);
-            Assert.Equals(25, newString.Length);
+            Assert.AreEquals(25, newString.Length);
         }
     }
 }
