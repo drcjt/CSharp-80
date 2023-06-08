@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Internal.Runtime;
+using System.Runtime.CompilerServices;
 
 namespace System.Runtime
 {
@@ -6,6 +7,6 @@ namespace System.Runtime
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         [RuntimeImport("NewString")]
-        public static unsafe extern string NewString(EETypePtr pEEType, int length);
+        internal static unsafe extern string NewString(EEType* pEEType, int length);
     }
 }
