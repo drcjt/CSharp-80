@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Runtime;
 
 namespace CoreLib
 {
     public class StringTests
     {
-        public static void NewStringTests()
+        public static unsafe void NewStringTests()
         {
-            string newString = RuntimeImports.NewString(EETypePtr.EETypePtrOf<String>(), 25);
+            var chars = new char[25];
+            string newString = new String(chars);
             Assert.Equals(25, newString.Length);
         }
     }
