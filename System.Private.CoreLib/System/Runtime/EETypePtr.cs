@@ -1,18 +1,12 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Internal.Runtime;
+using System.Runtime.CompilerServices;
 
 namespace System
 {
-    public struct EETypePtr
+    public unsafe struct EETypePtr
     {
-        private IntPtr _value;
-
-        internal EETypePtr(IntPtr value)
-        {
-            _value = value;
-        }
-
         [Intrinsic]
-        public static EETypePtr EETypePtrOf<T>()
+        internal static EEType* EETypePtrOf<T>()
         {
             throw new Exception();
         }

@@ -27,7 +27,7 @@ namespace System
             }
         }
 
-        public static string Ctor(char[] value)
+        internal unsafe static string Ctor(char[] value)
         {
             string result = RuntimeImports.NewString(EETypePtr.EETypePtrOf<String>(), value.Length);
             Buffer.Memmove(ref result._firstChar, ref value[0], (uint)result.Length);

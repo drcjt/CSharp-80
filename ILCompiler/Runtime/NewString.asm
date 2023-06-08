@@ -2,7 +2,7 @@
 ;
 ; Uses: HL, BC, DE
 ;
-; On entry: HL = element count, EETypePtr on stack
+; On entry: HL, DE = element code, EETypePtr on stack
 ; On exit: HL = pointer to allocated object
 
 NewString:

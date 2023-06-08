@@ -1,7 +1,9 @@
-﻿namespace System
+﻿using Internal.Runtime;
+
+namespace System
 {
-    public class Object
+    public unsafe class Object
     {
-        public IntPtr m_pEEType;
+        internal EEType* m_pEEType;
     }
 }
