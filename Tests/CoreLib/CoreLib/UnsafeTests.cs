@@ -29,7 +29,7 @@ namespace CoreLib
         public unsafe static void InitBlockTests()
         {
             // TODO: Fix this when bug with stackalloc of size 0 fixed
-            // InitBlockStack(0, 1);
+            InitBlockStack(0, 1);
             InitBlockStack(1, 1);
             InitBlockStack(10, 0);           
             InitBlockStack(10, 2);
@@ -78,13 +78,10 @@ namespace CoreLib
             ref int r = ref Unsafe.As<byte, int>(ref testBytes.B0);
             Assert.Equals(0x42424242, r);
 
-            /*
-             * TODO: This needs ldelema to be implemented
             byte[] b = new byte[4] { 0x42, 0x42, 0x42, 0x42 };
-            ref int r = ref Unsafe.As<byte, int>(ref b[0]);
+            ref int r2 = ref Unsafe.As<byte, int>(ref b[0]);
 
-            Assert.Equals(0x42424242, r);
-            */
+            Assert.Equals(0x42424242, r2);
         }
     }
 
