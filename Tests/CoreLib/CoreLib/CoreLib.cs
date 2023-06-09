@@ -19,6 +19,9 @@
             UnsafeTests.InitBlockTests();
             UnsafeTests.CopyBlockTests();
 
+            AllocTests.AllocEETypeTests();
+            AllocTests.AllocSizeTests();
+
             return 0;
         }
     }

@@ -12,11 +12,12 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 if (entry.Arguments.Count > 0)
                 {
-                    // Pass last argument in HL for 2 bytes or less
-                    // and in HL, DE for larger datatypes
+                    // Pass last argument in HL for Ptr type
+                    // and in HL, DE otherwise
                     var argument = entry.Arguments[entry.Arguments.Count - 1];
                     context.Emitter.Pop(HL);
-                    if (argument.Type == VarType.Int || argument.Type == VarType.UInt)
+
+                    if (argument.Type != VarType.Ptr && argument.Type != VarType.Ref) // TODO: should this also check for ByRef??
                     {
                         context.Emitter.Pop(DE);
                     }

@@ -11,6 +11,7 @@ GCGetTotalMemory:
 	; Calculate memory used on heap
 	LD HL, (HEAPNEXT)
 	LD DE, HEAP
+	OR A
 	SBC HL, DE
 	PUSH HL		; LSW
 
