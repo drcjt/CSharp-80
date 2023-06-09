@@ -20,7 +20,7 @@
             UnsafeTests.CopyBlockTests();
 
             AllocTests.AllocEETypeTests();
-            //AllocTests.AllocSizeTests();
+            AllocTests.AllocSizeTests();
 
             return 0;
         }
