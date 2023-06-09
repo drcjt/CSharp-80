@@ -21,24 +21,11 @@ namespace CoreLib
             return eetypeptr;
         }
 
-        static public void AllocSizeTests()
+        private static void AllocStringSizeTest(char[] chars)
         {
             // This is not GC safe
-
             var totalMemory = GC.GetTotalMemory();
 
-            var chars = new char[5];
-
-            // intptr   EEType      2
-            // ushort   length      2
-            // char     elements    5 x 2
-            // -----------------------
-            // Total                14
-
-            Assert.AreEquals(14, GC.GetTotalMemory() - totalMemory);
-
-            totalMemory = GC.GetTotalMemory();
-            
             var str1 = new String(chars);
 
             // intptr   EEType      2
@@ -48,8 +35,12 @@ namespace CoreLib
             // Total                14
 
             Assert.AreEquals(14, GC.GetTotalMemory() - totalMemory);
+        }
 
-            totalMemory = GC.GetTotalMemory();
+        private static void AllocObjectSizeTest()
+        {
+            // This is not GC safe
+            var totalMemory = GC.GetTotalMemory();
 
             var obj = new TestClass();
 
@@ -61,6 +52,29 @@ namespace CoreLib
             //                      10
 
             Assert.AreEquals(10, GC.GetTotalMemory() - totalMemory);
+        }
+
+        private static void AllocArraySizeTest()
+        {
+            // This is not GC safe
+            var totalMemory = GC.GetTotalMemory();
+
+            var chars = new char[5];
+
+            // intptr   EEType      2
+            // ushort   length      2
+            // char     elements    5 x 2
+            // -----------------------
+            // Total                14
+
+            Assert.AreEquals(14, GC.GetTotalMemory() - totalMemory);
+        }
+
+        static public void AllocSizeTests()
+        {
+            AllocArraySizeTest();
+            AllocStringSizeTest(new char[5]);
+            AllocObjectSizeTest();
         }
 
         static public void AllocEETypeTests()
