@@ -130,13 +130,13 @@ namespace ILCompiler.Compiler.Importer
 
             if (!methodToCall.HasReturnType)
             {
-                importer.ImportAppendTree(callNode);
+                importer.ImportAppendTree(callNode, true);
             }
             else
             {
                 if (returnType.IsStruct())
                 {
-                    importer.ImportAppendTree(callNode);
+                    importer.ImportAppendTree(callNode, true);
 
                     // Load return buffer to stack
                     var loadTemp = new LocalVariableEntry(returnBufferArgIndex, returnType.GetVarType(), returnType.GetInstanceFieldSize());
