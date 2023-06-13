@@ -98,27 +98,19 @@ namespace ILCompiler.Compiler
 
         private void ImportSpillAppendTree(StackEntry entry)
         {
-            // If we have an assignment and the variable being assigned to
-            // has prior loads on the evaluation stack then we need to ensure
-            // these loads are completed before the variable is modified
-            if (entry is StoreLocalVariableEntry)
-            {
-                // TODO: Do we need to check that variable being assigned to is a struct type?
-
-                // Convert loads into assignmented to new temps
-                ImportSpillLocalReferences(entry.As<StoreLocalVariableEntry>().LocalNumber);
-            }
+            // Spill any existing stack entries to temps to preserve evaluation order
+            ImportSpillStackEntries();
             ImportAppendTree(entry);
         }
 
-        private void ImportSpillLocalReferences(int localNumber)
+        private void ImportSpillStackEntries()
         {
             for (int i = 0; i < _stack.Length; i++)
             {
                 // TODO: Check if this evaluation stack entry refers to the local to spill
                 // if not then it can be skipped otherwise ...
 
-                // Create an assignment node from the spilled local var to a new temp
+                // Create an assignment node from the spilled stack entry to a new temp
                 // The return value is a local var node for the new temp
                 var tempLocalVar = ImportSpillStackEntry(_stack[i], null);
 
