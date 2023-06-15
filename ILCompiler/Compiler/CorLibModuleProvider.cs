@@ -24,6 +24,6 @@ namespace ILCompiler.Compiler
         public CorLibTypeResolutionException() { }
         public CorLibTypeResolutionException(string message) : base(message) { }
         public CorLibTypeResolutionException(string message, Exception innerException) : base(message, innerException) { }
-        public CorLibTypeResolutionException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        protected CorLibTypeResolutionException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }
