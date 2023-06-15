@@ -10,11 +10,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly MethodDesc _method;
         private readonly IList<IDependencyNode> _dependencies = new List<IDependencyNode>();
         private readonly NodeFactory _nodeFactory;
+        private readonly CorLibModuleProvider _corLibModuleProvider;
 
-        public DependencyAnalyser(MethodDesc method, NodeFactory nodeFactory)
+        public DependencyAnalyser(MethodDesc method, NodeFactory nodeFactory, CorLibModuleProvider corLibModuleProvider)
         {
             _method = method;
             _nodeFactory = nodeFactory;
+            _corLibModuleProvider = corLibModuleProvider;
         }
 
         public IList<IDependencyNode> FindDependencies()
@@ -42,6 +44,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                                 ImportNewArray(currentInstruction);
                                 break;
 
+                            case Code.Ldstr:
+                                ImportLoadString();
+                                break;
 
                             case Code.Ldsfld:
                             case Code.Ldsflda:
@@ -70,6 +75,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private void ImportLoadField(Instruction instruction, bool isStatic)
         {
             ImportFieldAccess(instruction, isStatic);
+        }
+
+        private void ImportLoadString()
+        {
+            var systemStringType = _corLibModuleProvider.FindThrow("System.String");
+            var objType = systemStringType.ToTypeSig();
+
+            // Determine required size on GC heap
+            var allocSize = objType.GetInstanceByteCount();
+
+            _dependencies.Add(_nodeFactory.ConstructedEETypeNode(systemStringType, allocSize));
         }
 
         private void ImportFieldAccess(Instruction instruction, bool isStatic)

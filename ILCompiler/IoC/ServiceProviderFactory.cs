@@ -61,6 +61,8 @@ namespace ILCompiler.IoC
 
             services.AddSingleton<RTILProvider>();
 
+            services.AddSingleton<CorLibModuleProvider>();
+
             _serviceProvider = services.BuildServiceProvider();
 
             return ServiceProvider;
