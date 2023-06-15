@@ -7,11 +7,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
     {
         private readonly ILogger<TypeDependencyAnalyser> _logger;
         private readonly NodeFactory _nodeFactory;
+        private readonly CorLibModuleProvider _corLibModuleProvider;
 
-        public TypeDependencyAnalyser(ILogger<TypeDependencyAnalyser> logger)
+        public TypeDependencyAnalyser(ILogger<TypeDependencyAnalyser> logger, CorLibModuleProvider corLibModuleProvider)
         {
             _logger = logger;
             _nodeFactory = new NodeFactory();
+            _corLibModuleProvider = corLibModuleProvider;
         }
 
         private void AnalyzeDependenciesForMethodCodeNode(Z80MethodCodeNode codeNode)
@@ -19,7 +21,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             _logger.LogDebug("Analysing dependencies for {methodFullName}", codeNode.Method.FullName);
             codeNode.Analysed = true;
 
-            var dependencyAnalyser = new DependencyAnalyser(codeNode.Method, _nodeFactory);
+            var dependencyAnalyser = new DependencyAnalyser(codeNode.Method, _nodeFactory, _corLibModuleProvider);
             var dependencies = dependencyAnalyser.FindDependencies();
 
             foreach (var dependentMethod in dependencies)

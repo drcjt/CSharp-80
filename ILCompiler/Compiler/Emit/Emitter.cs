@@ -69,6 +69,7 @@ namespace ILCompiler.Compiler.Emit
         public void Db(string source) => EmitInstruction(Instruction.CreateDeclareByte(Opcode.Db, source));
         public void Db(string label, string source) => EmitInstruction(Instruction.CreateDeclareByte(Opcode.Db, source, label));
         public void Db(byte b) => EmitInstruction(Instruction.Create(Opcode.Db, b));
+        public void Dw(string source) => EmitInstruction(Instruction.CreateDeclareWord(Opcode.Dw, source));
         public void Defs(ushort size) => EmitInstruction(Instruction.Create(Opcode.Defs, size));
         public void Dc(ushort count, ushort value) => EmitInstruction(Instruction.Create(Opcode.Dc, count, value));
         public void Org(ushort target) => EmitInstruction(Instruction.Create(Opcode.Org, target));

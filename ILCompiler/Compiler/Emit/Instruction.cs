@@ -98,5 +98,8 @@ namespace ILCompiler.Compiler.Emit
             => new() { Label = label, Opcode = opcode, Op0 = new() { Data = data } };
         public static Instruction CreateDeclareByte(Opcode opcode, string data)
             => new() { Opcode = opcode, Op0 = new() { Data = data } };
+
+        public static Instruction CreateDeclareWord(Opcode opcode, string label)
+            => new() { Opcode = opcode, Op0 = new() { Label = label } };
     }
 }

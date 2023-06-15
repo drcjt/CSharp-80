@@ -3,6 +3,7 @@ using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using ILCompiler.IoC;
 using Microsoft.Extensions.Logging;
+using System.Runtime.CompilerServices;
 
 namespace ILCompiler.Compiler
 {
@@ -13,14 +14,16 @@ namespace ILCompiler.Compiler
         private readonly Factory<IMethodCompiler> _methodCompilerFactory;
         private readonly Z80Writer _z80Writer;
         private readonly TypeDependencyAnalyser _typeDependencyAnalyser;
+        private readonly CorLibModuleProvider _corLibModuleProvider;
 
-        public Compilation(IConfiguration configuration, ILogger<Compilation> logger, Factory<IMethodCompiler> methodCompilerFactory, Z80Writer z80Writer, TypeDependencyAnalyser typeDependencyAnalyser)
+        public Compilation(IConfiguration configuration, ILogger<Compilation> logger, Factory<IMethodCompiler> methodCompilerFactory, Z80Writer z80Writer, TypeDependencyAnalyser typeDependencyAnalyser, CorLibModuleProvider corLibModuleProvider)
         {
             _configuration = configuration;
             _logger = logger;
             _methodCompilerFactory = methodCompilerFactory;
             _z80Writer = z80Writer;
             _typeDependencyAnalyser = typeDependencyAnalyser;
+            _corLibModuleProvider = corLibModuleProvider;
         }
 
         public void Compile(string inputFilePath, string outputFilePath)
@@ -44,6 +47,8 @@ namespace ILCompiler.Compiler
                 CorLibAssemblyRef = corlibModule.Assembly.ToAssemblyRef()
             };
             ModuleDefMD module = ModuleDefMD.Load(inputFilePath, options);
+
+            _corLibModuleProvider.CorLibModule = corlibModule;
 
             var rootNode = _typeDependencyAnalyser.AnalyseDependencies(module.EntryPoint);
 

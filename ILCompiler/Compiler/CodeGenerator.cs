@@ -14,17 +14,19 @@ namespace ILCompiler.Compiler
         private readonly ILogger<CodeGenerator> _logger;
         private readonly ICodeGeneratorFactory _codeGeneratorFactory;
         private readonly IConfiguration _configuration;
+        private readonly CorLibModuleProvider _corLibModuleProvider;
 
         private readonly Dictionary<string, string> _labelsToStringData = new();
 
         private CodeGeneratorContext _context = null!;
 
-        public CodeGenerator(INameMangler nameMangler, ILogger<CodeGenerator> logger, ICodeGeneratorFactory codeGeneratorFactory, IConfiguration configuration)
+        public CodeGenerator(INameMangler nameMangler, ILogger<CodeGenerator> logger, ICodeGeneratorFactory codeGeneratorFactory, IConfiguration configuration, CorLibModuleProvider corLibModuleProvider)
         {
             _nameMangler = nameMangler;
             _logger = logger;
             _codeGeneratorFactory = codeGeneratorFactory;
             _configuration = configuration;
+            _corLibModuleProvider = corLibModuleProvider;
         }
 
         public IList<Instruction> Generate(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable, Z80MethodCodeNode methodCodeNode)
@@ -160,6 +162,9 @@ namespace ILCompiler.Compiler
 
         private void GenerateStringData(Emitter emitter)
         {
+            var systemStringType = _corLibModuleProvider.FindThrow("System.String");
+            var systemStringEETypeMangledName = _nameMangler.GetMangledTypeName(systemStringType);
+
             // TODO: Need to eliminate duplicate strings
             foreach (var keyValuePair in _labelsToStringData)
             {
@@ -167,9 +172,7 @@ namespace ILCompiler.Compiler
 
                 var stringData = keyValuePair.Value;
 
-                // TODO: This needs to the EEType for String
-                emitter.Db(0);
-                emitter.Db(0);
+                emitter.Dw(systemStringEETypeMangledName);
 
                 byte lsb = (byte)(stringData.Length & 0xFF);
                 byte msb = (byte)((stringData.Length >> 8) & 0xFF);
