@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using System.Runtime.Serialization;
 
 namespace ILCompiler.Compiler
 {
@@ -13,7 +14,16 @@ namespace ILCompiler.Compiler
                 return typeDef;
             }
 
-            throw new NullReferenceException("System.String type cannot be found in corlib module");
+            throw new CorLibTypeResolutionException("System.String type cannot be found in corlib module");
         }
+    }
+
+    [Serializable]
+    public class CorLibTypeResolutionException : Exception
+    {
+        public CorLibTypeResolutionException() { }
+        public CorLibTypeResolutionException(string message) : base(message) { }
+        public CorLibTypeResolutionException(string message, Exception innerException) : base(message, innerException) { }
+        public CorLibTypeResolutionException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }
