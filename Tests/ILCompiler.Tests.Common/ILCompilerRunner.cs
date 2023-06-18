@@ -16,7 +16,7 @@ namespace ILCompiler.Tests.Common
             var assemblyConfigurationAttribute = currentType?.Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
             var buildConfigurationName = assemblyConfigurationAttribute?.Configuration;
 
-            _corelibPath = Path.Combine(solutionPath, $@".\System.Private.CoreLib\bin\{buildConfigurationName}\net7.0\System.Private.CoreLib.dll");
+            _corelibPath = Path.Combine(solutionPath, $@".\System.Private.CoreLib\bin\Trs80\{buildConfigurationName}\net7.0\System.Private.CoreLib.dll");
         }
 
         public static ILCompilerRunner Create(string solutionPath)

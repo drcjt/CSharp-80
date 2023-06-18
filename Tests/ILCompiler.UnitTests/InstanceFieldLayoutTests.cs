@@ -22,7 +22,7 @@ namespace ILCompiler.UnitTests
             var assemblyConfigurationAttribute = currentType.Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
             var buildConfigurationName = assemblyConfigurationAttribute?.Configuration;
 
-            var corelibPath = Path.Combine(SolutionPath, $@".\System.Private.CoreLib\bin\{buildConfigurationName}\net7.0\System.Private.CoreLib.dll");
+            var corelibPath = Path.Combine(SolutionPath, $@".\System.Private.CoreLib\bin\Trs80\{buildConfigurationName}\net7.0\System.Private.CoreLib.dll");
             ModuleDefMD corlibModule = ModuleDefMD.Load(corelibPath, modCtx);
             ((AssemblyResolver)modCtx.AssemblyResolver).AddToCache(corlibModule);
 
