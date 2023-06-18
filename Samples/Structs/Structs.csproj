@@ -19,6 +19,10 @@
     <UseAppHost>false</UseAppHost>
     
     <OutputType>Exe</OutputType>
+	<TargetPlatform>Trs80</TargetPlatform>
+	<BaseOutputPath>bin\$(TargetPlatform)</BaseOutputPath>
+
+	<ILCompilerPath>$(SolutionDir)ILCompiler\bin\$(Configuration)\$(TargetFramework)\ILCompiler.exe</ILCompilerPath>	  
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,7 +31,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="$(SolutionDir)ILCompiler\$(OutDir)ILCompiler.exe --ignoreUnknownCil --outputFile $(TargetDir)$(TargetName).asm $(TargetPath)" />
+    <Exec Command="$(ILCompilerPath) --ignoreUnknownCil --outputFile $(TargetDir)$(TargetName).asm $(TargetPath) --targetArchitecture $(TargetPlatform)" />
   </Target>
   
 </Project>
