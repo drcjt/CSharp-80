@@ -20,7 +20,10 @@
 		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
 
 		<TargetPlatform>Trs80</TargetPlatform>
-		<!-- <TargetPlatform>ZXSpectrum</TargetPlatform> -->
+		<!--<TargetPlatform>ZXSpectrum</TargetPlatform>-->
+		<!--<TargetPlatform>CPM</TargetPlatform>-->
+
+		<BaseOutputPath>bin\$(TargetPlatform)</BaseOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetPlatform)' == 'ZXSpectrum'">
