@@ -8,7 +8,8 @@ namespace System
         public static unsafe extern String ReadLine();
 
         [DllImport(Libraries.Runtime, EntryPoint = "SetXY")]
-        private static unsafe extern void SetConsoleCursorPosition(sbyte x, sbyte y);
+        public static unsafe extern void SetConsoleCursorPosition(sbyte x, sbyte y);
+
         public static unsafe void SetCursorPosition(int x, int y) 
         {
             SetConsoleCursorPosition((sbyte)x, (sbyte)y);
@@ -32,5 +33,8 @@ namespace System
         public static unsafe ConsoleKeyInfo ReadKey(bool intercept) { return new ConsoleKeyInfo(); }
 
         public static bool KeyAvailable => false;
+
+        public static int WindowHeight { get { return 24; } }
+        public static int WindowWidth { get { return 32; } }
     }
 }

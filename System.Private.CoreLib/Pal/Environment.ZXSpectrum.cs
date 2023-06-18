@@ -3,7 +3,7 @@
 
 namespace System
 {
-    public static class Environment
+    public static partial class Environment
     {
         /// <summary>
         /// The ZX Spectrum contains a 3 byte frame counter in 23672-23674 which is incremented every 20ms.
