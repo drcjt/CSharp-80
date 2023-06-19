@@ -100,6 +100,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hanoi", "Samples\Hanoi\Hano
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Life", "Samples\Life\Life.csproj", "{1BE977D5-1629-47D2-9AE3-860B6394BA66}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mandel", "Samples\Mandel\Mandel.csproj", "{495D7C02-7945-4C18-9B20-9E49CD7B4CBE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -250,6 +252,10 @@ Global
 		{1BE977D5-1629-47D2-9AE3-860B6394BA66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BE977D5-1629-47D2-9AE3-860B6394BA66}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BE977D5-1629-47D2-9AE3-860B6394BA66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{495D7C02-7945-4C18-9B20-9E49CD7B4CBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{495D7C02-7945-4C18-9B20-9E49CD7B4CBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{495D7C02-7945-4C18-9B20-9E49CD7B4CBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{495D7C02-7945-4C18-9B20-9E49CD7B4CBE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -293,6 +299,7 @@ Global
 		{D6408007-7F39-4D5B-822D-086B509AE95C} = {BA9F8E73-7E2E-4E47-A614-CF6D8AD8445D}
 		{FFAF6123-8A64-47B3-B2AC-E02E87FD7B51} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 		{1BE977D5-1629-47D2-9AE3-860B6394BA66} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
+		{495D7C02-7945-4C18-9B20-9E49CD7B4CBE} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}
