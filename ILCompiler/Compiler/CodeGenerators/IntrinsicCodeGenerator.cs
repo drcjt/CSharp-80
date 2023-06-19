@@ -32,7 +32,8 @@ namespace ILCompiler.Compiler.CodeGenerators
                         context.Emitter.Pop(HL);    // chars are stored on stack as int32 so remove MSW
                         context.Emitter.Ld(A, L); // Load low byte of argument 1 into A
                         context.Emitter.Call(0x0033); // ROM routine to display character at current cursor position
-                    } else if (context.Configuration.TargetArchitecture == TargetArchitecture.ZXSpectrum)
+                    } 
+                    else if (context.Configuration.TargetArchitecture == TargetArchitecture.ZXSpectrum)
                     {
                         context.Emitter.Pop(HL);    // chars are stored on stack as int32 so remove MSW
                         context.Emitter.Ld(A, L); // Load low byte of argument 1 into A

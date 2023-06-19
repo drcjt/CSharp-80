@@ -4,9 +4,6 @@
 
 ; On entry on stack: EETypePtr, element size, element count
 
-; CHANGE THIS TO BE JUST LIKE NEWSTRING BUT CALCULATION FOR SIZE MUST USE ELEM SIZE INSTEAD OF HAVING THIS HARDCODED AS 2
-; e.g. size = (element count * element size) + 4 ; 2 bytes for eetypeptr and 2 bytes for length
-
 NewArray:
 	; Save return address
 	POP AF
