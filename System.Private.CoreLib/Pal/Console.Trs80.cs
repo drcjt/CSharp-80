@@ -40,7 +40,7 @@ namespace System
             else if (c == 'a')
                 k = ConsoleKey.RightArrow;
 
-            // dispplay key if required
+            // display key if required
             if (!intercept && c != 0)
             {
                 Write(c);
