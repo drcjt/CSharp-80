@@ -9,11 +9,11 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
-  build-corlib:
+  build-corelib:
     strategy:
       matrix:
-        platform: [Trs-80,ZXSpectrum]
-    name: Build ${{ matrix.platform }} corlib
+        platform: [Trs80,ZXSpectrum]
+    name: Build ${{ matrix.platform }} corelib
     runs-on: windows-latest
 
     steps:
@@ -40,14 +40,14 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore -p:TargetPlatform=${{ matrix.platform }} ./System.Private.Corelib/System.Private.Corelib.csproj
 
-      - name: Upload corlib build artifacts
+      - name: Upload corelib build artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: corlib-${{ matrix.platfom }}-build-artifact
-          path: System.Private.CorLib/bin/${{ matrix.platform }}
+          name: corelib-${{ matrix.platfom }}-build-artifact
+          path: ./System.Private.CoreLib/bin/${{ matrix.platform }}
 
   build-ilcompiler:
-    name: Build and analyze ILCompiler
+    name: Build ILCompiler
     runs-on: windows-latest
 
     steps:
