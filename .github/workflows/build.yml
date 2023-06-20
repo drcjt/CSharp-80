@@ -14,7 +14,7 @@ jobs:
     strategy:
       matrix:
         platform: [Trs80,ZXSpectrum]
-    name: Build, test and analyze, platform ${{ matrix.platform }} 
+    name: Build samples for ${{ matrix.platform }} 
     runs-on: windows-latest
 
     steps:
@@ -46,6 +46,20 @@ jobs:
 
       - name: Build
         run: dotnet build --configuration Release --no-restore -p:TargetPlatform=${{ matrix.platform }}
+
+      - name: Upload .cmd files for trs80 platform if they exist
+        if: ${{ matrix.platform == 'Trs80' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: samples-${{ matrix.platform }}
+          path: Samples/**/*.cmd
+
+      - name: Upload .tap files for zx spectrum platform if they exist
+        if: ${{ matrix.platform == 'ZXSpectrum' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: samples-${{ matrix.platform }}
+          path: Samples/**/*.tap
 
   build:
     name: Build, test and analyze 
@@ -109,7 +123,7 @@ jobs:
           .\.sonar\scanner\dotnet-sonarscanner begin /k:"drcjt_CSharp-80" /o:"drcjt" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" /d:sonar.cs.vstest.reportsPaths="**/*.trx" /d:sonar.coverage.exclusions="**Tests*.cs,Samples/**/*"
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore -p:TargetPlatform=${{ matrix.platform }}
+        run: dotnet build --configuration Release --no-restore
 
       - name: Test
         run: dotnet test --configuration Release --no-restore --collect:"XPlat Code Coverage;Format=opencover" --logger:trx --results-directory "TestResults" -p:BuildInParallel=false -m:1 
