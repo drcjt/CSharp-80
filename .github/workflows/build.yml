@@ -38,7 +38,7 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore -p:TargetPlatform=${{ matrix.platform }} .\System.Private.Corlib\System.Private.Corlib.csproj
+        run: dotnet build --configuration Release --no-restore -p:TargetPlatform=${{ matrix.platform }} ./System.Private.Corelib/System.Private.Corelib.csproj
 
       - name: Upload corlib build artifacts
         uses: actions/upload-artifact@v3
@@ -72,7 +72,7 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore ./ILCompiler/ILCompiler.csproj
 
       - name: Upload ilcompiler build artifacts
         uses: actions/upload-artifact@v3
