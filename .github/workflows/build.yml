@@ -8,80 +8,12 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
     cancel-in-progress: true
 
-jobs:
-  build-corelib:
+jobs:  
+  build:
     strategy:
       matrix:
         platform: [Trs80,ZXSpectrum]
-    name: Build ${{ matrix.platform }} corelib
-    runs-on: windows-latest
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '7.0.x'
-
-      - uses: actions/cache@v3
-        with:
-          path: ~/.nuget/packages
-          # Look to see if there is a cache hit for the corresponding requirements file
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget
-
-      - name: Install dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --configuration Release --no-restore -p:TargetPlatform=${{ matrix.platform }} ./System.Private.Corelib/System.Private.Corelib.csproj
-
-      - name: Upload corelib build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: corelib-${{ matrix.platfom }}-build-artifact
-          path: ./System.Private.CoreLib/bin/${{ matrix.platform }}
-
-  build-ilcompiler:
-    name: Build ILCompiler
-    runs-on: windows-latest
-
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-
-      - name: Setup .NET Core SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '7.0.x'
-
-      - uses: actions/cache@v3
-        with:
-          path: ~/.nuget/packages
-          # Look to see if there is a cache hit for the corresponding requirements file
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget
-
-      - name: Install dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --configuration Release --no-restore ./ILCompiler/ILCompiler.csproj
-
-      - name: Upload ilcompiler build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: ilcompiler-build-artifact
-          path: ILCompiler/bin
-  
-  build:
-    name: Build and analyze
+    name: Build, test and analyze, platform ${{ matrix.platform }} 
     runs-on: windows-latest
 
     steps:
@@ -139,10 +71,10 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         shell: powershell
         run: |
-          .\.sonar\scanner\dotnet-sonarscanner begin /k:"drcjt_CSharp-80" /o:"drcjt" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" /d:sonar.cs.vstest.reportsPaths="**/*.trx" /d:sonar.coverage.exclusions="**Tests*.cs,Samples/**/*"
+          .\.sonar\scanner\dotnet-sonarscanner begin /k:"drcjt_CSharp-80_${{ matrix.platform }}" /o:"drcjt" /d:sonar.login="${{ secrets.SONAR_TOKEN }}" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.cs.opencover.reportsPaths="**/coverage.opencover.xml" /d:sonar.cs.vstest.reportsPaths="**/*.trx" /d:sonar.coverage.exclusions="**Tests*.cs,Samples/**/*"
 
       - name: Build
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --configuration Release --no-restore -p:TargetPlatform=${{ matrix.platform }}
 
       - name: Test
         run: dotnet test --configuration Release --no-restore --collect:"XPlat Code Coverage;Format=opencover" --logger:trx --results-directory "TestResults" -p:BuildInParallel=false -m:1 
