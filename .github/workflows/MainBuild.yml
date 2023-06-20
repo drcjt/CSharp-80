@@ -162,8 +162,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: samples-${{ matrix.platform }}
-          path: Samples/**/*.cmd
-                Samples/*.dsk
+          path: |
+            Samples/**/*.cmd
+            Samples/*.dsk
 
       - name: Upload .tap files for zx spectrum platform if they exist
         if: ${{ matrix.platform == 'ZXSpectrum' }}
