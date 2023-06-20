@@ -9,6 +9,77 @@ concurrency:
     cancel-in-progress: true
 
 jobs:
+  build-corlib:
+    strategy:
+      matrix:
+        platform: [Trs-80,ZXSpectrum]
+    name: Build ${{ matrix.platform }} corlib
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+
+      - uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          # Look to see if there is a cache hit for the corresponding requirements file
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore -p:TargetPlatform=${{ matrix.platform }} .\System.Private.Corlib\System.Private.Corlib.csproj
+
+      - name: Upload corlib build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: corlib-${{ matrix.platfom }}-build-artifact
+          path: System.Private.CorLib/bin/${{ matrix.platform }}
+
+  build-ilcompiler:
+    name: Build and analyze ILCompiler
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '7.0.x'
+
+      - uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          # Look to see if there is a cache hit for the corresponding requirements file
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget
+
+      - name: Install dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Upload ilcompiler build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ilcompiler-build-artifact
+          path: ILCompiler/bin
+  
   build:
     name: Build and analyze
     runs-on: windows-latest
