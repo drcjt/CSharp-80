@@ -8,9 +8,9 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
     cancel-in-progress: true
 
-jobs:
+jobs:  
   build:
-    name: Build and analyze
+    name: Build, test and analyze 
     runs-on: windows-latest
 
     steps:
