@@ -1,7 +1,10 @@
+SCR_CT	EQU 23692	; Scroll Count
+
 PRINTCHR:
-	PUSH DE
-	PUSH HL
 	RST 0x10
-	POP HL
-	POP DE
+
+	; Reset Scroll count to prevent scroll? message
+	LD A, 255
+	LD (SCR_CT), A
+
 	RET
