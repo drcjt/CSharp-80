@@ -1,11 +1,17 @@
-﻿using System.Runtime.InteropServices;
+﻿using Internal.Runtime;
+using System.Runtime.InteropServices;
 
 namespace System
 {
     public static partial class Console
     {
         [DllImport(Libraries.Runtime, EntryPoint = "READLINE")]
-        public static unsafe extern String ReadLine();
+        private static unsafe extern String InternalReadLine(EEType* stringEEType);
+
+        public static unsafe string ReadLine()
+        {
+            return InternalReadLine(EETypePtr.EETypePtrOf<String>());
+        }
 
         [DllImport(Libraries.Runtime, EntryPoint = "SetXY")]
         public static unsafe extern void SetConsoleCursorPosition(sbyte x, sbyte y);

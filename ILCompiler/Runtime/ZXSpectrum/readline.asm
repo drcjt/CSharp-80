@@ -1,18 +1,6 @@
-READKEYPRESS:
-	PUSH HL
-	LD HL, 0x5C08
-	LD A, 255
-	LD (HL), A
-AWAITKEY:
-	CP (HL)
-	JR Z, AWAITKEY
-	LD A, (HL)
-	POP HL
-	RET
-
 ; read a line (upto 240 characters) of text
-
 READLINE:
+
 	LD HL, INPUTBUF
 	LD B, 240
 	LD C, B
@@ -56,37 +44,27 @@ READOVER:
 	; Now need to heap alloc a proper dotnet string and copy characters
 	; String has 2 bytes for length, followed by characters which are utf-16 so 2 bytes per character
 
-	; Put actual entered string length into BC
-	LD C, B
-	LD B, 0
+	POP HL		; Ret Address
+	POP DE		; EETypePtr
+	PUSH HL		; Ret Address
 
-	PUSH BC	; Save actual entered string size
+	; Put actual entered string length into HL
+	LD H, 0
+	LD L, B
 
-	; Required size = (actual size + 1) * 2, as we need 2 initial bytes tos hold the length
-	; and then each character itself will need 2 bytes as we are using utf-16
-	INC BC	; Add 1
-	SLA C	; Multiply size by 2
-	RL B
+	PUSH BC		; Save string length
 
-	; Allocate string object on heap
-	PUSH BC
-	CALL NewObjectTemp
+	PUSH DE
+	CALL NewString
 
-	POP HL		; Pointer to heap allocated string
-	POP BC		; Length of string
-	POP DE		; Return Address
+	POP HL		; HL = allocated string
+	POP BC		; BC = string length
 
-	PUSH DE		; Save return address
-	PUSH HL		; Save pointer to string object on heap
+	PUSH HL		; Save allocated string
 
-	INC HL		; Add base size
-	INC HL
-
-	; Put length into first 2 bytes of string object
-	LD (HL), C
-	INC HL
-	LD (HL), 0
-	INC HL
+	; Skip EEPtr and String Length
+	LD DE, 4
+	ADD HL, DE
 
 	; Copy characters from input buffer to heap allocated string object
 	LD DE, INPUTBUF
@@ -110,6 +88,18 @@ COPYCHAR:
 	PUSH HL		; LSW of heap allocated string obejct
 
 	PUSH DE		; Restore return address
+	RET
+
+READKEYPRESS:
+	PUSH HL
+	LD HL, 0x5C08
+	LD A, 255
+	LD (HL), A
+AWAITKEY:
+	CP (HL)
+	JR Z, AWAITKEY
+	LD A, (HL)
+	POP HL
 	RET
 
 INPUTBUF:	DEFS 240
