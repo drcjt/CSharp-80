@@ -60,7 +60,7 @@ namespace ILCompiler.Compiler.Emit
         public void Push(Register16 register) => EmitInstruction(Instruction.Create(Opcode.Push, register));
         public void Ret() => EmitInstruction(Instruction.Create(Opcode.Ret));
         public void Rr(Register8 target) => EmitInstruction(Instruction.Create(Opcode.Rr, target));
-        public void Rst(ushort target) => EmitInstruction(Instruction.Create(Opcode.Call, target));
+        public void Rst(ushort target) => EmitInstruction(Instruction.Create(Opcode.Rst, target));
         public void Sbc(Register16 target, Register16 source) => EmitInstruction(Instruction.Create(Opcode.Sbc, target, source));
         public void Sbc(Register8 target, Register8 source) => EmitInstruction(Instruction.Create(Opcode.Sbc, target, source));
         public void Srl(Register8 target) => EmitInstruction(Instruction.Create(Opcode.Srl, target));
