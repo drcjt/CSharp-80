@@ -48,7 +48,7 @@ namespace ILCompiler.Compiler
             {
                 TargetArchitecture.TRS80 => 0x5200,
                 TargetArchitecture.CPM => 0x100,
-                TargetArchitecture.ZXSpectrum => 0x8000,
+                TargetArchitecture.ZXSpectrum => 0x5CCB,
                 _ => throw new ArgumentException("Invalid target architecture value"),
             };
         }
@@ -93,9 +93,18 @@ namespace ILCompiler.Compiler
             emitter.CreateLabel("EXIT");
             if (!_configuration.IntegrationTests)
             {
-                // Reset stack pointer and return to OS
-                emitter.Ld(SP, __["ORIGSP"]);
-                emitter.Ret();
+                if (_configuration.TargetArchitecture == TargetArchitecture.ZXSpectrum)
+                {
+                    // No point exiting so just loop forever
+                    emitter.CreateLabel("EXITLOOP");
+                    emitter.Jp("EXITLOOP");
+                }
+                else
+                {
+                    // Reset stack pointer and return to OS
+                    emitter.Ld(SP, __["ORIGSP"]);
+                    emitter.Ret();
+                }
             }
             else
             {
