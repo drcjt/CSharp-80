@@ -2,19 +2,17 @@ SETXY:
 	POP BC	; return address
 
 	POP HL	 ; y
-
 	POP DE	 ; x
 
-	LD H, E	; HL = x, y
+	PUSH BC
 
 	ld a, 22
-	rst 2
+	rst 0x10
 
 	ld a, l
-	rst 2
+	rst 0x10
 
-	ld a, h
-	rst 2
+	ld a, e
+	rst 0x10
 
-	PUSH BC
 	RET
