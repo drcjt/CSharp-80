@@ -6,10 +6,12 @@ namespace Matrix
 {
     public static class Program
     {
-        const int Height = 16;
+        static int Height;
         const int Width = 20;
         public unsafe static void Main()
         {
+            Height = Console.WindowHeight - 1;
+
             var random = new Random(); // NOSONAR
 
             // TODO: Cannot use width here as this generates IL using

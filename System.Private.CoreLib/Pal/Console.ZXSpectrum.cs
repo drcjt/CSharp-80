@@ -40,7 +40,8 @@ namespace System
 
         public static bool KeyAvailable => false;
 
-        public static int WindowHeight { get { return 24; } }
+        // Although screen has 24 lines bottom 2 are reserved for input only
+        public static int WindowHeight { get { return 22; } }
         public static int WindowWidth { get { return 32; } }
     }
 }
