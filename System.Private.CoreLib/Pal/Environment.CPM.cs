@@ -9,6 +9,6 @@ namespace System
 
         public static DateTime GetDateTime() { return new DateTime(); }
 
-        public static char NewLine => '\r';
+        public static string NewLine => "\r\n";
     }
 }
