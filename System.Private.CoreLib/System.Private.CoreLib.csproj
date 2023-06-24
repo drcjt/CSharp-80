@@ -45,5 +45,15 @@
 		<Compile Include="Pal/Interop.Libraries.cs" />
 		<Compile Include="Pal/Thread.Trs80.cs" />
 	</ItemGroup>
-	
+
+	<ItemGroup Condition="'$(TargetPlatform)' == 'CPM'">
+		<Compile Remove="Pal\*" />
+		<Compile Include="Pal/Console.cs" />
+		<Compile Include="Pal/Console.CPM.cs" />
+		<Compile Include="Pal/Graphics.CPM.cs" />
+		<Compile Include="Pal/Environment.CPM.cs" />
+		<Compile Include="Pal/Interop.Libraries.cs" />
+		<Compile Include="Pal/Thread.CPM.cs" />
+	</ItemGroup>
+
 </Project>

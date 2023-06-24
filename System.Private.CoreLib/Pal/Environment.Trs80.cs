@@ -21,6 +21,6 @@ namespace System
         [DllImport(Libraries.Runtime, EntryPoint = "GETDATETIME")]
         public static extern DateTime GetDateTime();
 
-        public static char NewLine => '\n';
+        public static string NewLine => "\n";
     }
 }
