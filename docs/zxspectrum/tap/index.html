@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html> 
+ <head> 
+<title>C# programs running on a TRS-80 Model III Emulator</title> 
+<style type="text/css">
+body
+{
+	font-family: calibri,tahoma,arial,sans-serif;
+	background: #FFFFFF;
+	width: 550px;
+}
+</style> 
+
+<script type="text/javascript" src="trsemu-1.4.js"></script> 
+
+<script type="text/javascript">
+function togglePerf()
+{
+	var button = document.getElementById('perf');
+	var graph = document.getElementById('graphparent');
+	if (button) {
+		var show = "Show Time Graph";
+		var hide = "Hide Time Graph";
+		if (button.value == show) {
+			graph.style.display = "block";
+			trsEmu.perf('graphparent');
+			button.value = hide;
+		} else {
+			graph.style.display = "none";
+			trsEmu.perf('graphparent');
+			button.value = show;
+		}
+	}
+}
+</script>
+
+ </head> 
+ <body onload="trsEmu.screen('canvasparent').button('startstop').focus().run();"> 
+	<h3>C# programs running on a TRS-80 Model III Emulator</h3>
+		<h4>Programs to Try</h4>
+		<table>
+			<tr>
+				<td><input type="button" value="Hello" onClick="trsEmu.run('|[1]{bin/hello.cmd}')"></td>
+				<td>Hello World</td>
+				<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/Hello">Hello World C# code</a></td>
+			</tr>
+			<tr>
+				<td><input type="button" value="Snake" onClick="trsEmu.run('|[1]{bin/snake.cmd}')"></td>
+				<td>Snake game</td>
+				<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/Snake">Snake C# code</a></td>
+			</tr>
+			<tr>
+				<td><input type="button" value="dotnet bot" onClick="trsEmu.run('bin/netbot.cmd')"></td>
+				<td>Draws netbot</td>
+				<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/NetBot">Netbot C# code</a></td>
+			</tr>
+			<tr>
+				<td><input type="button" value="Hunt the wumpus" onClick="trsEmu.run('bin/wumpus.cmd')"></td>
+				<td>Hunt the wumpus</td>
+				<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/Wumpus">Hunt the Wumpus C# code</a></td>
+			</tr>
+			<tr>
+				<td><input type="button" value="Graphics demo" onClick="trsEmu.run('bin/gfxdemos.cmd')"></td>
+				<td>Graphics demo</td>
+				<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/GfxDemos">Graphics Demos C# code</a></td>
+			</tr>
+			<tr>
+				<td><input type="button" value="Calculate digits of Pi" onClick="trsEmu.run('bin/calcpi.cmd')"></td>
+				<td>Calculate digits of pi</td>
+				<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/CalcPi">Calculate digits of Pi C# code</a></td>
+			</tr>
+			<tr>
+				<td><input type="button" value="Towers of Hanoi" onClick="trsEmu.run('bin/hanoi.cmd')"></td>
+				<td>Tower of Hanoi</td>
+				<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/Hanoi">Towers of Hanoi C# code</a></td>
+			</tr>
+			<tr>
+				<td><input type="button" value="Game of Life" onClick="trsEmu.run('bin/life.cmd')"></td>
+				<td>Game of Life</td>
+				<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/Life">Game of Life C# code</a></td>
+			</tr>
+			<tr>
+				<td><input type="button" value="Paint" onClick="trsEmu.run('bin/paint.cmd')"></td>
+				<td>Paint</td>
+				<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/Paint">Paint C# code</a></td>
+			</tr>
+			<tr>
+				<td><input type="button" value="ASCII Mandelbrot" onClick="trsEmu.run('bin/mandel.cmd')"></td>
+				<td>Paint</td>
+				<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/Mandel">ASCII Mandelbrot C# code</a></td>
+			</tr>
+
+			</tbody>
+		</table>
+	<div id="canvasparent"><canvas width="512" height="384" style="border:solid 1px black; background:black"></canvas></div>
+	<br>
+	<div id="graphparent" style="display: none"><canvas width="512" height="100" style="border:solid 1px black; background:black"></canvas><br></div>
+	<input type="button" id="startstop" value="Run" onClick="trsEmu.run('toggle');">
+	<input type="button" value="Reset" onClick="trsEmu.run('reset');">
+	<input type="button" id="perf" value="Show Time Graph" onClick="togglePerf();">
+ </body> 
+</html> 

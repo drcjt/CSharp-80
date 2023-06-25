@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html> 
+
+<head>
+   <title>JSSpeccy v3</title>
+   <script src="jsspeccy.js"></script>
+   <style>
+	body
+	{
+		font-family: calibri,tahoma,arial,sans-serif;
+		background: #FFFFFF;
+		width: 550px;
+	}
+            #jsspeccy {
+                width: 640px;
+                margin: auto;
+                background-color: white;
+            }
+   </style>
+   <script>
+      var emu;
+
+      function run(tapfile)
+      {
+         if (emu) emu.exit();
+         emu = JSSpeccy(document.getElementById('jsspeccy'), {zoom: 2, sandbox: false, machine: '48', autoLoadTapes: 'true', openUrl: tapfile, autoStart: 'true'})
+      }	
+    </script>
+</head>
+<body>
+   <h3>C# programs running on a TRS-80 Model III Emulator</h3>
+   <h4>Programs to Try</h4>
+   <table>
+	<tr>
+		<td><input type="button" value="Hello" onClick="run('tap/hello.tap')"></td>
+		<td>Hello World</td>	
+		<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/Hello">Hello World C# code</a></td>		
+	</tr>
+<!--
+	<tr>
+		<td><input type="button" value="Snake" onClick="run('tap/snake.tap')"></td>
+		<td>Snake game</td>	
+		<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/Snake">Snake C# code</a></td>
+	</tr>
+	<tr>
+		<td><input type="button" value="dotnet bot" onClick="run('tap/netbot.tap')"></td>
+		<td>Draws netbot</td>
+		<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/NetBot">Netbot C# code</a></td>
+	</tr>
+-->
+	<tr>
+		<td><input type="button" value="Hunt the wumpus" onClick="run('tap/wumpus.tap')"></td>
+		<td>Hunt the wumpus</td>
+		<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/Wumpus">Hunt the Wumpus C# code</a></td>
+	</tr>
+<!--
+	<tr>
+		<td><input type="button" value="Graphics demo" onClick="run('tap/gfxdemos.tap')"></td>
+		<td>Graphics demo</td>
+		<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/GfxDemos">Graphics Demos C# code</a></td>
+	</tr>
+-->
+	<tr>
+		<td><input type="button" value="Calculate digits of Pi" onClick="run('tap/calcpi.tap')"></td>
+		<td>Calculate digits of pi</td>
+		<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/CalcPi">Calculate digits of Pi C# code</a></td>
+	</tr>
+	<tr>
+		<td><input type="button" value="Towers of Hanoi" onClick="run('tap/hanoi.tap')"></td>
+		<td>Tower of Hanoi</td>
+		<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/Hanoi">Towers of Hanoi C# code</a></td>
+	</tr>
+	<tr>
+		<td><input type="button" value="Game of Life" onClick="run('tap/life.tap')"></td>
+		<td>Game of Life</td>
+		<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/Life">Game of Life C# code</a></td>
+	</tr>
+<!--
+	<tr>
+		<td><input type="button" value="Paint" onClick="run('tap/paint.tap')"></td>
+		<td>Paint</td>
+		<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/Paint">Paint C# code</a></td>
+	</tr>
+-->
+	<tr>
+		<td><input type="button" value="Mandelbrot" onClick="run('tap/mandel.tap')"></td>
+		<td>ASCII Mandelbrot</td>
+		<td><a href="https://github.com/drcjt/CSharp-80/tree/main/Samples/Mandel">ASCII Mandebrot C# code</a></td>
+	</tr>
+
+    </table>
+
+    <div id="jsspeccy"></div>
+</body> 
+</html> 
