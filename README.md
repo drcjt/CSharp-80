@@ -8,7 +8,9 @@ which is subsequently assembled using the [zmac](http://48k.ca/zmac.html) assemb
 
 ## How to use
 
-Try out the sample applications in an online TRS-80 emulator [here](https://drcjt.github.io/CSharp-80/index.html)
+Try out the sample applications here:
+* For [Trs-80](https://drcjt.github.io/CSharp-80/trs80/index.html)
+* For [ZX Spectrum](https://drcjt.github.io/CSharp-80/zxspectrum/index.html)
 
 Currently the easiest way to use the compiler is to clone the repo, load the solution in Visual Studio, build, and then alter the code in one of the samples like Hello World.
 Rebuild and then you can see the z80 assembly in the Hello.lst file, look in Samples/Hello/bin/Trs80/Debug/net7.0. Note that by default the solution targets the TRS-80 platform 
