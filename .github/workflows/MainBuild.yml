@@ -123,7 +123,7 @@ jobs:
   samples:
     strategy:
       matrix:
-        platform: [Trs80,ZXSpectrum]
+        platform: [Trs80,ZXSpectrum,CPM]
     name: Build samples for ${{ matrix.platform }} 
     runs-on: windows-latest
 
@@ -172,3 +172,10 @@ jobs:
         with:
           name: samples-${{ matrix.platform }}
           path: Samples/**/*.tap
+
+      - name: Upload .hex files for cpm platform if they exist
+        if: ${{ matrix.platform == 'CPM' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: samples-${{ matrix.platform }}
+          path: Samples/**/*.hex
