@@ -11,6 +11,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public TypeDef Type { get; private set; }
         public int BaseSize { get; private set; }
+
+        public TypeDef? RelatedType { get; set; }
+
         public string Name => Type.FullName + " constructed";
 
         public ConstructedEETypeNode(TypeDef type, int baseSize)

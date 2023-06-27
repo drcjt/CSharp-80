@@ -30,7 +30,33 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 {
                     AnalyzeDependenciesForMethodCodeNode((Z80MethodCodeNode)dependentMethod);
                 }
+                else if (dependentMethod is ConstructedEETypeNode && !dependentMethod.Analysed)
+                {
+                    AnalyzeDependenciesForEETypeNode((ConstructedEETypeNode)dependentMethod);
+                }
+
                 codeNode.Dependencies.Add(dependentMethod);
+            }
+        }
+
+        private void AnalyzeDependenciesForEETypeNode(ConstructedEETypeNode typeNode)
+        {
+            var baseType = typeNode.Type.BaseType;
+
+            if (baseType != null)
+            {
+                var resolvedBaseType = baseType.ResolveTypeDefThrow();
+                typeNode.RelatedType = resolvedBaseType;
+
+                var objType = baseType.ToTypeSig();
+                if (!objType.IsValueType)
+                {
+                    var allocSize = objType.GetInstanceByteCount();
+                    var constructedEETypeNode = _nodeFactory.ConstructedEETypeNode(resolvedBaseType, allocSize);
+                    typeNode.Dependencies.Add(constructedEETypeNode);
+
+                    AnalyzeDependenciesForEETypeNode(constructedEETypeNode);
+                }
             }
         }
 

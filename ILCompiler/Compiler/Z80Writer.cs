@@ -293,6 +293,16 @@ namespace ILCompiler.Compiler
 
                         _out.WriteLine(Instruction.Create(Opcode.Db, lsb));
                         _out.WriteLine(Instruction.Create(Opcode.Db, msb));
+
+                        if (typeNode.RelatedType != null)
+                        {
+                            var relatedTypeMangledTypeName = _nameMangler.GetMangledTypeName(typeNode.RelatedType);
+                            _out.WriteLine(Instruction.Create(Opcode.Dw, relatedTypeMangledTypeName));
+                        }
+                        else
+                        {
+                            _out.WriteLine(Instruction.Create(Opcode.Dw, (ushort)0));
+                        }
                     }
                 }
             }
