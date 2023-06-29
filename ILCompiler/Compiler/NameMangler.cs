@@ -72,7 +72,7 @@ namespace ILCompiler.Compiler
             return GetMangledFieldName(field.FullName);
         }
 
-        public string GetMangledTypeName(TypeDef type)
+        public string GetMangledTypeName(ITypeDefOrRef type)
         {
             return GetMangledTypeName(type.FullName);
         }

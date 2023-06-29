@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using Microsoft.Extensions.Logging;
+using System.Data;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
@@ -41,21 +42,33 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void AnalyzeDependenciesForEETypeNode(ConstructedEETypeNode typeNode)
         {
-            var baseType = typeNode.Type.BaseType;
 
-            if (baseType != null)
+            if (typeNode.Type.ToTypeSig().IsSZArray)
             {
-                var resolvedBaseType = baseType.ResolveTypeDefThrow();
-                typeNode.RelatedType = resolvedBaseType;
+                var arrayType = _corLibModuleProvider.FindThrow("System.Array");
 
-                var objType = baseType.ToTypeSig();
-                if (!objType.IsValueType)
+                var allocSize = arrayType.ToTypeSig().GetInstanceByteCount();
+                var constructedEETypeNode = _nodeFactory.ConstructedEETypeNode(arrayType, allocSize);
+                typeNode.Dependencies.Add(constructedEETypeNode);
+            }
+            else
+            {
+                var baseType = typeNode.Type.GetBaseType();
+
+                if (baseType != null)
                 {
-                    var allocSize = objType.GetInstanceByteCount();
-                    var constructedEETypeNode = _nodeFactory.ConstructedEETypeNode(resolvedBaseType, allocSize);
-                    typeNode.Dependencies.Add(constructedEETypeNode);
+                    var resolvedBaseType = baseType.ResolveTypeDefThrow();
+                    typeNode.RelatedType = resolvedBaseType;
 
-                    AnalyzeDependenciesForEETypeNode(constructedEETypeNode);
+                    var objType = baseType.ToTypeSig();
+                    if (!objType.IsValueType)
+                    {
+                        var allocSize = objType.GetInstanceByteCount();
+                        var constructedEETypeNode = _nodeFactory.ConstructedEETypeNode(resolvedBaseType, allocSize);
+                        typeNode.Dependencies.Add(constructedEETypeNode);
+
+                        AnalyzeDependenciesForEETypeNode(constructedEETypeNode);
+                    }
                 }
             }
         }

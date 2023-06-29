@@ -9,7 +9,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly IDictionary<string, Z80MethodCodeNode> _methodNodesByFullName = new Dictionary<string, Z80MethodCodeNode>();
         private readonly IDictionary<string, ConstructedEETypeNode> _constructedEETypeNodesByFullName = new Dictionary<string, ConstructedEETypeNode>();
 
-        public ConstructedEETypeNode ConstructedEETypeNode(TypeDef type, int size)
+        public ConstructedEETypeNode ConstructedEETypeNode(ITypeDefOrRef type, int size)
         {
             if (!_constructedEETypeNodesByFullName.TryGetValue(type.FullName, out var constructedEETypeNode))
             {

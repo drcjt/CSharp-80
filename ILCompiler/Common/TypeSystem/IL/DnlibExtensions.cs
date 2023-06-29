@@ -6,6 +6,11 @@ namespace ILCompiler.Common.TypeSystem.IL
     {
         private const string CompilerIntrinsicAttribute = "System.Runtime.CompilerServices.IntrinsicAttribute";
 
+        public static ITypeDefOrRef MakeArrayType(this ITypeDefOrRef elementType)
+        {
+            return new SZArraySig(elementType.ToTypeSig()).ToTypeDefOrRef();
+        }
+
         public static bool IsIntrinsic(this IMethodDefOrRef method)
         {
             return method.HasCustomAttributes && method.CustomAttributes.IsDefined(CompilerIntrinsicAttribute);

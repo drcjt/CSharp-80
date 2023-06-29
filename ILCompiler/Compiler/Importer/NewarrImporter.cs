@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -13,17 +14,14 @@ namespace ILCompiler.Compiler.Importer
 
             var op2 = importer.PopExpression();
 
-            var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-            typeSig = context.Method.ResolveType(typeSig);
+            var elemTypeDef = (instruction.Operand as ITypeDefOrRef).ResolveTypeDefThrow();
+            var arrayType = elemTypeDef.MakeArrayType();
+
+            var typeSig = context.Method.ResolveType(elemTypeDef.ToTypeSig());
             var arrayElementSize = typeSig.GetInstanceFieldSize();
 
-            var elemTypeDef = (instruction.Operand as ITypeDefOrRef).ResolveTypeDefThrow();
-            var mangledEETypeName = context.NameMangler.GetMangledTypeName(elemTypeDef);
+            var mangledEETypeName = context.NameMangler.GetMangledTypeName(arrayType);
             var eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
-
-            // Instead of creating new node type specifically for arrays
-            // could leverage existing CallEntry node to call arbitrary helper functions
-            // can use this then for other helper functions too
 
             var args = new List<StackEntry>() { op2, new Int32ConstantEntry(arrayElementSize), eeTypeNode };
             var node = new CallEntry("NewArray", args, VarType.Ref, 2);
