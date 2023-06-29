@@ -111,11 +111,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportNewArray(Instruction instruction)
         {
-            var elemTypeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
             var elemTypeDef = (instruction.Operand as ITypeDefOrRef).ResolveTypeDefThrow();
-            var allocSize = elemTypeSig.GetInstanceByteCount();
+            var allocSize = elemTypeDef.ToTypeSig().GetInstanceByteCount();
 
-            _dependencies.Add(_nodeFactory.ConstructedEETypeNode(elemTypeDef, allocSize));
+            var arrayType = elemTypeDef.MakeArrayType();
+
+            _dependencies.Add(_nodeFactory.ConstructedEETypeNode(arrayType, allocSize));
         }
 
         private void ImportCall(Instruction instruction)
