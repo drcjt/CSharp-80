@@ -84,7 +84,14 @@ namespace ILCompiler.Compiler.Importer
                 }
                 else
                 {
-                    op1 = new Int32ConstantEntry(0);
+                    if (op2.Type == VarType.Ref)
+                    {
+                        op1 = new NativeIntConstantEntry(0);
+                    }
+                    else
+                    {
+                        op1 = new Int32ConstantEntry(0);
+                    }
                     op = (code == Code.Brfalse) ? Operation.Eq : Operation.Ne_Un;
                 }
 
