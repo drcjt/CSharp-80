@@ -11,6 +11,7 @@ namespace ILCompiler.Compiler
         private readonly IConfiguration _configuration;
         private readonly ILogger<ILImporter> _logger;
         private readonly INameMangler _nameMangler;
+        private readonly CorLibModuleProvider _corLibModuleProvider;
 
         private MethodDesc _method = null!;
         private IList<LocalVariableDescriptor> _localVariableTable = null!;
@@ -50,13 +51,14 @@ namespace ILCompiler.Compiler
             public int GrabTemp(VarType type, int? exactSize) => _importer.GrabTemp(type, exactSize);
         }
 
-        public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers)
+        public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, CorLibModuleProvider corlibModuleProvider)
         {
             _configuration = configuration;
             _basicBlocks = Array.Empty<BasicBlock>();
             _logger = logger;
             _nameMangler = nameMangler;
             _importers = importers;
+            _corLibModuleProvider = corlibModuleProvider;
 
             _importerProxy = new ILImporterProxy(this);
         }
@@ -157,7 +159,7 @@ namespace ILCompiler.Compiler
 
                 var opcode = currentInstruction.OpCode.Code;
                 var fallthroughBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null;
-                var importContext = new ImportContext(block, fallthroughBlock, _method, _nameMangler);
+                var importContext = new ImportContext(block, fallthroughBlock, _method, _nameMangler, _corLibModuleProvider);
 
                 var imported = false;
                 foreach (var importer in _importers)

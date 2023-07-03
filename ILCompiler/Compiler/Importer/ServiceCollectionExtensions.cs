@@ -43,6 +43,7 @@ namespace ILCompiler.Compiler.Importer
             services.AddSingleton<IOpcodeImporter, LoadNullImporter>();
             services.AddSingleton<IOpcodeImporter, SizeOfImporter>();
             services.AddSingleton<IOpcodeImporter, LoadElemAddressImporter>();
+            services.AddSingleton<IOpcodeImporter, IsInstImporter>();
             return services;
         }
     }

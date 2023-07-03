@@ -282,6 +282,7 @@ namespace ILCompiler.Compiler
                     {
                         eeTypes.Add(eeMangledTypeName);
 
+                        _out.WriteLine($";{typeNode.Type.FullName}");
                         // Need to mangle full field name here
                         OutputLabel(eeMangledTypeName);
 
