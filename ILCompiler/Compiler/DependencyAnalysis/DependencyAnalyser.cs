@@ -57,6 +57,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                                 ImportStoreField(currentInstruction, true);
                                 break;
 
+                            case Code.Isinst:
+                                ImportCasting(currentInstruction);
+                                break;
                         }
                         currentOffset += currentInstruction.GetSize();
                         currentIndex++;
@@ -65,6 +68,18 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
 
             return _dependencies;
+        }
+
+        private void ImportCasting(Instruction instruction)
+        {
+            var typeDef = (instruction.Operand as ITypeDefOrRef).ResolveTypeDefThrow();
+
+            var systemRuntimeTypeCast = _corLibModuleProvider.FindThrow("System.Runtime.TypeCast");
+            var runtimeHelperMethod = systemRuntimeTypeCast.FindMethod("IsInstanceOfClass");
+
+            var methodNode = _nodeFactory.MethodNode(runtimeHelperMethod);
+
+            _dependencies.Add(methodNode);
         }
 
         private void ImportStoreField(Instruction instuction, bool isStatic)
