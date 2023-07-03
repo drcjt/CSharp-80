@@ -12,12 +12,15 @@ namespace ILCompiler.Compiler.Importer
         public MethodDesc Method { get; }
         public INameMangler NameMangler { get; }
 
-        public ImportContext(BasicBlock currentBlock, BasicBlock? fallthroughBlock, MethodDesc method, INameMangler nameMangler)
+        public CorLibModuleProvider CorLibModuleProvider { get; }
+
+        public ImportContext(BasicBlock currentBlock, BasicBlock? fallthroughBlock, MethodDesc method, INameMangler nameMangler, CorLibModuleProvider corLibModuleProvider)
         {
             CurrentBlock = currentBlock;
             FallThroughBlock = fallthroughBlock;
             Method = method;
             NameMangler = nameMangler;
+            CorLibModuleProvider = corLibModuleProvider;
         }
     }
 }
