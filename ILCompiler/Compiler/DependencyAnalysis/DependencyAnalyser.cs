@@ -72,8 +72,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportCasting(Instruction instruction)
         {
-            var typeDef = (instruction.Operand as ITypeDefOrRef).ResolveTypeDefThrow();
-
             var systemRuntimeTypeCast = _corLibModuleProvider.FindThrow("System.Runtime.TypeCast");
             var runtimeHelperMethod = systemRuntimeTypeCast.FindMethod("IsInstanceOfClass");
 

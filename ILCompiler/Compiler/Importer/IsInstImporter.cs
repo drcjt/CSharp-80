@@ -35,7 +35,7 @@ namespace ILCompiler.Compiler.Importer
             return true;
         }
 
-        private string GetHelperMethod(ImportContext context)
+        private static string GetHelperMethod(ImportContext context)
         {
             var systemRuntimeTypeCast = context.CorLibModuleProvider.FindThrow("System.Runtime.TypeCast");
             var runtimeHelperMethod = systemRuntimeTypeCast.FindMethod("IsInstanceOfClass");
