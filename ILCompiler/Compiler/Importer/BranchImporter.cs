@@ -84,7 +84,7 @@ namespace ILCompiler.Compiler.Importer
                 }
                 else
                 {
-                    if (op2.Type == VarType.Ref)
+                    if (op2.Type == VarType.Ref || op2.Type == VarType.Ptr)
                     {
                         op1 = new NativeIntConstantEntry(0);
                     }
