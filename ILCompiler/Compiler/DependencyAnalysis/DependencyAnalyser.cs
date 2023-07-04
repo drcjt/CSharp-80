@@ -207,17 +207,22 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
             else
             {
-                var methodToCall = methodDefOrRef.ResolveMethodDefThrow();
-                var declType = methodToCall.DeclaringType;
-
-                var objType = declType.ToTypeSig();
-
-                if (!declType.IsValueType)
+                if (declaringTypeSig.FullName == "System.String")
                 {
-                    // Determine required size on GC heap
-                    var allocSize = objType.GetInstanceByteCount();
+                    // No need to add dependency here as newobj importer will
+                    // detect dynamic dependency automatically
+                }
+                else
+                {
 
-                    _dependencies.Add(_nodeFactory.ConstructedEETypeNode(declType, allocSize));
+                    var objType = declaringTypeSig.ToClassOrValueTypeSig();
+                    if (!objType.IsValueType)
+                    {
+                        // Determine required size on GC heap
+                        var allocSize = objType.GetInstanceByteCount();
+
+                        _dependencies.Add(_nodeFactory.ConstructedEETypeNode(objType.ToTypeDefOrRef(), allocSize));
+                    }
                 }
             }
         }
