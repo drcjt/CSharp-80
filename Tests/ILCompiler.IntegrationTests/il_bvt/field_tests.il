@@ -114,6 +114,7 @@
 	   dup
 	   stloc 2
 	   call instance void field_tests::initialize()
+
 	   ldloc 2
 	   ldfld int8 field_tests::i1Field
 	   ldc.i4 0x1
@@ -132,12 +133,10 @@
 	   ceq
 	   brfalse fail
 
-	   /* TODO: Fix this when isinst is implemented
 	   ldloc 2
 	   ldfld class field_tests field_tests::ptrField
 	   isinst field_tests
 	   brfalse fail
-	   */
 
 	   ldsfld int8 field_tests::i1SField
 	   ldc.i4 0x1
@@ -154,11 +153,9 @@
 	   ceq
 	   brfalse fail
 
-	   /* TODO: Fix this when isinst is implemented
 	   ldsfld class field_tests field_tests::ptrSField
 	   isinst field_tests
 	   brfalse fail
-	   */
 
 	pass:
 		ldc.i4 0x0000

@@ -58,49 +58,48 @@ namespace ILCompiler.Compiler.Importer
             else
             {
                 var methodToCall = methodDefOrRef.ResolveMethodDefThrow();
-                var declType = methodToCall.DeclaringType;
 
-                var objType = declType.ToTypeSig();
-                var objVarType = objType.GetVarType();
-                var objSize = objType.GetInstanceFieldSize();
-
-                if (declType.IsValueType)
+                if (methodToCall.DeclaringType.FullName == "System.String" &&
+                    methodToCall.IsInternalCall &&
+                    methodToCall.HasCustomAttribute("System.Diagnostics.CodeAnalysis", "DynamicDependencyAttribute"))
                 {
-                    // Allocate memory on the stack for the value type as a temp local variable
-                    var lclNum = importer.GrabTemp(objVarType, objSize);
-                    var newObjThisPtr = new LocalVariableAddressEntry(lclNum);
+                    // String constructors marked as dynamic dependencies simply
+                    // call the referred method which will deal with allocation and
+                    // construction.
+                    var dependentTypeAttribute = methodToCall.CustomAttributes.Find("System.Diagnostics.CodeAnalysis.DynamicDependencyAttribute");
 
-                    // Call the valuetype constructor
-                    CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
+                    var dependentMethodName = dependentTypeAttribute.ConstructorArguments[0].Value.ToString();
+                    if (dependentMethodName == null) throw new InvalidOperationException("DynamicDependencyAttribute missing method name");
 
-                    var node = new LocalVariableEntry(lclNum, VarType.Struct, objSize);
-                    importer.PushExpression(node);
+                    var dependentMethod = methodToCall.DeclaringType.FindMethodEndsWith(dependentMethodName);
+
+                    // Replace the method to call in the instruction with the one referred to by the dynamic dependency attribute
+                    instruction.Operand = dependentMethod;
+
+                    // Call the dynamic dependency method
+                    CallImporter.ImportCall(instruction, context, importer, null);
                 }
                 else
                 {
-                    if (methodToCall.DeclaringType.FullName == "System.String" && 
-                        methodToCall.IsInternalCall &&
-                        methodToCall.HasCustomAttribute("System.Diagnostics.CodeAnalysis", "DynamicDependencyAttribute"))
+                    var objType = declaringTypeSig.ToClassOrValueTypeSig();
+                    var objVarType = objType.GetVarType();
+                    var objSize = objType.GetInstanceFieldSize();
+
+                    if (objType.IsValueType)
                     {
-                        // String constructors marked as dynamic dependencies simply
-                        // call the referred method which will deal with allocation and
-                        // construction.
-                        var dependentTypeAttribute = methodToCall.CustomAttributes.Find("System.Diagnostics.CodeAnalysis.DynamicDependencyAttribute");
+                        // Allocate memory on the stack for the value type as a temp local variable
+                        var lclNum = importer.GrabTemp(objVarType, objSize);
+                        var newObjThisPtr = new LocalVariableAddressEntry(lclNum);
 
-                        var dependentMethodName = dependentTypeAttribute.ConstructorArguments[0].Value.ToString();
-                        if (dependentMethodName == null) throw new InvalidOperationException("DynamicDependencyAttribute missing method name");
+                        // Call the valuetype constructor
+                        CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
 
-                        var dependentMethod = methodToCall.DeclaringType.FindMethodEndsWith(dependentMethodName);
-
-                        // Replace the method to call in the instruction with the one referred to by the dynamic dependency attribute
-                        instruction.Operand = dependentMethod;
-
-                        // Call the dynamic dependency method
-                        CallImporter.ImportCall(instruction, context, importer, null);
+                        var node = new LocalVariableEntry(lclNum, VarType.Struct, objSize);
+                        importer.PushExpression(node);
                     }
                     else
                     {
-                        var mangledEETypeName = context.NameMangler.GetMangledTypeName(declType);
+                        var mangledEETypeName = context.NameMangler.GetMangledTypeName(objType.ToTypeDefOrRef());
 
                         // Determine required size on GC heap
                         var allocSize = objType.GetInstanceByteCount();
