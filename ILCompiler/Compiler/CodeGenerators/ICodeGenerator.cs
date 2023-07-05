@@ -2,7 +2,7 @@
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    public interface ICodeGenerator<T> where T : StackEntry
+    public interface ICodeGenerator<in T> where T : StackEntry
     {
         public void GenerateCode(T entry, CodeGeneratorContext context);
     }

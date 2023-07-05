@@ -12,6 +12,30 @@ namespace ILCompiler.Compiler.Emit
 
         public void FormatOperand(StringBuilder stringBuilder)
         {
+            if (FormatMemoryOperand(stringBuilder))
+            {
+                return;
+            }
+            else if (Register != Register.None)
+            {
+                stringBuilder.Append(Register);
+            }
+            else if (Label != null)
+            {
+                stringBuilder.Append(Label.ToUpper());
+            }
+            else if (Immediate != null)
+            {
+                stringBuilder.Append(Immediate);
+            }
+            else if (Data != null)
+            {
+                stringBuilder.Append($"'{Data}'");
+            }
+        }
+
+        private bool FormatMemoryOperand(StringBuilder stringBuilder)
+        {
             if (Memory != null)
             {
                 stringBuilder.Append('(');
@@ -39,23 +63,10 @@ namespace ILCompiler.Compiler.Emit
                 }
 
                 stringBuilder.Append(')');
+                return true;
             }
-            else if (Register != Register.None)
-            {
-                stringBuilder.Append(Register);
-            }
-            else if (Label != null)
-            {
-                stringBuilder.Append(Label.ToUpper());
-            }
-            else if (Immediate != null)
-            {
-                stringBuilder.Append(Immediate);
-            }
-            else if (Data != null)
-            {
-                stringBuilder.Append($"'{Data}'");
-            }
+
+            return false;
         }
     }
 }

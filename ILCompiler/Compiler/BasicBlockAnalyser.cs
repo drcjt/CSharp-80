@@ -26,7 +26,7 @@ namespace ILCompiler.Compiler
             return basicBlocks;
         }
 
-        private void CreateBasicBlock(BasicBlock[] basicBlocks, int offset)
+        private static void CreateBasicBlock(BasicBlock[] basicBlocks, int offset)
         {
             var basicBlock = basicBlocks[offset];
             if (basicBlock == null)
@@ -93,13 +93,11 @@ namespace ILCompiler.Compiler
 
                     case Code.Switch:
                         {
-                            var targets = currentInstruction.Operand as dnlib.DotNet.Emit.Instruction[];
-                            if (targets != null)
+                            if (currentInstruction.Operand is Instruction[] targets)
                             {
                                 foreach (var target in targets)
                                 {
-                                    var targetOffset = target.Offset;
-                                    CreateBasicBlock(basicBlocks, (int)targetOffset); // target of jump
+                                    CreateBasicBlock(basicBlocks, (int)target.Offset); // target of jump
                                 }
                             }
                             var nextInstructionOffset = currentOffset + currentInstruction.GetSize();

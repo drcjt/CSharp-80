@@ -6,8 +6,8 @@ namespace ILCompiler.Common.TypeSystem.Common
     {
         public int Value { get; private set; }
 
-        public static readonly LayoutInt Zero = new LayoutInt(0);
-        public static readonly LayoutInt One = new LayoutInt(1);
+        public static readonly LayoutInt Zero = new(0);
+        public static readonly LayoutInt One = new(1);
 
         public LayoutInt(int value)
         {
@@ -37,9 +37,9 @@ namespace ILCompiler.Common.TypeSystem.Common
 
         public override bool Equals(object? obj)
         {
-            if (obj is LayoutInt)
+            if (obj is LayoutInt layoutInt)
             {
-                return this == (LayoutInt)obj;
+                return this == layoutInt;
             }
             return false;
         }

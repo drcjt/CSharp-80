@@ -4,7 +4,7 @@ using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    internal class CopyHelper
+    internal static class CopyHelper
     {
         public static void CopyStackToSmall(Emitter emitter, int bytesToCopy, int ixOffset)
         {

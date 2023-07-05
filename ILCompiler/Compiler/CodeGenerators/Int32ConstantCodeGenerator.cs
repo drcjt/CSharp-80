@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(Int32ConstantEntry entry, CodeGeneratorContext context)
         {
-            var value = (entry as Int32ConstantEntry).Value;
+            var value = entry.Value;
             var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
             var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
 

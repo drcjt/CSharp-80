@@ -58,7 +58,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                                 break;
 
                             case Code.Isinst:
-                                ImportCasting(currentInstruction);
+                                ImportCasting();
                                 break;
                         }
                         currentOffset += currentInstruction.GetSize();
@@ -70,7 +70,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return _dependencies;
         }
 
-        private void ImportCasting(Instruction instruction)
+        private void ImportCasting()
         {
             var systemRuntimeTypeCast = _corLibModuleProvider.FindThrow("System.Runtime.TypeCast");
             var runtimeHelperMethod = systemRuntimeTypeCast.FindMethod("IsInstanceOfClass");
@@ -139,8 +139,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 CreateConstructedEETypeNodeDependencies(instruction);
             }
 
-            var method = instruction.Operand as IMethod;
-            if (method != null)
+            if (instruction.Operand is IMethod method)
             {
                 Z80MethodCodeNode methodNode;
 
@@ -148,22 +147,19 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 {
                     var methodDef = method.ResolveMethodDefThrow();
 
-                    if (methodDef.IsIntrinsic())
+                    if (methodDef.IsIntrinsic() && methodDef.DeclaringType.Name == "EETypePtr" && methodDef.DeclaringType.Namespace == "System" && methodDef.Name == "EETypePtrOf")
                     {
-                        if (methodDef.DeclaringType.Name == "EETypePtr" && methodDef.DeclaringType.Namespace == "System" && methodDef.Name == "EETypePtrOf")
-                        {
-                            // Need to add constructed dependency on T
-                            var genericParameters = ((MethodSpec)method).GenericInstMethodSig.GenericArguments;
-                            var typeParam = genericParameters[0].TryGetTypeDefOrRef();
-                            var typeDef = typeParam.ResolveTypeDef();
+                        // Need to add constructed dependency on T
+                        var genericParameters = ((MethodSpec)method).GenericInstMethodSig.GenericArguments;
+                        var typeParam = genericParameters[0].TryGetTypeDefOrRef();
+                        var typeDef = typeParam.ResolveTypeDef();
 
-                            var objType = typeDef.ToTypeSig();
+                        var objType = typeDef.ToTypeSig();
 
-                            // Determine required size on GC heap
-                            var allocSize = objType.GetInstanceByteCount();
+                        // Determine required size on GC heap
+                        var allocSize = objType.GetInstanceByteCount();
 
-                            _dependencies.Add(_nodeFactory.ConstructedEETypeNode(typeDef, allocSize));
-                        }
+                        _dependencies.Add(_nodeFactory.ConstructedEETypeNode(typeDef, allocSize));
                     }
 
                     methodNode = _nodeFactory.MethodNode((MethodSpec)method, _method);
@@ -207,14 +203,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
             else
             {
-                if (declaringTypeSig.FullName == "System.String")
+                if (declaringTypeSig.FullName != "System.String")
                 {
-                    // No need to add dependency here as newobj importer will
-                    // detect dynamic dependency automatically
-                }
-                else
-                {
-
                     var objType = declaringTypeSig.ToClassOrValueTypeSig();
                     if (!objType.IsValueType)
                     {

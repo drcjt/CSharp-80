@@ -1,4 +1,5 @@
-﻿using ILCompiler.Common.TypeSystem.Common;
+﻿using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
 using ILCompiler.Interfaces;
@@ -28,7 +29,7 @@ namespace ILCompiler.Compiler
         private readonly IEnumerable<IOpcodeImporter> _importers;
         private readonly ILImporterProxy _importerProxy;
 
-        private class ILImporterProxy : IILImporterProxy
+        private sealed class ILImporterProxy : IILImporterProxy
         {
             private readonly ILImporter _importer;
             public ILImporterProxy(ILImporter importer)
@@ -93,7 +94,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void EndImportingBasicBlock(BasicBlock basicBlock)
+        private static void EndImportingBasicBlock(BasicBlock basicBlock)
         {
             // TODO: add any appropriate code to handle the end of importing a basic block
         }
@@ -138,9 +139,9 @@ namespace ILCompiler.Compiler
             StackEntry? lastStmt = null;
             if (_currentBasicBlock?.Statements.Count > 0)
             {
-                var lastStmtIndex = _currentBasicBlock.Statements.Count - 1;
-                lastStmt = _currentBasicBlock.Statements[lastStmtIndex];
-                _currentBasicBlock.Statements.RemoveAt(lastStmtIndex);
+                var lastStatementIndex = _currentBasicBlock.Statements.Count - 1;
+                lastStmt = _currentBasicBlock.Statements[lastStatementIndex];
+                _currentBasicBlock.Statements.RemoveAt(lastStatementIndex);
             }
             return lastStmt;
         }
@@ -157,19 +158,10 @@ namespace ILCompiler.Compiler
                 currentOffset += currentInstruction.GetSize();
                 currentIndex++;
 
-                var opcode = currentInstruction.OpCode.Code;
-                var fallthroughBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null;
-                var importContext = new ImportContext(block, fallthroughBlock, _method, _nameMangler, _corLibModuleProvider);
+                var fallThroughBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null;
+                var importContext = new ImportContext(block, fallThroughBlock, _method, _nameMangler, _corLibModuleProvider);
 
-                var imported = false;
-                foreach (var importer in _importers)
-                {
-                    if (importer.Import(currentInstruction, importContext, _importerProxy))
-                    {
-                        imported = true;
-                        break;
-                    }
-                }
+                bool imported = ImportInstruction(currentInstruction, importContext);
 
                 if (imported)
                 {
@@ -178,13 +170,9 @@ namespace ILCompiler.Compiler
                         return;
                     }
                 }
-                else if (_configuration.IgnoreUnknownCil)
-                {
-                    _logger.LogWarning("Unsupported IL opcode {opcode}", opcode);
-                }
                 else
                 {
-                    throw new UnknownCilException($"Unsupported IL opcode {opcode}");
+                    HandleUnknownInstruction(currentInstruction);
                 }
 
                 if (currentOffset == _basicBlocks.Length)
@@ -199,6 +187,33 @@ namespace ILCompiler.Compiler
                     return;
                 }
             }
+        }
+
+        private void HandleUnknownInstruction(Instruction currentInstruction)
+        {
+            if (_configuration.IgnoreUnknownCil)
+            {
+                _logger.LogWarning($"Unsupported IL opcode {currentInstruction.OpCode.Code}");
+            }
+            else
+            {
+                throw new UnknownCilException($"Unsupported IL opcode {currentInstruction.OpCode.Code}");
+            }
+        }
+
+        private bool ImportInstruction(Instruction currentInstruction, ImportContext importContext)
+        {
+            var imported = false;
+            foreach (var importer in _importers)
+            {
+                if (importer.Import(currentInstruction, importContext, _importerProxy))
+                {
+                    imported = true;
+                    break;
+                }
+            }
+
+            return imported;
         }
 
         private int GrabTemp(VarType type, int? exactSize)
@@ -320,7 +335,7 @@ namespace ILCompiler.Compiler
                 }
 
                 // Remove the branch/jump statement at the end of the block if present
-                var lastStmt = ImportExtractLastStmt();
+                var lastStatement = ImportExtractLastStmt();
 
                 // Spill stuff on stack in new temps and setup new stack to contain the temps
                 for (int i = 0; i < _stack.Length; i++)
@@ -338,9 +353,9 @@ namespace ILCompiler.Compiler
                 }
 
                 // Add the branch/jump statement back if there was one
-                if (lastStmt != null)
+                if (lastStatement != null)
                 {
-                    ImportAppendTree(lastStmt);
+                    ImportAppendTree(lastStatement);
                 }
 
                 // Set the entry stack for the next basic block to the one we've built

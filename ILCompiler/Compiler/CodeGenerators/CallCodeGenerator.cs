@@ -1,5 +1,4 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
-using System.Reflection.Metadata.Ecma335;
 using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
@@ -8,19 +7,16 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(CallEntry entry, CodeGeneratorContext context)
         {
-            if (entry.IsInternalCall)
+            if (entry.IsInternalCall && entry.Arguments.Count > 0)
             {
-                if (entry.Arguments.Count > 0)
-                {
-                    // Pass last argument in HL for Ptr type
-                    // and in HL, DE otherwise
-                    var argument = entry.Arguments[entry.Arguments.Count - 1];
-                    context.Emitter.Pop(HL);
+                // Pass last argument in HL for Ptr type
+                // and in HL, DE otherwise
+                var argument = entry.Arguments[entry.Arguments.Count - 1];
+                context.Emitter.Pop(HL);
 
-                    if (argument.Type != VarType.Ptr && argument.Type != VarType.Ref) // TODO: should this also check for ByRef??
-                    {
-                        context.Emitter.Pop(DE);
-                    }
+                if (argument.Type != VarType.Ptr && argument.Type != VarType.Ref) // TODO: should this also check for ByRef??
+                {
+                    context.Emitter.Pop(DE);
                 }
             }
             context.Emitter.Call(entry.TargetMethod);

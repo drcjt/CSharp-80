@@ -4,16 +4,16 @@ namespace ILCompiler.Common.TypeSystem.Common
 {
     public struct ComputedInstanceFieldLayout
     {
-        public LayoutInt FieldSize;
-        public LayoutInt FieldAlignment;
-        public LayoutInt ByteCountUnaligned;
-        public LayoutInt ByteCountAlignment;
+        public LayoutInt FieldSize { get; set; }
+        public LayoutInt FieldAlignment { get; set; }
+        public LayoutInt ByteCountUnaligned { get; set; }
+        public LayoutInt ByteCountAlignment { get; set; }
 
-        public FieldAndOffset[] Offsets;
+        public FieldAndOffset[] Offsets { get; set; }
     }
-    public struct FieldAndOffset
+    public readonly struct FieldAndOffset
     {
-        public static readonly LayoutInt InvalidOffset = new LayoutInt(int.MaxValue);
+        public static readonly LayoutInt InvalidOffset = new(int.MaxValue);
 
         public readonly FieldDef Field;
         public readonly LayoutInt Offset;
