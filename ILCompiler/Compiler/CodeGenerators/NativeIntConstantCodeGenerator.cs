@@ -13,7 +13,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             }
             else
             {
-                var value = (entry as NativeIntConstantEntry).Value;
+                var value = entry.Value;
                 var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
 
                 // Native ints are only 16 bit so just push low word

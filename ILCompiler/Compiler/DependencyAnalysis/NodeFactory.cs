@@ -42,7 +42,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
 
             var resolvedGenericParameters = new List<TypeSig>();
-            foreach (var genericParameter in ((MethodSpec)calleeMethod).GenericInstMethodSig.GenericArguments)
+            foreach (var genericParameter in calleeMethod.GenericInstMethodSig.GenericArguments)
             {
                 resolvedGenericParameters.Add(GenericTypeInstantiator.Instantiate(genericParameter, callerMethodGenericParameters));
             }

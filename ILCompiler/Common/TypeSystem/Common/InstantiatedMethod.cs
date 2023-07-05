@@ -5,8 +5,8 @@ namespace ILCompiler.Common.TypeSystem.Common
 {
     public class InstantiatedMethod : MethodDesc
     {
-        private IList<TypeSig> _genericParameters;
-        private string _fullName;
+        private readonly IList<TypeSig> _genericParameters;
+        private readonly string _fullName;
 
         public InstantiatedMethod(MethodDef methodDef, IList<TypeSig> genericParameters, string fullName) : base(methodDef)
         {

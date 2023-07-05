@@ -2,7 +2,7 @@
 
 namespace ILCompiler.Common.TypeSystem.Common
 {
-    internal class GenericTypeInstantiator
+    internal static class GenericTypeInstantiator
     {
         public static TypeSig Instantiate(TypeSig type, IMethod calleeMethod, MethodDesc callerMethod) 
         {
@@ -58,8 +58,7 @@ namespace ILCompiler.Common.TypeSystem.Common
                     throw new NotImplementedException("Generic arguments not yet implemented");
 
                 case ElementType.MVar:
-                    var varSig = (GenericSig)type;
-                    if (varSig != null && varSig.Number < genericMethodParameters.Count)
+                    if (type is GenericSig varSig && varSig.Number < genericMethodParameters.Count)
                     {
                         result = genericMethodParameters[(int)varSig.Number];
                     }
