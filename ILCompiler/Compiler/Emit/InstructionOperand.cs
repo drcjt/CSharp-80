@@ -12,11 +12,9 @@ namespace ILCompiler.Compiler.Emit
 
         public void FormatOperand(StringBuilder stringBuilder)
         {
-            if (FormatMemoryOperand(stringBuilder))
-            {
-                return;
-            }
-            else if (Register != Register.None)
+            if (FormatMemoryOperand(stringBuilder)) return;
+
+            if (Register != Register.None)
             {
                 stringBuilder.Append(Register);
             }
