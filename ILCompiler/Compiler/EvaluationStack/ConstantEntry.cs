@@ -5,6 +5,18 @@
         protected ConstantEntry(VarType type, int? exactSize) : base(type, exactSize)
         {
         }
+
+        public static ConstantEntry CreateZeroConstantEntry(VarType type)
+        {
+            if (type == VarType.Ref || type == VarType.Ptr)
+            {
+                return new NativeIntConstantEntry(0);
+            }
+            else
+            {
+                return new Int32ConstantEntry(0);
+            }
+        }
     }
 
     public abstract class ConstantEntry<T> : ConstantEntry where T : IConvertible
