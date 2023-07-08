@@ -12,9 +12,9 @@ namespace Matrix
     }
     public struct RainColumn
     {
-        public RainState state;
-        public int row;
-        public int speed;
+        public RainState State { get; set; }
+        public int Row { get; set; }
+        public int Speed { get; set; }
     }
 
     public static unsafe class Program
@@ -45,12 +45,22 @@ namespace Matrix
 
             while (true)
             {
+                // Quit if user presses Q
+                if (Console.KeyAvailable)
+                {
+                    var cki = Console.ReadKey(true);
+                    if (cki.KeyChar == 81)
+                    {
+                        Environment.Exit(0);
+                    }
+                }
+
                 PickColumnToRain(rainColumns);
 
                 // Use byte* to generate 16 bit arithmetic for loop
                 for (byte* pcol = (byte*)0; pcol < (byte*)Width; pcol++)
                 {
-                    switch (rainColumns[(int)pcol].state)
+                    switch (rainColumns[(int)pcol].State)
                     {
                         case RainState.None: continue;
                         case RainState.Raining:
@@ -66,33 +76,33 @@ namespace Matrix
 
         private static void StopRain(RainColumn* rainColumns, int col)
         {
-            for (int i = 0; i < rainColumns[col].speed; i++)
+            for (int i = 0; i < rainColumns[col].Speed; i++)
             {
-                int row = rainColumns[col].row;
+                int row = rainColumns[col].Row;
                 WriteAtCursorPosition(col, row, Blank);
                 row++;
                 if (row == Height)
                 {
-                    rainColumns[col].state = RainState.None;
-                    rainColumns[col].row = 0;
+                    rainColumns[col].State = RainState.None;
+                    rainColumns[col].Row = 0;
                     break;
                 }
-                rainColumns[col].row = row;
+                rainColumns[col].Row = row;
             }
         }
 
         private static void Rain(RainColumn* rainColumns, int col)
         {
-            for (int i = 0; i < rainColumns[col].speed; i++)
+            for (int i = 0; i < rainColumns[col].Speed; i++)
             {
-                var row = rainColumns[col].row;
+                var row = rainColumns[col].Row;
                 WriteAtCursorPosition(col, row, RandomChar());
 
                 row++;
                 if (row == Height)
                 {
-                    rainColumns[col].state = RainState.StopRaining;
-                    rainColumns[col].row = 0;
+                    rainColumns[col].State = RainState.StopRaining;
+                    rainColumns[col].Row = 0;
                     break;
                 }
                 else
@@ -100,17 +110,17 @@ namespace Matrix
                     WriteAtCursorPosition(col, row, LeadingCharacter);
                 }
 
-                rainColumns[col].row = row;
+                rainColumns[col].Row = row;
             }
         }
 
         private static void PickColumnToRain(RainColumn* rainColumns)
         {
             var column = _random.Next(Width);
-            if (rainColumns[column].state == RainState.None)
+            if (rainColumns[column].State == RainState.None)
             {
-                rainColumns[column].state = RainState.Raining;
-                rainColumns[column].speed = RandomSpeed();
+                rainColumns[column].State = RainState.Raining;
+                rainColumns[column].Speed = RandomSpeed();
             }
         }
 
@@ -118,9 +128,9 @@ namespace Matrix
         {
             for (int index = 0; index < Width; index++)
             {
-                rainColumns[index].state = RainState.None;
-                rainColumns[index].row = 0;
-                rainColumns[index].speed = 2;
+                rainColumns[index].State = RainState.None;
+                rainColumns[index].Row = 0;
+                rainColumns[index].Speed = 2;
             }
         }
         private static void WriteAtCursorPosition(int col, int row, char ch)
