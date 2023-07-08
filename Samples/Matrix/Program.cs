@@ -43,16 +43,14 @@ namespace Matrix
 
             Console.Clear();
 
-            while (true)
+            var quit = false;
+            while (!quit)
             {
                 // Quit if user presses Q
                 if (Console.KeyAvailable)
                 {
                     var cki = Console.ReadKey(true);
-                    if (cki.KeyChar == 81)
-                    {
-                        Environment.Exit(0);
-                    }
+                    quit = cki.KeyChar == 81;
                 }
 
                 PickColumnToRain(rainColumns);
