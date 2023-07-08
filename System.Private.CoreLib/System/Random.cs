@@ -19,9 +19,9 @@
             return (int)_val;
         }
 
-        public int Next(int maxVlaue)
+        public int Next(int maxValue)
         {
-            return Next() % maxVlaue;
+            return Next() % maxValue;
         }
    }
 }

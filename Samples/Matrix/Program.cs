@@ -4,51 +4,137 @@
 
 namespace Matrix
 {
-    public static class Program
+    public enum RainState
     {
+        None,
+        Raining,
+        StopRaining
+    }
+    public struct RainColumn
+    {
+        public RainState State { get; set; }
+        public int Row { get; set; }
+        public int Speed { get; set; }
+    }
+
+    public static unsafe class Program
+    {
+        static byte* address = (byte*)0;
+        private static unsafe char RandomChar() => (char)((*address++ & 63) + '!');
+        private static unsafe int RandomSpeed() => (*address & 2) + 1;
+
         static int Height;
-        const int Width = 20;
+        static int Width;
+        
+        const char LeadingCharacter = (char)0x8f;
+        const char Blank = ' ';
+
+        private static Random _random;
+
         public unsafe static void Main()
         {
-            Height = Console.WindowHeight - 1;
+            _random = new Random(); // NOSONAR
 
-            var random = new Random(); // NOSONAR
+            Height = Console.WindowHeight;
+            Width = Console.WindowWidth - 1;
 
-            // TODO: Cannot use width here as this generates IL using
-            // the mul.ovf.un opcode which is not supported yet ..
-            int* y = stackalloc int[20];
-
-            for (int x = 0; x < Width; x++)
-            {
-                y[x] = random.Next(Height);
-            }
+            RainColumn* rainColumns = stackalloc RainColumn[Width];
+            InitialiseRainColumns(rainColumns);
 
             Console.Clear();
 
-            for (int run = 0; run < 100; run++)
+            var quit = false;
+            while (!quit)
             {
-                for (int x = 0; x < Width; x++)
+                // Quit if user presses Q
+                if (Console.KeyAvailable)
                 {
-                    var t = y[x];
-                    Console.SetCursorPosition(x, t);
-                    Console.Write('A');
+                    var cki = Console.ReadKey(true);
+                    quit = cki.KeyChar == 81;
+                }
 
-                    Console.SetCursorPosition(x, InScreenYPosition(t - 6));
-                    Console.Write(' ');
+                PickColumnToRain(rainColumns);
 
-                    y[x] = InScreenYPosition(t + 1);
+                // Use byte* to generate 16 bit arithmetic for loop
+                for (byte* pcol = (byte*)0; pcol < (byte*)Width; pcol++)
+                {
+                    switch (rainColumns[(int)pcol].State)
+                    {
+                        case RainState.None: continue;
+                        case RainState.Raining:
+                            Rain(rainColumns, (int)pcol);
+                            break;
+                        case RainState.StopRaining:
+                            StopRain(rainColumns, (int)pcol);
+                            break;
+                    }
                 }
             }
         }
 
-        public static int InScreenYPosition(int yPosition)
+        private static void StopRain(RainColumn* rainColumns, int col)
         {
-            if (yPosition >= Height)
-                return 0;
-            else if (yPosition < 0)
-                return yPosition + Height;
-            else
-                return yPosition;
+            for (int i = 0; i < rainColumns[col].Speed; i++)
+            {
+                int row = rainColumns[col].Row;
+                WriteAtCursorPosition(col, row, Blank);
+                row++;
+                if (row == Height)
+                {
+                    rainColumns[col].State = RainState.None;
+                    rainColumns[col].Row = 0;
+                    break;
+                }
+                rainColumns[col].Row = row;
+            }
+        }
+
+        private static void Rain(RainColumn* rainColumns, int col)
+        {
+            for (int i = 0; i < rainColumns[col].Speed; i++)
+            {
+                var row = rainColumns[col].Row;
+                WriteAtCursorPosition(col, row, RandomChar());
+
+                row++;
+                if (row == Height)
+                {
+                    rainColumns[col].State = RainState.StopRaining;
+                    rainColumns[col].Row = 0;
+                    break;
+                }
+                else
+                {
+                    WriteAtCursorPosition(col, row, LeadingCharacter);
+                }
+
+                rainColumns[col].Row = row;
+            }
+        }
+
+        private static void PickColumnToRain(RainColumn* rainColumns)
+        {
+            var column = _random.Next(Width);
+            if (rainColumns[column].State == RainState.None)
+            {
+                rainColumns[column].State = RainState.Raining;
+                rainColumns[column].Speed = RandomSpeed();
+            }
+        }
+
+        private static void InitialiseRainColumns(RainColumn* rainColumns)
+        {
+            for (int index = 0; index < Width; index++)
+            {
+                rainColumns[index].State = RainState.None;
+                rainColumns[index].Row = 0;
+                rainColumns[index].Speed = 2;
+            }
+        }
+        private static void WriteAtCursorPosition(int col, int row, char ch)
+        {
+            Console.SetCursorPosition(col, row);
+            Console.Write(ch);
         }
     }
 }
