@@ -153,13 +153,10 @@ namespace ILCompiler.Compiler
                     }
                 }
 
-                if (node is Z80MethodCodeNode methodNode)
+                if (node is Z80MethodCodeNode methodNode && methodNode.Method.IsStaticConstructor)
                 {
-                    if (methodNode.Method.IsStaticConstructor)
-                    {
-                        // Now output call to the static constructor
-                        emitter.Call(_nameMangler.GetMangledMethodName(methodNode.Method));
-                    }
+                    // Now output call to the static constructor
+                    emitter.Call(_nameMangler.GetMangledMethodName(methodNode.Method));
                 }
             }
         }
