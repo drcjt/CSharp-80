@@ -1,5 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.Common;
-using ILCompiler.Compiler.DependencyAnalysis;
+﻿using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -56,7 +55,7 @@ namespace ILCompiler.Compiler
         private const string Entry = "ENTRY";
         private const string Heap = "HEAP";
 
-        private void OutputProlog(MethodDesc entryMethod)
+        private void OutputProlog(Z80MethodCodeNode root)
         {
             _out.WriteLine($"; INPUT FILE {_inputFilePath.ToUpper()}");
             _out.WriteLine($"; {DateTime.Now}");
@@ -82,6 +81,7 @@ namespace ILCompiler.Compiler
             // Restore the original stack and return to the OS
             emitter.CreateLabel("EXITRETCODE");
 
+            var entryMethod = root.Method;
             var returnType = entryMethod.ReturnType;
             var hasReturnCode = returnType != null && returnType.GetVarType().IsInt();
 
@@ -128,11 +128,40 @@ namespace ILCompiler.Compiler
             }
 
             emitter.CreateLabel("START");
-            // TODO: Call static constructors here
+
+            OutputStaticConstructorInitialization(root, emitter);
+
             emitter.Call(_nameMangler.GetMangledMethodName(entryMethod));
             emitter.Jp("EXITRETCODE");
 
             _out.WriteLine(emitter.ToString());
+        }
+
+        private static IList<IDependencyNode> _nodesProcessed = new List<IDependencyNode>();
+        private void OutputStaticConstructorInitialization(IDependencyNode node, Emitter emitter)
+        {
+            if (!_nodesProcessed.Contains(node))
+            {
+                _nodesProcessed.Add(node);
+
+                // Process dependent nodes first
+                foreach (var dependency in node.Dependencies)
+                {
+                    if (dependency is Z80MethodCodeNode dependentMethodNode)
+                    {
+                        OutputStaticConstructorInitialization(dependentMethodNode, emitter);
+                    }
+                }
+
+                if (node is Z80MethodCodeNode methodNode)
+                {
+                    if (methodNode.Method.IsStaticConstructor)
+                    {
+                        // Now output call to the static constructor
+                        emitter.Call(_nameMangler.GetMangledMethodName(methodNode.Method));
+                    }
+                }
+            }
         }
 
         private static void OutputOOMMessage(Emitter emitter)
@@ -232,7 +261,7 @@ namespace ILCompiler.Compiler
 
             using (_out = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, false), Encoding.ASCII))
             {
-                OutputProlog(root.Method);
+                OutputProlog(root);
 
                 OutputStatics(root);
                 OutputEETypes(root);

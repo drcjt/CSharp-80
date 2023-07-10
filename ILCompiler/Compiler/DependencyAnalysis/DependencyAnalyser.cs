@@ -119,6 +119,24 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 }
 
                 _dependencies.Add(_nodeFactory.StaticsNode(fieldDef));
+
+                AddStaticTypeConstructorDependency(fieldDef);
+            }
+        }
+
+        private void AddStaticTypeConstructorDependency(FieldDef fieldDef)
+        {
+            var declaringType = fieldDef.DeclaringType;
+            var staticConstructoreMethod = declaringType.FindStaticConstructor();
+            if (staticConstructoreMethod != null)
+            {
+                var node = _nodeFactory.MethodNode(staticConstructoreMethod);
+
+                // Ensure we don't have cyclic dependencies
+                if (_method.FullName != staticConstructoreMethod.FullName)
+                {
+                    _dependencies.Add(node);
+                }
             }
         }
 
