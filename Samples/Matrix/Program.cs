@@ -23,21 +23,16 @@ namespace Matrix
         private static unsafe char RandomChar() => (char)((*address++ & 63) + '!');
         private static unsafe int RandomSpeed() => (*address & 2) + 1;
 
-        static int Height;
-        static int Width;
+        static readonly int Height = Console.WindowHeight;
+        static readonly int Width = Console.WindowWidth - 1;
         
         const char LeadingCharacter = (char)0x8f;
         const char Blank = ' ';
 
-        private static Random _random;
+        private static readonly Random _random = new Random(); // NOSONAR
 
         public unsafe static void Main()
         {
-            _random = new Random(); // NOSONAR
-
-            Height = Console.WindowHeight;
-            Width = Console.WindowWidth - 1;
-
             RainColumn* rainColumns = stackalloc RainColumn[Width];
             InitialiseRainColumns(rainColumns);
 

@@ -20,6 +20,8 @@ namespace ILCompiler.Common.TypeSystem.Common
         public bool IsPInvokeImpl => _methodDef.IsPinvokeImpl;
         public bool IsInternalCall => _methodDef.IsInternalCall;
 
+        public bool IsStaticConstructor => _methodDef.IsStaticConstructor;
+
         public virtual TypeSig ResolveType(TypeSig type) => type;
 
         public ParameterList ParameterList => _methodDef.Parameters;
