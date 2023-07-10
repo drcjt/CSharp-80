@@ -29,7 +29,7 @@ namespace Matrix
         const char LeadingCharacter = (char)0x8f;
         const char Blank = ' ';
 
-        private static readonly Random _random = new Random();
+        private static readonly Random _random = new Random(); // NOSONAR
 
         public unsafe static void Main()
         {
