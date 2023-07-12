@@ -129,8 +129,6 @@ namespace ILCompiler.Compiler
 
             emitter.CreateLabel("START");
 
-            OutputStaticConstructorInitialization(root, emitter);
-
             emitter.Call(_nameMangler.GetMangledMethodName(entryMethod));
             emitter.Jp("EXITRETCODE");
 
