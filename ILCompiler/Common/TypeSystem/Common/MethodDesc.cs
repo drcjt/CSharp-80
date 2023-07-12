@@ -22,6 +22,8 @@ namespace ILCompiler.Common.TypeSystem.Common
 
         public bool IsStaticConstructor => _methodDef.IsStaticConstructor;
 
+        public bool IsInstanceConstructor => _methodDef.IsInstanceConstructor;
+
         public virtual TypeSig ResolveType(TypeSig type) => type;
 
         public ParameterList ParameterList => _methodDef.Parameters;
