@@ -120,14 +120,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 _dependencies.Add(_nodeFactory.StaticsNode(fieldDef));
 
-                AddStaticTypeConstructorDependency(fieldDef);
+                AddStaticTypeConstructorDependency(fieldDef.DeclaringType);
             }
         }
 
-        private void AddStaticTypeConstructorDependency(FieldDef fieldDef)
+        private void AddStaticTypeConstructorDependency(TypeDef type)
         {
-            var declaringType = fieldDef.DeclaringType;
-            var staticConstructoreMethod = declaringType.FindStaticConstructor();
+            var staticConstructoreMethod = type.FindStaticConstructor();
             if (staticConstructoreMethod != null)
             {
                 var node = _nodeFactory.MethodNode(staticConstructoreMethod);
@@ -200,6 +199,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         method = dependentMethod;
                     }
                     methodNode = _nodeFactory.MethodNode(method);
+                }
+
+                // Add dependency on static constructor if this is a NewObj for a type with a static constructor
+                if (instruction.OpCode.Code == Code.Newobj && methodNode.Method.IsInstanceConstructor) 
+                {
+                    AddStaticTypeConstructorDependency(methodNode.Method.DeclaringType);
                 }
 
                 _dependencies.Add(methodNode);
