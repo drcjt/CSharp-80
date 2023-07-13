@@ -27,10 +27,10 @@ namespace ILCompiler.Compiler.Importer
             StackEntry obj;
             if (isLoadStatic)
             {
-                TriggerStaticConstructor(fieldDef, context, importer);
-
                 var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDef);
                 obj = new StaticFieldEntry(mangledFieldName);
+
+                obj = ImportInitClass(fieldDef, context, importer, obj);
             }
             else
             {
@@ -56,14 +56,14 @@ namespace ILCompiler.Compiler.Importer
             return true;
         }
 
-        private static void TriggerStaticConstructor(FieldDef fieldDef, ImportContext context, IILImporterProxy importer)
+        private static StackEntry ImportInitClass(FieldDef fieldDef, ImportContext context, IILImporterProxy importer, StackEntry obj)
         {
             // Get the static constructor if one exists
             var declaringType = fieldDef.DeclaringType;
             var staticConstructorMethod = declaringType.FindStaticConstructor();
             if (staticConstructorMethod == null)
             {
-                return;
+                return obj;
             }
 
             // Generate call to static constructor
@@ -71,7 +71,7 @@ namespace ILCompiler.Compiler.Importer
             // idea is to modify code in static constructor so that at the end of the method it changes the initial code to a RET
             var targetMethod = context.NameMangler.GetMangledMethodName(staticConstructorMethod);
             var staticInitCall = new CallEntry(targetMethod, new List<StackEntry>(), VarType.Void, 0);
-            importer.ImportAppendTree(staticInitCall);
+            return new CommaEntry(staticInitCall, obj, obj.Type);
         }
 
         private static StackEntry GetStructAddress(ref uint fieldOffset, StackEntry structVal, IILImporterProxy importer)

@@ -112,6 +112,17 @@ namespace ILCompiler.Compiler
             _indent--;
         }
 
+        public void Visit(CommaEntry entry)
+        {
+            _indent++;
+            entry.Op1.Accept(this);
+            _indent--;
+            Print("COMMA");
+            _indent++;
+            entry.Op2.Accept(this);
+            _indent--;
+        }
+
         public void Visit(LocalVariableEntry entry)
         {
             Print($"LCL_VAR {entry.Type} V{entry.LocalNumber}");

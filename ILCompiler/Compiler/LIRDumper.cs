@@ -74,6 +74,13 @@ namespace ILCompiler.Compiler
             _sb.AppendLine($"t{entry.TreeID,-3} = {entry.Operation}");
         }
 
+        public void Visit(CommaEntry entry)
+        {
+            _sb.AppendLine($"       ┌──▌  t{entry.Op1.TreeID}");
+            _sb.AppendLine($"       ├──▌  t{entry.Op2.TreeID}");
+            _sb.AppendLine($"t{entry.TreeID,-3} comma");
+        }
+
         public void Visit(LocalVariableEntry entry)
         {
             _sb.AppendLine($"t{entry.TreeID,-3} = lclVar {entry.Type} V{entry.LocalNumber}");
