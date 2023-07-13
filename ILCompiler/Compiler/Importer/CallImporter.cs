@@ -126,7 +126,13 @@ namespace ILCompiler.Compiler.Importer
             int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetInstanceFieldSize() : null;
 
             var returnVarType = methodToCall.HasReturnType ? returnType.GetVarType() : VarType.Void;
-            var callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize, methodToCall.IsInternalCall);
+            StackEntry callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize, methodToCall.IsInternalCall);
+
+            if (methodToCall.IsStatic)
+            {
+                callNode = InitClassHelper.ImportInitClass(methodToCall, context, importer, callNode);
+            }
+
 
             if (!methodToCall.HasReturnType)
             {

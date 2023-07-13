@@ -201,9 +201,20 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     methodNode = _nodeFactory.MethodNode(method);
                 }
 
-                // Add dependency on static constructor if this is a NewObj for a type with a static constructor
-                if (instruction.OpCode.Code == Code.Newobj && methodNode.Method.IsInstanceConstructor) 
+                // Calling a static method on a class with a static constructor is a trigger for calling
+                // the static constructor so add the static constructor as a dependency
+                if (methodNode.Method.IsStatic)
                 {
+                    var staticConstructorMethod = methodNode.Method.DeclaringType.FindStaticConstructor();
+                    if (staticConstructorMethod != null)
+                    {
+                        AddStaticTypeConstructorDependency(methodNode.Method.DeclaringType);
+                    }
+                }
+                else if (instruction.OpCode.Code == Code.Newobj && methodNode.Method.IsInstanceConstructor) 
+                {
+                    // Add dependency on static constructor if this is a NewObj for a type with a static constructor
+
                     AddStaticTypeConstructorDependency(methodNode.Method.DeclaringType);
                 }
 
