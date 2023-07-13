@@ -25,7 +25,7 @@ namespace ILCompiler.Compiler.Importer
             if (isLoadStatic)
             {
                 var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDef);
-                var obj = ImportInitClass(fieldDef, context, importer, new StaticFieldEntry(mangledFieldName));
+                var obj = InitClassHelper.ImportInitClass(fieldDef, context, importer, new StaticFieldEntry(mangledFieldName));
                 importer.PushExpression(obj);
             }
             else
@@ -42,24 +42,6 @@ namespace ILCompiler.Compiler.Importer
             }
 
             return true;
-        }
-
-        private static StackEntry ImportInitClass(FieldDef fieldDef, ImportContext context, IILImporterProxy importer, StackEntry obj)
-        {
-            // Get the static constructor if one exists
-            var declaringType = fieldDef.DeclaringType;
-            var staticConstructorMethod = declaringType.FindStaticConstructor();
-            if (staticConstructorMethod == null)
-            {
-                return obj;
-            }
-
-            // Generate call to static constructor
-            // TODO: NEED TO ENSURE THIS IS ONLY CALLED ONCE THOUGH.
-            // idea is to modify code in static constructor so that at the end of the method it changes the initial code to a RET
-            var targetMethod = context.NameMangler.GetMangledMethodName(staticConstructorMethod);
-            var staticInitCall = new CallEntry(targetMethod, new List<StackEntry>(), VarType.Void, 0);
-            return new CommaEntry(staticInitCall, obj, obj.Type);
         }
     }
 }
