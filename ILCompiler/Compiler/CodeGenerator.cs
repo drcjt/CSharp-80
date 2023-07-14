@@ -40,7 +40,16 @@ namespace ILCompiler.Compiler
             GenerateStringMap(blocks);
             GenerateStringData(_context.Emitter);
 
-            _context.Emitter.CreateLabel(_nameMangler.GetMangledMethodName(_context.Method));
+            var mangledMethodName = _nameMangler.GetMangledMethodName(_context.Method);
+            _context.Emitter.CreateLabel(mangledMethodName);
+
+            if (methodCodeNode.Method.IsStaticConstructor)
+            {
+                // When a static constructor finishes running it replaces the first instruction in
+                // the method with a Ret instruction so it only ever executes once even if called multiple times
+                _context.Emitter.Ld(HL, mangledMethodName);
+                _context.Emitter.Ld(__[HL], 0xC9);
+            }
 
             GenerateProlog(_context.Emitter);
             methodInstructions.AddRange(_context.Emitter.Instructions);

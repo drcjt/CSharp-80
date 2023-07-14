@@ -1,4 +1,5 @@
-﻿using dnlib.DotNet.Emit;
+﻿using dnlib.DotNet;
+using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
@@ -265,6 +266,19 @@ namespace ILCompiler.Compiler
             var basicBlockAnalyser = new BasicBlockAnalyser(_method);
             var offsetToIndexMap = new Dictionary<int, int>();
             _basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
+
+            // Trigger static constructor if required
+            if (method.IsInstanceConstructor)
+            {
+                var staticConstructorMethod = method.DeclaringType.FindStaticConstructor();
+                if (staticConstructorMethod != null)
+                {
+                    var targetMethod = _nameMangler.GetMangledMethodName(staticConstructorMethod);
+                    var staticInitCall = new CallEntry(targetMethod, new List<StackEntry>(), VarType.Void, 0);
+
+                    _basicBlocks[0].Statements.Add(staticInitCall);
+                }
+            }
 
             ImportBasicBlocks(offsetToIndexMap);
 

@@ -184,6 +184,13 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
+        public void Visit(CommaEntry entry)
+        {
+            entry.Op1.Accept(this);
+            entry.Op2.Accept(this);
+            SetNext(entry);
+        }
+
         private void SetNext(StackEntry entry)
         {
             if (Current != null)

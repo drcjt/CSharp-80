@@ -120,14 +120,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 _dependencies.Add(_nodeFactory.StaticsNode(fieldDef));
 
-                AddStaticTypeConstructorDependency(fieldDef);
+                AddStaticTypeConstructorDependency(fieldDef.DeclaringType);
             }
         }
 
-        private void AddStaticTypeConstructorDependency(FieldDef fieldDef)
+        private void AddStaticTypeConstructorDependency(TypeDef type)
         {
-            var declaringType = fieldDef.DeclaringType;
-            var staticConstructoreMethod = declaringType.FindStaticConstructor();
+            var staticConstructoreMethod = type.FindStaticConstructor();
             if (staticConstructoreMethod != null)
             {
                 var node = _nodeFactory.MethodNode(staticConstructoreMethod);
@@ -200,6 +199,23 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         method = dependentMethod;
                     }
                     methodNode = _nodeFactory.MethodNode(method);
+                }
+
+                // Calling a static method on a class with a static constructor is a trigger for calling
+                // the static constructor so add the static constructor as a dependency
+                if (methodNode.Method.IsStatic)
+                {
+                    var staticConstructorMethod = methodNode.Method.DeclaringType.FindStaticConstructor();
+                    if (staticConstructorMethod != null)
+                    {
+                        AddStaticTypeConstructorDependency(methodNode.Method.DeclaringType);
+                    }
+                }
+                else if (instruction.OpCode.Code == Code.Newobj && methodNode.Method.IsInstanceConstructor) 
+                {
+                    // Add dependency on static constructor if this is a NewObj for a type with a static constructor
+
+                    AddStaticTypeConstructorDependency(methodNode.Method.DeclaringType);
                 }
 
                 _dependencies.Add(methodNode);

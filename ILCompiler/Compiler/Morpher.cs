@@ -33,6 +33,10 @@ namespace ILCompiler.Compiler
         {
             switch (tree)
             {
+                case CommaEntry ce:
+                    tree = new CommaEntry(MorphTree(ce.Op1), MorphTree(ce.Op2));
+                    break;
+
                 case CallEntry c:
                     tree = new CallEntry(c.TargetMethod, MorphList(c.Arguments), c.Type, c.ExactSize, c.IsInternalCall);
                     break;
