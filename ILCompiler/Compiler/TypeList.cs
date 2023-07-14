@@ -63,6 +63,9 @@
         {
             switch (type)
             {
+                case VarType.Void:
+                    return 0;
+
                 case VarType.Bool:
                 case VarType.Byte:
                 case VarType.SByte:
