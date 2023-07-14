@@ -6,6 +6,7 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(CommaEntry entry, CodeGeneratorContext context)
         {
+            // No code gen required as comma node is purely to force order of evaluation of operands
         }
     }
 }
