@@ -20,12 +20,12 @@ READLINE:
 	LD H, 0
 	LD L, B
 
-	PUSH BC		; Save string length
+	PUSH HL		; Save string length
 
 	PUSH DE
 	CALL NewString
-
 	POP HL		; HL = allocated string
+
 	POP BC		; BC = string length
 
 	PUSH HL		; Save allocated string
@@ -50,10 +50,7 @@ COPYCHAR:
 	POP HL		; Pointer to heap allocated string
 	POP DE		; Return address
 
-	LD BC, 0
-
-	PUSH BC		; MSW of heap allocated string object - always 0 as we only have 64kb of addressable memory
-	PUSH HL		; LSW of heap allocated string obejct
+	PUSH HL		; address of heap allocated string obejct
 
 	PUSH DE		; Restore return address
 	RET
