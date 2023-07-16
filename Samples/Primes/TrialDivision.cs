@@ -8,7 +8,7 @@ namespace Primes
         {
             var startTime = Environment.GetDateTime();
 
-            for (var i = 2; i <= limit; i++)
+            for (var i = 2; i < limit; i++)
             {
                 var isPrime = true;
                 var n = Sqrt(i);
