@@ -22,12 +22,12 @@ namespace Primes
 
             // At this point we still have some numbers that aren't prime marked as prime
             // So we go over them with a sieve, also we can start at 3 for obvious reasons
-            for (int i = 3; i * i <= bound; i += 2)
+            for (int i = 3; i * i < bound; i += 2)
             {
                 if (isPrime[i] == 1)
                 {
                     // Can this be optimized?
-                    for (int j = i; j * i <= bound; j++)
+                    for (int j = i; j * i < bound; j++)
                         isPrime[i * j] = 0;
                 }
             }
@@ -37,6 +37,5 @@ namespace Primes
 
             return elapsedTime;
         }
-
     }
 }

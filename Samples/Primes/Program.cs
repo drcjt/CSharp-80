@@ -30,6 +30,7 @@ namespace Primes
             Console.WriteLine("Original Sieve:");
 
             ResetPrimes(primes, length, 0);
+
             var elapsedTime = Sieve.GeneratePrimes(primes, length);
             PrimesWriter.Write(primes, length, elapsedTime);
         }
@@ -66,7 +67,6 @@ namespace Primes
             Console.WriteLine("Sundaram Sieve:");
 
             ResetPrimes(primes, length, 0);
-
             var elapsedTime = SundaramSieve.GeneratePrimes(primes, temp, length);
             PrimesWriter.Write(primes, length, elapsedTime);
         }

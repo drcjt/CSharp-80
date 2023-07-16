@@ -4,22 +4,6 @@ namespace Primes
 {
     internal static class EratosthenesSieve
     {
-        private static int Sqrt(int num)
-        {
-            int ret = 0;
-
-            for (var i = 15; i >= 0; i--)
-            {
-                int temp = ret | (1 << i);
-                if (temp * temp <= num)
-                {
-                    ret = temp;
-                }
-            }
-
-            return ret;
-        }
-
         public static unsafe int GeneratePrimes(int* isPrime, int bound)
         {
             var startTime = Environment.GetDateTime();
@@ -29,7 +13,7 @@ namespace Primes
             while (thisFactor * thisFactor <= bound)
             {
                 var mark = thisFactor + thisFactor;
-                while (mark <= bound)
+                while (mark < bound)
                 {
                     isPrime[mark] = 0;
                     mark += thisFactor;

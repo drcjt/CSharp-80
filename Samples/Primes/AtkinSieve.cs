@@ -23,15 +23,15 @@ namespace Primes
                 {
                     var yy = y * y;
                     var n = 4 * xx + yy;
-                    if (n <= limit && (n % 12 == 1 || n % 12 == 5))
+                    if (n < limit && (n % 12 == 1 || n % 12 == 5))
                         primes[n] = Xor(primes[n], 1);
 
                     n = 3 * xx + yy;
-                    if (n <= limit && n % 12 == 7)
+                    if (n < limit && n % 12 == 7)
                         primes[n] = Xor(primes[n], 1);
 
                     n = 3 * xx - yy;
-                    if (x > y && n <= limit && n % 12 == 11)
+                    if (x > y && n < limit && n % 12 == 11)
                         primes[n] = Xor(primes[n], 1);
                 }
             }
@@ -41,7 +41,7 @@ namespace Primes
                 if (primes[n] == 1)
                 {
                     var nn = n * n;
-                    for (var k = nn; k <= limit; k += nn)
+                    for (var k = nn; k < limit; k += nn)
                     {
                         primes[k] = 0;
                     }
