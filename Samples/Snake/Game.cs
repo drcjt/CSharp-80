@@ -15,9 +15,12 @@ namespace Snake
 
         private Random _random;
 
+        private int _score;
+
         private Game(uint randomSeed)
         {
             _random = new Random(randomSeed);
+            _score = 0;
         }
 
         private unsafe Result Run(/* ref FrameBuffer fb */)
@@ -34,7 +37,7 @@ namespace Snake
                 snakeYs[i] = -1;
             }
 
-            const int bits = 128 * 48;
+            const int bits = 128 * (48 - 3); // Use bottom line to show score
             const int boardSize = (bits) / 32;
             var board = stackalloc int[boardSize];
 
@@ -44,7 +47,7 @@ namespace Snake
             }
 
             var startX = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenWidth / 2);
-            var startY = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenHeight);
+            var startY = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenHeight - 3);
 
             var s = new Snake(startX, startY, snakeXs, snakeYs, board, MAX_LENGTH, (Direction)(_random.Next() % 4));
 
@@ -53,6 +56,9 @@ namespace Snake
             SetPixel(s.HeadX, s.HeadY, Color.White);
 
             SetBoardItem(board, s.HeadX, s.HeadY, true);
+
+            Console.SetConsoleCursorPosition(0, 15);
+            Console.Write("Score: 0");
 
             while (true)
             {
@@ -66,6 +72,7 @@ namespace Snake
                         case 91: s.SetCourse(Direction.Up); break;
                         case 8: s.SetCourse(Direction.Left); break;
                         case 9: s.SetCourse(Direction.Right); break;
+                        case 81: Environment.Exit(0); break;
                     }
                 }
 
@@ -85,6 +92,10 @@ namespace Snake
 
                 if (s.HitTest(foodX, foodY))
                 {
+                    _score++;
+                    Console.SetConsoleCursorPosition(7, 15);
+                    Console.Write(_score);
+
                     if (s.Extend())
                     {
                         MakeFood(s, out foodX, out foodY);
@@ -111,7 +122,7 @@ namespace Snake
             do
             {
                 foodX = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenWidth / 2);
-                foodY = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenHeight);
+                foodY = GraphicHelper.WrapAround((byte)_random.Next(), Graphics.ScreenHeight - 3);
             }
             while (snake.SnakeHit(foodX, foodY));
         }
@@ -143,19 +154,20 @@ namespace Snake
 
                 if (result == Result.Win)
                 {
-                    Console.WriteLine("You win");
+                    Console.SetConsoleCursorPosition(29, 7);
+                    Console.Write("You win");
 
                     Thread.Sleep(5000);
 
-                    // TODO: This seems to return immediately???
-                    //Console.ReadKey(intercept: true);
                     Console.Clear();
                 }
                 else
                 {
-                    Console.WriteLine("You lose");
+                    Console.SetConsoleCursorPosition(29, 7);
+                    Console.Write("You lose");
+                    Thread.Sleep(3000);
 
-                    break;
+                    Console.Clear();
                 }
 
                 //fb.Render();

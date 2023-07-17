@@ -75,7 +75,7 @@ namespace Snake
             }
 
             newHeadX = GraphicHelper.WrapAround(newHeadX, Graphics.ScreenWidth / 2);
-            newHeadY = GraphicHelper.WrapAround(newHeadY, Graphics.ScreenHeight);
+            newHeadY = GraphicHelper.WrapAround(newHeadY, Graphics.ScreenHeight - 3);
 
             // Does new head hit body of snake?
             if (GetBoardItem(newHeadX, newHeadY))
