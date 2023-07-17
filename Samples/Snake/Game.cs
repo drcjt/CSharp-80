@@ -74,7 +74,7 @@ namespace Snake
                         case 91: s.SetCourse(Direction.Up); break;
                         case 8: s.SetCourse(Direction.Left); break;
                         case 9: s.SetCourse(Direction.Right); break;
-                        case 81: return Result.Quit; break;
+                        case 81: return Result.Quit;                     
                     }
                 }
 
