@@ -10,7 +10,9 @@ namespace Snake
     {
         enum Result
         {
-            Win, Loss
+            Win, 
+            Loss,
+            Quit
         }
 
         private Random _random;
@@ -72,7 +74,7 @@ namespace Snake
                         case 91: s.SetCourse(Direction.Up); break;
                         case 8: s.SetCourse(Direction.Left); break;
                         case 9: s.SetCourse(Direction.Right); break;
-                        case 81: Environment.Exit(0); break;
+                        case 81: return Result.Quit; break;
                     }
                 }
 
@@ -146,31 +148,22 @@ namespace Snake
         {
             Console.Clear();
 
-            //FrameBuffer fb = new FrameBuffer();
             while (true)
             {
                 Game g = new Game((uint)Environment.TickCount);
                 Result result = g.Run();
 
-                if (result == Result.Win)
+                if (result == Result.Quit)
                 {
-                    Console.SetConsoleCursorPosition(29, 7);
-                    Console.Write("You win");
-
-                    Thread.Sleep(5000);
-
-                    Console.Clear();
-                }
-                else
-                {
-                    Console.SetConsoleCursorPosition(29, 7);
-                    Console.Write("You lose");
-                    Thread.Sleep(3000);
-
-                    Console.Clear();
+                    break;
                 }
 
-                //fb.Render();
+                Console.SetConsoleCursorPosition(29, 7);
+                Console.Write(result == Result.Win ? "You win" : "You lose");
+
+                Thread.Sleep(3000);
+
+                Console.Clear();
             }
         }
     }
