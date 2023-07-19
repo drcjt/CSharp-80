@@ -23,11 +23,11 @@ namespace GfxDemos
         {
             for (int y = 0; y < Graphics.ScreenHeight; y++)
             {
-                Graphics.DrawLine(pen, 0, y, 127, y);
+                Graphics.DrawLine(pen, 0, y, Graphics.ScreenWidth, y);
             }
         }
 
-        public static void Spiral(Pen pen, int startx = 0, int endx = 127, int starty = 0, int endy = 47)
+        public static void Spiral(Pen pen, int startx = 0, int endx = Graphics.ScreenWidth, int starty = 0, int endy = Graphics.ScreenHeight)
         {
             Graphics.DrawLine(pen, startx, starty, endx, starty);
             Graphics.DrawLine(pen, endx, starty, endx, endy);
@@ -48,11 +48,11 @@ namespace GfxDemos
 
             for (int i = 0; i < 10; i++)
             {
-                var x = random.Next(128);
-                var y = random.Next(48);
+                var x = random.Next(Graphics.ScreenWidth);
+                var y = random.Next(Graphics.ScreenHeight);
 
-                var width = random.Next(128) % (128 - x);
-                var height = random.Next(48) % (48 - y);
+                var width = random.Next(Graphics.ScreenWidth) % (Graphics.ScreenWidth - x);
+                var height = random.Next(Graphics.ScreenHeight) % (Graphics.ScreenHeight - y);
 
                 Graphics.DrawEllipse(Pens.White, x, y, width, height);
             }

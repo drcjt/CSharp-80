@@ -1,3 +1,5 @@
+P_FLAG	EQU	23697
+
 SETRES:
 
 	EXX
@@ -24,6 +26,8 @@ SETRES:
 
 	LD A, L	; SET/RESET
 
+	LD HL, P_FLAG
+	LD (HL), A
 
 	LD B, E
 	LD C, D
