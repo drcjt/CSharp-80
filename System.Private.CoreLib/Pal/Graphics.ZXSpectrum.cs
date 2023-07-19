@@ -4,8 +4,8 @@ namespace System.Drawing
 {
     public enum Color
     {
-        White = 0x80,
-        Black = 1
+        White = 0,
+        Black = 12,     // Corresponds to INVERSE 1
     }
 
     public partial class Graphics
@@ -14,7 +14,7 @@ namespace System.Drawing
         public static extern void SetPixel(int x, int y, Color color = Color.White);
 
         // TODO: These are not part of standard MS Graphics class
-        public const int ScreenWidth = 249;
-        public const int ScreenHeight = 191;
+        public const int ScreenWidth = 255;
+        public const int ScreenHeight = 175;    // Doesn't include bottom 2 lines
     }
 }
