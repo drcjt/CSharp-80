@@ -10,11 +10,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             var exactSize = entry.ExactSize ?? 0;
             if (exactSize > 0)
             {
-                context.Emitter.Push(IX);
-                context.Emitter.Pop(BC);
-
-                context.Emitter.Pop(IX);  
-
+                context.Emitter.Pop(HL);        // Address to store to
                 short offset = (short)entry.FieldOffset;
 
                 if (entry.Type.IsSmall())
@@ -23,11 +19,8 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
                 else
                 {
-                    CopyHelper.CopyFromStackToIX(context.Emitter, exactSize, offset);
+                    CopyHelper.CopyFromStackToHL(context.Emitter, exactSize, offset);
                 }
-
-                context.Emitter.Push(BC);
-                context.Emitter.Pop(IX);
             }
         }
     }
