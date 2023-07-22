@@ -6,43 +6,26 @@ namespace ILCompiler.Compiler.CodeGenerators
 {
     internal static class CopyHelper
     {
-        public static void CopyStackToSmall(Emitter emitter, int bytesToCopy, int ixOffset)
+        /*
+         * Assumes address to copy to is in HL
+         */
+        public static void CopyStackToSmall(Emitter emitter, int bytesToCopy, int offset)
         {
-            // pop lsw
-            emitter.Pop(HL);
+            if (offset != 0)
+            {
+                emitter.Ld(DE, (short)offset);
+                emitter.Add(HL, DE);
+            }
 
-            // pop msw and ignore it as for small data types we
-            // truncate the value
             emitter.Pop(DE);
+            emitter.Pop(BC);    // Ignore msw
 
-            short changeToIX = 0;
-            if (ixOffset + bytesToCopy - 1 > 127)
-            {
-                // Make IX larger so offset doesn't fall outside of bounds
-                changeToIX = 128;
-            }
-            if (ixOffset < -128)
-            {
-                changeToIX = -128;
-                // Make IX smaller so offset doesn't fall outside of bounds
-            }
-            if (changeToIX != 0)
-            {
-                emitter.Ld(DE, changeToIX);
-                emitter.Add(IX, DE);
-                ixOffset -= changeToIX;
-            }
+            emitter.Ld(__[HL], E);
+            emitter.Inc(HL);
 
             if (bytesToCopy == 2)
             {
-                emitter.Ld(__[IX + (short)(ixOffset + 1)], H);
-            }
-            emitter.Ld(__[IX + (short)(ixOffset + 0)], L);
-
-            if (changeToIX != 0)
-            {
-                emitter.Ld(DE, (short)-changeToIX);
-                emitter.Add(IX, DE);
+                emitter.Ld(__[HL], D);
             }
         }
 
@@ -121,74 +104,37 @@ namespace ILCompiler.Compiler.CodeGenerators
             }
         }
 
-        public static void CopyFromStackToIX(Emitter emitter, int size, int ixOffset = 0, bool restoreIX = false)
+        /*
+         *  Assumes address to copy to is in HL
+         */
+        public static void CopyFromStackToHL(Emitter emitter, int size, int offset = 0)
         {
-            // TODO: When does it make sense to use LDIR instead??
-            // e.g. if size > 255 then we'll have to emit code to alter IX so using ldir is probably better
-            // suspect it may be much better for size > x where x is substantially less than 255 as the generated code will be quite large.
-            // For small x should we ditch using ix completely and just use HL & DE e.g. LD (HL), D??
-
-            int changeToIX = 0;
+            if (offset != 0)
+            {
+                emitter.Ld(DE, (short)offset);
+                emitter.Add(HL, DE);
+            }
 
             var totalBytesToCopy = size;
-            int originalIxOffset = ixOffset;
-
             do
             {
                 var bytesToCopy = totalBytesToCopy > 2 ? 2 : totalBytesToCopy;
+                totalBytesToCopy -= 2;
 
-                // offset has to be -128 to + 127
-                if (ixOffset + bytesToCopy > 128)
-                {
-                    // Need to move IX along to keep stackOffset within -128 to +127 range
-                    short newIxChange = 0;
-                    do
-                    {
-                        newIxChange += 127;
-                        ixOffset -= 127;
-                        size -= 127;
-                    }
-                    while (ixOffset + bytesToCopy > 128);
+                emitter.Pop(DE);
 
-                    changeToIX += newIxChange;
-
-                    emitter.Ld(DE, newIxChange);
-                    emitter.Add(IX, DE);
-                }
-
-                while (ixOffset < -128)
-                {
-                    short newIxChange = 0;
-                    do
-                    {
-                        newIxChange -= 128;
-                        ixOffset += 128;
-                        size += 128;
-                    }
-                    while (ixOffset < -128);
-
-                    changeToIX += newIxChange;
-
-                    emitter.Ld(DE, newIxChange);
-                    emitter.Add(IX, DE);
-                }
-
-                emitter.Pop(HL);
+                emitter.Ld(__[HL], E);
+                emitter.Inc(HL);
                 if (bytesToCopy == 2)
                 {
-                    emitter.Ld(__[IX + (short)(ixOffset + 1)], H);
+                    emitter.Ld(__[HL], D);
+                    if (totalBytesToCopy > 0)
+                    {
+                        emitter.Inc(HL);
+                    }
                 }
-                emitter.Ld(__[IX + (short)(ixOffset + 0)], L);
 
-                ixOffset += 2;
-                totalBytesToCopy -= 2;
-            } while (ixOffset < size + originalIxOffset);
-
-            if (changeToIX != 0 && restoreIX)
-            {
-                emitter.Ld(DE, (short)(-changeToIX));
-                emitter.Add(IX, DE);
-            }
+            } while (totalBytesToCopy > 0);
         }
 
         public static void CopyFromIXToStack(Emitter emitter, int size, int ixOffset = 0, bool restoreIX = false)
