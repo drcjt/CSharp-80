@@ -15,7 +15,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                 if (entry.Type.IsSmall())
                 {
-                    CopyHelper.CopyStackToSmall(context.Emitter, exactSize, offset);
+                    CopyHelper.CopyStackToHLSmall(context.Emitter, exactSize, offset);
                 }
                 else
                 {

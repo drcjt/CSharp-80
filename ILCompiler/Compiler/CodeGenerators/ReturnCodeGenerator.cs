@@ -30,7 +30,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                     // Copy struct to the return buffer
                     var returnTypeExactSize = entry.ReturnTypeExactSize ?? 0;
-                    CopyHelper.CopyFromStackToHL(context.Emitter, returnTypeExactSize);
+                    CopyHelper.CopyFromStackToIX(context.Emitter, returnTypeExactSize);
 
                     context.Emitter.Push(BC); // restore IX
                     context.Emitter.Pop(IX);
