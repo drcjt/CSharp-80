@@ -148,6 +148,29 @@
 	ret
 }
 
+
+.method public static int32 U16ArrayU16Value(int32, uint16, uint16) {
+.maxstack  5
+.locals (int16[])
+
+	ldc.i4 0x00000004
+	newarr [mscorlib]System.Int16
+	stloc 0
+
+	ldloc 0
+	ldarg.0
+	ldarg.1
+	stelem.i2
+
+	ldloc 0
+	ldarg.0
+	ldelem.u2
+
+	ldarg.2
+	ceq
+	ret
+}
+
 .method public static int32 I32(int32, int32, int32) {
 .maxstack  5
 .locals (int32[])
@@ -304,6 +327,13 @@
 	ldc.i4 0x0000ffff
 	call int32 array_tests::U16(int32, uint32, uint32)
 	brfalse FAIL
+
+	ldc.i4 0x00
+	ldc.i4 0x00007fff
+	ldc.i4 0x00007fff
+	call int32 array_tests::U16ArrayU16Value(int32, uint16, uint16)
+	brfalse FAIL
+
 
 	ldc.i4 0x00
 	ldc.i4 0x00007fff
