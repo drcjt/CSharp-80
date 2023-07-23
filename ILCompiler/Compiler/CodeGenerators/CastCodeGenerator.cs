@@ -75,6 +75,10 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 // Nothing to do
             }
+            else if (actualType == VarType.UShort && desiredType == VarType.Short)
+            {
+                // Nothing to do
+            }
             else if (actualType == VarType.Ptr && (desiredType == VarType.UInt || desiredType == VarType.Int))
             {
                 context.Emitter.Pop(HL);
