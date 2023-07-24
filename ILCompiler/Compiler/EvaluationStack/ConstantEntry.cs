@@ -32,8 +32,7 @@
     public class StringConstantEntry : ConstantEntry<String>
     {
         public string Label { get; set; } = String.Empty;
-        // TODO: Should this use an exactSize of 2??
-        public StringConstantEntry(string value) : base(VarType.Ptr, value, 4)
+        public StringConstantEntry(string value) : base(VarType.Ptr, value, 2)
         {
         }
 

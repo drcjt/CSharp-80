@@ -12,6 +12,7 @@
             Int32Tests.Parse_Valid();
 
             StringTests.NewStringTests();
+            StringTests.SubstringTests();
 
             UnsafeTests.SizeOfTests();
             UnsafeTests.RefAs();

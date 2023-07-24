@@ -1,4 +1,5 @@
 ﻿using Internal.Runtime.CompilerServices;
+using System.Diagnostics;
 using System.Runtime;
 
 namespace System
@@ -21,6 +22,37 @@ namespace System
                 ref Unsafe.Add(ref dest._firstChar, destPos),
                 ref src._firstChar,
                 (uint)src.Length);
+        }
+
+        public string Substring(int startIndex, int length) 
+        { 
+            if (length == 0)
+            {
+                return Empty;
+            }
+
+            if (length == Length)
+            {
+                Debug.Assert(startIndex == 0);
+                return this;
+            }
+
+            if (startIndex > Length || length > (Length - startIndex))
+            {
+                // Should throw exception here but return null for now
+                return null;
+            }
+
+            return InternalSubstring(startIndex, length);
+        }
+
+        private unsafe string InternalSubstring(int startIndex, int length)
+        {
+            string result = RuntimeImports.NewString(EETypePtr.EETypePtrOf<String>(), length);
+
+            Buffer.Memmove(ref result._firstChar, ref Unsafe.Add(ref _firstChar, startIndex), (uint)length);
+
+            return result;
         }
     }
 }
