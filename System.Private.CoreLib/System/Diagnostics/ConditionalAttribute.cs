@@ -7,7 +7,7 @@
             _conditionString = conditionString;
         }
 
-        private string _conditionString;
+        private readonly string _conditionString;
         public string ConditionString
         {
             get
