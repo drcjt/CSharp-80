@@ -1,4 +1,5 @@
 ﻿using Internal.Runtime.CompilerServices;
+using System.Diagnostics;
 using System.Runtime;
 
 namespace System
@@ -32,7 +33,7 @@ namespace System
 
             if (length == Length)
             {
-                // Debug.Assert(startIndex == 0);
+                Debug.Assert(startIndex == 0);
                 return this;
             }
 
