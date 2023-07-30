@@ -20,6 +20,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             { Tuple.Create(Operation.Rsh, VarType.Int), "i_rsh" },
 
             { Tuple.Create(Operation.Add, VarType.Ptr), "i_add16" },
+            { Tuple.Create(Operation.Sub, VarType.Ptr), "i_sub16" },
             { Tuple.Create(Operation.Mul, VarType.Ptr), "i_mul16" },
             { Tuple.Create(Operation.Lsh, VarType.Ptr), "i_lsh16" },
             { Tuple.Create(Operation.Rsh, VarType.Ptr), "i_rsh16" },

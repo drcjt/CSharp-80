@@ -59,6 +59,7 @@
     <None Remove="Runtime\i_rsh.asm" />
     <None Remove="Runtime\i_rsh16.asm" />
     <None Remove="Runtime\i_sub.asm" />
+    <None Remove="Runtime\i_sub16.asm" />
     <None Remove="Runtime\kbdscan.asm" />
     <None Remove="Runtime\keyavail.asm" />
     <None Remove="Runtime\l_inc_dehl.asm" />
@@ -70,6 +71,7 @@
     <None Remove="Runtime\print.asm" />
     <None Remove="Runtime\stoi.asm" />
     <None Remove="Runtime\TRS80\cls.asm" />
+    <None Remove="Runtime\TRS80\fastsetres.asm" />
     <None Remove="Runtime\TRS80\getdatetime.asm" />
     <None Remove="Runtime\TRS80\printchr.asm" />
     <None Remove="Runtime\TRS80\readline.asm" />
@@ -91,6 +93,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Runtime\CPM\cls.asm" />
     <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
+    <EmbeddedResource Include="Runtime\i_sub16.asm" />
     <EmbeddedResource Include="Runtime\i_gt16.asm" />
     <EmbeddedResource Include="Runtime\i_gt_un.asm" />
     <EmbeddedResource Include="Runtime\i_ge16.asm" />
@@ -118,6 +121,7 @@
     <EmbeddedResource Include="Runtime\i_rsh16.asm" />
     <EmbeddedResource Include="Runtime\i_rsh.asm" />
     <EmbeddedResource Include="Runtime\TRS80\keyavail.asm" />
+    <EmbeddedResource Include="Runtime\TRS80\fastsetres.asm" />
     <EmbeddedResource Include="Runtime\TRS80\setres.asm" />
     <EmbeddedResource Include="Runtime\TRS80\kbdscan.asm" />
     <EmbeddedResource Include="Runtime\delay.asm" />
