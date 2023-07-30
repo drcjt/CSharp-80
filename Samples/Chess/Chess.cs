@@ -61,7 +61,7 @@ namespace Chess
 
                 for (int file = 0; file < 8; file++)
                 {
-                    Piece piece = board[rank, file];
+                    var piece = board[rank, file];
                     Console.Write(Notation.ToChar(piece));
                     Console.Write(' ');
                 }

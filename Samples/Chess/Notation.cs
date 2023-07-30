@@ -2,43 +2,43 @@
 {
     public static class Notation
     {
-        public static char ToChar(Piece piece)
+        public static char ToChar(Pieces piece)
         {
             return piece switch
             {
-                Piece.WhitePawn => 'P',
-                Piece.WhiteKnight => 'N',
-                Piece.WhiteBishop => 'B',
-                Piece.WhiteRook => 'R',
-                Piece.WhiteQueen => 'Q',
-                Piece.WhiteKing => 'K',
-                Piece.BlackPawn => 'p',
-                Piece.BlackKnight => 'n',
-                Piece.BlackBishop => 'b',
-                Piece.BlackRook => 'r',
-                Piece.BlackQueen => 'q',
-                Piece.BlackKing => 'k',
+                Pieces.WhitePawn => 'P',
+                Pieces.WhiteKnight => 'N',
+                Pieces.WhiteBishop => 'B',
+                Pieces.WhiteRook => 'R',
+                Pieces.WhiteQueen => 'Q',
+                Pieces.WhiteKing => 'K',
+                Pieces.BlackPawn => 'p',
+                Pieces.BlackKnight => 'n',
+                Pieces.BlackBishop => 'b',
+                Pieces.BlackRook => 'r',
+                Pieces.BlackQueen => 'q',
+                Pieces.BlackKing => 'k',
                 _ => '.',
             };
         }
 
-        public static Piece ToPiece(char ch)
+        public static Pieces ToPiece(char ch)
         {
             return ch switch
             {
-                'P' => Piece.WhitePawn,
-                'N' => Piece.WhiteKnight,
-                'B' => Piece.WhiteBishop,
-                'R' => Piece.WhiteRook,
-                'Q' => Piece.WhiteQueen,
-                'K' => Piece.WhiteKing,
-                'p' => Piece.BlackPawn,
-                'n' => Piece.BlackKnight,
-                'b' => Piece.BlackBishop,
-                'r' => Piece.BlackRook,
-                'q' => Piece.BlackQueen,
-                'k' => Piece.BlackKing,
-                _ => Piece.None,
+                'P' => Pieces.WhitePawn,
+                'N' => Pieces.WhiteKnight,
+                'B' => Pieces.WhiteBishop,
+                'R' => Pieces.WhiteRook,
+                'Q' => Pieces.WhiteQueen,
+                'K' => Pieces.WhiteKing,
+                'p' => Pieces.BlackPawn,
+                'n' => Pieces.BlackKnight,
+                'b' => Pieces.BlackBishop,
+                'r' => Pieces.BlackRook,
+                'q' => Pieces.BlackQueen,
+                'k' => Pieces.BlackKing,
+                _ => Pieces.None,
                 // _ => throw new ArgumentException($"Unknown piece character {ch}");
             };
         }

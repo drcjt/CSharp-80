@@ -8,7 +8,7 @@ namespace Chess
         White
     }
 
-    public enum Piece : byte
+    public enum Pieces : byte
     {
         // 1st bit indicates if piece or not
         None = 0,
@@ -43,11 +43,11 @@ namespace Chess
         TypeMask = Pawn | Knight | Bishop | Rook | Queen | King,
     }
 
-    public static class Pieces
+    public static class PiecesExtensions
     {
-        public static Color Color(Piece piece) => (Color)(piece & Piece.ColorMask);
+        public static Color Color(this Pieces piece) => (Color)(piece & Pieces.ColorMask);
 
-        public static bool IsWhite(Piece piece) => (piece & Piece.ColorMask) == Piece.White;
-        public static bool IsBlack(Piece piece) => (piece & Piece.ColorMask) == Piece.Black;
+        public static bool IsWhite(this Pieces piece) => (piece & Pieces.ColorMask) == Pieces.White;
+        public static bool IsBlack(this Pieces piece) => (piece & Pieces.ColorMask) == Pieces.Black;
     }
 }

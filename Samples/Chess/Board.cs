@@ -4,9 +4,9 @@ namespace Chess
 {
     public class Board
     {
-        private readonly Piece[] _state = new Piece[64];
+        private readonly Pieces[] _state = new Pieces[64];
 
-        public Piece this[int square]
+        public Pieces this[int square]
         {
             get => _state[square];
             private set
@@ -15,7 +15,7 @@ namespace Chess
             }
         }
 
-        public Piece this[int rank, int file] => _state[rank * 8 + file];
+        public Pieces this[int rank, int file] => _state[rank * 8 + file];
 
         public void SetupPosition(string fen)
         {
@@ -37,10 +37,10 @@ namespace Chess
 
         public void PlayMove(Move move)
         {
-            Piece movingPiece = this[move.FromSquare];
+            Pieces movingPiece = this[move.FromSquare];
 
             this[move.ToSquare] = movingPiece;
-            this[move.FromSquare] = Piece.None;
+            this[move.FromSquare] = Pieces.None;
         }
 
         private static int Rank(int square) => square / 8;
@@ -50,21 +50,15 @@ namespace Chess
 
         public bool IsMovePlayable(Move move)
         {
-            Piece movingPiece = this[move.FromSquare];
-            switch (movingPiece)
-            {
-                case Piece.BlackPawn:
-                    return IsBlackPawnMovePlayable(move);
-
-                case Piece.WhitePawn:
-                    return IsWhitePawnMovePlayable(move);
-
-                case Piece.BlackRook:
-                case Piece.WhiteRook:
-                    return IsRookMovePlayable(move);
-            }
-
-            return false;
+            Pieces movingPiece = this[move.FromSquare];
+            return movingPiece switch
+            { 
+                Pieces.BlackPawn => IsBlackPawnMovePlayable(move),
+                Pieces.WhitePawn => IsWhitePawnMovePlayable(move),
+                Pieces.BlackRook => IsRookMovePlayable(move),
+                Pieces.WhiteRook => IsRookMovePlayable(move),
+                _ => false,
+            };
         }
 
         private bool IsRookMovePlayable(Move move)
@@ -77,7 +71,7 @@ namespace Chess
                 var higherFile = Math.Max(File(move.FromSquare), File(move.ToSquare));
                 for (int file = lowerFile; file < higherFile; file++)
                 {
-                    if (file != File(move.FromSquare) && this[Rank(move.FromSquare), file] != Piece.None)
+                    if (file != File(move.FromSquare) && this[Rank(move.FromSquare), file] != Pieces.None)
                     {
                         return false;
                     }
@@ -90,7 +84,7 @@ namespace Chess
                 var higherRank = Math.Max(Rank(move.FromSquare), Rank(move.ToSquare));
                 for (int rank = lowerRank; rank < higherRank; rank++)
                 {
-                    if (rank != Rank(move.FromSquare) && this[rank, File(move.FromSquare)] != Piece.None)
+                    if (rank != Rank(move.FromSquare) && this[rank, File(move.FromSquare)] != Pieces.None)
                     {
                         return false;
                     }
@@ -105,11 +99,11 @@ namespace Chess
         {
             if (Rank(move.FromSquare) == 6 && Rank(move.ToSquare) == 4)
             {
-                return this[Down(move.FromSquare, 2)] == Piece.None;
+                return this[Down(move.FromSquare, 2)] == Pieces.None;
             }
             else
             {
-                if (this[Down(move.FromSquare)] != Piece.None) return false;
+                if (this[Down(move.FromSquare)] != Pieces.None) return false;
                 if (Rank(move.FromSquare) - Rank(move.ToSquare) != 1) return false;
                 return true;
             }
@@ -119,11 +113,11 @@ namespace Chess
         {
             if (Rank(move.FromSquare) == 1 && Rank(move.ToSquare) == 3)
             {
-                return this[Up(move.FromSquare, 2)] == Piece.None;
+                return this[Up(move.FromSquare, 2)] == Pieces.None;
             }
             else
             {
-                if (this[Up(move.FromSquare)] != Piece.None) return false;
+                if (this[Up(move.FromSquare)] != Pieces.None) return false;
                 if (Rank(move.ToSquare) - Rank(move.FromSquare) != 1) return false;
                 return true;
             }
