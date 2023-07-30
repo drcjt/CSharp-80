@@ -8,7 +8,6 @@ namespace Chess
         White
     }
 
-    [Flags]
     public enum Piece : byte
     {
         // 1st bit indicates if piece or not
@@ -26,22 +25,22 @@ namespace Chess
         Queen = 20,
         King = 24,
 
-        WhitePawn = White + Pawn,
-        WhiteKnight = White + Knight,
-        WhiteBishop = White + Bishop,
-        WhiteRook = White + Rook,
-        WhiteQueen = White + Queen,
-        WhiteKing = White + King,
+        WhitePawn = White | Pawn,
+        WhiteKnight = White | Knight,
+        WhiteBishop = White | Bishop,
+        WhiteRook = White | Rook,
+        WhiteQueen = White | Queen,
+        WhiteKing = White | King,
 
-        BlackPawn = Black + Pawn,
-        BlackKnight = Black + Knight,
-        BlackBishop = Black + Bishop,
-        BlackRook = Black + Rook,
-        BlackQueen = Black + Queen,
-        BlackKing = Black + King,
+        BlackPawn = Black | Pawn,
+        BlackKnight = Black | Knight,
+        BlackBishop = Black | Bishop,
+        BlackRook = Black | Rook,
+        BlackQueen = Black | Queen,
+        BlackKing = Black | King,
 
         ColorMask = 0b00000011,
-        TypeMask = 0b01111100
+        TypeMask = Pawn | Knight | Bishop | Rook | Queen | King,
     }
 
     public static class Pieces
