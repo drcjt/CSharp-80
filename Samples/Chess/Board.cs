@@ -4,7 +4,7 @@ namespace Chess
 {
     public class Board
     {
-        private Piece[] _state = new Piece[64];
+        private readonly Piece[] _state = new Piece[64];
 
         public Piece this[int square]
         {
@@ -129,7 +129,7 @@ namespace Chess
             }
         }
 
-        public bool IsSquareAttackedBy(int square, Color color)
+        public static bool IsSquareAttackedBy(int square, Color color)
         {
             // Work out if specified square is attacked by any piece of specified color
 

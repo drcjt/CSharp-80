@@ -1,4 +1,6 @@
-﻿namespace Chess
+﻿using System;
+
+namespace Chess
 {
     public enum Color
     {
@@ -6,6 +8,7 @@
         White
     }
 
+    [Flags]
     public enum Piece : byte
     {
         // 1st bit indicates if piece or not
@@ -43,7 +46,7 @@
 
     public static class Pieces
     {
-        public static Color Color(Piece piece) => (Color)((piece & Piece.ColorMask));
+        public static Color Color(Piece piece) => (Color)(piece & Piece.ColorMask);
 
         public static bool IsWhite(Piece piece) => (piece & Piece.ColorMask) == Piece.White;
         public static bool IsBlack(Piece piece) => (piece & Piece.ColorMask) == Piece.Black;

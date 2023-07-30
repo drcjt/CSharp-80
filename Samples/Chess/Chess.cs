@@ -5,11 +5,11 @@ namespace Chess
 {
     public static class Chess
     {
-        public static unsafe void Main()
+        public static void Main()
         {
             Console.Clear();
 
-            Board board = new Board();
+            var board = new Board();
 
             string startingPosition = 
                 "rnbqkbnr" + 
