@@ -120,6 +120,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InvokeCctorByFieldAccess", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeforeFieldInit", "Tests\Methodical\BeforeFieldInit\BeforeFieldInit.csproj", "{D344641A-181B-4644-AF69-C35F749A92FE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess", "Samples\Chess\Chess.csproj", "{024215E4-9022-4A45-85A0-1233908DC8BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -294,6 +296,10 @@ Global
 		{D344641A-181B-4644-AF69-C35F749A92FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D344641A-181B-4644-AF69-C35F749A92FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D344641A-181B-4644-AF69-C35F749A92FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{024215E4-9022-4A45-85A0-1233908DC8BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{024215E4-9022-4A45-85A0-1233908DC8BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{024215E4-9022-4A45-85A0-1233908DC8BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{024215E4-9022-4A45-85A0-1233908DC8BD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -344,6 +350,7 @@ Global
 		{A7BA368A-33EF-4FD6-9CBC-9679C30E5AE4} = {4DBCD88C-3231-4CCF-8D5A-D2AA2D45750B}
 		{6CAD3826-DB91-4CB0-B432-16A0372A526E} = {4DBCD88C-3231-4CCF-8D5A-D2AA2D45750B}
 		{D344641A-181B-4644-AF69-C35F749A92FE} = {4DBCD88C-3231-4CCF-8D5A-D2AA2D45750B}
+		{024215E4-9022-4A45-85A0-1233908DC8BD} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}
