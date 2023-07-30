@@ -1,0 +1,133 @@
+FASTSETRES:
+	EXX
+	POP HL		; SAVE RETURN ADDRESS
+	EXX
+
+	POP DE		; Set or Reset
+	POP BC		; Ignore msw
+
+	LD A, E
+	LD (TEMPSET), A
+
+	POP DE		; Get y-coordinate into DE
+	POP BC		; Ignore msw
+
+	POP BC		; get x-coordinate into BC
+	POP HL		; Ignore msw
+	LD A, C
+	LD (TEMPX), A
+
+	; DE = Y, BC = X
+
+	SLA E		; 2 * Y
+
+	LD HL, TABLEA
+	ADD HL, DE		; HL = entry in table
+
+	PUSH IX
+	PUSH HL
+	POP IX
+
+	; Entry in table now in IX
+
+	LD A, (IX+0)
+	AND 224
+	LD L, A
+	LD H, (IX+1)
+
+	LD A, (TEMPX)	; Get X
+	LD E, A
+	LD D, 0
+	SRL E		; X / 2
+	ADD HL, DE;		HL = Graphics Byte
+
+	LD A, (TEMPSET)
+	LD D, A
+	LD A, (TEMPX)
+	LD E, A
+
+	LD A, (HL)
+	OR A
+	JP M, FSE015
+	LD A, 0x80
+FSE015:
+	LD B, A
+
+
+	LD A, (IX+0)
+	AND 31	
+	BIT 0, E		; Test LSB of X for odd/even
+	JR Z, FSE020
+	SLA A
+FSE020:
+
+	BIT 0, D
+	JR Z, FSE030
+	CPL
+	AND B
+	JR FSE040
+FSE030:
+	OR B
+FSE040:
+	LD (HL), A
+
+	POP IX
+
+	EXX
+	PUSH HL		; RESTORE RETURN ADDRESS
+	EXX
+
+	RET
+
+TEMPX:		DS 1
+TEMPSET:	DS 1
+	
+TABLEA:
+	DW 3C00H + 1
+	DW 3C00H + 4
+	DW 3C00H + 16
+	DW 3C40H + 1
+	DW 3C40H + 4
+	DW 3C40H + 16
+	DW 3C80H + 1
+	DW 3C80H + 4
+	DW 3C80H + 16
+	DW 3CC0H + 1
+	DW 3CC0H + 4
+	DW 3CC0H + 16
+	DW 3D00H + 1
+	DW 3D00H + 4
+	DW 3D00H + 16
+	DW 3D40H + 1
+	DW 3D40H + 4
+	DW 3D40H + 16
+	DW 3D80H + 1
+	DW 3D80H + 4
+	DW 3D80H + 16
+	DW 3DC0H + 1
+	DW 3DC0H + 4
+	DW 3DC0H + 16
+	DW 3E00H + 1
+	DW 3E00H + 4
+	DW 3E00H + 16
+	DW 3E40H + 1
+	DW 3E40H + 4
+	DW 3E40H + 16
+	DW 3E80H + 1
+	DW 3E80H + 4
+	DW 3E80H + 16
+	DW 3EC0H + 1
+	DW 3EC0H + 4
+	DW 3EC0H + 16
+	DW 3F00H + 1
+	DW 3F00H + 4
+	DW 3F00H + 16
+	DW 3F40H + 1
+	DW 3F40H + 4
+	DW 3F40H + 16
+	DW 3F80H + 1
+	DW 3F80H + 4
+	DW 3F80H + 16
+	DW 3FC0H + 1
+	DW 3FC0H + 4
+	DW 3FC0H + 16
