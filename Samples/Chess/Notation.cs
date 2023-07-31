@@ -45,8 +45,8 @@
 
         public static string ToSquareName(byte squareIndex)
         {
-            int rank = squareIndex / 8;
-            int file = squareIndex % 8;
+            int rank = Board.Rank(squareIndex);
+            int file = Board.File(squareIndex);
 
             char[] squareNotation = new char[2] { (char)('a' + file), (char)('1' + rank) };
             return new string(squareNotation);
@@ -56,7 +56,7 @@
         {
             int file = squareNotation[0] - 'a';
             int rank= squareNotation[1] - '1';
-            int index = rank * 8 + file;
+            int index = Board.Square(rank, file);
 
             return (byte)index;
         }

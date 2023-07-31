@@ -4,7 +4,7 @@ namespace Chess
 {
     public class Board
     {
-        private readonly Pieces[] _state = new Pieces[64];
+        private readonly Pieces[] _state = new Pieces[8 * 16];
 
         public Pieces this[int square]
         {
@@ -15,11 +15,11 @@ namespace Chess
             }
         }
 
-        public Pieces this[int rank, int file] => _state[rank * 8 + file];
+        public Pieces this[int rank, int file] => _state[Square(rank, file)];
 
         public void SetupPosition(string fen)
         {
-            // Array.Clear(_state, 0, 64);
+            // Array.Clear(_state, 0, _state.Length);
             for (int i = 0; i < _state.Length; i++)
             {
                 _state[i] = 0;
@@ -30,7 +30,7 @@ namespace Chess
                 for (int file = 0; file < 8; file++)
                 {
                     char piece = fen[rank * 8 + file];
-                    _state[rank * 8 + file] = Notation.ToPiece(piece);
+                    _state[Square(rank, file)] = Notation.ToPiece(piece);
                 }
             }
         }
@@ -43,10 +43,13 @@ namespace Chess
             this[move.FromSquare] = Pieces.None;
         }
 
-        private static int Rank(int square) => square / 8;
-        private static int File(int square) => square % 8;
-        private static int Up(int square, int steps = 1) => square + steps * 8;
-        private static int Down(int square, int steps = 1) => square - steps * 8;
+        public static int Square(int rank, int file) => rank * 16 + file;
+        public static int Rank(int square) => square >> 4;
+        public static int File(int square) => square & 7;
+
+
+        private static int Up(int square, int steps = 1) => square + steps * 16;
+        private static int Down(int square, int steps = 1) => square - steps * 16;
 
         public bool IsMovePlayable(Move move)
         {
