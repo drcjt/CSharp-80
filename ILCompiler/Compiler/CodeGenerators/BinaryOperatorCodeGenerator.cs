@@ -49,6 +49,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             { Tuple.Create(Operation.Ne_Un, VarType.Ref), "i_neq16" },
             { Tuple.Create(Operation.Eq, VarType.Ref), "i_eq16" },
+            { Tuple.Create(Operation.Gt_Un, VarType.Ref), "i_gt16" },
 
             { Tuple.Create(Operation.Ne_Un, VarType.ByRef), "i_neq16" },
             { Tuple.Create(Operation.Eq, VarType.ByRef), "i_eq16" },
