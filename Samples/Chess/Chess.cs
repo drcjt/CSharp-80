@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Threading;
 
+[module: System.Runtime.CompilerServices.SkipLocalsInit]
+
 namespace Chess
 {
     public static class Chess

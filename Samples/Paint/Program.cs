@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Drawing;
 
+[module: System.Runtime.CompilerServices.SkipLocalsInit]
+
 namespace Paint
 {
     public static class Program
