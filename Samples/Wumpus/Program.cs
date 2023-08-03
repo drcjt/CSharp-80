@@ -1,5 +1,6 @@
-﻿using System;
-using Wumpus;
+﻿using Wumpus;
+
+[module: System.Runtime.CompilerServices.SkipLocalsInit]
 
 namespace MiniBCL
 {

@@ -249,30 +249,28 @@ namespace ILCompiler.Compiler
                 
                 if (_context.Method.Body.InitLocals)
                 {
-                    /*
                     // TODO: This should loop through the locals and only init those flagged as must init
                     // but this requires SSA and use/def analysis which we don't have yet.
                     // So for now just init all the locals
 
-                    emitter.Ld(Bc, (short)localsSize);
+                    emitter.Ld(BC, (short)localsSize);
 
-                    emitter.Push(Ix);
-                    emitter.Pop(Hl);
+                    emitter.Push(IX);
+                    emitter.Pop(HL);
 
                     var initLoopLabel = _context.NameMangler.GetUniqueName();
                     emitter.CreateLabel(initLoopLabel);
 
-                    emitter.Dec(Hl);  // Stack grows downwards so need to move to next byte first
+                    emitter.Dec(HL);  // Stack grows downwards so need to move to next byte first
 
-                    emitter.Ld(__[Hl], 0);
+                    emitter.Ld(__[HL], 0);
 
-                    emitter.Dec(Bc);
+                    emitter.Dec(BC);
 
                     emitter.Ld(A, B);
                     emitter.Or(C);
 
                     emitter.Jp(Condition.NZ, initLoopLabel);
-                    */
                 }
             }
         }

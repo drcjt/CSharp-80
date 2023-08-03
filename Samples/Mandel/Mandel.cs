@@ -1,6 +1,8 @@
 ﻿using dnlib.DotNet.Resources;
 using System;
 
+[module: System.Runtime.CompilerServices.SkipLocalsInit]
+
 namespace Mandelbrot
 {
     public static class Program

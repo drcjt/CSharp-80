@@ -1,5 +1,7 @@
 ﻿using System;
 
+[module: System.Runtime.CompilerServices.SkipLocalsInit]
+
 namespace Hanoi
 {
     public static class Program

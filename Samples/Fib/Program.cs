@@ -1,5 +1,7 @@
 ﻿using System;
 
+[module: System.Runtime.CompilerServices.SkipLocalsInit]
+
 namespace MiniBCL
 {
     public static class Program

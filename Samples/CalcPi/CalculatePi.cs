@@ -1,5 +1,7 @@
 ﻿using System;
 
+[module: System.Runtime.CompilerServices.SkipLocalsInit]
+
 namespace CalculatePi
 {
     public static class CalculatePi
