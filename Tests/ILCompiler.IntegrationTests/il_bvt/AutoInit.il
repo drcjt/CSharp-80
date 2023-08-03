@@ -14,7 +14,6 @@
 .locals (int32,int32,int32,int32,int32,int32,int32,int32,int32,int32,int32,int32,int32,int32,int32,int32)
 .maxstack  2
 
-/*
 	ldc.i4 0x1
 	stloc 0x1
 	ldc.i4 0x3
@@ -67,7 +66,6 @@
 	ldc.i4	0x40
 	ceq
 	brfalse FAIL
-*/
 
 PASS:
 	ldc.i4 0x0000
