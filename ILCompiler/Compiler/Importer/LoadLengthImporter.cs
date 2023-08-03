@@ -13,7 +13,7 @@ namespace ILCompiler.Compiler.Importer
             var addr = importer.PopExpression();
             var arraySizeOffset = new NativeIntConstantEntry(2);
             addr = new BinaryOperator(Operation.Add, isComparison: false, addr, arraySizeOffset, VarType.Ptr);
-            var node = new IndirectEntry(addr, VarType.UShort, 2);
+            var node = new IndirectEntry(addr, VarType.Ptr, 2);
             importer.PushExpression(node);
             return true;
         }
