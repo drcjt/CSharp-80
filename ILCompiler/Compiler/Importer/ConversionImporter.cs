@@ -62,6 +62,11 @@ namespace ILCompiler.Compiler.Importer
                 var cast = new CastEntry(op1, desiredType);
                 op1 = cast;
             }
+            else if (op1.Type == VarType.Ptr && (desiredType == VarType.UShort || desiredType == VarType.Short))
+            {
+                var cast = new CastEntry(op1, desiredType);
+                op1 = cast;
+            }
 
             // TODO: Work out why this was added
             //op1.Type = GetType(instruction.OpCode.Code);

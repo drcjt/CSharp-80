@@ -86,6 +86,13 @@ namespace ILCompiler.Compiler.CodeGenerators
                 context.Emitter.Push(DE);
                 context.Emitter.Push(HL);
             }
+            else if (actualType == VarType.Ptr && (desiredType == VarType.UShort || desiredType == VarType.Short))
+            {
+                context.Emitter.Pop(HL);
+                context.Emitter.Ld(DE, 0);    // clear msw
+                context.Emitter.Push(DE);
+                context.Emitter.Push(HL);
+            }
             else
             {
                 throw new NotImplementedException($"Implicit cast from {actualType} to {desiredType} not supported");

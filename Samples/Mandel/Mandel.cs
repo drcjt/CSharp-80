@@ -19,7 +19,7 @@ namespace Mandelbrot
             rightEdge = -leftEdge;
             int yStep = 15;
 
-            int maxIterations = 200;
+            const nuint maxIterations = 50;
 
             for (int y0 = topEdge; y0 > bottomEdge; y0 -= yStep)
             {
@@ -27,7 +27,7 @@ namespace Mandelbrot
                 {
                     int x = 0;
                     int y = 0;
-                    int i = 0;
+                    nuint i = 0;
                     char c = ' ';
 
                     while (i < maxIterations)
@@ -36,12 +36,8 @@ namespace Mandelbrot
                         int y_y = (y * y) / 200;
                         if (x_x + y_y > 800)
                         {
-                            c = (char)('0' + i);
-                            if (i > 9)
-                            {
-                                c = '@';
-                            }
-                            i = maxIterations;
+                            c = i <= 9 ? (char)(48 + i) : '@';
+                            break;
                         }
                         y = x * y / 100 + y0;
                         x = x_x - y_y + x0;
