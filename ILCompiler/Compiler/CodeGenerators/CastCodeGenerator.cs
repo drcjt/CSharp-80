@@ -79,14 +79,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 // Nothing to do
             }
-            else if (actualType == VarType.Ptr && (desiredType == VarType.UInt || desiredType == VarType.Int))
-            {
-                context.Emitter.Pop(HL);
-                context.Emitter.Ld(DE, 0);    // clear msw
-                context.Emitter.Push(DE);
-                context.Emitter.Push(HL);
-            }
-            else if (actualType == VarType.Ptr && (desiredType == VarType.UShort || desiredType == VarType.Short))
+            else if (actualType == VarType.Ptr && (desiredType == VarType.UInt || desiredType == VarType.Int || desiredType.IsShort())
             {
                 context.Emitter.Pop(HL);
                 context.Emitter.Ld(DE, 0);    // clear msw
