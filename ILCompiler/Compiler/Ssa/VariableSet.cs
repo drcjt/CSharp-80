@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.Ssa
         public void Clear() => _variables.Clear();
         public void AddElem(int localNumber) => _variables.Add(localNumber);
         public void Union(VariableSet other) => _variables.UnionWith(other._variables);
-        public override bool Equals(object? other) => other is VariableSet varSet && Equals(varSet);
+        public override bool Equals(object? obj) => obj is VariableSet varSet && Equals(varSet);
         public bool Equals(VariableSet? other)
         {
             if (other == null) return false;
