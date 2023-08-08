@@ -41,7 +41,7 @@ namespace ILCompiler.Compiler
             ClearMustInit(localVariableTable);
 
             // Figure out use/def info for all basic blocks
-            PerBlockLocalVarLiveness(blocks, localVariableTable);
+            PerBlockLocalVarLiveness(blocks);
             InterBlockLocalVarLiveness(blocks, localVariableTable);
         }
 
@@ -60,7 +60,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void PerBlockLocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
+        private void PerBlockLocalVarLiveness(IList<BasicBlock> blocks)
         {
             foreach (var block in blocks)
             {

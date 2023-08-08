@@ -3,7 +3,7 @@ using System.Text;
 
 namespace ILCompiler.Compiler.Ssa
 {
-    public class VariableSet : IEnumerable<int>
+    public sealed class VariableSet : IEnumerable<int>, IEquatable<VariableSet>
     {
         private readonly ISet<int> _variables = new HashSet<int>();
 
@@ -14,8 +14,12 @@ namespace ILCompiler.Compiler.Ssa
         public void Clear() => _variables.Clear();
         public void AddElem(int localNumber) => _variables.Add(localNumber);
         public void Union(VariableSet other) => _variables.UnionWith(other._variables);
-        public bool Equals(VariableSet other) => _variables.SetEquals(other._variables);
-
+        public bool Equals(VariableSet? other)
+        {
+            if (other == null) return false;
+            return _variables.SetEquals(other._variables);
+        }
+        
         public static VariableSet Union(VariableSet left, VariableSet right)
         {
             var result = new VariableSet ();
