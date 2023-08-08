@@ -14,11 +14,13 @@ namespace ILCompiler.Compiler.Ssa
         public void Clear() => _variables.Clear();
         public void AddElem(int localNumber) => _variables.Add(localNumber);
         public void Union(VariableSet other) => _variables.UnionWith(other._variables);
+        public override bool Equals(object? other) => other is VariableSet varSet && Equals(varSet);
         public bool Equals(VariableSet? other)
         {
             if (other == null) return false;
             return _variables.SetEquals(other._variables);
         }
+        public override int GetHashCode() => _variables.GetHashCode();
         
         public static VariableSet Union(VariableSet left, VariableSet right)
         {
