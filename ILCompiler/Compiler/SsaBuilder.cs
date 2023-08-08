@@ -1,5 +1,6 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.Compiler.Ssa;
 using Microsoft.Extensions.Logging;
 using System.Text;
 
@@ -25,7 +26,7 @@ namespace ILCompiler.Compiler
             // Create the dominator tree
             var dominatorTree = BuildDominatorTree(blocks);
 
-            // TODO: Calculate liveness
+            // Calculate liveness
             LocalVarLiveness(blocks, localVariableTable);
 
             // TODO: Insert Phi functions
@@ -37,33 +38,51 @@ namespace ILCompiler.Compiler
 
         private void LocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
         {
-            LocalVarLivenessInit(localVariableTable);
-
-            InitBlockVarSets(blocks);
+            ClearMustInit(localVariableTable);
 
             // Figure out use/def info for all basic blocks
-            PerBlockLocalVarLiveness(blocks, localVariableTable);
-            // InterBLockLocalVarLiveness()
+            PerBlockLocalVarLiveness(blocks);
+            InterBlockLocalVarLiveness(blocks, localVariableTable);
         }
 
-        private void PerBlockLocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
+        private static void InterBlockLocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
+        {
+            // Compute the IN and OUT sets using classic liveness algorithm
+            LiveVarAnalyzer.AnalyzeLiveVars(blocks);
+
+            // Set which local variable must be initialized
+            for (var lclNum = 0; lclNum < localVariableTable.Count; lclNum++)
+            {
+                if (!localVariableTable[lclNum].IsParameter && blocks[0].LiveIn.IsMember(lclNum))
+                {
+                    localVariableTable[lclNum].MustInit = true;
+                }
+            }
+        }
+
+        private void PerBlockLocalVarLiveness(IList<BasicBlock> blocks)
         {
             foreach (var block in blocks)
             {
-                // clear current use var set
-                // clear current def var set
+                var useSet = VariableSet.Empty;
+                var defSet = VariableSet.Empty;
 
                 // Enumerate nodes in each statement in evaluation order
-                foreach (var stmt in block.Statements)
+                var currentNode = block.FirstNode;
+                while (currentNode != null)
                 {
-                    for (var node = stmt; node != null; node = node.Next)
-                    {
-                        PerNodeLocalVarLiveness(node, localVariableTable);
-                    }
+                    PerNodeLocalVarLiveness(currentNode, useSet, defSet);
+                    currentNode = currentNode.Next;
                 }
 
-                // Save current use var set as block's use var set
-                // Save current def var set as block's def var set
+                block.VarDef = defSet;
+                block.VarUse = useSet;
+
+                // Dump use def details
+                var allVars = VariableSet.Union(defSet, useSet);
+
+                _logger.LogDebug(" USE({count}={curUseVarSet}", useSet.Count, useSet.DisplayVarSet(allVars));
+                _logger.LogDebug(" DEF({count}={defUseVarSet}", defSet.Count, defSet.DisplayVarSet(allVars));
             }
         }
 
@@ -71,57 +90,42 @@ namespace ILCompiler.Compiler
         /// Calls MarkUseDef for any local variables encountered
         /// </summary>
         /// <param name="node"></param>
-        private void PerNodeLocalVarLiveness(StackEntry node, IList<LocalVariableDescriptor> localVariableTable)
+        private static void PerNodeLocalVarLiveness(StackEntry node, VariableSet useSet, VariableSet defSet)
         {
             // For LocalVariableEntry, LocalVariableAddressEntry, StoreLocalVariableEntry, StoreIndEntry??, FieldAddressEntry?
-            if (node is ILocalVariable)
+            if (node is ILocalVariable localVarNode)
             {
-                var localVarNode = (ILocalVariable)node;
-                MarkUseDef(localVarNode, localVariableTable);
-            }
+                MarkUseDef(localVarNode, useSet, defSet);
+            }            
         }
 
-        private void MarkUseDef(ILocalVariable tree, IList<LocalVariableDescriptor> localVariableTable)
+        private static void MarkUseDef(ILocalVariable tree, VariableSet useSet, VariableSet defSet)
         {
+            // Assignment is a definition, everything else is a use.
+            
+            // Should we also check for StoreIndEntry which is generated from Stfld import??
+            // Are these really partial definitions e.g. struct field is assigned to s.f = ...
+
+            var isDef = tree is StoreLocalVariableEntry;
+            var isUse = !isDef;
+
             var localNumber = tree.LocalNumber;
-            var local = localVariableTable[localNumber];
-
-            // Need to get def/use from tree too
-            // So assignment is a definition, everything else is a use.
-
-            // if (isUse && not in current def set)
-            //   Add to Current Use set
-
-            // if (isDef)
-            //   Add to Current Def set
-        }
-
-        private void InitBlockVarSets(IList<BasicBlock> blocks)
-        {
-            foreach (var block in blocks)
+            if (isUse && !defSet.IsMember(localNumber))
             {
-                // block.InitVarSets();
+                useSet.AddElem(localNumber);
+            }
+
+            if (isDef)
+            {
+                defSet.AddElem(localNumber);
             }
         }
 
-        private void LocalVarLivenessInit(IList<LocalVariableDescriptor> localVariableTable)
+        private static void ClearMustInit(IList<LocalVariableDescriptor> localVariableTable)
         {
             foreach (var localVariable in localVariableTable)
             {
                 localVariable.MustInit = false;
-            }
-        }
-
-        // TODO: Move to separate file
-        // TODO: Will need ability to do a pre order traversal of this tree
-        class DominatorTreeNode
-        {
-            public BasicBlock Block { get; private set; }
-            public IList<DominatorTreeNode> Children { get; set; } = new List<DominatorTreeNode>();
-
-            public DominatorTreeNode(BasicBlock block)
-            {
-                Block = block;
             }
         }
 
@@ -221,8 +225,10 @@ namespace ILCompiler.Compiler
 
             var count = postOrder.Count;
 
-            var processedBlocks = new HashSet<BasicBlock>();
-            processedBlocks.Add(postOrder[postOrder.Count - 1]);
+            var processedBlocks = new HashSet<BasicBlock>
+            {
+                postOrder[postOrder.Count - 1]
+            };
 
             bool changed = true;
             while (changed)
@@ -234,7 +240,7 @@ namespace ILCompiler.Compiler
                 {
                     var block = postOrder[i];
 
-                    _logger.LogDebug($"Visiting in reverse post order: {block.Label}");
+                    _logger.LogDebug("Visiting in reverse post order: {BlockLabel}", block.Label);
 
                     // Find the first processed predecessor
                     BasicBlock? predecessorBlock = null;
@@ -249,7 +255,7 @@ namespace ILCompiler.Compiler
 
                     if (predecessorBlock != null)
                     {
-                        _logger.LogDebug($"Predecessor block is {predecessorBlock.Label}");
+                        _logger.LogDebug("Predecessor block is {PredecessorBlockLabel}", predecessorBlock.Label);
                     }
 
                     // Intersect DOM, if computed for all predecessors
@@ -272,11 +278,11 @@ namespace ILCompiler.Compiler
                     {
                         changed = true;
 
-                        _logger.LogDebug($"ImmediateDominator of {block.Label} becomes {basicBlockDominator?.Label}");
+                        _logger.LogDebug("ImmediateDominator of {BlockLabel} becomes {BasicBlockDominatorLabel}", block.Label, basicBlockDominator?.Label);
                         block.ImmediateDominator = basicBlockDominator;
                     }
 
-                    _logger.LogDebug($"Marking block {block.Label} as processed");
+                    _logger.LogDebug("Marking block {BlockLabel} as processed", block.Label);
                     processedBlocks.Add(block);
                 }
             }
