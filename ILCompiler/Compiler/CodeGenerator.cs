@@ -246,31 +246,28 @@ namespace ILCompiler.Compiler
                 emitter.Ld(HL, (short)-localsSize);
                 emitter.Add(HL, SP);
                 emitter.Ld(SP, HL);
-                
-                if (_context.Method.Body.InitLocals)
+
+                ZeroInitFrame(emitter);
+            }
+        }
+
+        private void ZeroInitFrame(Emitter emitter)
+        {
+            if (_context.Method.Body.InitLocals)
+            {
+                foreach (var variable in _context.LocalVariableTable)
                 {
-                    // TODO: This should loop through the locals and only init those flagged as must init
-                    // but this requires SSA and use/def analysis which we don't have yet.
-                    // So for now just init all the locals
+                    if (variable.MustInit)
+                    {
+                        // Emit code to init the local here
+                        var offset = variable.StackOffset;
+                        var exactSize = variable.ExactSize;
 
-                    emitter.Ld(BC, (short)localsSize);
-
-                    emitter.Push(IX);
-                    emitter.Pop(HL);
-
-                    var initLoopLabel = _context.NameMangler.GetUniqueName();
-                    emitter.CreateLabel(initLoopLabel);
-
-                    emitter.Dec(HL);  // Stack grows downwards so need to move to next byte first
-
-                    emitter.Ld(__[HL], 0);
-
-                    emitter.Dec(BC);
-
-                    emitter.Ld(A, B);
-                    emitter.Or(C);
-
-                    emitter.Jp(Condition.NZ, initLoopLabel);
+                        for (var count = 0; count < exactSize; count++)
+                        {
+                            emitter.Ld(__[IX + (short)(-offset + count)], 0);
+                        }
+                    }
                 }
             }
         }
