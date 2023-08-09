@@ -246,21 +246,26 @@ namespace ILCompiler.Compiler
                 emitter.Ld(HL, (short)-localsSize);
                 emitter.Add(HL, SP);
                 emitter.Ld(SP, HL);
-                
-                if (_context.Method.Body.InitLocals)
-                {
-                    foreach (var variable in _context.LocalVariableTable)
-                    {
-                        if (variable.MustInit)
-                        {
-                            // Emit code to init the local here
-                            var offset = variable.StackOffset;
-                            var exactSize = variable.ExactSize;
 
-                            for (var count = 0; count < offset; count++) 
-                            {
-                                emitter.Ld(__[IX + (short)(-offset + count)], 0);
-                            }
+                ZeroInitFrame(emitter);
+            }
+        }
+
+        private void ZeroInitFrame(Emitter emitter)
+        {
+            if (_context.Method.Body.InitLocals)
+            {
+                foreach (var variable in _context.LocalVariableTable)
+                {
+                    if (variable.MustInit)
+                    {
+                        // Emit code to init the local here
+                        var offset = variable.StackOffset;
+                        var exactSize = variable.ExactSize;
+
+                        for (var count = 0; count < exactSize; count++)
+                        {
+                            emitter.Ld(__[IX + (short)(-offset + count)], 0);
                         }
                     }
                 }
