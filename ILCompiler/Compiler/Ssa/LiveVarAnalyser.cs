@@ -21,8 +21,12 @@
         {
             // Compute the liveOut set
 
-            // TODO: deal with when block ends with a Jmp
-            // as need to mark all arguments as live at the Jmp
+            // When block ends with a Jmp need to mark all parameters as live at the Jmp
+            // Note importer does not currently handle jmp cil and the JumpEntry node is
+            // only generated from importing br and br.s so no need to worry about this
+            // for now.
+
+            // TODO: Revisit when importer handles jmp cil
 
             // Union in all the live in vars of blocks successors
             foreach (var succ in block.Successors)
