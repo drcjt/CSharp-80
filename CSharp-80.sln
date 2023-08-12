@@ -122,6 +122,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeforeFieldInit", "Tests\Me
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess", "Samples\Chess\Chess.csproj", "{024215E4-9022-4A45-85A0-1233908DC8BD}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroInit", "Tests\Methodical\ZeroInit\ZeroInit.csproj", "{02327B5A-3408-4928-BED7-2D6D1369349C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -300,6 +302,10 @@ Global
 		{024215E4-9022-4A45-85A0-1233908DC8BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{024215E4-9022-4A45-85A0-1233908DC8BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{024215E4-9022-4A45-85A0-1233908DC8BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02327B5A-3408-4928-BED7-2D6D1369349C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02327B5A-3408-4928-BED7-2D6D1369349C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02327B5A-3408-4928-BED7-2D6D1369349C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02327B5A-3408-4928-BED7-2D6D1369349C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -351,6 +357,7 @@ Global
 		{6CAD3826-DB91-4CB0-B432-16A0372A526E} = {4DBCD88C-3231-4CCF-8D5A-D2AA2D45750B}
 		{D344641A-181B-4644-AF69-C35F749A92FE} = {4DBCD88C-3231-4CCF-8D5A-D2AA2D45750B}
 		{024215E4-9022-4A45-85A0-1233908DC8BD} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
+		{02327B5A-3408-4928-BED7-2D6D1369349C} = {4DBCD88C-3231-4CCF-8D5A-D2AA2D45750B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}
