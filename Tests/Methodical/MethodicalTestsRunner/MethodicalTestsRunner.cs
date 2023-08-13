@@ -1,11 +1,15 @@
 ﻿using ILCompiler.Tests.Common;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace MethodicalTests
 {
     [TestFixture]
     public class MethodicalTestsRunner
     {
+        private const string IlExtension = ".il";
+        private const string CimExtension = ".cim";
+
         private const int StackStart = UInt16.MaxValue;
 
         [Test]
@@ -13,15 +17,19 @@ namespace MethodicalTests
         public void MethodicalTest(string testname)
         {
             // Determine if test is using il file or not
-            var ilPath = Path.ChangeExtension(testname, ".il");
-            if (File.Exists(ilPath))
+            if (Path.GetExtension(testname) == IlExtension)
             {
                 // Assemble the il
-                ILAsmRunner.Assemble(ilPath);
+                if (!ILAsmRunner.Assemble(testname))
+                {
+                    Assert.Fail("Failed to assemble IL");
+                }
+
+                var cimFile = Path.ChangeExtension(testname, CimExtension);
 
                 // Run the test
-                ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(testname, createLibrary : false);
-                Z80TestRunner.Create(SolutionPath).RunTest(testname);
+                ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(cimFile, createLibrary : false);
+                Z80TestRunner.Create(SolutionPath).RunTest(cimFile);
             }
             else
             {
@@ -47,10 +55,29 @@ namespace MethodicalTests
                     var methodicalTestName = Path.GetFileName(methodicalTestPath);
                     if (methodicalTestName != nameof(MethodicalTestsRunner))
                     {
-                        var temp = Path.Combine(binConfigTargetPath, $"{methodicalTestName}.cim");
-                        var testAssemblyPath = Path.Combine(methodicalTestPath, temp);
+                        var ilFiles = Directory.GetFiles(methodicalTestPath, "*.il");
 
-                        yield return new TestCaseData(testAssemblyPath).SetName(Path.GetFileNameWithoutExtension(methodicalTestName));
+                        if (ilFiles.Length == 0)
+                        {
+
+                            var temp = Path.Combine(binConfigTargetPath, $"{methodicalTestName}{CimExtension}");
+                            var testAssemblyPath = Path.Combine(methodicalTestPath, temp);
+
+                            yield return new TestCaseData(testAssemblyPath).SetName(methodicalTestName);
+                        }
+                        else
+                        {
+                            foreach (var ilFile in ilFiles)
+                            {
+                                var ilFileName = Path.GetFileName(ilFile);
+                                var temp = Path.Combine(binConfigTargetPath, ilFileName);
+                                var testAssemblyPath = Path.Combine(methodicalTestPath, temp);
+
+                                var testName = $"{methodicalTestName} ({Path.GetFileNameWithoutExtension(ilFile)})";
+
+                                yield return new TestCaseData(testAssemblyPath).SetName(testName);
+                            }
+                        }
                     }
                 }
             }

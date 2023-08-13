@@ -12,7 +12,10 @@ namespace CSharp80.Tests.BVT
         [TestCaseSource(typeof(ILBvtTests), nameof(IlBvtTestCaseData))]
         public void IlBvtTest(string ilFileName)
         {
-            ILAsmRunner.Assemble(ilFileName);
+            if (!ILAsmRunner.Assemble(ilFileName))
+            {
+                Assert.Fail("Failed to assemble IL");
+            }
             ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(ilFileName, createLibrary: false);
 
             var cimFileName = Path.Combine(TestContext.CurrentContext.TestDirectory, ".\\il_bvt\\" + NUnit.Framework.TestContext.CurrentContext.Test.Name + ".cim");
