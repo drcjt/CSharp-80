@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 [module: System.Runtime.CompilerServices.SkipLocalsInit]
 
@@ -8,6 +9,7 @@ namespace MiniBCL
     {
         public static void Main()
         {
+            Console.Clear();
             DrawDotNetBot();
         }
 
