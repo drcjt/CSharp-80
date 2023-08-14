@@ -12,7 +12,8 @@ SETRES:
 	POP DE		; Get y-coordinate into DE
 	POP BC		; Ignore msw
 
-	LD A, E		; Save y into A
+	LD A, 175	; Save 175-y into A
+	SUB E
 
 	POP DE		; get x-coordinate into HL
 	POP BC		; Ignore msw
