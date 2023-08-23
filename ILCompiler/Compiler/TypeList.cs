@@ -4,7 +4,6 @@
     {
         Void,
 
-        Bool,
         Byte,
         SByte,
 
@@ -31,12 +30,12 @@
     {
         public static bool IsSmall(this VarType type)
         {
-            return type >= VarType.Bool && type <= VarType.UShort;
+            return type >= VarType.Byte && type <= VarType.UShort;
         }
 
         public static bool IsByte(this VarType type)
         {
-            return type >= VarType.Bool && type <= VarType.SByte;
+            return type >= VarType.Byte && type <= VarType.SByte;
         }
 
         public static bool IsShort(this VarType type)
@@ -51,12 +50,12 @@
 
         public static bool IsUnsigned(this VarType type)
         {
-            return type == VarType.Bool || type == VarType.Byte || type == VarType.UShort || type == VarType.UInt;
+            return type == VarType.Byte || type == VarType.UShort || type == VarType.UInt;
         }
 
         public static bool IsInt(this VarType type)
         {
-            return type >= VarType.Bool && type <= VarType.UInt;
+            return type >= VarType.Byte && type <= VarType.UInt;
         }
 
         public static int GetTypeSize(this VarType type)
@@ -66,7 +65,6 @@
                 case VarType.Void:
                     return 0;
 
-                case VarType.Bool:
                 case VarType.Byte:
                 case VarType.SByte:
                     return 1;
