@@ -28,7 +28,7 @@ namespace ILCompiler.Compiler
                     return VarType.Void;
 
                 case ElementType.Boolean: 
-                    return VarType.Bool;
+                    return VarType.Byte;
 
                 case ElementType.I1:
                     return VarType.SByte;
