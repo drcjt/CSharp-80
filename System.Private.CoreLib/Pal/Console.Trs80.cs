@@ -65,13 +65,14 @@ namespace System
         public static int WindowHeight { get { return 16; } }
         public static int WindowWidth { get { return 64; } }
 
+
+        [DllImport(Libraries.Runtime, EntryPoint = "Beep")]
+        private static extern void InternalBeep(int frequency, int duration);
+
         public static void Beep()
         {
             Beep(800, 200);
         }
-
-        [DllImport(Libraries.Runtime, EntryPoint = "Beep")]
-        private static extern void InternalBeep(int frequency, int duration);
 
         public static void Beep(int frequency, int duration)
         {
