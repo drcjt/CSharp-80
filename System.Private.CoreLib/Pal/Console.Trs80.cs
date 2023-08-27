@@ -6,11 +6,11 @@ namespace System
     public static partial class Console
     {
         [DllImport(Libraries.Runtime, EntryPoint = "READLINE")]
-        private static unsafe extern String InternalReadLine(EEType* stringEEType);
+        private static unsafe extern string InternalReadLine(EEType* stringEEType);
 
         public static unsafe string ReadLine()
         {
-            return InternalReadLine(EETypePtr.EETypePtrOf<String>());
+            return InternalReadLine(EETypePtr.EETypePtrOf<string>());
         }
 
         [DllImport(Libraries.Runtime, EntryPoint = "SetXY")]
@@ -64,5 +64,35 @@ namespace System
 
         public static int WindowHeight { get { return 16; } }
         public static int WindowWidth { get { return 64; } }
+
+        public static void Beep()
+        {
+            Beep(800, 200);
+        }
+
+        [DllImport(Libraries.Runtime, EntryPoint = "Beep")]
+        private static extern void InternalBeep(int frequency, int duration);
+
+        public static void Beep(int frequency, int duration)
+        {
+            // Work out the frequency count for the assembly code routine
+            // TODO: Really want to do this calculation as follows
+            // frequencyCount = ((1000000 / frequency) - 44.53) / 25.9
+            // But we don't have floating point numbers yet
+
+            var frequencyCount = 0;
+            for (int count = 122; count > 0; count--)
+            {
+                var estimatedFreq = 1000000 / (26 * count + 44);
+
+                if (frequency < estimatedFreq)
+                {
+                    frequencyCount = count;
+                    break;
+                }
+            }
+
+            InternalBeep(frequencyCount, duration * frequency / 1000);
+        }
     }
 }
