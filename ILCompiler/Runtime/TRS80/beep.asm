@@ -1,20 +1,19 @@
 BEEP:
-	POP BC		; return address
-
-	EXX 
+	POP HL		; return address
 
 	POP BC		; Duration
 	POP DE
 
 	POP DE		; Frequency
-	POP HL
+	POP AF
+
+	PUSH HL
+	PUSH IX
 
 	; Freq in DE
 	; Duration in BC
 
 	DI
-
-	PUSH IX
 
 	DEC BC
 	PUSH BC
@@ -38,11 +37,8 @@ BEEP3:
 	ADD IX, BC
 	JP C, BEEP1
 
-	POP IX
-
 	EI
 
-	EXX
+	POP IX
 
-	PUSH BC
 	RET

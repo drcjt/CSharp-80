@@ -43,5 +43,24 @@ namespace System
         // Although screen has 24 lines bottom 2 are reserved for input only
         public static int WindowHeight { get { return 22; } }
         public static int WindowWidth { get { return 32; } }
+
+        [DllImport(Libraries.Runtime, EntryPoint = "Beep")]
+        private static extern void InternalBeep(int tonePeriod, int toneDurationInCycles);
+
+        public static void Beep()
+        {
+            const int BeepFrequencyInHz = 800;
+            const int BeepDurationInMs = 200;
+            Beep(BeepFrequencyInHz, BeepDurationInMs);
+        }
+
+        public static void Beep(int frequencyInHertz, int durationInMilliseconds)
+        {
+            const int CPUFrequencyInHertz = 3500000;
+            var tonePeriod = ((CPUFrequencyInHertz / frequencyInHertz) - 236) / 8;
+            var toneDurationInCycles = durationInMilliseconds * frequencyInHertz / 1000;
+
+            InternalBeep(tonePeriod, toneDurationInCycles);
+        }
     }
 }
