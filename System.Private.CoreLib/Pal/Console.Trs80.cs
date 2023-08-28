@@ -67,33 +67,22 @@ namespace System
 
 
         [DllImport(Libraries.Runtime, EntryPoint = "Beep")]
-        private static extern void InternalBeep(int frequency, int duration);
+        private static extern void InternalBeep(int tonePeriod, int toneDurationInCycles);
 
         public static void Beep()
         {
-            Beep(800, 200);
+            const int BeepFrequencyInHz = 800;
+            const int BeepDurationInMs = 200;
+            Beep(BeepFrequencyInHz, BeepDurationInMs);
         }
 
-        public static void Beep(int frequency, int duration)
+        public static void Beep(int frequencyInHertz, int durationInMilliseconds)
         {
-            // Work out the frequency count for the assembly code routine
-            // TODO: Really want to do this calculation as follows
-            // frequencyCount = ((1000000 / frequency) - 44.53) / 25.9
-            // But we don't have floating point numbers yet
+            const int CPUFrequencyInHertz = 1000000;
+            var tonePeriod = ((CPUFrequencyInHertz / frequencyInHertz) - 44) / 26;
+            var toneDurationInCycles = durationInMilliseconds * frequencyInHertz / 1000;
 
-            var frequencyCount = 0;
-            for (int count = 122; count > 0; count--)
-            {
-                var estimatedFreq = 1000000 / (26 * count + 44);
-
-                if (frequency < estimatedFreq)
-                {
-                    frequencyCount = count;
-                    break;
-                }
-            }
-
-            InternalBeep(frequencyCount, duration * frequency / 1000);
+            InternalBeep(tonePeriod, toneDurationInCycles);
         }
     }
 }
