@@ -27,5 +27,10 @@ namespace System
 
         public static int WindowHeight { get { return 24; } }
         public static int WindowWidth { get { return 80; } }
+
+        public static void Beep(int frequencyInHertz, int durationInMilliseconds)
+        {
+            // No sounds support on CPM yet
+        }
     }
 }
