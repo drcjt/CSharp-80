@@ -20,6 +20,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fib", "Samples\Fib\Fib.csproj", "{1C5765B4-0448-46C3-8BD5-39168A53F21A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleDsk", "Samples\SampleDsk\SampleDsk.csproj", "{7E8338DA-726C-4088-B4E3-E29E66BE3404}"
+	ProjectSection(ProjectDependencies) = postProject
+		{240E6384-74B7-4222-9A2F-D73960B8FEB7} = {240E6384-74B7-4222-9A2F-D73960B8FEB7}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Snake", "Samples\Snake\Snake.csproj", "{38B95D06-7F4C-49B2-945D-2ECAEA2210C4}"
 EndProject
@@ -123,6 +126,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess", "Samples\Chess\Chess.csproj", "{024215E4-9022-4A45-85A0-1233908DC8BD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ZeroInit", "Tests\Methodical\ZeroInit\ZeroInit.csproj", "{02327B5A-3408-4928-BED7-2D6D1369349C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Music", "Samples\Music\Music.csproj", "{240E6384-74B7-4222-9A2F-D73960B8FEB7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -306,6 +311,10 @@ Global
 		{02327B5A-3408-4928-BED7-2D6D1369349C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{02327B5A-3408-4928-BED7-2D6D1369349C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{02327B5A-3408-4928-BED7-2D6D1369349C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{240E6384-74B7-4222-9A2F-D73960B8FEB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{240E6384-74B7-4222-9A2F-D73960B8FEB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{240E6384-74B7-4222-9A2F-D73960B8FEB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{240E6384-74B7-4222-9A2F-D73960B8FEB7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -358,6 +367,7 @@ Global
 		{D344641A-181B-4644-AF69-C35F749A92FE} = {4DBCD88C-3231-4CCF-8D5A-D2AA2D45750B}
 		{024215E4-9022-4A45-85A0-1233908DC8BD} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 		{02327B5A-3408-4928-BED7-2D6D1369349C} = {4DBCD88C-3231-4CCF-8D5A-D2AA2D45750B}
+		{240E6384-74B7-4222-9A2F-D73960B8FEB7} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}

@@ -70,6 +70,7 @@
     <None Remove="Runtime\NewString.asm" />
     <None Remove="Runtime\print.asm" />
     <None Remove="Runtime\stoi.asm" />
+    <None Remove="Runtime\TRS80\beep.asm" />
     <None Remove="Runtime\TRS80\cls.asm" />
     <None Remove="Runtime\TRS80\fastsetres.asm" />
     <None Remove="Runtime\TRS80\getdatetime.asm" />
@@ -79,6 +80,7 @@
     <None Remove="Runtime\TRS80\ticks.asm" />
 	<None Remove="Runtime\TRS80\setres.asm" />
 	<None Remove="Runtime\TRS80\setxy.asm" />
+	<None Remove="Runtime\ZXSpectrum\beep.asm" />
 	<None Remove="Runtime\ZXSpectrum\cls.asm" />
     <None Remove="Runtime\ZXSpectrum\getdatetime.asm" />
     <None Remove="Runtime\ZXSpectrum\getxy.asm" />
@@ -125,6 +127,7 @@
     <EmbeddedResource Include="Runtime\TRS80\setres.asm" />
     <EmbeddedResource Include="Runtime\TRS80\kbdscan.asm" />
     <EmbeddedResource Include="Runtime\delay.asm" />
+    <EmbeddedResource Include="Runtime\TRS80\beep.asm" />
     <EmbeddedResource Include="Runtime\TRS80\ticks.asm" />
     <EmbeddedResource Include="Runtime\itoa.asm" />
     <EmbeddedResource Include="Runtime\i_add.asm" />
@@ -150,6 +153,7 @@
     <EmbeddedResource Include="Runtime\TRS80\getdatetime.asm" />
     <EmbeddedResource Include="Runtime\TRS80\readline.asm" />
     <EmbeddedResource Include="Runtime\TRS80\write.asm" />
+    <EmbeddedResource Include="Runtime\ZXSpectrum\beep.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\cls.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\getdatetime.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\printchr.asm" />
