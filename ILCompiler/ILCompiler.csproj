@@ -21,7 +21,6 @@
   <ItemGroup>	  
     <None Remove="Runtime\CPM\cls.asm" />
     <None Remove="Runtime\CPM\printchr.asm" />
-    <None Remove="Runtime\delay.asm" />
     <None Remove="Runtime\GCGetTotalMemory.asm" />
     <None Remove="Runtime\itoa.asm" />
     <None Remove="Runtime\i_add.asm" />
@@ -72,6 +71,7 @@
     <None Remove="Runtime\stoi.asm" />
     <None Remove="Runtime\TRS80\beep.asm" />
     <None Remove="Runtime\TRS80\cls.asm" />
+    <None Remove="Runtime\TRS80\delay.asm" />
     <None Remove="Runtime\TRS80\fastsetres.asm" />
     <None Remove="Runtime\TRS80\getdatetime.asm" />
     <None Remove="Runtime\TRS80\printchr.asm" />
@@ -82,6 +82,7 @@
 	<None Remove="Runtime\TRS80\setxy.asm" />
 	<None Remove="Runtime\ZXSpectrum\beep.asm" />
 	<None Remove="Runtime\ZXSpectrum\cls.asm" />
+	<None Remove="Runtime\ZXSpectrum\delay.asm" />
     <None Remove="Runtime\ZXSpectrum\getdatetime.asm" />
     <None Remove="Runtime\ZXSpectrum\getxy.asm" />
     <None Remove="Runtime\ZXSpectrum\printchr.asm" />
@@ -122,11 +123,11 @@
     <EmbeddedResource Include="Runtime\i_mul16.asm" />
     <EmbeddedResource Include="Runtime\i_rsh16.asm" />
     <EmbeddedResource Include="Runtime\i_rsh.asm" />
+    <EmbeddedResource Include="Runtime\TRS80\delay.asm" />
     <EmbeddedResource Include="Runtime\TRS80\keyavail.asm" />
     <EmbeddedResource Include="Runtime\TRS80\fastsetres.asm" />
     <EmbeddedResource Include="Runtime\TRS80\setres.asm" />
     <EmbeddedResource Include="Runtime\TRS80\kbdscan.asm" />
-    <EmbeddedResource Include="Runtime\delay.asm" />
     <EmbeddedResource Include="Runtime\TRS80\beep.asm" />
     <EmbeddedResource Include="Runtime\TRS80\ticks.asm" />
     <EmbeddedResource Include="Runtime\itoa.asm" />
@@ -155,6 +156,7 @@
     <EmbeddedResource Include="Runtime\TRS80\write.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\beep.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\cls.asm" />
+    <EmbeddedResource Include="Runtime\ZXSpectrum\delay.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\getdatetime.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\printchr.asm" />
     <EmbeddedResource Include="Runtime\ZXSpectrum\getxy.asm" />
