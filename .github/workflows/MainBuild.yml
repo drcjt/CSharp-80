@@ -87,19 +87,19 @@ jobs:
         run: dotnet build --configuration Release --no-restore -p:TargetPlatform=${{ matrix.platform }}
 
       - name: Test
+        if: matrix.platform == 'Trs80'  
         run: dotnet test --configuration Release --no-restore -p:TargetPlatform=${{ matrix.platform }} --collect:"XPlat Code Coverage;Format=opencover" --logger:trx --results-directory "TestResults-${{ matrix.platform }}" -p:BuildInParallel=false -m:1 
 
       - name: Upload dotnet test results
+        if: matrix.platform == 'Trs80' && always()
         uses: actions/upload-artifact@v3
         with:
           name: dotnet-results-${{ matrix.platform }}
           path: TestResults
-        # Use always() to always run this step to publish test results when there are test failures
-        if: ${{ always() }}
 
       - name: Upload benchmark results
         # Use always() to always run this step to publish benchmark results when there are test failures
-        if: ${{ matrix.platform == 'Trs80' }} && ${{ always() }}
+        if: matrix.platform == 'Trs80' && always()
         uses: actions/upload-artifact@v3
         with:
           name: benchmark-results
