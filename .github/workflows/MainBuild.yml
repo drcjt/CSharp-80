@@ -19,6 +19,7 @@ jobs:
     strategy:
       matrix:
         platform: [Trs80,ZXSpectrum,CPM]
+      fail-fast: false
     name: Build, Test and Analyze for ${{ matrix.platform }} 
     runs-on: windows-latest
 
@@ -34,7 +35,7 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
 
       - name: Cache SonarCloud packages
-        if: ${{ matrix.platform == 'Trs80' }}
+        if: matrix.platform == 'Trs80'
         uses: actions/cache@v3
         with:
           path: ~\sonar\cache
@@ -42,7 +43,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Cache SonarCloud scanner
-        if: ${{ matrix.platform == 'Trs80' }}
+        if: matrix.platform == 'Trs80'
         id: cache-sonar-scanner
         uses: actions/cache@v3
         with:
@@ -51,7 +52,7 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar-scanner
 
       - name: Install SonarCloud scanner
-        if: ${{ matrix.platform == 'Trs80' }} && steps.cache-sonar-scanner.outputs.cache-hit != 'true'
+        if: matrix.platform == 'Trs80' && steps.cache-sonar-scanner.outputs.cache-hit != 'true'
         shell: powershell
         run: |
           New-Item -Path .\.sonar\scanner -ItemType Directory
@@ -74,7 +75,7 @@ jobs:
         run: dotnet restore
 
       - name: Sonarqube setup
-        if: ${{ matrix.platform == 'Trs80' }}
+        if: matrix.platform == 'Trs80'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -105,7 +106,7 @@ jobs:
           path: benchmark-results.txt
 
       - name: Sonarqube end analysis
-        if: ${{ matrix.platform == 'Trs80' }}
+        if: matrix.platform == 'Trs80'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -114,7 +115,7 @@ jobs:
           .\.sonar\scanner\dotnet-sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
 
       - name: Store benchmark result
-        if: ${{ matrix.platform == 'Trs80' }}
+        if: matrix.platform == 'Trs80'
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: CSharp-80 Benchmark
@@ -129,7 +130,7 @@ jobs:
           benchmark-data-dir-path: docs/bench
 
       - name: Upload .cmd, .dsk files for trs80 platform if they exist
-        if: ${{ matrix.platform == 'Trs80' }}
+        if: matrix.platform == 'Trs80'
         uses: actions/upload-artifact@v3
         with:
           name: samples-${{ matrix.platform }}
@@ -138,14 +139,14 @@ jobs:
             Samples/*.dsk
 
       - name: Upload .tap files for zx spectrum platform if they exist
-        if: ${{ matrix.platform == 'ZXSpectrum' }}
+        if: matrix.platform == 'ZXSpectrum'
         uses: actions/upload-artifact@v3
         with:
           name: samples-${{ matrix.platform }}
           path: Samples/**/*.tap
 
       - name: Upload .hex files for cpm platform if they exist
-        if: ${{ matrix.platform == 'CPM' }}
+        if: matrix.platform == 'CPM'
         uses: actions/upload-artifact@v3
         with:
           name: samples-${{ matrix.platform }}
