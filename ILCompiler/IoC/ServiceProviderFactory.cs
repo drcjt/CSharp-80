@@ -41,6 +41,8 @@ namespace ILCompiler.IoC
 
             services.AddTransient<IMorpher, Morpher>();
 
+            services.AddTransient<IRationalizer, Rationalizer>();
+
             services.AddTransient<IFlowgraph, Flowgraph>();
 
             services.AddTransient<ISsaBuilder, SsaBuilder>();

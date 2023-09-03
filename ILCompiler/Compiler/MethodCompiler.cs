@@ -161,6 +161,10 @@ namespace ILCompiler.Compiler
                 _logger.LogInformation("{lirDump}", lirDump);
             }
 
+            // Rationalize
+            var rationalizer = _phaseFactory.Create<IRationalizer>();
+            rationalizer.Rationalize(basicBlocks);
+
             // Lower
             var lowering = _phaseFactory.Create<ILowering>();
             lowering.Run(basicBlocks);

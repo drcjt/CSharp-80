@@ -31,5 +31,6 @@
         public void Visit(PutArgTypeEntry entry);
         public void Visit(StaticFieldEntry entry);
         public void Visit(CommaEntry entry);
+        public void Visit(PhiNode entry);
     }
 }

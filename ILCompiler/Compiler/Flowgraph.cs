@@ -191,6 +191,11 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
+        public void Visit(PhiNode entry)
+        {
+            SetNext(entry);
+        }
+
         private void SetNext(StackEntry entry)
         {
             if (Current != null)
