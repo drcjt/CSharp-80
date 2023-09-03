@@ -30,14 +30,14 @@ namespace ILCompiler.Compiler
             LocalVarLiveness(blocks, localVariableTable);
 
             // Insert Phi functions
-            InsertPhiFunctions(postOrder);
+            InsertPhiFunctions(postOrder, localVariableTable);
 
             // TODO: Rename local variables
 
             // TODO: Print SSA form
         }
 
-        private void InsertPhiFunctions(IList<BasicBlock> postOrderBlocks)
+        private void InsertPhiFunctions(IList<BasicBlock> postOrderBlocks, IList<LocalVariableDescriptor> localVariableTable)
         {
             // From https://www.cs.cornell.edu/courses/cs6120/2020fa/lesson/5/
 
@@ -73,16 +73,51 @@ namespace ILCompiler.Compiler
                             continue;
                         }
 
-                        // TODO: Insert Phi functions
-                        /*
-                        if (!GetPhiNode(blockInDominanceFront, defVar))
+                        // Insert Phi functions - note arguments will be determined during variable renaming
+                        if (!HasPhiNode(blockInDominanceFront, defVar))
                         {
-                            InsertPhi(blockInDominanceFront, defVar);
+                            InsertPhi(blockInDominanceFront, defVar, localVariableTable);
                         }
-                        */
                     }
                 }
             }
+        }
+
+        private static bool HasPhiNode(BasicBlock block, int localNumber)
+        {
+            foreach (var statement in block.Statements)
+            {
+                if (statement is not PhiNode)
+                {
+                    break;
+                }
+
+                var store = statement.Next as StoreLocalVariableEntry;
+                if (store?.LocalNumber == localNumber)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void InsertPhi(BasicBlock block, int localNumber, IList<LocalVariableDescriptor> localVariableTable)
+        {
+            // Note actual arguments to Phi will be worked out during variable renaming
+
+            var local = localVariableTable[localNumber];
+            var phiNode = new PhiNode(local.Type);
+
+            var store = new StoreLocalVariableEntry(localNumber, false, phiNode);
+
+            // Create the statement and chain together in linear order e.g. PhiNode followed by StoreLocalVariableEntry
+            phiNode.Next = store;
+
+            // Add new phi statement to start of block
+            block.InsertStatementAtStart(phiNode);
+
+            _logger.LogDebug("Added Phi Node for V{localNumber} at start of {blockLabel}.", localNumber, block.Label);
         }
 
         private IList<BasicBlock> ComputeIteratedDominanceFrontier(BasicBlock block, IDictionary<BasicBlock, ISet<BasicBlock>> dominanceFrontierMap)

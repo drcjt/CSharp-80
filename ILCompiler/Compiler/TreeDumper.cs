@@ -221,6 +221,11 @@ namespace ILCompiler.Compiler
             _indent--;
         }
 
+        public void Visit(PhiNode entry)
+        {
+            Print($"PHI");
+        }
+
         public void Visit(IndexRefEntry entry)
         {
             _indent++;

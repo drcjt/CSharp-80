@@ -97,6 +97,11 @@ namespace ILCompiler.Compiler
             _sb.AppendLine($"       storelcl {entry.LocalNumber}");
         }
 
+        public void Visit(PhiNode entry)
+        {
+            _sb.AppendLine($"       phi");
+        }
+
         public void Visit(CallEntry entry)
         {
             var firstArg = true;
