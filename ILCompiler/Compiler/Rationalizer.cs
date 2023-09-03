@@ -15,7 +15,7 @@ namespace ILCompiler.Compiler
                     while (statement is PhiNode)
                     {
                         // Remove PhiNode statement
-                        var nextStatement = statement?.Next?.Next;
+                        var nextStatement = statement.Next?.Next;
                         block.Statements.RemoveAt(0);
                         block.FirstNode = nextStatement;
 
