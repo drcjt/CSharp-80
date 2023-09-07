@@ -32,9 +32,46 @@ namespace ILCompiler.Compiler
             // Insert Phi functions
             InsertPhiFunctions(postOrder, localVariableTable);
 
-            // TODO: Rename local variables
+            // Rename local variables
+            RenameVariables(dominatorTree, localVariableTable);
 
             // TODO: Print SSA form
+        }
+
+        private void RenameVariables(DominatorTreeNode tree, IList<LocalVariableDescriptor> localVariableTable)
+        {
+            // First deal with parameters and must-init variables as though they
+            // have a virtual definition before entry to the method. They all
+            // begin with a SSA number of 1.
+
+            // Visit blocks renaming stuff!!
+
+            /*
+             * stack[v] is a stack of variable names (for every variable v)
+
+             * def rename(block):
+             *   for instr in block: (BlockRenameVariables in Ryujit)
+             *     replace each argument to instr with stack[old name]
+
+             *     replace instr's destination with a new name
+             *     push that new name onto stack[old name]
+
+             *   for s in block's successors: (AddPhiArgsToSuccessors in Ryujit)
+             *     for p in s's ϕ-nodes:
+             *       Assuming p is for a variable v, make it read from stack[v].
+
+             *   for b in blocks immediately dominated by block: (DomTreeVisitor in Ryujit)
+             *     # That is, children in the dominance tree.
+             *     rename(b)
+
+             *   pop all the names we just pushed onto the stacks (PopBlockStacks in Ryujit)
+
+             * rename(entry)
+             */
+
+            var ssaRenameStack = new SsaRenameState(_logger, localVariableTable.Count);
+            var visitor = new SsaRenameDominatorTreeVisitor(tree, ssaRenameStack);
+            visitor.WalkTree();
         }
 
         private void InsertPhiFunctions(IList<BasicBlock> postOrderBlocks, IList<LocalVariableDescriptor> localVariableTable)
