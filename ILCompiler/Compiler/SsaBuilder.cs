@@ -6,6 +6,10 @@ using System.Text;
 
 namespace ILCompiler.Compiler
 {
+    // TODO:
+    // StoreInd - treat as a store??
+    // AddPhiArgsToSuccessors
+
     public class SsaBuilder : ISsaBuilder
     {
         private readonly ILogger<SsaBuilder> _logger;
@@ -29,6 +33,12 @@ namespace ILCompiler.Compiler
             // Calculate liveness
             LocalVarLiveness(blocks, localVariableTable);
 
+            // Calculate Ssa only for Tracked local variables
+            foreach (var localVariable in localVariableTable) 
+            {
+                localVariable.InSsa = localVariable.Tracked;
+            }
+
             // Insert Phi functions
             InsertPhiFunctions(postOrder, localVariableTable);
 
@@ -40,11 +50,20 @@ namespace ILCompiler.Compiler
 
         private void RenameVariables(DominatorTreeNode tree, IList<LocalVariableDescriptor> localVariableTable)
         {
+            var ssaRenameStack = new SsaRenameState(_logger, localVariableTable.Count);
+
             // First deal with parameters and must-init variables as though they
             // have a virtual definition before entry to the method. They all
             // begin with a SSA number of 1.
-
-            // Visit blocks renaming stuff!!
+            for (int localVariableNumber = 0; localVariableNumber < localVariableTable.Count; localVariableNumber++)
+            {
+                var localVariableDescriptor = localVariableTable[localVariableNumber];
+                if (localVariableDescriptor.IsParameter || localVariableDescriptor.MustInit) 
+                {
+                    var ssaNumber = localVariableDescriptor.PerSsaData.AllocSsaNumber(() => new LocalSsaVariableDescriptor(tree.Block));
+                    ssaRenameStack.Push(tree.Block, localVariableNumber, ssaNumber);
+                }
+            }
 
             /*
              * stack[v] is a stack of variable names (for every variable v)
@@ -69,8 +88,7 @@ namespace ILCompiler.Compiler
              * rename(entry)
              */
 
-            var ssaRenameStack = new SsaRenameState(_logger, localVariableTable.Count);
-            var visitor = new SsaRenameDominatorTreeVisitor(tree, ssaRenameStack);
+            var visitor = new SsaRenameDominatorTreeVisitor(tree, ssaRenameStack, localVariableTable);
             visitor.WalkTree();
         }
 
@@ -288,11 +306,47 @@ namespace ILCompiler.Compiler
 
         private void LocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
         {
-            ClearMustInit(localVariableTable);
+            LocalVarLivenessInit(localVariableTable);
 
             // Figure out use/def info for all basic blocks
             PerBlockLocalVarLiveness(blocks);
             InterBlockLocalVarLiveness(blocks, localVariableTable);
+        }
+
+        private void LocalVarLivenessInit(IList<LocalVariableDescriptor> localVariableTable)
+        {
+            SetTrackedVariables(localVariableTable);
+
+            // Mark all local variables as not requiring explicit initialization
+            // Liveness analysis will determine local variables that do need to be initialized
+            foreach (var localVariable in localVariableTable)
+            {
+                localVariable.MustInit = false;
+            }
+        }
+
+        /// <summary>
+        /// Determine which local variables will be tracked
+        /// </summary>
+        /// <param name="localVariableTable"></param>
+        private void SetTrackedVariables(IList<LocalVariableDescriptor> localVariableTable)
+        {
+            foreach (var localVariable in localVariableTable)
+            {
+                localVariable.Tracked = true;
+
+                // Don't track structs
+                if (localVariable.Type == VarType.Struct)
+                {
+                    localVariable.Tracked = false;
+                }
+
+                // Don't track local variables which are address exposed
+                if (localVariable.AddressExposed)
+                {
+                    localVariable.Tracked = false;
+                }
+            }
         }
 
         private static void InterBlockLocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
@@ -368,14 +422,6 @@ namespace ILCompiler.Compiler
             if (isDef)
             {
                 defSet.AddElem(localNumber);
-            }
-        }
-
-        private static void ClearMustInit(IList<LocalVariableDescriptor> localVariableTable)
-        {
-            foreach (var localVariable in localVariableTable)
-            {
-                localVariable.MustInit = false;
             }
         }
 
