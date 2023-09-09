@@ -14,9 +14,11 @@ namespace ILCompiler.Compiler.Importer
                 case Code.Ldarga:
                 case Code.Ldarga_S:
                     var index = (instruction.OperandAs<Parameter>()).Index;
-                    var lclNum = MapIlArgNum(index, importer.ReturnBufferArgIndex);
+                    var localNumber = MapIlArgNum(index, importer.ReturnBufferArgIndex);
 
-                    importer.PushExpression(new LocalVariableAddressEntry(lclNum));
+                    importer.PushExpression(new LocalVariableAddressEntry(localNumber));
+
+                    importer.LocalVariableTable[localNumber].AddressExposed = true;
 
                     return true;
 
