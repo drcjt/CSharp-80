@@ -45,7 +45,41 @@ namespace ILCompiler.Compiler
             // Rename local variables
             RenameVariables(dominatorTree, localVariableTable);
 
-            // TODO: Print SSA form
+            // Log SSA form
+            LogSsaSummary(localVariableTable);
+        }
+
+        private void LogSsaSummary(IList<LocalVariableDescriptor> localVariableTable)
+        {
+            for (var localNumber = 0; localNumber < localVariableTable.Count; localNumber++) 
+            { 
+                var localVariableDescriptor = localVariableTable[localNumber];
+
+                if (!localVariableDescriptor.InSsa)
+                {
+                    continue;
+                }
+
+                var ssaDefinitions = localVariableDescriptor.PerSsaData;
+                var numDefinitions = ssaDefinitions.Count;
+
+                if (numDefinitions == 0)
+                {
+                    _logger.LogDebug("V{localNumber:00} in SSA but no definitions", localNumber);
+                }
+                else
+                {
+                    for (var defIndex = 0; defIndex < numDefinitions; defIndex++) 
+                    {
+                        var ssaVarDefinition = ssaDefinitions.SsaDefinitionByIndex(defIndex);
+                        var ssaNumber = ssaDefinitions.GetSsaNumber(ssaVarDefinition);
+                        var block = ssaVarDefinition.Block;
+
+                        _logger.LogDebug("V{localNumber:00}.{ssaNumber:00}: defined in {blockLabel} {uses} uses {useType}",
+                            localNumber, ssaNumber, block.Label, ssaVarDefinition.NumberOfUses, ssaVarDefinition.HasGlobalUse ? "global" : "local");
+                    }
+                }
+            }
         }
 
         private void RenameVariables(DominatorTreeNode tree, IList<LocalVariableDescriptor> localVariableTable)
