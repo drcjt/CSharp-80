@@ -5,7 +5,7 @@
         public StackEntry Op1 { get; }
 
         public int LocalNumber { get; }
-        public int SsaNumber { get; }
+        public int SsaNumber { get; set; }
 
         public bool IsParameter { get; }
 
