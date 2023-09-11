@@ -39,6 +39,8 @@
         public int? ExactSize { get; }
 
         public StackEntry? Next { get; set; }
+        public StackEntry? Prev { get; set; }
+
         public int TreeID { get; }
 
         private static int _treeID = 0;
