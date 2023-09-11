@@ -5,6 +5,7 @@
         public BasicBlock Block { get; set; }
 
         public bool HasGlobalUse { get; private set; } = false;
+        public bool HasPhiUse { get; private set; } = false;
 
         public int NumberOfUses { get; private set; } = 0;
 
@@ -21,6 +22,12 @@
             }
 
             NumberOfUses++;
+        }
+
+        public void AddPhiUse(BasicBlock block)
+        {
+            HasPhiUse = true;
+            AddUse(block);
         }
     }
 }

@@ -9,18 +9,24 @@ namespace ILCompiler.Compiler
     // TODO:
     // StoreInd - treat as a store??
     // AddPhiArgsToSuccessors
+    // Dump/logging for phinode and phiargs
+    // Dump phi information
+    // HasPhiUse logging
 
     public class SsaBuilder : ISsaBuilder
     {
         private readonly ILogger<SsaBuilder> _logger;
+        private bool _dumpSsa;
 
         public SsaBuilder(ILogger<SsaBuilder> logger)
         {
             _logger = logger;
         }
 
-        public void Build(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
+        public void Build(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable, bool dumpSsa)
         {
+            _dumpSsa = dumpSsa;
+
             // Topologically sort the graph
             var postOrder = TopologicalSort(blocks[0]);
 
@@ -51,32 +57,35 @@ namespace ILCompiler.Compiler
 
         private void LogSsaSummary(IList<LocalVariableDescriptor> localVariableTable)
         {
-            for (var localNumber = 0; localNumber < localVariableTable.Count; localNumber++) 
-            { 
-                var localVariableDescriptor = localVariableTable[localNumber];
-
-                if (!localVariableDescriptor.InSsa)
+            if (_dumpSsa)
+            {
+                for (var localNumber = 0; localNumber < localVariableTable.Count; localNumber++)
                 {
-                    continue;
-                }
+                    var localVariableDescriptor = localVariableTable[localNumber];
 
-                var ssaDefinitions = localVariableDescriptor.PerSsaData;
-                var numDefinitions = ssaDefinitions.Count;
-
-                if (numDefinitions == 0)
-                {
-                    _logger.LogDebug("V{localNumber:00} in SSA but no definitions", localNumber);
-                }
-                else
-                {
-                    for (var defIndex = 0; defIndex < numDefinitions; defIndex++) 
+                    if (!localVariableDescriptor.InSsa)
                     {
-                        var ssaVarDefinition = ssaDefinitions.SsaDefinitionByIndex(defIndex);
-                        var ssaNumber = ssaDefinitions.GetSsaNumber(ssaVarDefinition);
-                        var block = ssaVarDefinition.Block;
+                        continue;
+                    }
 
-                        _logger.LogDebug("V{localNumber:00}.{ssaNumber:00}: defined in {blockLabel} {uses} uses {useType}",
-                            localNumber, ssaNumber, block.Label, ssaVarDefinition.NumberOfUses, ssaVarDefinition.HasGlobalUse ? "global" : "local");
+                    var ssaDefinitions = localVariableDescriptor.PerSsaData;
+                    var numDefinitions = ssaDefinitions.Count;
+
+                    if (numDefinitions == 0)
+                    {
+                        _logger.LogInformation("V{localNumber:00} in SSA but no definitions", localNumber);
+                    }
+                    else
+                    {
+                        for (var defIndex = 0; defIndex < numDefinitions; defIndex++)
+                        {
+                            var ssaVarDefinition = ssaDefinitions.SsaDefinitionByIndex(defIndex);
+                            var ssaNumber = ssaDefinitions.GetSsaNumber(ssaVarDefinition);
+                            var block = ssaVarDefinition.Block;
+
+                            _logger.LogInformation("V{localNumber:00}.{ssaNumber:00}: defined in {blockLabel} {uses} uses {useType}",
+                                localNumber, ssaNumber, block.Label, ssaVarDefinition.NumberOfUses, ssaVarDefinition.HasGlobalUse ? "global" : "local");
+                        }
                     }
                 }
             }
@@ -174,18 +183,18 @@ namespace ILCompiler.Compiler
 
         private static bool HasPhiNode(BasicBlock block, int localNumber)
         {
-            foreach (var statement in block.Statements)
+            var node = block.FirstNode;
+            while (node != null)
             {
-                if (statement is not PhiNode)
+                if (node is PhiNode phi)
                 {
-                    break;
+                    var store = phi.Next as StoreLocalVariableEntry;
+                    if (store?.LocalNumber == localNumber)
+                    {
+                        return true;
+                    }
                 }
-
-                var store = statement.Next as StoreLocalVariableEntry;
-                if (store?.LocalNumber == localNumber)
-                {
-                    return true;
-                }
+                node = node.Next;
             }
 
             return false;
@@ -202,11 +211,22 @@ namespace ILCompiler.Compiler
 
             // Create the statement and chain together in linear order e.g. PhiNode followed by StoreLocalVariableEntry
             phiNode.Next = store;
+            store.Prev = phiNode;
 
-            // Add new phi statement to start of block
-            block.InsertStatementAtStart(phiNode);
+            // Add new store/phi statement to start of block
+            store.Next = block.FirstNode;
+            if (block.FirstNode != null)
+            {
+                block.FirstNode.Prev = store;
+            }
 
-            _logger.LogDebug("Added Phi Node for V{localNumber} at start of {blockLabel}.", localNumber, block.Label);
+            block.FirstNode = phiNode;
+            block.Statements.Insert(0, store);
+
+            if (_dumpSsa)
+            {
+                _logger.LogInformation("Added Phi Node for V{localNumber} at start of {blockLabel}.", localNumber, block.Label);
+            }
         }
 
         private IList<BasicBlock> ComputeIteratedDominanceFrontier(BasicBlock block, IDictionary<BasicBlock, ISet<BasicBlock>> dominanceFrontierMap)
@@ -239,15 +259,18 @@ namespace ILCompiler.Compiler
                 }
             }
 
-            var sb = new StringBuilder($"IDF({block.Label}) := {{");
-            int index = 0;
-            foreach (var f in iteratedDominanceFrontier)
+            if (_dumpSsa)
             {
-                if (index++ != 0) sb.Append(',');
-                sb.Append($"{f.Label}");
+                var sb = new StringBuilder($"IDF({block.Label}) := {{");
+                int index = 0;
+                foreach (var f in iteratedDominanceFrontier)
+                {
+                    if (index++ != 0) sb.Append(',');
+                    sb.Append($"{f.Label}");
+                }
+                sb.Append("}}");
+                _logger.LogInformation(sb.ToString());
             }
-            sb.Append("}}");
-            _logger.LogDebug(sb.ToString());
 
             return iteratedDominanceFrontier;
         }

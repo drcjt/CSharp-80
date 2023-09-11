@@ -4,6 +4,6 @@ namespace ILCompiler.Interfaces
 {
     public interface ISsaBuilder : IPhase
     {
-        public void Build(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable);
+        public void Build(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable, bool dumpSsa);
     }
 }

@@ -1,4 +1,6 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using System.Data;
+using System.Diagnostics;
 
 namespace ILCompiler.Compiler.Ssa
 {
@@ -20,7 +22,69 @@ namespace ILCompiler.Compiler.Ssa
         public override void PreOrderVisit(BasicBlock block)
         {
             BlockRenameVariables(block);
-            // AddPhiArgsToSuccessors(block);
+            AddPhiArgsToSuccessors(block);
+        }
+
+        private void AddPhiArgsToSuccessors(BasicBlock block)
+        {
+            foreach (var successor in block.Successors)
+            {
+                foreach (var statement in successor.Statements)
+                {
+                    if (statement is StoreLocalVariableEntry store && store.Op1 is PhiNode phi)
+                    {
+                        var localNumber = store.LocalNumber;
+                        var ssaNumber = _renameStack.Top(localNumber);
+
+                        AddPhiArg(successor, statement, phi, localNumber, ssaNumber, block);
+                    }
+                }
+            }
+        }
+
+        private void AddPhiArg(BasicBlock block, StackEntry statement, PhiNode phi, int localNumber, int ssaNumber, BasicBlock predecessor)
+        {
+            // First check if there is already a phi arg for this predecessor, if so it should have the same ssaNumber, is so then nothing to do
+            foreach (var phiArg in phi.Arguments)
+            {
+                if (phiArg.Block == predecessor)
+                {
+                    if (phiArg.SsaNumber == ssaNumber)
+                    {
+                        return;
+                    }
+
+                    throw new InvalidOperationException($"Cannot add Phi arg for local {localNumber} with ssaNumber {ssaNumber} when Phi arg already exists with ssaNumber {phiArg.SsaNumber}");
+                }
+            }
+
+            // Need to add a new phi arg
+            var localVarDescriptor = _localVariableTable[localNumber];
+            var localVarType = localVarDescriptor.Type;
+
+            var newPhiArg = new PhiArg(localVarType, localNumber, ssaNumber, predecessor);
+            phi.Arguments.Add(newPhiArg);
+
+            var phiNode = statement.Prev;
+            Debug.Assert(phiNode != null);
+
+            var existingPhiArg = phiNode.Prev;
+
+            if (existingPhiArg != null)
+            {
+                existingPhiArg.Next = newPhiArg;
+                newPhiArg.Prev = existingPhiArg;
+            }
+            else
+            {
+                block.FirstNode = newPhiArg;
+            }
+
+            newPhiArg.Next = phiNode;
+            phiNode.Prev = newPhiArg;
+
+            var localVarSsaDescriptor = localVarDescriptor.GetPerSsaData(ssaNumber);
+            localVarSsaDescriptor.AddPhiUse(block);
         }
 
         private void BlockRenameVariables(BasicBlock block)
