@@ -8,10 +8,6 @@ namespace ILCompiler.Compiler
 {
     // TODO:
     // StoreInd - treat as a store??
-    // AddPhiArgsToSuccessors
-    // Dump/logging for phinode and phiargs
-    // Dump phi information
-    // HasPhiUse logging
 
     public class SsaBuilder : ISsaBuilder
     {
