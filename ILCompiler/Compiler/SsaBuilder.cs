@@ -50,7 +50,10 @@ namespace ILCompiler.Compiler
             RenameVariables(dominatorTree, localVariableTable);
 
             // Log SSA form
-            LogSsaSummary(localVariableTable);
+            if (_dumpSsa)
+            {
+                LogSsaSummary(localVariableTable);
+            }
         }
 
         private static IList<BasicBlock> SetupBasicBlockRoot(IList<BasicBlock> blocks) 
@@ -67,17 +70,11 @@ namespace ILCompiler.Compiler
 
         private void LogSsaSummary(IList<LocalVariableDescriptor> localVariableTable)
         {
-            if (_dumpSsa)
+            for (var localNumber = 0; localNumber < localVariableTable.Count; localNumber++)
             {
-                for (var localNumber = 0; localNumber < localVariableTable.Count; localNumber++)
+                var localVariableDescriptor = localVariableTable[localNumber];
+                if (localVariableDescriptor.InSsa)
                 {
-                    var localVariableDescriptor = localVariableTable[localNumber];
-
-                    if (!localVariableDescriptor.InSsa)
-                    {
-                        continue;
-                    }
-
                     var ssaDefinitions = localVariableDescriptor.PerSsaData;
                     var numDefinitions = ssaDefinitions.Count;
 
@@ -113,18 +110,6 @@ namespace ILCompiler.Compiler
                 var localVariableDescriptor = localVariableTable[localVariableNumber];
                 if (localVariableDescriptor.IsParameter || localVariableDescriptor.MustInit) 
                 {
-                    if (tree == null)
-                    {
-                        throw new Exception("TREE IS NULL");
-                    }
-                    if (localVariableDescriptor == null)
-                    {
-                        throw new Exception("LOCALVARIABLEDESCRIPTOR IS NULL");
-                    }
-                    if (localVariableDescriptor.PerSsaData == null)
-                    {
-                        throw new Exception("PERSSADATA IS NULL");
-                    }
                     var ssaNumber = localVariableDescriptor.PerSsaData.AllocSsaNumber(() => new LocalSsaVariableDescriptor(tree.Block));
                     ssaRenameStack.Push(tree.Block, localVariableNumber, ssaNumber);
                 }
@@ -408,7 +393,7 @@ namespace ILCompiler.Compiler
         /// Determine which local variables will be tracked
         /// </summary>
         /// <param name="localVariableTable"></param>
-        private void SetTrackedVariables(IList<LocalVariableDescriptor> localVariableTable)
+        private static void SetTrackedVariables(IList<LocalVariableDescriptor> localVariableTable)
         {
             foreach (var localVariable in localVariableTable)
             {

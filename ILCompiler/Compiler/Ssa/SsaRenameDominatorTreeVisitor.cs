@@ -122,7 +122,7 @@ namespace ILCompiler.Compiler.Ssa
                 var localVariableDescriptor = _localVariableTable[localNumber];
                 if (localVariableDescriptor.InSsa)
                 {
-                    localNode.SsaNumber = RenamePushDef(defNode, block, localNumber);
+                    localNode.SsaNumber = RenamePushDef(block, localNumber);
                 }
             }
         }
@@ -140,7 +140,7 @@ namespace ILCompiler.Compiler.Ssa
             }
         }
 
-        private int RenamePushDef(StackEntry defNode, BasicBlock block, int localNumber)
+        private int RenamePushDef(BasicBlock block, int localNumber)
         {
             var localVariableDescriptor = _localVariableTable[localNumber];
             int ssaNumber = localVariableDescriptor.PerSsaData.AllocSsaNumber(() => new LocalSsaVariableDescriptor(block));

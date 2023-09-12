@@ -3,7 +3,7 @@
     // A resizable array of Ssa Definitions
     public class SsaDefList<T>
     {
-        IList<T> _list = new List<T>();
+        readonly IList<T> _list = new List<T>();
 
         static int MinSsaNumber { get; } = 1;
 

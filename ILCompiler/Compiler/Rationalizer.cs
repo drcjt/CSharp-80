@@ -42,7 +42,7 @@ namespace ILCompiler.Compiler
                 while (node is PhiArg)
                 {
                     node = node.Next;
-                };
+                }
                 
                 // Remove PhiNode and StoreLocalVariableEntry
                 Debug.Assert(node is PhiNode);
