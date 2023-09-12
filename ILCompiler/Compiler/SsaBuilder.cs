@@ -84,17 +84,22 @@ namespace ILCompiler.Compiler
                     }
                     else
                     {
-                        for (var defIndex = 0; defIndex < numDefinitions; defIndex++)
-                        {
-                            var ssaVarDefinition = ssaDefinitions.SsaDefinitionByIndex(defIndex);
-                            var ssaNumber = ssaDefinitions.GetSsaNumber(ssaVarDefinition);
-                            var block = ssaVarDefinition.Block;
-
-                            _logger.LogInformation("V{localNumber:00}.{ssaNumber:00}: defined in {blockLabel} {uses} uses {useType}",
-                                localNumber, ssaNumber, block.Label, ssaVarDefinition.NumberOfUses, ssaVarDefinition.HasGlobalUse ? "global" : "local");
-                        }
+                        LogSsaSumaryDefinitions(localNumber, ssaDefinitions, numDefinitions);
                     }
                 }
+            }
+        }
+
+        private void LogSsaSumaryDefinitions(int localNumber, SsaDefList<LocalSsaVariableDescriptor> ssaDefinitions, int numDefinitions)
+        {
+            for (var defIndex = 0; defIndex < numDefinitions; defIndex++)
+            {
+                var ssaVarDefinition = ssaDefinitions.SsaDefinitionByIndex(defIndex);
+                var ssaNumber = ssaDefinitions.GetSsaNumber(ssaVarDefinition);
+                var block = ssaVarDefinition.Block;
+
+                _logger.LogInformation("V{localNumber:00}.{ssaNumber:00}: defined in {blockLabel} {uses} uses {useType}",
+                    localNumber, ssaNumber, block.Label, ssaVarDefinition.NumberOfUses, ssaVarDefinition.HasGlobalUse ? "global" : "local");
             }
         }
 
@@ -377,7 +382,7 @@ namespace ILCompiler.Compiler
             InterBlockLocalVarLiveness(blocks, localVariableTable);
         }
 
-        private void LocalVarLivenessInit(IList<LocalVariableDescriptor> localVariableTable)
+        private static void LocalVarLivenessInit(IList<LocalVariableDescriptor> localVariableTable)
         {
             SetTrackedVariables(localVariableTable);
 
