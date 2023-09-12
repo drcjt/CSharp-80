@@ -223,7 +223,18 @@ namespace ILCompiler.Compiler
 
         public void Visit(PhiNode entry)
         {
-            Print($"PHI");
+            Print($"PHI ");
+            _indent++;
+            foreach (var argument in entry.Arguments)
+            {
+                argument.Accept(this);
+            }
+            _indent--;
+        }
+
+        public void Visit(PhiArg entry)
+        {
+            Print($"PHIARG V{entry.LocalNumber:00} ssa{entry.SsaNumber} {entry.Type}");
         }
 
         public void Visit(IndexRefEntry entry)

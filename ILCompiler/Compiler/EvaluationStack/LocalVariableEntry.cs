@@ -3,7 +3,7 @@
     public class LocalVariableEntry : StackEntry, ILocalVariable
     {
         public int LocalNumber { get; }
-        public int SsaNumber { get; }
+        public int SsaNumber { get; set; }
         public LocalVariableEntry(int localNumber, VarType type, int? exactSize) : base(type, exactSize)
         {
             LocalNumber = localNumber;

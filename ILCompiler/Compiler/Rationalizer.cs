@@ -1,5 +1,6 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using System.Diagnostics;
 
 namespace ILCompiler.Compiler
 {
@@ -34,15 +35,29 @@ namespace ILCompiler.Compiler
 
         private static void RemovePhiNodes(BasicBlock block)
         {
-            var statement = block.Statements[0];
-            while (statement is PhiNode)
+            var node = block.FirstNode;
+            while (node is PhiArg || node is PhiNode)
             {
-                // Remove PhiNode statement
-                var nextStatement = statement.Next?.Next;
-                block.Statements.RemoveAt(0);
-                block.FirstNode = nextStatement;
+                // Remove PhiArgs
+                while (node is PhiArg)
+                {
+                    node = node.Next;
+                }
+                
+                // Remove PhiNode and StoreLocalVariableEntry
+                Debug.Assert(node is PhiNode);
+                node = node.Next;
+                Debug.Assert(node is StoreLocalVariableEntry);
+                node = node.Next;
 
-                statement = nextStatement;
+                // Remove statement
+                block.Statements.RemoveAt(0);
+            }
+            
+            block.FirstNode = node;
+            if (node != null)
+            {
+                node.Prev = null;
             }
         }
     }

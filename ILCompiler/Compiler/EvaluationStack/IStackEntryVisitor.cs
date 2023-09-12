@@ -32,5 +32,6 @@
         public void Visit(StaticFieldEntry entry);
         public void Visit(CommaEntry entry);
         public void Visit(PhiNode entry);
+        public void Visit(PhiArg entry);
     }
 }

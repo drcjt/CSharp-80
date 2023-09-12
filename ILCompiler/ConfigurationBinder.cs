@@ -21,6 +21,7 @@ namespace ILCompiler
                 CorelibPath = bindingContext.ParseResult.GetValueForOption(_configurationOptions.CoreLibPathOption) ?? "",
                 IntegrationTests = bindingContext.ParseResult.GetValueForOption(_configurationOptions.IntegrationTestsOption),
                 DumpIRTrees = bindingContext.ParseResult.GetValueForOption(_configurationOptions.DumpIRTreesOption),
+                DumpSsa = bindingContext.ParseResult.GetValueForOption(_configurationOptions.DumpSsaOption),
                 TargetArchitecture = bindingContext.ParseResult.GetValueForOption(_configurationOptions.TargetArchitectureOption),
                 StackStart = bindingContext.ParseResult.GetValueForOption(_configurationOptions.StackStartOption),
                 AssemblerArguments = bindingContext.ParseResult.GetValueForOption(_configurationOptions.AssemblerArguments) ?? "",

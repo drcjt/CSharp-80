@@ -6,17 +6,25 @@ using System.Text;
 
 namespace ILCompiler.Compiler
 {
+    // TODO:
+    // StoreInd - treat as a store??
+
     public class SsaBuilder : ISsaBuilder
     {
         private readonly ILogger<SsaBuilder> _logger;
+        private bool _dumpSsa;
 
         public SsaBuilder(ILogger<SsaBuilder> logger)
         {
             _logger = logger;
         }
 
-        public void Build(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
+        public void Build(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable, bool dumpSsa)
         {
+            _dumpSsa = dumpSsa;
+
+            blocks = SetupBasicBlockRoot(blocks);
+
             // Topologically sort the graph
             var postOrder = TopologicalSort(blocks[0]);
 
@@ -29,12 +37,114 @@ namespace ILCompiler.Compiler
             // Calculate liveness
             LocalVarLiveness(blocks, localVariableTable);
 
+            // Calculate Ssa only for Tracked local variables
+            foreach (var localVariable in localVariableTable) 
+            {
+                localVariable.InSsa = localVariable.Tracked;
+            }
+
             // Insert Phi functions
             InsertPhiFunctions(postOrder, localVariableTable);
 
-            // TODO: Rename local variables
+            // Rename local variables
+            RenameVariables(dominatorTree, localVariableTable);
 
-            // TODO: Print SSA form
+            // Log SSA form
+            if (_dumpSsa)
+            {
+                LogSsaSummary(localVariableTable);
+            }
+        }
+
+        private static IList<BasicBlock> SetupBasicBlockRoot(IList<BasicBlock> blocks) 
+        {
+            if (blocks[0].Predecessors.Count != 0)
+            {
+                // Need to create a new basic block to act as the loop as the real first block is a loop
+                var basicBlockRoot = new BasicBlock(0);
+                blocks.Insert(0, basicBlockRoot);
+            }
+
+            return blocks;
+        }
+
+        private void LogSsaSummary(IList<LocalVariableDescriptor> localVariableTable)
+        {
+            for (var localNumber = 0; localNumber < localVariableTable.Count; localNumber++)
+            {
+                var localVariableDescriptor = localVariableTable[localNumber];
+                if (localVariableDescriptor.InSsa)
+                {
+                    var ssaDefinitions = localVariableDescriptor.PerSsaData;
+                    var numDefinitions = ssaDefinitions.Count;
+
+                    if (numDefinitions == 0)
+                    {
+                        _logger.LogInformation("V{localNumber:00} in SSA but no definitions", localNumber);
+                    }
+                    else
+                    {
+                        LogSsaSumaryDefinitions(localNumber, ssaDefinitions, numDefinitions);
+                    }
+                }
+            }
+        }
+
+        private void LogSsaSumaryDefinitions(int localNumber, SsaDefList<LocalSsaVariableDescriptor> ssaDefinitions, int numDefinitions)
+        {
+            for (var defIndex = 0; defIndex < numDefinitions; defIndex++)
+            {
+                var ssaVarDefinition = ssaDefinitions.SsaDefinitionByIndex(defIndex);
+                var ssaNumber = ssaDefinitions.GetSsaNumber(ssaVarDefinition);
+                var block = ssaVarDefinition.Block;
+
+                _logger.LogInformation("V{localNumber:00}.{ssaNumber:00}: defined in {blockLabel} {uses} uses {useType}",
+                    localNumber, ssaNumber, block.Label, ssaVarDefinition.NumberOfUses, ssaVarDefinition.HasGlobalUse ? "global" : "local");
+            }
+        }
+
+        private void RenameVariables(DominatorTreeNode tree, IList<LocalVariableDescriptor> localVariableTable)
+        {
+            var ssaRenameStack = new SsaRenameState(_logger, localVariableTable.Count);
+
+            // First deal with parameters and must-init variables as though they
+            // have a virtual definition before entry to the method. They all
+            // begin with a SSA number of 1.
+            for (int localVariableNumber = 0; localVariableNumber < localVariableTable.Count; localVariableNumber++)
+            {
+                var localVariableDescriptor = localVariableTable[localVariableNumber];
+                if (localVariableDescriptor.IsParameter || localVariableDescriptor.MustInit) 
+                {
+                    var ssaNumber = localVariableDescriptor.PerSsaData.AllocSsaNumber(() => new LocalSsaVariableDescriptor(tree.Block));
+                    ssaRenameStack.Push(tree.Block, localVariableNumber, ssaNumber);
+                }
+            }
+
+            /*
+             * stack[v] is a stack of variable names (for every variable v)
+
+             * def rename(block):
+             *   for instr in block: (BlockRenameVariables in Ryujit)
+             *     replace each argument to instr with stack[old name]
+
+             *     replace instr's destination with a new name
+             *     push that new name onto stack[old name]
+
+             *   for s in block's successors: (AddPhiArgsToSuccessors in Ryujit)
+             *     for p in s's ϕ-nodes:
+             *       Assuming p is for a variable v, make it read from stack[v].
+
+             *   for b in blocks immediately dominated by block: (DomTreeVisitor in Ryujit)
+             *     # That is, children in the dominance tree.
+             *     rename(b)
+
+             *   pop all the names we just pushed onto the stacks (PopBlockStacks in Ryujit)
+
+             * rename(entry)
+             */
+
+            var visitor = new SsaRenameDominatorTreeVisitor(tree, ssaRenameStack, localVariableTable);
+            visitor.WalkTree();
         }
 
         private void InsertPhiFunctions(IList<BasicBlock> postOrderBlocks, IList<LocalVariableDescriptor> localVariableTable)
@@ -85,18 +195,18 @@ namespace ILCompiler.Compiler
 
         private static bool HasPhiNode(BasicBlock block, int localNumber)
         {
-            foreach (var statement in block.Statements)
+            var node = block.FirstNode;
+            while (node != null)
             {
-                if (statement is not PhiNode)
+                if (node is PhiNode phi)
                 {
-                    break;
+                    var store = phi.Next as StoreLocalVariableEntry;
+                    if (store?.LocalNumber == localNumber)
+                    {
+                        return true;
+                    }
                 }
-
-                var store = statement.Next as StoreLocalVariableEntry;
-                if (store?.LocalNumber == localNumber)
-                {
-                    return true;
-                }
+                node = node.Next;
             }
 
             return false;
@@ -113,11 +223,22 @@ namespace ILCompiler.Compiler
 
             // Create the statement and chain together in linear order e.g. PhiNode followed by StoreLocalVariableEntry
             phiNode.Next = store;
+            store.Prev = phiNode;
 
-            // Add new phi statement to start of block
-            block.InsertStatementAtStart(phiNode);
+            // Add new store/phi statement to start of block
+            store.Next = block.FirstNode;
+            if (block.FirstNode != null)
+            {
+                block.FirstNode.Prev = store;
+            }
 
-            _logger.LogDebug("Added Phi Node for V{localNumber} at start of {blockLabel}.", localNumber, block.Label);
+            block.FirstNode = phiNode;
+            block.Statements.Insert(0, store);
+
+            if (_dumpSsa)
+            {
+                _logger.LogInformation("Added Phi Node for V{localNumber} at start of {blockLabel}.", localNumber, block.Label);
+            }
         }
 
         private IList<BasicBlock> ComputeIteratedDominanceFrontier(BasicBlock block, IDictionary<BasicBlock, ISet<BasicBlock>> dominanceFrontierMap)
@@ -150,15 +271,18 @@ namespace ILCompiler.Compiler
                 }
             }
 
-            var sb = new StringBuilder($"IDF({block.Label}) := {{");
-            int index = 0;
-            foreach (var f in iteratedDominanceFrontier)
+            if (_dumpSsa)
             {
-                if (index++ != 0) sb.Append(',');
-                sb.Append($"{f.Label}");
+                var sb = new StringBuilder($"IDF({block.Label}) := {{");
+                int index = 0;
+                foreach (var f in iteratedDominanceFrontier)
+                {
+                    if (index++ != 0) sb.Append(',');
+                    sb.Append($"{f.Label}");
+                }
+                sb.Append("}}");
+                _logger.LogInformation(sb.ToString());
             }
-            sb.Append("}}");
-            _logger.LogDebug(sb.ToString());
 
             return iteratedDominanceFrontier;
         }
@@ -251,11 +375,47 @@ namespace ILCompiler.Compiler
 
         private void LocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
         {
-            ClearMustInit(localVariableTable);
+            LocalVarLivenessInit(localVariableTable);
 
             // Figure out use/def info for all basic blocks
             PerBlockLocalVarLiveness(blocks);
             InterBlockLocalVarLiveness(blocks, localVariableTable);
+        }
+
+        private static void LocalVarLivenessInit(IList<LocalVariableDescriptor> localVariableTable)
+        {
+            SetTrackedVariables(localVariableTable);
+
+            // Mark all local variables as not requiring explicit initialization
+            // Liveness analysis will determine local variables that do need to be initialized
+            foreach (var localVariable in localVariableTable)
+            {
+                localVariable.MustInit = false;
+            }
+        }
+
+        /// <summary>
+        /// Determine which local variables will be tracked
+        /// </summary>
+        /// <param name="localVariableTable"></param>
+        private static void SetTrackedVariables(IList<LocalVariableDescriptor> localVariableTable)
+        {
+            foreach (var localVariable in localVariableTable)
+            {
+                localVariable.Tracked = true;
+
+                // Don't track structs
+                if (localVariable.Type == VarType.Struct)
+                {
+                    localVariable.Tracked = false;
+                }
+
+                // Don't track local variables which are address exposed
+                if (localVariable.AddressExposed)
+                {
+                    localVariable.Tracked = false;
+                }
+            }
         }
 
         private static void InterBlockLocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
@@ -331,14 +491,6 @@ namespace ILCompiler.Compiler
             if (isDef)
             {
                 defSet.AddElem(localNumber);
-            }
-        }
-
-        private static void ClearMustInit(IList<LocalVariableDescriptor> localVariableTable)
-        {
-            foreach (var localVariable in localVariableTable)
-            {
-                localVariable.MustInit = false;
             }
         }
 

@@ -12,7 +12,9 @@ namespace ILCompiler.Compiler.Importer
             {
                 case Code.Ldloca:
                 case Code.Ldloca_S:
-                    importer.PushExpression(new LocalVariableAddressEntry(importer.ParameterCount + (instruction.OperandAs<Local>()).Index));
+                    var localNumber = importer.ParameterCount + (instruction.OperandAs<Local>()).Index;
+                    importer.PushExpression(new LocalVariableAddressEntry(localNumber));
+                    importer.LocalVariableTable[localNumber].AddressExposed = true;
                     return true;
                 default:
                     return false;

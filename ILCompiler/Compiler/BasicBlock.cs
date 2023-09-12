@@ -44,21 +44,5 @@ namespace ILCompiler.Compiler
             StartOffset = offset;
             Label = LabelGenerator.GetLabel(LabelType.BasicBlock);
         }
-
-        public void InsertStatementAtStart(StackEntry statement)
-        {
-            var currentFirst = FirstNode;
-            FirstNode = statement;
-
-            var lastNodeInStatement = statement;
-            while (lastNodeInStatement.Next != null)
-            {
-                lastNodeInStatement = lastNodeInStatement.Next;
-            }
-
-            lastNodeInStatement.Next = currentFirst;
-
-            Statements.Insert(0, statement);
-        }
     }
 }

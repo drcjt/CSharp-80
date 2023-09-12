@@ -99,7 +99,22 @@ namespace ILCompiler.Compiler
 
         public void Visit(PhiNode entry)
         {
-            _sb.AppendLine($"       phi");
+            var firstArg = true;
+            foreach (var argument in entry.Arguments)
+            {
+                _sb.Append("       ");
+                _sb.Append(firstArg ? "┌──▌" : "├──▌");
+                _sb.Append("  ");
+                _sb.AppendLine($"t{argument.TreeID}");
+                firstArg = false;
+            }
+
+            _sb.AppendLine($"t{entry.TreeID,-3} = phi");
+        }
+
+        public void Visit(PhiArg entry)
+        {
+            _sb.AppendLine($"t{entry.TreeID,-3} = phiarg {entry.Type} V{entry.LocalNumber:00} ssa{entry.SsaNumber}");
         }
 
         public void Visit(CallEntry entry)
