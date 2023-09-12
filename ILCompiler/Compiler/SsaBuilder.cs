@@ -23,6 +23,8 @@ namespace ILCompiler.Compiler
         {
             _dumpSsa = dumpSsa;
 
+            blocks = SetupBasicBlockRoot(blocks);
+
             // Topologically sort the graph
             var postOrder = TopologicalSort(blocks[0]);
 
@@ -49,6 +51,18 @@ namespace ILCompiler.Compiler
 
             // Log SSA form
             LogSsaSummary(localVariableTable);
+        }
+
+        private static IList<BasicBlock> SetupBasicBlockRoot(IList<BasicBlock> blocks) 
+        {
+            if (blocks[0].Predecessors.Count != 0)
+            {
+                // Need to create a new basic block to act as the loop as the real first block is a loop
+                var basicBlockRoot = new BasicBlock(0);
+                blocks.Insert(0, basicBlockRoot);
+            }
+
+            return blocks;
         }
 
         private void LogSsaSummary(IList<LocalVariableDescriptor> localVariableTable)
@@ -99,6 +113,18 @@ namespace ILCompiler.Compiler
                 var localVariableDescriptor = localVariableTable[localVariableNumber];
                 if (localVariableDescriptor.IsParameter || localVariableDescriptor.MustInit) 
                 {
+                    if (tree == null)
+                    {
+                        throw new Exception("TREE IS NULL");
+                    }
+                    if (localVariableDescriptor == null)
+                    {
+                        throw new Exception("LOCALVARIABLEDESCRIPTOR IS NULL");
+                    }
+                    if (localVariableDescriptor.PerSsaData == null)
+                    {
+                        throw new Exception("PERSSADATA IS NULL");
+                    }
                     var ssaNumber = localVariableDescriptor.PerSsaData.AllocSsaNumber(() => new LocalSsaVariableDescriptor(tree.Block));
                     ssaRenameStack.Push(tree.Block, localVariableNumber, ssaNumber);
                 }
