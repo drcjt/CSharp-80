@@ -1,5 +1,4 @@
 ﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
@@ -167,7 +166,7 @@ namespace ILCompiler.Compiler
 
             // Lower
             var lowering = _phaseFactory.Create<ILowering>();
-            lowering.Run(basicBlocks);
+          lowering.Run(basicBlocks);
 
             var codeGenerator = _phaseFactory.Create<ICodeGenerator>();
             var instructions = codeGenerator.Generate(basicBlocks, _localVariableTable, methodCodeNodeNeedingCode);

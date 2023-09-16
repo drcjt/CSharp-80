@@ -1,0 +1,131 @@
+﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.Ssa;
+using Microsoft.Extensions.Logging;
+
+namespace ILCompiler.Compiler
+{
+    internal static class Liveness
+    {
+        public static void LocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable, ILogger<SsaBuilder> logger)
+        {
+            LocalVarLivenessInit(localVariableTable);
+
+            // Figure out use/def info for all basic blocks
+            PerBlockLocalVarLiveness(blocks, logger);
+            InterBlockLocalVarLiveness(blocks, localVariableTable);
+        }
+
+        private static void LocalVarLivenessInit(IList<LocalVariableDescriptor> localVariableTable)
+        {
+            SetTrackedVariables(localVariableTable);
+
+            // Mark all local variables as not requiring explicit initialization
+            // Liveness analysis will determine local variables that do need to be initialized
+            foreach (var localVariable in localVariableTable)
+            {
+                localVariable.MustInit = false;
+            }
+        }
+
+        /// <summary>
+        /// Determine which local variables will be tracked
+        /// </summary>
+        /// <param name="localVariableTable"></param>
+        private static void SetTrackedVariables(IList<LocalVariableDescriptor> localVariableTable)
+        {
+            foreach (var localVariable in localVariableTable)
+            {
+                localVariable.Tracked = true;
+
+                // Don't track structs
+                if (localVariable.Type == VarType.Struct)
+                {
+                    localVariable.Tracked = false;
+                }
+
+                // Don't track local variables which are address exposed
+                if (localVariable.AddressExposed)
+                {
+                    localVariable.Tracked = false;
+                }
+            }
+        }
+
+        private static void InterBlockLocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
+        {
+            // Compute the IN and OUT sets using classic liveness algorithm
+            LiveVarAnalyzer.AnalyzeLiveVars(blocks);
+
+            // Set which local variable must be initialized
+            for (var lclNum = 0; lclNum < localVariableTable.Count; lclNum++)
+            {
+                if (!localVariableTable[lclNum].IsParameter && blocks[0].LiveIn.IsMember(lclNum))
+                {
+                    localVariableTable[lclNum].MustInit = true;
+                }
+            }
+        }
+
+
+        private static void PerBlockLocalVarLiveness(IList<BasicBlock> blocks, ILogger<SsaBuilder> logger)
+        {
+            foreach (var block in blocks)
+            {
+                var useSet = VariableSet.Empty;
+                var defSet = VariableSet.Empty;
+
+                // Enumerate nodes in each statement in evaluation order
+                var currentNode = block.FirstNode;
+                while (currentNode != null)
+                {
+                    PerNodeLocalVarLiveness(currentNode, useSet, defSet);
+                    currentNode = currentNode.Next;
+                }
+
+                block.VarDef = defSet;
+                block.VarUse = useSet;
+
+                // Dump use def details
+                var allVars = VariableSet.Union(defSet, useSet);
+
+                logger.LogDebug(" USE({count}={curUseVarSet}", useSet.Count, useSet.DisplayVarSet(allVars));
+                logger.LogDebug(" DEF({count}={defUseVarSet}", defSet.Count, defSet.DisplayVarSet(allVars));
+            }
+        }
+
+        /// <summary>
+        /// Calls MarkUseDef for any local variables encountered
+        /// </summary>
+        /// <param name="node"></param>
+        private static void PerNodeLocalVarLiveness(StackEntry node, VariableSet useSet, VariableSet defSet)
+        {
+            // For LocalVariableEntry, LocalVariableAddressEntry, StoreLocalVariableEntry, StoreIndEntry??, FieldAddressEntry?
+            if (node is ILocalVariable localVarNode)
+            {
+                MarkUseDef(localVarNode, useSet, defSet);
+            }
+        }
+
+        private static void MarkUseDef(ILocalVariable tree, VariableSet useSet, VariableSet defSet)
+        {
+            // Assignment is a definition, everything else is a use.
+
+            // Should we also check for StoreIndEntry which is generated from Stfld import??
+            // Are these really partial definitions e.g. struct field is assigned to s.f = ...
+
+            var isDef = tree is StoreLocalVariableEntry;
+            var isUse = !isDef;
+
+            var localNumber = tree.LocalNumber;
+            if (isUse && !defSet.IsMember(localNumber))
+            {
+                useSet.AddElem(localNumber);
+            }
+
+            if (isDef)
+            {
+                defSet.AddElem(localNumber);
+            }
+        }
+    }
+}
