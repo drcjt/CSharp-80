@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace ILCompiler.Compiler
 {
-    internal class Liveness
+    internal static class Liveness
     {
         public static void LocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable, ILogger<SsaBuilder> logger)
         {
