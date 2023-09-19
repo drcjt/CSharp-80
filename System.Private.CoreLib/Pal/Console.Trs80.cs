@@ -34,11 +34,7 @@ namespace System
         public static unsafe ConsoleKeyInfo ReadKey() => ReadKey(false);
         public static unsafe ConsoleKeyInfo ReadKey(bool intercept)
         {
-            char c;
-            //do
-            {
-                c = (char)KbdScan();
-            } //while (c == 0);
+            var c = (char)KbdScan();
 
             ConsoleKey k = (ConsoleKey)c;
 
