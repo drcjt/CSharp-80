@@ -247,5 +247,14 @@ namespace ILCompiler.Compiler
             entry.ArrayOp.Accept(this);
             _indent--;
         }
+
+        public void Visit(BoundsCheck entry)
+        {
+            Print($"BOUNDS_CHECK");
+            _indent++;
+            entry.Index.Accept(this);
+            entry.ArrayLength.Accept(this);
+            _indent--;
+        }
     }
 }

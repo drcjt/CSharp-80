@@ -33,5 +33,6 @@
         public void Visit(CommaEntry entry);
         public void Visit(PhiNode entry);
         public void Visit(PhiArg entry);
+        public void Visit(BoundsCheck entry);
     }
 }

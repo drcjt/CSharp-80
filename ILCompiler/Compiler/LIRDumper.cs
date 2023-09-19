@@ -211,5 +211,12 @@ namespace ILCompiler.Compiler
             _sb.AppendLine($"       ┌──▌  t{entry.Op1.TreeID}");
             _sb.AppendLine($"       putarg_type {entry.ArgType}");
         }
+
+        public void Visit(BoundsCheck entry)
+        {
+            _sb.AppendLine($"       ┌──▌  t{entry.ArrayLength.TreeID}");
+            _sb.AppendLine($"       ├──▌  t{entry.Index.TreeID}");
+            _sb.AppendLine($"       bounds_check");
+        }
     }
 }
