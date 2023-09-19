@@ -4,6 +4,6 @@ namespace ILCompiler.Interfaces
 {
     internal interface IMorpher : IPhase
     {
-        void Morph(IList<BasicBlock> blocks);
+        void Morph(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable);
     }
 }

@@ -29,7 +29,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             services.AddSingleton<ICodeGenerator<LocalHeapEntry>, LocalHeapCodeGenerator>();
             services.AddSingleton<ICodeGenerator<PutArgTypeEntry>, PutArgTypeCodeGenerator>();
             services.AddSingleton<ICodeGenerator<StaticFieldEntry>,  StaticFieldCodeGenerator>();
-
+            services.AddSingleton<ICodeGenerator<BoundsCheck>, BoundsCheckCodeGenerator>();
             return services;
         }
     }
