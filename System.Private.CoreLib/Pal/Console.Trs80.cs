@@ -27,24 +27,20 @@ namespace System
             SetConsoleCursorPosition((sbyte)x, (sbyte)y);
         }
 
-		[DllImport(Libraries.Runtime, EntryPoint = "WRITE")]
-		public static unsafe extern void WriteConsole(Int32 ch);
+        [DllImport(Libraries.Runtime, EntryPoint = "WRITE")]
+        public static unsafe extern void WriteConsole(Int32 ch);
 
         public static bool KeyAvailable => KeyAvail();
         public static unsafe ConsoleKeyInfo ReadKey() => ReadKey(false);
         public static unsafe ConsoleKeyInfo ReadKey(bool intercept)
         {
-            char c = (char)KbdScan();
+            char c;
+            //do
+            {
+                c = (char)KbdScan();
+            } //while (c == 0);
 
-            ConsoleKey k = default;
-            if (c == 'w')
-                k = ConsoleKey.UpArrow;
-            else if (c == 'd')
-                k = ConsoleKey.DownArrow;
-            else if (c == 's')
-                k = ConsoleKey.LeftArrow;
-            else if (c == 'a')
-                k = ConsoleKey.RightArrow;
+            ConsoleKey k = (ConsoleKey)c;
 
             // display key if required
             if (!intercept && c != 0)
