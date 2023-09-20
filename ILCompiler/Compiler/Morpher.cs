@@ -143,8 +143,7 @@ namespace ILCompiler.Compiler
             StackEntry? indexDefinition = null;
             StackEntry? arrayRefDefinition = null;
 
-            var boundsChecked = true;
-            if (boundsChecked)
+            if (tree.BoundsCheck)
             {
                 // Allocate temporaries to store the array and index expressions
                 // to ensure that if these expression involve assignments or calls

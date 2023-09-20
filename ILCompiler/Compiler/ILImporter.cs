@@ -160,7 +160,7 @@ namespace ILCompiler.Compiler
                 currentIndex++;
 
                 var fallThroughBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null;
-                var importContext = new ImportContext(block, fallThroughBlock, _method, _nameMangler, _corLibModuleProvider);
+                var importContext = new ImportContext(block, fallThroughBlock, _method, _nameMangler, _configuration, _corLibModuleProvider);
 
                 bool imported = ImportInstruction(currentInstruction, importContext);
 

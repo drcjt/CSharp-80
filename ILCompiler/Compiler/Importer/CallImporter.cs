@@ -318,7 +318,9 @@ namespace ILCompiler.Compiler.Importer
                         var arrayOp = arguments[0];
                         var indexOp = arguments[1];
 
-                        var node = new IndexRefEntry(indexOp, arrayOp, 2, VarType.UShort, StringCharsOffset);
+                        var boundsCheck = !context.Configuration.SkipArrayBoundsCheck;
+
+                        var node = new IndexRefEntry(indexOp, arrayOp, 2, VarType.UShort, StringCharsOffset, boundsCheck);
                         importer.PushExpression(node);
 
                         return true;
