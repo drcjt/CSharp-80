@@ -5,16 +5,18 @@ namespace ILCompiler.Compiler
 {
     public class Morpher : IMorpher
     {
-        public void Morph(IList<BasicBlock> blocks)
+        private IList<LocalVariableDescriptor>? _localVariableTable;
+        public void Morph(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
         {
+            _localVariableTable = localVariableTable;
             foreach (var block in blocks)
             {
                 // fgMorphBlocks -> fgMorphStmts -> fgMorphTree -> fgMorphSmpOp -> fgMorphArrayIndex
-                MorphStmts(block);
+                MorphStatements(block);
             }
         }
 
-        private static void MorphStmts(BasicBlock block)
+        private void MorphStatements(BasicBlock block)
         {
             var morphedStatements = new List<StackEntry>();
             foreach (var statement in block.Statements)
@@ -29,10 +31,14 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private static StackEntry MorphTree(StackEntry tree)
+        private StackEntry MorphTree(StackEntry tree)
         {
             switch (tree)
             {
+                case BoundsCheck be:
+                    tree = new BoundsCheck(MorphTree(be.Index), MorphTree(be.ArrayLength));
+                    break;
+
                 case CommaEntry ce:
                     tree = new CommaEntry(MorphTree(ce.Op1), MorphTree(ce.Op2));
                     break;
@@ -106,7 +112,7 @@ namespace ILCompiler.Compiler
             return tree;
         }
 
-        private static IList<StackEntry> MorphList(IList<StackEntry> list)
+        private IList<StackEntry> MorphList(IList<StackEntry> list)
         {
             var morphedItems = new List<StackEntry>();
             foreach (var item in list)
@@ -115,11 +121,63 @@ namespace ILCompiler.Compiler
             }
             return morphedItems;
         }
-
-        private static StackEntry MorphArrayIndex(IndexRefEntry tree)
+        private int GrabTemp(VarType type, int? exactSize)
         {
-            var cast = new CastEntry(tree.IndexOp, VarType.Ptr);
-            StackEntry addr = cast;
+            var temp = new LocalVariableDescriptor()
+            {
+                IsParameter = false,
+                IsTemp = true,
+                ExactSize = exactSize ?? 0,
+                Type = type
+            };
+
+            _localVariableTable!.Add(temp);
+
+            return _localVariableTable.Count - 1;
+        }
+        private StackEntry MorphArrayIndex(IndexRefEntry tree)
+        {
+            var arrayRef = tree.ArrayOp;
+            var index = tree.IndexOp;
+            StackEntry? boundsCheck = null;
+            StackEntry? indexDefinition = null;
+            StackEntry? arrayRefDefinition = null;
+
+            if (tree.BoundsCheck)
+            {
+                // Allocate temporaries to store the array and index expressions
+                // to ensure that if these expression involve assignments or calls
+                // that the same values are used in the bounds check as the actual
+                // array dereference.
+
+                // TODO: Need to move GrabTemp to be in common place outside of the ILImporter
+                // Really need to create new class to represent the LocalVariableTable and add GrabTemp as a method on this
+                // The class will hold the list of local variables, but then need to change everything that is using
+                // IList<LocalVariableDescriptor> to use the new LocalVariableTable type instead
+                var arrayRefTemporaryNumber = GrabTemp(tree.ArrayOp.Type, tree.ArrayOp.ExactSize);
+                arrayRefDefinition = new StoreLocalVariableEntry(arrayRefTemporaryNumber, false, tree.ArrayOp);
+                arrayRef = new LocalVariableEntry(arrayRefTemporaryNumber, tree.ArrayOp.Type, tree.ArrayOp.ExactSize);
+                var arrayRef2 = new LocalVariableEntry(arrayRefTemporaryNumber, tree.ArrayOp.Type, tree.ArrayOp.ExactSize);
+
+                var indexTemporaryNumber = GrabTemp(tree.IndexOp.Type, tree.IndexOp.ExactSize);
+                indexDefinition = new StoreLocalVariableEntry(indexTemporaryNumber, false, tree.IndexOp);
+                index = new LocalVariableEntry(indexTemporaryNumber, tree.IndexOp.Type, tree.IndexOp.ExactSize);
+                var index2 = new LocalVariableEntry(indexTemporaryNumber, tree.IndexOp.Type, tree.IndexOp.ExactSize);
+
+                // Create IR node to work out the array length
+                var arraySizeOffset = new NativeIntConstantEntry(2);
+                var arrayLengthPointer = new BinaryOperator(Operation.Add, isComparison: false, arrayRef, arraySizeOffset, VarType.Ptr);
+                var arrayLength = new IndirectEntry(arrayLengthPointer, VarType.Ptr, 2);
+
+                // Bounds check node taking the index and the array length
+                boundsCheck = new BoundsCheck(new CastEntry(index, VarType.Ptr), arrayLength);
+
+                arrayRef = arrayRef2;
+                index = index2;
+            }
+
+            StackEntry addr = new CastEntry(index, VarType.Ptr);
+
             if (tree.ElemSize > 1)
             {
                 // elemSize * index
@@ -130,8 +188,27 @@ namespace ILCompiler.Compiler
             // addr + arraySizeOffset + firstElemOffset + (elemSize * index)
             var offset = new NativeIntConstantEntry((short)(2 + tree.FirstElementOffset));
             addr = new BinaryOperator(Operation.Add, isComparison: false, addr, offset, VarType.Ptr);
-            addr = new BinaryOperator(Operation.Add, isComparison: false, MorphTree(tree.ArrayOp), addr, VarType.Ptr);
+            addr = new BinaryOperator(Operation.Add, isComparison: false, arrayRef, addr, VarType.Ptr);
             addr = new IndirectEntry(addr, tree.Type, tree.ElemSize);
+
+            // Do bounds check first and then the array operation
+            if (boundsCheck != null)
+            {
+                addr = new CommaEntry(boundsCheck, addr);
+            }
+
+            // Ensure any temporaries are defined before everything else
+            if (indexDefinition != null)
+            {
+                addr = new CommaEntry(indexDefinition, addr);
+            }
+            if (arrayRefDefinition != null) 
+            {
+                addr = new CommaEntry(arrayRefDefinition, addr);
+            }
+
+            // Morph new tree in case any sub part of it includes stuff that needs to be morphed
+            addr = MorphTree(addr);
 
             return addr;
         }

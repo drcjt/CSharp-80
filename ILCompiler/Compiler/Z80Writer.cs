@@ -126,6 +126,7 @@ namespace ILCompiler.Compiler
             {
                 OutputReturnCodeMessage(emitter);
             }
+            OutputIndexOutOfRangeMessage(emitter);
 
             emitter.CreateLabel("START");
 
@@ -173,6 +174,14 @@ namespace ILCompiler.Compiler
             emitter.Db(12);
             emitter.Db(0); // Length of message
             emitter.Db("R e t u r n   C o d e : ");
+        }
+
+        private static void OutputIndexOutOfRangeMessage(Emitter emitter)
+        {
+            emitter.CreateLabel("INDEX_OUT_OF_RANGE_MSG");
+            emitter.Db(18);
+            emitter.Db(0); // Length of message
+            emitter.Db("I n d e x   O u t   O f   R a n g e ");
         }
 
         private void OutputLabel(string label) => _out.WriteLine(Instruction.Create(label));

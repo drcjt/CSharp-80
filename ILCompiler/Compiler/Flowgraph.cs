@@ -178,6 +178,13 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
+        public void Visit(BoundsCheck entry)
+        {
+            entry.Index.Accept(this);
+            entry.ArrayLength.Accept(this);
+            SetNext(entry);
+        }
+
         public void Visit(PutArgTypeEntry entry)
         {
             entry.Op1.Accept(this);

@@ -27,6 +27,7 @@ namespace ILCompiler
                 AssemblerArguments = bindingContext.ParseResult.GetValueForOption(_configurationOptions.AssemblerArguments) ?? "",
                 AssemblerOutput = bindingContext.ParseResult.GetValueForOption(_configurationOptions.AssemblerOutput) ?? "",
                 NoListFile = bindingContext.ParseResult.GetValueForOption(_configurationOptions.NoListFile),
+                SkipArrayBoundsCheck = bindingContext.ParseResult.GetValueForOption(_configurationOptions.SkipArrayBoundsCheck),
             };
         }
     }

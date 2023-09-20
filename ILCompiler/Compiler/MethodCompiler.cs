@@ -144,7 +144,7 @@ namespace ILCompiler.Compiler
             }
 
             var morpher = _phaseFactory.Create<IMorpher>();
-            morpher.Morph(basicBlocks);
+            morpher.Morph(basicBlocks, _localVariableTable);
 
             var flowgraph = _phaseFactory.Create<IFlowgraph>();
             flowgraph.SetBlockOrder(basicBlocks);
@@ -166,14 +166,14 @@ namespace ILCompiler.Compiler
 
             // Lower
             var lowering = _phaseFactory.Create<ILowering>();
-          lowering.Run(basicBlocks);
+            lowering.Run(basicBlocks);
 
             var codeGenerator = _phaseFactory.Create<ICodeGenerator>();
             var instructions = codeGenerator.Generate(basicBlocks, _localVariableTable, methodCodeNodeNeedingCode);
             methodCodeNodeNeedingCode.MethodCode = GetMethodCode(instructions);
         }
 
-        private static string GetMethodCode(IList<ILCompiler.Compiler.Emit.Instruction> instructions)
+        private static string GetMethodCode(IList<Emit.Instruction> instructions)
         {
             var sb = new StringBuilder();
             foreach (var instruction in instructions)

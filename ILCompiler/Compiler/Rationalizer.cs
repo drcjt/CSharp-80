@@ -28,7 +28,10 @@ namespace ILCompiler.Compiler
                 {
                     previousNode.Next = node.Next;
                 }
-                previousNode = node;
+                else
+                {
+                    previousNode = node;
+                }
                 node = node.Next;
             }
         }

@@ -16,5 +16,6 @@ namespace ILCompiler
         public string AssemblerArguments { get; set; } = string.Empty;
         public string AssemblerOutput { get; set; } = string.Empty;
         public bool NoListFile { get; set; } = true;
+        public bool SkipArrayBoundsCheck { get; set; } = false;
     }
 }

@@ -15,5 +15,6 @@ namespace ILCompiler.Interfaces
         public string AssemblerArguments { get; set; }
         public string AssemblerOutput { get; set; }
         public bool NoListFile { get; set; }
+        public bool SkipArrayBoundsCheck { get; set; }
     }
 }
