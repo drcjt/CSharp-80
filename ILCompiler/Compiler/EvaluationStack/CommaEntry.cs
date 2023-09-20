@@ -5,7 +5,7 @@
         public StackEntry Op1 { get; }
         public StackEntry Op2 { get; }
 
-        public CommaEntry(StackEntry op1, StackEntry op2) : base(op2.Type)
+        public CommaEntry(StackEntry op1, StackEntry op2) : base(op2.Type, op2.ExactSize)
         {
             Op1 = op1;
             Op2 = op2;
