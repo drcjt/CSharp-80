@@ -263,9 +263,15 @@ namespace ILCompiler.Compiler
                         var offset = variable.StackOffset;
                         var exactSize = variable.ExactSize;
 
+                        emitter.Push(IX);
+                        emitter.Pop(HL);
+                        emitter.Ld(DE, (short)-offset);
+                        emitter.Add(HL, DE);
+
                         for (var count = 0; count < exactSize; count++)
                         {
-                            emitter.Ld(__[IX + (short)(-offset + count)], 0);
+                            emitter.Ld(__[HL], 0);
+                            emitter.Inc(HL);
                         }
                     }
                 }
