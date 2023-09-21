@@ -14,6 +14,7 @@
         Rem_Un,
         And,
         Or,
+        Xor,
 
         Eq,
         Ge,

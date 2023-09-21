@@ -59,6 +59,7 @@
     <None Remove="Runtime\i_rsh16.asm" />
     <None Remove="Runtime\i_sub.asm" />
     <None Remove="Runtime\i_sub16.asm" />
+    <None Remove="Runtime\i_xor.asm" />
     <None Remove="Runtime\kbdscan.asm" />
     <None Remove="Runtime\keyavail.asm" />
     <None Remove="Runtime\l_inc_dehl.asm" />
@@ -96,6 +97,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Runtime\CPM\cls.asm" />
     <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
+    <EmbeddedResource Include="Runtime\i_xor.asm" />
     <EmbeddedResource Include="Runtime\i_sub16.asm" />
     <EmbeddedResource Include="Runtime\i_gt16.asm" />
     <EmbeddedResource Include="Runtime\i_gt_un.asm" />
