@@ -20,6 +20,7 @@ namespace ILCompiler.Compiler.Importer
                 case Code.Rem_Un:
                 case Code.And:
                 case Code.Or:
+                case Code.Xor:
                     binaryOp = Operation.Add + (instruction.OpCode.Code - Code.Add);
                     break;
                 case Code.Mul_Ovf_Un:

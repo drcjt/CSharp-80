@@ -9,6 +9,7 @@ namespace ILCompiler.Compiler.CodeGenerators
         {
             { Tuple.Create(Operation.Add, VarType.Int), "i_add" },
             { Tuple.Create(Operation.Or, VarType.Int), "i_or" },
+            { Tuple.Create(Operation.Xor, VarType.Int), "i_xor" },
             { Tuple.Create(Operation.Sub, VarType.Int), "i_sub" },
             { Tuple.Create(Operation.Mul, VarType.Int), "i_mul" },
             { Tuple.Create(Operation.Div, VarType.Int), "i_div" },
