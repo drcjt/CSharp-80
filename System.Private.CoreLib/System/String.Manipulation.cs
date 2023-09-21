@@ -8,7 +8,7 @@ namespace System
     {
         public unsafe static string Concat(string str0, string str1)
         {
-            string result = RuntimeImports.NewString(EETypePtr.EETypePtrOf<String>(), str0.Length + str1.Length);
+            string result = RuntimeImports.NewString(EETypePtr.EETypePtrOf<string>(), str0.Length + str1.Length);
 
             FillStringChecked(result, 0, str0);
             FillStringChecked(result, str0.Length, str1);
@@ -48,7 +48,7 @@ namespace System
 
         private unsafe string InternalSubstring(int startIndex, int length)
         {
-            string result = RuntimeImports.NewString(EETypePtr.EETypePtrOf<String>(), length);
+            string result = RuntimeImports.NewString(EETypePtr.EETypePtrOf<string>(), length);
 
             Buffer.Memmove(ref result._firstChar, ref Unsafe.Add(ref _firstChar, startIndex), (uint)length);
 

@@ -29,7 +29,7 @@ namespace System
 
         internal unsafe static string Ctor(char[] value)
         {
-            string result = RuntimeImports.NewString(EETypePtr.EETypePtrOf<String>(), value.Length);
+            string result = RuntimeImports.NewString(EETypePtr.EETypePtrOf<string>(), value.Length);
             Buffer.Memmove(ref result._firstChar, ref value[0], (uint)result.Length);
             return result;
         }

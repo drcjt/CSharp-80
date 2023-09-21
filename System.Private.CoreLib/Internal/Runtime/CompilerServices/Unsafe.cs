@@ -15,6 +15,14 @@ namespace Internal.Runtime.CompilerServices
             // ret
         }
 
+        public static T As<T>(object value) where T: class
+        {
+            throw new Exception();
+
+            // ldarg.0
+            // ret
+        }
+
         [Intrinsic]
         public static ref TTo As<TFrom, TTo>(ref TFrom source)
         {
