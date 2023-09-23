@@ -135,6 +135,7 @@ namespace ILCompiler.Compiler
 
             return _localVariableTable.Count - 1;
         }
+
         private StackEntry MorphArrayIndex(IndexRefEntry tree)
         {
             var arrayRef = tree.ArrayOp;
@@ -154,15 +155,15 @@ namespace ILCompiler.Compiler
                 // Really need to create new class to represent the LocalVariableTable and add GrabTemp as a method on this
                 // The class will hold the list of local variables, but then need to change everything that is using
                 // IList<LocalVariableDescriptor> to use the new LocalVariableTable type instead
-                var arrayRefTemporaryNumber = GrabTemp(tree.ArrayOp.Type, tree.ArrayOp.ExactSize);
-                arrayRefDefinition = new StoreLocalVariableEntry(arrayRefTemporaryNumber, false, tree.ArrayOp);
-                arrayRef = new LocalVariableEntry(arrayRefTemporaryNumber, tree.ArrayOp.Type, tree.ArrayOp.ExactSize);
-                var arrayRef2 = new LocalVariableEntry(arrayRefTemporaryNumber, tree.ArrayOp.Type, tree.ArrayOp.ExactSize);
+                var arrayRefTemporaryNumber = GrabTemp(arrayRef.Type, arrayRef.ExactSize);
+                arrayRefDefinition = new StoreLocalVariableEntry(arrayRefTemporaryNumber, false, arrayRef);
+                arrayRef = new LocalVariableEntry(arrayRefTemporaryNumber, arrayRef.Type, arrayRef.ExactSize);
+                var arrayRef2 = new LocalVariableEntry(arrayRefTemporaryNumber, arrayRef.Type, arrayRef.ExactSize);
 
-                var indexTemporaryNumber = GrabTemp(tree.IndexOp.Type, tree.IndexOp.ExactSize);
-                indexDefinition = new StoreLocalVariableEntry(indexTemporaryNumber, false, tree.IndexOp);
-                index = new LocalVariableEntry(indexTemporaryNumber, tree.IndexOp.Type, tree.IndexOp.ExactSize);
-                var index2 = new LocalVariableEntry(indexTemporaryNumber, tree.IndexOp.Type, tree.IndexOp.ExactSize);
+                var indexTemporaryNumber = GrabTemp(index.Type, index.ExactSize);
+                indexDefinition = new StoreLocalVariableEntry(indexTemporaryNumber, false, index);
+                index = new LocalVariableEntry(indexTemporaryNumber, index.Type, index.ExactSize);
+                var index2 = new LocalVariableEntry(indexTemporaryNumber, index.Type, index.ExactSize);
 
                 // Create IR node to work out the array length
                 var arraySizeOffset = new NativeIntConstantEntry(2);
