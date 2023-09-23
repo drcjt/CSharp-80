@@ -122,20 +122,6 @@ namespace ILCompiler.Compiler
             }
             return morphedItems;
         }
-        private int GrabTemp(VarType type, int? exactSize)
-        {
-            var temp = new LocalVariableDescriptor()
-            {
-                IsParameter = false,
-                IsTemp = true,
-                ExactSize = exactSize ?? 0,
-                Type = type
-            };
-
-            _localVariableTable!.Add(temp);
-
-            return _localVariableTable.Count - 1;
-        }
 
         private StackEntry MorphArrayIndex(IndexRefEntry tree)
         {
