@@ -13,7 +13,7 @@ namespace ILCompiler.Interfaces
         int GrabTemp(VarType type, int? exactSize);
 
         int ParameterCount { get; }
-        IList<LocalVariableDescriptor> LocalVariableTable { get; }
+        LocalVariableTable LocalVariableTable { get; }
         BasicBlock[] BasicBlocks { get; }
 
         int? ReturnBufferArgIndex { get; }

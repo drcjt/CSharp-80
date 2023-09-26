@@ -18,13 +18,13 @@ namespace ILCompiler.Compiler
         private int _parameterCount;
         private int? _returnBufferArgIndex;
 
-        private readonly IList<LocalVariableDescriptor> _localVariableTable;
+        private readonly LocalVariableTable _locals;
 
         public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory, RTILProvider ilProvider)
         {
             _configuration = configuration;
             _logger = logger;
-            _localVariableTable = new List<LocalVariableDescriptor>();
+            _locals = new LocalVariableTable();
             _phaseFactory = phaseFactory;
             _ilProvider = ilProvider;
         }
@@ -44,7 +44,7 @@ namespace ILCompiler.Compiler
                     ExactSize = parameter.Type.GetInstanceFieldSize(),
                     Type = parameter.Type.GetVarType(),
                 };
-                _localVariableTable.Add(local);
+                _locals.Add(local);
             }
 
             if (body != null)
@@ -59,7 +59,7 @@ namespace ILCompiler.Compiler
                         ExactSize = local.Type.GetInstanceFieldSize(),
                         Type = local.Type.GetVarType(),
                     };
-                    _localVariableTable.Add(localVariableDescriptor);
+                    _locals.Add(localVariableDescriptor);
                 }
             }
 
@@ -86,7 +86,7 @@ namespace ILCompiler.Compiler
 
                 // Ensure return buffer parameter goes after the this parameter if present
                 _returnBufferArgIndex = hasThis ? 1 : 0;
-                _localVariableTable.Insert(_returnBufferArgIndex.Value, returnBuffer);
+                _locals.Insert(_returnBufferArgIndex.Value, returnBuffer);
 
                 _parameterCount++;
             }
@@ -122,7 +122,7 @@ namespace ILCompiler.Compiler
             var ilImporter = _phaseFactory.Create<IILImporter>();
 
             // Main phases of the compiler live here
-            var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _localVariableTable);
+            var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _locals);
 
             if (_configuration.DumpIRTrees)
             {
@@ -130,7 +130,7 @@ namespace ILCompiler.Compiler
 
                 int lclNum = 0;
                 StringBuilder sb = new();
-                foreach (var lclVar in _localVariableTable)
+                foreach (var lclVar in _locals)
                 {
                     sb.AppendLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Type} {lclVar.ExactSize}");
 
@@ -144,13 +144,13 @@ namespace ILCompiler.Compiler
             }
 
             var morpher = _phaseFactory.Create<IMorpher>();
-            morpher.Morph(basicBlocks, _localVariableTable);
+            morpher.Morph(basicBlocks, _locals);
 
             var flowgraph = _phaseFactory.Create<IFlowgraph>();
             flowgraph.SetBlockOrder(basicBlocks);
 
             var ssaBuilder = _phaseFactory.Create<ISsaBuilder>();
-            ssaBuilder.Build(basicBlocks, _localVariableTable, _configuration.DumpSsa);
+            ssaBuilder.Build(basicBlocks, _locals, _configuration.DumpSsa);
 
             if (_configuration.DumpIRTrees)
             {
@@ -169,7 +169,7 @@ namespace ILCompiler.Compiler
             lowering.Run(basicBlocks);
 
             var codeGenerator = _phaseFactory.Create<ICodeGenerator>();
-            var instructions = codeGenerator.Generate(basicBlocks, _localVariableTable, methodCodeNodeNeedingCode);
+            var instructions = codeGenerator.Generate(basicBlocks, _locals, methodCodeNodeNeedingCode);
             methodCodeNodeNeedingCode.MethodCode = GetMethodCode(instructions);
         }
 

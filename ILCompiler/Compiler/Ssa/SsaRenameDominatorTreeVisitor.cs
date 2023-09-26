@@ -1,5 +1,4 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
-using System.Data;
 using System.Diagnostics;
 
 namespace ILCompiler.Compiler.Ssa
@@ -7,11 +6,11 @@ namespace ILCompiler.Compiler.Ssa
     internal class SsaRenameDominatorTreeVisitor : DominatorTreeVisitor
     {
         private readonly SsaRenameState _renameStack;
-        private readonly IList<LocalVariableDescriptor> _localVariableTable;
-        public SsaRenameDominatorTreeVisitor(DominatorTreeNode root, SsaRenameState renameStack, IList<LocalVariableDescriptor> localVariableTable) : base(root)
+        private readonly LocalVariableTable _locals;
+        public SsaRenameDominatorTreeVisitor(DominatorTreeNode root, SsaRenameState renameStack, LocalVariableTable locals) : base(root)
         {
             _renameStack = renameStack;
-            _localVariableTable = localVariableTable;
+            _locals = locals;
         }
 
         public override void PostOrderVisit(BasicBlock block)
@@ -59,7 +58,7 @@ namespace ILCompiler.Compiler.Ssa
             }
 
             // Need to add a new phi arg
-            var localVarDescriptor = _localVariableTable[localNumber];
+            var localVarDescriptor = _locals[localNumber];
             var localVarType = localVarDescriptor.Type;
 
             var newPhiArg = new PhiArg(localVarType, localNumber, ssaNumber, predecessor);
@@ -119,7 +118,7 @@ namespace ILCompiler.Compiler.Ssa
             if (defNode is StoreLocalVariableEntry localNode)
             {
                 var localNumber = localNode.LocalNumber;
-                var localVariableDescriptor = _localVariableTable[localNumber];
+                var localVariableDescriptor = _locals[localNumber];
                 if (localVariableDescriptor.InSsa)
                 {
                     localNode.SsaNumber = RenamePushDef(block, localNumber);
@@ -130,7 +129,7 @@ namespace ILCompiler.Compiler.Ssa
         private void RenameLocalUse(ILocalVariable tree, BasicBlock block)
         {
             var localNumber = tree.LocalNumber;
-            var localVariableDescriptor = _localVariableTable[localNumber];
+            var localVariableDescriptor = _locals[localNumber];
 
             if (localVariableDescriptor.InSsa)
             {
@@ -142,7 +141,7 @@ namespace ILCompiler.Compiler.Ssa
 
         private int RenamePushDef(BasicBlock block, int localNumber)
         {
-            var localVariableDescriptor = _localVariableTable[localNumber];
+            var localVariableDescriptor = _locals[localNumber];
             int ssaNumber = localVariableDescriptor.PerSsaData.AllocSsaNumber(() => new LocalSsaVariableDescriptor(block));
 
             _renameStack.Push(block, localNumber, ssaNumber);

@@ -5,6 +5,6 @@ namespace ILCompiler.Interfaces
 {
     public interface IILImporter : IPhase
     {
-        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, IList<LocalVariableDescriptor> localVariableTable);
+        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, LocalVariableTable locals);
     }
 }

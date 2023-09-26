@@ -8,7 +8,7 @@ namespace ILCompiler.Compiler.CodeGenerators
     public class CodeGeneratorContext
     {
         public Emitter Emitter { get; } = new();
-        public IList<LocalVariableDescriptor> LocalVariableTable { get; }
+        public LocalVariableTable LocalVariableTable { get; }
         public int ParamsCount => _method.ParamsCount;
         public int LocalsCount => _method.LocalsCount;
         public MethodDesc Method => _method.Method;
@@ -19,7 +19,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
         public readonly IConfiguration Configuration;
 
-        public CodeGeneratorContext(IList<LocalVariableDescriptor> localVariableTable, Z80MethodCodeNode method, IConfiguration configuration, INameMangler nameMangler)
+        public CodeGeneratorContext(LocalVariableTable localVariableTable, Z80MethodCodeNode method, IConfiguration configuration, INameMangler nameMangler)
         {
             LocalVariableTable = localVariableTable;
             _method = method;

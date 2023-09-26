@@ -6,22 +6,22 @@ namespace ILCompiler.Compiler
 {
     internal static class Liveness
     {
-        public static void LocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable, ILogger<SsaBuilder> logger)
+        public static void LocalVarLiveness(IList<BasicBlock> blocks, LocalVariableTable locals, ILogger<SsaBuilder> logger)
         {
-            LocalVarLivenessInit(localVariableTable);
+            LocalVarLivenessInit(locals);
 
             // Figure out use/def info for all basic blocks
             PerBlockLocalVarLiveness(blocks, logger);
-            InterBlockLocalVarLiveness(blocks, localVariableTable);
+            InterBlockLocalVarLiveness(blocks, locals);
         }
 
-        private static void LocalVarLivenessInit(IList<LocalVariableDescriptor> localVariableTable)
+        private static void LocalVarLivenessInit(LocalVariableTable locals)
         {
-            SetTrackedVariables(localVariableTable);
+            SetTrackedVariables(locals);
 
             // Mark all local variables as not requiring explicit initialization
             // Liveness analysis will determine local variables that do need to be initialized
-            foreach (var localVariable in localVariableTable)
+            foreach (var localVariable in locals)
             {
                 localVariable.MustInit = false;
             }
@@ -31,9 +31,9 @@ namespace ILCompiler.Compiler
         /// Determine which local variables will be tracked
         /// </summary>
         /// <param name="localVariableTable"></param>
-        private static void SetTrackedVariables(IList<LocalVariableDescriptor> localVariableTable)
+        private static void SetTrackedVariables(LocalVariableTable locals)
         {
-            foreach (var localVariable in localVariableTable)
+            foreach (var localVariable in locals)
             {
                 localVariable.Tracked = true;
 
@@ -51,17 +51,17 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private static void InterBlockLocalVarLiveness(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
+        private static void InterBlockLocalVarLiveness(IList<BasicBlock> blocks, LocalVariableTable locals)
         {
             // Compute the IN and OUT sets using classic liveness algorithm
             LiveVarAnalyzer.AnalyzeLiveVars(blocks);
 
             // Set which local variable must be initialized
-            for (var lclNum = 0; lclNum < localVariableTable.Count; lclNum++)
+            for (var lclNum = 0; lclNum < locals.Count; lclNum++)
             {
-                if (!localVariableTable[lclNum].IsParameter && blocks[0].LiveIn.IsMember(lclNum))
+                if (!locals[lclNum].IsParameter && blocks[0].LiveIn.IsMember(lclNum))
                 {
-                    localVariableTable[lclNum].MustInit = true;
+                    locals[lclNum].MustInit = true;
                 }
             }
         }

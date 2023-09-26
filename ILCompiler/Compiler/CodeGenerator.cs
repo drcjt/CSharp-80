@@ -29,9 +29,9 @@ namespace ILCompiler.Compiler
             _corLibModuleProvider = corLibModuleProvider;
         }
 
-        public IList<Instruction> Generate(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable, Z80MethodCodeNode methodCodeNode)
+        public IList<Instruction> Generate(IList<BasicBlock> blocks, LocalVariableTable locals, Z80MethodCodeNode methodCodeNode)
         {
-            _context = new CodeGeneratorContext(localVariableTable, methodCodeNode, _configuration, _nameMangler);
+            _context = new CodeGeneratorContext(locals, methodCodeNode, _configuration, _nameMangler);
 
             AssignFrameOffsets();
 

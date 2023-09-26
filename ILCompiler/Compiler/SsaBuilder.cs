@@ -19,7 +19,7 @@ namespace ILCompiler.Compiler
             _logger = logger;
         }
 
-        public void Build(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable, bool dumpSsa)
+        public void Build(IList<BasicBlock> blocks, LocalVariableTable locals, bool dumpSsa)
         {
             _dumpSsa = dumpSsa;
 
@@ -35,24 +35,24 @@ namespace ILCompiler.Compiler
             var dominatorTree = BuildDominatorTree(blocks);
 
             // Calculate liveness
-            Liveness.LocalVarLiveness(blocks, localVariableTable, _logger);
+            Liveness.LocalVarLiveness(blocks, locals, _logger);
 
             // Calculate Ssa only for Tracked local variables
-            foreach (var localVariable in localVariableTable) 
+            foreach (var localVariable in locals) 
             {
                 localVariable.InSsa = localVariable.Tracked;
             }
 
             // Insert Phi functions
-            InsertPhiFunctions(postOrder, localVariableTable);
+            InsertPhiFunctions(postOrder, locals);
 
             // Rename local variables
-            RenameVariables(dominatorTree, localVariableTable);
+            RenameVariables(dominatorTree, locals);
 
             // Log SSA form
             if (_dumpSsa)
             {
-                LogSsaSummary(localVariableTable);
+                LogSsaSummary(locals);
             }
         }
 
@@ -68,11 +68,11 @@ namespace ILCompiler.Compiler
             return blocks;
         }
 
-        private void LogSsaSummary(IList<LocalVariableDescriptor> localVariableTable)
+        private void LogSsaSummary(LocalVariableTable locals)
         {
-            for (var localNumber = 0; localNumber < localVariableTable.Count; localNumber++)
+            for (var localNumber = 0; localNumber < locals.Count; localNumber++)
             {
-                var localVariableDescriptor = localVariableTable[localNumber];
+                var localVariableDescriptor = locals[localNumber];
                 if (localVariableDescriptor.InSsa)
                 {
                     var ssaDefinitions = localVariableDescriptor.PerSsaData;
@@ -103,16 +103,16 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void RenameVariables(DominatorTreeNode tree, IList<LocalVariableDescriptor> localVariableTable)
+        private void RenameVariables(DominatorTreeNode tree, LocalVariableTable locals)
         {
-            var ssaRenameStack = new SsaRenameState(_logger, localVariableTable.Count);
+            var ssaRenameStack = new SsaRenameState(_logger, locals.Count);
 
             // First deal with parameters and must-init variables as though they
             // have a virtual definition before entry to the method. They all
             // begin with a SSA number of 1.
-            for (int localVariableNumber = 0; localVariableNumber < localVariableTable.Count; localVariableNumber++)
+            for (int localVariableNumber = 0; localVariableNumber < locals.Count; localVariableNumber++)
             {
-                var localVariableDescriptor = localVariableTable[localVariableNumber];
+                var localVariableDescriptor = locals[localVariableNumber];
                 if (localVariableDescriptor.IsParameter || localVariableDescriptor.MustInit) 
                 {
                     var ssaNumber = localVariableDescriptor.PerSsaData.AllocSsaNumber(() => new LocalSsaVariableDescriptor(tree.Block));
@@ -143,11 +143,11 @@ namespace ILCompiler.Compiler
              * rename(entry)
              */
 
-            var visitor = new SsaRenameDominatorTreeVisitor(tree, ssaRenameStack, localVariableTable);
+            var visitor = new SsaRenameDominatorTreeVisitor(tree, ssaRenameStack, locals);
             visitor.WalkTree();
         }
 
-        private void InsertPhiFunctions(IList<BasicBlock> postOrderBlocks, IList<LocalVariableDescriptor> localVariableTable)
+        private void InsertPhiFunctions(IList<BasicBlock> postOrderBlocks, LocalVariableTable locals)
         {
             // From https://www.cs.cornell.edu/courses/cs6120/2020fa/lesson/5/
 
@@ -186,7 +186,7 @@ namespace ILCompiler.Compiler
                         // Insert Phi functions - note arguments will be determined during variable renaming
                         if (!HasPhiNode(blockInDominanceFront, defVar))
                         {
-                            InsertPhi(blockInDominanceFront, defVar, localVariableTable);
+                            InsertPhi(blockInDominanceFront, defVar, locals);
                         }
                     }
                 }
@@ -212,11 +212,11 @@ namespace ILCompiler.Compiler
             return false;
         }
 
-        private void InsertPhi(BasicBlock block, int localNumber, IList<LocalVariableDescriptor> localVariableTable)
+        private void InsertPhi(BasicBlock block, int localNumber, LocalVariableTable locals)
         {
             // Note actual arguments to Phi will be worked out during variable renaming
 
-            var local = localVariableTable[localNumber];
+            var local = locals[localNumber];
             var phiNode = new PhiNode(local.Type);
 
             var store = new StoreLocalVariableEntry(localNumber, false, phiNode);
