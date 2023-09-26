@@ -16,7 +16,7 @@ namespace ILCompiler.Compiler
         private readonly CorLibModuleProvider _corLibModuleProvider;
 
         private MethodDesc _method = null!;
-        private IList<LocalVariableDescriptor> _localVariableTable = null!;
+        private LocalVariableTable? _locals;
 
         private BasicBlock[] _basicBlocks;
         private BasicBlock? _currentBasicBlock;
@@ -39,7 +39,7 @@ namespace ILCompiler.Compiler
             }
 
             public int ParameterCount => _importer._parameterCount;
-            public IList<LocalVariableDescriptor> LocalVariableTable => _importer._localVariableTable;
+            public LocalVariableTable LocalVariableTable => _importer._locals!;
 
             public BasicBlock[] BasicBlocks => _importer._basicBlocks;
 
@@ -50,7 +50,7 @@ namespace ILCompiler.Compiler
             public StackEntry PopExpression() => _importer._stack.Pop();
             public void PushExpression(StackEntry entry) => _importer._stack.Push(entry);
                 
-            public int GrabTemp(VarType type, int? exactSize) => _importer.GrabTemp(type, exactSize);
+            public int GrabTemp(VarType type, int? exactSize) => _importer._locals!.GrabTemp(type, exactSize);
         }
 
         public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, CorLibModuleProvider corlibModuleProvider)
@@ -217,26 +217,11 @@ namespace ILCompiler.Compiler
             return imported;
         }
 
-        private int GrabTemp(VarType type, int? exactSize)
-        {
-            var temp = new LocalVariableDescriptor()
-            {
-                IsParameter = false,
-                IsTemp = true,
-                ExactSize = exactSize ?? 0,
-                Type = type
-            };
-
-            _localVariableTable.Add(temp);
-
-            return _localVariableTable.Count - 1;
-        }
-
         private StackEntry ImportSpillStackEntry(StackEntry entry, int? tempNumber = null)
         {
             if (tempNumber == null)
             {
-                tempNumber = GrabTemp(entry.Type, entry.ExactSize);
+                tempNumber = _locals!.GrabTemp(entry.Type, entry.ExactSize);
             }
 
             var node = new StoreLocalVariableEntry(tempNumber.Value, false, entry.Duplicate());
@@ -255,13 +240,13 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, IList<LocalVariableDescriptor> localVariableTable)
+        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, LocalVariableTable locals)
         {
             _parameterCount = parameterCount;
             _returnBufferArgIndex = returnBufferArgIndex;
 
             _method = method;
-            _localVariableTable = localVariableTable;
+            _locals = locals;
 
             var basicBlockAnalyser = new BasicBlockAnalyser(_method);
             var offsetToIndexMap = new Dictionary<int, int>();

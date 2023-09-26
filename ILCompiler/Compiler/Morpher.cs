@@ -6,10 +6,10 @@ namespace ILCompiler.Compiler
 {
     public class Morpher : IMorpher
     {
-        private IList<LocalVariableDescriptor>? _localVariableTable;
-        public void Morph(IList<BasicBlock> blocks, IList<LocalVariableDescriptor> localVariableTable)
+        private LocalVariableTable? _locals;
+        public void Morph(IList<BasicBlock> blocks, LocalVariableTable locals)
         {
-            _localVariableTable = localVariableTable;
+            _locals = locals;
             foreach (var block in blocks)
             {
                 // fgMorphBlocks -> fgMorphStmts -> fgMorphTree -> fgMorphSmpOp -> fgMorphArrayIndex
@@ -128,7 +128,7 @@ namespace ILCompiler.Compiler
             var arrayRef = tree.ArrayOp;
             var index = tree.IndexOp;
 
-            var arrayElementHelper = new ArrayElementHelper(_localVariableTable!);
+            var arrayElementHelper = new ArrayElementHelper(_locals!);
             var addr = arrayElementHelper.CreateArrayAccess(index, arrayRef, tree.Type, tree.ElemSize, false, tree.BoundsCheck, tree.FirstElementOffset);
 
             // Morph new tree in case any sub part of it includes stuff that needs to be morphed
