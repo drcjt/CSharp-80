@@ -78,6 +78,7 @@ namespace ILCompiler
                     configuration.CorelibPath = parsedConfiguration.CorelibPath;
                     configuration.DumpIRTrees = parsedConfiguration.DumpIRTrees;
                     configuration.DumpSsa = parsedConfiguration.DumpSsa;
+                    configuration.DumpFlowGraphs = parsedConfiguration.DumpFlowGraphs;
                     configuration.IgnoreUnknownCil = parsedConfiguration.IgnoreUnknownCil;
                     configuration.PrintReturnCode = parsedConfiguration.PrintReturnCode;
                     configuration.IntegrationTests = parsedConfiguration.IntegrationTests;

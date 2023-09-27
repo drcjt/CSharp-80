@@ -11,6 +11,7 @@ namespace ILCompiler
         public readonly Option<bool> IntegrationTestsOption = new(new[] { "-it", "--integrationTests" }, "Compile for integration tests");
         public readonly Option<bool> DumpIRTreesOption = new(new[] { "-dir", "--dumpIRTrees" }, "Dump IR trees");
         public readonly Option<bool> DumpSsaOption = new(new[] { "-dssa", "--dumpSsa" }, "Dump Ssa information");
+        public readonly Option<bool> DumpFlowGraphs = new(new[] { "-dfg", "--dumpFlowGraphs" }, "Dump Flow Graphs");
 
         public readonly Option<TargetArchitecture> TargetArchitectureOption = new(new[] { "-a", "--targetArchitecture" }, getDefaultValue : () => TargetArchitecture.TRS80, "Target Architecture");
         public readonly Option<int> StackStartOption = new(new[] { "-ss", "--stackStart" }, getDefaultValue: () => 0xa000, "Stack Start Address");
