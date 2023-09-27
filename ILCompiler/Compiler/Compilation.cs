@@ -55,7 +55,7 @@ namespace ILCompiler.Compiler
             // Write dgml version of dependency graph
             WriteDependencyLog(Path.ChangeExtension(inputFilePath, ".dgml"), rootNode);
 
-            CompileNode(rootNode);
+            CompileNode(rootNode, inputFilePath);
 
             _z80Writer.OutputCode(rootNode, inputFilePath, outputFilePath);
         }
@@ -69,14 +69,14 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void CompileNode(Z80MethodCodeNode node)
+        private void CompileNode(Z80MethodCodeNode node, string inputFilePath)
         {
             if (!node.Compiled)
             {
                 _logger.LogDebug("Compiling method {method.Name}", node.Method.Name);
 
                 var methodCompiler = _methodCompilerFactory.Create();
-                methodCompiler.CompileMethod(node);
+                methodCompiler.CompileMethod(node, inputFilePath);
                 node.Compiled = true;
 
                 if (node.Dependencies != null)
@@ -85,7 +85,7 @@ namespace ILCompiler.Compiler
                     {
                         if (dependentNode is Z80MethodCodeNode z80MethodNode)
                         {
-                            CompileNode(z80MethodNode);
+                            CompileNode(z80MethodNode, inputFilePath);
                         }
                     }
                 }

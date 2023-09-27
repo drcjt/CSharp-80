@@ -92,7 +92,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode)
+        public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode, string inputFilePath)
         {
             var method = methodCodeNodeNeedingCode.Method;
 
@@ -123,6 +123,11 @@ namespace ILCompiler.Compiler
 
             // Main phases of the compiler live here
             var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _locals);
+
+            if (_configuration.DumpFlowGraphs)
+            {
+                Diagnostics.DumpFlowGraph(inputFilePath, methodCodeNodeNeedingCode.Method, basicBlocks);
+            }
 
             if (_configuration.DumpIRTrees)
             {
