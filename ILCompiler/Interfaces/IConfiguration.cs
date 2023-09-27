@@ -6,6 +6,7 @@ namespace ILCompiler.Interfaces
     {
         public bool DumpIRTrees { get; set; }
         public bool DumpSsa { get; set; }
+        public bool DumpFlowGraphs {  get; set; }
         public bool IgnoreUnknownCil { get; set; }
         public bool PrintReturnCode { get; set; }
         public string CorelibPath { get; set; }

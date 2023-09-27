@@ -4,6 +4,6 @@ namespace ILCompiler.Interfaces
 {
     public interface IMethodCompiler
     {
-        public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode);
+        public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode, string inputFilePath);
     }
 }

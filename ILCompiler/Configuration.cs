@@ -7,6 +7,7 @@ namespace ILCompiler
     {
         public bool DumpIRTrees { get; set; } = false;
         public bool DumpSsa { get; set; } = false;
+        public bool DumpFlowGraphs {  get; set; } = false;
         public bool IgnoreUnknownCil { get; set; } = false;
         public bool PrintReturnCode { get; set; } = true;
         public string CorelibPath { get; set; } = string.Empty;
