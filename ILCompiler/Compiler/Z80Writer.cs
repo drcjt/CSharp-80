@@ -136,30 +136,6 @@ namespace ILCompiler.Compiler
             _out.WriteLine(emitter.ToString());
         }
 
-        private static IList<IDependencyNode> _nodesProcessed = new List<IDependencyNode>();
-        private void OutputStaticConstructorInitialization(IDependencyNode node, Emitter emitter)
-        {
-            if (!_nodesProcessed.Contains(node))
-            {
-                _nodesProcessed.Add(node);
-
-                // Process dependent nodes first
-                foreach (var dependency in node.Dependencies)
-                {
-                    if (dependency is Z80MethodCodeNode dependentMethodNode)
-                    {
-                        OutputStaticConstructorInitialization(dependentMethodNode, emitter);
-                    }
-                }
-
-                if (node is Z80MethodCodeNode methodNode && methodNode.Method.IsStaticConstructor)
-                {
-                    // Now output call to the static constructor
-                    emitter.Call(_nameMangler.GetMangledMethodName(methodNode.Method));
-                }
-            }
-        }
-
         private static void OutputOOMMessage(Emitter emitter)
         {
             emitter.CreateLabel("OOM_MSG");
