@@ -11,6 +11,11 @@ namespace ILCompiler.Common.TypeSystem.IL
             return new SZArraySig(elementType.ToTypeSig()).ToTypeDefOrRef();
         }
 
+        public static bool HasStaticConstructor(this TypeDef type)
+        {
+            return type.FindStaticConstructor() != null;
+        }
+
         public static bool IsIntrinsic(this IMethodDefOrRef method)
         {
             return method.HasCustomAttributes && method.CustomAttributes.IsDefined(CompilerIntrinsicAttribute);

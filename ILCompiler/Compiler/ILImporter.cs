@@ -3,6 +3,7 @@ using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
+using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -14,6 +15,7 @@ namespace ILCompiler.Compiler
         private readonly ILogger<ILImporter> _logger;
         private readonly INameMangler _nameMangler;
         private readonly CorLibModuleProvider _corLibModuleProvider;
+        private readonly PreinitializationManager _preinitializationManager;
 
         private MethodDesc _method = null!;
         private LocalVariableTable? _locals;
@@ -53,7 +55,7 @@ namespace ILCompiler.Compiler
             public int GrabTemp(VarType type, int? exactSize) => _importer._locals!.GrabTemp(type, exactSize);
         }
 
-        public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, CorLibModuleProvider corlibModuleProvider)
+        public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, CorLibModuleProvider corlibModuleProvider, PreinitializationManager preinitializationManager)
         {
             _configuration = configuration;
             _basicBlocks = Array.Empty<BasicBlock>();
@@ -61,6 +63,7 @@ namespace ILCompiler.Compiler
             _nameMangler = nameMangler;
             _importers = importers;
             _corLibModuleProvider = corlibModuleProvider;
+            _preinitializationManager = preinitializationManager;
 
             _importerProxy = new ILImporterProxy(this);
         }
@@ -160,7 +163,16 @@ namespace ILCompiler.Compiler
                 currentIndex++;
 
                 var fallThroughBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null;
-                var importContext = new ImportContext(block, fallThroughBlock, _method, _nameMangler, _configuration, _corLibModuleProvider);
+                var importContext = new ImportContext
+                {
+                    CurrentBlock = block,
+                    FallThroughBlock = fallThroughBlock,
+                    Method = _method,
+                    NameMangler = _nameMangler,
+                    Configuration = _configuration,
+                    CorLibModuleProvider = _corLibModuleProvider,
+                    PreinitializationManager = _preinitializationManager,
+                };
 
                 bool imported = ImportInstruction(currentInstruction, importContext);
 

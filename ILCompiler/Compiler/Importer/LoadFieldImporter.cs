@@ -30,7 +30,18 @@ namespace ILCompiler.Compiler.Importer
                 var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDef);
                 obj = new StaticFieldEntry(mangledFieldName);
 
-                obj = InitClassHelper.ImportInitClass(fieldDef, context, importer, obj);
+                var declaringType = fieldDef.DeclaringType;
+
+                if (context.PreinitializationManager.IsPreinitialized(declaringType))
+                {
+                    var info = context.PreinitializationManager.GetPreinitializationInfo(declaringType);
+
+                    // TODO use the info somehow
+                }
+                else
+                {
+                    obj = InitClassHelper.ImportInitClass(fieldDef, context, importer, obj);
+                }
             }
             else
             {
