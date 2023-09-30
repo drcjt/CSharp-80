@@ -25,7 +25,12 @@ namespace ILCompiler.Compiler.Importer
             if (isLoadStatic)
             {
                 var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDef);
-                var obj = InitClassHelper.ImportInitClass(fieldDef, context, importer, new StaticFieldEntry(mangledFieldName));
+
+                StackEntry obj = new StaticFieldEntry(mangledFieldName);
+                if (!context.PreinitializationManager.IsPreinitialized(fieldDef.DeclaringType))
+                {
+                    obj = InitClassHelper.ImportInitClass(fieldDef, context, importer, obj);
+                }
                 importer.PushExpression(obj);
             }
             else
