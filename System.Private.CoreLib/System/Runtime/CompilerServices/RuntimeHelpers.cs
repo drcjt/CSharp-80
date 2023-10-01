@@ -6,7 +6,7 @@
 
         // TODO: This should be removed when better support for reflection has been
         // added via Type class.
-        public unsafe static bool HasCctor<T>() => EETypePtr.EETypePtrOf<T>()->GetFlags() == 1;
+        public unsafe static bool HasCctor<T>() => EETypePtr.EETypePtrOf<T>().HasCctor;
 
     }
 }

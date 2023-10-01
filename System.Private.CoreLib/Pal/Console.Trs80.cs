@@ -6,7 +6,7 @@ namespace System
     public static partial class Console
     {
         [DllImport(Libraries.Runtime, EntryPoint = "READLINE")]
-        private static unsafe extern string InternalReadLine(EEType* stringEEType);
+        private static unsafe extern string InternalReadLine(EETypePtr stringEEType);
 
         public static unsafe string ReadLine()
         {
