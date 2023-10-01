@@ -6,8 +6,8 @@
         private ushort _usBaseSize;
         private EEType* _relatedType;
 
-        public ushort GetFlags() { return _usFlags; }
+        internal readonly ushort GetFlags() { return _usFlags; }
 
-        internal EEType* RelatedType => _relatedType;
+        internal readonly EEType* RelatedType => _relatedType;
     }
 }

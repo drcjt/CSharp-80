@@ -4,7 +4,7 @@ namespace ILCompiler.Compiler.PreInit
 {
     public class ValueTypeValue : Value
     {
-        public readonly byte[] InstanceBytes;
+        private readonly byte[] InstanceBytes;
         public ValueTypeValue(byte[] bytes)
         {
             InstanceBytes = bytes;
