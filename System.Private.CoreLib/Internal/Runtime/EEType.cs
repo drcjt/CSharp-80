@@ -9,5 +9,13 @@
         internal readonly ushort GetFlags() { return _usFlags; }
 
         internal readonly EEType* RelatedType => _relatedType;
+
+        internal bool HasCctor
+        {
+            get
+            {
+                return _usFlags == 1;
+            }
+        }
     }
 }
