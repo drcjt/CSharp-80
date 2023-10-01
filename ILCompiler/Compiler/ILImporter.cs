@@ -1,11 +1,10 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
+﻿using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
-using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
+using PreinitializationManager = ILCompiler.Compiler.PreInit.PreinitializationManager;
 
 namespace ILCompiler.Compiler
 {

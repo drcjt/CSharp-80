@@ -19,7 +19,11 @@ namespace ILCompiler.Compiler.PreInit
 
         public PreinitializationInfo GetPreinitializationInfo(TypeDef type)
         {
-            return new PreinitializationInfo();
+            if (!_preInitializationInfoByType.ContainsKey(type))
+            {
+                _preInitializationInfoByType[type] = TypePreinitializer.ScanType(type);
+            }
+            return _preInitializationInfoByType[type];
         }
     }
 }
