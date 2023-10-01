@@ -2,6 +2,7 @@
 using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Common.TypeSystem.IL;
+using ILCompiler.Compiler.PreInit;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
@@ -11,12 +12,14 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly IList<IDependencyNode> _dependencies = new List<IDependencyNode>();
         private readonly NodeFactory _nodeFactory;
         private readonly CorLibModuleProvider _corLibModuleProvider;
+        private readonly PreinitializationManager _preinitializationManager;
 
-        public DependencyAnalyser(MethodDesc method, NodeFactory nodeFactory, CorLibModuleProvider corLibModuleProvider)
+        public DependencyAnalyser(MethodDesc method, NodeFactory nodeFactory, CorLibModuleProvider corLibModuleProvider, PreinitializationManager preinitializationManager)
         {
             _method = method;
             _nodeFactory = nodeFactory;
             _corLibModuleProvider = corLibModuleProvider;
+            _preinitializationManager = preinitializationManager;
         }
 
         public IList<IDependencyNode> FindDependencies()
@@ -120,7 +123,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 _dependencies.Add(_nodeFactory.StaticsNode(fieldDef));
 
-                AddStaticTypeConstructorDependency(fieldDef.DeclaringType);
+                if (!_preinitializationManager.IsPreinitialized(fieldDef.DeclaringType))
+                {
+                    AddStaticTypeConstructorDependency(fieldDef.DeclaringType);
+                }
             }
         }
 
@@ -203,15 +209,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 // Calling a static method on a class with a static constructor is a trigger for calling
                 // the static constructor so add the static constructor as a dependency
+                var declaringType = methodNode.Method.DeclaringType;
                 if (methodNode.Method.IsStatic)
                 {
-                    var staticConstructorMethod = methodNode.Method.DeclaringType.FindStaticConstructor();
-                    if (staticConstructorMethod != null)
+                    var staticConstructorMethod = declaringType.FindStaticConstructor();
+                    if (staticConstructorMethod != null && !_preinitializationManager.IsPreinitialized(declaringType))
                     {
                         AddStaticTypeConstructorDependency(methodNode.Method.DeclaringType);
                     }
                 }
-                else if (instruction.OpCode.Code == Code.Newobj && methodNode.Method.IsInstanceConstructor) 
+                else if (instruction.OpCode.Code == Code.Newobj && methodNode.Method.IsInstanceConstructor
+                    && !_preinitializationManager.IsPreinitialized(declaringType)) 
                 {
                     // Add dependency on static constructor if this is a NewObj for a type with a static constructor
 
