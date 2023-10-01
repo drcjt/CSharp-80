@@ -174,10 +174,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     {
                         // Need to add constructed dependency on T
                         var genericParameters = ((MethodSpec)method).GenericInstMethodSig.GenericArguments;
-                        var typeParam = genericParameters[0].TryGetTypeDefOrRef();
-                        var typeDef = typeParam.ResolveTypeDef();
-
-                        var objType = typeDef.ToTypeSig();
+                        var objType = GenericTypeInstantiator.Instantiate(genericParameters[0], method, _method);
+                        var typeDef = objType.ToTypeDefOrRef().ResolveTypeDef();
 
                         // Determine required size on GC heap
                         var allocSize = objType.GetInstanceByteCount();
