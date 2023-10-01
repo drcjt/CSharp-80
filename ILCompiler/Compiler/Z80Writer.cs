@@ -1,5 +1,6 @@
 ﻿using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.Emit;
+using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text;
@@ -13,6 +14,7 @@ namespace ILCompiler.Compiler
         private readonly INameMangler _nameMangler;
         private readonly ILogger<Z80Writer> _logger;
         private readonly NativeDependencyAnalyser _nativeDependencyAnalyser;
+        private readonly PreinitializationManager _preinitializationManager;
 
         private string _inputFilePath = null!;
         private string _outputFilePath = null!;
@@ -20,12 +22,13 @@ namespace ILCompiler.Compiler
 
         private readonly ISet<string> _calls = new HashSet<string>();
 
-        public Z80Writer(IConfiguration configuration, INameMangler nameMangler, ILogger<Z80Writer> logger, NativeDependencyAnalyser nativeDependencyAnalyser)
+        public Z80Writer(IConfiguration configuration, INameMangler nameMangler, ILogger<Z80Writer> logger, NativeDependencyAnalyser nativeDependencyAnalyser, PreinitializationManager preinitializzationManager)
         {
             _configuration = configuration;
             _nameMangler = nameMangler;
             _logger = logger;
             _nativeDependencyAnalyser = nativeDependencyAnalyser;
+            _preinitializationManager = preinitializzationManager;
         }
 
         private void OutputMethodNode(Z80MethodCodeNode methodCodeNode)
@@ -262,15 +265,32 @@ namespace ILCompiler.Compiler
                 if (dependentNode is StaticsNode typeNode)
                 {
                     var field = typeNode.Field;
-                    var fieldSize = field.FieldType.GetInstanceFieldSize();
-                    _logger.LogDebug("Reserving {fieldSize} bytes for static field {field.FullName}", fieldSize, field.FullName);
 
-                    // Need to mangle full field name here
-                    OutputLabel(_nameMangler.GetMangledFieldName(field));
+                    if (_preinitializationManager.IsPreinitialized(field.DeclaringType))
+                    {
+                        var preinitializationInfo = _preinitializationManager.GetPreinitializationInfo(field.DeclaringType);
+                        var value = preinitializationInfo.GetFieldValue(field);
 
-                    // Emit fieldSize bytes with value 0
-                    _out.WriteLine(Instruction.Create(Opcode.Dc, (ushort)fieldSize, 0));
+                        // Need to mangle full field name here
+                        OutputLabel(_nameMangler.GetMangledFieldName(field));
 
+                        var bytes = value.GetRawData();
+                        foreach (var b in bytes)
+                        {
+                            _out.WriteLine(Instruction.Create(Opcode.Db, b));
+                        }
+                    }
+                    else
+                    {
+                        var fieldSize = field.FieldType.GetInstanceFieldSize();
+                        _logger.LogDebug("Reserving {fieldSize} bytes for static field {field.FullName}", fieldSize, field.FullName);
+
+                        // Need to mangle full field name here
+                        OutputLabel(_nameMangler.GetMangledFieldName(field));
+
+                        // Emit fieldSize bytes with value 0
+                        _out.WriteLine(Instruction.Create(Opcode.Dc, (ushort)fieldSize, 0));
+                    }
                 }
             }
         }
@@ -294,6 +314,14 @@ namespace ILCompiler.Compiler
                         _out.WriteLine($";{typeNode.Type.FullName}");
                         // Need to mangle full field name here
                         OutputLabel(eeMangledTypeName);
+
+                        // Emit data for EEType flags here
+                        ushort flags = 0;
+                        if (_preinitializationManager.HasLazyStaticConstructor(typeNode.Type))
+                        {
+                            flags = 1;
+                        }
+                        _out.WriteLine(Instruction.Create(Opcode.Dw, flags));
 
                         // Emit data for EEType here
                         var baseSize = typeNode.BaseSize;

@@ -24,7 +24,10 @@ namespace ILCompiler.Compiler.Importer
                 var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDef);
                 addr = new StaticFieldEntry(mangledFieldName);
 
-                addr = InitClassHelper.ImportInitClass(fieldDef, context, importer, addr);
+                if (!context.PreinitializationManager.IsPreinitialized(fieldDef.DeclaringType))
+                {
+                    addr = InitClassHelper.ImportInitClass(fieldDef, context, importer, addr);
+                }
             }
             else
             {

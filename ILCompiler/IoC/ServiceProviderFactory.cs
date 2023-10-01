@@ -4,6 +4,7 @@ using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.Importer;
 using ILCompiler.Compiler.Lowerings;
+using ILCompiler.Compiler.PreInit;
 using ILCompiler.Compiler.Z80Assembler;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -77,6 +78,7 @@ namespace ILCompiler.IoC
             services.AddSingleton<IZ80Assembler, Z80Assembler>();
             services.AddSingleton<IConfiguration, Configuration>();
             services.AddSingleton<INameMangler, NameMangler>();
+            services.AddSingleton<PreinitializationManager, PreinitializationManager>();
 
             services.AddSingleton<ICodeGeneratorFactory, CodeGeneratorFactory>();
             services.AddSingleton<ILoweringFactory, LoweringFactory>();

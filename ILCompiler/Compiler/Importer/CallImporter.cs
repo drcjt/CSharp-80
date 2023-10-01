@@ -128,11 +128,10 @@ namespace ILCompiler.Compiler.Importer
             var returnVarType = methodToCall.HasReturnType ? returnType.GetVarType() : VarType.Void;
             StackEntry callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize, methodToCall.IsInternalCall);
 
-            if (methodToCall.IsStatic)
+            if (methodToCall.IsStatic && !context.PreinitializationManager.IsPreinitialized(methodToCall.DeclaringType))
             {
                 callNode = InitClassHelper.ImportInitClass(methodToCall, context, importer, callNode);
             }
-
 
             if (!methodToCall.HasReturnType)
             {
@@ -214,8 +213,9 @@ namespace ILCompiler.Compiler.Importer
                     if (IsTypeName(methodToCall, "System", "EETypePtr"))
                     {
                         var genericParameters = ((MethodSpec)method).GenericInstMethodSig.GenericArguments;
-                        var typeParam = genericParameters[0].TryGetTypeDefOrRef();
-                        var typeDef = typeParam.ResolveTypeDef();
+                        var objType = GenericTypeInstantiator.Instantiate(genericParameters[0], method, context.Method);
+                        var typeDef = objType.ToTypeDefOrRef().ResolveTypeDef();
+
                         var mangledEETypeName = context.NameMangler.GetMangledTypeName(typeDef);
 
                         importer.PushExpression(new NativeIntConstantEntry(mangledEETypeName));

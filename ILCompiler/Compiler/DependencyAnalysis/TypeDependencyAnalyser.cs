@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Compiler.PreInit;
 using Microsoft.Extensions.Logging;
 using System.Data;
 
@@ -9,12 +10,14 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly ILogger<TypeDependencyAnalyser> _logger;
         private readonly NodeFactory _nodeFactory;
         private readonly CorLibModuleProvider _corLibModuleProvider;
+        private readonly PreinitializationManager _preinitializationManager;
 
-        public TypeDependencyAnalyser(ILogger<TypeDependencyAnalyser> logger, CorLibModuleProvider corLibModuleProvider)
+        public TypeDependencyAnalyser(ILogger<TypeDependencyAnalyser> logger, CorLibModuleProvider corLibModuleProvider, PreinitializationManager preinitializationManager)
         {
             _logger = logger;
             _nodeFactory = new NodeFactory();
             _corLibModuleProvider = corLibModuleProvider;
+            _preinitializationManager = preinitializationManager;
         }
 
         private void AnalyzeDependenciesForMethodCodeNode(Z80MethodCodeNode codeNode)
@@ -22,18 +25,18 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             _logger.LogDebug("Analysing dependencies for {methodFullName}", codeNode.Method.FullName);
             codeNode.Analysed = true;
 
-            var dependencyAnalyser = new DependencyAnalyser(codeNode.Method, _nodeFactory, _corLibModuleProvider);
+            var dependencyAnalyser = new DependencyAnalyser(codeNode.Method, _nodeFactory, _corLibModuleProvider, _preinitializationManager);
             var dependencies = dependencyAnalyser.FindDependencies();
 
             foreach (var dependentMethod in dependencies)
             {
-                if (dependentMethod is Z80MethodCodeNode && !dependentMethod.Analysed)
+                if (dependentMethod is Z80MethodCodeNode methodCodeNode && !dependentMethod.Analysed)
                 {
-                    AnalyzeDependenciesForMethodCodeNode((Z80MethodCodeNode)dependentMethod);
+                    AnalyzeDependenciesForMethodCodeNode(methodCodeNode);
                 }
-                else if (dependentMethod is ConstructedEETypeNode && !dependentMethod.Analysed)
+                else if (dependentMethod is ConstructedEETypeNode eeTypeNode && !dependentMethod.Analysed)
                 {
-                    AnalyzeDependenciesForEETypeNode((ConstructedEETypeNode)dependentMethod);
+                    AnalyzeDependenciesForEETypeNode(eeTypeNode);
                 }
 
                 codeNode.Dependencies.Add(dependentMethod);

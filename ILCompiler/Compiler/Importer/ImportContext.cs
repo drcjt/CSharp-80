@@ -1,28 +1,18 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.Common;
+﻿using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Importer
 {
-    public class ImportContext
+    public record ImportContext
     {
-        public BasicBlock CurrentBlock { get; }
-        public BasicBlock? FallThroughBlock { get; }
+        public required BasicBlock CurrentBlock { get; init; }
+        public required BasicBlock? FallThroughBlock { get; init; }
         public bool StopImporting { get; set; }
-        public MethodDesc Method { get; }
-        public INameMangler NameMangler { get; }
-        public IConfiguration Configuration { get; }
-
-        public CorLibModuleProvider CorLibModuleProvider { get; }
-
-        public ImportContext(BasicBlock currentBlock, BasicBlock? fallthroughBlock, MethodDesc method, INameMangler nameMangler, IConfiguration configuration, CorLibModuleProvider corLibModuleProvider)
-        {
-            CurrentBlock = currentBlock;
-            FallThroughBlock = fallthroughBlock;
-            Method = method;
-            NameMangler = nameMangler;
-            Configuration = configuration;
-            CorLibModuleProvider = corLibModuleProvider;
-        }
+        public required MethodDesc Method { get; init; }
+        public required INameMangler NameMangler { get; init; }
+        public required IConfiguration Configuration { get; init; }
+        public required PreinitializationManager PreinitializationManager { get; init; }
+        public required CorLibModuleProvider CorLibModuleProvider { get; init; }
     }
 }
