@@ -25,5 +25,16 @@ namespace ILCompiler.Compiler.PreInit
             }
             return _preInitializationInfoByType[type];
         }
+
+        public bool HasLazyStaticConstructor(ITypeDefOrRef type)
+        {
+            var typeDef = type.ResolveTypeDef();
+            if (!typeDef.HasStaticConstructor())
+            {
+                return false;
+            }
+
+            return !IsPreinitialized(typeDef);
+        }
     }
 }

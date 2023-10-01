@@ -315,6 +315,14 @@ namespace ILCompiler.Compiler
                         // Need to mangle full field name here
                         OutputLabel(eeMangledTypeName);
 
+                        // Emit data for EEType flags here
+                        ushort flags = 0;
+                        if (_preinitializationManager.HasLazyStaticConstructor(typeNode.Type))
+                        {
+                            flags = 1;
+                        }
+                        _out.WriteLine(Instruction.Create(Opcode.Dw, flags));
+
                         // Emit data for EEType here
                         var baseSize = typeNode.BaseSize;
 
