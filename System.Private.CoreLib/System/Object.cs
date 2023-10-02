@@ -1,5 +1,4 @@
 ﻿using Internal.Runtime;
-using Internal.Runtime.CompilerServices;
 
 namespace System
 {
@@ -12,5 +11,8 @@ namespace System
         {
             return new RuntimeTypeHandle((IntPtr)m_pEEType);
         }
+
+        public virtual bool Equals(object o) => false;
+        public virtual int GetHashCode() => 0;
     }
 }

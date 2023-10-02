@@ -1,24 +1,16 @@
 ﻿namespace System
 {
-    public struct RuntimeTypeHandle
+    public readonly struct RuntimeTypeHandle
     {
-        private IntPtr _EEType;
+        private readonly IntPtr _EEType;
 
         internal RuntimeTypeHandle(IntPtr pEEType)
         {
             _EEType = pEEType;
         }
 
-        internal static unsafe IntPtr GetValueInternal(RuntimeTypeHandle handle)
-        {
-            return handle._EEType;
-        }
+        internal static unsafe IntPtr GetValueInternal(RuntimeTypeHandle handle) => handle._EEType;
 
-        public bool Equals(RuntimeTypeHandle handle)
-        {
-            if (_EEType == handle._EEType)
-                return true;
-            return false;
-        }
+        public readonly bool Equals(RuntimeTypeHandle handle) => handle._EEType == _EEType;
     }
 }
