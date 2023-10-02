@@ -20,9 +20,17 @@ namespace CoreLib
             }
         }
 
-        public static void AreNotEquals(int expected, int actual)
+        public static void AreEquals(RuntimeTypeHandle expected, RuntimeTypeHandle actual)
         {
-            if (expected == actual)
+            if (!expected.Equals(actual))
+            {
+                Environment.Exit(1);
+            }
+        }
+
+        public static void AreNotEquals(RuntimeTypeHandle expected, RuntimeTypeHandle actual)
+        {
+            if (expected.Equals(actual))
             {
                 Environment.Exit(1);
             }

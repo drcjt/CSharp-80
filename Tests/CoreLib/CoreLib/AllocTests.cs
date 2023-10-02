@@ -11,16 +11,6 @@ namespace CoreLib
             private bool field3;
         }
 
-        // Very unsafe method to get EEType of a managed object
-        // This is not GC safe
-        static unsafe ushort GetEEType(object obj)
-        {
-            var objectptr = *(void**)Internal.Runtime.CompilerServices.Unsafe.AsPointer(ref obj);
-            var eetypeptr = *((ushort*)objectptr);
-
-            return eetypeptr;
-        }
-
         private static void AllocStringSizeTest(char[] chars)
         {
             // This is not GC safe
@@ -83,16 +73,16 @@ namespace CoreLib
             var str2 = new String(new char[3]);
 
             // Check EEType is same for both string objects
-            Assert.AreEquals(GetEEType(str1), GetEEType(str2));
+            Assert.AreEquals(str1.GetEEType(), str2.GetEEType());
 
             var class1 = new TestClass();
             var class2 = new TestClass();
 
             // Check EEType is same for both instances of TestClass
-            Assert.AreEquals(GetEEType(class1), GetEEType(class2));
+            Assert.AreEquals(class1.GetEEType(), class2.GetEEType());
 
             // Check EEType is different for String and TestClass instances
-            Assert.AreNotEquals(GetEEType(str1), GetEEType(class1));
+            Assert.AreNotEquals(str1.GetEEType(), class1.GetEEType());
         }
     }
 }

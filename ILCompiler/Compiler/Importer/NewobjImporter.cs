@@ -29,7 +29,7 @@ namespace ILCompiler.Compiler.Importer
                 }
                 else
                 {
-                    var objType = declaringTypeSig.ToClassOrValueTypeSig();
+                    var objType = declaringTypeSig;
                     var objVarType = objType.GetVarType();
                     var objSize = objType.GetInstanceFieldSize();
 
@@ -39,7 +39,8 @@ namespace ILCompiler.Compiler.Importer
                     }
                     else
                     {
-                        ImportNewObjReferenceType(instruction, context, importer, objType, objVarType, objSize);
+                        var classType = objType.ToClassSig();
+                        ImportNewObjReferenceType(instruction, context, importer, classType, objVarType, objSize);
                     }
                 }
             }
@@ -97,7 +98,7 @@ namespace ILCompiler.Compiler.Importer
             // Call the valuetype constructor
             CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
 
-            var node = new LocalVariableEntry(lclNum, VarType.Struct, objSize);
+            var node = new LocalVariableEntry(lclNum, objVarType, objSize);
             importer.PushExpression(node);
         }
 
