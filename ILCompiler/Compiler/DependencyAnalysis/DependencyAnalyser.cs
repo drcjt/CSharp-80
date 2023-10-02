@@ -241,19 +241,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 // TODO: Will need to review this when changing NewArray assembly routine to take EEType instead of size
             }
-            else
+            else if (declaringTypeSig.IsValueType)
             {
-                if (declaringTypeSig.FullName != "System.String")
-                {
-                    var objType = declaringTypeSig.ToClassOrValueTypeSig();
-                    if (!objType.IsValueType)
-                    {
-                        // Determine required size on GC heap
-                        var allocSize = objType.GetInstanceByteCount();
+                // No dependency required 
+            }
+            else if (declaringTypeSig.FullName != "System.String")
+            {
+                var objType = declaringTypeSig.ToClassSig();
+                // Determine required size on GC heap
+                var allocSize = objType.GetInstanceByteCount();
 
-                        _dependencies.Add(_nodeFactory.ConstructedEETypeNode(objType.ToTypeDefOrRef(), allocSize));
-                    }
-                }
+                _dependencies.Add(_nodeFactory.ConstructedEETypeNode(objType.ToTypeDefOrRef(), allocSize));
             }
         }
     }

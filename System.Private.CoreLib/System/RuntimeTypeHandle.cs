@@ -2,11 +2,23 @@
 {
     public struct RuntimeTypeHandle
     {
-        private EETypePtr _EEType;
+        private IntPtr _EEType;
+
+        internal RuntimeTypeHandle(IntPtr pEEType)
+        {
+            _EEType = pEEType;
+        }
 
         internal static unsafe IntPtr GetValueInternal(RuntimeTypeHandle handle)
         {
-            return (IntPtr)handle._EEType.ToPointer();
+            return handle._EEType;
+        }
+
+        public bool Equals(RuntimeTypeHandle handle)
+        {
+            if (_EEType == handle._EEType)
+                return true;
+            return false;
         }
     }
 }
