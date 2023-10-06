@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             Dependencies = new List<IDependencyNode>();
         }
 
-        public override IList<IDependencyNode> Dependencies { get; set; } = new List<IDependencyNode>();
+        public override IList<IDependencyNode> Dependencies { get; set; }
 
         public override IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context) => Dependencies;
     }

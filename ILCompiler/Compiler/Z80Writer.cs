@@ -217,13 +217,10 @@ namespace ILCompiler.Compiler
         {
             foreach (var node in nodes)
             {
-                if (node is Z80MethodCodeNode codeNode)
+                if (node is Z80MethodCodeNode codeNode && codeNode.MethodCode != null)
                 {
-                    if (codeNode.MethodCode != null)
-                    {
-                        _out.WriteLine($"; {codeNode.Method.FullName}");
-                        OutputMethodNode(codeNode);
-                    }
+                    _out.WriteLine($"; {codeNode.Method.FullName}");
+                    OutputMethodNode(codeNode);
                 }
             }
         }
