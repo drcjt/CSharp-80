@@ -2,15 +2,11 @@
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
-    public class StaticsNode : IDependencyNode
+    public class StaticsNode : DependencyNode
     {
-        public bool Analysed { get; set; }
-
-        public bool Compiled { get; set; }
-
         public FieldDef Field { get; private set; }
 
-        public string Name => Field.FullName;
+        public override string Name => Field.FullName;
 
         public StaticsNode(FieldDef field)
         {
@@ -18,6 +14,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             Dependencies = new List<IDependencyNode>();
         }
 
-        public IList<IDependencyNode> Dependencies { get; set; }
+        public override IList<IDependencyNode> Dependencies { get; set; }
+
+        public override IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context) => Dependencies;
     }
 }

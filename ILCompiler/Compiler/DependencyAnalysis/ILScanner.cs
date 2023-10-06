@@ -6,7 +6,7 @@ using ILCompiler.Compiler.PreInit;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
-    public class DependencyAnalyser
+    public class ILScanner
     {
         private readonly MethodDesc _method;
         private readonly IList<IDependencyNode> _dependencies = new List<IDependencyNode>();
@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly CorLibModuleProvider _corLibModuleProvider;
         private readonly PreinitializationManager _preinitializationManager;
 
-        public DependencyAnalyser(MethodDesc method, NodeFactory nodeFactory, CorLibModuleProvider corLibModuleProvider, PreinitializationManager preinitializationManager)
+        public ILScanner(MethodDesc method, NodeFactory nodeFactory, CorLibModuleProvider corLibModuleProvider, PreinitializationManager preinitializationManager)
         {
             _method = method;
             _nodeFactory = nodeFactory;
@@ -202,7 +202,16 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                         method = dependentMethod;
                     }
-                    methodNode = _nodeFactory.MethodNode(method);
+
+                    bool directCall = IsDirectCall(methodDef, instruction.OpCode.Code);
+                    if (directCall)
+                    {
+                        methodNode = _nodeFactory.MethodNode(method);
+                    }
+                    else
+                    {
+                        throw new NotImplementedException("Non direct calls not supported");
+                    }
                 }
 
                 // Calling a static method on a class with a static constructor is a trigger for calling
@@ -217,7 +226,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     }
                 }
                 else if (instruction.OpCode.Code == Code.Newobj && methodNode.Method.IsInstanceConstructor
-                    && !_preinitializationManager.IsPreinitialized(declaringType)) 
+                    && !_preinitializationManager.IsPreinitialized(declaringType))
                 {
                     // Add dependency on static constructor if this is a NewObj for a type with a static constructor
 
@@ -226,6 +235,28 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 _dependencies.Add(methodNode);
             }
+        }
+
+        private static bool IsDirectCall(MethodDef targetMethod, Code opcode)
+        {
+            bool directCall = false;
+
+            if (targetMethod.IsStatic)
+            {
+                directCall = true;
+            }
+            else if (opcode != Code.Callvirt)
+            {
+                directCall = true;
+            }
+            else
+            {
+                if (!targetMethod.IsVirtual)
+                {
+                    directCall = true;
+                }
+            }
+            return directCall;
         }
 
         private void CreateConstructedEETypeNodeDependencies(Instruction instruction)
