@@ -213,42 +213,33 @@ namespace ILCompiler.Compiler
             _out.Write(emitter.ToString());
         }
 
-        private void OutputCodeForNode(Z80MethodCodeNode node)
+        private void OutputCodeForNodes(IList<IDependencyNode> nodes)
         {
-            if (!node.CodeEmitted)
+            foreach (var node in nodes)
             {
-                node.CodeEmitted = true;
-                if (node.MethodCode != null)
+                if (node is Z80MethodCodeNode codeNode)
                 {
-                    _out.WriteLine($"; {node.Method.FullName}");
-                    OutputMethodNode(node);
-                }
-
-                if (node.Dependencies != null)
-                {
-                    foreach (var dependentNode in node.Dependencies)
+                    if (codeNode.MethodCode != null)
                     {
-                        if (dependentNode is Z80MethodCodeNode z80MethodCodeNode)
-                        {
-                            OutputCodeForNode(z80MethodCodeNode);
-                        }
+                        _out.WriteLine($"; {codeNode.Method.FullName}");
+                        OutputMethodNode(codeNode);
                     }
                 }
             }
         }
 
-        public void OutputCode(Z80MethodCodeNode root, string inputFilePath, string outputFilePath)
+        public void OutputCode(Z80MethodCodeNode rootNode, IList<IDependencyNode> nodes, string inputFilePath, string outputFilePath)
         {
             _inputFilePath = inputFilePath;
             _outputFilePath = outputFilePath;
 
             using (_out = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, false), Encoding.ASCII))
             {
-                OutputProlog(root);
+                OutputProlog(rootNode);
 
-                OutputStatics(root);
-                OutputEETypes(root);
-                OutputCodeForNode(root);
+                OutputStatics(nodes);
+                OutputEETypes(nodes);
+                OutputCodeForNodes(nodes);
 
                 OutputEpilog();
             }
@@ -256,13 +247,12 @@ namespace ILCompiler.Compiler
             _logger.LogDebug("Written compiled file to {_outputFilePath}", _outputFilePath);
         }
 
-        private void OutputStatics(Z80MethodCodeNode node)
+        private void OutputStatics(IList<IDependencyNode> nodes)
         {
-            var dependencies = DependencyNodeHelpers.GetFlattenedDependencies(node);
-            foreach (var dependentNode in dependencies)
+            foreach (var node in nodes)
             {
                 // For static field dependencies we need to reserve appropriate space for the field
-                if (dependentNode is StaticsNode typeNode)
+                if (node is StaticsNode typeNode)
                 {
                     var field = typeNode.Field;
 
@@ -295,15 +285,14 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void OutputEETypes(Z80MethodCodeNode node)
+        private void OutputEETypes(IList<IDependencyNode> nodes)
         {
             var eeTypes = new List<string>();
 
-            var dependencies = DependencyNodeHelpers.GetFlattenedDependencies(node);
-            foreach (var dependentNode in dependencies)
+            foreach (var node in nodes)
             {
                 // For static field dependencies we need to reserve appropriate space for the field
-                if (dependentNode is ConstructedEETypeNode typeNode)
+                if (node is ConstructedEETypeNode typeNode)
                 {
                     var eeMangledTypeName = _nameMangler.GetMangledTypeName(typeNode.Type);
 

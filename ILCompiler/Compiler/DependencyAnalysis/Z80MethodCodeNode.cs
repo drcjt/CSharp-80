@@ -2,11 +2,10 @@
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
-    public class Z80MethodCodeNode : IDependencyNode
+    public class Z80MethodCodeNode : DependencyNode
     {
-        public bool Analysed { get; set; }
         public MethodDesc Method { get; }
-        public string Name => Method.FullName;
+        public override string Name => Method.FullName;
 
         public Z80MethodCodeNode(MethodDesc method)
         {
@@ -18,13 +17,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public string? MethodCode { get; set; }
 
-        public IList<IDependencyNode> Dependencies { get; set; }
-
-        public bool CodeEmitted { get; set; }
-
-        public bool Compiled { get; set; }
+        public override IList<IDependencyNode> Dependencies { get; set; }
 
         public int ParamsCount { get; set; }
         public int LocalsCount { get; set; }
+
+        public override IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context)
+        {
+            var scanner = new ILScanner(Method, context.NodeFactory, context.CorLibModuleProvider, context.PreinitializationManager);
+            Dependencies = scanner.FindDependencies();
+            
+            return Dependencies;
+        }
     }
 }

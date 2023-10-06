@@ -2,9 +2,11 @@
 {
     public interface IDependencyNode
     {
-        public bool Analysed { get; set; }
+        public bool Mark { get; set; }
+
+        public IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context);
+
         public IList<IDependencyNode> Dependencies { get; set; }
-        public bool Compiled { get; set; }
 
         public string Name { get; }
     }

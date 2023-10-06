@@ -60,7 +60,7 @@ namespace ILCompiler.IoC
 
             services.AddSingleton<Z80Writer>();
 
-            services.AddSingleton<TypeDependencyAnalyser>();
+            services.AddSingleton<DependencyAnalyzer>();
 
             services.AddSingleton<RTILProvider>();
 
