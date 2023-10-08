@@ -72,6 +72,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         var conditionalDependency = new ConditionalDependency
                         {
                             IfNode = context.NodeFactory.VirtualMethodUse(method),
+                            ThenParent = this,
                             ThenNode = context.NodeFactory.MethodNode(implementation),
                         };
                         conditionalDependencies.Add(conditionalDependency);
