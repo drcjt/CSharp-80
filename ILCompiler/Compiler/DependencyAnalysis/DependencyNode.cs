@@ -6,6 +6,8 @@
 
         public abstract IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context);
 
+        public abstract IList<ConditionalDependency> GetConditionalStaticDependencies(DependencyNodeContext context);
+
         public abstract IList<IDependencyNode> Dependencies { get; set; }
 
         public abstract string Name { get; }

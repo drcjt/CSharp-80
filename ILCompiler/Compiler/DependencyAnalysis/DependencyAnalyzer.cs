@@ -7,7 +7,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
     public class DependencyAnalyzer
     {
         private readonly Stack<IDependencyNode> _markStack = new();
-        private readonly IList<IDependencyNode> _markedNodes = new List<IDependencyNode>();
+        private readonly List<IDependencyNode> _markedNodes = new();
+        private readonly Dictionary<IDependencyNode, IList<IDependencyNode>> _conditionalDependencyStore = new();
 
         private readonly NodeFactory _nodeFactory;
         private readonly DependencyNodeContext _nodeContext;
@@ -46,15 +47,21 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ProcessMarkStack()
         {
-            do
+            while (_markStack.Count > 0)
             {
-                while (_markStack.Count > 0)
-                {
-                    var currentNode = _markStack.Pop();
+                var currentNode = _markStack.Pop();
 
-                    GetStaticDependencies(currentNode);                    
+                GetStaticDependencies(currentNode);
+
+                if (_conditionalDependencyStore.TryGetValue(currentNode, out var conditionalDependencyList))
+                {
+                    foreach(var conditionalDependency in conditionalDependencyList) 
+                    {
+                        AddToMarkStack(conditionalDependency);
+                    }
+                    _conditionalDependencyStore.Remove(currentNode);
                 }
-            } while (_markStack.Count != 0);
+            }
         }
 
         private void GetStaticDependencies(IDependencyNode node)
@@ -63,6 +70,23 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             foreach (var dependency in dependencies) 
             {
                 AddToMarkStack(dependency);
+            }
+
+            foreach (var dependency in node.GetConditionalStaticDependencies(_nodeContext))
+            {
+                if (dependency.IfNode.Mark)
+                {
+                    AddToMarkStack(dependency.ThenNode);
+                }
+                else
+                {
+                    if (!_conditionalDependencyStore.TryGetValue(dependency.IfNode, out var conditionalDependencyList))
+                    {
+                        conditionalDependencyList = new List<IDependencyNode>();
+                        _conditionalDependencyStore.Add(dependency.IfNode, conditionalDependencyList);
+                    }
+                    conditionalDependencyList.Add(dependency.ThenNode);
+                }
             }
         }
 
