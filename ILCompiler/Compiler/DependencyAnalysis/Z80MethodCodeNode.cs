@@ -29,5 +29,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             
             return Dependencies;
         }
+
+        public override IList<ConditionalDependency> GetConditionalStaticDependencies(DependencyNodeContext context) => new List<ConditionalDependency>();
     }
 }
