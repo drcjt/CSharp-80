@@ -8,7 +8,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
     {
         private readonly Stack<IDependencyNode> _markStack = new();
         private readonly List<IDependencyNode> _markedNodes = new();
-        private readonly Dictionary<IDependencyNode, IList<IDependencyNode>> _conditionalDependencyStore = new();
+        private readonly Dictionary<IDependencyNode, IList<ConditionalDependency>> _conditionalDependencyStore = new();
 
         private readonly NodeFactory _nodeFactory;
         private readonly DependencyNodeContext _nodeContext;
@@ -57,7 +57,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 {
                     foreach(var conditionalDependency in conditionalDependencyList) 
                     {
-                        AddToMarkStack(conditionalDependency);
+                        conditionalDependency.ThenParent.Dependencies.Add(conditionalDependency.ThenNode);
+                        AddToMarkStack(conditionalDependency.ThenNode);
                     }
                     _conditionalDependencyStore.Remove(currentNode);
                 }
@@ -76,16 +77,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 if (dependency.IfNode.Mark)
                 {
+                    node.Dependencies.Add(dependency.ThenNode);
                     AddToMarkStack(dependency.ThenNode);
                 }
                 else
                 {
                     if (!_conditionalDependencyStore.TryGetValue(dependency.IfNode, out var conditionalDependencyList))
                     {
-                        conditionalDependencyList = new List<IDependencyNode>();
+                        conditionalDependencyList = new List<ConditionalDependency>();
                         _conditionalDependencyStore.Add(dependency.IfNode, conditionalDependencyList);
                     }
-                    conditionalDependencyList.Add(dependency.ThenNode);
+                    conditionalDependencyList.Add(dependency);
                 }
             }
         }

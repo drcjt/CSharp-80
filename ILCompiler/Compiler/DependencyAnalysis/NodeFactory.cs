@@ -7,6 +7,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
     {
         private readonly IDictionary<string, StaticsNode> _staticNodesByFullName = new Dictionary<string, StaticsNode>();
         private readonly IDictionary<string, Z80MethodCodeNode> _methodNodesByFullName = new Dictionary<string, Z80MethodCodeNode>();
+        private readonly IDictionary<string, VirtualMethodUseNode> _virtualMethodNodesByFullName = new Dictionary<string, VirtualMethodUseNode>();
         private readonly IDictionary<string, ConstructedEETypeNode> _constructedEETypeNodesByFullName = new Dictionary<string, ConstructedEETypeNode>();
 
         public ConstructedEETypeNode ConstructedEETypeNode(ITypeDefOrRef type, int size)
@@ -29,6 +30,18 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
 
             return staticNode;
+        }
+
+        public VirtualMethodUseNode VirtualMethodUse(IMethod method)
+        {
+            var methodDef = method.ResolveMethodDefThrow();
+            if (!_virtualMethodNodesByFullName.TryGetValue(methodDef.FullName, out var methodNode))
+            {
+                methodNode = new VirtualMethodUseNode(new MethodDesc(methodDef));
+                _virtualMethodNodesByFullName[methodDef.FullName] = methodNode;
+            }
+
+            return methodNode;
         }
 
         public Z80MethodCodeNode MethodNode(MethodSpec calleeMethod, MethodDesc callerMethod)

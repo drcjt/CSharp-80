@@ -210,7 +210,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     }
                     else
                     {
-                        throw new NotImplementedException("Non direct calls not supported");
+                        _dependencies.Add(_nodeFactory.VirtualMethodUse(method));
+                        return;
                     }
                 }
 
