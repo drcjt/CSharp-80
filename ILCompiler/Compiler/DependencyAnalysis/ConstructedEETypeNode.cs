@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.Common;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
@@ -53,6 +54,36 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return Dependencies;
         }
 
-        public override IList<ConditionalDependency> GetConditionalStaticDependencies(DependencyNodeContext context) => new List<ConditionalDependency>();
+        public override IList<ConditionalDependency> GetConditionalStaticDependencies(DependencyNodeContext context)
+        {
+            var resolvedType = Type.ResolveTypeDefThrow();
+
+            IList<ConditionalDependency> conditionalDependencies = new List<ConditionalDependency>();
+            foreach (var method in VirtualMethodAlgorithm.EnumAllVirtualSlots(resolvedType))
+            {
+                if (!method.HasGenericParameters)
+                {
+                    var implementation = VirtualMethodAlgorithm.FindVirtualFunctionTargetMethodOnObjectType(resolvedType, method);
+
+                    // Add a conditional dependency if the method implementation is on this type
+                    // and is not abstract since there is no code for an abstract method
+                    if (implementation?.DeclaringType == resolvedType && !implementation.IsAbstract)
+                    {
+                        var conditionalDependency = new ConditionalDependency
+                        {
+                            IfNode = context.NodeFactory.VirtualMethodUse(method),
+                            ThenNode = context.NodeFactory.MethodNode(implementation),
+                        };
+                        conditionalDependencies.Add(conditionalDependency);
+                    }
+                }
+                else
+                {
+                    throw new NotImplementedException("Generic virtual methods not supported");
+                }
+            }
+
+            return conditionalDependencies;
+        }
     }
 }
