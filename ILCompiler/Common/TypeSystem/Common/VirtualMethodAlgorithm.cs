@@ -8,7 +8,7 @@ namespace ILCompiler.Common.TypeSystem.Common
     ///     II.10.3 Introducing and overriding virtual methods
     ///     II.10.3.1 Introduction a virtual method
     /// </summary>
-    public class VirtualMethodAlgorithm
+    public static class VirtualMethodAlgorithm
     {
         /// <summary>
         /// Enumerate all virtual methods on the specified type and it's parent types
@@ -77,16 +77,13 @@ namespace ILCompiler.Common.TypeSystem.Common
 
             foreach (var candidateMethod in currentType.Methods)
             {
-                if (candidateMethod.Name == targetMethod.Name)
+                if (candidateMethod.Name == targetMethod.Name && new SigComparer().Equals(candidateMethod.Signature, targetMethod.Signature))
                 {
-                    if (new SigComparer().Equals(candidateMethod.Signature, targetMethod.Signature))
-                    {
-                        equivalentMatch = candidateMethod;
+                    equivalentMatch = candidateMethod;
 
-                        if (candidateMethod.Signature == targetMethod.Signature)
-                        {
-                            exactMatch = candidateMethod;
-                        }
+                    if (candidateMethod.Signature == targetMethod.Signature)
+                    {
+                        exactMatch = candidateMethod;
                     }
                 }
             }

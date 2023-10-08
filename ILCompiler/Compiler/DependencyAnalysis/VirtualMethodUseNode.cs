@@ -5,7 +5,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
     public class VirtualMethodUseNode : DependencyNode
     {
         public MethodDesc Method { get; }
-        public override IList<IDependencyNode> Dependencies {  get; set; } = new List<IDependencyNode>();
+        public override IList<IDependencyNode> Dependencies { get; set; }
 
         public override string Name => Method.FullName;
 
