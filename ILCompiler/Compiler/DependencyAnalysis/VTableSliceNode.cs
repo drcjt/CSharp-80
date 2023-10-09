@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Common.TypeSystem.Common;
+using System.Linq;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
@@ -27,13 +28,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public IReadOnlyList<MethodDef> GetSlots()
         {
             IList<MethodDef> slots = new List<MethodDef>();
-
-            foreach (var method in _type.Methods)
+            foreach (var method in _type.Methods.Where(method => _usedMethods.Contains(method.FullName)))
             {
-                if (_usedMethods.Contains(method.FullName))
-                {
-                    slots.Add(method);
-                }
+                slots.Add(method);
             }
 
             return slots.ToArray();
