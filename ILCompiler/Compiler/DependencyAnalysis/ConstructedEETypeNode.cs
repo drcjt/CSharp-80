@@ -5,8 +5,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class ConstructedEETypeNode : DependencyNode
     {
-        public override IList<IDependencyNode> Dependencies { get; set; }
-
         public ITypeDefOrRef Type { get; private set; }
         public int BaseSize { get; private set; }
 
@@ -18,7 +16,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             Type = type;
             BaseSize = baseSize;
-            Dependencies = new List<IDependencyNode>();
         }
 
         public override IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context)
@@ -49,9 +46,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     }
                 }
             }
-            Dependencies = dependencies;
 
-            return Dependencies;
+            return dependencies;
         }
 
         public override IList<ConditionalDependency> GetConditionalStaticDependencies(DependencyNodeContext context)

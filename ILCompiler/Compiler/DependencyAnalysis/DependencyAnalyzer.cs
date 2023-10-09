@@ -21,9 +21,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
         }
 
-        public DependencyAnalyzer(ILogger<DependencyAnalyzer> logger, CorLibModuleProvider corLibModuleProvider, PreinitializationManager preinitializationManager)
+        public DependencyAnalyzer(ILogger<DependencyAnalyzer> logger, CorLibModuleProvider corLibModuleProvider, PreinitializationManager preinitializationManager, NodeFactory nodeFactory)
         {
-            _nodeFactory = new NodeFactory();
+            _nodeFactory = nodeFactory;
             _nodeContext = new DependencyNodeContext
             {
                 Logger = logger,
@@ -90,6 +90,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     conditionalDependencyList.Add(dependency);
                 }
             }
+            node.Dependencies = dependencies;
         }
 
         private void AddToMarkStack(IDependencyNode node) 
@@ -98,6 +99,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 node.Mark = true;
                 _markedNodes.Add(node);
+
+                node.OnMarked(_nodeFactory);
 
                 _markStack.Push(node);
             }

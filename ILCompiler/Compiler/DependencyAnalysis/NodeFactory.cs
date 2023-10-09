@@ -9,6 +9,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly IDictionary<string, Z80MethodCodeNode> _methodNodesByFullName = new Dictionary<string, Z80MethodCodeNode>();
         private readonly IDictionary<string, VirtualMethodUseNode> _virtualMethodNodesByFullName = new Dictionary<string, VirtualMethodUseNode>();
         private readonly IDictionary<string, ConstructedEETypeNode> _constructedEETypeNodesByFullName = new Dictionary<string, ConstructedEETypeNode>();
+        private readonly IDictionary<TypeDef, VTableSliceNode> _vTableNodes = new Dictionary<TypeDef, VTableSliceNode>();
 
         public ConstructedEETypeNode ConstructedEETypeNode(ITypeDefOrRef type, int size)
         {
@@ -81,6 +82,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
 
             return methodNode;
+        }
+
+        public VTableSliceNode VTable(TypeDef type)
+        {
+            if (!_vTableNodes.TryGetValue(type, out var vTableSliceNode))
+            {
+                vTableSliceNode = new VTableSliceNode(type);
+                _vTableNodes[type] = vTableSliceNode;
+            }
+
+            return vTableSliceNode;
         }
     }
 }

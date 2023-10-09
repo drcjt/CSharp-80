@@ -12,12 +12,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             Method = method;
             ParamsCount = method.Parameters().Count;
             LocalsCount = method.Body?.Variables.Count ?? 0;
-            Dependencies = new List<IDependencyNode>();
         }
 
         public string? MethodCode { get; set; }
-
-        public override IList<IDependencyNode> Dependencies { get; set; }
 
         public int ParamsCount { get; set; }
         public int LocalsCount { get; set; }
@@ -25,11 +22,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public override IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context)
         {
             var scanner = new ILScanner(Method, context.NodeFactory, context.CorLibModuleProvider, context.PreinitializationManager);
-            Dependencies = scanner.FindDependencies();
-            
-            return Dependencies;
+            return scanner.FindDependencies();
         }
-
-        public override IList<ConditionalDependency> GetConditionalStaticDependencies(DependencyNodeContext context) => new List<ConditionalDependency>();
     }
 }

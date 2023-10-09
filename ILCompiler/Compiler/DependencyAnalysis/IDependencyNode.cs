@@ -3,6 +3,7 @@
     public interface IDependencyNode
     {
         public bool Mark { get; set; }
+        public void OnMarked(NodeFactory factory);
 
         public IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context);
 

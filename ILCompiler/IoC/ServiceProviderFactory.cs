@@ -56,6 +56,8 @@ namespace ILCompiler.IoC
 
             services.AddTransient<IObjectAllocator, ObjectAllocator>();
 
+            services.AddSingleton<NodeFactory>();
+
             services.AddSingleton<NativeDependencyAnalyser>();
 
             services.AddSingleton<Z80Writer>();
