@@ -11,12 +11,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public StaticsNode(FieldDef field)
         {
             Field = field;
-            Dependencies = new List<IDependencyNode>();
         }
-
-        public override IList<IDependencyNode> Dependencies { get; set; }
-
-        public override IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context) => Dependencies;
-        public override IList<ConditionalDependency> GetConditionalStaticDependencies(DependencyNodeContext context) => new List<ConditionalDependency>();
     }
 }

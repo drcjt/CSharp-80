@@ -3,12 +3,15 @@
     public abstract class DependencyNode : IDependencyNode
     {
         public bool Mark { get; set; }
+        public virtual void OnMarked(NodeFactory factory)
+        {
+        }
 
-        public abstract IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context);
+        public virtual IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context) => new List<IDependencyNode>();
 
-        public abstract IList<ConditionalDependency> GetConditionalStaticDependencies(DependencyNodeContext context);
+        public virtual IList<ConditionalDependency> GetConditionalStaticDependencies(DependencyNodeContext context) => new List<ConditionalDependency>();
 
-        public abstract IList<IDependencyNode> Dependencies { get; set; }
+        public IList<IDependencyNode> Dependencies { get; set; } = new List<IDependencyNode>();
 
         public abstract string Name { get; }
     }

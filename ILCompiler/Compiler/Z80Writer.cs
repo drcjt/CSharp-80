@@ -1,4 +1,6 @@
-﻿using ILCompiler.Compiler.DependencyAnalysis;
+﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
@@ -15,6 +17,7 @@ namespace ILCompiler.Compiler
         private readonly ILogger<Z80Writer> _logger;
         private readonly NativeDependencyAnalyser _nativeDependencyAnalyser;
         private readonly PreinitializationManager _preinitializationManager;
+        private readonly NodeFactory _nodeFactory;
 
         private string _inputFilePath = null!;
         private string _outputFilePath = null!;
@@ -22,13 +25,14 @@ namespace ILCompiler.Compiler
 
         private readonly ISet<string> _calls = new HashSet<string>();
 
-        public Z80Writer(IConfiguration configuration, INameMangler nameMangler, ILogger<Z80Writer> logger, NativeDependencyAnalyser nativeDependencyAnalyser, PreinitializationManager preinitializzationManager)
+        public Z80Writer(IConfiguration configuration, INameMangler nameMangler, ILogger<Z80Writer> logger, NativeDependencyAnalyser nativeDependencyAnalyser, PreinitializationManager preinitializzationManager, NodeFactory nodeFactory)
         {
             _configuration = configuration;
             _nameMangler = nameMangler;
             _logger = logger;
             _nativeDependencyAnalyser = nativeDependencyAnalyser;
             _preinitializationManager = preinitializzationManager;
+            _nodeFactory = nodeFactory;
         }
 
         private void OutputMethodNode(Z80MethodCodeNode methodCodeNode)
@@ -327,7 +331,39 @@ namespace ILCompiler.Compiler
                         {
                             _out.WriteLine(Instruction.Create(Opcode.Dw, (ushort)0));
                         }
+
+                        // Emit VTable
+                        OutputVirtualSlots(typeNode.Type, typeNode.Type);
                     }
+                }
+            }
+        }
+
+        private void OutputVirtualSlots(ITypeDefOrRef type, ITypeDefOrRef implType)
+        {
+            // Output inherited VTable slots first
+            var baseType = type.GetBaseType();
+            if (baseType != null)
+            {
+                OutputVirtualSlots(baseType, implType);
+            }
+
+            // Now get new slots
+            var resolvedType = type.ResolveTypeDefThrow();
+            var vTable = _nodeFactory.VTable(resolvedType);
+            var virtualSlots = vTable.GetSlots();
+
+            // Emit VTable entries for the new slots
+            for (int i = 0; i < virtualSlots.Count; i++)
+            {
+                var method = virtualSlots[i];
+                var implementation = VirtualMethodAlgorithm.FindVirtualFunctionTargetMethodOnObjectType(implType.ResolveTypeDefThrow(), method);
+
+                // Only generate slot entries for non abstract methods
+                if (implementation != null && !implementation.IsAbstract)
+                {
+                    var implementationMangledName = _nameMangler.GetMangledMethodName(implementation);
+                    _out.WriteLine(Instruction.Create(Opcode.Dw, implementationMangledName));
                 }
             }
         }
