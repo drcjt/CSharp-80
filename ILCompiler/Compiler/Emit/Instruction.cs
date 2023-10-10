@@ -74,6 +74,9 @@ namespace ILCompiler.Compiler.Emit
         public static Instruction Create(Opcode opcode, ushort target)
             => new() { Opcode = opcode, Op0 = new() { Immediate = target } };
 
+        public static Instruction Create(Opcode opcode, MemoryOperand target)
+            => new() { Opcode = opcode, Op0 = new() { Memory = target } };
+
         public static Instruction Create(Opcode opcode, MemoryOperand target, Register source) 
             => new() { Opcode = opcode, Op0 = new() { Memory = target }, Op1 = new() { Register = source } };
         public static Instruction Create(Opcode opcode, MemoryOperand target, byte source)
