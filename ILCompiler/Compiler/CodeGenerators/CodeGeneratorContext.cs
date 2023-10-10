@@ -14,17 +14,19 @@ namespace ILCompiler.Compiler.CodeGenerators
         public MethodDesc Method => _method.Method;
 
         public INameMangler NameMangler { get; }
+        public NodeFactory NodeFactory { get; }
 
         private readonly Z80MethodCodeNode _method;
 
         public readonly IConfiguration Configuration;
 
-        public CodeGeneratorContext(LocalVariableTable localVariableTable, Z80MethodCodeNode method, IConfiguration configuration, INameMangler nameMangler)
+        public CodeGeneratorContext(LocalVariableTable localVariableTable, Z80MethodCodeNode method, IConfiguration configuration, INameMangler nameMangler, NodeFactory nodeFactory)
         {
             LocalVariableTable = localVariableTable;
             _method = method;
             Configuration = configuration;
             NameMangler = nameMangler;
+            NodeFactory = nodeFactory;
         }
     }
 }
