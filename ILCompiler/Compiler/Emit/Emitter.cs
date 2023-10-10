@@ -43,6 +43,14 @@ namespace ILCompiler.Compiler.Emit
         public void Halt() => EmitInstruction(Instruction.Create(Opcode.Halt));
         public void Inc(Register16 register) => EmitInstruction(Instruction.Create(Opcode.Inc, register));
         public void Jp(string target) => EmitInstruction(Instruction.CreateBranch(Opcode.Jp, target));
+        public void Jp(MemoryOperand target)
+        {
+            if (target.Register != Register.HL)
+            {
+                throw new NotSupportedException("Indirect jump only supports HL");
+            }
+            EmitInstruction(Instruction.Create(Opcode.Jp, target));
+        }
         public void Jp(Condition condition, string target) => EmitInstruction(Instruction.CreateBranch(Opcode.Jp, condition, target));
         public void Ld(Register8 target, Register8 source) => EmitInstruction(Instruction.Create(Opcode.Ld, target, source));
         public void Ld(Register16 target, Register16 source) => EmitInstruction(Instruction.Create(Opcode.Ld, target, source));
