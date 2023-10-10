@@ -40,7 +40,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             if (targetMethod == null)
             {
-                throw new ArgumentNullException("Virtual CallEntry must have non-null Method");
+                throw new InvalidOperationException("Virtual CallEntry must have non-null Method");
             }
 
             int slot = VirtualMethodSlotHelper.GetVirtualMethodSlot(context.NodeFactory, targetMethod, targetMethod.DeclaringType);
