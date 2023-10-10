@@ -113,6 +113,26 @@ namespace ILCompiler.Compiler.Importer
                 targetMethod = context.NameMangler.GetMangledMethodName(methodToCall);
             }
 
+            bool directCall = false;
+            if (methodToCall.IsStatic)
+            {
+                directCall = true;
+            }
+            else if (instruction.OpCode.Code != Code.Callvirt)
+            {
+                directCall = true;
+            }
+            else if (!methodToCall.IsVirtual)
+            {
+                directCall = true;
+            }
+
+            if (methodToCall.HasGenericParameters && !directCall)
+            {
+                throw new NotSupportedException("Non direct calls to generic methods not supported");
+            }
+
+
             int returnBufferArgIndex = 0;
             var returnType = GenericTypeInstantiator.Instantiate(methodToCall.ReturnType, method, context.Method);
             if (methodToCall.HasReturnType)
@@ -126,7 +146,7 @@ namespace ILCompiler.Compiler.Importer
             int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetInstanceFieldSize() : null;
 
             var returnVarType = methodToCall.HasReturnType ? returnType.GetVarType() : VarType.Void;
-            StackEntry callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize, methodToCall.IsInternalCall);
+            StackEntry callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize, methodToCall.IsInternalCall, !directCall, methodToCall);
 
             if (methodToCall.IsStatic && !context.PreinitializationManager.IsPreinitialized(methodToCall.DeclaringType))
             {
