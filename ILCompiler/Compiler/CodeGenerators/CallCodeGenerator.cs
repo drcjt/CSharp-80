@@ -19,7 +19,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
         private static void GenerateCodeForCall(CallEntry entry, CodeGeneratorContext context)
         {
-            if (entry.IsInternalCall && entry.Arguments.Count > 0)
+            if (entry.Method != null && entry.Method.IsInternalCall && entry.Arguments.Count > 0)
             {
                 // Pass last argument in HL for Ptr type
                 // and in HL, DE otherwise
