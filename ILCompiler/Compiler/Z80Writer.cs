@@ -206,15 +206,11 @@ namespace ILCompiler.Compiler
 
         private void OutputEpilog()
         {
-            // Emit stub for simulating Call (HL)
-            var emitter = new Emitter();
-            emitter.CreateLabel("JPHL");
-            emitter.Jp(__[HL]);
-
             OutputRuntimeCode();
 
             _out.WriteLine();
 
+            var emitter = new Emitter();
             emitter.CreateLabel(Heap);
             emitter.End(Entry);
 
