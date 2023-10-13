@@ -1,6 +1,7 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysis;
+using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
@@ -10,22 +11,21 @@ using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler
 {
-    public class Z80Writer
+    public class Z80AssemblyWriter
     {
         private readonly IConfiguration _configuration;
         private readonly INameMangler _nameMangler;
-        private readonly ILogger<Z80Writer> _logger;
+        private readonly ILogger<Z80AssemblyWriter> _logger;
         private readonly NativeDependencyAnalyser _nativeDependencyAnalyser;
         private readonly PreinitializationManager _preinitializationManager;
         private readonly NodeFactory _nodeFactory;
 
         private string _inputFilePath = null!;
-        private string _outputFilePath = null!;
         private StreamWriter _out = null!;
 
         private readonly ISet<string> _calls = new HashSet<string>();
 
-        public Z80Writer(IConfiguration configuration, INameMangler nameMangler, ILogger<Z80Writer> logger, NativeDependencyAnalyser nativeDependencyAnalyser, PreinitializationManager preinitializzationManager, NodeFactory nodeFactory)
+        public Z80AssemblyWriter(IConfiguration configuration, INameMangler nameMangler, ILogger<Z80AssemblyWriter> logger, NativeDependencyAnalyser nativeDependencyAnalyser, PreinitializationManager preinitializzationManager, NodeFactory nodeFactory)
         {
             _configuration = configuration;
             _nameMangler = nameMangler;
@@ -217,7 +217,7 @@ namespace ILCompiler.Compiler
             _out.Write(emitter.ToString());
         }
 
-        private void OutputCodeForNodes(IList<IDependencyNode> nodes)
+        private void OutputCodeForNodes(IReadOnlyCollection<IDependencyNode> nodes)
         {
             foreach (var node in nodes)
             {
@@ -229,10 +229,9 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public void OutputCode(Z80MethodCodeNode rootNode, IList<IDependencyNode> nodes, string inputFilePath, string outputFilePath)
+        public void OutputCode(Z80MethodCodeNode rootNode, IReadOnlyCollection<IDependencyNode> nodes, string inputFilePath, string outputFilePath)
         {
             _inputFilePath = inputFilePath;
-            _outputFilePath = outputFilePath;
 
             using (_out = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, false), Encoding.ASCII))
             {
@@ -245,10 +244,10 @@ namespace ILCompiler.Compiler
                 OutputEpilog();
             }
 
-            _logger.LogDebug("Written compiled file to {_outputFilePath}", _outputFilePath);
+            _logger.LogDebug("Written compiled file to {_outputFilePath}", outputFilePath);
         }
 
-        private void OutputStatics(IList<IDependencyNode> nodes)
+        private void OutputStatics(IReadOnlyCollection<IDependencyNode> nodes)
         {
             foreach (var node in nodes)
             {
@@ -286,7 +285,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void OutputEETypes(IList<IDependencyNode> nodes)
+        private void OutputEETypes(IReadOnlyCollection<IDependencyNode> nodes)
         {
             var eeTypes = new List<string>();
 

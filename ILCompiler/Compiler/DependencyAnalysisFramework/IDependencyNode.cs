@@ -1,4 +1,6 @@
-﻿namespace ILCompiler.Compiler.DependencyAnalysis
+﻿using ILCompiler.Compiler.DependencyAnalysis;
+
+namespace ILCompiler.Compiler.DependencyAnalysisFramework
 {
     public interface IDependencyNode
     {

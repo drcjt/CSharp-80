@@ -1,4 +1,4 @@
-﻿namespace ILCompiler.Compiler.DependencyAnalysis
+﻿namespace ILCompiler.Compiler.DependencyAnalysisFramework
 {
     internal interface IDependencyGraphEdgeVisitor
     {

@@ -1,8 +1,10 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.PreInit;
 using Microsoft.Extensions.Logging;
+using System.Collections.Immutable;
 
-namespace ILCompiler.Compiler.DependencyAnalysis
+namespace ILCompiler.Compiler.DependencyAnalysisFramework
 {
     public class DependencyAnalyzer
     {
@@ -10,16 +12,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly List<IDependencyNode> _markedNodes = new();
         private readonly Dictionary<IDependencyNode, IList<ConditionalDependency>> _conditionalDependencyStore = new();
 
+        public event Action<List<IDependencyNode>>? ComputeDependencyRoutine;
+
         private readonly NodeFactory _nodeFactory;
         private readonly DependencyNodeContext _nodeContext;
-
-        public IList<IDependencyNode> MarkedNodeList
-        {
-            get
-            {
-                return _markedNodes;
-            }
-        }
 
         public DependencyAnalyzer(ILogger<DependencyAnalyzer> logger, CorLibModuleProvider corLibModuleProvider, PreinitializationManager preinitializationManager, NodeFactory nodeFactory)
         {
@@ -40,9 +36,16 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return rootCodeNode;
         }
 
-        public void ComputeMarkedNodes()
+        private void ComputeDependencies(List<IDependencyNode> nodes) =>  ComputeDependencyRoutine?.Invoke(nodes);
+
+        public IImmutableList<IDependencyNode> ComputeMarkedNodes()
         {
             ProcessMarkStack();
+
+            // Compile methods
+            ComputeDependencies(_markedNodes);
+
+            return _markedNodes.ToImmutableList<IDependencyNode>();
         }
 
         private void ProcessMarkStack()
@@ -55,7 +58,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 if (_conditionalDependencyStore.TryGetValue(currentNode, out var conditionalDependencyList))
                 {
-                    foreach(var conditionalDependency in conditionalDependencyList) 
+                    foreach (var conditionalDependency in conditionalDependencyList)
                     {
                         conditionalDependency.ThenParent.Dependencies.Add(conditionalDependency.ThenNode);
                         AddToMarkStack(conditionalDependency.ThenNode);
@@ -68,7 +71,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private void GetStaticDependencies(IDependencyNode node)
         {
             var dependencies = node.GetStaticDependencies(_nodeContext);
-            foreach (var dependency in dependencies) 
+            foreach (var dependency in dependencies)
             {
                 AddToMarkStack(dependency);
             }
@@ -93,7 +96,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             node.Dependencies = dependencies;
         }
 
-        private void AddToMarkStack(IDependencyNode node) 
+        private void AddToMarkStack(IDependencyNode node)
         {
             if (!node.Mark)
             {

@@ -1,14 +1,14 @@
 ﻿using System.Xml;
 
-namespace ILCompiler.Compiler.DependencyAnalysis
+namespace ILCompiler.Compiler.DependencyAnalysisFramework
 {
     internal sealed class DgmlWriter : IDisposable, IDependencyGraphNodeVisitor, IDependencyGraphEdgeVisitor
     {
         private readonly XmlWriter _xmlWrite;
         private bool _done = false;
 
-        public DgmlWriter(XmlWriter xmlWriter) 
-        { 
+        public DgmlWriter(XmlWriter xmlWriter)
+        {
             _xmlWrite = xmlWriter;
             _xmlWrite.WriteStartDocument();
             _xmlWrite.WriteStartElement("DirectedGraph", "http://schemas.microsoft.com/vs/2009/dgml");
