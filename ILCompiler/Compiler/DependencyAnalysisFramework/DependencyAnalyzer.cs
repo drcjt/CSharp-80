@@ -1,8 +1,9 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.PreInit;
 using Microsoft.Extensions.Logging;
 
-namespace ILCompiler.Compiler.DependencyAnalysis
+namespace ILCompiler.Compiler.DependencyAnalysisFramework
 {
     public class DependencyAnalyzer
     {
@@ -55,7 +56,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 if (_conditionalDependencyStore.TryGetValue(currentNode, out var conditionalDependencyList))
                 {
-                    foreach(var conditionalDependency in conditionalDependencyList) 
+                    foreach (var conditionalDependency in conditionalDependencyList)
                     {
                         conditionalDependency.ThenParent.Dependencies.Add(conditionalDependency.ThenNode);
                         AddToMarkStack(conditionalDependency.ThenNode);
@@ -68,7 +69,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private void GetStaticDependencies(IDependencyNode node)
         {
             var dependencies = node.GetStaticDependencies(_nodeContext);
-            foreach (var dependency in dependencies) 
+            foreach (var dependency in dependencies)
             {
                 AddToMarkStack(dependency);
             }
@@ -93,7 +94,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             node.Dependencies = dependencies;
         }
 
-        private void AddToMarkStack(IDependencyNode node) 
+        private void AddToMarkStack(IDependencyNode node)
         {
             if (!node.Mark)
             {

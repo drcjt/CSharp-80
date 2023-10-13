@@ -1,6 +1,7 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysis;
+using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;

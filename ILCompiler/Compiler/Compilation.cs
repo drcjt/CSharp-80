@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Compiler.DependencyAnalysis;
+using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Interfaces;
 using ILCompiler.IoC;
 using Microsoft.Extensions.Logging;

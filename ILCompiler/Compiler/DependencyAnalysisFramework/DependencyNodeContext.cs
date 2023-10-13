@@ -1,7 +1,8 @@
-﻿using ILCompiler.Compiler.PreInit;
+﻿using ILCompiler.Compiler.DependencyAnalysis;
+using ILCompiler.Compiler.PreInit;
 using Microsoft.Extensions.Logging;
 
-namespace ILCompiler.Compiler.DependencyAnalysis
+namespace ILCompiler.Compiler.DependencyAnalysisFramework
 {
     public record DependencyNodeContext
     {

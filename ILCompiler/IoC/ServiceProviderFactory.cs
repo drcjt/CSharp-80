@@ -2,6 +2,7 @@
 using ILCompiler.Compiler;
 using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
+using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Compiler.Importer;
 using ILCompiler.Compiler.Lowerings;
 using ILCompiler.Compiler.PreInit;

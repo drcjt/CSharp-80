@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Compiler.DependencyAnalysisFramework;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {

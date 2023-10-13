@@ -1,4 +1,4 @@
-﻿namespace ILCompiler.Compiler.DependencyAnalysis
+﻿namespace ILCompiler.Compiler.DependencyAnalysisFramework
 {
     internal class DependencyGraphTraverser
     {
@@ -18,7 +18,7 @@
 
         public void TraverseEdges()
         {
-            foreach (var depender in _visited) 
+            foreach (var depender in _visited)
             {
                 foreach (var dependedOn in depender.Dependencies)
                 {
