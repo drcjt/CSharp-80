@@ -4,7 +4,6 @@ using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Interfaces;
 using ILCompiler.IoC;
 using Microsoft.Extensions.Logging;
-using System.Collections.Immutable;
 
 namespace ILCompiler.Compiler
 {
@@ -13,22 +12,24 @@ namespace ILCompiler.Compiler
         private readonly ILogger<Compilation> _logger;
         private readonly IConfiguration _configuration;
         private readonly Factory<IMethodCompiler> _methodCompilerFactory;
-        private readonly Z80AssemblyWriter _z80Writer;
+        private readonly Z80AssemblyWriter _z80AssemblyWriter;
         private readonly DependencyAnalyzer _dependencyAnalyzer;
         private readonly CorLibModuleProvider _corLibModuleProvider;
+        private string _inputFilePath = String.Empty;
 
         public Compilation(IConfiguration configuration, ILogger<Compilation> logger, Factory<IMethodCompiler> methodCompilerFactory, Z80AssemblyWriter z80Writer, CorLibModuleProvider corLibModuleProvider, DependencyAnalyzer dependencyAnalyzer)
         {
             _configuration = configuration;
             _logger = logger;
             _methodCompilerFactory = methodCompilerFactory;
-            _z80Writer = z80Writer;
+            _z80AssemblyWriter = z80Writer;
             _corLibModuleProvider = corLibModuleProvider;
             _dependencyAnalyzer = dependencyAnalyzer;
         }
 
         public void Compile(string inputFilePath, string outputFilePath)
         {
+            _inputFilePath = inputFilePath;
             ModuleContext modCtx = ModuleDef.CreateModuleContext();
 
             var corlibFilePath = _configuration.CorelibPath;
@@ -52,13 +53,15 @@ namespace ILCompiler.Compiler
             _corLibModuleProvider.CorLibModule = corlibModule;
 
             var rootNode = (Z80MethodCodeNode)_dependencyAnalyzer.AddRoot(module.EntryPoint);
+
+            _dependencyAnalyzer.ComputeDependencyRoutine += ComputeDependencyNodeDependencies;
+
+            // Core Dependency Analysis and code output routine
             var nodes = _dependencyAnalyzer.ComputeMarkedNodes();
+            _z80AssemblyWriter.OutputCode(rootNode, nodes, inputFilePath, outputFilePath);
 
             // Write dgml version of dependency graph
             WriteDependencyLog(Path.ChangeExtension(inputFilePath, ".dgml"), rootNode);
-
-            CompileNodes(nodes, inputFilePath);
-            _z80Writer.OutputCode(rootNode, nodes, inputFilePath, outputFilePath);
         }
 
         private static void WriteDependencyLog(string fileName, IDependencyNode root)
@@ -70,16 +73,16 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void CompileNodes(IImmutableList<IDependencyNode> nodes, string inputFilePath)
+        private void ComputeDependencyNodeDependencies(List<IDependencyNode> nodes)
         {
-            foreach (var node in nodes) 
+            foreach (var node in nodes)
             {
-                if (node is Z80MethodCodeNode codeNode)
+                if (node is Z80MethodCodeNode methodCodeNodeNeedingCode)
                 {
-                    _logger.LogDebug("Compiling method {method.Name}", codeNode.Method.Name);
+                    _logger.LogDebug("Compiling method {method.Name}", methodCodeNodeNeedingCode.Method.Name);
 
                     var methodCompiler = _methodCompilerFactory.Create();
-                    methodCompiler.CompileMethod(codeNode, inputFilePath);
+                    methodCompiler.CompileMethod(methodCodeNodeNeedingCode, _inputFilePath);
                 }
             }
         }
