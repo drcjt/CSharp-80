@@ -2,6 +2,7 @@
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.PreInit;
 using Microsoft.Extensions.Logging;
+using System.Collections.Immutable;
 
 namespace ILCompiler.Compiler.DependencyAnalysisFramework
 {
@@ -14,13 +15,7 @@ namespace ILCompiler.Compiler.DependencyAnalysisFramework
         private readonly NodeFactory _nodeFactory;
         private readonly DependencyNodeContext _nodeContext;
 
-        public IList<IDependencyNode> MarkedNodeList
-        {
-            get
-            {
-                return _markedNodes;
-            }
-        }
+        private IImmutableList<IDependencyNode>? _markedNodesFinal;
 
         public DependencyAnalyzer(ILogger<DependencyAnalyzer> logger, CorLibModuleProvider corLibModuleProvider, PreinitializationManager preinitializationManager, NodeFactory nodeFactory)
         {
@@ -41,9 +36,10 @@ namespace ILCompiler.Compiler.DependencyAnalysisFramework
             return rootCodeNode;
         }
 
-        public void ComputeMarkedNodes()
+        public IImmutableList<IDependencyNode> ComputeMarkedNodes()
         {
             ProcessMarkStack();
+            return _markedNodes.ToImmutableList<IDependencyNode>();
         }
 
         private void ProcessMarkStack()

@@ -4,6 +4,7 @@ using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Interfaces;
 using ILCompiler.IoC;
 using Microsoft.Extensions.Logging;
+using System.Collections.Immutable;
 
 namespace ILCompiler.Compiler
 {
@@ -51,12 +52,11 @@ namespace ILCompiler.Compiler
             _corLibModuleProvider.CorLibModule = corlibModule;
 
             var rootNode = (Z80MethodCodeNode)_dependencyAnalyzer.AddRoot(module.EntryPoint);
-            _dependencyAnalyzer.ComputeMarkedNodes();
+            var nodes = _dependencyAnalyzer.ComputeMarkedNodes();
 
             // Write dgml version of dependency graph
             WriteDependencyLog(Path.ChangeExtension(inputFilePath, ".dgml"), rootNode);
 
-            var nodes = _dependencyAnalyzer.MarkedNodeList;
             CompileNodes(nodes, inputFilePath);
             _z80Writer.OutputCode(rootNode, nodes, inputFilePath, outputFilePath);
         }
@@ -70,7 +70,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void CompileNodes(IList<IDependencyNode> nodes, string inputFilePath)
+        private void CompileNodes(IImmutableList<IDependencyNode> nodes, string inputFilePath)
         {
             foreach (var node in nodes) 
             {

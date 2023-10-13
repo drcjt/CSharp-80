@@ -218,7 +218,7 @@ namespace ILCompiler.Compiler
             _out.Write(emitter.ToString());
         }
 
-        private void OutputCodeForNodes(IList<IDependencyNode> nodes)
+        private void OutputCodeForNodes(IReadOnlyCollection<IDependencyNode> nodes)
         {
             foreach (var node in nodes)
             {
@@ -230,7 +230,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public void OutputCode(Z80MethodCodeNode rootNode, IList<IDependencyNode> nodes, string inputFilePath, string outputFilePath)
+        public void OutputCode(Z80MethodCodeNode rootNode, IReadOnlyCollection<IDependencyNode> nodes, string inputFilePath, string outputFilePath)
         {
             _inputFilePath = inputFilePath;
             _outputFilePath = outputFilePath;
@@ -249,7 +249,7 @@ namespace ILCompiler.Compiler
             _logger.LogDebug("Written compiled file to {_outputFilePath}", _outputFilePath);
         }
 
-        private void OutputStatics(IList<IDependencyNode> nodes)
+        private void OutputStatics(IReadOnlyCollection<IDependencyNode> nodes)
         {
             foreach (var node in nodes)
             {
@@ -287,7 +287,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void OutputEETypes(IList<IDependencyNode> nodes)
+        private void OutputEETypes(IReadOnlyCollection<IDependencyNode> nodes)
         {
             var eeTypes = new List<string>();
 
