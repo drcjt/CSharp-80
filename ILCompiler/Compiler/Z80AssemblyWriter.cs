@@ -21,7 +21,6 @@ namespace ILCompiler.Compiler
         private readonly NodeFactory _nodeFactory;
 
         private string _inputFilePath = null!;
-        private string _outputFilePath = null!;
         private StreamWriter _out = null!;
 
         private readonly ISet<string> _calls = new HashSet<string>();
@@ -233,7 +232,6 @@ namespace ILCompiler.Compiler
         public void OutputCode(Z80MethodCodeNode rootNode, IReadOnlyCollection<IDependencyNode> nodes, string inputFilePath, string outputFilePath)
         {
             _inputFilePath = inputFilePath;
-            _outputFilePath = outputFilePath;
 
             using (_out = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, false), Encoding.ASCII))
             {
@@ -246,7 +244,7 @@ namespace ILCompiler.Compiler
                 OutputEpilog();
             }
 
-            _logger.LogDebug("Written compiled file to {_outputFilePath}", _outputFilePath);
+            _logger.LogDebug("Written compiled file to {_outputFilePath}", outputFilePath);
         }
 
         private void OutputStatics(IReadOnlyCollection<IDependencyNode> nodes)
