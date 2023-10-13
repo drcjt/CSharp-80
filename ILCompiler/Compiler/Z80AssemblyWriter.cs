@@ -11,11 +11,11 @@ using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler
 {
-    public class Z80Writer
+    public class Z80AssemblyWriter
     {
         private readonly IConfiguration _configuration;
         private readonly INameMangler _nameMangler;
-        private readonly ILogger<Z80Writer> _logger;
+        private readonly ILogger<Z80AssemblyWriter> _logger;
         private readonly NativeDependencyAnalyser _nativeDependencyAnalyser;
         private readonly PreinitializationManager _preinitializationManager;
         private readonly NodeFactory _nodeFactory;
@@ -26,7 +26,7 @@ namespace ILCompiler.Compiler
 
         private readonly ISet<string> _calls = new HashSet<string>();
 
-        public Z80Writer(IConfiguration configuration, INameMangler nameMangler, ILogger<Z80Writer> logger, NativeDependencyAnalyser nativeDependencyAnalyser, PreinitializationManager preinitializzationManager, NodeFactory nodeFactory)
+        public Z80AssemblyWriter(IConfiguration configuration, INameMangler nameMangler, ILogger<Z80AssemblyWriter> logger, NativeDependencyAnalyser nativeDependencyAnalyser, PreinitializationManager preinitializzationManager, NodeFactory nodeFactory)
         {
             _configuration = configuration;
             _nameMangler = nameMangler;

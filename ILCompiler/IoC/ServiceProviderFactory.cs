@@ -61,7 +61,7 @@ namespace ILCompiler.IoC
 
             services.AddSingleton<NativeDependencyAnalyser>();
 
-            services.AddSingleton<Z80Writer>();
+            services.AddSingleton<Z80AssemblyWriter>();
 
             services.AddSingleton<DependencyAnalyzer>();
 

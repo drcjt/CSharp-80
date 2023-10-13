@@ -13,11 +13,11 @@ namespace ILCompiler.Compiler
         private readonly ILogger<Compilation> _logger;
         private readonly IConfiguration _configuration;
         private readonly Factory<IMethodCompiler> _methodCompilerFactory;
-        private readonly Z80Writer _z80Writer;
+        private readonly Z80AssemblyWriter _z80Writer;
         private readonly DependencyAnalyzer _dependencyAnalyzer;
         private readonly CorLibModuleProvider _corLibModuleProvider;
 
-        public Compilation(IConfiguration configuration, ILogger<Compilation> logger, Factory<IMethodCompiler> methodCompilerFactory, Z80Writer z80Writer, CorLibModuleProvider corLibModuleProvider, DependencyAnalyzer dependencyAnalyzer)
+        public Compilation(IConfiguration configuration, ILogger<Compilation> logger, Factory<IMethodCompiler> methodCompilerFactory, Z80AssemblyWriter z80Writer, CorLibModuleProvider corLibModuleProvider, DependencyAnalyzer dependencyAnalyzer)
         {
             _configuration = configuration;
             _logger = logger;
