@@ -75,10 +75,6 @@ namespace ILCompiler.Compiler.Emit
             => new() { Opcode = opcode, Op0 = new() { Register = target }, Op1 = new() { Register = source } };
         public static Instruction Create(Opcode opcode, Register target, ushort source)
             => new() { Opcode = opcode, Op0 = new() { Register = target }, Op1 = new() { Immediate = source } };
-
-        public static Instruction CreateComment(string comment)
-            => new() { Opcode = Opcode.None, Comment = comment };
-
         public static Instruction Create(Opcode opcode, string target)
             => new() { Opcode = opcode, Op0 = new() { Label = target } };
 
@@ -101,8 +97,11 @@ namespace ILCompiler.Compiler.Emit
         public static Instruction Create(Opcode opcode, ushort count, ushort value)
             => new() { Opcode = opcode, Op0 = new() { Immediate = count }, Op1 = new() { Immediate = value } };
 
+        public static Instruction CreateComment(string comment)
+            => new() { Opcode = Opcode.None, Comment = comment };
+
         public static Instruction CreateBranch(Opcode opcode, string target)
-    => new() { Opcode = opcode, Op0 = new() { Label = target } };
+            => new() { Opcode = opcode, Op0 = new() { Label = target } };
         public static Instruction CreateBranch(Opcode opcode, Condition condition, string target)
             => new() { Opcode = opcode, Condition = condition, Op0 = new() { Label = target } };
         public static Instruction CreateBranch(Opcode opcode, ushort target)

@@ -2,26 +2,19 @@
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Interfaces;
-using ILCompiler.IoC;
-using Microsoft.Extensions.Logging;
 
 namespace ILCompiler.Compiler
 {
     public class Compilation : ICompilation
     {
-        private readonly ILogger<Compilation> _logger;
         private readonly IConfiguration _configuration;
-        private readonly Factory<IMethodCompiler> _methodCompilerFactory;
         private readonly Z80AssemblyWriter _z80AssemblyWriter;
         private readonly DependencyAnalyzer _dependencyAnalyzer;
         private readonly CorLibModuleProvider _corLibModuleProvider;
-        private string _inputFilePath = String.Empty;
 
-        public Compilation(IConfiguration configuration, ILogger<Compilation> logger, Factory<IMethodCompiler> methodCompilerFactory, Z80AssemblyWriter z80Writer, CorLibModuleProvider corLibModuleProvider, DependencyAnalyzer dependencyAnalyzer)
+        public Compilation(IConfiguration configuration, Z80AssemblyWriter z80Writer, CorLibModuleProvider corLibModuleProvider, DependencyAnalyzer dependencyAnalyzer)
         {
             _configuration = configuration;
-            _logger = logger;
-            _methodCompilerFactory = methodCompilerFactory;
             _z80AssemblyWriter = z80Writer;
             _corLibModuleProvider = corLibModuleProvider;
             _dependencyAnalyzer = dependencyAnalyzer;
@@ -29,7 +22,6 @@ namespace ILCompiler.Compiler
 
         public void Compile(string inputFilePath, string outputFilePath)
         {
-            _inputFilePath = inputFilePath;
             ModuleContext modCtx = ModuleDef.CreateModuleContext();
 
             var corlibFilePath = _configuration.CorelibPath;
