@@ -10,15 +10,15 @@ namespace ILCompiler.Compiler.CodeGenerators
             var fieldOffset = entry.Offset;
 
             // Get address of object
-            context.Emitter.Pop(HL);      // LSW
+            context.InstructionsBuilder.Pop(HL);      // LSW
 
             // Calculate field address
-            context.Emitter.Ld(DE, (short)fieldOffset);
-            context.Emitter.Add(HL, DE);
+            context.InstructionsBuilder.Ld(DE, (short)fieldOffset);
+            context.InstructionsBuilder.Add(HL, DE);
 
             // Push field address onto the stack msw first, lsw second
-            context.Emitter.Ld(DE, 0);
-            context.Emitter.Push(HL);
+            context.InstructionsBuilder.Ld(DE, 0);
+            context.InstructionsBuilder.Push(HL);
         }
     }
 }

@@ -9,8 +9,8 @@ namespace ILCompiler.Compiler.CodeGenerators
         {
             var mangledFieldName = entry.Name;
 
-            context.Emitter.Ld(HL, mangledFieldName);
-            context.Emitter.Push(HL);
+            context.InstructionsBuilder.Ld(HL, mangledFieldName);
+            context.InstructionsBuilder.Push(HL);
         }
     }
 }

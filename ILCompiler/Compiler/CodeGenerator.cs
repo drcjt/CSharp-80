@@ -40,27 +40,27 @@ namespace ILCompiler.Compiler
             var methodInstructions = new List<Instruction>();
 
             GenerateStringMap(blocks);
-            GenerateStringData(_context.Emitter);
+            GenerateStringData(_context.InstructionsBuilder);
 
             var mangledMethodName = _nameMangler.GetMangledMethodName(_context.Method);
-            _context.Emitter.CreateLabel(mangledMethodName);
+            _context.InstructionsBuilder.Label(mangledMethodName);
 
             if (methodCodeNode.Method.IsStaticConstructor)
             {
                 // When a static constructor finishes running it replaces the first instruction in
                 // the method with a Ret instruction so it only ever executes once even if called multiple times
-                _context.Emitter.Ld(HL, mangledMethodName);
-                _context.Emitter.Ld(__[HL], 0xC9);
+                _context.InstructionsBuilder.Ld(HL, mangledMethodName);
+                _context.InstructionsBuilder.Ld(__[HL], 0xC9);
             }
 
-            GenerateProlog(_context.Emitter);
-            methodInstructions.AddRange(_context.Emitter.Instructions);
+            GenerateProlog(_context.InstructionsBuilder);
+            methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
 
             foreach (var block in blocks)
             {
-                _context.Emitter.Reset();
+                _context.InstructionsBuilder.Reset();
 
-                _context.Emitter.CreateLabel(block.Label);
+                _context.InstructionsBuilder.Label(block.Label);
 
                 var visitorAdapter = new GenericStackEntryAdapter(this);
 
@@ -71,8 +71,8 @@ namespace ILCompiler.Compiler
                     currentNode = currentNode.Next;
                 }
 
-                Optimize(_context.Emitter.Instructions);
-                methodInstructions.AddRange(_context.Emitter.Instructions);
+                Optimize(_context.InstructionsBuilder.Instructions);
+                methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
             }
 
             return methodInstructions;
@@ -171,7 +171,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void GenerateStringData(Emitter emitter)
+        private void GenerateStringData(InstructionsBuilder instructionsBuilder)
         {
             var systemStringType = _corLibModuleProvider.FindThrow("System.String");
             var systemStringEETypeMangledName = _nameMangler.GetMangledTypeName(systemStringType);
@@ -179,26 +179,26 @@ namespace ILCompiler.Compiler
             // TODO: Need to eliminate duplicate strings
             foreach (var keyValuePair in _labelsToStringData)
             {
-                emitter.CreateLabel(keyValuePair.Key);
+                instructionsBuilder.Label(keyValuePair.Key);
 
                 var stringData = keyValuePair.Value;
 
-                emitter.Dw(systemStringEETypeMangledName);
+                instructionsBuilder.Dw(systemStringEETypeMangledName);
 
                 byte lsb = (byte)(stringData.Length & 0xFF);
                 byte msb = (byte)((stringData.Length >> 8) & 0xFF);
 
-                emitter.Db(lsb);
-                emitter.Db(msb);
+                instructionsBuilder.Db(lsb);
+                instructionsBuilder.Db(msb);
 
                 foreach (var ch in stringData)
                 {
-                    emitter.Db((byte)ch);
-                    emitter.Db((byte)0x00);
+                    instructionsBuilder.Db((byte)ch);
+                    instructionsBuilder.Db((byte)0x00);
                 }
             }
         }
-        private void GenerateProlog(Emitter emitter)
+        private void GenerateProlog(InstructionsBuilder instructionsBuilder)
         {
             // Stack frame looks like this:
             //
@@ -237,23 +237,23 @@ namespace ILCompiler.Compiler
 
             if (_context.ParamsCount > 0 || (_context.LocalsCount + tempCount) > 0)
             {
-                emitter.Push(IX);
-                emitter.Ld(IX, 0);
-                emitter.Add(IX, SP);
+                instructionsBuilder.Push(IX);
+                instructionsBuilder.Ld(IX, 0);
+                instructionsBuilder.Add(IX, SP);
             }
 
             if (_context.LocalsCount + tempCount > 0)
             {
                 // Reserve space on stack for locals
-                emitter.Ld(HL, (short)-localsSize);
-                emitter.Add(HL, SP);
-                emitter.Ld(SP, HL);
+                instructionsBuilder.Ld(HL, (short)-localsSize);
+                instructionsBuilder.Add(HL, SP);
+                instructionsBuilder.Ld(SP, HL);
 
-                ZeroInitFrame(emitter);
+                ZeroInitFrame(instructionsBuilder);
             }
         }
 
-        private void ZeroInitFrame(Emitter emitter)
+        private void ZeroInitFrame(InstructionsBuilder instructionsBuilder)
         {
             if (_context.Method.Body.InitLocals)
             {
@@ -265,15 +265,15 @@ namespace ILCompiler.Compiler
                         var offset = variable.StackOffset;
                         var exactSize = variable.ExactSize;
 
-                        emitter.Push(IX);
-                        emitter.Pop(HL);
-                        emitter.Ld(DE, (short)-offset);
-                        emitter.Add(HL, DE);
+                        instructionsBuilder.Push(IX);
+                        instructionsBuilder.Pop(HL);
+                        instructionsBuilder.Ld(DE, (short)-offset);
+                        instructionsBuilder.Add(HL, DE);
 
                         for (var count = 0; count < exactSize; count++)
                         {
-                            emitter.Ld(__[HL], 0);
-                            emitter.Inc(HL);
+                            instructionsBuilder.Ld(__[HL], 0);
+                            instructionsBuilder.Inc(HL);
                         }
                     }
                 }

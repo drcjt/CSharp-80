@@ -94,6 +94,8 @@ namespace ILCompiler.Compiler
 
         public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode, string inputFilePath)
         {
+            _logger.LogDebug("Compiling method {method.Name}", methodCodeNodeNeedingCode.Method.Name);
+
             var method = methodCodeNodeNeedingCode.Method;
 
             if (method.HasCustomAttribute("System.Runtime", "RuntimeImportAttribute"))
@@ -175,17 +177,7 @@ namespace ILCompiler.Compiler
 
             var codeGenerator = _phaseFactory.Create<ICodeGenerator>();
             var instructions = codeGenerator.Generate(basicBlocks, _locals, methodCodeNodeNeedingCode);
-            methodCodeNodeNeedingCode.MethodCode = GetMethodCode(instructions);
-        }
-
-        private static string GetMethodCode(IList<Emit.Instruction> instructions)
-        {
-            var sb = new StringBuilder();
-            foreach (var instruction in instructions)
-            {
-                sb.AppendLine(instruction.ToString());
-            }
-            return sb.ToString();
+            methodCodeNodeNeedingCode.MethodCode = instructions;
         }
     }
 }

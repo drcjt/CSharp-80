@@ -10,10 +10,10 @@ namespace ILCompiler.Compiler.CodeGenerators
             // We have 4 bytes on the stack representing a small data type, e.g int16, uint16, int8, uint8, bool
             // For all of these cases we drop the MSWs
 
-            context.Emitter.Pop(HL);      // LSW
-            context.Emitter.Pop(DE);      // MSW
+            context.InstructionsBuilder.Pop(HL);      // LSW
+            context.InstructionsBuilder.Pop(DE);      // MSW
 
-            context.Emitter.Push(HL);
+            context.InstructionsBuilder.Push(HL);
         }
     }
 }

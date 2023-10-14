@@ -12,13 +12,13 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             if (variable.Type.IsSmall())
             {
-                CopyHelper.CopySmallToStack(context.Emitter, variable.Type.IsByte() ? 1 : 2, -variable.StackOffset, !variable.Type.IsUnsigned());
+                CopyHelper.CopySmallToStack(context.InstructionsBuilder, variable.Type.IsByte() ? 1 : 2, -variable.StackOffset, !variable.Type.IsUnsigned());
             }
             else
             {
                 // Loading a local variable/argument
                 Debug.Assert(size % 2 == 0);
-                CopyHelper.CopyFromIXToStack(context.Emitter, size, -variable.StackOffset, restoreIX: true);
+                CopyHelper.CopyFromIXToStack(context.InstructionsBuilder, size, -variable.StackOffset, restoreIX: true);
             }
         }
     }

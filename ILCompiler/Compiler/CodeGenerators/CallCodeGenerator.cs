@@ -24,14 +24,14 @@ namespace ILCompiler.Compiler.CodeGenerators
                 // Pass last argument in HL for Ptr type
                 // and in HL, DE otherwise
                 var argument = entry.Arguments[entry.Arguments.Count - 1];
-                context.Emitter.Pop(HL);
+                context.InstructionsBuilder.Pop(HL);
 
                 if (argument.Type != VarType.Ptr && argument.Type != VarType.Ref) // TODO: should this also check for ByRef??
                 {
-                    context.Emitter.Pop(DE);
+                    context.InstructionsBuilder.Pop(DE);
                 }
             }
-            context.Emitter.Call(entry.TargetMethod);
+            context.InstructionsBuilder.Call(entry.TargetMethod);
         }
 
         private static void GenerateCodeForVirtualCall(CallEntry entry, CodeGeneratorContext context)
@@ -50,9 +50,9 @@ namespace ILCompiler.Compiler.CodeGenerators
             //    2 bytes for base size
             //    2 bytes for related type
             const int eeTypeHeader = 3 * 2;
-            context.Emitter.Ld(BC, (byte)((slot * 2) + eeTypeHeader));
+            context.InstructionsBuilder.Ld(BC, (byte)((slot * 2) + eeTypeHeader));
 
-            context.Emitter.Call("VirtualCall");
+            context.InstructionsBuilder.Call("VirtualCall");
         }
     }
 }

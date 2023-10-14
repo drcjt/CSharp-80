@@ -8,19 +8,19 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(SwitchEntry entry, CodeGeneratorContext context)
         {
-            context.Emitter.Pop(HL);      // LSW
-            context.Emitter.Pop(DE);      // Ignore MSW
+            context.InstructionsBuilder.Pop(HL);      // LSW
+            context.InstructionsBuilder.Pop(DE);      // Ignore MSW
 
-            context.Emitter.Ld(A, L);
+            context.InstructionsBuilder.Ld(A, L);
 
             for (int targetIndex = 0; targetIndex < entry.JumpTable.Count; targetIndex++)
             {
-                context.Emitter.Or(A);
-                context.Emitter.Jp(Condition.Z, entry.JumpTable[targetIndex]);
+                context.InstructionsBuilder.Or(A);
+                context.InstructionsBuilder.Jp(Condition.Z, entry.JumpTable[targetIndex]);
 
                 if (targetIndex < entry.JumpTable.Count - 1)
                 {
-                    context.Emitter.Dec(A);
+                    context.InstructionsBuilder.Dec(A);
                 }
             }
         }

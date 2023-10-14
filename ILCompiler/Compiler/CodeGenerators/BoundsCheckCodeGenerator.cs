@@ -11,26 +11,26 @@ namespace ILCompiler.Compiler.CodeGenerators
             // Stack will contain Index followed by array length
             // just need to pop them off here, compare and fail if index is beyond end of array
 
-            context.Emitter.Pop(HL);        // Array Length
-            context.Emitter.Dec(HL);        // Make 0 based
+            context.InstructionsBuilder.Pop(HL);        // Array Length
+            context.InstructionsBuilder.Dec(HL);        // Make 0 based
 
-            context.Emitter.Pop(DE);        // Index to validate
+            context.InstructionsBuilder.Pop(DE);        // Index to validate
 
-            context.Emitter.And(A);         // Clear carry flag
-            context.Emitter.Sbc(HL, DE);    // Calculate Array Length - Index
+            context.InstructionsBuilder.And(A);         // Clear carry flag
+            context.InstructionsBuilder.Sbc(HL, DE);    // Calculate Array Length - Index
 
             var endLabel = context.NameMangler.GetUniqueName();
 
-            context.Emitter.Jp(Condition.NC, endLabel);
+            context.InstructionsBuilder.Jp(Condition.NC, endLabel);
 
             // Code to display Index Out of Range message and fail fast
 
-            context.Emitter.Ld(HL, "INDEX_OUT_OF_RANGE_MSG - 2");
-            context.Emitter.Call("PRINT");
-            context.Emitter.Jp("EXIT");
+            context.InstructionsBuilder.Ld(HL, "INDEX_OUT_OF_RANGE_MSG - 2");
+            context.InstructionsBuilder.Call("PRINT");
+            context.InstructionsBuilder.Jp("EXIT");
 
             // Index was valid
-            context.Emitter.CreateLabel(endLabel);
+            context.InstructionsBuilder.Label(endLabel);
         }
     }
 }

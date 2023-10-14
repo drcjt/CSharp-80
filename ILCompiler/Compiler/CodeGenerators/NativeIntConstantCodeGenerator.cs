@@ -9,7 +9,7 @@ namespace ILCompiler.Compiler.CodeGenerators
         {
             if (entry.SymbolName != String.Empty)
             {
-                context.Emitter.Ld(HL, entry.SymbolName);
+                context.InstructionsBuilder.Ld(HL, entry.SymbolName);
             }
             else
             {
@@ -17,10 +17,10 @@ namespace ILCompiler.Compiler.CodeGenerators
                 var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
 
                 // Native ints are only 16 bit so just push low word
-                context.Emitter.Ld(HL, low);
+                context.InstructionsBuilder.Ld(HL, low);
             }
 
-            context.Emitter.Push(HL);
+            context.InstructionsBuilder.Push(HL);
         }
     }
 }

@@ -19,31 +19,31 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                     // Load address of return buffer into HL
                     var variable = context.LocalVariableTable[entry.ReturnBufferArgIndex.Value];
-                    context.Emitter.Ld(H, __[IX + (short)-(variable.StackOffset - 1)]);
-                    context.Emitter.Ld(L, __[IX + (short)-(variable.StackOffset - 0)]);
+                    context.InstructionsBuilder.Ld(H, __[IX + (short)-(variable.StackOffset - 1)]);
+                    context.InstructionsBuilder.Ld(L, __[IX + (short)-(variable.StackOffset - 0)]);
 
-                    context.Emitter.Push(IX); // save IX to BC
-                    context.Emitter.Pop(BC);
+                    context.InstructionsBuilder.Push(IX); // save IX to BC
+                    context.InstructionsBuilder.Pop(BC);
 
-                    context.Emitter.Push(HL); // Move HL to IX
-                    context.Emitter.Pop(IX);
+                    context.InstructionsBuilder.Push(HL); // Move HL to IX
+                    context.InstructionsBuilder.Pop(IX);
 
                     // Copy struct to the return buffer
                     var returnTypeExactSize = entry.ReturnTypeExactSize ?? 0;
-                    CopyHelper.CopyFromStackToIX(context.Emitter, returnTypeExactSize);
+                    CopyHelper.CopyFromStackToIX(context.InstructionsBuilder, returnTypeExactSize);
 
-                    context.Emitter.Push(BC); // restore IX
-                    context.Emitter.Pop(IX);
+                    context.InstructionsBuilder.Push(BC); // restore IX
+                    context.InstructionsBuilder.Pop(IX);
                 }
                 else
                 {
-                    context.Emitter.Pop(DE);            // Copy return value into DE/DE'
+                    context.InstructionsBuilder.Pop(DE);            // Copy return value into DE/DE'
 
                     if (targetType?.Type.IsInt() ?? false)
                     {
-                        context.Emitter.Exx();
-                        context.Emitter.Pop(DE);
-                        context.Emitter.Exx();
+                        context.InstructionsBuilder.Exx();
+                        context.InstructionsBuilder.Pop(DE);
+                        context.InstructionsBuilder.Exx();
                     }
                 }                
             }
@@ -75,25 +75,25 @@ namespace ILCompiler.Compiler.CodeGenerators
                         // TODO: also need to factor in any localloc space allocated
                         // this is why localloc integration test fails with this code enabled
 
-                        context.Emitter.Ld(HL, (short)localsSize);
-                        context.Emitter.Add(HL, SP);
+                        context.InstructionsBuilder.Ld(HL, (short)localsSize);
+                        context.InstructionsBuilder.Add(HL, SP);
 
-                        context.Emitter.Push(IX);
-                        context.Emitter.Pop(BC);
+                        context.InstructionsBuilder.Push(IX);
+                        context.InstructionsBuilder.Pop(BC);
 
-                        context.Emitter.Sbc(HL, BC);
+                        context.InstructionsBuilder.Sbc(HL, BC);
 
                         var unwindLabel = context.NameMangler.GetUniqueName();
-                        context.Emitter.Jp(Condition.Z, unwindLabel);
+                        context.InstructionsBuilder.Jp(Condition.Z, unwindLabel);
 
-                        context.Emitter.Halt();
+                        context.InstructionsBuilder.Halt();
 
-                        context.Emitter.CreateLabel(unwindLabel);
+                        context.InstructionsBuilder.Label(unwindLabel);
                     }
 
-                    context.Emitter.Ld(SP, IX);     // Move SP to before locals
+                    context.InstructionsBuilder.Ld(SP, IX);     // Move SP to before locals
                 }
-                context.Emitter.Pop(IX);            // Remove IX
+                context.InstructionsBuilder.Pop(IX);            // Remove IX
 
                 if (context.ParamsCount > 0)
                 {
@@ -111,38 +111,38 @@ namespace ILCompiler.Compiler.CodeGenerators
                     // will probably be better for 1 or maybe 2 32bit parameters.
 
                     // Work out start of params so we can reset SP after removing return address
-                    context.Emitter.Ld(HL, 0);
-                    context.Emitter.Add(HL, SP);
-                    context.Emitter.Ld(BC, (short)(2 + totalParametersSize));
-                    context.Emitter.Add(HL, BC);
+                    context.InstructionsBuilder.Ld(HL, 0);
+                    context.InstructionsBuilder.Add(HL, SP);
+                    context.InstructionsBuilder.Ld(BC, (short)(2 + totalParametersSize));
+                    context.InstructionsBuilder.Add(HL, BC);
                 }
 
-                context.Emitter.Pop(BC);      // Store return address in BC
+                context.InstructionsBuilder.Pop(BC);      // Store return address in BC
 
                 if (context.ParamsCount > 0)
                 {
                     // Remove parameters from stack
-                    context.Emitter.Ld(SP, HL);
+                    context.InstructionsBuilder.Ld(SP, HL);
                 }
             }
             else
             {
-                context.Emitter.Pop(BC);      // Store return address in BC
+                context.InstructionsBuilder.Pop(BC);      // Store return address in BC
             }
 
             if (hasReturnValue && !entry.ReturnBufferArgIndex.HasValue)
             {
                 if (targetType?.Type.IsInt() ?? false)
                 {
-                    context.Emitter.Exx();
-                    context.Emitter.Push(DE);
-                    context.Emitter.Exx();
+                    context.InstructionsBuilder.Exx();
+                    context.InstructionsBuilder.Push(DE);
+                    context.InstructionsBuilder.Exx();
                 }
-                context.Emitter.Push(DE);
+                context.InstructionsBuilder.Push(DE);
             }
 
-            context.Emitter.Push(BC);
-            context.Emitter.Ret();
+            context.InstructionsBuilder.Push(BC);
+            context.InstructionsBuilder.Ret();
         }
     }
 }

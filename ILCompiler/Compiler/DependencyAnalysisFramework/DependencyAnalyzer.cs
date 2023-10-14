@@ -12,8 +12,6 @@ namespace ILCompiler.Compiler.DependencyAnalysisFramework
         private readonly List<IDependencyNode> _markedNodes = new();
         private readonly Dictionary<IDependencyNode, IList<ConditionalDependency>> _conditionalDependencyStore = new();
 
-        public event Action<List<IDependencyNode>>? ComputeDependencyRoutine;
-
         private readonly NodeFactory _nodeFactory;
         private readonly DependencyNodeContext _nodeContext;
 
@@ -36,14 +34,9 @@ namespace ILCompiler.Compiler.DependencyAnalysisFramework
             return rootCodeNode;
         }
 
-        private void ComputeDependencies(List<IDependencyNode> nodes) =>  ComputeDependencyRoutine?.Invoke(nodes);
-
         public IImmutableList<IDependencyNode> ComputeMarkedNodes()
         {
             ProcessMarkStack();
-
-            // Compile methods
-            ComputeDependencies(_markedNodes);
 
             return _markedNodes.ToImmutableList<IDependencyNode>();
         }

@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 {
     public class CodeGeneratorContext
     {
-        public Emitter Emitter { get; } = new();
+        public InstructionsBuilder InstructionsBuilder { get; } = new();
         public LocalVariableTable LocalVariableTable { get; }
         public int ParamsCount => _method.ParamsCount;
         public int LocalsCount => _method.LocalsCount;

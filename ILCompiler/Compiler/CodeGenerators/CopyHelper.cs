@@ -6,14 +6,14 @@ namespace ILCompiler.Compiler.CodeGenerators
 {
     internal static class CopyHelper
     {
-        public static void CopyStackToSmall(Emitter emitter, int bytesToCopy, int ixOffset)
+        public static void CopyStackToSmall(InstructionsBuilder instructionsBuilder, int bytesToCopy, int ixOffset)
         {
             // pop lsw
-            emitter.Pop(HL);
+            instructionsBuilder.Pop(HL);
 
             // pop msw and ignore it as for small data types we
             // truncate the value
-            emitter.Pop(DE);
+            instructionsBuilder.Pop(DE);
 
             short changeToIX = 0;
             if (ixOffset + bytesToCopy - 1 > 127)
@@ -28,48 +28,48 @@ namespace ILCompiler.Compiler.CodeGenerators
             }
             if (changeToIX != 0)
             {
-                emitter.Ld(DE, changeToIX);
-                emitter.Add(IX, DE);
+                instructionsBuilder.Ld(DE, changeToIX);
+                instructionsBuilder.Add(IX, DE);
                 ixOffset -= changeToIX;
             }
 
             if (bytesToCopy == 2)
             {
-                emitter.Ld(__[IX + (short)(ixOffset + 1)], H);
+                instructionsBuilder.Ld(__[IX + (short)(ixOffset + 1)], H);
             }
-            emitter.Ld(__[IX + (short)(ixOffset + 0)], L);
+            instructionsBuilder.Ld(__[IX + (short)(ixOffset + 0)], L);
 
             if (changeToIX != 0)
             {
-                emitter.Ld(DE, (short)-changeToIX);
-                emitter.Add(IX, DE);
+                instructionsBuilder.Ld(DE, (short)-changeToIX);
+                instructionsBuilder.Add(IX, DE);
             }
         }
 
         /*
          * Assumes address to copy to is in HL
          */
-        public static void CopyStackToHLSmall(Emitter emitter, int bytesToCopy, int offset)
+        public static void CopyStackToHLSmall(InstructionsBuilder instructionsBuilder, int bytesToCopy, int offset)
         {
             if (offset != 0)
             {
-                emitter.Ld(DE, (short)offset);
-                emitter.Add(HL, DE);
+                instructionsBuilder.Ld(DE, (short)offset);
+                instructionsBuilder.Add(HL, DE);
             }
 
-            emitter.Pop(DE);
-            emitter.Pop(BC);    // Ignore msw
+            instructionsBuilder.Pop(DE);
+            instructionsBuilder.Pop(BC);    // Ignore msw
 
-            emitter.Ld(__[HL], E);
-            emitter.Inc(HL);
+            instructionsBuilder.Ld(__[HL], E);
+            instructionsBuilder.Inc(HL);
 
             if (bytesToCopy == 2)
             {
-                emitter.Ld(__[HL], D);
+                instructionsBuilder.Ld(__[HL], D);
             }
         }
 
-        public static void CopySmallToStack(Emitter emitter, int bytesToCopy, int ixOffset, bool signExtend)
+        public static void CopySmallToStack(InstructionsBuilder instructionsBuilder, int bytesToCopy, int ixOffset, bool signExtend)
         {
             Debug.Assert(bytesToCopy == 1 || bytesToCopy == 2);
             int changeToIX = 0;
@@ -77,8 +77,8 @@ namespace ILCompiler.Compiler.CodeGenerators
             if (ixOffset + bytesToCopy < -127)
             {
                 var delta = ixOffset + 1;
-                emitter.Ld(DE, (short)delta);
-                emitter.Add(IX, DE);
+                instructionsBuilder.Ld(DE, (short)delta);
+                instructionsBuilder.Add(IX, DE);
                 changeToIX += delta;
 
                 ixOffset -= delta;
@@ -88,71 +88,71 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 if (signExtend)
                 {
-                    emitter.Ld(A, __[IX + (short)(ixOffset)]);
-                    emitter.Ld(E, A);
+                    instructionsBuilder.Ld(A, __[IX + (short)(ixOffset)]);
+                    instructionsBuilder.Ld(E, A);
 
-                    emitter.Add(A, A);
-                    emitter.Sbc(A, A);
-                    emitter.Ld(H, A);
-                    emitter.Ld(L, A);
-                    emitter.Push(HL);
+                    instructionsBuilder.Add(A, A);
+                    instructionsBuilder.Sbc(A, A);
+                    instructionsBuilder.Ld(H, A);
+                    instructionsBuilder.Ld(L, A);
+                    instructionsBuilder.Push(HL);
 
-                    emitter.Ld(L, E);
-                    emitter.Push(HL);
+                    instructionsBuilder.Ld(L, E);
+                    instructionsBuilder.Push(HL);
                 }
                 else
                 {
-                    emitter.Ld(HL, 0);
-                    emitter.Push(HL);
+                    instructionsBuilder.Ld(HL, 0);
+                    instructionsBuilder.Push(HL);
 
-                    emitter.Ld(H, 0);
-                    emitter.Ld(L, __[IX + (short)(ixOffset)]);
-                    emitter.Push(HL);
+                    instructionsBuilder.Ld(H, 0);
+                    instructionsBuilder.Ld(L, __[IX + (short)(ixOffset)]);
+                    instructionsBuilder.Push(HL);
                 }
             }
             else
             {
                 if (signExtend)
                 {
-                    emitter.Ld(H, __[IX + (short)(ixOffset + 1)]);
-                    emitter.Ld(L, __[IX + (short)(ixOffset)]);
+                    instructionsBuilder.Ld(H, __[IX + (short)(ixOffset + 1)]);
+                    instructionsBuilder.Ld(L, __[IX + (short)(ixOffset)]);
 
-                    emitter.Ld(D, H);
-                    emitter.Ld(E, L);
+                    instructionsBuilder.Ld(D, H);
+                    instructionsBuilder.Ld(E, L);
 
-                    emitter.Add(HL, HL);  // move sign bit into carry flag
-                    emitter.Sbc(HL, HL);  // hl is now 0000 or FFFF
-                    emitter.Push(HL);
+                    instructionsBuilder.Add(HL, HL);  // move sign bit into carry flag
+                    instructionsBuilder.Sbc(HL, HL);  // hl is now 0000 or FFFF
+                    instructionsBuilder.Push(HL);
 
-                    emitter.Push(DE);
+                    instructionsBuilder.Push(DE);
                 }
                 else
                 {
-                    emitter.Ld(HL, 0);
-                    emitter.Push(HL);
+                    instructionsBuilder.Ld(HL, 0);
+                    instructionsBuilder.Push(HL);
 
-                    emitter.Ld(H, __[IX + (short)(ixOffset + 1)]);
-                    emitter.Ld(L, __[IX + (short)(ixOffset)]);
-                    emitter.Push(HL);
+                    instructionsBuilder.Ld(H, __[IX + (short)(ixOffset + 1)]);
+                    instructionsBuilder.Ld(L, __[IX + (short)(ixOffset)]);
+                    instructionsBuilder.Push(HL);
                 }
             }
 
             if (changeToIX != 0)
             {
-                emitter.Ld(DE, (short)(-changeToIX));
-                emitter.Add(IX, DE);
+                instructionsBuilder.Ld(DE, (short)(-changeToIX));
+                instructionsBuilder.Add(IX, DE);
             }
         }
 
         /*
          *  Assumes address to copy to is in HL
          */
-        public static void CopyFromStackToHL(Emitter emitter, int size, int offset = 0)
+        public static void CopyFromStackToHL(InstructionsBuilder instructionsBuilder, int size, int offset = 0)
         {
             if (offset != 0)
             {
-                emitter.Ld(DE, (short)offset);
-                emitter.Add(HL, DE);
+                instructionsBuilder.Ld(DE, (short)offset);
+                instructionsBuilder.Add(HL, DE);
             }
 
             var totalBytesToCopy = size;
@@ -161,23 +161,23 @@ namespace ILCompiler.Compiler.CodeGenerators
                 var bytesToCopy = totalBytesToCopy > 2 ? 2 : totalBytesToCopy;
                 totalBytesToCopy -= 2;
 
-                emitter.Pop(DE);
+                instructionsBuilder.Pop(DE);
 
-                emitter.Ld(__[HL], E);
-                emitter.Inc(HL);
+                instructionsBuilder.Ld(__[HL], E);
+                instructionsBuilder.Inc(HL);
                 if (bytesToCopy == 2)
                 {
-                    emitter.Ld(__[HL], D);
+                    instructionsBuilder.Ld(__[HL], D);
                     if (totalBytesToCopy > 0)
                     {
-                        emitter.Inc(HL);
+                        instructionsBuilder.Inc(HL);
                     }
                 }
 
             } while (totalBytesToCopy > 0);
         }
 
-        public static void CopyFromStackToIX(Emitter emitter, int size, int ixOffset = 0, bool restoreIX = false)
+        public static void CopyFromStackToIX(InstructionsBuilder instructionsBuilder, int size, int ixOffset = 0, bool restoreIX = false)
         {
             // TODO: When does it make sense to use LDIR instead??
             // e.g. if size > 255 then we'll have to emit code to alter IX so using ldir is probably better
@@ -208,8 +208,8 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                     changeToIX += newIxChange;
 
-                    emitter.Ld(DE, newIxChange);
-                    emitter.Add(IX, DE);
+                    instructionsBuilder.Ld(DE, newIxChange);
+                    instructionsBuilder.Add(IX, DE);
                 }
 
                 while (ixOffset < -128)
@@ -225,16 +225,16 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                     changeToIX += newIxChange;
 
-                    emitter.Ld(DE, newIxChange);
-                    emitter.Add(IX, DE);
+                    instructionsBuilder.Ld(DE, newIxChange);
+                    instructionsBuilder.Add(IX, DE);
                 }
 
-                emitter.Pop(HL);
+                instructionsBuilder.Pop(HL);
                 if (bytesToCopy == 2)
                 {
-                    emitter.Ld(__[IX + (short)(ixOffset + 1)], H);
+                    instructionsBuilder.Ld(__[IX + (short)(ixOffset + 1)], H);
                 }
-                emitter.Ld(__[IX + (short)(ixOffset + 0)], L);
+                instructionsBuilder.Ld(__[IX + (short)(ixOffset + 0)], L);
 
                 ixOffset += 2;
                 totalBytesToCopy -= 2;
@@ -242,12 +242,12 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             if (changeToIX != 0 && restoreIX)
             {
-                emitter.Ld(DE, (short)(-changeToIX));
-                emitter.Add(IX, DE);
+                instructionsBuilder.Ld(DE, (short)(-changeToIX));
+                instructionsBuilder.Add(IX, DE);
             }
         }
 
-        public static void CopyFromIXToStack(Emitter emitter, int size, int ixOffset = 0, bool restoreIX = false)
+        public static void CopyFromIXToStack(InstructionsBuilder instructionsBuilder, int size, int ixOffset = 0, bool restoreIX = false)
         {
             int changeToIX = 0;
 
@@ -263,8 +263,8 @@ namespace ILCompiler.Compiler.CodeGenerators
                 {
                     // Move IX so new offset will be 126/127
                     var delta = -ixOffset + 126;
-                    emitter.Ld(DE, (short)-delta);
-                    emitter.Add(IX, DE);
+                    instructionsBuilder.Ld(DE, (short)-delta);
+                    instructionsBuilder.Add(IX, DE);
                     changeToIX -= delta;
 
                     ixOffset += delta;
@@ -273,23 +273,23 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                 if (bytesToCopy == 1)
                 {
-                    emitter.Ld(H, 0);
-                    emitter.Ld(L, __[IX + (short)(ixOffset + 1)]);
+                    instructionsBuilder.Ld(H, 0);
+                    instructionsBuilder.Ld(L, __[IX + (short)(ixOffset + 1)]);
                 }
                 else
                 {
-                    emitter.Ld(H, __[IX + (short)(ixOffset + 1)]);
-                    emitter.Ld(L, __[IX + (short)(ixOffset + 0)]);
+                    instructionsBuilder.Ld(H, __[IX + (short)(ixOffset + 1)]);
+                    instructionsBuilder.Ld(L, __[IX + (short)(ixOffset + 0)]);
                 }
-                emitter.Push(HL);
+                instructionsBuilder.Push(HL);
 
                 ixOffset -= 2;
             } while (ixOffset >= originalIxOffset);
 
             if (changeToIX != 0 && restoreIX)
             {
-                emitter.Ld(DE, (short)(-changeToIX));
-                emitter.Add(IX, DE);
+                instructionsBuilder.Ld(DE, (short)(-changeToIX));
+                instructionsBuilder.Add(IX, DE);
             }
         }
     }
