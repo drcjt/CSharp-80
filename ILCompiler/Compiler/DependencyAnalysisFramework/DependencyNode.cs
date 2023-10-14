@@ -6,6 +6,7 @@ namespace ILCompiler.Compiler.DependencyAnalysisFramework
     public abstract class DependencyNode : IDependencyNode
     {
         public bool Mark { get; set; }
+
         public virtual void OnMarked(NodeFactory factory) { }
 
         public virtual IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context) => new List<IDependencyNode>();

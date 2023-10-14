@@ -15,6 +15,9 @@ namespace ILCompiler.Compiler
         private readonly ILogger<Z80AssemblyWriter> _logger;
         private readonly NativeDependencyAnalyser _nativeDependencyAnalyser;
 
+        private readonly PreinitializationManager _preinitializationManager;
+        private readonly NodeFactory _nodeFactory;
+
         private string _inputFilePath = null!;
         private StreamWriter _out = null!;
 

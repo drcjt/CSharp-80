@@ -15,6 +15,7 @@ namespace ILCompiler.Compiler
         private readonly Z80AssemblyWriter _z80AssemblyWriter;
         private readonly DependencyAnalyzer _dependencyAnalyzer;
         private readonly CorLibModuleProvider _corLibModuleProvider;
+        private string _inputFilePath = String.Empty;
 
         public Compilation(IConfiguration configuration, ILogger<Compilation> logger, Factory<IMethodCompiler> methodCompilerFactory, Z80AssemblyWriter z80Writer, CorLibModuleProvider corLibModuleProvider, DependencyAnalyzer dependencyAnalyzer)
         {
@@ -28,6 +29,7 @@ namespace ILCompiler.Compiler
 
         public void Compile(string inputFilePath, string outputFilePath)
         {
+            _inputFilePath = inputFilePath;
             ModuleContext modCtx = ModuleDef.CreateModuleContext();
 
             var corlibFilePath = _configuration.CorelibPath;
