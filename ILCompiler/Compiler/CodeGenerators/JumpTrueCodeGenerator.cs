@@ -9,11 +9,11 @@ namespace ILCompiler.Compiler.CodeGenerators
         public void GenerateCode(JumpTrueEntry entry, CodeGeneratorContext context)
         {
             // Pop i4 from stack and jump if non zero
-            context.Emitter.Pop(HL);      // LSW
-            context.Emitter.Ld(A, 0);
-            context.Emitter.Add(A, L);
-            context.Emitter.Pop(HL);      // MSW
-            context.Emitter.Jp(Condition.NZ, entry.TargetLabel);
+            context.InstructionsBuilder.Pop(HL);      // LSW
+            context.InstructionsBuilder.Ld(A, 0);
+            context.InstructionsBuilder.Add(A, L);
+            context.InstructionsBuilder.Pop(HL);      // MSW
+            context.InstructionsBuilder.Jp(Condition.NZ, entry.TargetLabel);
         }
     }
 }

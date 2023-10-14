@@ -9,10 +9,10 @@ namespace ILCompiler.Compiler.CodeGenerators
             switch (entry.Operation)
             {
                 case Operation.Neg:
-                    context.Emitter.Call("i_neg");
+                    context.InstructionsBuilder.Call("i_neg");
                     break;
                 case Operation.Not:
-                    context.Emitter.Call("i_not");
+                    context.InstructionsBuilder.Call("i_not");
                     break;
                 default:
                     throw new NotImplementedException($"Unary operator {entry.Operation} not implemented");

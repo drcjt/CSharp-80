@@ -15,7 +15,6 @@ namespace ILCompiler.Compiler
         private readonly Z80AssemblyWriter _z80AssemblyWriter;
         private readonly DependencyAnalyzer _dependencyAnalyzer;
         private readonly CorLibModuleProvider _corLibModuleProvider;
-        private string _inputFilePath = String.Empty;
 
         public Compilation(IConfiguration configuration, ILogger<Compilation> logger, Factory<IMethodCompiler> methodCompilerFactory, Z80AssemblyWriter z80Writer, CorLibModuleProvider corLibModuleProvider, DependencyAnalyzer dependencyAnalyzer)
         {
@@ -29,7 +28,6 @@ namespace ILCompiler.Compiler
 
         public void Compile(string inputFilePath, string outputFilePath)
         {
-            _inputFilePath = inputFilePath;
             ModuleContext modCtx = ModuleDef.CreateModuleContext();
 
             var corlibFilePath = _configuration.CorelibPath;
@@ -54,11 +52,9 @@ namespace ILCompiler.Compiler
 
             var rootNode = (Z80MethodCodeNode)_dependencyAnalyzer.AddRoot(module.EntryPoint);
 
-            _dependencyAnalyzer.ComputeDependencyRoutine += ComputeDependencyNodeDependencies;
-
             // Core Dependency Analysis and code output routine
             var nodes = _dependencyAnalyzer.ComputeMarkedNodes();
-            _z80AssemblyWriter.OutputCode(rootNode, nodes, inputFilePath, outputFilePath);
+            _z80AssemblyWriter.WriteCode(rootNode, nodes, inputFilePath, outputFilePath);
 
             // Write dgml version of dependency graph
             WriteDependencyLog(Path.ChangeExtension(inputFilePath, ".dgml"), rootNode);
@@ -70,20 +66,6 @@ namespace ILCompiler.Compiler
             {
                 DgmlWriter.WriteDependencyGraphToStream(dgmlOutput, root);
                 dgmlOutput.Flush();
-            }
-        }
-
-        private void ComputeDependencyNodeDependencies(List<IDependencyNode> nodes)
-        {
-            foreach (var node in nodes)
-            {
-                if (node is Z80MethodCodeNode methodCodeNodeNeedingCode)
-                {
-                    _logger.LogDebug("Compiling method {method.Name}", methodCodeNodeNeedingCode.Method.Name);
-
-                    var methodCompiler = _methodCompilerFactory.Create();
-                    methodCompiler.CompileMethod(methodCodeNodeNeedingCode, _inputFilePath);
-                }
             }
         }
     }

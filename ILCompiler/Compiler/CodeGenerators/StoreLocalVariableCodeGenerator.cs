@@ -14,13 +14,13 @@ namespace ILCompiler.Compiler.CodeGenerators
                 // Copy from stack to IX truncating to required size
                 var bytesToCopy = variable.Type.IsByte() ? 1 : 2;
 
-                CopyHelper.CopyStackToSmall(context.Emitter, bytesToCopy, -variable.StackOffset);
+                CopyHelper.CopyStackToSmall(context.InstructionsBuilder, bytesToCopy, -variable.StackOffset);
             }
             else
             {
                 // Storing a local variable/argument
                 Debug.Assert(variable.ExactSize % 2 == 0);
-                CopyHelper.CopyFromStackToIX(context.Emitter, variable.ExactSize, -variable.StackOffset, restoreIX: true);
+                CopyHelper.CopyFromStackToIX(context.InstructionsBuilder, variable.ExactSize, -variable.StackOffset, restoreIX: true);
             }
         }
     }

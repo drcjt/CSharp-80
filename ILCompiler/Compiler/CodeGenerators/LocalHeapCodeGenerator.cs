@@ -10,73 +10,73 @@ namespace ILCompiler.Compiler.CodeGenerators
         public void GenerateCode(LocalHeapEntry entry, CodeGeneratorContext context)
         {
             // Use the 16 bit size on top of the stack to determine the amount of localloc to do
-            context.Emitter.Pop(HL);
+            context.InstructionsBuilder.Pop(HL);
 
             var endLabel = context.NameMangler.GetUniqueName();
 
             // Test if size is 0 and return null if it is
-            context.Emitter.Ld(A, H);
-            context.Emitter.Or(L);
-            context.Emitter.Jp(Condition.Z, endLabel);
+            context.InstructionsBuilder.Ld(A, H);
+            context.InstructionsBuilder.Or(L);
+            context.InstructionsBuilder.Jp(Condition.Z, endLabel);
 
             // Round up number of bytes to allocate to a StackAlign boundary
             // BC = (HL + (StackAlign - 1)) & ~(StackAlign - 1)
-            context.Emitter.Ld(DE, (short)(StackAlign - 1));
-            context.Emitter.Add(HL, DE);
-            context.Emitter.Ld(DE, (short)~(StackAlign - 1));
-            context.Emitter.Ld(A, H);
-            context.Emitter.And(D);
-            context.Emitter.Ld(B, A);
-            context.Emitter.Ld(A, L);
-            context.Emitter.And(E);
-            context.Emitter.Ld(C, A);
+            context.InstructionsBuilder.Ld(DE, (short)(StackAlign - 1));
+            context.InstructionsBuilder.Add(HL, DE);
+            context.InstructionsBuilder.Ld(DE, (short)~(StackAlign - 1));
+            context.InstructionsBuilder.Ld(A, H);
+            context.InstructionsBuilder.And(D);
+            context.InstructionsBuilder.Ld(B, A);
+            context.InstructionsBuilder.Ld(A, L);
+            context.InstructionsBuilder.And(E);
+            context.InstructionsBuilder.Ld(C, A);
 
             if (context.Method.Body.InitLocals)
             {
                 // zero space on stack
-                context.Emitter.Ld(HL, 0);
+                context.InstructionsBuilder.Ld(HL, 0);
 
                 // Divide BC by 2
-                context.Emitter.Srl(B);
-                context.Emitter.Rr(C);
-                context.Emitter.Srl(B);
-                context.Emitter.Rr(C);
+                context.InstructionsBuilder.Srl(B);
+                context.InstructionsBuilder.Rr(C);
+                context.InstructionsBuilder.Srl(B);
+                context.InstructionsBuilder.Rr(C);
 
                 // Start of Zeroing loop
                 var initLoopLabel = context.NameMangler.GetUniqueName();
-                context.Emitter.CreateLabel(initLoopLabel);
+                context.InstructionsBuilder.Label(initLoopLabel);
 
                 // Zero two zero bytes
-                context.Emitter.Push(HL);
-                context.Emitter.Push(HL);
+                context.InstructionsBuilder.Push(HL);
+                context.InstructionsBuilder.Push(HL);
 
                 // Decrement byte count
-                context.Emitter.Dec(BC);
+                context.InstructionsBuilder.Dec(BC);
 
-                context.Emitter.Ld(A, B);
-                context.Emitter.Or(C);
+                context.InstructionsBuilder.Ld(A, B);
+                context.InstructionsBuilder.Or(C);
 
                 // More bytes to zero then loop
-                context.Emitter.Jp(Condition.NZ, initLoopLabel);
+                context.InstructionsBuilder.Jp(Condition.NZ, initLoopLabel);
 
-                context.Emitter.Ld(HL, 0);
-                context.Emitter.Add(HL, SP);
+                context.InstructionsBuilder.Ld(HL, 0);
+                context.InstructionsBuilder.Add(HL, SP);
             }
             else
             {
-                context.Emitter.Ld(HL, 0);
-                context.Emitter.Add(HL, SP);
+                context.InstructionsBuilder.Ld(HL, 0);
+                context.InstructionsBuilder.Add(HL, SP);
 
-                context.Emitter.And(A);
-                context.Emitter.Sbc(HL, BC);
+                context.InstructionsBuilder.And(A);
+                context.InstructionsBuilder.Sbc(HL, BC);
 
-                context.Emitter.Ld(SP, HL);
+                context.InstructionsBuilder.Ld(SP, HL);
             }
 
-            context.Emitter.CreateLabel(endLabel);
+            context.InstructionsBuilder.Label(endLabel);
 
             // Push address of newly allocated space
-            context.Emitter.Push(HL);
+            context.InstructionsBuilder.Push(HL);
         }
     }
 }

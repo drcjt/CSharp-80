@@ -67,14 +67,14 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                 if (ComparisonOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, op1Type), out string? routine))
                 {
-                    context.Emitter.Call(routine);
+                    context.InstructionsBuilder.Call(routine);
                     // If carry set then push i4 1 else push i4 0
-                    context.Emitter.Ld(HL, 0);
-                    context.Emitter.Push(HL);     // MSW
+                    context.InstructionsBuilder.Ld(HL, 0);
+                    context.InstructionsBuilder.Push(HL);     // MSW
 
-                    context.Emitter.Ld(HL, 0);
-                    context.Emitter.Adc(HL, HL);
-                    context.Emitter.Push(HL);     // LSW
+                    context.InstructionsBuilder.Ld(HL, 0);
+                    context.InstructionsBuilder.Adc(HL, HL);
+                    context.InstructionsBuilder.Push(HL);     // LSW
                 }
                 else
                 {
@@ -86,14 +86,14 @@ namespace ILCompiler.Compiler.CodeGenerators
                 if (operatorType == VarType.Ptr && entry.Operation == Operation.Add)
                 {
                     // Inline 16 bit adds to avoid overhead of call 
-                    context.Emitter.Pop(HL);
-                    context.Emitter.Pop(BC);
-                    context.Emitter.Add(HL, BC);
-                    context.Emitter.Push(HL);
+                    context.InstructionsBuilder.Pop(HL);
+                    context.InstructionsBuilder.Pop(BC);
+                    context.InstructionsBuilder.Add(HL, BC);
+                    context.InstructionsBuilder.Push(HL);
                 }
                 else if (BinaryOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, operatorType), out string? routine))
                 {
-                    context.Emitter.Call(routine);
+                    context.InstructionsBuilder.Call(routine);
                 }
                 else
                 {

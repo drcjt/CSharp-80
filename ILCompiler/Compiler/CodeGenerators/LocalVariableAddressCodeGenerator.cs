@@ -12,14 +12,14 @@ namespace ILCompiler.Compiler.CodeGenerators
             var offset = localVariable.StackOffset;
 
             // Calculate and push the actual 16 bit address
-            context.Emitter.Push(IX);
-            context.Emitter.Pop(HL);
+            context.InstructionsBuilder.Push(IX);
+            context.InstructionsBuilder.Pop(HL);
 
-            context.Emitter.Ld(DE, (short)(-offset));
-            context.Emitter.Add(HL, DE);
+            context.InstructionsBuilder.Ld(DE, (short)(-offset));
+            context.InstructionsBuilder.Add(HL, DE);
 
             // Push address
-            context.Emitter.Push(HL);
+            context.InstructionsBuilder.Push(HL);
         }
     }
 }

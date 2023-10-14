@@ -1,5 +1,8 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Compiler.PreInit;
+using ILCompiler.Interfaces;
+using ILCompiler.IoC;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
@@ -11,11 +14,22 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly IDictionary<string, ConstructedEETypeNode> _constructedEETypeNodesByFullName = new Dictionary<string, ConstructedEETypeNode>();
         private readonly IDictionary<TypeDef, VTableSliceNode> _vTableNodes = new Dictionary<TypeDef, VTableSliceNode>();
 
+        private readonly PreinitializationManager _preinitializationManager;
+        private readonly INameMangler _nameMangler;
+        private readonly Factory<IMethodCompiler> _methodCompilerFactory;
+
+        public NodeFactory(PreinitializationManager preinitializationManager, INameMangler nameMangler, Factory<IMethodCompiler> methodCompilerFactory) 
+        {
+            _preinitializationManager = preinitializationManager;
+            _nameMangler = nameMangler;
+            _methodCompilerFactory = methodCompilerFactory;
+        }
+
         public ConstructedEETypeNode ConstructedEETypeNode(ITypeDefOrRef type, int size)
         {
             if (!_constructedEETypeNodesByFullName.TryGetValue(type.FullName, out var constructedEETypeNode))
             {
-                constructedEETypeNode = new ConstructedEETypeNode(type, size);
+                constructedEETypeNode = new ConstructedEETypeNode(type, size, _nameMangler, _preinitializationManager, this);
                 _constructedEETypeNodesByFullName[type.FullName] = constructedEETypeNode;
             }
 
@@ -26,7 +40,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             if (!_staticNodesByFullName.TryGetValue(field.FullName, out var staticNode))
             {
-                staticNode = new StaticsNode(field);
+                staticNode = new StaticsNode(field, _preinitializationManager, _nameMangler);
                 _staticNodesByFullName[field.FullName] = staticNode;
             }
 
@@ -65,7 +79,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
             if (!_methodNodesByFullName.TryGetValue(calleeMethodFullName, out var methodNode))
             {
-                methodNode = new Z80MethodCodeNode(new InstantiatedMethod(calleeMethodDef, resolvedGenericParameters, calleeMethodFullName));
+                var instantiatedMethod = new InstantiatedMethod(calleeMethodDef, resolvedGenericParameters, calleeMethodFullName);
+                methodNode = new Z80MethodCodeNode(instantiatedMethod, _methodCompilerFactory);
                 _methodNodesByFullName[calleeMethodFullName] = methodNode;
             }
 
@@ -77,7 +92,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             var methodDef = method.ResolveMethodDefThrow();
             if (!_methodNodesByFullName.TryGetValue(methodDef.FullName, out var methodNode))
             {
-                methodNode = new Z80MethodCodeNode(new MethodDesc(methodDef));
+                methodNode = new Z80MethodCodeNode(new MethodDesc(methodDef), _methodCompilerFactory);
                 _methodNodesByFullName[methodDef.FullName] = methodNode;
             }
 

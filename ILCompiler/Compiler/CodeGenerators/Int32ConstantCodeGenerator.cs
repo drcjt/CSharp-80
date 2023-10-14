@@ -11,10 +11,10 @@ namespace ILCompiler.Compiler.CodeGenerators
             var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
             var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
 
-            context.Emitter.Ld(HL, high);     //MSW
-            context.Emitter.Push(HL);
-            context.Emitter.Ld(HL, low);      //LSW
-            context.Emitter.Push(HL);
+            context.InstructionsBuilder.Ld(HL, high);     //MSW
+            context.InstructionsBuilder.Push(HL);
+            context.InstructionsBuilder.Ld(HL, low);      //LSW
+            context.InstructionsBuilder.Push(HL);
         }
     }
 }

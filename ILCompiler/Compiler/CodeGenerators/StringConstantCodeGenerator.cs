@@ -8,8 +8,8 @@ namespace ILCompiler.Compiler.CodeGenerators
         public void GenerateCode(StringConstantEntry entry, CodeGeneratorContext context)
         {
             // TODO: Currently obj refs can only be strings
-            context.Emitter.Ld(HL, entry.Label);     // LSW
-            context.Emitter.Push(HL);
+            context.InstructionsBuilder.Ld(HL, entry.Label);     // LSW
+            context.InstructionsBuilder.Push(HL);
         }
     }
 }

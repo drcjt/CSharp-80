@@ -6,7 +6,7 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(JumpEntry entry, CodeGeneratorContext context)
         {
-            context.Emitter.Jp(entry.TargetLabel);
+            context.InstructionsBuilder.Jp(entry.TargetLabel);
         }
     }
 }
