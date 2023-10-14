@@ -6,7 +6,7 @@ namespace Primes
     {
         public unsafe static int GeneratePrimes(int* primes, int limit)
         {
-            var startTime = Environment.GetDateTime();
+            var startTime = DateTime.Now;
 
             for (var i = 2; i < limit; i++)
             {
@@ -28,7 +28,7 @@ namespace Primes
                 }
             }
 
-            var endTime = Environment.GetDateTime();
+            var endTime = DateTime.Now;
             var elapsedTime = endTime.TotalSeconds - startTime.TotalSeconds;
 
             return elapsedTime;

@@ -16,7 +16,7 @@ namespace Primes
         {
             ResetPrimes(temp, bound);
 
-            var startTime = Environment.GetDateTime();
+            var startTime = DateTime.Now;
 
             var k = (bound - 1) >> 1;
 
@@ -46,7 +46,7 @@ namespace Primes
 
             primes[2] = 1;
 
-            var endTime = Environment.GetDateTime();
+            var endTime = DateTime.Now;
             var elapsedTime = endTime.TotalSeconds - startTime.TotalSeconds;
 
             return elapsedTime;

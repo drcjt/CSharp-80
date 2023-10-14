@@ -24,11 +24,11 @@ namespace Life
                 Console.Write("Generation : ");
                 Console.Write(generation);
 
-                var startTime = Environment.GetDateTime();
+                var startTime = DateTime.Now;
 
                 currentMap.NextGeneration();
 
-                var endTime = Environment.GetDateTime();
+                var endTime = DateTime.Now;
                 var elapsedTime = endTime.TotalSeconds - startTime.TotalSeconds;
 
                 Console.SetCursorPosition(25, 0);
