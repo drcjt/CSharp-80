@@ -1,6 +1,6 @@
 ﻿namespace System
 {
-    public readonly struct DateTime
+    public readonly partial struct DateTime
     {
         public int Day { get; }
         public int Hour { get; }
@@ -8,6 +8,8 @@
         public int Second { get; }
 
         public int TotalSeconds => Second + (Minute * 60) + (Hour * 60 * 60);
+
+        public static DateTime Now { get {  return GetDateTime(); } }
 
         public DateTime(int day, int hour, int minute, int second)
         {

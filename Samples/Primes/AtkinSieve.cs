@@ -12,7 +12,7 @@ namespace Primes
 
         public unsafe static int GeneratePrimes(int* primes, int limit)
         {
-            var startTime = Environment.GetDateTime();
+            var startTime = DateTime.Now;
 
             var sqrt = Sqrt(limit);
 
@@ -51,7 +51,7 @@ namespace Primes
             primes[2] = 1;
             primes[3] = 1;
 
-            var endTime = Environment.GetDateTime();
+            var endTime = DateTime.Now;
             var elapsedTime = endTime.TotalSeconds - startTime.TotalSeconds;
 
             return elapsedTime;

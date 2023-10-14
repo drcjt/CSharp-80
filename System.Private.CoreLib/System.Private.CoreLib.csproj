@@ -34,6 +34,7 @@
 		<Compile Include="Pal/Graphics.ZXSpectrum.cs" />
 		<Compile Include="Pal/Interop.Libraries.cs" />
 		<Compile Include="Pal/Thread.ZXSpectrum.cs" />
+		<Compile Include="Pal\DateTime.ZXSpectrum.cs" />
 	</ItemGroup>
 	
 	<ItemGroup Condition="'$(TargetPlatform)' == 'Trs80'">
@@ -44,6 +45,7 @@
 		<Compile Include="Pal/Graphics.Trs80.cs" />		
 		<Compile Include="Pal/Interop.Libraries.cs" />
 		<Compile Include="Pal/Thread.Trs80.cs" />
+		<Compile Include="Pal\DateTime.Trs80.cs" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetPlatform)' == 'CPM'">
@@ -54,6 +56,7 @@
 		<Compile Include="Pal/Environment.CPM.cs" />
 		<Compile Include="Pal/Interop.Libraries.cs" />
 		<Compile Include="Pal/Thread.CPM.cs" />
+		<Compile Include="Pal\DateTime.CPM.cs" />
 	</ItemGroup>
 
 </Project>
