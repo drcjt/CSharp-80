@@ -9,9 +9,9 @@ namespace ILCompiler.Compiler.DependencyAnalysisFramework
 
         public virtual void OnMarked(NodeFactory factory) { }
 
-        public virtual IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context) => new List<IDependencyNode>();
+        public virtual IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context) => Array.Empty<IDependencyNode>();
 
-        public virtual IList<ConditionalDependency> GetConditionalStaticDependencies(DependencyNodeContext context) => new List<ConditionalDependency>();
+        public virtual IList<ConditionalDependency> GetConditionalStaticDependencies(DependencyNodeContext context) => Array.Empty<ConditionalDependency>();
 
         public IList<IDependencyNode> Dependencies { get; set; } = new List<IDependencyNode>();
 
