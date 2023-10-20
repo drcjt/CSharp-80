@@ -177,14 +177,16 @@ namespace ILCompiler.Common.TypeSystem.Common
 
         private static MethodDef? ResolveInterfaceMethodToVirtualMethodOnTypeRecursive(MethodDef interfaceMethod, ITypeDefOrRef? currentType)
         {
-            MethodDef? typeInterfaceResolution = null;
-            while (currentType != null && typeInterfaceResolution != null && 
-                   IsInterfaceImplementedOnType(currentType, interfaceMethod.DeclaringType))
+            while (currentType != null && IsInterfaceImplementedOnType(currentType, interfaceMethod.DeclaringType))
             {
-                typeInterfaceResolution = ResolveInterfaceMethodToVirtualMethodOnType(interfaceMethod, currentType.ResolveTypeDefThrow());
+                var typeInterfaceResolution = ResolveInterfaceMethodToVirtualMethodOnType(interfaceMethod, currentType.ResolveTypeDefThrow());
+                if (typeInterfaceResolution != null)
+                {
+                    return typeInterfaceResolution;
+                }
                 currentType = currentType.GetBaseType();
             }
-            return typeInterfaceResolution;
+            return null;
         }
 
         /// <summary>
@@ -249,12 +251,9 @@ namespace ILCompiler.Common.TypeSystem.Common
             var foundRecords = new List<MethodOverride>();
             foreach (var method in type.Methods)
             {
-                foreach (var methodOverride in method.Overrides)
+                foreach (var methodOverride in method.Overrides.Where(x => x.MethodDeclaration.Name == name))
                 {
-                    if (methodOverride.MethodDeclaration.Name == name)
-                    {
-                        foundRecords.Add(new MethodOverride(method, methodOverride.MethodDeclaration));
-                    }
+                    foundRecords.Add(new MethodOverride(method, methodOverride.MethodDeclaration));
                 }
             }
 
