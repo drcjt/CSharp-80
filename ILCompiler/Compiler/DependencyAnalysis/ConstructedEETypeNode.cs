@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.PreInit;
@@ -91,6 +92,30 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 }
             }
 
+            var runtimeInterfaces = resolvedType.RuntimeInterfaces();
+            for (int interfaceIndex = 0;  interfaceIndex < runtimeInterfaces.Length; interfaceIndex++) 
+            {
+                var interfaceType = runtimeInterfaces[interfaceIndex].ResolveTypeDefThrow();
+
+                foreach (var method in interfaceType.Methods)
+                {
+                    if (method.IsVirtual)
+                    {
+                        var implMethod = VirtualMethodAlgorithm.ResolveInterfaceMethodToVirtualMethodOnType(method, resolvedType);
+                        if (implMethod != null)
+                        {
+                            var conditionalDependency = new ConditionalDependency
+                            {
+                                IfNode = context.NodeFactory.VirtualMethodUse(method),
+                                ThenParent = this,
+                                ThenNode = context.NodeFactory.VirtualMethodUse(implMethod)
+                            };
+                            conditionalDependencies.Add(conditionalDependency);
+                        }
+                    }
+                }
+            }
+
             return conditionalDependencies;
         }
         public override IList<Instruction> GetInstructions(string inputFilePath)
@@ -133,7 +158,60 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             // Emit VTable
             OutputVirtualSlots(instructionsBuilder, Type, Type);
 
+            OutputDispatchMap(instructionsBuilder);
+
             return instructionsBuilder.Instructions;
+        }
+
+        private void OutputDispatchMap(InstructionsBuilder instructionsBuilder)
+        {
+            instructionsBuilder.Comment($"Dispatch map for {Type.FullName}");
+
+            var resolvedType = Type.ResolveTypeDefThrow();
+            var interfaces = Type.RuntimeInterfaces();
+
+            // Enumerate each interface this type implements
+            for (int interfaceIndex = 0; interfaceIndex < interfaces.Length; interfaceIndex++) 
+            {
+                var interfaceType = interfaces[interfaceIndex];
+                var resolvedInterfaceType = interfaceType.ResolveTypeDefThrow();
+                var virtualSlots = _nodeFactory.VTable(resolvedInterfaceType).GetSlots();
+
+                // For each interface method slot try to emit a dispatch map
+                for (int interfaceMethodSlot = 0; interfaceMethodSlot < virtualSlots.Count; interfaceMethodSlot++) 
+                {
+                    var method = virtualSlots[interfaceMethodSlot];
+
+                    if (method.IsStatic)
+                    {
+                        // TODO: Static interface methods
+                        throw new NotImplementedException("Static interface methods not currently supported");
+                    }
+
+                    var implMethod = VirtualMethodAlgorithm.ResolveInterfaceMethodToVirtualMethodOnType(method, resolvedType);
+                    if (implMethod != null)
+                    {
+                        int emittedInterfaceSlot = interfaceMethodSlot;
+                        int emittedImplSlot = VirtualMethodSlotHelper.GetVirtualMethodSlot(_nodeFactory, implMethod, resolvedType);
+
+                        instructionsBuilder.Comment($"Interface {interfaceType.FullName}, {method.FullName}, {implMethod.FullName}");
+                        instructionsBuilder.Dw((ushort)interfaceIndex);
+                        instructionsBuilder.Dw((ushort)emittedInterfaceSlot);
+                        instructionsBuilder.Dw((ushort)emittedImplSlot);
+                    }
+                    else
+                    {
+                        // No implementation in this type, so must be implemented by a base type in the hierarchy.
+                        // No need to emit a dispatch map in this case as the runtime interface dispatch code will
+                        // walk the inheritance chain
+
+                        // TODO: Will need to check here for
+                        //  * default implementation
+                        //  * Reabstraction
+                        //  * Diamond
+                    }
+                }
+            }
         }
 
         private void OutputVirtualSlots(InstructionsBuilder instructionsBuilder, ITypeDefOrRef type, ITypeDefOrRef implType)
