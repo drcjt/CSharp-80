@@ -1,10 +1,17 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.Common;
 
 namespace ILCompiler.Common.TypeSystem.IL
 {
     public static class DnlibExtensions
     {
         private const string CompilerIntrinsicAttribute = "System.Runtime.CompilerServices.IntrinsicAttribute";
+
+        public static ITypeDefOrRef[] RuntimeInterfaces(this ITypeDefOrRef typeDefOrRef)
+        {
+            // TODO: consider caching the results of this
+            return MetadataRuntimeInterfacesAlgorithm.ComputeRuntimeInterfaces(typeDefOrRef);
+        }
 
         public static ITypeDefOrRef MakeArrayType(this ITypeDefOrRef elementType)
         {

@@ -99,8 +99,9 @@ namespace ILCompiler.Common.TypeSystem.Common
         /// </summary>
         /// <param name="method"></param>
         /// <returns></returns>
-        public static MethodDef FindSlotDefiningMethodForVirtualMethod(MethodDef method)
+        public static MethodDef FindSlotDefiningMethodForVirtualMethod(IMethodDefOrRef methodDefOrRef)
         {
+            var method = methodDefOrRef.ResolveMethodDefThrow();
             var currentType = method.DeclaringType.BaseType;
 
             while (currentType != null && !method.IsNewSlot)
@@ -115,6 +116,148 @@ namespace ILCompiler.Common.TypeSystem.Common
             }
 
             return method;
+        }
+
+        /// <summary>
+        /// Interface resolution.
+        /// See ECMA II.12.2
+        /// </summary>
+        /// <param name="interfaceMethod"></param>
+        /// <param name="currentType"></param>
+        /// <returns></returns>
+        public static MethodDef? ResolveInterfaceMethodToVirtualMethodOnType(MethodDef interfaceMethod, TypeDef currentType) 
+        {
+            if (!currentType.IsInterface)
+            {
+                var methodImpl = FindMethodsFromDeclarationsFromMethodOverrides(currentType, interfaceMethod);
+                if (methodImpl != null)
+                {
+                    return methodImpl;
+                }
+
+                var interfaceType = interfaceMethod.DeclaringType;
+                var baseType = currentType.BaseType;
+
+                var foundExplicitInterface = IsInterfaceExplicitlyImplementedOnType(currentType, interfaceType);
+                if (foundExplicitInterface)
+                {
+                    var foundOnCurrentType = FindMatchingVirtualMethodOnTypeByNameAndSig(interfaceMethod, currentType);
+                    if (foundOnCurrentType != null)
+                    {
+                        foundOnCurrentType = FindSlotDefiningMethodForVirtualMethod(foundOnCurrentType);
+                    }
+
+                    if (baseType != null && foundOnCurrentType == null)
+                    {
+                        throw new NotImplementedException("Unable to resolve explicit interface method to virtual method on type");
+                    }
+
+                    return foundOnCurrentType;
+                }
+                else if (IsInterfaceImplementedOnType(currentType, interfaceType) && 
+                         ResolveInterfaceMethodToVirtualMethodOnTypeRecursive(interfaceMethod, baseType) == null)
+                {
+                    var foundOnCurrentType = FindMatchingVirtualMethodOnTypeByNameAndSig(interfaceMethod, currentType);
+                    if (foundOnCurrentType != null)
+                    {
+                        foundOnCurrentType = FindSlotDefiningMethodForVirtualMethod(foundOnCurrentType);
+                    }
+
+                    if (foundOnCurrentType != null)
+                    {
+                        return foundOnCurrentType;
+                    }
+
+                    throw new NotImplementedException("Unable to resolve implicit interface method to virtual method on type");
+                }
+            }
+
+            return null;
+        }
+
+        private static MethodDef? ResolveInterfaceMethodToVirtualMethodOnTypeRecursive(MethodDef interfaceMethod, ITypeDefOrRef? currentType)
+        {
+            while (currentType != null && IsInterfaceImplementedOnType(currentType, interfaceMethod.DeclaringType))
+            {
+                var typeInterfaceResolution = ResolveInterfaceMethodToVirtualMethodOnType(interfaceMethod, currentType.ResolveTypeDefThrow());
+                if (typeInterfaceResolution != null)
+                {
+                    return typeInterfaceResolution;
+                }
+                currentType = currentType.GetBaseType();
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Determine if a type implements an interface either explicitly or via inheritance
+        /// </summary>
+        /// <param name="currentType"></param>
+        /// <param name="interfaceType"></param>
+        /// <returns>true if interface is implemented by the type</returns>
+        private static bool IsInterfaceImplementedOnType(ITypeDefOrRef currentType, TypeDef interfaceType)
+        {
+            var runtimeInterfaces = MetadataRuntimeInterfacesAlgorithm.ComputeRuntimeInterfaces(currentType);
+            return runtimeInterfaces.Any(type => type == interfaceType);
+        }
+
+        /// <summary>
+        /// Determine if a type implements an interface explicitly
+        /// </summary>
+        /// <param name="currentType"></param>
+        /// <param name="interfaceType"></param>
+        /// <returns>true if interface is implemented by the type explicitly</returns>
+        private static bool IsInterfaceExplicitlyImplementedOnType(TypeDef currentType, TypeDef interfaceType)
+            => currentType.Interfaces.Any(interfaceImpl => interfaceImpl.Interface == interfaceType);
+
+
+        private static MethodDef? FindMethodsFromDeclarationsFromMethodOverrides(TypeDef currentType, MethodDef method)
+        {
+            var foundMethodOverrides = FindMethodOverridesWithMatchingDeclarationName(method.Name, currentType);
+            if (foundMethodOverrides != null)
+            {
+                bool isInterfaceDeclaration = method.DeclaringType.IsInterface;
+
+                foreach (var methodOverride in foundMethodOverrides)
+                {
+                    var declaration = methodOverride.MethodDeclaration.ResolveMethodDefThrow();
+                    if (isInterfaceDeclaration == declaration.DeclaringType.IsInterface)
+                    {
+                        if (!isInterfaceDeclaration)
+                        {
+                            declaration = FindSlotDefiningMethodForVirtualMethod(declaration);
+                        }
+
+                        if (declaration == method)
+                        {
+                            return FindSlotDefiningMethodForVirtualMethod(methodOverride.MethodBody);
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Determine the method implementations where the declaration 
+        /// FindMethodsWithMatchingOverrideNamess
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        private static IEnumerable<MethodOverride> FindMethodOverridesWithMatchingDeclarationName(string name, TypeDef type)
+        {
+            var foundRecords = new List<MethodOverride>();
+            foreach (var method in type.Methods)
+            {
+                foreach (var methodOverride in method.Overrides.Where(x => x.MethodDeclaration.Name == name))
+                {
+                    foundRecords.Add(new MethodOverride(method, methodOverride.MethodDeclaration));
+                }
+            }
+
+            return foundRecords;
         }
     }
 }
