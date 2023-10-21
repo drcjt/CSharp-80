@@ -49,7 +49,9 @@ namespace ILCompiler.Compiler.CodeGenerators
             //    2 bytes for Flags
             //    2 bytes for base size
             //    2 bytes for related type
-            const int eeTypeHeader = 3 * 2;
+            //    1 byte for vtable slot count
+            //    1 byte for interface slot count
+            const int eeTypeHeader = 2 + 2 + 2 + 1 + 1;
             context.InstructionsBuilder.Ld(BC, (byte)((slot * 2) + eeTypeHeader));
 
             context.InstructionsBuilder.Call("VirtualCall");

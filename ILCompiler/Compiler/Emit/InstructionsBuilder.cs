@@ -11,6 +11,20 @@ namespace ILCompiler.Compiler.Emit
             Instructions.Add(instruction);
         }
 
+        public int ReserveByte()
+        {
+            var reservationIndex = Instructions.Count;
+
+            AddInstruction(Instruction.Create(Opcode.Db, (ushort)0));
+
+            return reservationIndex;
+        }
+
+        public void UpdateReservation(int reservationIndex, Instruction instruction)
+        {
+            Instructions[reservationIndex] = instruction;
+        }
+
         public void Reset()
         {
             Instructions.Clear();
@@ -77,9 +91,9 @@ namespace ILCompiler.Compiler.Emit
         // Pseudo instructions
         public void Db(string source) => AddInstruction(Instruction.CreateDeclareByte(Opcode.Db, source));
         public void Db(string label, string source) => AddInstruction(Instruction.CreateDeclareByte(Opcode.Db, source, label));
-        public void Db(byte b) => AddInstruction(Instruction.Create(Opcode.Db, b));
-        public void Dw(string source) => AddInstruction(Instruction.CreateDeclareWord(Opcode.Dw, source));
-        public void Dw(ushort w) => AddInstruction(Instruction.Create(Opcode.Dw, w));
+        public void Db(byte b, string? comment = null) => AddInstruction(Instruction.Create(Opcode.Db, b, comment));
+        public void Dw(string source, string? comment = null) => AddInstruction(Instruction.CreateDeclareWord(Opcode.Dw, source, comment));
+        public void Dw(ushort w, string? comment = null) => AddInstruction(Instruction.Create(Opcode.Dw, w, comment));
         public void Defs(ushort size) => AddInstruction(Instruction.Create(Opcode.Defs, size));
         public void Dc(ushort count, ushort value) => AddInstruction(Instruction.Create(Opcode.Dc, count, value));
         public void Org(ushort target) => AddInstruction(Instruction.Create(Opcode.Org, target));

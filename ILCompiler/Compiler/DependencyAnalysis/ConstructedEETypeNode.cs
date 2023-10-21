@@ -134,34 +134,38 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 flags = 1;
             }
-            instructionsBuilder.Dw(flags);
+            instructionsBuilder.Dw(flags, "EEType flags");
 
             // Emit data for EEType here
             var baseSize = BaseSize;
 
-            byte lsb = (byte)(baseSize & 0xFF);
-            byte msb = (byte)((baseSize >> 8) & 0xFF);
-
-            instructionsBuilder.Db(lsb);
-            instructionsBuilder.Db(msb);
+            instructionsBuilder.Dw((ushort)baseSize, "Base Size");
 
             if (RelatedType != null)
             {
                 var relatedTypeMangledTypeName = _nameMangler.GetMangledTypeName(RelatedType);
-                instructionsBuilder.Dw(relatedTypeMangledTypeName);
+                instructionsBuilder.Dw(relatedTypeMangledTypeName, "Related Type");
             }
             else
             {
-                instructionsBuilder.Dw((ushort)0);
+                instructionsBuilder.Dw((ushort)0, "No Related Type");
             }
+
+
+            var vtableSlotCountReservation = instructionsBuilder.ReserveByte();
+            var interfaceCountReservation = instructionsBuilder.ReserveByte();
 
             // Emit VTable
             OutputVirtualSlots(instructionsBuilder, Type, Type);
+            instructionsBuilder.UpdateReservation(vtableSlotCountReservation, Instruction.Create(Opcode.Db, _virtualSlotCount, "VTable slot count"));
 
             OutputDispatchMap(instructionsBuilder);
+            instructionsBuilder.UpdateReservation(interfaceCountReservation, Instruction.Create(Opcode.Db, _interfaceSlotCount, "Interface slot count"));
 
             return instructionsBuilder.Instructions;
         }
+
+        private byte _interfaceSlotCount = 0;
 
         private void OutputDispatchMap(InstructionsBuilder instructionsBuilder)
         {
@@ -195,9 +199,11 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         int emittedImplSlot = VirtualMethodSlotHelper.GetVirtualMethodSlot(_nodeFactory, implMethod, resolvedType);
 
                         instructionsBuilder.Comment($"Interface {interfaceType.FullName}, {method.FullName}, {implMethod.FullName}");
-                        instructionsBuilder.Dw((ushort)interfaceIndex);
-                        instructionsBuilder.Dw((ushort)emittedInterfaceSlot);
-                        instructionsBuilder.Dw((ushort)emittedImplSlot);
+                        instructionsBuilder.Db((byte)interfaceIndex, "Interface index");
+                        instructionsBuilder.Db((byte)emittedInterfaceSlot, "Interface slot");
+                        instructionsBuilder.Dw((ushort)emittedImplSlot, "Implementation slot");
+
+                        _interfaceSlotCount++;
                     }
                     else
                     {
@@ -214,8 +220,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
         }
 
+        private byte _virtualSlotCount = 0;
+
         private void OutputVirtualSlots(InstructionsBuilder instructionsBuilder, ITypeDefOrRef type, ITypeDefOrRef implType)
         {
+            instructionsBuilder.Comment($"VTable slots for {type.FullName}");
+
             // Output inherited VTable slots first
             var baseType = type.GetBaseType();
             if (baseType != null)
@@ -239,6 +249,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 {
                     var implementationMangledName = _nameMangler.GetMangledMethodName(implementation);
                     instructionsBuilder.Dw(implementationMangledName);
+                    _virtualSlotCount++;
                 }
             }
         }

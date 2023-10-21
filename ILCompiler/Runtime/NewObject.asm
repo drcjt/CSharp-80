@@ -5,8 +5,6 @@
 ; On Entry: BC = EETypePtr, DE = size to allocate
 ; On Exit: HL = pointer to allocated object
 
-OFFSET_BASESIZE		EQU 0
-
 NewObject:	
 
 	; Allocate and check if hit stack

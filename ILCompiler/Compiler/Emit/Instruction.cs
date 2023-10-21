@@ -28,7 +28,7 @@ namespace ILCompiler.Compiler.Emit
 
             FormatOpcode(stringBuilder);
 
-            if (Comment != null)
+            if (!string.IsNullOrEmpty(Comment))
             {
                 stringBuilder.Append(" ;");
                 stringBuilder.Append(Comment);
@@ -78,8 +78,8 @@ namespace ILCompiler.Compiler.Emit
         public static Instruction Create(Opcode opcode, string target)
             => new() { Opcode = opcode, Op0 = new() { Label = target } };
 
-        public static Instruction Create(Opcode opcode, ushort target)
-            => new() { Opcode = opcode, Op0 = new() { Immediate = target } };
+        public static Instruction Create(Opcode opcode, ushort target, string? comment = null)
+            => new() { Opcode = opcode, Op0 = new() { Immediate = target }, Comment = comment };
 
         public static Instruction Create(Opcode opcode, MemoryOperand target)
             => new() { Opcode = opcode, Op0 = new() { Memory = target } };
@@ -112,7 +112,7 @@ namespace ILCompiler.Compiler.Emit
         public static Instruction CreateDeclareByte(Opcode opcode, string data)
             => new() { Opcode = opcode, Op0 = new() { Data = data } };
 
-        public static Instruction CreateDeclareWord(Opcode opcode, string label)
-            => new() { Opcode = opcode, Op0 = new() { Label = label } };
+        public static Instruction CreateDeclareWord(Opcode opcode, string label, string? comment = null)
+            => new() { Opcode = opcode, Op0 = new() { Label = label }, Comment = comment };
     }
 }
