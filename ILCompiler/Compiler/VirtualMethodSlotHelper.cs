@@ -5,7 +5,7 @@ namespace ILCompiler.Compiler
 {
     public static class VirtualMethodSlotHelper
     {
-        public static int GetVirtualMethodSlot(NodeFactory factory, MethodDef method, TypeDef implType)
+        public static int GetVirtualMethodSlot(NodeFactory factory, MethodDef method)
         {
             var owningType = method.DeclaringType;
             int baseSlots = GetNumberOfBaseSlots(factory, owningType);

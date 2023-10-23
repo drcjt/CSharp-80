@@ -196,12 +196,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     if (implMethod != null)
                     {
                         int emittedInterfaceSlot = interfaceMethodSlot;
-                        int emittedImplSlot = VirtualMethodSlotHelper.GetVirtualMethodSlot(_nodeFactory, implMethod, resolvedType);
+                        int emittedImplSlot = VirtualMethodSlotHelper.GetVirtualMethodSlot(_nodeFactory, implMethod);
 
                         instructionsBuilder.Comment($"Interface {interfaceType.FullName}, {method.FullName}, {implMethod.FullName}");
                         instructionsBuilder.Db((byte)interfaceIndex, "Interface index");
                         instructionsBuilder.Db((byte)emittedInterfaceSlot, "Interface slot");
-                        instructionsBuilder.Dw((ushort)emittedImplSlot, "Implementation slot");
+                        instructionsBuilder.Dw((byte)emittedImplSlot, "Implementation slot");
 
                         _interfaceSlotCount++;
                     }

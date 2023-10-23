@@ -1,4 +1,5 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
+﻿using dnlib.DotNet;
+using ILCompiler.Compiler.EvaluationStack;
 using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
@@ -7,7 +8,11 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(CallEntry entry, CodeGeneratorContext context)
         {
-            if (entry.IsVirtual)
+            if (entry.Method != null && entry.Method.DeclaringType.IsInterface)
+            {
+                GenerateCodeForInterfaceCall(entry, context);
+            }
+            else  if (entry.IsVirtual)
             {
                 GenerateCodeForVirtualCall(entry, context);
             }
@@ -15,6 +20,28 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 GenerateCodeForCall(entry, context);
             }
+        }
+
+        private static void GenerateCodeForInterfaceCall(CallEntry entry, CodeGeneratorContext context) 
+        {
+            if (entry.Method == null)
+            {
+                throw new InvalidOperationException("Method must not be null for interface dispatch");
+            }
+
+            var interfaceType = entry.Method.DeclaringType;
+            var resolvedInterfaceType = interfaceType.ResolveTypeDefThrow();
+
+            int methodSlot = VirtualMethodSlotHelper.GetVirtualMethodSlot(context.NodeFactory, entry.Method);
+
+            // Need to generate call to generic resolver runtime routine passing
+            // * this pointer for object method is being called on - note this should be on stack already
+            // * EEType for interfaceType
+            // * methodSlot 
+            //
+            // resolver will need to use interfacemap via this pointer to convert interfaceType to interface index
+            // Then will need to use dispatchmaps via this pointer looking for match with interface index/methodslot
+            // If not found then should recurse up inheritance hierarchy via this pointer & related type.
         }
 
         private static void GenerateCodeForCall(CallEntry entry, CodeGeneratorContext context)
@@ -43,7 +70,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 throw new InvalidOperationException("Virtual CallEntry must have non-null Method");
             }
 
-            int slot = VirtualMethodSlotHelper.GetVirtualMethodSlot(context.NodeFactory, targetMethod, targetMethod.DeclaringType);
+            int slot = VirtualMethodSlotHelper.GetVirtualMethodSlot(context.NodeFactory, targetMethod);
 
             // EEType header comprises of following:
             //    2 bytes for Flags
