@@ -1,5 +1,4 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
@@ -30,18 +29,21 @@ namespace ILCompiler.Compiler.CodeGenerators
             }
 
             var interfaceType = entry.Method.DeclaringType;
-            var resolvedInterfaceType = interfaceType.ResolveTypeDefThrow();
-
+            var interfaceEETypeNode = context.NodeFactory.NecessaryTypeSymbol(interfaceType);
+            var interfaceMangledName = interfaceEETypeNode.MangledTypeName;
             int methodSlot = VirtualMethodSlotHelper.GetVirtualMethodSlot(context.NodeFactory, entry.Method);
 
-            // Need to generate call to generic resolver runtime routine passing
-            // * this pointer for object method is being called on - note this should be on stack already
-            // * EEType for interfaceType
-            // * methodSlot 
-            //
-            // resolver will need to use interfacemap via this pointer to convert interfaceType to interface index
+            // Stack holds this pointer and actual parameters for method call
+            // Pass other parameters in registers:
+
+            context.InstructionsBuilder.Ld(BC, interfaceMangledName);
+            context.InstructionsBuilder.Ld(DE, (ushort)methodSlot);
+
+            // IntefaceCall routine will need to use interfacemap via this pointer to convert interfaceType to interface index
             // Then will need to use dispatchmaps via this pointer looking for match with interface index/methodslot
             // If not found then should recurse up inheritance hierarchy via this pointer & related type.
+
+            context.InstructionsBuilder.Call("InterfaceCall");
         }
 
         private static void GenerateCodeForCall(CallEntry entry, CodeGeneratorContext context)
