@@ -13,6 +13,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly IDictionary<string, VirtualMethodUseNode> _virtualMethodNodesByFullName = new Dictionary<string, VirtualMethodUseNode>();
         private readonly IDictionary<string, ConstructedEETypeNode> _constructedEETypeNodesByFullName = new Dictionary<string, ConstructedEETypeNode>();
         private readonly IDictionary<TypeDef, VTableSliceNode> _vTableNodes = new Dictionary<TypeDef, VTableSliceNode>();
+        private readonly IDictionary<ITypeDefOrRef, EETypeNode> _necessaryTypeSymbolNodes = new Dictionary<ITypeDefOrRef, EETypeNode>();
 
         private readonly PreinitializationManager _preinitializationManager;
         private readonly INameMangler _nameMangler;
@@ -34,6 +35,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
 
             return constructedEETypeNode;
+        }
+
+        public EETypeNode NecessaryTypeSymbol(ITypeDefOrRef type)
+        {
+            if (!_necessaryTypeSymbolNodes.TryGetValue(type, out var necessaryTypeSymbolNode))
+            {
+                necessaryTypeSymbolNode = new EETypeNode(type, _nameMangler);
+                _necessaryTypeSymbolNodes[type] = necessaryTypeSymbolNode;
+            }
+
+            return necessaryTypeSymbolNode;
         }
 
         public StaticsNode StaticsNode(FieldDef field)

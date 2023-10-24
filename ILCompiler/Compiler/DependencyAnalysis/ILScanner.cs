@@ -204,6 +204,11 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         method = dependentMethod;
                     }
 
+                    if (methodDef.DeclaringType.IsInterface)
+                    {
+                        _dependencies.Add(_nodeFactory.NecessaryTypeSymbol(methodDef.DeclaringType));
+                    }
+
                     bool directCall = IsDirectCall(methodDef, instruction.OpCode.Code);
                     if (directCall)
                     {
