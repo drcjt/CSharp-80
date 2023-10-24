@@ -8,24 +8,21 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
-    public class ConstructedEETypeNode : DependencyNode
+    public class ConstructedEETypeNode : EETypeNode
     {
-        public ITypeDefOrRef Type { get; private set; }
         public int BaseSize { get; private set; }
 
         public TypeDef? RelatedType { get; set; }
 
         public override string Name => Type.FullName + " constructed";
 
-        private readonly INameMangler _nameMangler;
         private readonly PreinitializationManager _preinitializationManager;
         private readonly NodeFactory _nodeFactory;
 
-        public ConstructedEETypeNode(ITypeDefOrRef type, int baseSize, INameMangler nameMangler, PreinitializationManager preinitializationManager, NodeFactory nodeFactory)
+        public ConstructedEETypeNode(ITypeDefOrRef type, int baseSize, INameMangler nameMangler, PreinitializationManager preinitializationManager, NodeFactory nodeFactory) 
+            : base(type, nameMangler)
         {
-            Type = type;
             BaseSize = baseSize;
-            _nameMangler = nameMangler;
             _preinitializationManager = preinitializationManager;
             _nodeFactory = nodeFactory;
         }
@@ -155,17 +152,38 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             var vtableSlotCountReservation = instructionsBuilder.ReserveByte();
             var interfaceCountReservation = instructionsBuilder.ReserveByte();
 
+
             // Emit VTable
             OutputVirtualSlots(instructionsBuilder, Type, Type);
             instructionsBuilder.UpdateReservation(vtableSlotCountReservation, Instruction.Create(Opcode.Db, _virtualSlotCount, "VTable slot count"));
 
-            OutputDispatchMap(instructionsBuilder);
+            // Emit Interface map
+            OutputInterfaceMap(instructionsBuilder);
             instructionsBuilder.UpdateReservation(interfaceCountReservation, Instruction.Create(Opcode.Db, _interfaceSlotCount, "Interface slot count"));
+
+            // Emit dispatch map
+            OutputDispatchMap(instructionsBuilder);
 
             return instructionsBuilder.Instructions;
         }
 
         private byte _interfaceSlotCount = 0;
+
+        private void OutputInterfaceMap(InstructionsBuilder instructionsBuilder)
+        {
+            instructionsBuilder.Comment($"Interface map for {Type.FullName}");
+
+            var interfaces = Type.RuntimeInterfaces();
+
+            // Enumerate each interface this type implements
+            foreach (var interfaceType in interfaces) 
+            {
+                var interfaceTypeNode = _nodeFactory.NecessaryTypeSymbol(interfaceType);
+                instructionsBuilder.Dw(interfaceTypeNode.MangledTypeName);
+
+                _interfaceSlotCount++;
+            }
+        }
 
         private void OutputDispatchMap(InstructionsBuilder instructionsBuilder)
         {
@@ -202,8 +220,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         instructionsBuilder.Db((byte)interfaceIndex, "Interface index");
                         instructionsBuilder.Db((byte)emittedInterfaceSlot, "Interface slot");
                         instructionsBuilder.Dw((byte)emittedImplSlot, "Implementation slot");
-
-                        _interfaceSlotCount++;
                     }
                     else
                     {
