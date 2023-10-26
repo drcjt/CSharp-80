@@ -22,6 +22,7 @@
     <None Remove="Runtime\CPM\cls.asm" />
     <None Remove="Runtime\CPM\printchr.asm" />
     <None Remove="Runtime\GCGetTotalMemory.asm" />
+    <None Remove="Runtime\InterfaceCall.asm" />
     <None Remove="Runtime\itoa.asm" />
     <None Remove="Runtime\i_add.asm" />
     <None Remove="Runtime\i_add16.asm" />
@@ -109,6 +110,7 @@
     <EmbeddedResource Include="Runtime\GCGetTotalMemory.asm" />
     <EmbeddedResource Include="Runtime\Memcpy.asm" />
     <EmbeddedResource Include="Runtime\Memset.asm" />
+    <EmbeddedResource Include="Runtime\InterfaceCall.asm" />
     <EmbeddedResource Include="Runtime\VirtualCall.asm" />
     <EmbeddedResource Include="Runtime\NewString.asm" />
     <EmbeddedResource Include="Runtime\print.asm" />
