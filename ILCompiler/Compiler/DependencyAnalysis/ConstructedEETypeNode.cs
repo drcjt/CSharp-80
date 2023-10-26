@@ -56,6 +56,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 }
             }
 
+            // Enumerate each interface this type implements and add as dependencies
+            foreach (var interfaceType in Type.RuntimeInterfaces())
+            {
+                var interfaceTypeNode = _nodeFactory.NecessaryTypeSymbol(interfaceType);
+                dependencies.Add(interfaceTypeNode);
+            }
+
             return dependencies;
         }
 
@@ -189,8 +196,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             instructionsBuilder.Comment($"Dispatch map for {Type.FullName}");
 
+            var dispatchMapEntryCountReservation = instructionsBuilder.ReserveByte();
+
             var resolvedType = Type.ResolveTypeDefThrow();
             var interfaces = Type.RuntimeInterfaces();
+
+            byte entryCount = 0;
 
             // Enumerate each interface this type implements
             for (int interfaceIndex = 0; interfaceIndex < interfaces.Length; interfaceIndex++) 
@@ -219,7 +230,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         instructionsBuilder.Comment($"Interface {interfaceType.FullName}, {method.FullName}, {implMethod.FullName}");
                         instructionsBuilder.Db((byte)interfaceIndex, "Interface index");
                         instructionsBuilder.Db((byte)emittedInterfaceSlot, "Interface slot");
-                        instructionsBuilder.Dw((byte)emittedImplSlot, "Implementation slot");
+                        instructionsBuilder.Db((byte)emittedImplSlot, "Implementation slot");
+
+                        entryCount++;
                     }
                     else
                     {
@@ -234,6 +247,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     }
                 }
             }
+
+            instructionsBuilder.UpdateReservation(dispatchMapEntryCountReservation, Instruction.Create(Opcode.Db, entryCount));
         }
 
         private byte _virtualSlotCount = 0;
