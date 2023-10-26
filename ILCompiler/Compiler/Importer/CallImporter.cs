@@ -86,6 +86,21 @@ namespace ILCompiler.Compiler.Importer
             }
             arguments.Reverse();
 
+            if (methodToCall.DeclaringType.IsInterface)
+            {
+                // Need to add this pointer as extra param which will be consumed by InterfaceCall routine
+                var thisEntry = arguments[0];
+
+                var lclNum = importer.GrabTemp(thisEntry.Type, thisEntry.ExactSize);
+                var asg = new StoreLocalVariableEntry(lclNum, false, thisEntry);
+                importer.ImportAppendTree(asg);
+
+                arguments[0] = new LocalVariableEntry(lclNum, thisEntry.Type, thisEntry.ExactSize);
+
+                var node2 = new LocalVariableEntry(lclNum, thisEntry.Type, thisEntry.ExactSize);
+                arguments.Add(node2);
+            }
+
             // Intrinsic calls
             if (methodToCall.IsIntrinsic() || isArrayMethod)
             {
