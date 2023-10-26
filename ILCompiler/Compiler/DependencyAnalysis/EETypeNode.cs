@@ -29,6 +29,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             // Need to mangle full field name here
             instructionsBuilder.Label(MangledTypeName);
 
+            // Need something here to ensure the label has a unique value
+            instructionsBuilder.Db(0);
+
             return instructionsBuilder.Instructions;
         }
     }
