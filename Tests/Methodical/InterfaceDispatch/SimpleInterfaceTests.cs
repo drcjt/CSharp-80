@@ -15,14 +15,14 @@
     {
         private static IMyInterface[] MakeInterfaceArray()
         {
-            IMyInterface[] interfaces =
-            [
+            IMyInterface[] interfaces = new IMyInterface[]
+            {
                 new Foo0(),
                 new Foo1(),
                 new Foo2(),
                 new Foo3(),
                 new Foo4(),
-            ];
+            };
             return interfaces;
         }
 
