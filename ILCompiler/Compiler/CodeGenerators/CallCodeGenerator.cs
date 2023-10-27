@@ -28,20 +28,20 @@ namespace ILCompiler.Compiler.CodeGenerators
                 throw new InvalidOperationException("Method must not be null for interface dispatch");
             }
 
-            var interfaceType = entry.Method.DeclaringType;
-            var interfaceEETypeNode = context.NodeFactory.NecessaryTypeSymbol(interfaceType);
-            var interfaceMangledName = interfaceEETypeNode.MangledTypeName;
+            var interfaceEETypeNode = context.NodeFactory.NecessaryTypeSymbol(entry.Method.DeclaringType);
             int methodSlot = VirtualMethodSlotHelper.GetVirtualMethodSlot(context.NodeFactory, entry.Method);
 
             // Stack holds this pointer and actual parameters for method call
             // Pass other parameters in registers:
 
-            context.InstructionsBuilder.Ld(BC, interfaceMangledName);
+            context.InstructionsBuilder.Ld(BC, interfaceEETypeNode.MangledTypeName);
             context.InstructionsBuilder.Ld(DE, (ushort)methodSlot);
 
-            // IntefaceCall routine will need to use interfacemap via this pointer to convert interfaceType to interface index
-            // Then will need to use dispatchmaps via this pointer looking for match with interface index/methodslot
-            // If not found then should recurse up inheritance hierarchy via this pointer & related type.
+            // IntefaceCall searches dispatch map looking for entry with required method slot
+            // If found it checks if the interfaceindex matches too - based on finding the interfaceType in the interface map
+            // If found then the implementation slot is used with the vtable to find the implementation method and jump to it
+            // Otherwise continue searching the dispatch map
+            // If no match in dispatch map then recurse up inheritance hierarchy via base type and repeat above
 
             context.InstructionsBuilder.Call("InterfaceCall");
         }
