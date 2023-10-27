@@ -1,15 +1,17 @@
 ; This routine performs an interface call by resolution through interface map/dispatch maps
 ; finally calling the method via the VTable
 ;
-; Uses: HL, DE, BC
+; Uses: HL, DE, BC, HL', DE', BC', AF
 ;
-; On Entry: BC = Interface EEType Ptr, DE = method slot
+; On Entry: BC = Interface EEType Ptr, E = method slot
 
 InterfaceCall:	
 
 	; Save required interface eetype ptr
-	LD (reqdinterface), BC
-	LD (reqdmethod), DE
+	LD (REQDINTERFACE), BC
+
+	LD A, E
+	LD (REQDMETHOD), A
 
 	POP AF		; Return address
 	POP HL		; This pointer
@@ -34,14 +36,14 @@ CheckType:
 	INC HL
 	LD B, (HL)
 	INC HL
-	LD (BaseType), BC
+	LD (BASETYPE), BC
 
 	LD B, (HL)	; B = vtable slot count
 	INC HL
 	LD C, (HL)	; C = interface slot count
 	INC HL
 
-	LD (vtable), HL
+	LD (VTABLE), HL
 
 	; Skip over the vtable & interface slots
 	EX DE, HL
@@ -51,7 +53,8 @@ CheckType:
 
 	LD B, 0
 	; C already contains interface slot count
-	LD (intfslots), BC
+	LD A, C
+	LD (INTFSLOTS), A
 
 	ADD HL, BC
 
@@ -79,25 +82,54 @@ SearchDispatchMap:
 
 	; Save ptr to intfmap
 	DEC HL
-	LD (intfmap), HL
+	LD (INTFMAP), HL
 	INC HL
 
-	LD DE, (reqdmethod)
+	LD A, (REQDMETHOD)
+	LD E, A
 
 NextMapEntry:
 	INC HL
-	LD D, (HL)
+	LD D, (HL)	; interface index
 	INC HL
 	LD A, (HL)	; interface slot
 	CP E
 	JP NZ, NoMatch
 
-	Call GetIntfIndex
+	EXX
+
+	LD A, (INTFSLOTS)
+	LD B, A
+	LD HL, (INTFMAP)
+
+GetIntfIndexLoop:
+
+	LD A, (REQDINTERFACE + 1)
+	CP (HL)
+	JR NZ, LoopEnd1
+	DEC HL
+	LD A, (REQDINTERFACE)
+	CP (HL)
+	JR NZ, LoopEnd2
+	DEC HL
+
+	DEC B
+	LD A, B
+	LD (INTFINDEX), A
+	JR FoundIntfIndex
+
+LoopEnd1:
+	DEC HL
+LoopEnd2:
+	DEC HL
+	DJNZ GetIntfIndexLoop
+
+FoundIntfIndex:
+	EXX
 	
-	LD A, (intfindex+1)
+	LD A, (INTFINDEX)
 	CP D
 	JR NZ, NoMatch
-
 	
 	; Got right dispatch map entry - get the implementation slot
 	INC HL
@@ -107,7 +139,7 @@ NextMapEntry:
 	; HL = vtable + (implementation slot * 2)
 	EX DE, HL
 	ADD HL, HL
-	LD DE, (vtable)
+	LD DE, (VTABLE)
 	ADD HL, DE
 
 	LD E, (HL)	; Get entry in VTable slot into HL
@@ -123,54 +155,16 @@ NoMatch:
 
 	DJNZ NextMapEntry
 
-	LD HL, (BaseType)
+	LD HL, (BASETYPE)
 
 	; TODO - check HL for zero - but if it is what do we do?? fail fast??
 
 	JP CheckType
 
-; Determine the interface index - assumes interface will be in the map
-GetIntfIndex:
-	PUSH BC
-	PUSH HL
-	PUSH DE
-
-	LD A, (intfslots)
-	LD B, A
-	LD HL, (intfmap)
-
-	DEC B
-
-GetIntfIndexLoop:
-
-	LD D, (HL)
-	DEC HL
-	LD E, (HL)
-	DEC HL
-
-	LD A, (reqdinterface+1)
-	CP D
-	JR NZ, LoopEnd
-	LD A, (reqdinterface)
-	CP E
-	JR NZ, LoopEnd
-
-	LD (intfindex), bc
-	JR FoundIntfIndex
-
-LoopEnd:
-	DJNZ GetIntfIndexLoop
-
-FoundIntfIndex:
-	POP DE
-	POP HL
-	POP BC
-	RET
-
-reqdinterface: dw 0
-reqdmethod: dw 0 
-basetype: dw 0
-intfslots: dw 0
-intfmap dw 0
-intfindex: dw 0
-vtable: dw 0 
+REQDINTERFACE: DW 0
+REQDMETHOD: DB 0 
+BASETYPE: DW 0
+INTFSLOTS: DB 0
+INTFMAP DW 0
+INTFINDEX: DB 0
+VTABLE: DW 0 
