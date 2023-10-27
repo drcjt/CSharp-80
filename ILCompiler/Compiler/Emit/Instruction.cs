@@ -78,6 +78,9 @@ namespace ILCompiler.Compiler.Emit
         public static Instruction Create(Opcode opcode, string target)
             => new() { Opcode = opcode, Op0 = new() { Label = target } };
 
+        public static Instruction Create(Opcode opcode, string label, ushort value)
+            => new() { Opcode = opcode, Label = label, Op0 = new() { Immediate = value } };
+
         public static Instruction Create(Opcode opcode, ushort target, string? comment = null)
             => new() { Opcode = opcode, Op0 = new() { Immediate = target }, Comment = comment };
 

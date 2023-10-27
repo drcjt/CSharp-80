@@ -6,6 +6,7 @@
 
         Org,
         End,
+        Equ,
 
         Db,
         Defs,

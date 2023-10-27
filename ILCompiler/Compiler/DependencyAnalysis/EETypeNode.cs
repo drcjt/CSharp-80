@@ -17,20 +17,20 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             Type = type;
             _nameMangler = nameMangler;
+            _eeTypePtr = _nextEETypePtr++;
         }
 
         public string MangledTypeName => _nameMangler.GetMangledTypeName(Type);
 
+        private static ushort _nextEETypePtr = 1;
+
+        private readonly ushort _eeTypePtr;
         public override IList<Instruction> GetInstructions(string inputFilePath)
         {
             var instructionsBuilder = new InstructionsBuilder();
             instructionsBuilder.Comment($"{Type.FullName}");
 
-            // Need to mangle full field name here
-            instructionsBuilder.Label(MangledTypeName);
-
-            // Need something here to ensure the label has a unique value
-            instructionsBuilder.Db(0);
+            instructionsBuilder.Equ(MangledTypeName, _eeTypePtr);
 
             return instructionsBuilder.Instructions;
         }

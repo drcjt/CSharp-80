@@ -98,5 +98,6 @@ namespace ILCompiler.Compiler.Emit
         public void Dc(ushort count, ushort value) => AddInstruction(Instruction.Create(Opcode.Dc, count, value));
         public void Org(ushort target) => AddInstruction(Instruction.Create(Opcode.Org, target));
         public void End(string label) => AddInstruction(Instruction.Create(Opcode.End, label));
+        public void Equ(string label, ushort value) => AddInstruction(Instruction.Create(Opcode.Equ, label, value ));
     }
 }
