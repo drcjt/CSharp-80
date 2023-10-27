@@ -11,7 +11,7 @@
     class Foo3 : IMyInterface { public int GetAnInt() => 3; }
     class Foo4 : IMyInterface { public int GetAnInt() => 4; }
 
-    internal class SimpleInterfaceTests
+    internal static class SimpleInterfaceTests
     {
         private static IMyInterface[] MakeInterfaceArray()
         {

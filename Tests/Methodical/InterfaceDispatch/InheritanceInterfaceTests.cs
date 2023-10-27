@@ -16,7 +16,7 @@
         int IB.Add(int i) => 7;
     }
 
-    internal class InheritanceInterfaceTests
+    internal static class InheritanceInterfaceTests
     {
         private static int Test(ID d)
         {

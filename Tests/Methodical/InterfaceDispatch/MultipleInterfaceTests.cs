@@ -11,7 +11,7 @@
         public int GetInt() => 5;
     }
 
-    internal class MultipleInterfaceTests
+    internal static class MultipleInterfaceTests
     {
         public static int RunTests()
         {
