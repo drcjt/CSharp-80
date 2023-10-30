@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.IL;
 
 namespace ILCompiler.Common.TypeSystem.Common
 {
@@ -173,6 +174,80 @@ namespace ILCompiler.Common.TypeSystem.Common
             }
 
             return null;
+        }
+
+        public static DefaultInterfaceMethodResolution ResolveInterfaceMethodToDefaultImplementationOnType(MethodDef interfaceMethod, TypeDef currentType, out MethodDef? impl)
+        {
+            var interfaceMethodOwningType = interfaceMethod.DeclaringType;
+            ITypeDefOrRef[] consideredInterfaces;
+            if (currentType.IsInterface)
+            {
+                consideredInterfaces = currentType.RuntimeInterfaces();
+            }
+            else
+            {
+                consideredInterfaces = new ITypeDefOrRef[currentType.RuntimeInterfaces().Length + 1];
+                Array.Copy(currentType.RuntimeInterfaces(), consideredInterfaces, currentType.RuntimeInterfaces().Length);
+                consideredInterfaces[consideredInterfaces.Length - 1] = currentType;
+            }
+
+            impl = null;
+
+            ITypeDefOrRef? mostSpecificInterface = null;
+            bool diamondCase = false;
+            foreach (var runtimeInterface in consideredInterfaces)
+            {
+                if (runtimeInterface == interfaceMethodOwningType)
+                {
+                    if (mostSpecificInterface == null && !interfaceMethod.IsAbstract)
+                    {
+                        mostSpecificInterface = runtimeInterface;
+                        impl = interfaceMethod;
+                    }
+                }
+                else if (Array.IndexOf(runtimeInterface.RuntimeInterfaces(), interfaceMethodOwningType) != 1)
+                {
+                    var possibleMethodOverrides = FindMethodOverridesWithMatchingDeclarationName(interfaceMethod.FullName, runtimeInterface.ResolveTypeDefThrow());
+                    if (possibleMethodOverrides != null)
+                    {
+                        foreach (var methodOverride in possibleMethodOverrides) 
+                        {
+                            if (methodOverride.MethodDeclaration == interfaceMethod)
+                            {
+                                if (mostSpecificInterface == null || Array.IndexOf(runtimeInterface.RuntimeInterfaces(), mostSpecificInterface) != 1)
+                                {
+                                    mostSpecificInterface = runtimeInterface;
+                                    impl = methodOverride.MethodBody.ResolveMethodDefThrow();
+                                    diamondCase = false;
+                                }
+                                else if (Array.IndexOf(mostSpecificInterface.RuntimeInterfaces(), runtimeInterface) == -1)
+                                {
+                                    diamondCase = true;
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (diamondCase)
+            {
+                impl = null;
+                return DefaultInterfaceMethodResolution.Diamond;
+            }
+            else if (impl == null)
+            {
+                return DefaultInterfaceMethodResolution.None;
+            }
+            else if (impl.ResolveMethodDefThrow().IsAbstract)
+            {
+                impl = null;
+                return DefaultInterfaceMethodResolution.Reabstraction;
+            }
+
+            return DefaultInterfaceMethodResolution.DefaultImplementation;
         }
 
         private static MethodDef? ResolveInterfaceMethodToVirtualMethodOnTypeRecursive(MethodDef interfaceMethod, ITypeDefOrRef? currentType)
