@@ -240,10 +240,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         // No need to emit a dispatch map in this case as the runtime interface dispatch code will
                         // walk the inheritance chain
 
-                        // TODO: Will need to check here for
-                        //  * default implementation
-                        //  * Reabstraction
-                        //  * Diamond
+                        var result = VirtualMethodAlgorithm.ResolveInterfaceMethodToDefaultImplementationOnType(method, resolvedType, out implMethod);
+
+                        if (result != DefaultInterfaceMethodResolution.None)
+                        {
+                            // TODO: Will need to check here for
+                            //  * default implementation
+                            //  * Reabstraction
+                            //  * Diamond
+
+                            throw new NotImplementedException();
+                        }
                     }
                 }
             }
