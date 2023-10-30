@@ -18,12 +18,10 @@ namespace ILCompiler.Compiler
         }
     }
 
-    [Serializable]
     public class CorLibTypeResolutionException : Exception
     {
         public CorLibTypeResolutionException() { }
         public CorLibTypeResolutionException(string message) : base(message) { }
         public CorLibTypeResolutionException(string message, Exception innerException) : base(message, innerException) { }
-        protected CorLibTypeResolutionException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }
