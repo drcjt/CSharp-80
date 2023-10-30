@@ -22,7 +22,7 @@ namespace ILCompiler.UnitTests
             var assemblyConfigurationAttribute = currentType.Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
             var buildConfigurationName = assemblyConfigurationAttribute?.Configuration;
 
-            var corelibPath = Path.Combine(SolutionPath, $@".\System.Private.CoreLib\bin\Trs80\{buildConfigurationName}\net7.0\System.Private.CoreLib.dll");
+            var corelibPath = Path.Combine(SolutionPath, $@".\System.Private.CoreLib\bin\Trs80\{buildConfigurationName}\net8.0\System.Private.CoreLib.dll");
             ModuleDefMD corlibModule = ModuleDefMD.Load(corelibPath, modCtx);
             ((AssemblyResolver)modCtx.AssemblyResolver).AddToCache(corlibModule);
 
@@ -30,7 +30,7 @@ namespace ILCompiler.UnitTests
             {
                 CorLibAssemblyRef = corlibModule.Assembly.ToAssemblyRef()
             };
-            string inputFilePath = Path.Combine(SolutionPath, $@".\Tests\CoreTestAssembly\bin\{buildConfigurationName}\net7.0\CoreTestAssembly.dll");
+            string inputFilePath = Path.Combine(SolutionPath, $@".\Tests\CoreTestAssembly\bin\{buildConfigurationName}\net8.0\CoreTestAssembly.dll");
             _testModule = ModuleDefMD.Load(inputFilePath, options);
         }
 

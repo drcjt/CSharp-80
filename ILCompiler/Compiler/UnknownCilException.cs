@@ -2,7 +2,6 @@
 
 namespace ILCompiler.Compiler
 {
-    [Serializable]
     public class UnknownCilException : Exception
     {
         public UnknownCilException()
@@ -14,10 +13,6 @@ namespace ILCompiler.Compiler
         }
 
         public UnknownCilException(string message, Exception inner) : base(message, inner)
-        {
-        }
-
-        protected UnknownCilException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }
