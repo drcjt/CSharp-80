@@ -67,7 +67,7 @@ namespace ILCompiler.Compiler
         private static ISet<string> GetCalls(TextReader reader)
         {
             var calls = new HashSet<string>();
-            var callRegex = new Regex(@"^\s*(call)\s*(.*\s*,\s*)?(?<target>\w+)", RegexOptions.IgnoreCase);
+            var callRegex = new Regex(@"^\s*(call|jp)\s*(.*\s*,\s*)?(?<target>\w+)", RegexOptions.IgnoreCase);
 
             var line = reader.ReadLine();
             while (line != null)

@@ -17,6 +17,7 @@ VirtualCall:
 	LD H, D
 	LD L, E
 
+VirtualCall_Internal:
 	ADD HL, BC	; Add VTable slot offset to EEType Ptr
 
 	LD E, (HL)	; Get entry in VTable slot into HL
