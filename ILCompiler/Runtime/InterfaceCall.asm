@@ -4,8 +4,8 @@
 ; For each dispatch map entry
 ;    If method slot matches
 ;    then
-;       search interface map to determine interface index
-;       If dispatch map entry matches interface index
+;		Use interface index in entry to find entry in interface map
+;		If interface map entry matches required interface EEType
 ;       then dynamic dispatch based on implementation slot in dispatch map
 ; Next
 ; Repeat for base type
@@ -13,7 +13,6 @@
 ; Uses: HL, DE, BC, HL', DE', BC', AF
 ;
 ; On Entry: BC = Interface EEType Ptr, E = method slot, this pointer is on stack behind return address
-
 
 ; EEType contains, flags (2 bytes), base size (2 bytes), related type (2 bytes), vtable slot count (1 byte), inteface slot count (1 byte)
 BaseTypeOffset:		EQU 4
@@ -53,77 +52,78 @@ CheckType:
 
 	LD (VTABLE), HL
 
-	; Skip over the vtable & interface slots
-	EX DE, HL
+	; Skip over the vtable
 
+	EX DE, HL
 	LD H, 0
 	LD L, B
+	ADD HL, HL		; 2 * vtable slots
+	ADD HL, DE		; find end of vtable
+	LD (INTFMAP), HL
 
-	LD B, 0
-	LD C, A
-
-	ADD HL, BC
-	ADD HL, HL	; 2 bytes per slot
-	ADD HL, DE	; add slots * 2 to ptr to start of slots
-
+	EX DE, HL
+	LD H, 0
+	LD L, A
+	ADD HL, HL
+	ADD HL, DE		; find end of interface map
+		
 	; HL now pointing at dispatch map entry count
 	LD B, (HL)
 
 	; Now search dispatch map for entry with required method slot
 	LD A, 0
 	CP B
-	JR NZ, SearchDispatchMap
+	JR Z, CheckType
 
-	JR CheckType
-
-SearchDispatchMap:
 	; Compare interface map entry to desired interface eetype
 
 	; HL pointing at dispatch map count
 	; B is number of entries in map
 
-	; Save ptr to intfmap
-	DEC HL
-	LD (INTFMAP), HL
-	INC HL
-
-	LD A, (REQDMETHOD)
-	LD E, A
-
 NextMapEntry:
 	INC HL
 	LD D, (HL)	; interface index
+
 	INC HL
-	LD A, (HL)	; interface slot
+	LD E, (HL)	; interface slot
+	LD A, (REQDMETHOD)
 	CP E
 	JR NZ, NoMatch
 
-	EXX
+	PUSH HL
 
-	LD A, (INTFSLOTS)
-	LD B, A
+	LD H, 0
+	LD L, D
+	ADD HL, HL
+	EX DE, HL
 	LD HL, (INTFMAP)
+	ADD HL, DE
 
-GetIntfIndexLoop:
+	; HL now pointing at entry in interface map need to check if this is what we want
 
-	LD A, (REQDINTERFACE + 1)
-	CP (HL)
-	DEC HL
-	JR NZ, IntfIndexLoopEnd
-	LD A, (REQDINTERFACE)
-	CP (HL)
-	DEC HL
-	JR NZ, IntfIndexLoopEnd
-
-	DEC B
-	LD A, B
-	LD (INTFINDEX), A
-	EXX
-
-	LD A, (INTFINDEX)	; Check interface index matches
-	CP D
-	JR NZ, NoMatch
+	LD E, (HL)
+	INC HL
+	LD D, (HL)
+	INC HL
 	
+	EX DE, HL
+	LD DE, (REQDINTERFACE)
+	OR A
+	SBC HL, DE
+	JR Z, Match
+
+IntfIndexLoopEnd:
+	POP HL
+
+NoMatch:
+	INC HL	; Skip implementation slot
+	DJNZ NextMapEntry
+
+	JR CheckType
+
+Match:	
+	POP HL
+
 	; Got right dispatch map entry - get the implementation slot
 	INC HL
 	LD E, (HL)
@@ -137,16 +137,6 @@ GetIntfIndexLoop:
 	; Dynamic dispatch to destination method
 	JP VirtualCall_Internal
 
-IntfIndexLoopEnd:
-	DJNZ GetIntfIndexLoop
-
-	EXX
-
-NoMatch:
-	INC HL	; Skip implementation slot
-	DJNZ NextMapEntry
-
-	JR CheckType
 
 REQDINTERFACE:	DW 0
 REQDMETHOD:		DB 0 
