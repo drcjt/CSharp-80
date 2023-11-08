@@ -74,7 +74,7 @@
 
 	ldloc 0
 	ldarg.0
-	ldelema int32
+	ldelema int16
 	ldarg.1
 	conv.i
 	stind.i
