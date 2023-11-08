@@ -22,11 +22,30 @@ NewObject:
 	OR A
 	SBC HL, DE
 
+	PUSH HL
+
 	; Set the new object's EETypePtr
 	LD (HL), C
 	INC HL
 	LD (HL), B
-	DEC HL
+
+	; Zero rest of allocated memory
+	LD B, D
+	LD C, E
+	DEC BC	; Skip over first 1 byte of EEType
+
+NewObject_ZeroLoop:
+	DEC BC
+	LD A, B
+	OR C
+	JR Z, NewObject_ZeroLoopEnd
+
+	INC HL
+	LD (HL), 0
+	JR NewObject_ZeroLoop
+
+NewObject_ZeroLoopEnd:
+	POP HL
 
 	RET
 
