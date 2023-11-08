@@ -8,6 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Update="init_object.il">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="init_byte.il">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
