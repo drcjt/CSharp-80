@@ -35,75 +35,85 @@ namespace Mines
 
             DisplayEmptyBoard();
 
-
-            char cellCharacter = VisualizeCurrentState(cursorX, cursorY);
+            char cellCharacter = _board.Get(cursorX, cursorY).AsChar();
             DisplayCell(cursorChar, cursorX, cursorY);
 
             int completedMoves = ((_columns - 2) * (_rows - 2)) - _mines;
 
-            while (true)
+            bool playing = true;
+            while (playing)
             {
-                if (Console.KeyAvailable)
+                int kc = GetKeyCode();
+
+                if (IsValidKey(kc))
                 {
-                    ConsoleKeyInfo ki = Console.ReadKey(true);
-                    int kc = ki.KeyChar;
-
-                    if (kc != 10 && kc != 91 && kc != 9 && kc != 8 && kc != 81 && kc != 114 && kc != 102)
-                        continue;
-
                     DisplayCell(cellCharacter, cursorX, cursorY);
 
                     switch (kc)
                     {
-                        case 10: if (cursorY < _rows - 2) cursorY++; break;
-                        case 91: if (cursorY > 1) cursorY--; break;
-                        case 9: if (cursorX < _columns - 2) cursorX++; break;
-                        case 8: if (cursorX > 1) cursorX--; break;
-                        case 81: Environment.Exit(0); break;
+                        case 10: cursorY = Math.Min(cursorY + 1, _rows - 2); break;
+                        case 91: cursorY = Math.Max(cursorY - 1, 1); break;
+                        case 9: cursorX = Math.Min(cursorX + 1, _columns - 2); break;
+                        case 8: cursorX = Math.Max(cursorX - 1, 1); break;
+                        case 81: playing = false; break;
                         case 114: Reveal(cursorX, cursorY); break;
                         case 102: Flag(cursorX, cursorY); break;
                     }
 
                     // Game over
-                    if (_moves == completedMoves || _revealMines)
+                    if (playing && (_moves == completedMoves || _revealMines))
                     {
-                        RevealMines();
-
-                        Console.SetConsoleCursorPosition((sbyte)(_columns - 4), 0);
-                        Console.Write(_revealMines ? Lost : Won);
-
-                        Thread.Sleep(500);
-
-                        while (!Console.KeyAvailable);
-
-                        Console.Clear();
-
-                        _board.Reset();
-                        DisplayEmptyBoard();
+                        GameOver();
 
                         cursorX = 1;
                         cursorY = 1;
-
-                        _flagged = 0;
-                        _moves = 0;
-                        _revealMines = false;
                     }
 
-                    cellCharacter = VisualizeCurrentState(cursorX, cursorY);
+                    cellCharacter = _board.Get(cursorX, cursorY).AsChar();
                     DisplayCell(cursorChar, cursorX, cursorY);
                 }
             }
         }
+
+        private void GameOver()
+        {
+            RevealMines();
+
+            Console.SetConsoleCursorPosition((sbyte)(_columns - 4), 0);
+            Console.Write(_revealMines ? Lost : Won);
+
+            Thread.Sleep(500);
+
+            while (!Console.KeyAvailable) { }
+
+            Console.Clear();
+
+            _board.Reset();
+            DisplayEmptyBoard();
+
+            _flagged = 0;
+            _moves = 0;
+            _revealMines = false;
+        }
+
+        private static int GetKeyCode()
+        {
+            // Wait for keypress
+            while (!Console.KeyAvailable) { }
+
+            // Get details of key
+            ConsoleKeyInfo ki = Console.ReadKey(true);
+            int kc = ki.KeyChar;
+            return kc;
+        }
+
+        private static bool IsValidKey(int kc) => kc == 10 || kc == 91 || kc == 9 || kc == 8 || kc == 81 || kc == 114 || kc == 102;
 
         private static void DisplayCell(char cell, int x, int y)
         {
             Console.SetConsoleCursorPosition((sbyte)(x * 2), (sbyte)y);
             Console.Write(cell);
         }
-
-        private static void DisplayCell(Square square) => DisplayCell(square.AsChar(), square.X, square.Y);
-
-        private char VisualizeCurrentState(int x, int y) => _board.Get(x, y).AsChar();
 
         public void DisplayEmptyBoard()
         {
@@ -121,7 +131,6 @@ namespace Mines
 
             Console.SetConsoleCursorPosition((sbyte)(_columns - 4), 0);
             Console.Write(Playing);
-
         }
 
         private void RevealMines()
@@ -158,29 +167,21 @@ namespace Mines
                 return;
 
             var square = _board.Get(x, y);
+            if (square.Revealed)
+                return;
 
             if (square.Mined)
             {
-                /*
-                if (_moves == 0)
-                {
-                    _board.MoveMine(square);
-                }
-                else
-                */
-                {
-                    _revealMines = true;
-                    return;
-                }
-            }
+                // TODO: if _moves == 0 then move mine
 
-            if (square.Revealed)
+                _revealMines = true;
                 return;
+            }
 
             _moves++;
 
             square.Revealed = true;
-            DisplayCell(square);
+            DisplayCell(square.AsChar(), square.X, square.Y);
 
             if (square.AdjacentMines == 0)
             {

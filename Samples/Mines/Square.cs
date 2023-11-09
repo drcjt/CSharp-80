@@ -1,14 +1,20 @@
 ﻿namespace Mines
 {
-    public class Square(int x, int y)
+    public class Square
     {
-        public int X { get; } = x;
-        public int Y { get; } = y;
+        public int X { get; }
+        public int Y { get; }
         public int AdjacentMines { get; internal set; } = 0;
 
         public bool Mined { get; internal set; } = false;
         public bool Revealed { get; internal set; } = false;
         public bool Flagged { get; internal set; } = false;
+
+        public Square(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
 
         public void Reset()
         {
