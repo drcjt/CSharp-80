@@ -84,7 +84,7 @@ namespace Mines
 
             Thread.Sleep(500);
 
-            while (!Console.KeyAvailable) { }
+            WaitForKeyPress();
 
             Console.Clear();
 
@@ -96,10 +96,17 @@ namespace Mines
             _revealMines = false;
         }
 
+        private static void WaitForKeyPress()
+        {
+            while (!Console.KeyAvailable)
+            {
+                // Wait for keypress
+            }
+        }
+
         private static int GetKeyCode()
         {
-            // Wait for keypress
-            while (!Console.KeyAvailable) { }
+            WaitForKeyPress();
 
             // Get details of key
             ConsoleKeyInfo ki = Console.ReadKey(true);

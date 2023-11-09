@@ -1,30 +1,29 @@
-﻿namespace Mines
+﻿using System;
+
+namespace Mines
 {
     public static class Program
     {
         public static void Main()
         {
-            // Beginner
-            const int Width = 8;
-            const int Height = 8;
-            const int Bombs = 10;
+            Console.WriteLine("Beginner (1), Intermediate (2), or Expert (3)?");
+            var level = int.Parse(Console.ReadLine());
 
-            // Intermediate
-            /*
-            const int Width = 9;
-            const int Height = 9;
-            const int Bombs = 10;
-            */
-
-            // Expert
-            /*
-            const int Width = 30;
-            const int Height = 15; // Should be 15 but can't fit 16 and status row on Trs-80 screen
-            const int Bombs = 99;
-             */
-
-            var game = new Game(Width, Height, Bombs);
-            game.Play();
+            if (level == 1)
+            {
+                var game = new Game(8, 8, 10);
+                game.Play();
+            } 
+            else if (level == 2)
+            {
+                var game = new Game(11, 11, 24);
+                game.Play();
+            }
+            else if (level == 3)
+            {
+                var game = new Game(14, 14, 45);
+                game.Play();
+            }
         }
     }
 }
