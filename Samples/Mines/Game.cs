@@ -79,7 +79,7 @@ namespace Mines
         {
             RevealMines();
 
-            Console.SetConsoleCursorPosition((sbyte)(_columns - 4), 0);
+            Console.SetCursorPosition(_columns - 4, 0);
             Console.Write(_revealMines ? Lost : Won);
 
             Thread.Sleep(500);
@@ -118,7 +118,7 @@ namespace Mines
 
         private static void DisplayCell(char cell, int x, int y)
         {
-            Console.SetConsoleCursorPosition((sbyte)(x * 2), (sbyte)y);
+            Console.SetCursorPosition(x * 2, y);
             Console.Write(cell);
         }
 
@@ -136,7 +136,7 @@ namespace Mines
                 Console.WriteLine("+");
             }
 
-            Console.SetConsoleCursorPosition((sbyte)(_columns - 4), 0);
+            Console.SetCursorPosition(_columns - 4, 0);
             Console.Write(Playing);
         }
 
@@ -162,9 +162,9 @@ namespace Mines
 
             _flagged += square.Flagged ? 1 : -1;
 
-            Console.SetConsoleCursorPosition(0, 0);
+            Console.SetCursorPosition(0, 0);
             Console.Write("   ");
-            Console.SetConsoleCursorPosition(0, 0);
+            Console.SetCursorPosition(0, 0);
             Console.Write(_mines - _flagged);
         }
 
