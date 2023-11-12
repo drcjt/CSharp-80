@@ -14,7 +14,7 @@ namespace System
         }
 
         [DllImport(Libraries.Runtime, EntryPoint = "SetXY")]
-        public static unsafe extern void SetConsoleCursorPosition(sbyte x, sbyte y);
+        private static unsafe extern void SetConsoleCursorPosition(sbyte x, sbyte y);
 
         public static unsafe void SetCursorPosition(int x, int y) 
         {

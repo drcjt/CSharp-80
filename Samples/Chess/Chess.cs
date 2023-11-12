@@ -53,7 +53,7 @@ namespace Chess
 
         public static void Print(Board board)
         {
-            Console.SetConsoleCursorPosition(0, 0);
+            Console.SetCursorPosition(0, 0);
             Console.WriteLine("   A B C D E F G H");
             Console.WriteLine(" .----------------.");
             for (int rank = 7; rank >= 0; rank--)

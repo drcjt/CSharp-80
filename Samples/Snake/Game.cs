@@ -59,7 +59,7 @@ namespace Snake
 
             SetBoardItem(board, s.HeadX, s.HeadY, true);
 
-            Console.SetConsoleCursorPosition(0, 15);
+            Console.SetCursorPosition(0, 15);
             Console.Write("Score: 0");
 
             while (true)
@@ -95,7 +95,7 @@ namespace Snake
                 if (s.HitTest(foodX, foodY))
                 {
                     _score++;
-                    Console.SetConsoleCursorPosition(7, 15);
+                    Console.SetCursorPosition(7, 15);
                     Console.Write(_score);
 
                     if (s.Extend())
@@ -158,7 +158,7 @@ namespace Snake
                     break;
                 }
 
-                Console.SetConsoleCursorPosition(29, 7);
+                Console.SetCursorPosition(29, 7);
                 Console.Write(result == Result.Win ? "You win" : "You lose");
 
                 Thread.Sleep(3000);

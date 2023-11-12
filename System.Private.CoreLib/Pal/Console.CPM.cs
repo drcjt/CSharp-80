@@ -10,10 +10,6 @@ namespace System
             return null;
         }
 
-        public static void SetConsoleCursorPosition(sbyte x, sbyte y)
-        { 
-        }
-
         public static void SetCursorPosition(int x, int y)
         {
         }
