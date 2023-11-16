@@ -1,9 +1,11 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using System.Diagnostics;
+using ILCompiler.Compiler.Emit;
 using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    internal class BinaryOperatorCodeGenerator : ICodeGenerator<BinaryOperator>
+    internal static class BinaryOperatorCodeGenerator
     {
         private static readonly Dictionary<Tuple<Operation, VarType>, string> BinaryOperatorMappings = new()
         {
@@ -29,76 +31,114 @@ namespace ILCompiler.Compiler.CodeGenerators
             { Tuple.Create(Operation.Or, VarType.Ptr), "i_or16" },
         };
 
-        private static readonly Dictionary<Tuple<Operation, VarType>, string> ComparisonOperatorMappings = new()
+        private static bool IsAddOrSub(BinaryOperator op) => op.Operation == Operation.Add || op.Operation == Operation.Sub;
+        public static void GenerateCode(BinaryOperator entry, CodeGeneratorContext context)
         {
-            { Tuple.Create(Operation.Eq, VarType.Int), "i_eq" },
-            { Tuple.Create(Operation.Ge, VarType.Int), "i_ge" },
-            { Tuple.Create(Operation.Gt, VarType.Int), "i_gt" },
-            { Tuple.Create(Operation.Gt_Un, VarType.Int), "i_gt_un" },
-            { Tuple.Create(Operation.Le, VarType.Int), "i_le" },
-            { Tuple.Create(Operation.Lt, VarType.Int), "i_lt" },
-            { Tuple.Create(Operation.Lt_Un, VarType.Int), "i_lt_un" },
-            { Tuple.Create(Operation.Ne_Un, VarType.Int), "i_neq" },
+            Debug.Assert(!entry.IsComparison);
 
-            { Tuple.Create(Operation.Ne_Un, VarType.Ptr), "i_neq16" },
-            { Tuple.Create(Operation.Eq, VarType.Ptr), "i_eq16" },
-            { Tuple.Create(Operation.Lt_Un, VarType.Ptr), "i_lt16" },
-            { Tuple.Create(Operation.Le_Un, VarType.Ptr), "i_le16" },
-            { Tuple.Create(Operation.Gt_Un, VarType.Ptr), "i_gt16" },
-            { Tuple.Create(Operation.Gt, VarType.Ptr), "i_gt16" },
-            { Tuple.Create(Operation.Ge, VarType.Ptr), "i_ge16" },
-
-            { Tuple.Create(Operation.Ne_Un, VarType.Ref), "i_neq16" },
-            { Tuple.Create(Operation.Eq, VarType.Ref), "i_eq16" },
-            { Tuple.Create(Operation.Gt_Un, VarType.Ref), "i_gt16" },
-
-            { Tuple.Create(Operation.Ne_Un, VarType.ByRef), "i_neq16" },
-            { Tuple.Create(Operation.Eq, VarType.ByRef), "i_eq16" },
-        };
-
-        public void GenerateCode(BinaryOperator entry, CodeGeneratorContext context)
-        {
             // Treat all int types as Int
             var operatorType = entry.Type.IsInt() ? VarType.Int : entry.Type;
 
-            if (entry.IsComparison)
+            if (IsAddOrSub(entry))
             {
-                var op1Type = entry.Op1.Type.IsInt() ? VarType.Int : entry.Op1.Type;
-
-                if (ComparisonOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, op1Type), out string? routine))
+                if (operatorType == VarType.Ptr)
                 {
-                    context.InstructionsBuilder.Call(routine);
-                    // If carry set then push i4 1 else push i4 0
-                    context.InstructionsBuilder.Ld(HL, 0);
-                    context.InstructionsBuilder.Push(HL);     // MSW
+                    context.InstructionsBuilder.Pop(HL);
+                    context.InstructionsBuilder.Pop(BC);
+                    GenerateAddOrSub(context, entry.Operation);
+                    context.InstructionsBuilder.Push(HL);
+                    return;
+                }
 
-                    context.InstructionsBuilder.Ld(HL, 0);
-                    context.InstructionsBuilder.Adc(HL, HL);
-                    context.InstructionsBuilder.Push(HL);     // LSW
-                }
-                else
+                if (entry.Op2.IsContainedInt())
                 {
-                    throw new NotImplementedException($"Binary operator {entry.Operation} for type {op1Type} not yet implemented");
+                    int value = entry.Op2.As<Int32ConstantEntry>().Value;
+
+                    if (entry.Operation == Operation.Sub)
+                    {
+                        value = -value;
+                    }
+
+                    var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
+                    var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
+
+                    // Try to use an increment or decrement
+                    if (value == 1)
+                    {
+                        GenerateInc(context);
+                        return;
+                    }
+                    if (value == -1)
+                    {
+                        GenerateDec(context);
+                        return;
+                    }
+
+                    // Adding constant so can inline this
+                    context.InstructionsBuilder.Pop(HL);
+                    context.InstructionsBuilder.Ld(BC, low);
+                    context.InstructionsBuilder.Add(HL, BC);
+                    context.InstructionsBuilder.Ex(DE, HL);
+                    context.InstructionsBuilder.Pop(HL);
+                    context.InstructionsBuilder.Ld(BC, high);
+                    context.InstructionsBuilder.Adc(HL, BC);
+                    context.InstructionsBuilder.Push(HL);
+                    context.InstructionsBuilder.Push(DE);
+                    return;
                 }
+            }
+
+            if (BinaryOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, operatorType), out string? routine))
+            {
+                context.InstructionsBuilder.Call(routine);
+                return;
+            }
+
+            throw new NotImplementedException($"Binary operator {entry.Operation} for type {operatorType} not yet implemented");
+        }
+
+        private static void GenerateInc(CodeGeneratorContext context)
+        {
+            var endLabel = context.NameMangler.GetUniqueName();
+            context.InstructionsBuilder.Pop(HL);
+            context.InstructionsBuilder.Pop(DE);
+            context.InstructionsBuilder.Inc(L);
+            context.InstructionsBuilder.Jr(Condition.NZ, endLabel);
+            context.InstructionsBuilder.Inc(H);
+            context.InstructionsBuilder.Jr(Condition.NZ, endLabel);
+            context.InstructionsBuilder.Inc(DE);
+            context.InstructionsBuilder.Label(endLabel);
+            context.InstructionsBuilder.Push(DE);
+            context.InstructionsBuilder.Push(HL);
+            return;
+        }
+
+        private static void GenerateDec(CodeGeneratorContext context)
+        {
+            var endLabel = context.NameMangler.GetUniqueName();
+            context.InstructionsBuilder.Pop(HL);
+            context.InstructionsBuilder.Pop(DE);
+            context.InstructionsBuilder.Ld(A, H);
+            context.InstructionsBuilder.Or(L);
+            context.InstructionsBuilder.Dec(HL);
+            context.InstructionsBuilder.Jr(Condition.NZ, endLabel);
+            context.InstructionsBuilder.Dec(DE);
+            context.InstructionsBuilder.Label(endLabel);
+            context.InstructionsBuilder.Push(DE);
+            context.InstructionsBuilder.Push(HL);
+            return;
+        }
+
+        private static void GenerateAddOrSub(CodeGeneratorContext context, Operation op)
+        {
+            if (op == Operation.Add)
+            {
+                context.InstructionsBuilder.Add(HL, BC);
             }
             else
             {
-                if (operatorType == VarType.Ptr && entry.Operation == Operation.Add)
-                {
-                    // Inline 16 bit adds to avoid overhead of call 
-                    context.InstructionsBuilder.Pop(HL);
-                    context.InstructionsBuilder.Pop(BC);
-                    context.InstructionsBuilder.Add(HL, BC);
-                    context.InstructionsBuilder.Push(HL);
-                }
-                else if (BinaryOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, operatorType), out string? routine))
-                {
-                    context.InstructionsBuilder.Call(routine);
-                }
-                else
-                {
-                    throw new NotImplementedException($"Binary operator {entry.Operation} for type {operatorType} not yet implemented");
-                }
+                context.InstructionsBuilder.Or(A);
+                context.InstructionsBuilder.Sbc(HL, BC);
             }
         }
     }

@@ -67,8 +67,14 @@ namespace ILCompiler.Compiler
                 var currentNode = block.FirstNode;
                 while (currentNode != null)
                 {
-                    currentNode.Accept(visitorAdapter);
+                    // Only need to generate code for nodes that are not contained
+                    // Contained nodes are part of their parents for code generation purposes
+                    if (!currentNode.Contained)
+                    {
+                        currentNode.Accept(visitorAdapter);
+                    }
                     currentNode = currentNode.Next;
+
                 }
 
                 Optimize(_context.InstructionsBuilder.Instructions);

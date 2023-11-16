@@ -24,6 +24,7 @@
         Halt,
         Inc,
         Jp,
+        Jr,
         Ld,
         Ldir,
         Or,
