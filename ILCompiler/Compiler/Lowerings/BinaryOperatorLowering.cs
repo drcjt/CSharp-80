@@ -85,7 +85,6 @@ namespace ILCompiler.Compiler.Lowerings
 
         private static void ContainCheckBinary(BinaryOperator node)
         {
-            var op1 = node.Op1;
             var op2 = node.Op2;
 
             bool directlyEncodable = false;

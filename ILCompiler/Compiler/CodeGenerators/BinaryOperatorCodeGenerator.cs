@@ -52,38 +52,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                 if (entry.Op2.IsContainedInt())
                 {
-                    int value = entry.Op2.As<Int32ConstantEntry>().Value;
-
-                    if (entry.Operation == Operation.Sub)
-                    {
-                        value = -value;
-                    }
-
-                    var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
-                    var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
-
-                    // Try to use an increment or decrement
-                    if (value == 1)
-                    {
-                        GenerateInc(context);
-                        return;
-                    }
-                    if (value == -1)
-                    {
-                        GenerateDec(context);
-                        return;
-                    }
-
-                    // Adding constant so can inline this
-                    context.InstructionsBuilder.Pop(HL);
-                    context.InstructionsBuilder.Ld(BC, low);
-                    context.InstructionsBuilder.Add(HL, BC);
-                    context.InstructionsBuilder.Ex(DE, HL);
-                    context.InstructionsBuilder.Pop(HL);
-                    context.InstructionsBuilder.Ld(BC, high);
-                    context.InstructionsBuilder.Adc(HL, BC);
-                    context.InstructionsBuilder.Push(HL);
-                    context.InstructionsBuilder.Push(DE);
+                    GenerateContainedIntAddOrSub(entry, context);
                     return;
                 }
             }
@@ -95,6 +64,43 @@ namespace ILCompiler.Compiler.CodeGenerators
             }
 
             throw new NotImplementedException($"Binary operator {entry.Operation} for type {operatorType} not yet implemented");
+        }
+
+        private static void GenerateContainedIntAddOrSub(BinaryOperator entry, CodeGeneratorContext context)
+        {
+            int value = entry.Op2.As<Int32ConstantEntry>().Value;
+
+            if (entry.Operation == Operation.Sub)
+            {
+                value = -value;
+            }
+
+            var low = BitConverter.ToInt16(BitConverter.GetBytes(value), 0);
+            var high = BitConverter.ToInt16(BitConverter.GetBytes(value), 2);
+
+            // Try to use an increment or decrement
+            if (value == 1)
+            {
+                GenerateInc(context);
+                return;
+            }
+            if (value == -1)
+            {
+                GenerateDec(context);
+                return;
+            }
+
+            // Adding constant so can inline this
+            context.InstructionsBuilder.Pop(HL);
+            context.InstructionsBuilder.Ld(BC, low);
+            context.InstructionsBuilder.Add(HL, BC);
+            context.InstructionsBuilder.Ex(DE, HL);
+            context.InstructionsBuilder.Pop(HL);
+            context.InstructionsBuilder.Ld(BC, high);
+            context.InstructionsBuilder.Adc(HL, BC);
+            context.InstructionsBuilder.Push(HL);
+            context.InstructionsBuilder.Push(DE);
+            return;
         }
 
         private static void GenerateInc(CodeGeneratorContext context)
@@ -110,7 +116,6 @@ namespace ILCompiler.Compiler.CodeGenerators
             context.InstructionsBuilder.Label(endLabel);
             context.InstructionsBuilder.Push(DE);
             context.InstructionsBuilder.Push(HL);
-            return;
         }
 
         private static void GenerateDec(CodeGeneratorContext context)
@@ -126,7 +131,6 @@ namespace ILCompiler.Compiler.CodeGenerators
             context.InstructionsBuilder.Label(endLabel);
             context.InstructionsBuilder.Push(DE);
             context.InstructionsBuilder.Push(HL);
-            return;
         }
 
         private static void GenerateAddOrSub(CodeGeneratorContext context, Operation op)

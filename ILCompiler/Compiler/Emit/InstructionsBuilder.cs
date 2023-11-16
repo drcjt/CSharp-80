@@ -68,7 +68,6 @@ namespace ILCompiler.Compiler.Emit
         public void Inc(Register16 register) => AddInstruction(Instruction.Create(Opcode.Inc, register));
         public void Inc(Register8 register) => AddInstruction(Instruction.Create(Opcode.Inc, register));
         public void Jp(string target) => AddInstruction(Instruction.CreateBranch(Opcode.Jp, target));
-        public void Jr(string target) => AddInstruction(Instruction.CreateBranch(Opcode.Jr, target));
         public void Jp(MemoryOperand target)
         {
             if (target.Register != Register.HL)
@@ -78,8 +77,8 @@ namespace ILCompiler.Compiler.Emit
             AddInstruction(Instruction.Create(Opcode.Jp, target));
         }
         public void Jp(Condition condition, string target) => AddInstruction(Instruction.CreateBranch(Opcode.Jp, condition, target));
+        public void Jr(string target) => AddInstruction(Instruction.CreateBranch(Opcode.Jr, target));
         public void Jr(Condition condition, string target) => AddInstruction(Instruction.CreateBranch(Opcode.Jr, condition, target));
-
         public void Ld(Register8 target, Register8 source) => AddInstruction(Instruction.Create(Opcode.Ld, target, source));
         public void Ld(Register16 target, Register16 source) => AddInstruction(Instruction.Create(Opcode.Ld, target, source));
         public void Ld(Register8 target, ushort source) => AddInstruction(Instruction.Create(Opcode.Ld, target, source));
