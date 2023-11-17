@@ -100,7 +100,6 @@ namespace ILCompiler.Compiler.CodeGenerators
             context.InstructionsBuilder.Adc(HL, BC);
             context.InstructionsBuilder.Push(HL);
             context.InstructionsBuilder.Push(DE);
-            return;
         }
 
         private static void GenerateInc(CodeGeneratorContext context)
