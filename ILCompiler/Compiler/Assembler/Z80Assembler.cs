@@ -82,7 +82,7 @@ namespace ILCompiler.Compiler.Z80Assembler
 
         private static void DownloadAssembler(string zmacPath)
         {
-            var tempPath = Path.GetTempFileName();
+            var tempPath = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
 
             using (var client = new HttpClient())
             {
