@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public static IServiceCollection AddCodeGenerators(this IServiceCollection services)
         {
-            services.AddSingleton<ICodeGenerator<BinaryOperator>, BinaryOperatorCodeGenerator>();
+            services.AddSingleton<ICodeGenerator<BinaryOperator>, BinaryOrComparisionOperatorCodeGenerator>();
             services.AddSingleton<ICodeGenerator<CallEntry>, CallCodeGenerator>();
             services.AddSingleton<ICodeGenerator<CastEntry>, CastCodeGenerator>();
             services.AddSingleton<ICodeGenerator<FieldAddressEntry>, FieldAddressCodeGenerator>();

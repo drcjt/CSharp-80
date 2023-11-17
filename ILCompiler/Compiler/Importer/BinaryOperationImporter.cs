@@ -35,6 +35,15 @@ namespace ILCompiler.Compiler.Importer
             var op2 = importer.PopExpression();
             var op1 = importer.PopExpression();
 
+            // Handle special case of int+0, int-0, int*1, int/1
+            // All of these just turn into int
+            if ((op2.IsIntegralConstant(0) && (binaryOp == Operation.Add || binaryOp == Operation.Sub)) ||
+                op2.IsIntegralConstant(1) && (binaryOp == Operation.Mul || binaryOp == Operation.Div))
+            {
+                importer.PushExpression(op1);
+                return true;
+            }
+
             // If one of the values is a native int then cast the other to be native int too
             if (op1.Type == VarType.Ptr || op2.Type == VarType.Ptr)
             {

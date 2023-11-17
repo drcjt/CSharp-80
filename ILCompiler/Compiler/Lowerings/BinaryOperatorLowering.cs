@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using System.Diagnostics;
 
 namespace ILCompiler.Compiler.Lowerings
 {
@@ -16,6 +17,14 @@ namespace ILCompiler.Compiler.Lowerings
 
                 case Operation.Div:
                     LowerDiv(entry);
+                    break;
+
+                case Operation.Add:
+                    LowerAdd(entry);
+                    break;
+
+                case Operation.Sub: 
+                    LowerSub(entry);
                     break;
             }
 
@@ -49,6 +58,16 @@ namespace ILCompiler.Compiler.Lowerings
             }
         }
 
+        private static void LowerAdd(BinaryOperator add)
+        {
+            ContainCheckBinary(add);
+        }
+
+        private static void LowerSub(BinaryOperator sub)
+        {
+            ContainCheckBinary(sub);
+        }
+
         private static bool IsPow2(int i)
         {
             return (i > 0 && ((i - 1) & i) == 0);
@@ -62,6 +81,38 @@ namespace ILCompiler.Compiler.Lowerings
                 ++r;
             }
             return r;
+        }
+
+        private static void ContainCheckBinary(BinaryOperator node)
+        {
+            var op2 = node.Op2;
+
+            bool directlyEncodable = false;
+            StackEntry? operand = null;
+
+            if (IsContainableImmediate(node, op2))
+            {
+                directlyEncodable = true;
+                operand = op2;
+            }
+            else
+            {
+                // Todo: more containment stuff
+            }
+
+            if (directlyEncodable && operand != null)
+            {
+                MakeSrcContained(node, operand);
+            }
+        }
+
+        private static bool IsContainableImmediate(StackEntry parent, StackEntry child) => child.IsIntCns();
+
+        private static void MakeSrcContained(StackEntry parent, StackEntry child)
+        {
+            child.Contained = true;
+
+            // TODO: check is containable memory op
         }
     }
 }
