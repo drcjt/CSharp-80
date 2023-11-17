@@ -82,15 +82,27 @@ namespace ILCompiler.Compiler.Z80Assembler
 
         private static void DownloadAssembler(string zmacPath)
         {
+            var tempPath = Path.GetTempFileName();
+
             using (var client = new HttpClient())
             {
                 using (var s = client.GetStreamAsync(ZmacUrl))
                 {
-                    using (var fs = new FileStream(zmacPath, FileMode.OpenOrCreate))
+                    using (var fs = new FileStream(tempPath, FileMode.OpenOrCreate))
                     {
                         s.Result.CopyTo(fs);
                     }
                 }
+            }
+
+            try
+            {
+                File.Move(tempPath, zmacPath);
+            }
+            catch
+            {
+                // Ignore errors as another ILCompiler process running at same time may
+                // have downloaded the compiler already
             }
         }
     }
