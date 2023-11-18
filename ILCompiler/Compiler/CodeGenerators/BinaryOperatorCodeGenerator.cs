@@ -44,13 +44,21 @@ namespace ILCompiler.Compiler.CodeGenerators
                 if (operatorType == VarType.Ptr)
                 {
                     context.InstructionsBuilder.Pop(HL);
-                    context.InstructionsBuilder.Pop(BC);
+
+                    if (entry.Op2.IsContainedIntOrI())
+                    {
+                        context.InstructionsBuilder.Ld(BC, (short)entry.Op2.GetIntConstant());
+                    }
+                    else
+                    {
+                        context.InstructionsBuilder.Pop(BC);
+                    }
                     GenerateAddOrSub(context, entry.Operation);
                     context.InstructionsBuilder.Push(HL);
                     return;
                 }
 
-                if (entry.Op2.IsContainedInt())
+                if (entry.Op2.IsContainedIntOrI())
                 {
                     GenerateContainedIntAddOrSub(entry, context);
                     return;
