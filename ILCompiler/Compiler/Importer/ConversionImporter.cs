@@ -63,6 +63,8 @@ namespace ILCompiler.Compiler.Importer
                 op1 = cast;
             }
 
+            op1 = CodeFolder.FoldExpression(op1);
+
             // TODO: Work out why this was added
             //op1.Type = GetType(instruction.OpCode.Code);
 

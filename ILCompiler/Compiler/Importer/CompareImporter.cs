@@ -40,12 +40,12 @@ namespace ILCompiler.Compiler.Importer
             {
                 if (op1.Type != VarType.Ptr)
                 {
-                    var cast = new CastEntry(op1, VarType.Ptr);
+                    var cast = CodeFolder.FoldExpression(new CastEntry(op1, VarType.Ptr));
                     op1 = cast;
                 }
                 if (op2.Type != VarType.Ptr)
                 {
-                    var cast = new CastEntry(op2, VarType.Ptr);
+                    var cast = CodeFolder.FoldExpression(new CastEntry(op2, VarType.Ptr));
                     op2 = cast;
                 }
             }
