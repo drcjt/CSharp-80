@@ -7,12 +7,9 @@ namespace ILCompiler.Compiler.Importer
     {
         public static StackEntry FoldExpression(StackEntry tree)
         {
-            if (tree is CastEntry castOperator)
+            if (tree is CastEntry castOperator && castOperator.Op1.IsIntCnsOrI())
             {
-                if (castOperator.Op1.IsIntCnsOrI())
-                {
-                    return FoldConstantExpression(tree);
-                }
+                return FoldConstantExpression(tree);
             }
 
             return tree;
