@@ -54,13 +54,13 @@ namespace ILCompiler.Compiler.Importer
 
             if (addr.Type == VarType.Int)
             {
-                var cast = new CastEntry(addr, VarType.Ptr);
+                var cast = CodeFolder.FoldExpression(new CastEntry(addr, VarType.Ptr));
                 addr = cast;
             }    
 
             if (type.IsSmall() && !value.Type.IsSmall())
             {
-                value = new CastEntry(value, type);
+                value = CodeFolder.FoldExpression(new CastEntry(value, type));
             }
 
             var node = new StoreIndEntry(addr, value, value.Type, fieldOffset: 0, exactSize);

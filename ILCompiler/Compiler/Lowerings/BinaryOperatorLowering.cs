@@ -106,7 +106,7 @@ namespace ILCompiler.Compiler.Lowerings
             }
         }
 
-        private static bool IsContainableImmediate(StackEntry parent, StackEntry child) => child.IsIntCns();
+        private static bool IsContainableImmediate(StackEntry parent, StackEntry child) => child.IsIntCnsOrI();
 
         private static void MakeSrcContained(StackEntry parent, StackEntry child)
         {

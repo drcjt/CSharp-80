@@ -49,7 +49,7 @@ namespace ILCompiler.Compiler.Importer
 
             if (addr.Type == VarType.Int)
             {
-                var cast = new CastEntry(addr, VarType.Ptr);
+                var cast = CodeFolder.FoldExpression(new CastEntry(addr, VarType.Ptr));
                 addr = cast;
             }
 

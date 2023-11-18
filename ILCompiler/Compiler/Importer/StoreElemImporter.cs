@@ -46,14 +46,14 @@ namespace ILCompiler.Compiler.Importer
 
                 if (value.Type != elemType && elemType != VarType.Ref)
                 {
-                    value = new CastEntry(value, elemType);
+                    value = CodeFolder.FoldExpression(new CastEntry(value, elemType));
                 }
             }
 
             var indexOp = importer.PopExpression();
             var arrayOp = importer.PopExpression();
 
-            var cast = new CastEntry(indexOp, VarType.Ptr);
+            var cast = CodeFolder.FoldExpression(new CastEntry(indexOp, VarType.Ptr));
             StackEntry addr = cast;
             if (elemSize > 1)
             {
