@@ -58,6 +58,11 @@
             return type >= VarType.Byte && type <= VarType.UInt;
         }
 
+        public static bool GenActualTypeIsI(this VarType type)
+        {
+            return type == VarType.Ptr || type == VarType.Ref || type == VarType.ByRef;
+        }
+
         public static int GetTypeSize(this VarType type)
         {
             switch (type)
