@@ -44,7 +44,6 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             var condition = binOp.Operation == Operation.Eq ? Condition.Z : Condition.NZ;
             context.InstructionsBuilder.Jp(condition, entry.TargetLabel);
-            return;
         }
     }
 }
