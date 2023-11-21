@@ -8,7 +8,7 @@
 
         public static ConstantEntry CreateZeroConstantEntry(VarType type)
         {
-            if (type == VarType.Ref || type == VarType.Ptr)
+            if (type.GenActualTypeIsI())
             {
                 return new NativeIntConstantEntry(0);
             }
