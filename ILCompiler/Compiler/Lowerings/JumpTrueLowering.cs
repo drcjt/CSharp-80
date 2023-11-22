@@ -9,7 +9,7 @@ namespace ILCompiler.Compiler.Lowerings
             var condition = entry.Condition;
 
             if (condition is BinaryOperator binOp && binOp.IsComparison &&
-                binOp.Op1.IsIntegralConstant(0) && (binOp.Operation == Operation.Eq || binOp.Operation == Operation.Ne_Un))
+                binOp.Op1.IsIntCnsOrI() && (binOp.Operation == Operation.Eq || binOp.Operation == Operation.Ne_Un))
             {
                     binOp.Op1.Contained = true;
 
