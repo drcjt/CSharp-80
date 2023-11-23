@@ -4,7 +4,16 @@ namespace ILCompiler.Compiler.EvaluationStack
 {
     public static class StackEntryExtensions
     {
-        public static bool IsIntCnsOrI(this StackEntry entry) => entry is Int32ConstantEntry || entry is NativeIntConstantEntry;
+        public static bool IsIntCnsOrI(this StackEntry entry)
+        {
+            if (entry is Int32ConstantEntry) return true;
+
+            // Ignore NativeIntConstants using a symbolname e.g. T1.
+            if (entry is NativeIntConstantEntry nativeEntry && nativeEntry.SymbolName == String.Empty) return true;
+
+            return false;
+
+        }
 
         public static int GetIntConstant(this StackEntry entry)
         {
