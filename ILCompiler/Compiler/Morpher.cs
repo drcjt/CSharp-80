@@ -49,7 +49,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case BinaryOperator bo:
-                    tree = new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(bo.Op1), MorphTree(bo.Op2), bo.Type);
+                    tree = MorphBinaryOperator(bo);
                     break;
 
                 case CastEntry ce:
@@ -135,6 +135,33 @@ namespace ILCompiler.Compiler
             addr = MorphTree(addr);
 
             return addr;
+        }
+
+        private BinaryOperator MorphBinaryOperator(BinaryOperator bo)
+        {
+            switch (bo.Operation)
+            {
+                case Operation.Add:
+                case Operation.Mul:
+                case Operation.Or:
+                case Operation.Xor:
+                case Operation.And:
+                    return OptimizeCommutativeArithmetic(bo);
+
+                default:
+                    return new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(bo.Op1), MorphTree(bo.Op2), bo.Type);
+            }
+        }
+
+        private BinaryOperator OptimizeCommutativeArithmetic(BinaryOperator bo)
+        {
+            // Commute constants to the right
+            if (bo.Op1.IsIntCnsOrI())
+            {
+                return new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(bo.Op2), MorphTree(bo.Op1), bo.Type);
+            }
+
+            return new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(bo.Op1), MorphTree(bo.Op2), bo.Type);
         }
     }
 }
