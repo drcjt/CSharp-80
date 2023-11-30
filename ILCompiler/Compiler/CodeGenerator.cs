@@ -74,12 +74,12 @@ namespace ILCompiler.Compiler
                         currentNode.Accept(visitorAdapter);
                     }
                     currentNode = currentNode.Next;
-
                 }
 
-                Optimize(_context.InstructionsBuilder.Instructions);
                 methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
             }
+
+            Optimize(methodInstructions);
 
             return methodInstructions;
         }
@@ -288,23 +288,57 @@ namespace ILCompiler.Compiler
 
         private void Optimize(IList<Instruction> instructions)
         {
-            EliminatePushXXPopXX(instructions);
+            var removedInstructions = EliminatePushXXPopXX(instructions);
+            removedInstructions += RemoveJumpsToNextInstruction(instructions);
+
+            _logger.LogDebug("Eliminated {eliminatedInstructions} instructions", removedInstructions);
         }
 
-        private void EliminatePushXXPopXX(IList<Instruction> instructions)
+        private static int RemoveJumpsToNextInstruction(IList<Instruction> instructions)
         {
-            int unoptimizedInstructionCount = instructions.Count;
+            var removedInstructions = 0;
+            var currentInstruction = instructions[0];
+            int count = 0;
+
+            do
+            {
+                if (currentInstruction != null && currentInstruction.Opcode == Opcode.Jp 
+                    && count < instructions.Count && currentInstruction.Label == null)
+                {
+                    var target = currentInstruction.Op0?.Label;
+                    var nextInstruction = instructions[count + 1];
+                    if (target == nextInstruction.Label)
+                    {
+                        instructions.RemoveAt(count);
+                        removedInstructions++;
+                        count--;
+                    }
+                }
+                if (count + 1 < instructions.Count)
+                {
+                    currentInstruction = instructions[++count];
+                }
+            } while (count < instructions.Count - 1);
+
+            return removedInstructions;
+        }
+
+        private static int EliminatePushXXPopXX(IList<Instruction> instructions)
+        {
+            int removedInstructions = 0;
             Instruction? lastInstruction = null;
             var currentInstruction = instructions[0];
             int count = 0;
             do
             {
                 if (lastInstruction?.Opcode == Opcode.Push && currentInstruction.Opcode == Opcode.Pop
-                    && lastInstruction?.Op0?.Register == currentInstruction.Op0?.Register)
+                    && lastInstruction?.Op0?.Register == currentInstruction.Op0?.Register &&
+                    currentInstruction.Label == null && lastInstruction?.Label == null)
                 {
                     // Eliminate Push followed by Pop
                     instructions.RemoveAt(count - 1);
                     instructions.RemoveAt(count - 1);
+                    removedInstructions += 2;
 
                     count--;
                     currentInstruction = instructions[count];
@@ -320,7 +354,7 @@ namespace ILCompiler.Compiler
                 }
             } while (count < instructions.Count - 1);
 
-            _logger.LogDebug("Eliminated {eliminatedInstructions} instructions", unoptimizedInstructionCount - instructions.Count);
+            return removedInstructions;
         }
     }
 }
