@@ -307,14 +307,11 @@ namespace ILCompiler.Compiler
                 {
                     var target = currentInstruction.Op0?.Label;
                     var nextInstruction = instructions[count + 1];
-                    if (nextInstruction.Label != null)
+                    if (target == nextInstruction.Label)
                     {
-                        if (target == nextInstruction.Label)
-                        {
-                            instructions.RemoveAt(count);
-                            removedInstructions++;
-                            count--;
-                        }
+                        instructions.RemoveAt(count);
+                        removedInstructions++;
+                        count--;
                     }
                 }
                 if (count + 1 < instructions.Count)
