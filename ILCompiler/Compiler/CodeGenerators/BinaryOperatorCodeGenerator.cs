@@ -1,6 +1,6 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.Emit;
+using ILCompiler.Compiler.EvaluationStack;
 using System.Diagnostics;
-using ILCompiler.Compiler.Emit;
 using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
@@ -47,13 +47,28 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                     if (entry.Op2.IsContainedIntOrI())
                     {
-                        context.InstructionsBuilder.Ld(BC, (short)entry.Op2.GetIntConstant());
+                        int value = entry.Op2.As<NativeIntConstantEntry>().Value;
+                        value = entry.Operation == Operation.Sub ? -value : value;
+
+                        if (value == 1)
+                        {
+                            context.InstructionsBuilder.Inc(HL);
+                        }
+                        else if (value == -1)
+                        {
+                            context.InstructionsBuilder.Dec(HL);
+                        }
+                        else
+                        {
+                            context.InstructionsBuilder.Ld(BC, (short)entry.Op2.GetIntConstant());
+                            GenerateAddOrSub(context, entry.Operation);
+                        }
                     }
                     else
                     {
                         context.InstructionsBuilder.Pop(BC);
+                        GenerateAddOrSub(context, entry.Operation);
                     }
-                    GenerateAddOrSub(context, entry.Operation);
                     context.InstructionsBuilder.Push(HL);
                     return;
                 }
@@ -100,10 +115,10 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             // Adding constant so can inline this
             context.InstructionsBuilder.Pop(HL);
+            context.InstructionsBuilder.Pop(DE);
             context.InstructionsBuilder.Ld(BC, low);
             context.InstructionsBuilder.Add(HL, BC);
             context.InstructionsBuilder.Ex(DE, HL);
-            context.InstructionsBuilder.Pop(HL);
             context.InstructionsBuilder.Ld(BC, high);
             context.InstructionsBuilder.Adc(HL, BC);
             context.InstructionsBuilder.Push(HL);
