@@ -77,8 +77,8 @@ namespace ILCompiler.Compiler.CodeGenerators
             if (ixOffset + bytesToCopy < -127)
             {
                 var delta = ixOffset + 1;
-                instructionsBuilder.Ld(DE, (short)delta);
-                instructionsBuilder.Add(IX, DE);
+                instructionsBuilder.Ld(BC, (short)delta);
+                instructionsBuilder.Add(IX, BC);
                 changeToIX += delta;
 
                 ixOffset -= delta;
@@ -139,8 +139,8 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             if (changeToIX != 0)
             {
-                instructionsBuilder.Ld(DE, (short)(-changeToIX));
-                instructionsBuilder.Add(IX, DE);
+                instructionsBuilder.Ld(BC, (short)(-changeToIX));
+                instructionsBuilder.Add(IX, BC);
             }
         }
 
@@ -186,9 +186,11 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             int changeToIX = 0;
 
+            var registerHigh = H;
+            var registerLow = L;
+
             var totalBytesToCopy = size;
             int originalIxOffset = ixOffset;
-
             do
             {
                 var bytesToCopy = totalBytesToCopy > 2 ? 2 : totalBytesToCopy;
@@ -208,8 +210,8 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                     changeToIX += newIxChange;
 
-                    instructionsBuilder.Ld(DE, newIxChange);
-                    instructionsBuilder.Add(IX, DE);
+                    instructionsBuilder.Ld(BC, newIxChange);
+                    instructionsBuilder.Add(IX, BC);
                 }
 
                 while (ixOffset < -128)
@@ -225,16 +227,20 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                     changeToIX += newIxChange;
 
-                    instructionsBuilder.Ld(DE, newIxChange);
-                    instructionsBuilder.Add(IX, DE);
+                    instructionsBuilder.Ld(BC, newIxChange);
+                    instructionsBuilder.Add(IX, BC);
                 }
 
-                instructionsBuilder.Pop(HL);
+                if (registerHigh == D) instructionsBuilder.Pop(DE);
+                if (registerHigh == H) instructionsBuilder.Pop(HL);
                 if (bytesToCopy == 2)
                 {
-                    instructionsBuilder.Ld(__[IX + (short)(ixOffset + 1)], H);
+                    instructionsBuilder.Ld(__[IX + (short)(ixOffset + 1)], registerHigh);
                 }
-                instructionsBuilder.Ld(__[IX + (short)(ixOffset + 0)], L);
+                instructionsBuilder.Ld(__[IX + (short)(ixOffset + 0)], registerLow);
+
+                registerHigh = D;
+                registerLow = E;
 
                 ixOffset += 2;
                 totalBytesToCopy -= 2;
@@ -242,14 +248,19 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             if (changeToIX != 0 && restoreIX)
             {
-                instructionsBuilder.Ld(DE, (short)(-changeToIX));
-                instructionsBuilder.Add(IX, DE);
+                instructionsBuilder.Ld(BC, (short)(-changeToIX));
+                instructionsBuilder.Add(IX, BC);
             }
         }
 
         public static void CopyFromIXToStack(InstructionsBuilder instructionsBuilder, int size, int ixOffset = 0, bool restoreIX = false)
         {
             int changeToIX = 0;
+
+            bool pushImmediately = size > 4;
+            int originalSize = size;
+            var destHigh = size == 2 ? H : D;
+            var destLow = size == 2 ? L : E;
 
             int originalIxOffset = ixOffset;
             ixOffset += size - 2;
@@ -263,8 +274,8 @@ namespace ILCompiler.Compiler.CodeGenerators
                 {
                     // Move IX so new offset will be 126/127
                     var delta = -ixOffset + 126;
-                    instructionsBuilder.Ld(DE, (short)-delta);
-                    instructionsBuilder.Add(IX, DE);
+                    instructionsBuilder.Ld(BC, (short)-delta);
+                    instructionsBuilder.Add(IX, BC);
                     changeToIX -= delta;
 
                     ixOffset += delta;
@@ -273,23 +284,40 @@ namespace ILCompiler.Compiler.CodeGenerators
 
                 if (bytesToCopy == 1)
                 {
-                    instructionsBuilder.Ld(H, 0);
-                    instructionsBuilder.Ld(L, __[IX + (short)(ixOffset + 1)]);
+                    instructionsBuilder.Ld(destHigh, 0);
+                    instructionsBuilder.Ld(destLow, __[IX + (short)(ixOffset + 1)]);
                 }
                 else
                 {
-                    instructionsBuilder.Ld(H, __[IX + (short)(ixOffset + 1)]);
-                    instructionsBuilder.Ld(L, __[IX + (short)(ixOffset + 0)]);
+                    instructionsBuilder.Ld(destHigh, __[IX + (short)(ixOffset + 1)]);
+                    instructionsBuilder.Ld(destLow, __[IX + (short)(ixOffset + 0)]);
                 }
-                instructionsBuilder.Push(HL);
+
+                if (pushImmediately)
+                {
+                    if (destHigh == H) instructionsBuilder.Push(HL);
+                    if (destHigh == D) instructionsBuilder.Push(DE);
+                }
+
+                destHigh = H;
+                destLow = L;
 
                 ixOffset -= 2;
             } while (ixOffset >= originalIxOffset);
 
+            if (!pushImmediately)
+            {
+                if (originalSize == 4)
+                {
+                    instructionsBuilder.Push(DE);
+                }
+                instructionsBuilder.Push(HL);
+            }
+
             if (changeToIX != 0 && restoreIX)
             {
-                instructionsBuilder.Ld(DE, (short)(-changeToIX));
-                instructionsBuilder.Add(IX, DE);
+                instructionsBuilder.Ld(BC, (short)(-changeToIX));
+                instructionsBuilder.Add(IX, BC);
             }
         }
     }
