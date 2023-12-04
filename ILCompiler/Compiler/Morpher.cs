@@ -70,7 +70,18 @@ namespace ILCompiler.Compiler
                     break;
 
                 case JumpTrueEntry jte:
-                    tree = new JumpTrueEntry(jte.TargetLabel, MorphTree(jte.Condition));
+                    {
+                        if (jte.Condition is BinaryOperator binOp && binOp.IsComparison)
+                        {
+                            var morphedConditionTree = MorphBinaryOperator(binOp);
+                            morphedConditionTree.ResultUsedInJump = true;
+                            tree = new JumpTrueEntry(jte.TargetLabel, morphedConditionTree);
+                        }
+                        else
+                        {
+                            tree = new JumpTrueEntry(jte.TargetLabel, MorphTree(jte.Condition));
+                        }
+                    }
                     break;
 
                 case LocalHeapEntry lhe:
