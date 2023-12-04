@@ -42,13 +42,17 @@ namespace ILCompiler.Compiler.CodeGenerators
             if (ComparisonOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, op1Type), out string? routine))
             {
                 context.InstructionsBuilder.Call(routine);
-                // If carry set then push i4 1 else push i4 0
-                context.InstructionsBuilder.Ld(HL, 0);
-                context.InstructionsBuilder.Push(HL);     // MSW
 
-                context.InstructionsBuilder.Ld(HL, 0);
-                context.InstructionsBuilder.Adc(HL, HL);
-                context.InstructionsBuilder.Push(HL);     // LSW
+                if (!entry.ResultUsedInJump)
+                {
+                    // If carry set then push i4 1 else push i4 0
+                    context.InstructionsBuilder.Ld(HL, 0);
+                    context.InstructionsBuilder.Push(HL);     // MSW
+
+                    context.InstructionsBuilder.Ld(HL, 0);
+                    context.InstructionsBuilder.Adc(HL, HL);
+                    context.InstructionsBuilder.Push(HL);     // LSW
+                }
             }
             else
             {

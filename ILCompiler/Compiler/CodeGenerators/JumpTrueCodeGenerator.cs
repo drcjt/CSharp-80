@@ -16,13 +16,19 @@ namespace ILCompiler.Compiler.CodeGenerators
                 return;
             }
 
-
-            // Pop i4 from stack and jump if non zero
-            context.InstructionsBuilder.Pop(HL);      // LSW
-            context.InstructionsBuilder.Ld(A, 0);
-            context.InstructionsBuilder.Add(A, L);
-            context.InstructionsBuilder.Pop(HL);      // MSW
-            context.InstructionsBuilder.Jp(Condition.NZ, entry.TargetLabel);
+            if (binOp.ResultUsedInJump)
+            {
+                context.InstructionsBuilder.Jp(Condition.C, entry.TargetLabel);
+            }
+            else
+            {
+                // Pop i4 from stack and jump if non zero
+                context.InstructionsBuilder.Pop(HL);      // LSW
+                context.InstructionsBuilder.Ld(A, 0);
+                context.InstructionsBuilder.Add(A, L);
+                context.InstructionsBuilder.Pop(HL);      // MSW
+                context.InstructionsBuilder.Jp(Condition.NZ, entry.TargetLabel);
+            }
         }
 
         private static void GenerateJumpCompareCode(JumpTrueEntry entry, CodeGeneratorContext context, BinaryOperator binOp)

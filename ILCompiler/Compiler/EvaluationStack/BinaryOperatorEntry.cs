@@ -6,6 +6,7 @@
         public StackEntry Op2 { get; }
         public bool IsComparison { get; }
         public Operation Operation { get; set; }
+        public bool ResultUsedInJump { get; set; } = false;
 
         public BinaryOperator(Operation operation, bool isComparison, StackEntry op1, StackEntry op2, VarType type) : base(type, type.GetTypeSize())
         {
@@ -17,7 +18,9 @@
 
         public override StackEntry Duplicate()
         {
-            return new BinaryOperator(Operation, IsComparison, Op1.Duplicate(), Op2.Duplicate(), Type);
+            var clone = new BinaryOperator(Operation, IsComparison, Op1.Duplicate(), Op2.Duplicate(), Type);
+            clone.ResultUsedInJump = ResultUsedInJump;
+            return clone;
         }
 
         public override void Accept(IStackEntryVisitor visitor)
