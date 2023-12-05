@@ -23,6 +23,8 @@
             AllocTests.AllocEETypeTests();
             AllocTests.AllocSizeTests();
 
+            ArrayTests.ForEachArrayEnumerationTests();
+
             return 0;
         }
     }
