@@ -1,6 +1,6 @@
 ﻿namespace CoreLib
 {
-    public class ArrayTests
+    public static class ArrayTests
     {
         public static void ForEachArrayEnumerationTests()
         {            
