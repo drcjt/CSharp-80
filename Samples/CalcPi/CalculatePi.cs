@@ -1,7 +1,5 @@
 ﻿using System;
 
-[module: System.Runtime.CompilerServices.SkipLocalsInit]
-
 namespace CalculatePi
 {
     public static class CalculatePi
@@ -15,6 +13,14 @@ namespace CalculatePi
             DisplayDigitsOfPi(digits);
         }
 
+        /// <summary>
+        /// Calculate digits of pi using spigot algorithm.
+        /// 
+        /// See "A Spigot Algorithm for the Digits of Pi" by Stanley Rabinowitz and Stan Wagon
+        /// http://www.stanleyrabinowitz.com/bibliography/spigot.pdf
+        /// 
+        /// </summary>
+        /// <param name="digits">number of digits of pi to calculate</param>
         public static void DisplayDigitsOfPi(int digits)
         {
             digits++;
@@ -52,12 +58,18 @@ namespace CalculatePi
                 for (int j = 0; j < length; j++)
                     x[j] = r[j] * 10;
             }
-            Console.WriteLine();
 
-            Console.Write("PI = ");
+            uint c = 0;
+            for (int i = digits - 1; i >= 0; i--)
+            {
+                pi[i] += c;               
+                c = pi[i] / 10;
+            }
+
+            Console.WriteLine("PI = ");
             for (int i = 0; i < digits - 1; i++)
             {
-                Console.Write(pi[i]);
+                Console.Write(pi[i] % 10);
                 if (i == 0)
                     Console.Write('.');
             }
