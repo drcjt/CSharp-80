@@ -13,6 +13,7 @@ namespace ILCompiler.Compiler
         public BasicBlock? ImmediateDominator { get; set; }
         public IList<BasicBlock> Successors { get; } = new List<BasicBlock>();
         public IList<BasicBlock> Predecessors { get; } = new List<BasicBlock>();
+        public ISet<BasicBlock> Reach { get; } = new HashSet<BasicBlock>();
 
         // High level intermediate representation - main output of importation process
         public IList<StackEntry> Statements { get; } = new List<StackEntry>();
