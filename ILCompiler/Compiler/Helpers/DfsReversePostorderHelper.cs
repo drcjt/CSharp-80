@@ -2,7 +2,7 @@
 {
     public class DfsReversePostorderHelper
     {
-        private class DfsBlockEntry
+        private sealed class DfsBlockEntry
         {
             public BasicBlock Block { get; init; }
             private IEnumerator<BasicBlock>? _enumerator;
@@ -38,7 +38,7 @@
             var visited = new HashSet<BasicBlock>();
             stack.Push(new DfsBlockEntry(blocks[0]));
 
-            IList<BasicBlock> postOrderTraversal = new List<BasicBlock>();
+            var postOrderTraversal = new List<BasicBlock>();
 
             while (stack.Count > 0)
             {
@@ -57,7 +57,7 @@
                 }
             }
 
-            return postOrderTraversal.Reverse();
+            return postOrderTraversal.AsEnumerable().Reverse();
         }
     }
 }
