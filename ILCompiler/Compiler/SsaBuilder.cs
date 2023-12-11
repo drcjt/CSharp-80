@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.FlowgraphHelpers;
 using ILCompiler.Compiler.Ssa;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -26,7 +27,7 @@ namespace ILCompiler.Compiler
             blocks = SetupBasicBlockRoot(blocks);
 
             // Topologically sort the graph
-            var postOrder = TopologicalSort(blocks[0]);
+            var postOrder = FlowgraphDfsTree.Build(blocks[0]).PostOrder;
 
             // Compute the immediate dominators of all basic blocks
             ComputeImmediateDominators(postOrder);
@@ -418,49 +419,6 @@ namespace ILCompiler.Compiler
             }
 
             return rootNode!;
-        }
-
-        private static IList<BasicBlock> TopologicalSort(BasicBlock firstBlock)
-        {
-            var postOrder = new List<BasicBlock>();
-            var visitedBlocks = new HashSet<BasicBlock>();
-
-            var blocksStack = new Stack<BasicBlock>();
-            var successorsStack = new Stack<int>();
-
-            blocksStack.Push(firstBlock);
-            successorsStack.Push(0);
-
-            uint postIndex = 0;
-
-            while (blocksStack.Count > 0)
-            {
-                var topBlock = blocksStack.Peek();
-                var successorIndex = successorsStack.Pop();
-
-                if (successorIndex < topBlock.Successors.Count)
-                {
-                    var successor = topBlock.Successors[successorIndex];
-                    successorsStack.Push(successorIndex + 1);
-
-                    if (!visitedBlocks.Contains(successor))
-                    {
-                        blocksStack.Push(successor);
-                        successorsStack.Push(0);
-
-                        visitedBlocks.Add(successor);
-                    }
-                }
-                else
-                {
-                    var block = blocksStack.Pop();
-                    block.PostOrderNum = postIndex;
-                    postOrder.Add(block);
-                    postIndex++;
-                }
-            }
-
-            return postOrder;
         }
 
         private void ComputeImmediateDominators(IList<BasicBlock> postOrder)
