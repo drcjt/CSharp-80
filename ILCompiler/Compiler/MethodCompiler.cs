@@ -153,6 +153,10 @@ namespace ILCompiler.Compiler
             var morpher = _phaseFactory.Create<IMorpher>();
             morpher.Morph(basicBlocks, _locals);
 
+            // Find loops
+            var loopFinder = _phaseFactory.Create<ILoopFinder>();
+            loopFinder.FindLoops(basicBlocks);
+
             var flowgraph = _phaseFactory.Create<IFlowgraph>();
             flowgraph.SetBlockOrder(basicBlocks);
 

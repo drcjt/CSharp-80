@@ -43,6 +43,8 @@ namespace ILCompiler.IoC
 
             services.AddTransient<IMorpher, Morpher>();
 
+            services.AddTransient<ILoopFinder, LoopFinder>();
+
             services.AddTransient<IRationalizer, Rationalizer>();
 
             services.AddTransient<IFlowgraph, Flowgraph>();
