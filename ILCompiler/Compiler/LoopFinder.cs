@@ -1,4 +1,4 @@
-﻿using ILCompiler.Compiler.Helpers;
+﻿using ILCompiler.Compiler.FlowgraphHelpers;
 using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler
@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler
     {
         public void FindLoops(IList<BasicBlock> blocks)
         {
-            var reversePostOrder = DfsReversePostorderHelper.CreateDfsReversePostorder(blocks);
+            var reversePostOrder = FlowgraphDfsTree.Build(blocks[0]).PostOrder.Reverse();
             ComputeReachabilitySets(reversePostOrder);
         }
 
