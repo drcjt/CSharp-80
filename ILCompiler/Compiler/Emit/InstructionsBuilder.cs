@@ -52,6 +52,7 @@ namespace ILCompiler.Compiler.Emit
         public void And(Register8 target) => AddInstruction(Instruction.Create(Opcode.And, target));
         public void Call(string target) => AddInstruction(Instruction.CreateBranch(Opcode.Call, target));
         public void Call(ushort target) => AddInstruction(Instruction.CreateBranch(Opcode.Call, target));
+        public void Call(Condition condition, string target) => AddInstruction(Instruction.CreateBranch(Opcode.Call, condition, target));
         public void Dec(Register16 register) => AddInstruction(Instruction.Create(Opcode.Dec, register));
         public void Dec(Register8 register) => AddInstruction(Instruction.Create(Opcode.Dec, register));
 

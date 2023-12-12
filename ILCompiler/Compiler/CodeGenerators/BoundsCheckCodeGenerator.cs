@@ -19,18 +19,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             context.InstructionsBuilder.And(A);         // Clear carry flag
             context.InstructionsBuilder.Sbc(HL, DE);    // Calculate Array Length - Index
 
-            var endLabel = context.NameMangler.GetUniqueName();
-
-            context.InstructionsBuilder.Jp(Condition.NC, endLabel);
-
-            // Code to display Index Out of Range message and fail fast
-
-            context.InstructionsBuilder.Ld(HL, "INDEX_OUT_OF_RANGE_MSG - 2");
-            context.InstructionsBuilder.Call("PRINT");
-            context.InstructionsBuilder.Jp("EXIT");
-
-            // Index was valid
-            context.InstructionsBuilder.Label(endLabel);
+            context.InstructionsBuilder.Call(Condition.C, "RangeCheckFail");            
         }
     }
 }
