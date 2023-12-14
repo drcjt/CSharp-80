@@ -64,6 +64,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                             case Code.Isinst:
                                 ImportCasting();
                                 break;
+
+                            case Code.Throw:
+                                ImportThrow();
+                                break;
                         }
                         currentOffset += currentInstruction.GetSize();
                         currentIndex++;
@@ -78,6 +82,16 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             var systemRuntimeTypeCast = _corLibModuleProvider.FindThrow("System.Runtime.TypeCast");
             var runtimeHelperMethod = systemRuntimeTypeCast.FindMethod("IsInstanceOfClass");
+
+            var methodNode = _nodeFactory.MethodNode(runtimeHelperMethod);
+
+            _dependencies.Add(methodNode);
+        }
+
+        private void ImportThrow()
+        {
+            var systemRuntimeExceptionHandling = _corLibModuleProvider.FindThrow("System.Runtime.ExceptionHandling");
+            var runtimeHelperMethod = systemRuntimeExceptionHandling.FindMethod("ThrowException");
 
             var methodNode = _nodeFactory.MethodNode(runtimeHelperMethod);
 
