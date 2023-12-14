@@ -2,11 +2,11 @@
 {
     public class Exception
     {
-        internal string? _message = null;
+        internal string _message = null;
 
         public Exception() { }
 
-        public Exception(string? message)
+        public Exception(string message)
         {
             _message = message;
         }
