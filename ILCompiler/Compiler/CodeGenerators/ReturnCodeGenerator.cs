@@ -63,7 +63,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
             }
 
-            if (context.ParamsCount > 0 || (context.LocalsCount + tempCount) > 0)
+            if (context.ParamsCount > 0 || (context.LocalsCount + tempCount) > 0 || context.Configuration.ExceptionSupport)
             {
                 if (context.LocalsCount + tempCount > 0)
                 {

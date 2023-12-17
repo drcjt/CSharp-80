@@ -241,7 +241,7 @@ namespace ILCompiler.Compiler
                 }
             }
 
-            if (_context.ParamsCount > 0 || (_context.LocalsCount + tempCount) > 0)
+            if (_context.ParamsCount > 0 || (_context.LocalsCount + tempCount) > 0 || _context.Configuration.ExceptionSupport)
             {
                 instructionsBuilder.Push(IX);
                 instructionsBuilder.Ld(IX, 0);
