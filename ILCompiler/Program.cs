@@ -87,6 +87,7 @@ namespace ILCompiler
                     configuration.AssemblerArguments = parsedConfiguration.AssemblerArguments;
                     configuration.AssemblerOutput = parsedConfiguration.AssemblerOutput;
                     configuration.NoListFile = parsedConfiguration.NoListFile;
+                    configuration.ExceptionSupport = parsedConfiguration.ExceptionSupport;
                 },
                 inputFileArgument, outputFileOption, configurationBinder
             );
