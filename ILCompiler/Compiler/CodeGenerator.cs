@@ -78,6 +78,10 @@ namespace ILCompiler.Compiler
 
                 methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
             }
+            // Emit end of method label
+            _context.InstructionsBuilder.Reset();
+            _context.InstructionsBuilder.Label($"{mangledMethodName}_END");
+            methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
 
             Optimize(methodInstructions);
 
