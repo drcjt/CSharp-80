@@ -19,6 +19,7 @@ namespace ILCompiler
         public readonly Option<string> AssemblerOutput = new(new[] { "-ao", "--assemblerOutput" }, "Assembler output type");
         public readonly Option<bool> NoListFile = new(new[] { "-nl", "--noListFile" }, "No list file");
         public readonly Option<bool> SkipArrayBoundsCheck = new(new[] { "-nb", "--noBoundsCheck" }, "No Array Bounds Check");
+        public readonly Option<bool> ExceptionSupport = new(new[] { "-ex", "--exceptions" }, "Exceptions support");
 
         public void AddToCommand(Command command)
         {
@@ -33,6 +34,7 @@ namespace ILCompiler
             command.AddOption(AssemblerOutput);
             command.AddOption(NoListFile);
             command.AddOption(SkipArrayBoundsCheck);
+            command.AddOption(ExceptionSupport);
         }
     }
 }

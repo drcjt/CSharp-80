@@ -78,6 +78,10 @@ namespace ILCompiler.Compiler
 
                 methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
             }
+            // Emit end of method label
+            _context.InstructionsBuilder.Reset();
+            _context.InstructionsBuilder.Label($"{mangledMethodName}_END");
+            methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
 
             Optimize(methodInstructions);
 
@@ -241,7 +245,7 @@ namespace ILCompiler.Compiler
                 }
             }
 
-            if (_context.ParamsCount > 0 || (_context.LocalsCount + tempCount) > 0)
+            if (_context.ParamsCount > 0 || (_context.LocalsCount + tempCount) > 0 || _context.Configuration.ExceptionSupport)
             {
                 instructionsBuilder.Push(IX);
                 instructionsBuilder.Ld(IX, 0);
