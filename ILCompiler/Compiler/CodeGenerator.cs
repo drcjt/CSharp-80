@@ -42,14 +42,24 @@ namespace ILCompiler.Compiler
             GenerateStringMap(blocks);
             GenerateStringData(_context.InstructionsBuilder);
 
-            var mangledMethodName = _nameMangler.GetMangledMethodName(_context.Method);
-            _context.InstructionsBuilder.Label(mangledMethodName);
+            string methodName;
+            if (methodCodeNode.Method.HasCustomAttribute("System.Runtime", "RuntimeExportAttribute"))
+            {
+                var runtimeExportAttribute = methodCodeNode.Method.FindCustomAttribute("System.Runtime.RuntimeExportAttribute");
+                var runtimeExportAttributeValue = runtimeExportAttribute.ConstructorArguments[0].Value.ToString() ?? "";
+                methodName = runtimeExportAttributeValue;
+            }
+            else
+            {
+                methodName = _nameMangler.GetMangledMethodName(_context.Method);
+            }
+            _context.InstructionsBuilder.Label(methodName);
 
             if (methodCodeNode.Method.IsStaticConstructor)
             {
                 // When a static constructor finishes running it replaces the first instruction in
                 // the method with a Ret instruction so it only ever executes once even if called multiple times
-                _context.InstructionsBuilder.Ld(HL, mangledMethodName);
+                _context.InstructionsBuilder.Ld(HL, methodName);
                 _context.InstructionsBuilder.Ld(__[HL], 0xC9);
             }
 
@@ -80,7 +90,7 @@ namespace ILCompiler.Compiler
             }
             // Emit end of method label
             _context.InstructionsBuilder.Reset();
-            _context.InstructionsBuilder.Label($"{mangledMethodName}_END");
+            _context.InstructionsBuilder.Label($"{methodName}_END");
             methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
 
             Optimize(methodInstructions);
