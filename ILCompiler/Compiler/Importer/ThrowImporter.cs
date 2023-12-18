@@ -15,20 +15,12 @@ namespace ILCompiler.Compiler.Importer
 
             // Create call to helper method passing exception object
             var args = new List<StackEntry>() { op1 };
-            var node = new CallEntry(GetHelperMethod(context), args, VarType.Void, 0);
+            var node = new CallEntry("ThrowEx", args, VarType.Void, 0);
 
             importer.ImportAppendTree(node);
 
             return true;
         }
 
-        private static string GetHelperMethod(ImportContext context)
-        {
-            var systemRuntimeExceptionHandling = context.CorLibModuleProvider.FindThrow("System.Runtime.ExceptionHandling");
-            var runtimeHelperMethod = systemRuntimeExceptionHandling.FindMethod("ThrowException");
-            var mangledHelperMethod = context.NameMangler.GetMangledMethodName(runtimeHelperMethod);
-
-            return mangledHelperMethod;
-        }
     }
 }
