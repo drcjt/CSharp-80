@@ -7,6 +7,10 @@ PRINT:
 	LD D, (HL)
 	INC HL
 
+	LD A, D
+	OR E
+	JR Z, PRINTEND	; bail if string is 0 length
+
 	LD B, E		; Mystery fast loop calculus
 	DEC DE
 	INC D
@@ -21,4 +25,5 @@ PRINTLOOP:
 	DEC D
 	JP NZ, PRINTLOOP
 
+PRINTEND:
 	RET
