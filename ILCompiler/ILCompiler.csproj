@@ -72,6 +72,7 @@
     <None Remove="Runtime\print.asm" />
     <None Remove="Runtime\RangeCheckFail.asm" />
     <None Remove="Runtime\stoi.asm" />
+    <None Remove="Runtime\ThrowEx.asm" />
     <None Remove="Runtime\TRS80\beep.asm" />
     <None Remove="Runtime\TRS80\cls.asm" />
     <None Remove="Runtime\TRS80\delay.asm" />
@@ -112,6 +113,7 @@
     <EmbeddedResource Include="Runtime\Memcpy.asm" />
     <EmbeddedResource Include="Runtime\Memset.asm" />
     <EmbeddedResource Include="Runtime\InterfaceCall.asm" />
+    <EmbeddedResource Include="Runtime\ThrowEx.asm" />
     <EmbeddedResource Include="Runtime\RangeCheckFail.asm" />
     <EmbeddedResource Include="Runtime\VirtualCall.asm" />
     <EmbeddedResource Include="Runtime\NewString.asm" />
