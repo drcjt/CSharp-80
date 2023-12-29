@@ -31,18 +31,8 @@
             if (unhandledException is Exception exceptionObject)
             {
                 Console.Write("Unhandled exception. ");
-                
-                // TODO: this isn't working need to work out why
-                //Console.WriteLine(exceptionObject.Message ?? "");
-
-                if (exceptionObject.Message == null)
-                {
-                    Console.WriteLine();
-                }
-                else
-                {
-                    Console.WriteLine(exceptionObject.Message);
-                }
+           
+                Console.WriteLine(exceptionObject.Message ?? "");
 
                 Console.Write("IP="); 
                 Console.Write(exceptionInfo.instructionPointer);
