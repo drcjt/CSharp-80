@@ -232,7 +232,6 @@ project.lock.json
 #####
 # End of core ignore list, below put you custom 'per project' settings (patterns or path)
 #####
-/ILCompiler/csharprt.asm
 /Tests/ILCompiler.IntegrationTests/il_bvt/*.exe
 /Tests/ILCompiler.IntegrationTests/il_bvt/*.dll
 /Tests/ILCompiler.IntegrationTests/il_bvt/*.asm
