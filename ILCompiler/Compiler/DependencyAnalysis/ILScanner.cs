@@ -70,7 +70,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                                 break;
 
                             case Code.Ldelema:
-                                ImportAddressOfElem(currentInstruction);
+                                ImportAddressOfElem();
                                 break;
 
                             case Code.Ldelem:
@@ -115,7 +115,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             _dependencies.Add(methodNode);
         }
 
-        private void ImportAddressOfElem(Instruction instuction)
+        private void ImportAddressOfElem()
         {
             _dependencies.Add(GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException"));
         }
