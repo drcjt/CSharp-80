@@ -1,4 +1,5 @@
-﻿using ILCompiler.Compiler.Emit;
+﻿using ILCompiler.Common.TypeSystem.IL;
+using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.EvaluationStack;
 using static ILCompiler.Compiler.Emit.Registers;
 
@@ -19,7 +20,19 @@ namespace ILCompiler.Compiler.CodeGenerators
             context.InstructionsBuilder.And(A);         // Clear carry flag
             context.InstructionsBuilder.Sbc(HL, DE);    // Calculate Array Length - Index
 
-            context.InstructionsBuilder.Call(Condition.C, "RangeCheckFail");            
+            
+            if (!context.Configuration.ExceptionSupport)
+            {
+                context.InstructionsBuilder.Call(Condition.C, "RangeCheckFail");
+            }
+            else
+            {
+                // Emit conditional call to ThrowHelpers.ThrowIndexOutOfRangeException
+                var throwHelperMethod = context.CorLibModuleProvider.GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException");
+                var mangledThrowHelperMethod = context.NameMangler.GetMangledMethodName(throwHelperMethod);
+
+                context.InstructionsBuilder.Call(Condition.C, mangledThrowHelperMethod);
+            }
         }
     }
 }

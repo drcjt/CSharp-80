@@ -86,6 +86,12 @@ namespace ILCompiler.Compiler.Importer
             }
             arguments.Reverse();
 
+            if (instruction.OpCode == OpCodes.Callvirt)
+            {
+                // Turn first argument into throw null ref check
+                arguments[0] = new NullCheckEntry(arguments[0]);
+            }
+
             if (methodToCall.DeclaringType.IsInterface)
             {
                 // Need to add this pointer as extra param which will be consumed by InterfaceCall routine

@@ -68,6 +68,23 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                             case Code.Throw:
                                 ImportThrow();
                                 break;
+
+                            case Code.Ldelema:
+                                ImportAddressOfElem();
+                                break;
+
+                            case Code.Ldelem:
+                                ImportLoadElement();
+                                break;
+
+                            case Code.Stelem:
+                            case Code.Stelem_I:
+                            case Code.Stelem_I1:
+                            case Code.Stelem_I2:
+                            case Code.Stelem_I4:
+                            case Code.Stelem_Ref:
+                                ImportStoreElement();
+                                break;
                         }
                         currentOffset += currentInstruction.GetSize();
                         currentIndex++;
@@ -96,6 +113,26 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             var methodNode = _nodeFactory.MethodNode(runtimeHelperMethod);
 
             _dependencies.Add(methodNode);
+        }
+
+        private void ImportAddressOfElem()
+        {
+            _dependencies.Add(GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException"));
+        }
+
+        private void ImportLoadElement()
+        {
+            _dependencies.Add(GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException"));
+        }
+
+        private void ImportStoreElement()
+        {
+            _dependencies.Add(GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException"));
+        }
+
+        private void AddThrowNullReferenceThrowHelperDependency()
+        {
+            _dependencies.Add(GetHelperEntryPoint("ThrowHelpers", "ThrowNullReferenceException"));
         }
 
         private void ImportStoreField(Instruction instuction, bool isStatic)
@@ -172,6 +209,11 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportCall(Instruction instruction)
         {
+            if (instruction.OpCode.Code == Code.Callvirt)
+            {
+                AddThrowNullReferenceThrowHelperDependency();
+            }
+
             if (instruction.OpCode.Code == Code.Newobj)
             {
                 CreateConstructedEETypeNodeDependencies(instruction);
@@ -305,6 +347,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 _dependencies.Add(_nodeFactory.ConstructedEETypeNode(objType.ToTypeDefOrRef(), allocSize));
             }
+        }
+
+        private Z80MethodCodeNode GetHelperEntryPoint(string typeName, string methodName)
+        {
+            var helperMethod = _corLibModuleProvider.GetHelperEntryPoint(typeName, methodName);
+            return _nodeFactory.MethodNode(helperMethod);
         }
     }
 }

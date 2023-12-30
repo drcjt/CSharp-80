@@ -19,14 +19,16 @@ namespace ILCompiler.Compiler.CodeGenerators
         private readonly Z80MethodCodeNode _method;
 
         public readonly IConfiguration Configuration;
+        public readonly CorLibModuleProvider CorLibModuleProvider;
 
-        public CodeGeneratorContext(LocalVariableTable localVariableTable, Z80MethodCodeNode method, IConfiguration configuration, INameMangler nameMangler, NodeFactory nodeFactory)
+        public CodeGeneratorContext(LocalVariableTable localVariableTable, Z80MethodCodeNode method, IConfiguration configuration, INameMangler nameMangler, NodeFactory nodeFactory, CorLibModuleProvider corLibModuleProvider)
         {
             LocalVariableTable = localVariableTable;
             _method = method;
             Configuration = configuration;
             NameMangler = nameMangler;
             NodeFactory = nodeFactory;
+            CorLibModuleProvider = corLibModuleProvider;
         }
     }
 }

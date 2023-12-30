@@ -171,6 +171,14 @@ namespace ILCompiler.Compiler
             _indent--;
         }
 
+        public void Visit(NullCheckEntry entry)
+        {
+            Print($"NULLCHECK");
+            _indent++;
+            entry.Op1.Accept(this);
+            _indent--;
+        }
+
         public void Visit(PutArgTypeEntry entry)
         {
             Print($"PUTARG_TYPE {entry.ArgType}");

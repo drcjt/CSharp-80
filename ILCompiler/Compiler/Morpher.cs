@@ -120,6 +120,10 @@ namespace ILCompiler.Compiler
                 case PutArgTypeEntry putArgTypeEntry:
                     tree = new PutArgTypeEntry(putArgTypeEntry.ArgType, MorphTree(putArgTypeEntry.Op1));
                     break;
+
+                case NullCheckEntry nullCheckEntry:
+                    tree = new NullCheckEntry(MorphTree(nullCheckEntry.Op1));
+                    break;
             }
             return tree;
         }
