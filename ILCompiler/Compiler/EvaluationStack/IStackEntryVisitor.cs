@@ -34,5 +34,6 @@
         public void Visit(PhiNode entry);
         public void Visit(PhiArg entry);
         public void Visit(BoundsCheck entry);
+        public void Visit(NullCheckEntry entry);
     }
 }

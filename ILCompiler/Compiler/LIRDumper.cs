@@ -161,6 +161,11 @@ namespace ILCompiler.Compiler
             _sb.AppendLine($"       cast {entry.Type}");
         }
 
+        public void Visit(NullCheckEntry entry)
+        {
+            _sb.AppendLine($"       nullcheck {entry.Op1.TreeID}");
+        }
+
         public void Visit(UnaryOperator entry)
         {
             _sb.AppendLine($"       ┌──▌  t{entry.Op1.TreeID}");

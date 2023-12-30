@@ -35,5 +35,6 @@
         public void Visit(PhiNode entry) => _genericStackEntryVisitor.Visit<PhiNode>(entry);
         public void Visit(PhiArg entry) => _genericStackEntryVisitor.Visit<PhiArg>(entry);
         public void Visit(BoundsCheck entry) => _genericStackEntryVisitor.Visit<BoundsCheck>(entry);
+        public void Visit(NullCheckEntry entry) => _genericStackEntryVisitor.Visit<NullCheckEntry>(entry);
     }
 }
