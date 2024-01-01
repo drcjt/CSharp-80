@@ -3,10 +3,21 @@ using ILCompiler.Compiler.Ssa;
 
 namespace ILCompiler.Compiler
 {
+    public enum JumpKind
+    {
+        Return,         // block ends with ret
+        Always,         // block always jumps to the target
+        Conditional,    // block conditionally jumps to target
+        Switch,         // block ends with a switch statement
+    }
+
     public class BasicBlock
     {
         public BasicBlock? Next { get; set; }
         public int StartOffset { get; set; }
+        public int EndOffset { get; set; }
+
+        public JumpKind JumpKind { get; set; }
 
         public uint PostOrderNum { get; set; }
 
@@ -40,10 +51,16 @@ namespace ILCompiler.Compiler
         // Variables in scope over the block
         public VariableSet Scope { get; set; } = VariableSet.Empty;
 
+        public bool TryStart { get; set; }
+        public bool FilterStart { get; set; }
+        public bool HandlerStart { get; set; }
+
+
         public BasicBlock(int offset)
         {
             StartOffset = offset;
             Label = LabelGenerator.GetLabel(LabelType.BasicBlock);
+            JumpKind = JumpKind.Always;
         }
     }
 }
