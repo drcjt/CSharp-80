@@ -28,7 +28,7 @@ namespace MethodicalTests
                 var cimFile = Path.ChangeExtension(testname, CimExtension);
 
                 // Run the test
-                ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(cimFile, createLibrary : false);
+                ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(cimFile, createLibrary : false, optionalArguments : "--exceptions");
                 Z80TestRunner.Create(SolutionPath).RunTest(cimFile);
             }
             else
