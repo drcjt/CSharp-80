@@ -24,17 +24,18 @@ namespace ILCompiler.Tests.Common
             return new ILCompilerRunner(solutionPath);
         }
 
-        public void CompileILAndAssemble(string ilFileName, bool createLibrary = true)
+        public void CompileILAndAssemble(string ilFileName, bool createLibrary = true, string optionalArguments = null)
         {
-            CompileIL(ilFileName, createLibrary);
+            CompileIL(ilFileName, createLibrary, optionalArguments);
         }
 
-        private void CompileIL(string ilFileName, bool createLibrary)
+        private void CompileIL(string ilFileName, bool createLibrary, string optionalArguments)
         {
             var asmFileName = Path.ChangeExtension(ilFileName, "asm");
             var exeFileName = Path.ChangeExtension(ilFileName, createLibrary ? "dll" : "exe");
 
             string arguments = $"-ao cim --ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {_corelibPath} --outputFile {asmFileName} {exeFileName} --stackStart {StackStart}";
+            arguments += optionalArguments ?? "";
 
             var compiled = ILCompiler.Program.Main(arguments.Split(' '));
 
