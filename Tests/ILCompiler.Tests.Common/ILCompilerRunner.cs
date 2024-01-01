@@ -24,7 +24,7 @@ namespace ILCompiler.Tests.Common
             return new ILCompilerRunner(solutionPath);
         }
 
-        public void CompileILAndAssemble(string ilFileName, bool createLibrary = true, string optionalArguments = null)
+        public void CompileILAndAssemble(string ilFileName, bool createLibrary = true, string optionalArguments = "")
         {
             CompileIL(ilFileName, createLibrary, optionalArguments);
         }
@@ -35,7 +35,13 @@ namespace ILCompiler.Tests.Common
             var exeFileName = Path.ChangeExtension(ilFileName, createLibrary ? "dll" : "exe");
 
             string arguments = $"-ao cim --ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {_corelibPath} --outputFile {asmFileName} {exeFileName} --stackStart {StackStart}";
-            arguments += optionalArguments ?? "";
+
+            if (!string.IsNullOrWhiteSpace(optionalArguments))
+            {
+                arguments += " " + optionalArguments;
+            }
+
+            Console.WriteLine($"*** ARGUMENTS: {arguments}");
 
             var compiled = ILCompiler.Program.Main(arguments.Split(' '));
 
