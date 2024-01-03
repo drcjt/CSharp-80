@@ -31,8 +31,9 @@ namespace ILCompiler.Tests
             });
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
+            var ehClauses = new List<EHClause>();
 
-            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
+            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
             Assert.AreEqual(JumpKind.Always, basicBlocks[0].JumpKind);
         }
@@ -46,8 +47,9 @@ namespace ILCompiler.Tests
             });
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
+            var ehClauses = new List<EHClause>();
 
-            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
+            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
             Assert.AreEqual(JumpKind.Return, basicBlocks[0].JumpKind);
         }
@@ -62,8 +64,9 @@ namespace ILCompiler.Tests
             });
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
+            var ehClauses = new List<EHClause>();
 
-            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
+            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
             Assert.AreEqual(JumpKind.Switch, basicBlocks[0].JumpKind);
         }
@@ -80,8 +83,9 @@ namespace ILCompiler.Tests
             var method = BuildMethod(code);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
+            var ehClauses = new List<EHClause>();
 
-            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
+            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
             Assert.AreEqual(JumpKind.Conditional, basicBlocks[0].JumpKind);
         }
@@ -96,8 +100,9 @@ namespace ILCompiler.Tests
             });
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
+            var ehClauses = new List<EHClause>();
 
-            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
+            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
             Assert.AreEqual(1, basicBlocks.Count(x => x != null));
             Assert.IsNotNull(basicBlocks[0]);
@@ -115,8 +120,9 @@ namespace ILCompiler.Tests
             var method = BuildMethod(code);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
+            var ehClauses = new List<EHClause>();
 
-            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
+            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
             Assert.AreEqual(3, basicBlocks.Count(x => x != null));
             Assert.IsNotNull(basicBlocks[branchTarget.Offset]);
@@ -135,8 +141,9 @@ namespace ILCompiler.Tests
             var method = BuildMethod(code);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
+            var ehClauses = new List<EHClause>();
 
-            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
+            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
             Assert.AreEqual(3, basicBlocks.Count(x => x != null));
             Assert.IsNotNull(basicBlocks[instructionAfterBranch.Offset]);
@@ -153,8 +160,9 @@ namespace ILCompiler.Tests
             var method = BuildMethod(code);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
+            var ehClauses = new List<EHClause>();
 
-            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
+            var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
             Assert.AreEqual(2, basicBlocks.Count(x => x != null));
             Assert.IsNotNull(basicBlocks[branchTarget.Offset]);
