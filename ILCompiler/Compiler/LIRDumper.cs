@@ -211,6 +211,11 @@ namespace ILCompiler.Compiler
             throw new Exception("IndexRefEntry not valid in LIR");
         }
 
+        public void Visit(CatchArgumentEntry entry)
+        {
+            throw new Exception("CatchArgumentEntry not valid in LIR");
+        }
+
         public void Visit(PutArgTypeEntry entry)
         {
             _sb.AppendLine($"       ┌──▌  t{entry.Op1.TreeID}");

@@ -31,6 +31,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             services.AddSingleton<ICodeGenerator<StaticFieldEntry>,  StaticFieldCodeGenerator>();
             services.AddSingleton<ICodeGenerator<BoundsCheck>, BoundsCheckCodeGenerator>();
             services.AddSingleton<ICodeGenerator<NullCheckEntry>, NullCheckCodeGenerator>();
+            services.AddSingleton<ICodeGenerator<CatchArgumentEntry>, CatchArgumentCodeGenerator>();
             return services;
         }
     }
