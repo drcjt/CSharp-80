@@ -24,6 +24,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public IList<Instruction> MethodCode { get; set; } = new List<Instruction>();
 
+        public IList<EHClause> EhClauses { get; set; } = new List<EHClause>();
+
         public int ParamsCount { get; set; }
         public int LocalsCount { get; set; }
 

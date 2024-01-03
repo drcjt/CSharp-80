@@ -3,6 +3,33 @@ using ILCompiler.Common.TypeSystem.Common;
 
 namespace ILCompiler.Compiler
 {
+    public enum EHClauseKind
+    {
+        Typed,
+        Fault,
+        Filter
+    }
+
+    public class EHClause
+    {
+        public BasicBlock TryBegin { get; init; }
+        public BasicBlock TryEnd { get; init; }
+        public BasicBlock HandlerBegin { get; init; }
+        public BasicBlock HandlerEnd { get; init; }
+        public BasicBlock? Filter { get; init; }
+        public EHClauseKind Kind { get; init; }
+
+        public EHClause(BasicBlock tryBegin, BasicBlock tryEnd, BasicBlock handlerBegin, BasicBlock handlerEnd, BasicBlock? filter, EHClauseKind kind)
+        {
+            TryBegin = tryBegin;
+            TryEnd = tryEnd;
+            HandlerBegin = handlerBegin;
+            HandlerEnd = handlerEnd;
+            Filter = filter;
+            Kind = kind;
+        }   
+    }
+
     public class BasicBlockAnalyser
     {
         private readonly MethodDesc _method;
@@ -12,7 +39,7 @@ namespace ILCompiler.Compiler
             _method = method;
         }
 
-        public BasicBlock[] FindBasicBlocks(IDictionary<int, int> offsetToIndexMap)
+        public BasicBlock[] FindBasicBlocks(IDictionary<int, int> offsetToIndexMap, IList<EHClause> ehClauses)
         {
             var instructions = _method.Body.Instructions;
             var lastInstruction = instructions[instructions.Count - 1];
@@ -22,22 +49,38 @@ namespace ILCompiler.Compiler
             CreateBasicBlock(basicBlocks, 0);
 
             FindJumpTargets(basicBlocks, offsetToIndexMap);
-
-            FindEHTargets(basicBlocks);
+            FindEHTargets(basicBlocks, ehClauses);
 
             return basicBlocks;
         }
 
-        private void FindEHTargets(BasicBlock[] basicBlocks)
+        private void FindEHTargets(BasicBlock[] basicBlocks, IList<EHClause> ehClauses)
         {
             foreach (var exceptionHandler in _method.Body.ExceptionHandlers)
             {
-                CreateBasicBlock(basicBlocks, (int)exceptionHandler.TryStart.Offset).TryStart = true;
+                var tryBeginBlock = CreateBasicBlock(basicBlocks, (int)exceptionHandler.TryStart.Offset);
+                BasicBlock? filterBlock = null;
                 if (exceptionHandler.IsFilter)
                 {
-                    CreateBasicBlock(basicBlocks, (int)exceptionHandler.FilterStart.Offset).FilterStart = true;
+                    filterBlock = CreateBasicBlock(basicBlocks, (int)exceptionHandler.FilterStart.Offset);
+                    filterBlock.FilterStart = true;
                 }
-                CreateBasicBlock(basicBlocks, (int)exceptionHandler.HandlerStart.Offset).HandlerStart = true;
+
+                var handlerBeginBlock = CreateBasicBlock(basicBlocks, (int)exceptionHandler.HandlerStart.Offset);
+                var handlerEndBlock = basicBlocks[exceptionHandler.HandlerEnd.Offset];
+                var tryEndBlock = basicBlocks[exceptionHandler.TryEnd.Offset];
+
+                handlerBeginBlock.HandlerStart = true;
+                tryBeginBlock.TryStart = true;
+
+                tryBeginBlock.Handlers.Add(handlerBeginBlock);
+
+                EHClauseKind kind = EHClauseKind.Typed;
+                if (exceptionHandler.IsFault || exceptionHandler.IsFinally) kind = EHClauseKind.Fault;
+                else if (exceptionHandler.IsFilter) kind = EHClauseKind.Filter;
+
+                var ehClause = new EHClause(tryBeginBlock, tryEndBlock, handlerBeginBlock, handlerEndBlock, filterBlock, kind);
+                ehClauses.Add(ehClause);
             }
         }
 
