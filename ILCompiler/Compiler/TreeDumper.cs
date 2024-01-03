@@ -264,5 +264,10 @@ namespace ILCompiler.Compiler
             entry.ArrayLength.Accept(this);
             _indent--;
         }
+
+        public void Visit(CatchArgumentEntry entry)
+        {
+            Print($"CATCH_ARGUMENT");
+        }
     }
 }

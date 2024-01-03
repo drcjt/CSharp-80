@@ -124,7 +124,7 @@ namespace ILCompiler.Compiler
             var ilImporter = _phaseFactory.Create<IILImporter>();
 
             // Main phases of the compiler live here
-            var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _locals);
+            var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _locals, methodCodeNodeNeedingCode.EhClauses);
 
             if (_configuration.DumpFlowGraphs)
             {

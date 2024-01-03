@@ -213,10 +213,41 @@ namespace ILCompiler.Compiler
                     WriteInstructions(instructions);
                 }
 
+                WriteEhClauses(nodes);
+
                 WriteEpilog();
             }
 
             _logger.LogDebug("Written compiled file to {_outputFilePath}", outputFilePath);
+        }
+
+        private void WriteEhClauses(IReadOnlyCollection<IDependencyNode> nodes)
+        {
+            InstructionsBuilder ehClausesBuilder = new InstructionsBuilder();
+            ehClausesBuilder.Label("EH_CLAUSES");
+            foreach (var node in nodes)
+            {
+                if (node is Z80MethodCodeNode codeNode)
+                {
+                    var ehClauses = codeNode.EhClauses;
+
+                    if (ehClauses.Count > 0)
+                    {
+
+                        ehClausesBuilder.Comment($"{codeNode.Method.FullName} EH Clauses");
+                        foreach (var ehClause in ehClauses)
+                        {
+                            if (ehClause.Kind == EHClauseKind.Typed)
+                            {
+                                ehClausesBuilder.Dw(ehClause.TryBegin.Label, "Protected Region Start");
+                                ehClausesBuilder.Dw(ehClause.TryEnd.Label, "Protected Region End");
+                                ehClausesBuilder.Dw(ehClause.HandlerBegin.Label, "Handler Start");
+                            }
+                        }
+                    }
+                }
+            }
+            WriteInstructions(ehClausesBuilder.Instructions);
         }
 
         private void WriteInstructions(IList<Emit.Instruction> instructions)

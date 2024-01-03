@@ -95,6 +95,18 @@ namespace ILCompiler.Compiler
                     _stack.Push(entryStack[i].Duplicate());
                 }
             }
+
+            // Add exception object for catch
+            if (basicBlock.HandlerStart)
+            {
+                // TODO: need to use a node type that won't generate any code
+                _stack.Push(new CatchArgumentEntry());
+            }
+
+            foreach (var handlerBlock in basicBlock.Handlers)
+            {
+                MarkBasicBlock(handlerBlock);
+            }
         }
 
         private static void EndImportingBasicBlock(BasicBlock basicBlock)
@@ -251,7 +263,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, LocalVariableTable locals)
+        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, LocalVariableTable locals, IList<EHClause> ehClauses)
         {
             _parameterCount = parameterCount;
             _returnBufferArgIndex = returnBufferArgIndex;
@@ -261,7 +273,7 @@ namespace ILCompiler.Compiler
 
             var basicBlockAnalyser = new BasicBlockAnalyser(_method);
             var offsetToIndexMap = new Dictionary<int, int>();
-            _basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap);
+            _basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
             // Trigger static constructor if required
             if (method.IsInstanceConstructor)
@@ -286,7 +298,7 @@ namespace ILCompiler.Compiler
                     importedBasicBlocks.Add(_basicBlocks[i]);
                 }
             }
-
+         
             return importedBasicBlocks;
         }
 
