@@ -9,15 +9,22 @@
 ; On Entry: On stack: exception object, return address 
 
 ThrowEx:
+	; Get return address
+	POP DE
 
-	; POP HL
-	; POP DE
+	LD HL, 0		; HL = SP before Call to ThrowEx
+	ADD HL, SP
 
-	; Put exception object on stack
-	; PUSH DE
+	; Load ExInfo struct to stack, first is instructionPointer
+	DEC DE	; Return address is after call instruction so need to decrement by 1
+	PUSH DE
 
-	; Put ExInfo struct on stack
-	; PUSH HL
-	PUSH IX
+	; Second is frame pointer
+	PUSH IX	
+
+	; Finally we have SP but need to account for exception object
+	INC HL
+	INC HL
+	PUSH HL
 
 	CALL THROWEXCEPTION
