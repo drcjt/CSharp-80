@@ -233,7 +233,6 @@ namespace ILCompiler.Compiler
 
                     if (ehClauses.Count > 0)
                     {
-
                         ehClausesBuilder.Comment($"{codeNode.Method.FullName} EH Clauses");
                         foreach (var ehClause in ehClauses)
                         {
@@ -247,6 +246,7 @@ namespace ILCompiler.Compiler
                     }
                 }
             }
+            ehClausesBuilder.Label("EH_CLAUSES_END");
             WriteInstructions(ehClausesBuilder.Instructions);
         }
 
