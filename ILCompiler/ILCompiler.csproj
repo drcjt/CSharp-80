@@ -19,8 +19,11 @@
   </PropertyGroup>
 
   <ItemGroup>	  
+    <None Remove="Runtime\CallCatchHandler.asm" />	  
     <None Remove="Runtime\CPM\cls.asm" />
     <None Remove="Runtime\CPM\printchr.asm" />
+    <None Remove="Runtime\EHEnumInit.asm" />
+    <None Remove="Runtime\EHEnumNext.asm" />
     <None Remove="Runtime\GCGetTotalMemory.asm" />
     <None Remove="Runtime\InterfaceCall.asm" />
     <None Remove="Runtime\itoa.asm" />
@@ -101,6 +104,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Runtime\CPM\cls.asm" />
     <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
+    <EmbeddedResource Include="Runtime\CallCatchHandler.asm" />
+    <EmbeddedResource Include="Runtime\EHEnumNext.asm" />
+    <EmbeddedResource Include="Runtime\EHEnumInit.asm" />
     <EmbeddedResource Include="Runtime\i_xor.asm" />
     <EmbeddedResource Include="Runtime\i_sub16.asm" />
     <EmbeddedResource Include="Runtime\i_gt16.asm" />
