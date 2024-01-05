@@ -41,8 +41,6 @@ namespace ILCompiler.Tests.Common
                 arguments += " " + optionalArguments;
             }
 
-            Console.WriteLine($"*** ARGUMENTS: {arguments}");
-
             var compiled = ILCompiler.Program.Main(arguments.Split(' '));
 
             Assert.AreEqual(0, compiled, "IL Failed to compile");

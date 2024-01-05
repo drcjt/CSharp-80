@@ -2,12 +2,20 @@
 {
     public struct ExInfo
     {
-        public ushort framePointer;
-        public ushort instructionPointer;
+        internal ushort stackPointer;
+        internal ushort framePointer;
+        internal ushort instructionPointer;
     }
 
-    internal static class ExceptionHandling
+    internal static unsafe class ExceptionHandling
     {
+        private struct EHClause
+        {
+            internal ushort _tryStartOffset;
+            internal ushort _tryEndOffset;
+            internal byte* _handlerAddress;
+        }
+
         [RuntimeExport("ThrowException")]
         public static void ThrowException(object exception, ExInfo exceptionInfo)
         {
@@ -22,8 +30,47 @@
             // search for appropriate handler
             // then call the handler if found
 
-            // Treat everything that gets here as unhandled exceptions
-            UnhandledExceptionFailFast(exception, exceptionInfo);
+            byte* pCatchHandler = null;
+            // enumerate frames
+            // for (; isValid; isValid = frameIter.Next))
+            // {
+            byte* pHandler;
+            if (FindFirstPassHandler(exception, exceptionInfo, out pHandler))
+            {
+                // Found a handler
+                //break;
+                pCatchHandler = pHandler;
+            }
+            // }
+
+            if (pCatchHandler == null)
+            {
+                // Treat everything that gets here as unhandled exceptions
+                UnhandledExceptionFailFast(exception, exceptionInfo);
+            }
+
+            InternalCalls.CallCatchHandler(exception, pCatchHandler, ref exceptionInfo);
+        }
+
+        private static bool FindFirstPassHandler(object exception, ExInfo exceptionInfo, out byte* pHandler)
+        {
+            pHandler = null;
+
+            EHClause nextClause;
+            byte* ehEnum;
+
+            InternalCalls.EHEnumInit(&ehEnum);
+
+            for (int idx = 0; InternalCalls.EHEnumNext(&ehEnum, &nextClause); idx++)
+            {
+                if (exceptionInfo.instructionPointer >= nextClause._tryStartOffset && exceptionInfo.instructionPointer < nextClause._tryEndOffset)
+                {
+                    pHandler = nextClause._handlerAddress;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         private static void UnhandledExceptionFailFast(object unhandledException, ExInfo exceptionInfo)

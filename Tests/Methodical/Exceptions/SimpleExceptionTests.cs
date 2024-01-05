@@ -1,4 +1,6 @@
-﻿namespace Exceptions
+﻿using System;
+
+namespace Exceptions
 {
     internal static class SimpleExceptionTests
     {
@@ -18,9 +20,50 @@
             return result;
         }
 
+        private static int TryCatch_WithThrow_IsCaught()
+        {
+            int result = 1;
+            try
+            {
+                throw new Exception();
+            }
+            catch
+            {
+                result = 0;
+            }
+
+            return result;
+        }
+
+        private static int NestedTryCatch_WithThrows_AreCaught()
+        {
+            int result = 1;
+            try
+            {
+                try
+                {
+                    throw new Exception();
+                }
+                catch 
+                {
+                }
+                throw new Exception();
+            }
+            catch
+            {
+                result = 0;
+            }
+
+            return result;
+        }
+
         public static int RunTests()
         {
-            return Try_NoThrow();
+            int result = Try_NoThrow(); if (result != 0) return result;
+            result = TryCatch_WithThrow_IsCaught(); if (result != 0) return result;
+            result = NestedTryCatch_WithThrows_AreCaught(); if (result != 0) return result;
+
+            return result;
         }
     }
 }
