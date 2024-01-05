@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1704311752499,
+  "lastUpdate": 1704494601561,
   "repoUrl": "https://github.com/drcjt/CSharp-80",
   "entries": {
     "CSharp-80 Benchmark": [
@@ -77112,6 +77112,495 @@ window.BENCHMARK_DATA = {
           {
             "name": "\\Tests\\Methodical\\Exceptions\\bin\\Release\\net8.0\\Exceptions.cim",
             "value": 1274,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Methodical\\InterfaceDispatch\\bin\\Release\\net8.0\\InterfaceDispatch.cim",
+            "value": 43263,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Methodical\\InvokeCctorByFieldAccess\\bin\\Release\\net8.0\\InvokeCctorByFieldAccess.cim",
+            "value": 1160,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Methodical\\InvokeCctorByInstanceMethod\\bin\\Release\\net8.0\\InvokeCctorByInstanceMethod.cim",
+            "value": 2141,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Methodical\\InvokeCctorByStaticMethod\\bin\\Release\\net8.0\\InvokeCctorByStaticMethod.cim",
+            "value": 1624,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Methodical\\Preinitialization\\bin\\Release\\net8.0\\Preinitialization.cim",
+            "value": 5835,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Methodical\\VirtualMethods\\bin\\Release\\net8.0\\VirtualMethods.cim",
+            "value": 4990,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Methodical\\ZeroInit\\bin\\Release\\net8.0\\init_byte.cim",
+            "value": 972,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Methodical\\ZeroInit\\bin\\Release\\net8.0\\init_int32.cim",
+            "value": 16102,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Methodical\\ZeroInit\\bin\\Release\\net8.0\\init_object.cim",
+            "value": 2140,
+            "unit": "T-States"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "5084481+drcjt@users.noreply.github.com",
+            "name": "Colin Taylor",
+            "username": "drcjt"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a6957d9907429f0a0bc24f3e75ce558055dcad9e",
+          "message": "Find and call EH handlers wihtin current frame (#436)\n\n* Label end of EH Clauses\r\n\r\n* Native routines to enumerate eh clauses\r\n\r\n* Native routine to call eh handler\r\n\r\n* Capture SP as part of exception throw\r\n\r\n* Add new EH routines to csproj\r\n\r\n* Add managed methods for native EH routines\r\n\r\n* Find and call handler when dispatching exceptions\r\nNote - only searches handlers within current frame.\r\n\r\n* Add tests to validate exception handlers are determined and called\r\n\r\n* Remove unnecessary logging of arguments\r\n\r\n* Fix test for end of eh clauses\r\n\r\n* Make ExInfo fields internal",
+          "timestamp": "2024-01-05T22:39:34Z",
+          "tree_id": "8d2b6925fa538c21a43625b66c30a04bf4b6a7d6",
+          "url": "https://github.com/drcjt/CSharp-80/commit/a6957d9907429f0a0bc24f3e75ce558055dcad9e"
+        },
+        "date": 1704494595332,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\add.cim",
+            "value": 743,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\add_i.cim",
+            "value": 650,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\and.cim",
+            "value": 770,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\array_tests.cim",
+            "value": 86856,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\AutoInit.cim",
+            "value": 5724,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\beq.cim",
+            "value": 757,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\beq_i.cim",
+            "value": 1241,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\bge.cim",
+            "value": 1682,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\bge_u.cim",
+            "value": 1388,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\bgt.cim",
+            "value": 1480,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\bgt_u.cim",
+            "value": 1397,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ble.cim",
+            "value": 1685,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ble_u.cim",
+            "value": 1388,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\blt.cim",
+            "value": 1504,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\blt_u.cim",
+            "value": 1179,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\bne.cim",
+            "value": 831,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\bne_u.cim",
+            "value": 1168,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\br.cim",
+            "value": 248,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\brfalse.cim",
+            "value": 374,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\brtrue.cim",
+            "value": 388,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\call.cim",
+            "value": 685,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\callnonvirt.cim",
+            "value": 1976,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\callvirt.cim",
+            "value": 5881,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ceq.cim",
+            "value": 814,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\cgt.cim",
+            "value": 1474,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\cgt_ref.cim",
+            "value": 1355,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\clt.cim",
+            "value": 1276,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\conv.cim",
+            "value": 8162,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\cpblk.cim",
+            "value": 2140,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\div.cim",
+            "value": 12785,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\div_i4.cim",
+            "value": 278316,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\dup.cim",
+            "value": 3432,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\fielda_tests.cim",
+            "value": 2987,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\field_tests.cim",
+            "value": 10263,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\initblk.cim",
+            "value": 1054,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\isinst.cim",
+            "value": 7623,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ldarga_i4.cim",
+            "value": 4413,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ldarga_ref.cim",
+            "value": 1643,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ldarg_n.cim",
+            "value": 8220,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ldarg_starg.cim",
+            "value": 1062,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ldc.cim",
+            "value": 889,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ldc_i4_n.cim",
+            "value": 3585,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ldelema.cim",
+            "value": 64853,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ldind_ref.cim",
+            "value": 1370,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ldind_stind.cim",
+            "value": 5034,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ldlen.cim",
+            "value": 52228,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ldloca.cim",
+            "value": 1650,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ldloc_stloc.cim",
+            "value": 1964,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ldnull.cim",
+            "value": 483,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\localloc.cim",
+            "value": 3258,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\mul_i.cim",
+            "value": 1354,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\mul_i4.cim",
+            "value": 230753,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\mul_ovf.cim",
+            "value": 87692,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\neg.cim",
+            "value": 1059,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\newobj.cim",
+            "value": 1343,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\nop.cim",
+            "value": 1199,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\not.cim",
+            "value": 700,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\or.cim",
+            "value": 770,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\out_of_order.cim",
+            "value": 19373,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\pop.cim",
+            "value": 1503,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\rem.cim",
+            "value": 13768,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ret_i.cim",
+            "value": 1614,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\ret_i4.cim",
+            "value": 4735,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\shl.cim",
+            "value": 12905,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\shr.cim",
+            "value": 26522,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\sizeof.cim",
+            "value": 1334,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\stind_ref.cim",
+            "value": 1560,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\structs.cim",
+            "value": 4074,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\sub.cim",
+            "value": 1168,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\sub_i.cim",
+            "value": 810,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\switch.cim",
+            "value": 2254,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\xor.cim",
+            "value": 19040,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\zeroinit_large.cim",
+            "value": 5383830,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\ILCompiler.IntegrationTests\\bin\\Release\\net8.0\\.\\il_bvt\\zeroinit_small.cim",
+            "value": 2535,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Directed\\Ackermann\\bin\\Release\\net8.0\\Ackermann.cim",
+            "value": 1535187,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Directed\\Arrays\\bin\\Release\\net8.0\\Arrays.cim",
+            "value": 11778078,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Directed\\Fibonacci\\bin\\Release\\net8.0\\Fibonacci.cim",
+            "value": 2772888,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Directed\\Hanoi\\bin\\Release\\net8.0\\Hanoi.cim",
+            "value": 47695404,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Directed\\MDArrays\\bin\\Release\\net8.0\\MDArrays.cim",
+            "value": 248,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Directed\\Primes\\bin\\Release\\net8.0\\Primes.cim",
+            "value": 8165281,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Directed\\Strings\\bin\\Release\\net8.0\\Strings.cim",
+            "value": 3039,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Generics\\GenericMethods\\bin\\Release\\net8.0\\GenericMethods.cim",
+            "value": 2218,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Methodical\\BeforeFieldInit\\bin\\Release\\net8.0\\BeforeFieldInit.cim",
+            "value": 1022,
+            "unit": "T-States"
+          },
+          {
+            "name": "\\Tests\\Methodical\\Exceptions\\bin\\Release\\net8.0\\Exceptions.cim",
+            "value": 31528,
             "unit": "T-States"
           },
           {
