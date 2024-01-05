@@ -2,9 +2,9 @@
 {
     public struct ExInfo
     {
-        public ushort stackPointer;
-        public ushort framePointer;
-        public ushort instructionPointer;
+        internal ushort stackPointer;
+        internal ushort framePointer;
+        internal ushort instructionPointer;
     }
 
     internal static unsafe class ExceptionHandling
