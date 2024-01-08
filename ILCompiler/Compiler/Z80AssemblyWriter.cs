@@ -122,6 +122,8 @@ namespace ILCompiler.Compiler
             instructionsBuilder.Label("START");
 
             instructionsBuilder.Call(_nameMangler.GetMangledMethodName(entryMethod));
+
+            instructionsBuilder.Label("EH_ENDIP");
             instructionsBuilder.Jp("EXITRETCODE");
 
             _out.WriteLine(instructionsBuilder.ToString());

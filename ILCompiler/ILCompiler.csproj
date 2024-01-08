@@ -74,6 +74,7 @@
     <None Remove="Runtime\NewString.asm" />
     <None Remove="Runtime\print.asm" />
     <None Remove="Runtime\RangeCheckFail.asm" />
+    <None Remove="Runtime\SFINext.asm" />
     <None Remove="Runtime\stoi.asm" />
     <None Remove="Runtime\ThrowEx.asm" />
     <None Remove="Runtime\TRS80\beep.asm" />
@@ -105,6 +106,7 @@
     <EmbeddedResource Include="Runtime\CPM\cls.asm" />
     <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
     <EmbeddedResource Include="Runtime\CallCatchHandler.asm" />
+    <EmbeddedResource Include="Runtime\SFINext.asm" />
     <EmbeddedResource Include="Runtime\EHEnumNext.asm" />
     <EmbeddedResource Include="Runtime\EHEnumInit.asm" />
     <EmbeddedResource Include="Runtime\i_xor.asm" />

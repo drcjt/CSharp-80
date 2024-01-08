@@ -2,13 +2,13 @@
 ;
 ; Uses: HL, DE
 ;
-; On Entry: exception info, handler address, exception object all on stack
+; On Entry: stack frame iter info, handler address, exception object all on stack
 
 CALLCATCHHANDLER:
 	POP HL		; Return address - discard
 
 	; Restore IX
-	POP HL		; exception info address
+	POP HL		; stack frame iterator info address
 	LD E, (HL)
 	INC HL
 	LD D, (HL)
@@ -40,4 +40,5 @@ CALLCATCHHANDLER:
 	; Jump to handler
 	LD H, D
 	LD L, E
+
 	JP (HL)

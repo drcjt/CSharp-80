@@ -34,7 +34,7 @@ namespace MethodicalTests
             else
             {
                 // No need to assemble any il as roslyn will have created assembled il
-                ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(testname);
+                ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(testname, optionalArguments : "--exceptions");
                 Z80TestRunner.Create(SolutionPath).RunTest(testname);
             }
 

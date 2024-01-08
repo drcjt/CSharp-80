@@ -1,10 +1,11 @@
-﻿namespace System.Runtime
+﻿using System.Diagnostics;
+
+namespace System.Runtime
 {
     public struct ExInfo
     {
-        internal ushort stackPointer;
-        internal ushort framePointer;
-        internal ushort instructionPointer;
+        internal StackFrameIterator _frameIter;
+        internal object _exception;
     }
 
     internal static unsafe class ExceptionHandling
@@ -17,42 +18,41 @@
         }
 
         [RuntimeExport("ThrowException")]
-        public static void ThrowException(object exception, ExInfo exceptionInfo)
+        public static void ThrowException(ref ExInfo exceptionInfo)
         {
-            exception ??= new NullReferenceException();
+            exceptionInfo._exception ??= new NullReferenceException();
 
-            DispatchException(exception, exceptionInfo);
+            DispatchException(ref exceptionInfo);
         }
 
-        private static void DispatchException(object exception, ExInfo exceptionInfo)
+        private static void DispatchException(ref ExInfo exceptionInfo)
         {
-            // TODO: Exception dispatch goes here
-            // search for appropriate handler
-            // then call the handler if found
+            object exceptionObj = exceptionInfo._exception;
 
             byte* pCatchHandler = null;
             // enumerate frames
-            // for (; isValid; isValid = frameIter.Next))
-            // {
-            byte* pHandler;
-            if (FindFirstPassHandler(exception, exceptionInfo, out pHandler))
+            bool isValid = true;
+            for (; isValid; isValid = InternalCalls.SFINext(ref exceptionInfo._frameIter))
             {
-                // Found a handler
-                //break;
-                pCatchHandler = pHandler;
+                byte* pHandler;
+                if (FindFirstPassHandler(exceptionObj, ref exceptionInfo._frameIter, out pHandler))
+                {
+                    // Found a handler
+                    pCatchHandler = pHandler;
+                    break;
+                }
             }
-            // }
 
             if (pCatchHandler == null)
             {
                 // Treat everything that gets here as unhandled exceptions
-                UnhandledExceptionFailFast(exception, exceptionInfo);
+                UnhandledExceptionFailFast(ref exceptionInfo);
             }
 
-            InternalCalls.CallCatchHandler(exception, pCatchHandler, ref exceptionInfo);
+            InternalCalls.CallCatchHandler(exceptionObj, pCatchHandler, ref exceptionInfo._frameIter);
         }
 
-        private static bool FindFirstPassHandler(object exception, ExInfo exceptionInfo, out byte* pHandler)
+        private static bool FindFirstPassHandler(object exception, ref StackFrameIterator frameIter, out byte* pHandler)
         {
             pHandler = null;
 
@@ -63,7 +63,7 @@
 
             for (int idx = 0; InternalCalls.EHEnumNext(&ehEnum, &nextClause); idx++)
             {
-                if (exceptionInfo.instructionPointer >= nextClause._tryStartOffset && exceptionInfo.instructionPointer < nextClause._tryEndOffset)
+                if (frameIter.InstructionPointer >= nextClause._tryStartOffset && frameIter.InstructionPointer < nextClause._tryEndOffset)
                 {
                     pHandler = nextClause._handlerAddress;
                     return true;
@@ -73,18 +73,18 @@
             return false;
         }
 
-        private static void UnhandledExceptionFailFast(object unhandledException, ExInfo exceptionInfo)
+        private static void UnhandledExceptionFailFast(ref ExInfo exceptionInfo)
         {
-            if (unhandledException is Exception exceptionObject)
+            if (exceptionInfo._exception is Exception exceptionObject)
             {
                 Console.Write("Unhandled exception. ");
-           
+
                 Console.WriteLine(exceptionObject.Message ?? "");
 
                 Console.Write("IP="); 
-                Console.Write(exceptionInfo.instructionPointer);
+                Console.Write(exceptionInfo._frameIter.InstructionPointer);
                 Console.Write(",FP=");
-                Console.WriteLine(exceptionInfo.framePointer);
+                Console.WriteLine(exceptionInfo._frameIter.FramePointer);
             }
 
             Environment.Exit(-1);
