@@ -12,11 +12,11 @@ ThrowEx:
 	POP DE
 
 	; exception object
-	POP BC
+	;POP BC
 
 	; Create ExInfo on stack
-	; First is ExInfo._exception object, initialise this to null
-	PUSH BC
+	; First is ExInfo._exception object
+	;PUSH BC
 
 	; Initialise ExInfo._frameIter.InstructionPointer
 	DEC DE	; Return address is after call instruction so need to decrement by 1
