@@ -16,8 +16,7 @@ ThrowEx:
 
 	; Create ExInfo on stack
 	; First is ExInfo._exception object, initialise this to null
-	LD HL, 0
-	PUSH HL
+	PUSH BC
 
 	; Initialise ExInfo._frameIter.InstructionPointer
 	DEC DE	; Return address is after call instruction so need to decrement by 1
@@ -30,10 +29,6 @@ ThrowEx:
 	LD HL, 6	; Accounts for _frameIter
 	ADD HL, SP
 	PUSH HL
-
-	; Now setup arguments for ThrowException
-	; First is exception object
-;	PUSH BC
 
 	; Now we have reference to ExInfo struct itself
 	LD HL, 0
