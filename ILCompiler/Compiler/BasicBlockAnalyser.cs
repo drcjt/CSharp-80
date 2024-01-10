@@ -1,5 +1,7 @@
-﻿using dnlib.DotNet.Emit;
+﻿using dnlib.DotNet;
+using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler
 {
@@ -18,8 +20,9 @@ namespace ILCompiler.Compiler
         public BasicBlock HandlerEnd { get; init; }
         public BasicBlock? Filter { get; init; }
         public EHClauseKind Kind { get; init; }
+        public string CatchTypeMangledName { get; init; }
 
-        public EHClause(BasicBlock tryBegin, BasicBlock tryEnd, BasicBlock handlerBegin, BasicBlock handlerEnd, BasicBlock? filter, EHClauseKind kind)
+        public EHClause(BasicBlock tryBegin, BasicBlock tryEnd, BasicBlock handlerBegin, BasicBlock handlerEnd, BasicBlock? filter, EHClauseKind kind, string catchTypeMangledName)
         {
             TryBegin = tryBegin;
             TryEnd = tryEnd;
@@ -27,16 +30,23 @@ namespace ILCompiler.Compiler
             HandlerEnd = handlerEnd;
             Filter = filter;
             Kind = kind;
+            CatchTypeMangledName = catchTypeMangledName;
         }   
     }
 
     public class BasicBlockAnalyser
     {
         private readonly MethodDesc _method;
+        private readonly INameMangler _nameMangler;
 
-        public BasicBlockAnalyser(MethodDesc method)
+        public BasicBlockAnalyser(MethodDesc method) : this(method, new NameMangler())
+        {
+        }
+
+        public BasicBlockAnalyser(MethodDesc method, INameMangler nameMangler)
         {
             _method = method;
+            _nameMangler = nameMangler;
         }
 
         public BasicBlock[] FindBasicBlocks(IDictionary<int, int> offsetToIndexMap, IList<EHClause> ehClauses)
@@ -73,13 +83,16 @@ namespace ILCompiler.Compiler
                 handlerBeginBlock.HandlerStart = true;
                 tryBeginBlock.TryStart = true;
 
+                var catchTypeDef = exceptionHandler.CatchType.ResolveTypeDefThrow();
+                var catchTypeMangledName = _nameMangler.GetMangledTypeName(catchTypeDef);
+
                 tryBeginBlock.Handlers.Add(handlerBeginBlock);
 
                 EHClauseKind kind = EHClauseKind.Typed;
                 if (exceptionHandler.IsFault || exceptionHandler.IsFinally) kind = EHClauseKind.Fault;
                 else if (exceptionHandler.IsFilter) kind = EHClauseKind.Filter;
 
-                var ehClause = new EHClause(tryBeginBlock, tryEndBlock, handlerBeginBlock, handlerEndBlock, filterBlock, kind);
+                var ehClause = new EHClause(tryBeginBlock, tryEndBlock, handlerBeginBlock, handlerEndBlock, filterBlock, kind, catchTypeMangledName);
                 ehClauses.Add(ehClause);
             }
         }

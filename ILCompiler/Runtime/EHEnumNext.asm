@@ -32,7 +32,7 @@ EHENUMNEXT:
 	LD D, B
 	LD E, C
 
-	LD BC, 6
+	LD BC, 8
 	LDIR
 
 	LD D, H

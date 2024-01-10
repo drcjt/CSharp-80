@@ -17,7 +17,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 context.InstructionsBuilder.Push(HL);
                 context.InstructionsBuilder.Ld(A, H);
                 context.InstructionsBuilder.Or(L);
-                context.InstructionsBuilder.Jp(Emit.Condition.Z, mangledThrowHelperMethod);
+                context.InstructionsBuilder.Call(Emit.Condition.Z, mangledThrowHelperMethod);
             }
         }
     }

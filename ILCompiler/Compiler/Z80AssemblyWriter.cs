@@ -243,6 +243,7 @@ namespace ILCompiler.Compiler
                                 ehClausesBuilder.Dw(ehClause.TryBegin.Label, "Protected Region Start");
                                 ehClausesBuilder.Dw(ehClause.TryEnd.Label, "Protected Region End");
                                 ehClausesBuilder.Dw(ehClause.HandlerBegin.Label, "Handler Start");
+                                ehClausesBuilder.Dw(ehClause.CatchTypeMangledName, "Catch Type");
                             }
                         }
                     }

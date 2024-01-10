@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Internal.Runtime;
+using System.Diagnostics;
 
 namespace System.Runtime
 {
@@ -15,6 +16,7 @@ namespace System.Runtime
             internal ushort _tryStartOffset;
             internal ushort _tryEndOffset;
             internal byte* _handlerAddress;
+            internal void* _pTargetType;
         }
 
         [RuntimeExport("ThrowException")]
@@ -63,7 +65,10 @@ namespace System.Runtime
 
             for (int idx = 0; InternalCalls.EHEnumNext(&ehEnum, &nextClause); idx++)
             {
-                if (frameIter.InstructionPointer >= nextClause._tryStartOffset && frameIter.InstructionPointer < nextClause._tryEndOffset)
+                var catchEETypePtr = (EEType*)(nextClause._pTargetType);
+
+                if (frameIter.InstructionPointer >= nextClause._tryStartOffset && frameIter.InstructionPointer < nextClause._tryEndOffset &&
+                    TypeCast.IsInstanceOfClass(catchEETypePtr, exception) != null)
                 {
                     pHandler = nextClause._handlerAddress;
                     return true;

@@ -271,7 +271,7 @@ namespace ILCompiler.Compiler
             _method = method;
             _locals = locals;
 
-            var basicBlockAnalyser = new BasicBlockAnalyser(_method);
+            var basicBlockAnalyser = new BasicBlockAnalyser(_method, _nameMangler);
             var offsetToIndexMap = new Dictionary<int, int>();
             _basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
