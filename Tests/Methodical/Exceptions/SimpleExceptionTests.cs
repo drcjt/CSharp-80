@@ -129,8 +129,7 @@ namespace Exceptions
             }
             catch (NullReferenceException ex)
             {
-                // TODO: return 0 from here caused exception in SSA
-                result = 0;
+                return 0;
             }
 
             return result;
