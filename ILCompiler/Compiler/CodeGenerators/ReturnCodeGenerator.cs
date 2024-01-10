@@ -67,7 +67,9 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 if (context.LocalsCount + tempCount > 0)
                 {
-                    if (context.Configuration.IntegrationTests && !context.Method.LocallocUsed)
+                    if (context.Configuration.IntegrationTests && 
+                        !context.Method.LocallocUsed &&
+                        !context.Configuration.ExceptionSupport)    // EH can result in SP over flow
                     {
                         // Validate we haven't got any under/over flow on stack
                         // Assert that localsSize + SP - IX = 0
