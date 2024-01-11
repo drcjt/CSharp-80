@@ -213,7 +213,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(CatchArgumentEntry entry)
         {
-            throw new Exception("CatchArgumentEntry not valid in LIR");
+            _sb.AppendLine($"       catchArgument");
         }
 
         public void Visit(PutArgTypeEntry entry)

@@ -15,14 +15,14 @@ namespace ILCompiler.Compiler
     public class EHClause
     {
         public BasicBlock TryBegin { get; init; }
-        public BasicBlock TryEnd { get; init; }
+        public BasicBlock? TryEnd { get; init; }
         public BasicBlock HandlerBegin { get; init; }
-        public BasicBlock HandlerEnd { get; init; }
+        public BasicBlock? HandlerEnd { get; init; }
         public BasicBlock? Filter { get; init; }
         public EHClauseKind Kind { get; init; }
         public string CatchTypeMangledName { get; init; }
 
-        public EHClause(BasicBlock tryBegin, BasicBlock tryEnd, BasicBlock handlerBegin, BasicBlock handlerEnd, BasicBlock? filter, EHClauseKind kind, string catchTypeMangledName)
+        public EHClause(BasicBlock tryBegin, BasicBlock? tryEnd, BasicBlock handlerBegin, BasicBlock? handlerEnd, BasicBlock? filter, EHClauseKind kind, string catchTypeMangledName)
         {
             TryBegin = tryBegin;
             TryEnd = tryEnd;
@@ -77,8 +77,8 @@ namespace ILCompiler.Compiler
                 }
 
                 var handlerBeginBlock = CreateBasicBlock(basicBlocks, (int)exceptionHandler.HandlerStart.Offset);
-                var handlerEndBlock = basicBlocks[exceptionHandler.HandlerEnd.Offset];
-                var tryEndBlock = basicBlocks[exceptionHandler.TryEnd.Offset];
+                var handlerEndBlock = exceptionHandler.HandlerEnd != null ? basicBlocks[exceptionHandler.HandlerEnd.Offset] : null;
+                var tryEndBlock = exceptionHandler.TryEnd != null ? basicBlocks[exceptionHandler.TryEnd.Offset] : null;
 
                 handlerBeginBlock.HandlerStart = true;
                 tryBeginBlock.TryStart = true;
