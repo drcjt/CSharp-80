@@ -99,7 +99,7 @@ namespace ILCompiler.Compiler
             // Add exception object for catch
             if (basicBlock.HandlerStart)
             {
-                // TODO: need to use a node type that won't generate any code
+                // Use a node type that won't generate any code
                 _stack.Push(new CatchArgumentEntry());
             }
 
