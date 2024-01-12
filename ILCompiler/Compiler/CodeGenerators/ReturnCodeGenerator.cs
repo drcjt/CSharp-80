@@ -113,10 +113,8 @@ namespace ILCompiler.Compiler.CodeGenerators
                     // will probably be better for 1 or maybe 2 32bit parameters.
 
                     // Work out start of params so we can reset SP after removing return address
-                    context.InstructionsBuilder.Ld(HL, 0);
+                    context.InstructionsBuilder.Ld(HL, (short)(2 + totalParametersSize));
                     context.InstructionsBuilder.Add(HL, SP);
-                    context.InstructionsBuilder.Ld(BC, (short)(2 + totalParametersSize));
-                    context.InstructionsBuilder.Add(HL, BC);
                 }
 
                 context.InstructionsBuilder.Pop(BC);      // Store return address in BC
