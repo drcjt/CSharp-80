@@ -9,9 +9,8 @@ namespace DoomFire
         const int Height = 20;
 
         static byte* address = (byte*)0;
-        private static unsafe int RandomInt() => (int)(*address++ & 3);
 
-        public static unsafe void Main()
+        public static void Main()
         {
             Console.Clear();
 
@@ -27,7 +26,7 @@ namespace DoomFire
                 RenderEffect(firePixels);
         }
 
-        static unsafe void RenderEffect(byte* firePixels)
+        static void RenderEffect(byte* firePixels)
         {
 #if TIME_CODE
             var startTime = DateTime.Now;
@@ -50,7 +49,7 @@ namespace DoomFire
                     }
                     else
                     {
-                        var rand = RandomInt(); // (int)(*address++ & 3);
+                        var rand = *address++ & 3;
                         var dst = (srcOffset - rand) + 1;
                         *(dst - Width) = (byte)(pixel - (rand & 1));
                     }
