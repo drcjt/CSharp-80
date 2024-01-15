@@ -100,7 +100,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private IList<BasicBlock> GetTryBlocks(ExceptionHandler exceptionHandler, BasicBlock[] basicBlocks)
+        private static List<BasicBlock> GetTryBlocks(ExceptionHandler exceptionHandler, BasicBlock[] basicBlocks)
         {
             var tryStartOffset = (int)exceptionHandler.TryStart.Offset;
             var tryEndOffset = (int?)exceptionHandler.TryEnd?.Offset ?? basicBlocks.Length;

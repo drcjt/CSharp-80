@@ -499,7 +499,7 @@ namespace ILCompiler.Compiler
         /// </summary>
         /// <param name="block"></param>
         /// <returns>list of dominance predecessors</returns>
-        private IList<BasicBlock> BlockDominancePredecessors(BasicBlock block)
+        private static IList<BasicBlock> BlockDominancePredecessors(BasicBlock block)
         {
             if (!block.HandlerStart)
             {

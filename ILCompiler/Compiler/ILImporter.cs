@@ -305,7 +305,7 @@ namespace ILCompiler.Compiler
             return importedBasicBlocks;
         }
 
-        private void SetTryBlockSuccessors(IList<BasicBlock> basicBlocks)
+        private static void SetTryBlockSuccessors(IList<BasicBlock> basicBlocks)
         {
             foreach (var block in basicBlocks)
             {
