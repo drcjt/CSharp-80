@@ -4,6 +4,7 @@ using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler
@@ -53,6 +54,26 @@ namespace ILCompiler.Compiler
             {
                 methodName = _nameMangler.GetMangledMethodName(_context.Method);
             }
+
+            if (_configuration.ExceptionSupport)
+            {
+                // Think of this as the unwind information
+                // Could expand from single byte for number of parameters
+                // For example to handle frameless methods.
+
+                // Emit byte before method as number of bytes parameters take up on stack - basically unwind info for exception handling
+                var totalParametersSize = 0;
+                foreach (var local in _context.LocalVariableTable)
+                {
+                    if (local.IsParameter)
+                    {
+                        totalParametersSize += local.ExactSize;
+                    }
+                }
+                Debug.Assert(totalParametersSize <= Byte.MaxValue);
+                _context.InstructionsBuilder.Db((byte)totalParametersSize, "Total Parameter Size");
+            }
+
             _context.InstructionsBuilder.Label(methodName);
 
             if (methodCodeNode.Method.IsStaticConstructor)

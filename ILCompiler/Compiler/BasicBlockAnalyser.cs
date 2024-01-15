@@ -78,6 +78,9 @@ namespace ILCompiler.Compiler
 
                 var handlerBeginBlock = CreateBasicBlock(basicBlocks, (int)exceptionHandler.HandlerStart.Offset);
                 var handlerEndBlock = exceptionHandler.HandlerEnd != null ? basicBlocks[exceptionHandler.HandlerEnd.Offset] : null;
+
+                handlerBeginBlock.TryBlocks = GetTryBlocks(exceptionHandler, basicBlocks);
+
                 var tryEndBlock = exceptionHandler.TryEnd != null ? basicBlocks[exceptionHandler.TryEnd.Offset] : null;
 
                 handlerBeginBlock.HandlerStart = true;
@@ -97,6 +100,22 @@ namespace ILCompiler.Compiler
             }
         }
 
+        private IList<BasicBlock> GetTryBlocks(ExceptionHandler exceptionHandler, BasicBlock[] basicBlocks)
+        {
+            var tryStartOffset = (int)exceptionHandler.TryStart.Offset;
+            var tryEndOffset = (int?)exceptionHandler.TryEnd?.Offset ?? basicBlocks.Length;
+
+            var tryBlocks = new List<BasicBlock>();
+            for (int offset = tryStartOffset; offset < tryEndOffset; offset++)
+            {
+                if (basicBlocks[offset] != null)
+                {
+                    tryBlocks.Add(basicBlocks[offset]);
+                }
+            }
+
+            return tryBlocks;
+        }
         private static BasicBlock CreateBasicBlock(BasicBlock[] basicBlocks, int offset)
         {
             var basicBlock = basicBlocks[offset];

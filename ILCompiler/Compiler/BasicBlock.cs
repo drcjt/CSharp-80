@@ -55,6 +55,8 @@ namespace ILCompiler.Compiler
         public bool FilterStart { get; set; }
         public bool HandlerStart { get; set; }
 
+        public IList<BasicBlock> TryBlocks { get; set; } = new List<BasicBlock>();
+
         public IList<BasicBlock> Handlers { get; set; } = new List<BasicBlock>();
 
         public BasicBlock(int offset)

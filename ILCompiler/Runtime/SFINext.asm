@@ -69,6 +69,43 @@ SFINEXT:
 	; BC = new instruction pointer
 	; HL = new stack pointer
 
+	; Note new stack pointer doesn't account for any parameters passed on the stack
+	; We deal with this as follows:
+	;    1. Use new instruction pointer - 2 to get address of method we are unwinding, i.e. extract address from CALL instruction before return address
+	;    2. Use address of method being unwound - 1 to get byte before method.
+	;    3. The byte before the method will specify the number of parameters passed on the stack in bytes. So for 1 int parameter, the value would be 4.
+	;    4. Increment the SP by the byte before the method
+	
+	; Save frame pointer, instruction pointer, stack pointer
+	PUSH DE
+	PUSH BC
+	PUSH HL
+
+	; Determine address of method being called that we are unwinding
+	LD H, B
+	LD L, C
+	DEC HL
+	LD B, (HL)
+	DEC HL
+	LD C, (HL)
+
+	; Unwind information is immediately before the method
+	DEC BC
+
+	; Unwind information is the number of bytes for the parameters on the stack prior to the call
+	LD A, (BC)
+
+	LD D, 0
+	LD E, A
+
+	; Restore stack pointer and add bytes to remove parameters on the stack
+	POP HL
+	ADD HL, DE
+
+	; Restore instruction pointer and frame pointer
+	POP BC
+	POP DE
+
 	PUSH HL
 
 	; Compare BC to EH_ENDIP
