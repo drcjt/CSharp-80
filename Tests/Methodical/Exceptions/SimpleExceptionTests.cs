@@ -62,6 +62,11 @@ namespace Exceptions
             throw new Exception();
         }
 
+        private static void Throw(int parameter)
+        {
+            throw new Exception();
+        }
+
         private static void ThrowIndirect()
         {
             Throw();
@@ -135,6 +140,30 @@ namespace Exceptions
             return result;
         }
 
+        public unsafe static int TryCatch_WithThrowingMethodHavingAParameter_StackIsRestoredCorrectly()
+        {
+            int result = 1;
+            int count = 0;
+            ushort[] stackAllocedVariables = new ushort[2];
+            while (count < 2)
+            {
+                try
+                {
+                    var stackTest = stackalloc int[1];
+                    stackAllocedVariables[count] = (ushort)stackTest;
+
+                    Throw(count);
+                }
+                catch
+                {
+                }
+                count++;
+            }
+
+            result = stackAllocedVariables[0] - stackAllocedVariables[1] != 4 ? 1 : 0;
+            return result;
+        }
+
         public static int RunTests()
         {
             int result = Try_NoThrow(); if (result != 0) return result;
@@ -144,6 +173,7 @@ namespace Exceptions
             result = TryCatch_WithThrowInNestedSeparateMethod_IsCaught(); if (result != 0) return result;
             result = TryCatch_WithSpecificExceptionTypes(); if (result != 0) return result;
             result = TryCatchOfNRE_WhenNREThrown_IsCaught(); if (result != 0) return result;
+            result = TryCatch_WithThrowingMethodHavingAParameter_StackIsRestoredCorrectly(); if (result != 0) return result;
 
             return result;
         }

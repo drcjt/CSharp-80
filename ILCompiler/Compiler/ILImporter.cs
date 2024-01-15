@@ -294,12 +294,29 @@ namespace ILCompiler.Compiler
             for (int i = 0; i < _basicBlocks.Length; i++)
             {
                 if (_basicBlocks[i] != null)
-                {
+                {                    
                     importedBasicBlocks.Add(_basicBlocks[i]);
                 }
             }
-         
+
+            // Add EH begin block as successor to all blocks in trys
+            SetTryBlockSuccessors(importedBasicBlocks);
+
             return importedBasicBlocks;
+        }
+
+        private static void SetTryBlockSuccessors(IList<BasicBlock> basicBlocks)
+        {
+            foreach (var block in basicBlocks)
+            {
+                if (block.HandlerStart)
+                {
+                    foreach (var tryBlock in block.TryBlocks)
+                    {
+                        tryBlock.Successors.Add(block);
+                    }
+                }
+            }
         }
 
         private void ImportFallThrough(BasicBlock next)

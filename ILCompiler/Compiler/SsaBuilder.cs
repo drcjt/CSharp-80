@@ -317,7 +317,8 @@ namespace ILCompiler.Compiler
                 // First we consider the predecessors of block looking for candidate B2's
                 // block is obviously an immediate successor of its immediate predecessors
 
-                var predecessors = block.Predecessors;
+                // If block is first block in exception handler then use all blocks handled by the handler
+                IList<BasicBlock> predecessors = !block.HandlerStart ? block.Predecessors : block.TryBlocks;
 
                 // If there is zero or one predecessors then there is no predecessor,
                 // or else the single predecessor dominates block, so no B2 exists
@@ -446,7 +447,7 @@ namespace ILCompiler.Compiler
 
                     // Find the first processed predecessor
                     BasicBlock? predecessorBlock = null;
-                    foreach (var predecessor in block.Predecessors)
+                    foreach (var predecessor in BlockDominancePredecessors(block))
                     {
                         if (processedBlocks.Contains(predecessor))
                         {
@@ -462,7 +463,7 @@ namespace ILCompiler.Compiler
 
                     // Intersect DOM, if computed for all predecessors
                     var basicBlockDominator = predecessorBlock;
-                    foreach (var predecessor in block.Predecessors)
+                    foreach (var predecessor in BlockDominancePredecessors(block))
                     {
                         if (predecessorBlock != predecessor)
                         {
@@ -487,6 +488,26 @@ namespace ILCompiler.Compiler
                     _logger.LogDebug("Marking block {BlockLabel} as processed", block.Label);
                     processedBlocks.Add(block);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Calculates the predecessor blocks that have fully executed before block was reached.
+        /// Only differs for handler blocks as the try blocks may not have fully executed 
+        /// so we use the predecessors of the first block in the try
+        /// 
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns>list of dominance predecessors</returns>
+        private static IList<BasicBlock> BlockDominancePredecessors(BasicBlock block)
+        {
+            if (!block.HandlerStart)
+            {
+                return block.Predecessors;
+            }
+            else
+            {
+                return block.TryBlocks[0].Predecessors;
             }
         }
 
