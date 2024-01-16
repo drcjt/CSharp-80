@@ -135,6 +135,11 @@ SFINEXT:
 	LD (HL), D
 	INC HL
 
+	; Call instruction is 3 before return address
+	DEC BC
+	DEC BC
+	DEC BC
+
 	LD (HL), C	; save new instruction pointer into stack frame iterator
 	INC HL
 	LD (HL), B
