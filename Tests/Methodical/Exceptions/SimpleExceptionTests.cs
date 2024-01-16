@@ -164,6 +164,28 @@ namespace Exceptions
             return result;
         }
 
+        public static int TryCatch_ThrowBeforeTry_IsNotCaughtByInnerTry()
+        {
+            int result = 2;
+            try
+            {
+                Throw();
+                try
+                {
+                }
+                catch
+                {
+                    result = 1;
+                }
+            }
+            catch
+            {
+                result = 0;
+            }
+
+            return result;
+        }
+
         public static int RunTests()
         {
             int result = Try_NoThrow(); if (result != 0) return result;
@@ -174,6 +196,7 @@ namespace Exceptions
             result = TryCatch_WithSpecificExceptionTypes(); if (result != 0) return result;
             result = TryCatchOfNRE_WhenNREThrown_IsCaught(); if (result != 0) return result;
             result = TryCatch_WithThrowingMethodHavingAParameter_StackIsRestoredCorrectly(); if (result != 0) return result;
+            result = TryCatch_ThrowBeforeTry_IsNotCaughtByInnerTry(); if (result != 0) return result;
 
             return result;
         }

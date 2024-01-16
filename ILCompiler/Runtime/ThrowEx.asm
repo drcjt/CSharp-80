@@ -18,8 +18,10 @@ ThrowEx:
 	; First is ExInfo._exception object
 	;PUSH BC
 
-	; Initialise ExInfo._frameIter.InstructionPointer
-	DEC DE	; Return address is after call instruction so need to decrement by 1
+	; Initialise ExInfo._frameIter.InstructionPointer to be return address - 3 as call instruction is 3 bytes long
+	DEC DE
+	DEC DE
+	DEC DE
 	PUSH DE
 
 	; Initialise ExInfo._frameIter.FramePointer
