@@ -89,10 +89,22 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         currentOffset += currentInstruction.GetSize();
                         currentIndex++;
                     }
+
+                    AddCatchTypeDependencies();
                 }
             }
 
             return _dependencies;
+        }
+
+        private void AddCatchTypeDependencies()
+        {
+            foreach (var exceptionHandler in _method.Body.ExceptionHandlers)
+            {
+                var catchTypeDef = exceptionHandler.CatchType.ResolveTypeDefThrow();
+                var allocSize = catchTypeDef.ToTypeSig().GetInstanceByteCount();
+                _dependencies.Add(_nodeFactory.ConstructedEETypeNode(catchTypeDef, allocSize));
+            }
         }
 
         private void ImportCasting()

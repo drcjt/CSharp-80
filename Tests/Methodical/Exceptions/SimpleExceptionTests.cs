@@ -1,4 +1,5 @@
-﻿using System;
+﻿using dnlib.DotNet;
+using System;
 
 namespace Exceptions
 {
@@ -186,6 +187,21 @@ namespace Exceptions
             return result;
         }
 
+        private class TestException : Exception
+        {
+        }
+
+        public static void TryCatch_WithCatchType_CatchTypeIsAddedAsDependency()
+        {
+            try
+            {
+
+            }
+            catch (TestException)
+            {
+            }
+        }
+
         public static int RunTests()
         {
             int result = Try_NoThrow(); if (result != 0) return result;
@@ -197,6 +213,7 @@ namespace Exceptions
             result = TryCatchOfNRE_WhenNREThrown_IsCaught(); if (result != 0) return result;
             result = TryCatch_WithThrowingMethodHavingAParameter_StackIsRestoredCorrectly(); if (result != 0) return result;
             result = TryCatch_ThrowBeforeTry_IsNotCaughtByInnerTry(); if (result != 0) return result;
+            TryCatch_WithCatchType_CatchTypeIsAddedAsDependency();
 
             return result;
         }

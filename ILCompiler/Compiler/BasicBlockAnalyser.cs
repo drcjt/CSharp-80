@@ -70,6 +70,12 @@ namespace ILCompiler.Compiler
             {
                 var tryBeginBlock = CreateBasicBlock(basicBlocks, (int)exceptionHandler.TryStart.Offset);
                 BasicBlock? filterBlock = null;
+
+                if (!exceptionHandler.IsCatch)
+                {
+                    throw new NotSupportedException("Only catch handlers supported");
+                }
+
                 if (exceptionHandler.IsFilter)
                 {
                     filterBlock = CreateBasicBlock(basicBlocks, (int)exceptionHandler.FilterStart.Offset);
