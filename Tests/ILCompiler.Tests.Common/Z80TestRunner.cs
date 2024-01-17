@@ -6,6 +6,7 @@ namespace ILCompiler.Tests.Common
     public class Z80TestRunner
     {
         private string _solutionPath = "";
+        private string _tracePath = "";
         public Z80TestRunner(string solutionPath)
         {
             _solutionPath = Path.GetFullPath(solutionPath);
@@ -18,6 +19,7 @@ namespace ILCompiler.Tests.Common
 
         public bool RunTest(string assemblyFileName, bool ilBvt = false, bool benchmark = true)
         {
+            _tracePath = Path.ChangeExtension(assemblyFileName, "ptc");
             var program = File.ReadAllBytes(assemblyFileName);
             RunTest(program, assemblyFileName, ilBvt, benchmark);
 
@@ -32,9 +34,13 @@ namespace ILCompiler.Tests.Common
             return nonZeroBytes;
         }
 
+        // Set to true to enable PC tracing to help debug failing tests
+        private const bool TracePC = false;
+
+        private Z80Processor z80 = new Z80Processor();
         private void RunTest(byte[]? z80Bytes, string testName, bool ilBvt, bool benchmark)
         {
-            var z80 = new Z80Processor();
+            File.Delete(_tracePath);
 
             // The Z80 simulator doesn't handle auto stop correctly
             // if the sp is manually manipulated e.g. ld sp, xx
@@ -50,10 +56,12 @@ namespace ILCompiler.Tests.Common
 
             // Load the program bytes
             z80.Memory.SetContents(0, z80Bytes);
-
-            //z80.BeforeInstructionExecution += Z80_BeforeInstructionExecution;
+            
+            z80.BeforeInstructionExecution += Z80_BeforeInstructionExecution;
 
             z80.Start();
+
+            Console.WriteLine($"Last value of PC = {z80.Registers.PC}");
 
             if (benchmark)
             {
@@ -81,6 +89,14 @@ namespace ILCompiler.Tests.Common
             {
                 // Make sure stack pointer ends up at original place
                 Assert.AreEqual(ILCompilerRunner.StackStart, (ushort)z80.Registers.SP);
+            }
+        }
+
+        private void Z80_BeforeInstructionExecution(object? sender, BeforeInstructionExecutionEventArgs e)
+        {
+            if (TracePC)
+            {
+                File.AppendAllText(_tracePath, $"0x{z80.Registers.PC:X}{Environment.NewLine}");
             }
         }
     }
