@@ -48,7 +48,6 @@ namespace ILCompiler.Tests.Common
             // on halt
             z80.AutoStopOnRetWithStackEmpty = false;
 
-
             // Start out with all memory set to 0xff
             // makes sure no tests happen to pass just because
             // memory contains zeros to begin with
@@ -56,8 +55,8 @@ namespace ILCompiler.Tests.Common
 
             // Load the program bytes
             z80.Memory.SetContents(0, z80Bytes);
-            
-            z80.BeforeInstructionExecution += Z80_BeforeInstructionExecution;
+
+            z80.BeforeInstructionFetch += BeforeInstructionFetch;
 
             z80.Start();
 
@@ -92,7 +91,7 @@ namespace ILCompiler.Tests.Common
             }
         }
 
-        private void Z80_BeforeInstructionExecution(object? sender, BeforeInstructionExecutionEventArgs e)
+        private void BeforeInstructionFetch(object? sender, BeforeInstructionFetchEventArgs e)
         {
             if (TracePC)
             {
