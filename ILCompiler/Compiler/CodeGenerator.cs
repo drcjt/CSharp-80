@@ -286,9 +286,7 @@ namespace ILCompiler.Compiler
             if (_context.LocalsCount + tempCount > 0)
             {
                 // Reserve space on stack for locals
-                instructionsBuilder.Ld(HL, (short)-localsSize);
-                instructionsBuilder.Add(HL, SP);
-                instructionsBuilder.Ld(SP, HL);
+                CodeGeneratorHelper.AddSPFromHL(instructionsBuilder, (short)-localsSize);
 
                 ZeroInitFrame(instructionsBuilder);
             }
@@ -308,8 +306,8 @@ namespace ILCompiler.Compiler
 
                         instructionsBuilder.Push(IX);
                         instructionsBuilder.Pop(HL);
-                        instructionsBuilder.Ld(DE, (short)-offset);
-                        instructionsBuilder.Add(HL, DE);
+
+                        CodeGeneratorHelper.AddHLFromDE(instructionsBuilder, (short)-offset);
 
                         for (var count = 0; count < exactSize; count++)
                         {
