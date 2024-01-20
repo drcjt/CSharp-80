@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             if (variable.Type.IsSmall())
             {
-                CopyHelper.CopySmallToStack(context.InstructionsBuilder, variable.Type.IsByte() ? 1 : 2, -variable.StackOffset, !variable.Type.IsUnsigned());
+                CopyHelper.CopySmallFromIXToStack(context.InstructionsBuilder, variable.Type.IsByte() ? 1 : 2, -variable.StackOffset, !variable.Type.IsUnsigned());
             }
             else
             {
