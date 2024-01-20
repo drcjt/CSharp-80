@@ -17,8 +17,8 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
                 else
                 {
-                    builder.Ld(DE, (short)value);       // 3 bytes, 10 t-states
-                    builder.Add(HL, DE);                // 1 byte, 11 t-states
+                    builder.Ld(DE, value);       // 3 bytes, 10 t-states
+                    builder.Add(HL, DE);         // 1 byte, 11 t-states
                 }
             }
         }
@@ -47,7 +47,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 else
                 {
                     // 5 bytes, 10 + 11 + 6 = 27 t-states
-                    builder.Ld(HL, (short)value);
+                    builder.Ld(HL, value);
                     builder.Add(HL, SP);
                     builder.Ld(SP, HL);
                 }
