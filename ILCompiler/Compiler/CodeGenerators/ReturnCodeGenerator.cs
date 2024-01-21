@@ -67,7 +67,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 if (context.LocalsCount + tempCount > 0)
                 {
-                    if (context.Configuration.IntegrationTests && 
+                    if (context.Configuration.IntegrationTests &&
                         !context.Method.LocallocUsed &&
                         !context.Configuration.ExceptionSupport)    // EH can result in SP over flow
                     {
@@ -97,6 +97,8 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
                 context.InstructionsBuilder.Pop(IX);            // Remove IX
 
+                context.InstructionsBuilder.Pop(BC);      // Store return address in BC
+
                 if (context.ParamsCount > 0)
                 {
                     // Calculate size of parameters
@@ -109,20 +111,9 @@ namespace ILCompiler.Compiler.CodeGenerators
                         }
                     }
 
-                    // TODO: consider optimising simple cases to just use Pop to remove the parameters.
-                    // will probably be better for 1 or maybe 2 32bit parameters.
-
-                    // Work out start of params so we can reset SP after removing return address
-                    context.InstructionsBuilder.Ld(HL, (short)(2 + totalParametersSize));
-                    context.InstructionsBuilder.Add(HL, SP);
-                }
-
-                context.InstructionsBuilder.Pop(BC);      // Store return address in BC
-
-                if (context.ParamsCount > 0)
-                {
                     // Remove parameters from stack
-                    context.InstructionsBuilder.Ld(SP, HL);
+                    CodeGeneratorHelper.AddSPFromHL(context.InstructionsBuilder, (short)(totalParametersSize));
+
                 }
             }
             else
@@ -140,6 +131,11 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
                 context.InstructionsBuilder.Push(DE);
             }
+
+            // Could do this instead - it's a bit faster, but 1 byte longer
+            //context.InstructionsBuilder.Ld(H, B);
+            //context.InstructionsBuilder.Ld(L, C);
+            //context.InstructionsBuilder.Jp(__[HL]);
 
             context.InstructionsBuilder.Push(BC);
             context.InstructionsBuilder.Ret();

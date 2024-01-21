@@ -51,25 +51,77 @@ namespace ILCompiler.Compiler.CodeGenerators
          */
         public static void CopyStackToHLSmall(InstructionsBuilder instructionsBuilder, int bytesToCopy, int offset)
         {
-            if (offset != 0)
-            {
-                instructionsBuilder.Ld(DE, (short)offset);
-                instructionsBuilder.Add(HL, DE);
-            }
+            CodeGeneratorHelper.AddHLFromDE(instructionsBuilder, (short)offset);
 
             instructionsBuilder.Pop(DE);
             instructionsBuilder.Pop(BC);    // Ignore msw
 
             instructionsBuilder.Ld(__[HL], E);
-            instructionsBuilder.Inc(HL);
 
             if (bytesToCopy == 2)
             {
+                instructionsBuilder.Inc(HL);
                 instructionsBuilder.Ld(__[HL], D);
             }
         }
 
-        public static void CopySmallToStack(InstructionsBuilder instructionsBuilder, int bytesToCopy, int ixOffset, bool signExtend)
+        public static void CopySmallFromHLToStack(InstructionsBuilder instructionsBuilder, int bytesToCopy, int offset, bool signExtend)
+        {
+            // Assume pointer to copy from is in HL
+            Debug.Assert(bytesToCopy == 1 || bytesToCopy == 2);
+
+            var delta = offset + bytesToCopy - 1;
+            CodeGeneratorHelper.AddHLFromDE(instructionsBuilder, (short)delta);
+
+            if (!signExtend)
+            {
+                instructionsBuilder.Ld(DE, 0);
+                instructionsBuilder.Push(DE);
+
+                if (bytesToCopy == 1)
+                {
+                    instructionsBuilder.Ld(D, 0);
+                }
+                else
+                {
+                    instructionsBuilder.Ld(D, __[HL]);
+                    instructionsBuilder.Dec(HL);
+                }
+                instructionsBuilder.Ld(E, __[HL]);
+                instructionsBuilder.Push(DE);
+            }
+            else if (bytesToCopy == 1)
+            {
+                instructionsBuilder.Ld(A, __[HL]);
+                instructionsBuilder.Ld(E, A);
+
+                instructionsBuilder.Add(A, A);
+                instructionsBuilder.Sbc(A, A);
+                instructionsBuilder.Ld(H, A);
+                instructionsBuilder.Ld(L, A);
+                instructionsBuilder.Push(HL);
+
+                instructionsBuilder.Ld(L, E);
+                instructionsBuilder.Push(HL);
+            }
+            else
+            {             
+                instructionsBuilder.Ld(B, __[HL]);
+                instructionsBuilder.Dec(HL);
+                instructionsBuilder.Ld(C, __[HL]);
+
+                instructionsBuilder.Ld(H, B);
+                instructionsBuilder.Ld(L, C);
+
+                instructionsBuilder.Add(HL, HL);  // move sign bit into carry flag
+                instructionsBuilder.Sbc(HL, HL);  // hl is now 0000 or FFFF
+                instructionsBuilder.Push(HL);
+
+                instructionsBuilder.Push(BC);
+            }
+        }
+
+        public static void CopySmallFromIXToStack(InstructionsBuilder instructionsBuilder, int bytesToCopy, int ixOffset, bool signExtend)
         {
             Debug.Assert(bytesToCopy == 1 || bytesToCopy == 2);
             int changeToIX = 0;
@@ -84,57 +136,49 @@ namespace ILCompiler.Compiler.CodeGenerators
                 ixOffset -= delta;
             }
 
-            if (bytesToCopy == 1)
+            if (!signExtend)
             {
-                if (signExtend)
+                instructionsBuilder.Ld(HL, 0);
+                instructionsBuilder.Push(HL);
+
+                if (bytesToCopy == 1)
                 {
-                    instructionsBuilder.Ld(A, __[IX + (short)(ixOffset)]);
-                    instructionsBuilder.Ld(E, A);
-
-                    instructionsBuilder.Add(A, A);
-                    instructionsBuilder.Sbc(A, A);
-                    instructionsBuilder.Ld(H, A);
-                    instructionsBuilder.Ld(L, A);
-                    instructionsBuilder.Push(HL);
-
-                    instructionsBuilder.Ld(L, E);
-                    instructionsBuilder.Push(HL);
+                    instructionsBuilder.Ld(H, 0);
                 }
                 else
                 {
-                    instructionsBuilder.Ld(HL, 0);
-                    instructionsBuilder.Push(HL);
-
-                    instructionsBuilder.Ld(H, 0);
-                    instructionsBuilder.Ld(L, __[IX + (short)(ixOffset)]);
-                    instructionsBuilder.Push(HL);
+                    instructionsBuilder.Ld(H, __[IX + (short)(ixOffset + 1)]);
                 }
+                instructionsBuilder.Ld(L, __[IX + (short)(ixOffset)]);
+                instructionsBuilder.Push(HL);
+            }
+            else if (bytesToCopy == 1)
+            {
+                instructionsBuilder.Ld(A, __[IX + (short)(ixOffset)]);
+                instructionsBuilder.Ld(E, A);
+
+                instructionsBuilder.Add(A, A);
+                instructionsBuilder.Sbc(A, A);
+                instructionsBuilder.Ld(H, A);
+                instructionsBuilder.Ld(L, A);
+                instructionsBuilder.Push(HL);
+
+                instructionsBuilder.Ld(L, E);
+                instructionsBuilder.Push(HL);
             }
             else
             {
-                if (signExtend)
-                {
-                    instructionsBuilder.Ld(H, __[IX + (short)(ixOffset + 1)]);
-                    instructionsBuilder.Ld(L, __[IX + (short)(ixOffset)]);
+                instructionsBuilder.Ld(H, __[IX + (short)(ixOffset + 1)]);
+                instructionsBuilder.Ld(L, __[IX + (short)(ixOffset)]);
 
-                    instructionsBuilder.Ld(D, H);
-                    instructionsBuilder.Ld(E, L);
+                instructionsBuilder.Ld(D, H);
+                instructionsBuilder.Ld(E, L);
 
-                    instructionsBuilder.Add(HL, HL);  // move sign bit into carry flag
-                    instructionsBuilder.Sbc(HL, HL);  // hl is now 0000 or FFFF
-                    instructionsBuilder.Push(HL);
+                instructionsBuilder.Add(HL, HL);  // move sign bit into carry flag
+                instructionsBuilder.Sbc(HL, HL);  // hl is now 0000 or FFFF
+                instructionsBuilder.Push(HL);
 
-                    instructionsBuilder.Push(DE);
-                }
-                else
-                {
-                    instructionsBuilder.Ld(HL, 0);
-                    instructionsBuilder.Push(HL);
-
-                    instructionsBuilder.Ld(H, __[IX + (short)(ixOffset + 1)]);
-                    instructionsBuilder.Ld(L, __[IX + (short)(ixOffset)]);
-                    instructionsBuilder.Push(HL);
-                }
+                instructionsBuilder.Push(DE);
             }
 
             if (changeToIX != 0)
@@ -149,11 +193,7 @@ namespace ILCompiler.Compiler.CodeGenerators
          */
         public static void CopyFromStackToHL(InstructionsBuilder instructionsBuilder, int size, int offset = 0)
         {
-            if (offset != 0)
-            {
-                instructionsBuilder.Ld(DE, (short)offset);
-                instructionsBuilder.Add(HL, DE);
-            }
+            CodeGeneratorHelper.AddHLFromDE(instructionsBuilder, (short)offset);
 
             var totalBytesToCopy = size;
             do
@@ -251,6 +291,40 @@ namespace ILCompiler.Compiler.CodeGenerators
                 instructionsBuilder.Ld(BC, (short)(-changeToIX));
                 instructionsBuilder.Add(IX, BC);
             }
+        }
+
+        public static void CopyFromHLToStack(InstructionsBuilder instructionsBuilder, int size, int offset = 0)
+        {
+            // Assume address is in HL
+
+            // Add offset to HL            
+            var delta = offset + size - 1;
+            CodeGeneratorHelper.AddHLFromDE(instructionsBuilder, (short)delta);
+
+            // Copy from HL to stack
+            do
+            {
+                if (size > 1)
+                {
+                    instructionsBuilder.Ld(B, __[HL]);
+                    instructionsBuilder.Dec(HL);
+                }
+                else
+                {
+                    instructionsBuilder.Ld(B, 0);
+                }
+                instructionsBuilder.Ld(C, __[HL]);
+
+                if (size - 2 > 0)
+                {
+                    instructionsBuilder.Dec(HL);
+                }
+
+                instructionsBuilder.Push(BC);
+
+                size -= 2;
+            }
+            while (size > 0);
         }
 
         public static void CopyFromIXToStack(InstructionsBuilder instructionsBuilder, int size, int ixOffset = 0, bool restoreIX = false)

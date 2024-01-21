@@ -15,8 +15,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             context.InstructionsBuilder.Push(IX);
             context.InstructionsBuilder.Pop(HL);
 
-            context.InstructionsBuilder.Ld(DE, (short)(-offset));
-            context.InstructionsBuilder.Add(HL, DE);
+            CodeGeneratorHelper.AddHLFromDE(context.InstructionsBuilder, (short)(-offset));
 
             // Push address
             context.InstructionsBuilder.Push(HL);

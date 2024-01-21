@@ -13,8 +13,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             context.InstructionsBuilder.Pop(HL);      // LSW
 
             // Calculate field address
-            context.InstructionsBuilder.Ld(DE, (short)fieldOffset);
-            context.InstructionsBuilder.Add(HL, DE);
+            CodeGeneratorHelper.AddHLFromDE(context.InstructionsBuilder, (short)fieldOffset);
 
             // Push field address onto the stack msw first, lsw second
             context.InstructionsBuilder.Ld(DE, 0);
