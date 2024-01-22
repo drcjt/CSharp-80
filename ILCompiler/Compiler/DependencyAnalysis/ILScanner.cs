@@ -239,7 +239,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 {
                     var methodDef = method.ResolveMethodDefThrow();
 
-                    if (methodDef.IsIntrinsic() && methodDef.DeclaringType.Name == "EETypePtr" && methodDef.DeclaringType.Namespace == "System" && methodDef.Name == "EETypePtrOf")
+                    if (methodDef.IsIntrinsic() && methodDef.DeclaringType.Name == "EEType" && methodDef.DeclaringType.Namespace == "Internal.Runtime" && methodDef.Name == "Of")
                     {
                         // Need to add constructed dependency on T
                         var genericParameters = ((MethodSpec)method).GenericInstMethodSig.GenericArguments;
