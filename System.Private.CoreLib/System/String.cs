@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Internal.Runtime;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime;
 using System.Runtime.CompilerServices;
 
@@ -29,7 +30,7 @@ namespace System
 
         internal unsafe static string Ctor(char[] value)
         {
-            string result = RuntimeImports.NewString(EETypePtr.EETypePtrOf<string>(), value.Length);
+            string result = RuntimeImports.NewString(EEType.Of<string>(), value.Length);
             Buffer.Memmove(ref result._firstChar, ref value[0], (uint)result.Length);
             return result;
         }

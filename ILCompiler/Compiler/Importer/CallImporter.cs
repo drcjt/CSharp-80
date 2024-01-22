@@ -236,8 +236,8 @@ namespace ILCompiler.Compiler.Importer
             var targetMethodName = methodToCall.Name;
             switch (targetMethodName)
             {
-                case "EETypePtrOf":
-                    if (IsTypeName(methodToCall, "System", "EETypePtr"))
+                case "Of":
+                    if (IsTypeName(methodToCall, "Internal.Runtime", "EEType"))
                     {
                         var genericParameters = ((MethodSpec)method).GenericInstMethodSig.GenericArguments;
                         var objType = GenericTypeInstantiator.Instantiate(genericParameters[0], method, context.Method);

@@ -1,4 +1,6 @@
-﻿namespace System.Runtime.CompilerServices
+﻿using Internal.Runtime;
+
+namespace System.Runtime.CompilerServices
 {
     public static class RuntimeHelpers
     {
@@ -6,6 +8,6 @@
 
         // TODO: This should be removed when better support for reflection has been
         // added via Type class.
-        public unsafe static bool HasCctor<T>() => EETypePtr.EETypePtrOf<T>().HasCctor;
+        public unsafe static bool HasCctor<T>() => EEType.Of<T>()->HasCctor;
     }
 }

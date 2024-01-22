@@ -1,4 +1,6 @@
-﻿namespace Internal.Runtime
+﻿using System.Runtime.CompilerServices;
+
+namespace Internal.Runtime
 {
     internal unsafe struct EEType
     {
@@ -9,6 +11,9 @@
         internal readonly ushort GetFlags() { return _usFlags; }
 
         internal readonly EEType* RelatedType => _relatedType;
+
+        [Intrinsic]
+        internal static extern EEType* Of<T>();
 
         internal bool HasCctor
         {
