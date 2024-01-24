@@ -10,6 +10,7 @@ namespace ILCompiler.Compiler.Lowerings
             services.AddSingleton<ILowering<BinaryOperator>, BinaryOperatorLowering>();
             services.AddSingleton<ILowering<JumpTrueEntry>, JumpTrueLowering>();
             services.AddSingleton<ILowering<StoreLocalVariableEntry>, StoreLocalVariableLowering>();
+            services.AddSingleton<ILowering<IndirectEntry>, IndirectLowering>();
             return services;
         }
     }
