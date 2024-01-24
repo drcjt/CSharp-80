@@ -6,8 +6,22 @@ namespace ILCompiler.Compiler.CodeGenerators
 {
     internal class ReturnCodeGenerator : ICodeGenerator<ReturnEntry>
     {
+        private static string GetEpilogLabel(CodeGeneratorContext context) => $"{context.NameMangler.GetMangledMethodName(context.Method)}_EPILOG";
+
         public void GenerateCode(ReturnEntry entry, CodeGeneratorContext context)
         {
+            var epilogLabel = GetEpilogLabel(context);
+            if (context.GeneratedEpilog)
+            {
+                // Don't generate more than one epilog just jump to
+                // previously generate epilog
+                context.InstructionsBuilder.Jp(epilogLabel);
+                return;
+            }
+
+            context.GeneratedEpilog = true;
+            context.InstructionsBuilder.Label(epilogLabel);
+
             var targetType = entry.Return;
             var hasReturnValue = targetType != null && targetType.Type != VarType.Void;
 

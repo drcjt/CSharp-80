@@ -13,6 +13,8 @@ namespace ILCompiler.Compiler.CodeGenerators
         public int LocalsCount => _method.LocalsCount;
         public MethodDesc Method => _method.Method;
 
+        public bool GeneratedEpilog { get; set; }
+
         public INameMangler NameMangler { get; }
         public NodeFactory NodeFactory { get; }
 
