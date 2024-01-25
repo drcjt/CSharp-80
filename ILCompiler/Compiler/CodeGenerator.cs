@@ -360,32 +360,38 @@ namespace ILCompiler.Compiler
         {
             int removedInstructions = 0;
             Instruction? lastInstruction = null;
-            var currentInstruction = instructions[0];
-            int count = 0;
+            int lastInstructionIndex = 0;
+            Instruction currentInstruction;
+            var currentInstructionIndex = 0;
+
             do
             {
+                currentInstruction = instructions[currentInstructionIndex];
+
                 if (lastInstruction?.Opcode == Opcode.Push && currentInstruction.Opcode == Opcode.Pop
                     && lastInstruction?.Op0?.Register == currentInstruction.Op0?.Register &&
                     currentInstruction.Label == null && lastInstruction?.Label == null)
                 {
                     // Eliminate Push followed by Pop
-                    instructions.RemoveAt(count - 1);
-                    instructions.RemoveAt(count - 1);
+                    instructions.RemoveAt(lastInstructionIndex);
+                    instructions.RemoveAt(currentInstructionIndex - 1);
                     removedInstructions += 2;
 
-                    count--;
-                    currentInstruction = instructions[count];
-                    lastInstruction = count > 0 ? instructions[count - 1] : null;
+                    currentInstructionIndex--;
+                    currentInstruction = instructions[currentInstructionIndex];
+                    lastInstruction = currentInstructionIndex > 0 ? instructions[currentInstructionIndex - 1] : null;
                 }
                 else
                 {
                     lastInstruction = currentInstruction;
-                    if (count + 1 < instructions.Count)
+                    lastInstructionIndex = currentInstructionIndex;
+
+                    do
                     {
-                        currentInstruction = instructions[++count];
-                    }
+                        currentInstructionIndex++;
+                    } while (currentInstructionIndex < instructions.Count && instructions[currentInstructionIndex].Opcode == Opcode.None);
                 }
-            } while (count < instructions.Count - 1);
+            } while (currentInstructionIndex < instructions.Count);
 
             return removedInstructions;
         }
