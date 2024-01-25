@@ -378,7 +378,6 @@ namespace ILCompiler.Compiler
                     removedInstructions += 2;
 
                     currentInstructionIndex--;
-                    currentInstruction = instructions[currentInstructionIndex];
                     lastInstruction = currentInstructionIndex > 0 ? instructions[currentInstructionIndex - 1] : null;
                 }
                 else
