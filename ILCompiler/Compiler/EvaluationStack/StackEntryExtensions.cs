@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace ILCompiler.Compiler.EvaluationStack
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public static class StackEntryExtensions
     {
@@ -12,7 +10,20 @@ namespace ILCompiler.Compiler.EvaluationStack
             if (entry is NativeIntConstantEntry nativeEntry && nativeEntry.SymbolName == String.Empty) return true;
 
             return false;
+        }
 
+        public static StackEntry NegateIntCnsOrI(this StackEntry entry)
+        {
+            if (entry is Int32ConstantEntry int32Constant)
+            {
+                return new Int32ConstantEntry(-int32Constant.Value);
+            }
+            if (entry is NativeIntConstantEntry nativeEntry)
+            {
+                return new NativeIntConstantEntry((short)-nativeEntry.Value);
+            }
+
+            throw new ArgumentException("Cannot negate an entry that isn't a Int32 or NativeInt");
         }
 
         public static int GetIntConstant(this StackEntry entry)
