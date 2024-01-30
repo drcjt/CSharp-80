@@ -4,10 +4,11 @@
     {
         public static int Main()
         {
-            TestSubtractionMorphToAddition(25, 20);
-            TestAdditionWithMultipleConstants(13, 90);
-            TestMultiplicationWithMultipleConstants(13, 4680);
-            return 0;
+            int result = 0;
+            result += TestSubtractionMorphToAddition(25, 20);
+            result += TestAdditionWithMultipleConstants(13, 90);
+            result += TestMultiplicationWithMultipleConstants(13, 4680);
+            return result;
         }
 
         private static int TestSubtractionMorphToAddition(int value, int expected)

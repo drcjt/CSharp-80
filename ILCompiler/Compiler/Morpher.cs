@@ -202,15 +202,14 @@ namespace ILCompiler.Compiler
         /// <returns></returns>
         private BinaryOperator MorphCommutative(BinaryOperator bo)
         {
-            if (bo.Op1 is BinaryOperator boLeftChild)
+            if (bo.Op1 is BinaryOperator boLeftChild && 
+                boLeftChild.Op2.IsIntCnsOrI() && bo.Op2.IsIntCnsOrI() && 
+                boLeftChild.Operation == bo.Operation)
             {
-                if (boLeftChild.Op2.IsIntCnsOrI() && bo.Op2.IsIntCnsOrI() && boLeftChild.Operation == bo.Operation)
-                {
-                    var newOperNode = new BinaryOperator(bo.Operation, bo.IsComparison, boLeftChild.Op2, bo.Op2, bo.Type);
-                    var foldedNewOperNode = CodeFolder.FoldConstantExpression(newOperNode);
+                var newOperNode = new BinaryOperator(bo.Operation, bo.IsComparison, boLeftChild.Op2, bo.Op2, bo.Type);
+                var foldedNewOperNode = CodeFolder.FoldConstantExpression(newOperNode);
 
-                    return new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(boLeftChild.Op1), foldedNewOperNode, bo.Type);
-                }
+                return new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(boLeftChild.Op1), foldedNewOperNode, bo.Type);
             }
 
             return new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(bo.Op1), MorphTree(bo.Op2), bo.Type);
