@@ -1,5 +1,6 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Helpers;
+using ILCompiler.Compiler.Importer;
 using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler
@@ -156,6 +157,9 @@ namespace ILCompiler.Compiler
         {
             switch (bo.Operation)
             {
+                case Operation.Sub:
+                    return MorphSub(bo);
+
                 case Operation.Add:
                 case Operation.Mul:
                 case Operation.Or:
@@ -168,12 +172,44 @@ namespace ILCompiler.Compiler
             }
         }
 
+        private BinaryOperator MorphSub(BinaryOperator bo)
+        {
+            // Convert "op1-constant" into addition e.g. "op1 + (-constant)@
+            if (bo.Op2.IsIntCnsOrI())
+            {
+                var newTree = new BinaryOperator(Operation.Add, bo.IsComparison, MorphTree(bo.Op1), bo.Op2.NegateIntCnsOrI(), bo.Type);
+                return MorphBinaryOperator(newTree);
+            }
+
+            return new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(bo.Op1), MorphTree(bo.Op2), bo.Type);
+        }
+
         private BinaryOperator OptimizeCommutativeArithmetic(BinaryOperator bo)
         {
             // Commute constants to the right
             if (bo.Op1.IsIntCnsOrI())
             {
                 return new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(bo.Op2), MorphTree(bo.Op1), bo.Type);
+            }
+
+            return MorphCommutative(bo);
+        }
+
+        /// <summary>
+        /// Try to simplify "(X op Constant1) op Constant2" to "X op Cosntant3"
+        /// </summary>
+        /// <param name="bo"></param>
+        /// <returns></returns>
+        private BinaryOperator MorphCommutative(BinaryOperator bo)
+        {
+            if (bo.Op1 is BinaryOperator boLeftChild && 
+                boLeftChild.Op2.IsIntCnsOrI() && bo.Op2.IsIntCnsOrI() && 
+                boLeftChild.Operation == bo.Operation)
+            {
+                var newOperNode = new BinaryOperator(bo.Operation, bo.IsComparison, boLeftChild.Op2, bo.Op2, bo.Type);
+                var foldedNewOperNode = CodeFolder.FoldConstantExpression(newOperNode);
+
+                return new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(boLeftChild.Op1), foldedNewOperNode, bo.Type);
             }
 
             return new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(bo.Op1), MorphTree(bo.Op2), bo.Type);
