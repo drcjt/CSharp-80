@@ -116,6 +116,10 @@ namespace ILCompiler.Compiler
 
             Optimize(methodInstructions);
 
+            var totalBytes = methodInstructions.Sum<Instruction>(x => x.Bytes);
+
+            methodInstructions.Add(Instruction.CreateComment($"Total bytes of code {totalBytes} for method {methodCodeNode.Method.FullName}"));
+
             return methodInstructions;
         }
 

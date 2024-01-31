@@ -126,7 +126,7 @@ namespace ILCompiler.Compiler
             instructionsBuilder.Label("EH_ENDIP");
             instructionsBuilder.Jp("EXITRETCODE");
 
-            _out.WriteLine(instructionsBuilder.ToString());
+            _out.Write(instructionsBuilder.ToString());
         }
 
         private static void WriteOOMMessage(InstructionsBuilder instructionsBuilder)
@@ -263,6 +263,8 @@ namespace ILCompiler.Compiler
 
         private void WriteInstructions(IList<Emit.Instruction> instructions)
         {
+            _out.WriteLine();
+
             var stringBuilder = new StringBuilder();
             foreach (var instruction in instructions)
             {
