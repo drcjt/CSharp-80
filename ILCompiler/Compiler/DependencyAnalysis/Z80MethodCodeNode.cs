@@ -47,7 +47,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
             if (MethodCode.Count > 0)
             {
-                MethodCode.Insert(0, Instruction.CreateComment($"{Method.FullName}"));
+                MethodCode.Insert(0, Instruction.CreateComment($"Assembly listing for method {Method.FullName}"));
+                MethodCode.Insert(1, Instruction.CreateComment("ix based frame"));
             }
             return MethodCode;
         }

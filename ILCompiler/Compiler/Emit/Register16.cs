@@ -10,14 +10,10 @@
             Value = value;
         }
 
-        public static implicit operator Register(Register16 reg)
-        {
-            return reg.Value;
-        }
+        public static implicit operator Register(Register16 reg) => reg.Value;
 
-        public static MemoryOperand operator +(Register16 left, short displacement)
-        {
-            return new MemoryOperand(left, displacement);
-        }
+        public bool IsIndexRegister() => Value.IsIndexRegister();
+
+        public static MemoryOperand operator +(Register16 left, short displacement) => new MemoryOperand(left, displacement);
     }
 }
