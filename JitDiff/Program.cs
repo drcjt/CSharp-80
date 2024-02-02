@@ -24,13 +24,13 @@ namespace JitDiff
             return Summarize(compareList);
         }
 
-        public record MethodInfo(string Name, int CodeSize);
-        public record MethodDelta(string Name, int BaseBytes, int DiffBytes)
+        private sealed record MethodInfo(string Name, int CodeSize);
+        private sealed record MethodDelta(string Name, int BaseBytes, int DiffBytes)
         {
             public int DeltaBytes => DiffBytes - BaseBytes;
         }
 
-        private class MethodInfoComparer : IEqualityComparer<MethodInfo>
+        private sealed class MethodInfoComparer : IEqualityComparer<MethodInfo>
         {
             public bool Equals(MethodInfo? x, MethodInfo? y)
             {
@@ -46,9 +46,9 @@ namespace JitDiff
             }
         }
 
-        public record FileInfo(string Name, IEnumerable<MethodInfo> Methods);
+        private sealed record FileInfo(string Name, IEnumerable<MethodInfo> Methods);
 
-        public class FileDelta
+        private sealed class FileDelta
         {
             public required string BaseName;
             public required string DiffName;
@@ -65,7 +65,7 @@ namespace JitDiff
         [GeneratedRegex(@"code ([0-9]{1,})")]
         private static partial Regex CodeSizePattern();
 
-        public static IEnumerable<MethodInfo> ExtractMethodInfo(string filePath)
+        private static IEnumerable<MethodInfo> ExtractMethodInfo(string filePath)
         {
             var result = File.ReadLines(filePath).Select((x, i) => new { line = x, index = i })
                 .Where(l => l.line.StartsWith(@";Assembly listing for method", StringComparison.Ordinal)
@@ -104,7 +104,7 @@ namespace JitDiff
             }
         }
 
-        public static IEnumerable<FileDelta> Comparator(IEnumerable<FileInfo> baseInfo, IEnumerable<FileInfo> diffInfo)
+        private static IEnumerable<FileDelta> Comparator(IEnumerable<FileInfo> baseInfo, IEnumerable<FileInfo> diffInfo)
         {
             var methodInfoComparer = new MethodInfoComparer();
 
@@ -128,7 +128,7 @@ namespace JitDiff
             }).ToList();
         }
 
-        public static int Summarize(IEnumerable<FileDelta> fileDeltas)
+        private static int Summarize(IEnumerable<FileDelta> fileDeltas)
         {
             var totalBytes = fileDeltas.Sum(x => x.DeltaBytes);
 
