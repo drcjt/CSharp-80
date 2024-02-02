@@ -65,7 +65,7 @@ namespace JitDiff
         [GeneratedRegex(@"code ([0-9]{1,})")]
         private static partial Regex CodeSizePattern();
 
-        private static IEnumerable<MethodInfo> ExtractMethodInfo(string filePath)
+        private static List<MethodInfo> ExtractMethodInfo(string filePath)
         {
             var result = File.ReadLines(filePath).Select((x, i) => new { line = x, index = i })
                 .Where(l => l.line.StartsWith(@";Assembly listing for method", StringComparison.Ordinal)
@@ -104,7 +104,7 @@ namespace JitDiff
             }
         }
 
-        private static IEnumerable<FileDelta> Comparator(IEnumerable<FileInfo> baseInfo, IEnumerable<FileInfo> diffInfo)
+        private static List<FileDelta> Comparator(IEnumerable<FileInfo> baseInfo, IEnumerable<FileInfo> diffInfo)
         {
             var methodInfoComparer = new MethodInfoComparer();
 
