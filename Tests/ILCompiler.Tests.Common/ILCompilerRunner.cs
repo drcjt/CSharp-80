@@ -31,7 +31,7 @@ namespace ILCompiler.Tests.Common
 
         private void CompileIL(string ilFileName, bool createLibrary, string optionalArguments)
         {
-            var asmFileName = Path.ChangeExtension(ilFileName, "asm");
+            var asmFileName = Path.ChangeExtension(ilFileName, "dasm");
             var exeFileName = Path.ChangeExtension(ilFileName, createLibrary ? "dll" : "exe");
 
             string arguments = $"-ao cim --ignoreUnknownCil false --printReturnCode false --integrationTests true --corelibPath {_corelibPath} --outputFile {asmFileName} {exeFileName} --stackStart {StackStart}";

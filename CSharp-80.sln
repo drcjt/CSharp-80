@@ -149,6 +149,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoomFire", "Samples\DoomFir
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConstantFolding", "Tests\Directed\ConstantFolding\ConstantFolding.csproj", "{3BC3BDDD-3EE0-48D9-A13B-F5B699B07B22}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JitDiff", "JitDiff\JitDiff.csproj", "{0D32A97C-AED2-4433-B967-BDF7B6DF009E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -363,6 +365,10 @@ Global
 		{3BC3BDDD-3EE0-48D9-A13B-F5B699B07B22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BC3BDDD-3EE0-48D9-A13B-F5B699B07B22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BC3BDDD-3EE0-48D9-A13B-F5B699B07B22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D32A97C-AED2-4433-B967-BDF7B6DF009E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D32A97C-AED2-4433-B967-BDF7B6DF009E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D32A97C-AED2-4433-B967-BDF7B6DF009E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D32A97C-AED2-4433-B967-BDF7B6DF009E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

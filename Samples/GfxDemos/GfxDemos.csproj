@@ -31,7 +31,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="$(ILCompilerPath) --ignoreUnknownCil --outputFile $(TargetDir)$(TargetName).asm $(TargetPath) --targetArchitecture $(TargetPlatform)" />
+    <Exec Command="$(ILCompilerPath) --ignoreUnknownCil --outputFile $(TargetDir)$(TargetName).dasm $(TargetPath) --targetArchitecture $(TargetPlatform)" />
   </Target>
   
 </Project>
