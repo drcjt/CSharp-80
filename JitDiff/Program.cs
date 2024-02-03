@@ -132,7 +132,8 @@ namespace JitDiff
         {
             var totalBytes = fileDeltas.Sum(x => x.DeltaBytes);
 
-            Console.WriteLine("\nSummary:\n(Note: Lower is better)\n");
+            Console.WriteLine();
+            Console.WriteLine("Summary:\n(Note: Lower is better)\n");
             Console.WriteLine($"Total bytes of diff: {totalBytes}");
 
             if (totalBytes != 0)
@@ -147,12 +148,63 @@ namespace JitDiff
 
             if (sortedFileCount> 0 && sortedDeltas[0].DeltaBytes > 0)
             {
-                Console.WriteLine("\nTop file regressions by size (bytes).");
+                Console.WriteLine();
+                Console.WriteLine("Top file regressions by size (bytes).");
                 foreach (var fileDelta in sortedDeltas.GetRange(0, fileCount).Where(x => x.DeltaBytes > 0)) 
                 {
                     Console.WriteLine($"\t{fileDelta.DeltaBytes,8} : {fileDelta.BaseName}");
                 }
             }
+
+            if (sortedFileCount > 0 && sortedDeltas.Last().DeltaBytes < 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Top file improvements by size (bytes).");
+                var fileDeltaIndex = sortedDeltas.Count - fileCount;
+                foreach (var fileDelta in sortedDeltas.GetRange(fileDeltaIndex, fileCount).Where(x => x.DeltaBytes < 0).OrderBy(x => x.DeltaBytes))
+                {
+                    Console.WriteLine($"\t{fileDelta.DeltaBytes,8} : {fileDelta.BaseName}");
+                }
+            }
+
+            Console.WriteLine();
+            Console.WriteLine($"{sortedFileCount} total files with size differences.");
+
+            var sortedMethodDelta = fileDeltas.SelectMany(fd => fd.MethodDeltas, (fd, md) => new
+            {
+                Path = fd.BaseName,
+                Name = md.Name,
+                DeltaBytes = md.DeltaBytes
+            }).OrderByDescending(x => x.DeltaBytes).ToList();
+
+            var sortedMethodCount = sortedMethodDelta.Count;
+            var methodCount = sortedMethodCount < 5 ? sortedMethodCount : 5;
+
+            if (sortedMethodCount > 0 && sortedMethodDelta[0].DeltaBytes > 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Top method regressions by size (bytes):");
+
+                foreach (var method in sortedMethodDelta.GetRange(0, methodCount).Where(x => x.DeltaBytes > 0))
+                {
+                    Console.WriteLine($"\t{method.DeltaBytes,8} : {method.Path} - {method.Name}");
+                }
+            }
+
+            if (sortedMethodCount > 0 && sortedMethodDelta.Last().DeltaBytes < 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Top method improvements by size (bytes):");
+
+                var methodDeltaIndex = sortedMethodCount - methodCount;
+                foreach (var method in sortedMethodDelta.GetRange(methodDeltaIndex, methodCount).Where(x => x.DeltaBytes < 0).OrderBy(x => x.DeltaBytes))
+                {
+                    Console.WriteLine($"\t{method.DeltaBytes,8} : {method.Path} - {method.Name}");
+                }
+            }
+
+            Console.WriteLine();
+            Console.WriteLine($"{sortedMethodCount} total methods with size differences.");
 
             return Math.Abs(totalBytes);
         }
