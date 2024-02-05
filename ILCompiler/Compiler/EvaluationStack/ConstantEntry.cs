@@ -29,23 +29,6 @@
         }
     }
 
-    public class StringConstantEntry : ConstantEntry<String>
-    {
-        public string Label { get; set; } = String.Empty;
-        public StringConstantEntry(string value) : base(VarType.Ptr, value, 2)
-        {
-        }
-
-        public override StackEntry Duplicate()
-        {
-            return new StringConstantEntry(Value);
-        }
-
-        public override void Accept(IStackEntryVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
-    }
 
     public class Int32ConstantEntry : ConstantEntry<int>
     {

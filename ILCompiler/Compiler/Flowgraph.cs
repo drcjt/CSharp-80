@@ -52,11 +52,6 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
-        public void Visit(StringConstantEntry entry)
-        {
-            SetNext(entry);
-        }
-
         public void Visit(StoreIndEntry entry)
         {
             entry.Op1.Accept(this);
@@ -125,7 +120,7 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
-        public void Visit(StaticFieldEntry entry)
+        public void Visit(ExpressionEntry entry)
         {
             SetNext(entry);
         }

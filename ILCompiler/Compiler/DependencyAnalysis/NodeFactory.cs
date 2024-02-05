@@ -14,6 +14,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly IDictionary<string, ConstructedEETypeNode> _constructedEETypeNodesByFullName = new Dictionary<string, ConstructedEETypeNode>();
         private readonly IDictionary<TypeDef, VTableSliceNode> _vTableNodes = new Dictionary<TypeDef, VTableSliceNode>();
         private readonly IDictionary<ITypeDefOrRef, EETypeNode> _necessaryTypeSymbolNodes = new Dictionary<ITypeDefOrRef, EETypeNode>();
+        private readonly IDictionary<string, FrozenStringNode> _frozenStringNodes = new Dictionary<string, FrozenStringNode>();
 
         private readonly PreinitializationManager _preinitializationManager;
         private readonly INameMangler _nameMangler;
@@ -57,6 +58,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
 
             return staticNode;
+        }
+
+        public FrozenStringNode SerializedStringObject(string data, CorLibModuleProvider corLibModuleProvider)
+        {
+            if (!_frozenStringNodes.TryGetValue(data, out var frozenStringNode))
+            {
+                frozenStringNode = new FrozenStringNode(data, _nameMangler, corLibModuleProvider);
+                _frozenStringNodes[data] = frozenStringNode;
+            }
+
+            return frozenStringNode;
         }
 
         public VirtualMethodUseNode VirtualMethodUse(IMethod method)

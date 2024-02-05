@@ -40,9 +40,6 @@ namespace ILCompiler.Compiler
 
             var methodInstructions = new List<Instruction>();
 
-            GenerateStringMap(blocks);
-            GenerateStringData(_context.InstructionsBuilder);
-
             string methodName;
             if (methodCodeNode.Method.HasCustomAttribute("System.Runtime", "RuntimeExportAttribute"))
             {
@@ -193,56 +190,6 @@ namespace ILCompiler.Compiler
             }
         }
 
-        // TODO: Consider making this a separate phase
-        private void GenerateStringMap(IList<BasicBlock> blocks)
-        {
-            // Process all nodes in the basic blocks and extract string definitions to populate the string map
-            foreach (var block in blocks)
-            {
-                var currentNode = block.FirstNode;
-                while (currentNode != null)
-                {
-                    if (currentNode is StringConstantEntry)
-                    {
-                        var stringConstantEntry = currentNode.As<StringConstantEntry>();
-
-                        var label = LabelGenerator.GetLabel(LabelType.String);
-                        _labelsToStringData[label] = stringConstantEntry.Value;
-
-                        stringConstantEntry.Label = label;
-                    }
-                    currentNode = currentNode.Next;
-                }
-            }
-        }
-
-        private void GenerateStringData(InstructionsBuilder instructionsBuilder)
-        {
-            var systemStringType = _corLibModuleProvider.FindThrow("System.String");
-            var systemStringEETypeMangledName = _nameMangler.GetMangledTypeName(systemStringType);
-
-            // TODO: Need to eliminate duplicate strings
-            foreach (var keyValuePair in _labelsToStringData)
-            {
-                instructionsBuilder.Label(keyValuePair.Key);
-
-                var stringData = keyValuePair.Value;
-
-                instructionsBuilder.Dw(systemStringEETypeMangledName);
-
-                byte lsb = (byte)(stringData.Length & 0xFF);
-                byte msb = (byte)((stringData.Length >> 8) & 0xFF);
-
-                instructionsBuilder.Db(lsb);
-                instructionsBuilder.Db(msb);
-
-                foreach (var ch in stringData)
-                {
-                    instructionsBuilder.Db((byte)ch);
-                    instructionsBuilder.Db((byte)0x00);
-                }
-            }
-        }
         private void GenerateProlog(InstructionsBuilder instructionsBuilder)
         {
             // Stack frame looks like this:

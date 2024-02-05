@@ -26,7 +26,7 @@ namespace ILCompiler.Compiler.Importer
             {
                 var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDef);
 
-                StackEntry obj = new StaticFieldEntry(mangledFieldName);
+                StackEntry obj = new ExpressionEntry(VarType.Ptr, mangledFieldName);
                 if (!context.PreinitializationManager.IsPreinitialized(fieldDef.DeclaringType))
                 {
                     obj = InitClassHelper.ImportInitClass(fieldDef, context, importer, obj);

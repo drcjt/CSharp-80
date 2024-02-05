@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
 using ILCompiler.Interfaces;
@@ -15,6 +16,7 @@ namespace ILCompiler.Compiler
         private readonly INameMangler _nameMangler;
         private readonly CorLibModuleProvider _corLibModuleProvider;
         private readonly PreinitializationManager _preinitializationManager;
+        private readonly NodeFactory _nodeFactory;
 
         private MethodDesc _method = null!;
         private LocalVariableTable? _locals;
@@ -54,7 +56,7 @@ namespace ILCompiler.Compiler
             public int GrabTemp(VarType type, int? exactSize) => _importer._locals!.GrabTemp(type, exactSize);
         }
 
-        public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, CorLibModuleProvider corlibModuleProvider, PreinitializationManager preinitializationManager)
+        public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, CorLibModuleProvider corlibModuleProvider, PreinitializationManager preinitializationManager, NodeFactory nodeFactory)
         {
             _configuration = configuration;
             _basicBlocks = Array.Empty<BasicBlock>();
@@ -63,6 +65,7 @@ namespace ILCompiler.Compiler
             _importers = importers;
             _corLibModuleProvider = corlibModuleProvider;
             _preinitializationManager = preinitializationManager;
+            _nodeFactory = nodeFactory;
 
             _importerProxy = new ILImporterProxy(this);
         }
@@ -183,6 +186,7 @@ namespace ILCompiler.Compiler
                     Configuration = _configuration,
                     CorLibModuleProvider = _corLibModuleProvider,
                     PreinitializationManager = _preinitializationManager,
+                    NodeFactory = _nodeFactory,
                 };
 
                 bool imported = ImportInstruction(currentInstruction, importContext);

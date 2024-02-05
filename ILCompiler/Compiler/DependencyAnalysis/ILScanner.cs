@@ -49,7 +49,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                                 break;
 
                             case Code.Ldstr:
-                                ImportLoadString();
+                                ImportLoadString(currentInstruction);
                                 break;
 
                             case Code.Ldsfld:
@@ -157,7 +157,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             ImportFieldAccess(instruction, isStatic);
         }
 
-        private void ImportLoadString()
+        private void ImportLoadString(Instruction instruction)
         {
             var systemStringType = _corLibModuleProvider.FindThrow("System.String");
             var objType = systemStringType.ToTypeSig();
@@ -166,6 +166,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             var allocSize = objType.GetInstanceByteCount();
 
             _dependencies.Add(_nodeFactory.ConstructedEETypeNode(systemStringType, allocSize));
+
+            _dependencies.Add(_nodeFactory.SerializedStringObject(instruction.OperandAs<string>(), _corLibModuleProvider));
         }
 
         private void ImportFieldAccess(Instruction instruction, bool isStatic)

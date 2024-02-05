@@ -53,11 +53,6 @@ namespace ILCompiler.Compiler
             Print($"CNS_INT {entry.Value}");
         }
 
-        public void Visit(StringConstantEntry entry)
-        {
-            Print($"CNS_STR {entry.Value}");
-        }
-
         public void Visit(StoreIndEntry entry)
         {
             _indent++;
@@ -211,9 +206,9 @@ namespace ILCompiler.Compiler
             _indent--;
         }
 
-        public void Visit(StaticFieldEntry entry)
+        public void Visit(ExpressionEntry entry)
         {
-            Print($"STATIC_FLD {entry.Name}");
+            Print($"EXPRESSION {entry.Name}");
         }
 
         public void Visit(AllocObjEntry entry)

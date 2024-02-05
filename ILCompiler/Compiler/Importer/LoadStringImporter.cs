@@ -10,7 +10,10 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.OpCode.Code != Code.Ldstr) return false;
 
-            importer.PushExpression(new StringConstantEntry(instruction.OperandAs<string>()));
+            var node = context.NodeFactory.SerializedStringObject(instruction.OperandAs<string>(), context.CorLibModuleProvider);
+
+            importer.PushExpression(new ExpressionEntry(VarType.Ptr, node.Label));
+
             return true;
         }
     }
