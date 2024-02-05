@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
 
@@ -14,5 +15,6 @@ namespace ILCompiler.Compiler.Importer
         public required IConfiguration Configuration { get; init; }
         public required PreinitializationManager PreinitializationManager { get; init; }
         public required CorLibModuleProvider CorLibModuleProvider { get; init; }
+        public required NodeFactory NodeFactory { get; init; }
     }
 }

@@ -28,7 +28,7 @@ namespace ILCompiler.Compiler.Importer
             if (isLoadStatic)
             {
                 var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDef);
-                obj = new StaticFieldEntry(mangledFieldName);
+                obj = new ExpressionEntry(VarType.Ptr, mangledFieldName);
 
                 if (!context.PreinitializationManager.IsPreinitialized(fieldDef.DeclaringType))
                 {

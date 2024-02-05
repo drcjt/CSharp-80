@@ -36,11 +36,6 @@ namespace ILCompiler.Compiler
             _sb.AppendLine($"t{entry.TreeID,-3} = intconst {entry.Value}");
         }
 
-        public void Visit(StringConstantEntry entry)
-        {
-            _sb.AppendLine($"t{entry.TreeID,-3} = intconst {entry.Value}");
-        }
-
         public void Visit(StoreIndEntry entry)
         {
             _sb.AppendLine($"       ┌──▌  t{entry.Op1.TreeID}");
@@ -184,9 +179,9 @@ namespace ILCompiler.Compiler
             _sb.AppendLine($"       fieldAddr {entry.Name}");
         }
 
-        public void Visit(StaticFieldEntry entry)
+        public void Visit(ExpressionEntry entry)
         {
-            _sb.AppendLine($"       staticField {entry.Name}");
+            _sb.AppendLine($"       expAddr {entry.Name}");
         }
 
         public void Visit(SwitchEntry entry)

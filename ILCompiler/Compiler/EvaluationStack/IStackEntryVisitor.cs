@@ -9,7 +9,6 @@
     {
         public void Visit(NativeIntConstantEntry entry);
         public void Visit(Int32ConstantEntry entry);
-        public void Visit(StringConstantEntry entry);
         public void Visit(StoreIndEntry entry);
         public void Visit(JumpTrueEntry entry);
         public void Visit(JumpEntry entry);
@@ -29,7 +28,7 @@
         public void Visit(LocalHeapEntry entry);
         public void Visit(IndexRefEntry entry);
         public void Visit(PutArgTypeEntry entry);
-        public void Visit(StaticFieldEntry entry);
+        public void Visit(ExpressionEntry entry);
         public void Visit(CommaEntry entry);
         public void Visit(PhiNode entry);
         public void Visit(PhiArg entry);

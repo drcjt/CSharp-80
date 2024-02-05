@@ -3,9 +3,9 @@ using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    internal class StaticFieldCodeGenerator : ICodeGenerator<StaticFieldEntry>
+    internal class ExpressionCodeGenerator : ICodeGenerator<ExpressionEntry>
     {
-        public void GenerateCode(StaticFieldEntry entry, CodeGeneratorContext context)
+        public void GenerateCode(ExpressionEntry entry, CodeGeneratorContext context)
         {
             var mangledFieldName = entry.Name;
 

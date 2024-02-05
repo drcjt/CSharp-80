@@ -17,7 +17,6 @@ namespace ILCompiler.Compiler.CodeGenerators
             services.AddSingleton<ICodeGenerator<JumpEntry>, JumpCodeGenerator>();
             services.AddSingleton<ICodeGenerator<JumpTrueEntry>, JumpTrueCodeGenerator>();
             services.AddSingleton<ICodeGenerator<LocalVariableAddressEntry>, LocalVariableAddressCodeGenerator>();
-            services.AddSingleton<ICodeGenerator<StringConstantEntry>, StringConstantCodeGenerator>();
             services.AddSingleton<ICodeGenerator<SwitchEntry>, SwitchCodeGenerator>();
             services.AddSingleton<ICodeGenerator<UnaryOperator>, UnaryOperatorCodeGenerator>();
             services.AddSingleton<ICodeGenerator<StoreIndEntry>, StoreIndCodeGenerator>();
@@ -28,7 +27,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             services.AddSingleton<ICodeGenerator<AllocObjEntry>, AllocObjCodeGenerator>();
             services.AddSingleton<ICodeGenerator<LocalHeapEntry>, LocalHeapCodeGenerator>();
             services.AddSingleton<ICodeGenerator<PutArgTypeEntry>, PutArgTypeCodeGenerator>();
-            services.AddSingleton<ICodeGenerator<StaticFieldEntry>,  StaticFieldCodeGenerator>();
+            services.AddSingleton<ICodeGenerator<ExpressionEntry>,  ExpressionCodeGenerator>();
             services.AddSingleton<ICodeGenerator<BoundsCheck>, BoundsCheckCodeGenerator>();
             services.AddSingleton<ICodeGenerator<NullCheckEntry>, NullCheckCodeGenerator>();
             services.AddSingleton<ICodeGenerator<CatchArgumentEntry>, CatchArgumentCodeGenerator>();
