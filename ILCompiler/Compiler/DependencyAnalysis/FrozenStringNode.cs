@@ -9,7 +9,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly INameMangler _nameMangler;
         private readonly string _data;
         public readonly string Label;
-        private CorLibModuleProvider _corLibModuleProvider;
+        private readonly CorLibModuleProvider _corLibModuleProvider;
 
         public FrozenStringNode(string data, INameMangler nameMangler, CorLibModuleProvider corLibModuleProvider)
         {

@@ -18,8 +18,6 @@ namespace ILCompiler.Compiler
         private readonly CorLibModuleProvider _corLibModuleProvider;
         private readonly NodeFactory _nodeFactory;
 
-        private readonly Dictionary<string, string> _labelsToStringData = new();
-
         private CodeGeneratorContext _context = null!;
 
         public CodeGenerator(INameMangler nameMangler, ILogger<CodeGenerator> logger, ICodeGeneratorFactory codeGeneratorFactory, IConfiguration configuration, CorLibModuleProvider corLibModuleProvider, NodeFactory nodeFactory)
