@@ -179,9 +179,9 @@ namespace ILCompiler.Compiler
             _sb.AppendLine($"       fieldAddr {entry.Name}");
         }
 
-        public void Visit(ExpressionEntry entry)
+        public void Visit(SymbolConstantEntry entry)
         {
-            _sb.AppendLine($"       expAddr {entry.Name}");
+            _sb.AppendLine($"       symbol {entry.Value}");
         }
 
         public void Visit(SwitchEntry entry)

@@ -3,11 +3,11 @@ using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
-    internal class ExpressionCodeGenerator : ICodeGenerator<ExpressionEntry>
+    internal class SymbolConstantCodeGenerator : ICodeGenerator<SymbolConstantEntry>
     {
-        public void GenerateCode(ExpressionEntry entry, CodeGeneratorContext context)
+        public void GenerateCode(SymbolConstantEntry entry, CodeGeneratorContext context)
         {
-            var mangledFieldName = entry.Name;
+            var mangledFieldName = entry.Value;
 
             context.InstructionsBuilder.Ld(HL, mangledFieldName);
             context.InstructionsBuilder.Push(HL);

@@ -29,7 +29,7 @@
         public void Visit(LocalHeapEntry entry) => _genericStackEntryVisitor.Visit<LocalHeapEntry>(entry);
         public void Visit(IndexRefEntry entry) => _genericStackEntryVisitor.Visit<IndexRefEntry>(entry);
         public void Visit(PutArgTypeEntry entry) => _genericStackEntryVisitor.Visit<PutArgTypeEntry>(entry);
-        public void Visit(ExpressionEntry entry) => _genericStackEntryVisitor.Visit<ExpressionEntry>(entry);
+        public void Visit(SymbolConstantEntry entry) => _genericStackEntryVisitor.Visit<SymbolConstantEntry>(entry);
         public void Visit(CommaEntry entry) => _genericStackEntryVisitor.Visit<CommaEntry>(entry);
         public void Visit(PhiNode entry) => _genericStackEntryVisitor.Visit<PhiNode>(entry);
         public void Visit(PhiArg entry) => _genericStackEntryVisitor.Visit<PhiArg>(entry);
