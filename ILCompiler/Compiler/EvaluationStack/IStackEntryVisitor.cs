@@ -28,7 +28,7 @@
         public void Visit(LocalHeapEntry entry);
         public void Visit(IndexRefEntry entry);
         public void Visit(PutArgTypeEntry entry);
-        public void Visit(ExpressionEntry entry);
+        public void Visit(SymbolConstantEntry entry);
         public void Visit(CommaEntry entry);
         public void Visit(PhiNode entry);
         public void Visit(PhiArg entry);

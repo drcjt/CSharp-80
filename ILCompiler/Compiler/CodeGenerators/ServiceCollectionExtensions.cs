@@ -27,7 +27,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             services.AddSingleton<ICodeGenerator<AllocObjEntry>, AllocObjCodeGenerator>();
             services.AddSingleton<ICodeGenerator<LocalHeapEntry>, LocalHeapCodeGenerator>();
             services.AddSingleton<ICodeGenerator<PutArgTypeEntry>, PutArgTypeCodeGenerator>();
-            services.AddSingleton<ICodeGenerator<ExpressionEntry>,  ExpressionCodeGenerator>();
+            services.AddSingleton<ICodeGenerator<SymbolConstantEntry>,  SymbolConstantCodeGenerator>();
             services.AddSingleton<ICodeGenerator<BoundsCheck>, BoundsCheckCodeGenerator>();
             services.AddSingleton<ICodeGenerator<NullCheckEntry>, NullCheckCodeGenerator>();
             services.AddSingleton<ICodeGenerator<CatchArgumentEntry>, CatchArgumentCodeGenerator>();

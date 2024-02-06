@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler.Importer
 
             var node = context.NodeFactory.SerializedStringObject(instruction.OperandAs<string>(), context.CorLibModuleProvider);
 
-            importer.PushExpression(new ExpressionEntry(VarType.Ptr, node.Label));
+            importer.PushExpression(new SymbolConstantEntry(node.Label));
 
             return true;
         }

@@ -120,7 +120,7 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
-        public void Visit(ExpressionEntry entry)
+        public void Visit(SymbolConstantEntry entry)
         {
             SetNext(entry);
         }

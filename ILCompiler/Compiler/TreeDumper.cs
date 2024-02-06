@@ -206,9 +206,9 @@ namespace ILCompiler.Compiler
             _indent--;
         }
 
-        public void Visit(ExpressionEntry entry)
+        public void Visit(SymbolConstantEntry entry)
         {
-            Print($"EXPRESSION {entry.Name}");
+            Print($"SYMBOL {entry.Value}");
         }
 
         public void Visit(AllocObjEntry entry)

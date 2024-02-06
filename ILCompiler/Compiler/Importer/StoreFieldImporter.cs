@@ -22,7 +22,7 @@ namespace ILCompiler.Compiler.Importer
             if (isStoreStatic)
             {
                 var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDef);
-                addr = new ExpressionEntry(VarType.Ptr, mangledFieldName);
+                addr = new SymbolConstantEntry(mangledFieldName);
 
                 if (!context.PreinitializationManager.IsPreinitialized(fieldDef.DeclaringType))
                 {

@@ -29,6 +29,22 @@
         }
     }
 
+    public class SymbolConstantEntry : ConstantEntry<string>
+    {
+        public SymbolConstantEntry(String name) : base(VarType.Ptr, name, 2)
+        {
+        }
+
+        public override SymbolConstantEntry Duplicate()
+        {
+            return new SymbolConstantEntry(Value);
+        }
+
+        public override void Accept(IStackEntryVisitor visitor)
+        {
+            visitor.Visit(this);
+        }
+    }
 
     public class Int32ConstantEntry : ConstantEntry<int>
     {
