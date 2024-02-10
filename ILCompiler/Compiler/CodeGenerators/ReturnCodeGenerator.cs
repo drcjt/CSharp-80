@@ -77,62 +77,53 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
             }
 
-            if (context.ParamsCount > 0 || (context.LocalsCount + tempCount) > 0 || context.Configuration.ExceptionSupport)
+            if (context.LocalsCount + tempCount > 0)
             {
-                if (context.LocalsCount + tempCount > 0)
+                if (context.Configuration.IntegrationTests && !context.Method.LocallocUsed)
                 {
-                    if (context.Configuration.IntegrationTests &&
-                        !context.Method.LocallocUsed &&
-                        !context.Configuration.ExceptionSupport)    // EH can result in SP over flow
-                    {
-                        // Validate we haven't got any under/over flow on stack
-                        // Assert that localsSize + SP - IX = 0
+                    // Validate we haven't got any under/over flow on stack
+                    // Assert that localsSize + SP - IX = 0
 
-                        // TODO: also need to factor in any localloc space allocated
-                        // this is why localloc integration test fails with this code enabled
+                    // TODO: also need to factor in any localloc space allocated
+                    // this is why localloc integration test fails with this code enabled
 
-                        context.InstructionsBuilder.Ld(HL, (short)localsSize);
-                        context.InstructionsBuilder.Add(HL, SP);
+                    context.InstructionsBuilder.Ld(HL, (short)localsSize);
+                    context.InstructionsBuilder.Add(HL, SP);
 
-                        context.InstructionsBuilder.Push(IX);
-                        context.InstructionsBuilder.Pop(BC);
+                    context.InstructionsBuilder.Push(IX);
+                    context.InstructionsBuilder.Pop(BC);
 
-                        context.InstructionsBuilder.Sbc(HL, BC);
+                    context.InstructionsBuilder.Sbc(HL, BC);
 
-                        var unwindLabel = context.NameMangler.GetUniqueName();
-                        context.InstructionsBuilder.Jp(Condition.Z, unwindLabel);
+                    var unwindLabel = context.NameMangler.GetUniqueName();
+                    context.InstructionsBuilder.Jp(Condition.Z, unwindLabel);
 
-                        context.InstructionsBuilder.Halt();
+                    context.InstructionsBuilder.Halt();
 
-                        context.InstructionsBuilder.Label(unwindLabel);
-                    }
-
-                    context.InstructionsBuilder.Ld(SP, IX);     // Move SP to before locals
+                    context.InstructionsBuilder.Label(unwindLabel);
                 }
-                context.InstructionsBuilder.Pop(IX);            // Remove IX
 
-                context.InstructionsBuilder.Pop(BC);      // Store return address in BC
-
-                if (context.ParamsCount > 0)
-                {
-                    // Calculate size of parameters
-                    var totalParametersSize = 0;
-                    foreach (var local in context.LocalVariableTable)
-                    {
-                        if (local.IsParameter)
-                        {
-                            totalParametersSize += local.ExactSize;
-                        }
-                    }
-
-                    // Remove parameters from stack
-                    CodeGeneratorHelper.AddSPFromHL(context.InstructionsBuilder, (short)(totalParametersSize));
-
-                }
+                context.InstructionsBuilder.Ld(SP, IX);     // Move SP to before locals
             }
-            else
+            context.InstructionsBuilder.Pop(IX);            // Remove IX
+
+            context.InstructionsBuilder.Pop(BC);      // Store return address in BC
+
+            if (context.ParamsCount > 0)
             {
-                context.InstructionsBuilder.Pop(BC);      // Store return address in BC
+                // Calculate size of parameters
+                var totalParametersSize = 0;
+                foreach (var local in context.LocalVariableTable)
+                {
+                    if (local.IsParameter)
+                    {
+                        totalParametersSize += local.ExactSize;
+                    }
+                }
+
+                // Remove parameters from stack
+                CodeGeneratorHelper.AddSPFromHL(context.InstructionsBuilder, (short)(totalParametersSize));
+
             }
 
             if (hasReturnValue && !entry.ReturnBufferArgIndex.HasValue)

@@ -19,6 +19,5 @@ namespace ILCompiler
         public bool NoListFile { get; set; } = true;
         public bool SkipArrayBoundsCheck { get; set; } = false;
         public bool SkipNullReferenceCheck { get; set; } = false;
-        public bool ExceptionSupport { get; set; } = false;
     }
 }
