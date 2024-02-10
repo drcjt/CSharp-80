@@ -117,7 +117,10 @@ namespace ILCompiler.Compiler
             {
                 WriteReturnCodeMessage(instructionsBuilder);
             }
-            WriteIndexOutOfRangeMessage(instructionsBuilder);
+            if (!_configuration.ExceptionSupport)
+            {
+                WriteIndexOutOfRangeMessage(instructionsBuilder);
+            }
 
             instructionsBuilder.Label("START");
 
@@ -225,40 +228,43 @@ namespace ILCompiler.Compiler
 
         private void WriteEhClauses(IReadOnlyCollection<IDependencyNode> nodes)
         {
-            InstructionsBuilder ehClausesBuilder = new InstructionsBuilder();
-            ehClausesBuilder.Label("EH_CLAUSES");
-            foreach (var node in nodes)
+            if (Compilation.AnyExceptionHandlers)
             {
-                if (node is Z80MethodCodeNode codeNode)
+                InstructionsBuilder ehClausesBuilder = new InstructionsBuilder();
+                ehClausesBuilder.Label("EH_CLAUSES");
+                foreach (var node in nodes)
                 {
-                    var ehClauses = codeNode.EhClauses;
-
-                    if (ehClauses.Count > 0)
+                    if (node is Z80MethodCodeNode codeNode)
                     {
-                        ehClausesBuilder.Comment($"{codeNode.Method.FullName} EH Clauses");
-                        foreach (var ehClause in ehClauses)
+                        var ehClauses = codeNode.EhClauses;
+
+                        if (ehClauses.Count > 0)
                         {
-                            if (ehClause.Kind == EHClauseKind.Typed)
+                            ehClausesBuilder.Comment($"{codeNode.Method.FullName} EH Clauses");
+                            foreach (var ehClause in ehClauses)
                             {
-                                ehClausesBuilder.Dw(ehClause.TryBegin.Label, "Protected Region Start");
-                                if (ehClause.TryEnd != null)
+                                if (ehClause.Kind == EHClauseKind.Typed)
                                 {
-                                    ehClausesBuilder.Dw(ehClause.TryEnd.Label, "Protected Region End");
+                                    ehClausesBuilder.Dw(ehClause.TryBegin.Label, "Protected Region Start");
+                                    if (ehClause.TryEnd != null)
+                                    {
+                                        ehClausesBuilder.Dw(ehClause.TryEnd.Label, "Protected Region End");
+                                    }
+                                    else
+                                    {
+                                        var methodName = _nameMangler.GetMangledMethodName(codeNode.Method);
+                                        ehClausesBuilder.Dw($"{methodName}_END", "Protected Region End");
+                                    }
+                                    ehClausesBuilder.Dw(ehClause.HandlerBegin.Label, "Handler Start");
+                                    ehClausesBuilder.Dw(ehClause.CatchTypeMangledName, "Catch Type");
                                 }
-                                else
-                                {
-                                    var methodName = _nameMangler.GetMangledMethodName(codeNode.Method);
-                                    ehClausesBuilder.Dw($"{methodName}_END", "Protected Region End");
-                                }
-                                ehClausesBuilder.Dw(ehClause.HandlerBegin.Label, "Handler Start");
-                                ehClausesBuilder.Dw(ehClause.CatchTypeMangledName, "Catch Type");
                             }
                         }
                     }
                 }
+                ehClausesBuilder.Label("EH_CLAUSES_END");
+                WriteInstructions(ehClausesBuilder.Instructions);
             }
-            ehClausesBuilder.Label("EH_CLAUSES_END");
-            WriteInstructions(ehClausesBuilder.Instructions);
         }
 
         private void WriteInstructions(IList<Emit.Instruction> instructions)

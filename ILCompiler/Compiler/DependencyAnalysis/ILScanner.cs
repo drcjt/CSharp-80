@@ -32,6 +32,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 if (_method.Body != null)
                 {
+                    AddThrowExceptionIfAnyExceptionHandlers();
+
                     while (currentIndex < _method.Body.Instructions.Count)
                     {
                         var currentInstruction = _method.Body.Instructions[currentIndex];
@@ -74,6 +76,11 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                                 break;
 
                             case Code.Ldelem:
+                            case Code.Ldelem_I:
+                            case Code.Ldelem_I1:
+                            case Code.Ldelem_I2:
+                            case Code.Ldelem_I4:
+                            case Code.Ldelem_Ref:
                                 ImportLoadElement();
                                 break;
 
@@ -95,6 +102,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
 
             return _dependencies;
+        }
+
+        private void AddThrowExceptionIfAnyExceptionHandlers()
+        {
+            if (_method.HasExceptionHandlers)
+            {
+                var systemRuntimeExceptionHandling = _corLibModuleProvider.FindThrow("System.Runtime.ExceptionHandling");
+                var runtimeHelperMethod = systemRuntimeExceptionHandling.FindMethod("ThrowException");
+                var methodNode = _nodeFactory.MethodNode(runtimeHelperMethod);
+                _dependencies.Add(methodNode);
+            }
         }
 
         private void AddCatchTypeDependencies()
@@ -119,16 +137,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportThrow()
         {
-            var systemRuntimeExceptionHandling = _corLibModuleProvider.FindThrow("System.Runtime.ExceptionHandling");
-            var runtimeHelperMethod = systemRuntimeExceptionHandling.FindMethod("ThrowException");
-
-            var methodNode = _nodeFactory.MethodNode(runtimeHelperMethod);
-
-            _dependencies.Add(methodNode);
         }
 
         private void ImportAddressOfElem()
-        {
+        {        
             _dependencies.Add(GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException"));
         }
 
@@ -259,6 +271,11 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 else
                 {
                     var methodDef = method.ResolveMethodDefThrow();
+                    if (methodDef.IsIntrinsic() && methodDef.Name == "get_Chars")
+                    {
+                        _dependencies.Add(GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException"));
+                    }
+
                     if (methodDef.HasCustomAttribute("System.Diagnostics.CodeAnalysis", "DynamicDependencyAttribute"))
                     {
                         // For dynamic dependencies we need to include the method referred to as part of the dependencies

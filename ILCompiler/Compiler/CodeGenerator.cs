@@ -50,7 +50,7 @@ namespace ILCompiler.Compiler
                 methodName = _nameMangler.GetMangledMethodName(_context.Method);
             }
 
-            if (_configuration.ExceptionSupport)
+            if (_configuration.ExceptionSupport && Compilation.AnyExceptionHandlers)
             {
                 // Think of this as the unwind information
                 // Could expand from single byte for number of parameters
