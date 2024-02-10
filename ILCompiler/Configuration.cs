@@ -18,6 +18,7 @@ namespace ILCompiler
         public string AssemblerOutput { get; set; } = string.Empty;
         public bool NoListFile { get; set; } = true;
         public bool SkipArrayBoundsCheck { get; set; } = false;
+        public bool SkipNullReferenceCheck { get; set; } = false;
         public bool ExceptionSupport { get; set; } = false;
     }
 }

@@ -11,16 +11,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
     {
         private readonly MethodDesc _method;
         private readonly IList<IDependencyNode> _dependencies = new List<IDependencyNode>();
-        private readonly NodeFactory _nodeFactory;
-        private readonly CorLibModuleProvider _corLibModuleProvider;
-        private readonly PreinitializationManager _preinitializationManager;
+        private readonly DependencyNodeContext _context;
 
-        public ILScanner(MethodDesc method, NodeFactory nodeFactory, CorLibModuleProvider corLibModuleProvider, PreinitializationManager preinitializationManager)
+        public ILScanner(MethodDesc method, DependencyNodeContext context)
         {
             _method = method;
-            _nodeFactory = nodeFactory;
-            _corLibModuleProvider = corLibModuleProvider;
-            _preinitializationManager = preinitializationManager;
+            _context = context;
         }
 
         public IList<IDependencyNode> FindDependencies()
@@ -104,9 +100,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             if (_method.HasExceptionHandlers)
             {
-                var systemRuntimeExceptionHandling = _corLibModuleProvider.FindThrow("System.Runtime.ExceptionHandling");
+                var systemRuntimeExceptionHandling = _context.CorLibModuleProvider.FindThrow("System.Runtime.ExceptionHandling");
                 var runtimeHelperMethod = systemRuntimeExceptionHandling.FindMethod("ThrowException");
-                var methodNode = _nodeFactory.MethodNode(runtimeHelperMethod);
+                var methodNode = _context.NodeFactory.MethodNode(runtimeHelperMethod);
                 _dependencies.Add(methodNode);
             }
         }
@@ -117,16 +113,16 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 var catchTypeDef = exceptionHandler.CatchType.ResolveTypeDefThrow();
                 var allocSize = catchTypeDef.ToTypeSig().GetInstanceByteCount();
-                _dependencies.Add(_nodeFactory.ConstructedEETypeNode(catchTypeDef, allocSize));
+                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(catchTypeDef, allocSize));
             }
         }
 
         private void ImportCasting()
         {
-            var systemRuntimeTypeCast = _corLibModuleProvider.FindThrow("System.Runtime.TypeCast");
+            var systemRuntimeTypeCast = _context.CorLibModuleProvider.FindThrow("System.Runtime.TypeCast");
             var runtimeHelperMethod = systemRuntimeTypeCast.FindMethod("IsInstanceOfClass");
 
-            var methodNode = _nodeFactory.MethodNode(runtimeHelperMethod);
+            var methodNode = _context.NodeFactory.MethodNode(runtimeHelperMethod);
 
             _dependencies.Add(methodNode);
         }
@@ -148,7 +144,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void AddThrowNullReferenceThrowHelperDependency()
         {
-            _dependencies.Add(GetHelperEntryPoint("ThrowHelpers", "ThrowNullReferenceException"));
+            if (!_context.Configuration.SkipNullReferenceCheck)
+            {
+                _dependencies.Add(GetHelperEntryPoint("ThrowHelpers", "ThrowNullReferenceException"));
+            }
         }
 
         private void ImportStoreField(Instruction instuction, bool isStatic)
@@ -163,15 +162,15 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportLoadString(Instruction instruction)
         {
-            var systemStringType = _corLibModuleProvider.FindThrow("System.String");
+            var systemStringType = _context.CorLibModuleProvider.FindThrow("System.String");
             var objType = systemStringType.ToTypeSig();
 
             // Determine required size on GC heap
             var allocSize = objType.GetInstanceByteCount();
 
-            _dependencies.Add(_nodeFactory.ConstructedEETypeNode(systemStringType, allocSize));
+            _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(systemStringType, allocSize));
 
-            _dependencies.Add(_nodeFactory.SerializedStringObject(instruction.OperandAs<string>(), _corLibModuleProvider));
+            _dependencies.Add(_context.NodeFactory.SerializedStringObject(instruction.OperandAs<string>(), _context.CorLibModuleProvider));
         }
 
         private void ImportFieldAccess(Instruction instruction, bool isStatic)
@@ -191,9 +190,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     return;
                 }
 
-                _dependencies.Add(_nodeFactory.StaticsNode(fieldDef));
+                _dependencies.Add(_context.NodeFactory.StaticsNode(fieldDef));
 
-                if (!_preinitializationManager.IsPreinitialized(fieldDef.DeclaringType))
+                if (!_context.PreinitializationManager.IsPreinitialized(fieldDef.DeclaringType))
                 {
                     AddStaticTypeConstructorDependency(fieldDef.DeclaringType);
                 }
@@ -205,7 +204,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             var staticConstructoreMethod = type.FindStaticConstructor();
             if (staticConstructoreMethod != null)
             {
-                var node = _nodeFactory.MethodNode(staticConstructoreMethod);
+                var node = _context.NodeFactory.MethodNode(staticConstructoreMethod);
 
                 // Ensure we don't have cyclic dependencies
                 if (_method.FullName != staticConstructoreMethod.FullName)
@@ -222,7 +221,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
             var arrayType = elemTypeDef.MakeArrayType();
 
-            _dependencies.Add(_nodeFactory.ConstructedEETypeNode(arrayType, allocSize));
+            _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(arrayType, allocSize));
         }
 
         private void ImportCall(Instruction instruction)
@@ -255,10 +254,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         // Determine required size on GC heap
                         var allocSize = objType.GetInstanceByteCount();
 
-                        _dependencies.Add(_nodeFactory.ConstructedEETypeNode(typeDef, allocSize));
+                        _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(typeDef, allocSize));
                     }
 
-                    methodNode = _nodeFactory.MethodNode((MethodSpec)method, _method);
+                    methodNode = _context.NodeFactory.MethodNode((MethodSpec)method, _method);
                 }
                 else
                 {
@@ -285,17 +284,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                     if (methodDef.DeclaringType.IsInterface)
                     {
-                        _dependencies.Add(_nodeFactory.NecessaryTypeSymbol(methodDef.DeclaringType));
+                        _dependencies.Add(_context.NodeFactory.NecessaryTypeSymbol(methodDef.DeclaringType));
                     }
 
                     bool directCall = IsDirectCall(methodDef, instruction.OpCode.Code);
                     if (directCall)
                     {
-                        methodNode = _nodeFactory.MethodNode(method);
+                        methodNode = _context.NodeFactory.MethodNode(method);
                     }
                     else
                     {
-                        _dependencies.Add(_nodeFactory.VirtualMethodUse(method));
+                        _dependencies.Add(_context.NodeFactory.VirtualMethodUse(method));
                         return;
                     }
                 }
@@ -306,13 +305,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 if (methodNode.Method.IsStatic)
                 {
                     var staticConstructorMethod = declaringType.FindStaticConstructor();
-                    if (staticConstructorMethod != null && !_preinitializationManager.IsPreinitialized(declaringType))
+                    if (staticConstructorMethod != null && !_context.PreinitializationManager.IsPreinitialized(declaringType))
                     {
                         AddStaticTypeConstructorDependency(methodNode.Method.DeclaringType);
                     }
                 }
                 else if (instruction.OpCode.Code == Code.Newobj && methodNode.Method.IsInstanceConstructor
-                    && !_preinitializationManager.IsPreinitialized(declaringType))
+                    && !_context.PreinitializationManager.IsPreinitialized(declaringType))
                 {
                     // Add dependency on static constructor if this is a NewObj for a type with a static constructor
 
@@ -368,14 +367,14 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 // Determine required size on GC heap
                 var allocSize = objType.GetInstanceByteCount();
 
-                _dependencies.Add(_nodeFactory.ConstructedEETypeNode(objType.ToTypeDefOrRef(), allocSize));
+                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(objType.ToTypeDefOrRef(), allocSize));
             }
         }
 
         private Z80MethodCodeNode GetHelperEntryPoint(string typeName, string methodName)
         {
-            var helperMethod = _corLibModuleProvider.GetHelperEntryPoint(typeName, methodName);
-            return _nodeFactory.MethodNode(helperMethod);
+            var helperMethod = _context.CorLibModuleProvider.GetHelperEntryPoint(typeName, methodName);
+            return _context.NodeFactory.MethodNode(helperMethod);
         }
     }
 }

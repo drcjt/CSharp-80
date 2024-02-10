@@ -1,6 +1,7 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.PreInit;
+using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Collections.Immutable;
 
@@ -15,7 +16,7 @@ namespace ILCompiler.Compiler.DependencyAnalysisFramework
         private readonly NodeFactory _nodeFactory;
         private readonly DependencyNodeContext _nodeContext;
 
-        public DependencyAnalyzer(ILogger<DependencyAnalyzer> logger, CorLibModuleProvider corLibModuleProvider, PreinitializationManager preinitializationManager, NodeFactory nodeFactory)
+        public DependencyAnalyzer(ILogger<DependencyAnalyzer> logger, CorLibModuleProvider corLibModuleProvider, PreinitializationManager preinitializationManager, NodeFactory nodeFactory, IConfiguration configuration)
         {
             _nodeFactory = nodeFactory;
             _nodeContext = new DependencyNodeContext
@@ -24,6 +25,7 @@ namespace ILCompiler.Compiler.DependencyAnalysisFramework
                 NodeFactory = _nodeFactory,
                 CorLibModuleProvider = corLibModuleProvider,
                 PreinitializationManager = preinitializationManager,
+                Configuration = configuration,
             };
         }
 

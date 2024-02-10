@@ -1,5 +1,6 @@
 ﻿using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.PreInit;
+using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace ILCompiler.Compiler.DependencyAnalysisFramework
@@ -10,5 +11,6 @@ namespace ILCompiler.Compiler.DependencyAnalysisFramework
         public required NodeFactory NodeFactory { get; init; }
         public required CorLibModuleProvider CorLibModuleProvider { get; init; }
         public required PreinitializationManager PreinitializationManager { get; init; }
+        public required IConfiguration Configuration { get; init; }
     }
 }
