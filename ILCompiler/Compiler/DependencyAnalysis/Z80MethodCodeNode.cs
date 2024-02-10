@@ -32,7 +32,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public override IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context)
         {
-            var scanner = new ILScanner(Method, context.NodeFactory, context.CorLibModuleProvider, context.PreinitializationManager);
+            var scanner = new ILScanner(Method, context);
             return scanner.FindDependencies();
         }
 

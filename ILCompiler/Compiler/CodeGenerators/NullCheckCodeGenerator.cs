@@ -8,7 +8,7 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(NullCheckEntry entry, CodeGeneratorContext context)
         {
-            if (context.Configuration.ExceptionSupport)
+            if (context.Configuration.ExceptionSupport && !context.Configuration.SkipNullReferenceCheck)
             {
                 var throwHelperMethod = context.CorLibModuleProvider.GetHelperEntryPoint("ThrowHelpers", "ThrowNullReferenceException");
                 var mangledThrowHelperMethod = context.NameMangler.GetMangledMethodName(throwHelperMethod);
