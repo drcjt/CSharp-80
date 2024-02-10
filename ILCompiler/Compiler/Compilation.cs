@@ -12,6 +12,8 @@ namespace ILCompiler.Compiler
         private readonly DependencyAnalyzer _dependencyAnalyzer;
         private readonly CorLibModuleProvider _corLibModuleProvider;
 
+        public static bool AnyExceptionHandlers { get; set; } = false;
+
         public Compilation(IConfiguration configuration, Z80AssemblyWriter z80Writer, CorLibModuleProvider corLibModuleProvider, DependencyAnalyzer dependencyAnalyzer)
         {
             _configuration = configuration;
@@ -48,6 +50,8 @@ namespace ILCompiler.Compiler
 
             // Core Dependency Analysis and code output routine
             var nodes = _dependencyAnalyzer.ComputeMarkedNodes();
+            AnyExceptionHandlers = nodes.OfType<Z80MethodCodeNode>().Any(n => n.HasExceptionHandlers);
+
             _z80AssemblyWriter.WriteCode(rootNode, nodes, inputFilePath, outputFilePath);
 
             // Write dgml version of dependency graph

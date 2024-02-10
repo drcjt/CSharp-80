@@ -15,12 +15,23 @@ namespace ILCompiler.Compiler.Importer
 
             // Create call to helper method passing exception object
             var args = new List<StackEntry>() { op1 };
-            var node = new CallEntry("ThrowEx", args, VarType.Void, 0);
+            var node = new CallEntry(GetThrowHelper(), args, VarType.Void, 0);
 
             importer.ImportAppendTree(node);
 
             return true;
         }
 
+        public static string GetThrowHelper()
+        {
+            // If no exception handlers then can just use fail fast
+            // and avoid any overhead of searching for exception handler
+            if (!Compilation.AnyExceptionHandlers)
+            {
+                return "FailFast";
+            }
+
+            return "ThrowEx";
+        }
     }
 }

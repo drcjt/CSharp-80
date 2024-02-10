@@ -24,6 +24,7 @@
     <None Remove="Runtime\CPM\printchr.asm" />
     <None Remove="Runtime\EHEnumInit.asm" />
     <None Remove="Runtime\EHEnumNext.asm" />
+    <None Remove="Runtime\FailFast.asm" />
     <None Remove="Runtime\GCGetTotalMemory.asm" />
     <None Remove="Runtime\InterfaceCall.asm" />
     <None Remove="Runtime\itoa.asm" />
@@ -121,6 +122,7 @@
     <EmbeddedResource Include="Runtime\Memcpy.asm" />
     <EmbeddedResource Include="Runtime\Memset.asm" />
     <EmbeddedResource Include="Runtime\InterfaceCall.asm" />
+    <EmbeddedResource Include="Runtime\FailFast.asm" />
     <EmbeddedResource Include="Runtime\ThrowEx.asm" />
     <EmbeddedResource Include="Runtime\RangeCheckFail.asm" />
     <EmbeddedResource Include="Runtime\VirtualCall.asm" />
