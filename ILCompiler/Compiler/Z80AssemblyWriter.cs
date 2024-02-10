@@ -117,10 +117,6 @@ namespace ILCompiler.Compiler
             {
                 WriteReturnCodeMessage(instructionsBuilder);
             }
-            if (!_configuration.ExceptionSupport)
-            {
-                WriteIndexOutOfRangeMessage(instructionsBuilder);
-            }
 
             instructionsBuilder.Label("START");
 
@@ -146,14 +142,6 @@ namespace ILCompiler.Compiler
             instructionsBuilder.Db(12);
             instructionsBuilder.Db(0); // Length of message
             instructionsBuilder.Db("R e t u r n   C o d e : ");
-        }
-
-        private static void WriteIndexOutOfRangeMessage(InstructionsBuilder instructionsBuilder)
-        {
-            instructionsBuilder.Label("INDEX_OUT_OF_RANGE_MSG");
-            instructionsBuilder.Db(18);
-            instructionsBuilder.Db(0); // Length of message
-            instructionsBuilder.Db("I n d e x   O u t   O f   R a n g e ");
         }
 
         private void WriteReturnCodeHandler(InstructionsBuilder instructionsBuilder)

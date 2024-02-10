@@ -28,13 +28,13 @@ namespace MethodicalTests
                 var cimFile = Path.ChangeExtension(testname, CimExtension);
 
                 // Run the test
-                ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(cimFile, createLibrary : false, optionalArguments : "--exceptions");
+                ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(cimFile, createLibrary : false);
                 Z80TestRunner.Create(SolutionPath).RunTest(cimFile);
             }
             else
             {
                 // No need to assemble any il as roslyn will have created assembled il
-                ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(testname, optionalArguments : "--exceptions");
+                ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(testname);
                 Z80TestRunner.Create(SolutionPath).RunTest(testname);
             }
 

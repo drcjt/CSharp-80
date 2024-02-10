@@ -8,16 +8,16 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(NullCheckEntry entry, CodeGeneratorContext context)
         {
-            if (context.Configuration.ExceptionSupport && !context.Configuration.SkipNullReferenceCheck)
+            if (!context.Configuration.SkipNullReferenceCheck)
             {
                 var throwHelperMethod = context.CorLibModuleProvider.GetHelperEntryPoint("ThrowHelpers", "ThrowNullReferenceException");
                 var mangledThrowHelperMethod = context.NameMangler.GetMangledMethodName(throwHelperMethod);
 
                 context.InstructionsBuilder.Pop(HL);
-                context.InstructionsBuilder.Push(HL);
                 context.InstructionsBuilder.Ld(A, H);
                 context.InstructionsBuilder.Or(L);
                 context.InstructionsBuilder.Call(Emit.Condition.Z, mangledThrowHelperMethod);
+                context.InstructionsBuilder.Push(HL);
             }
         }
     }

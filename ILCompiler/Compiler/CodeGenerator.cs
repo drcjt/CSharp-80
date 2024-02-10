@@ -50,7 +50,7 @@ namespace ILCompiler.Compiler
                 methodName = _nameMangler.GetMangledMethodName(_context.Method);
             }
 
-            if (_configuration.ExceptionSupport && Compilation.AnyExceptionHandlers)
+            if (Compilation.AnyExceptionHandlers)
             {
                 GenerateMethodUnwindInfo();
             }
@@ -230,12 +230,9 @@ namespace ILCompiler.Compiler
                 }
             }
 
-            if (_context.ParamsCount > 0 || (_context.LocalsCount + tempCount) > 0 || _context.Configuration.ExceptionSupport)
-            {
-                instructionsBuilder.Push(IX);
-                instructionsBuilder.Ld(IX, 0);
-                instructionsBuilder.Add(IX, SP);
-            }
+            instructionsBuilder.Push(IX);
+            instructionsBuilder.Ld(IX, 0);
+            instructionsBuilder.Add(IX, SP);
 
             if (_context.LocalsCount + tempCount > 0)
             {

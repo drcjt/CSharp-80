@@ -21,18 +21,11 @@ namespace ILCompiler.Compiler.CodeGenerators
             context.InstructionsBuilder.Sbc(HL, DE);    // Calculate Array Length - Index
 
             
-            if (!context.Configuration.ExceptionSupport)
-            {
-                context.InstructionsBuilder.Call(Condition.C, "RangeCheckFail");
-            }
-            else
-            {
-                // Emit conditional call to ThrowHelpers.ThrowIndexOutOfRangeException
-                var throwHelperMethod = context.CorLibModuleProvider.GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException");
-                var mangledThrowHelperMethod = context.NameMangler.GetMangledMethodName(throwHelperMethod);
+            // Emit conditional call to ThrowHelpers.ThrowIndexOutOfRangeException
+            var throwHelperMethod = context.CorLibModuleProvider.GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException");
+            var mangledThrowHelperMethod = context.NameMangler.GetMangledMethodName(throwHelperMethod);
 
-                context.InstructionsBuilder.Call(Condition.C, mangledThrowHelperMethod);
-            }
+            context.InstructionsBuilder.Call(Condition.C, mangledThrowHelperMethod);
         }
     }
 }
