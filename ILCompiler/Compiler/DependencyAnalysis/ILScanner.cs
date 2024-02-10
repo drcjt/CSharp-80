@@ -67,10 +67,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                                 ImportCasting();
                                 break;
 
-                            case Code.Throw:
-                                ImportThrow();
-                                break;
-
                             case Code.Ldelema:
                                 ImportAddressOfElem();
                                 break;
@@ -133,10 +129,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             var methodNode = _nodeFactory.MethodNode(runtimeHelperMethod);
 
             _dependencies.Add(methodNode);
-        }
-
-        private void ImportThrow()
-        {
         }
 
         private void ImportAddressOfElem()
