@@ -14,7 +14,7 @@ namespace CoreLib
 
     internal class TypeCastTests
     {
-        public unsafe static void ClassTypeCastTests()
+        public static void ClassTypeCastTests()
         {
             var super = new SuperClass();
             var sub = new SubClass();
