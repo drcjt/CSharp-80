@@ -13,6 +13,7 @@
 
             StringTests.NewStringTests();
             StringTests.SubstringTests();
+            StringTests.EqualsTests();
 
             UnsafeTests.SizeOfTests();
             UnsafeTests.RefAs();
@@ -26,6 +27,10 @@
             ArrayTests.ForEachArrayEnumerationTests();
 
             TypeCastTests.ClassTypeCastTests();
+
+            InterpolatedStringHandlerTests.ToStringAndClear_Clears();
+            InterpolatedStringHandlerTests.AppendLiteral();
+            InterpolatedStringHandlerTests.AppendFormatted();
 
             return 0;
         }
