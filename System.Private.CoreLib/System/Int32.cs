@@ -1,7 +1,9 @@
 ﻿namespace System
 {
-    public struct Int32
+    public readonly struct Int32
     {
+        private readonly int m_value;
+
         public static int Parse(string s)
         {
             int result = 0;
@@ -15,6 +17,11 @@
             }
 
             return result;
+        }
+
+        public override string ToString()
+        {
+            return Number.Int32ToDecStr(m_value);
         }
     }
 }
