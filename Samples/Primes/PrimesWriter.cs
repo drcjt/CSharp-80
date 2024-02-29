@@ -25,11 +25,8 @@ namespace Primes
 
             Console.WriteLine();
 
-            Console.Write("Total: ");
-            Console.WriteLine(totalPrimes);            
-            Console.Write("Elapsed Time (seconds): ");
-            Console.WriteLine(elapsedTime);
-            Console.WriteLine();
+            Console.WriteLine($"Total: {totalPrimes}");
+            Console.WriteLine($"Elapsed Time (seconds): {elapsedTime}");
         }
     }
 }
