@@ -46,7 +46,7 @@ namespace ILCompiler.Compiler.Importer
 
             var node = new StoreIndEntry(addr, value, fieldDef.FieldType.GetVarType(), fieldOffset, fieldSize);
 
-            importer.ImportAppendTree(node);
+            importer.ImportAppendTree(node, true);
 
             return true;
         }
