@@ -13,6 +13,8 @@
 
             Assert.Equals(0, Bug206(0));
 
+            Assert.Equals(2, new SpillImportAppendTests().SpillOnStFldImport());
+
             return 0;
         }
 
