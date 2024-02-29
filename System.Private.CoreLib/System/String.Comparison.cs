@@ -2,12 +2,12 @@
 {
     public sealed partial class String
     {
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
         {
-            if (this == other)
+            if (this == obj)
                 return true;
 
-            if (other is not string str)
+            if (obj is not string str)
                 return false;
 
             if (this.Length != str.Length)
@@ -19,26 +19,29 @@
 
         private unsafe bool EqualsHelper(string strA, string strB)
         {
-            fixed (char* strABuffer = strA)
+            fixed (char* strABuffer = &strA._firstChar) fixed (char* strBBuffer = &strB._firstChar)
             {
-                fixed (char* strBBuffer = strB)
-                {
-                    char* pA = strABuffer;
-                    char* pB = strBBuffer;
+                char* pA = strABuffer;
+                char* pB = strBBuffer;
 
-                    var offset = 0;
-                    while (offset < strA.Length)
+                var offset = 0;
+                while (offset < strA.Length)
+                {
+                    if (*(pA++) != *(pB++))
                     {
-                        if (*(pA++) != *(pB++))
-                        {
-                            return false;
-                        }
-                        offset++;
+                        return false;
                     }
+                    offset++;
                 }
             }
 
             return true;
+        }
+
+        public override int GetHashCode()
+        {
+            // TODO: Implement hash algorithm
+            return 0;
         }
     }
 }

@@ -32,7 +32,7 @@ namespace System
 
                 if (isNegative)
                 {
-                    *(--p) = '-';
+                    *(p-1) = '-';
                 }
             }
 

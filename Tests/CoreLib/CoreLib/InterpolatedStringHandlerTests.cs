@@ -2,7 +2,7 @@
 
 namespace CoreLib
 {
-    public class InterpolatedStringHandlerTests
+    public static class InterpolatedStringHandlerTests
     {
         public static void ToStringAndClear_Clears()
         {
