@@ -34,6 +34,54 @@ namespace ILCompiler.UnitTests
             _testModule = ModuleDefMD.Load(inputFilePath, options);
         }
 
+        [Test]
+        public void TestSequentialTypeLayout_WithFixedSizeBuffer()
+        {
+            var typeDef = _testModule.Find("CoreTestAssembly.Struct2", false);
+
+            var target = new TargetDetails(TargetArchitecture.Z80);
+            var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
+
+            var computedFieldLayout = typeDef.InstanceFieldLayout(metadataFieldLayoutAlgorithm);
+
+            // Byte count
+            // bool     b1           1 + 1 padding
+            // char[25] fixedBuffer  50
+            // int      i1           4
+            // ------------------------
+            //                       56
+
+            var instanceByteCountUnaligned = computedFieldLayout.ByteCountUnaligned;
+            var instanceByteAlignment = computedFieldLayout.ByteCountAlignment;
+            var instanceByteCount = LayoutInt.AlignUp(instanceByteCountUnaligned, instanceByteAlignment, target);
+
+            Assert.AreEqual(56, instanceByteCount.AsInt);
+
+            foreach (var f in typeDef.Fields)
+            {
+                if (f.IsStatic)
+                    continue;
+
+                var fieldOffset = GetFieldOffset(computedFieldLayout.Offsets, f.Name);
+
+                switch (f.Name)
+                {
+                    case "b1":
+                        Assert.AreEqual(0, fieldOffset);
+                        break;
+                    case "fixedBuffer":
+                        Assert.AreEqual(2, fieldOffset);
+                        break;
+                    case "i1":
+                        Assert.AreEqual(52, fieldOffset);
+                        break;
+                    default:
+                        Assert.Fail();
+                        break;
+                }
+            }
+        }
+
 
         [Test]
         public void TestSequentialTypeLayout()
