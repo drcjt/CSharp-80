@@ -88,7 +88,15 @@ namespace ILCompiler.Common.TypeSystem.Common
 
         protected ComputedInstanceFieldLayout ComputeInstanceFieldLayout(TypeDef type, int numInstanceFields)
         {
-            return ComputeSequentialFieldLayout(type, numInstanceFields);
+            if (type.IsSequentialLayout)
+            {
+                return ComputeSequentialFieldLayout(type, numInstanceFields);
+            }
+            else
+            {
+                // TODO: implement auto layout https://github.com/drcjt/CSharp-80/issues/162
+                return ComputeSequentialFieldLayout(type, numInstanceFields);
+            }
         }
 
         protected ComputedInstanceFieldLayout ComputeSequentialFieldLayout(TypeDef type, int numInstanceFields)
@@ -97,6 +105,8 @@ namespace ILCompiler.Common.TypeSystem.Common
 
             // For types inheriting from another type, field offsets continue on from where they left off
             LayoutInt cumulativeInstanceFieldPos = ComputeBytesUsedInParentType(type);
+
+            var layoutMetadata = type.GetClassLayout();
 
             LayoutInt largestAlignmentRequirement = LayoutInt.One;
             int fieldOrdinal = 0;
@@ -119,7 +129,7 @@ namespace ILCompiler.Common.TypeSystem.Common
             }
 
             SizeAndAlignment instanceByteSizeAndAlignment;
-            var instanceSizeAndAlignment = ComputeInstanceSize(type, cumulativeInstanceFieldPos, largestAlignmentRequirement, (int)(type?.ClassSize ?? 0), out instanceByteSizeAndAlignment);
+            var instanceSizeAndAlignment = ComputeInstanceSize(type, cumulativeInstanceFieldPos, largestAlignmentRequirement, layoutMetadata.Size, out instanceByteSizeAndAlignment);
 
             ComputedInstanceFieldLayout computedLayout = new ComputedInstanceFieldLayout();
             computedLayout.FieldAlignment = instanceSizeAndAlignment.Alignment;

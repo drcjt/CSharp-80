@@ -34,5 +34,17 @@ namespace ILCompiler.Common.TypeSystem.Common
         {
             return typedef.InstanceFieldLayout(fieldLayoutAlgorithm).ByteCountAlignment;
         }
+
+        public static ClassLayoutMetadata GetClassLayout(this TypeDef type)
+        {
+            var layout = new ClassLayoutMetadata();
+            if (type.ClassLayout != null)
+            {
+                layout.PackingSize = type.ClassLayout.PackingSize;
+                layout.Size = (int)type.ClassLayout.ClassSize;
+            }
+
+            return layout;
+        }
     }
 }
