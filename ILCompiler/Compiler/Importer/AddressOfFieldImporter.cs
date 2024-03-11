@@ -37,7 +37,7 @@ namespace ILCompiler.Compiler.Importer
             {
                 var obj = importer.PopExpression();
 
-                if (obj.Type != VarType.Ref && obj.Type != VarType.ByRef)
+                if (obj.Type != VarType.Ref && obj.Type != VarType.ByRef && obj.Type != VarType.Ptr)
                 {
                     throw new NotImplementedException($"LoadFieldImporter does not support {obj.Type}");
                 }
