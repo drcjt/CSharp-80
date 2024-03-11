@@ -38,4 +38,11 @@ namespace CoreTestAssembly
         Struct0 MyStruct0;
         bool MyBool;
     }
+
+    unsafe struct Struct2
+    {
+        bool b1;
+        fixed char fixedBuffer[25];
+        int i1;
+    }
 }
