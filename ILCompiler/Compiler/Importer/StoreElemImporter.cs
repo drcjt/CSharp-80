@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -15,9 +16,9 @@ namespace ILCompiler.Compiler.Importer
             {
                 case Code.Stelem:
                     var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-                    typeSig = context.Method.ResolveType(typeSig);
-                    elemType = typeSig.GetVarType();
-                    elemSize = typeSig.GetInstanceFieldSize();
+                    var typeDesc = context.TypeSystemContext.Create(typeSig, context.Method.Instantiation);
+                    elemType = typeDesc.VarType;
+                    elemSize = typeDesc.GetElementSize().AsInt;
                     break;
                 case Code.Stelem_I:
                     elemType = VarType.Ptr;

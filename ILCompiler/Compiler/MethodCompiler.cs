@@ -1,5 +1,4 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.Common;
+﻿using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
@@ -34,45 +33,46 @@ namespace ILCompiler.Compiler
             var body = method.Body;
 
             // Setup local variable table - includes parameters as well as locals in method
-            foreach (var parameter in method.Parameters())
+            for (int parameterIndex = 0; parameterIndex < method.Signature.Length; parameterIndex++)
             {
+                var parameter = method.Signature[parameterIndex];
                 var local = new LocalVariableDescriptor()
                 {
                     IsParameter = true,
                     IsTemp = false,
                     Name = parameter.Name,
-                    ExactSize = parameter.Type.GetInstanceFieldSize(),
-                    Type = parameter.Type.GetVarType(),
+                    ExactSize = parameter.Type.GetElementSize().AsInt,
+                    Type = parameter.Type.VarType,
                 };
                 _locals.Add(local);
             }
 
             if (body != null)
             {
-                foreach (var local in method.Locals())
+                foreach (var local in method.Locals)
                 {
                     var localVariableDescriptor = new LocalVariableDescriptor()
                     {
                         IsParameter = false,
                         IsTemp = false,
                         Name = local.Name,
-                        ExactSize = local.Type.GetInstanceFieldSize(),
-                        Type = local.Type.GetVarType(),
+                        ExactSize = local.Type.GetElementSize().AsInt,
+                        Type = local.Type.VarType,
                     };
                     _locals.Add(localVariableDescriptor);
                 }
             }
 
-            if (method.HasReturnType)
+            if (!method.Signature.ReturnType.IsVoid)
             {
-                var returnType = method.ReturnType;
-                InitReturnBufferArg(returnType, method.HasThis);
+                var returnType = method.Signature.ReturnType;
+                InitReturnBufferArg(returnType, !method.Signature.IsStatic);
             }
         }
 
-        private void InitReturnBufferArg(TypeSig returnType, bool hasThis)
+        private void InitReturnBufferArg(TypeDesc returnType, bool hasThis)
         {
-            if (returnType.IsStruct())
+            if (returnType.IsValueType && returnType.GetElementSize().AsInt > 4)
             {
                 var target = new TargetDetails(Common.TypeSystem.Common.TargetArchitecture.Z80);
 
@@ -102,10 +102,11 @@ namespace ILCompiler.Compiler
             {
                 return;
             }
-            if (method.IsPInvokeImpl || method.IsInternalCall)
+            if (method.IsPInvoke || method.IsInternalCall)
             {
                 return;
             }
+
             if (method.IsIntrinsic)
             {
                 var methodIL = _ilProvider.GetMethodIL(method);
@@ -117,7 +118,7 @@ namespace ILCompiler.Compiler
                 method.Body = methodIL;
             }
 
-            _parameterCount = method.Parameters().Count;
+            _parameterCount = method.Signature.Length;
 
             SetupLocalVariableTable(method);
 

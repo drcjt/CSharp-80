@@ -1,4 +1,4 @@
-﻿using dnlib.DotNet;
+﻿using ILCompiler.Common.TypeSystem.Common;
 
 namespace ILCompiler.Compiler.EvaluationStack
 {
@@ -8,9 +8,9 @@ namespace ILCompiler.Compiler.EvaluationStack
         public IList<StackEntry> Arguments { get; }
         public bool IsVirtual { get; }
 
-        public MethodDef? Method { get; }
+        public MethodDesc? Method { get; }
 
-        public CallEntry(string targetMethod, IList<StackEntry> arguments, VarType returnType, int? returnSize, bool isVirtual = false, MethodDef? method = null) : base(returnType, returnSize)
+        public CallEntry(string targetMethod, IList<StackEntry> arguments, VarType returnType, int? returnSize, bool isVirtual = false, MethodDesc? method = null) : base(returnType, returnSize)
         {
             TargetMethod = targetMethod;
             Arguments = arguments;

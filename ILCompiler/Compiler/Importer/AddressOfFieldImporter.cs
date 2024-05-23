@@ -13,23 +13,17 @@ namespace ILCompiler.Compiler.Importer
 
             var isLoadStatic = instruction.OpCode == OpCodes.Ldsflda;
 
-            var fieldDefOrRef = instruction.Operand as IField;
-            var fieldDef = fieldDefOrRef.ResolveFieldDefThrow();
-
-            // Ensure fields have all offsets calculated
-            if (fieldDef.FieldOffset == null)
-            {
-                fieldDef.DeclaringType.ToTypeSig().GetInstanceFieldSize();
-            }
+            var fieldDefOrRef = (IField)instruction.Operand;
+            var fieldDesc = context.TypeSystemContext.Create((IField)instruction.Operand);
 
             if (isLoadStatic)
             {
-                var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDef);
+                var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDesc);
 
                 StackEntry obj = new SymbolConstantEntry(mangledFieldName);
-                if (!context.PreinitializationManager.IsPreinitialized(fieldDef.DeclaringType))
+                if (!context.PreinitializationManager.IsPreinitialized(fieldDesc.OwningType))
                 {
-                    obj = InitClassHelper.ImportInitClass(fieldDef, context, importer, obj);
+                    obj = InitClassHelper.ImportInitClass(fieldDesc.OwningType, context, importer, obj);
                 }
                 importer.PushExpression(obj);
             }
@@ -42,7 +36,7 @@ namespace ILCompiler.Compiler.Importer
                     throw new NotImplementedException($"LoadFieldImporter does not support {obj.Type}");
                 }
 
-                var node = new FieldAddressEntry(fieldDef.Name, obj, fieldDef?.FieldOffset ?? 0);
+                var node = new FieldAddressEntry(fieldDesc.Name, obj, (uint)fieldDesc.Offset.AsInt);
                 importer.PushExpression(node);
             }
 

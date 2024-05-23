@@ -1,13 +1,12 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.Common;
+﻿using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class VTableSliceNode : DependencyNode
     {
-        private readonly TypeDef _type;
-        public VTableSliceNode(TypeDef type)
+        private readonly TypeDesc _type;
+        public VTableSliceNode(TypeDesc type)
         {
             _type = type;
         }
@@ -25,10 +24,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         /// Sort the used virtual methods in metadata order to get the slots
         /// </summary>
         /// <returns></returns>
-        public IReadOnlyList<MethodDef> GetSlots()
+        public IReadOnlyList<MethodDesc> GetSlots()
         {
-            IList<MethodDef> slots = new List<MethodDef>();
-            foreach (var method in _type.Methods.Where(method => _usedMethods.Contains(method.FullName)))
+            IList<MethodDesc> slots = new List<MethodDesc>();
+            foreach (var method in _type.GetVirtualMethods().Where(method => _usedMethods.Contains(method.FullName)))
             {
                 slots.Add(method);
             }

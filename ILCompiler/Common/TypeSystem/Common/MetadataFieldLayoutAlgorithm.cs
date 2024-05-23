@@ -1,5 +1,4 @@
-﻿using dnlib.DotNet;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace ILCompiler.Common.TypeSystem.Common
 {
@@ -11,17 +10,18 @@ namespace ILCompiler.Common.TypeSystem.Common
             _target = target;
         }
 
-        public ComputedInstanceFieldLayout ComputeInstanceLayout(TypeDef type)
+        public ComputedInstanceFieldLayout ComputeInstanceLayout(DefType defType)
         {
+            MetadataType type = (MetadataType)defType;
             Debug.Assert(type != null, "Cannot compute instance layout for null type def");
             // Count the number of instance fields in advance
             int numInstanceFields = 0;
-            foreach (var field in type.Fields)
+            foreach (var field in type.GetFields())
             {
                 if (field.IsStatic)
                     continue;
 
-                TypeSig fieldType = field.FieldType;
+                TypeDesc fieldType = field.FieldType;
 
                 if (fieldType.IsByRef)
                 {
@@ -51,7 +51,7 @@ namespace ILCompiler.Common.TypeSystem.Common
                     0,
                     out instanceByteSizeAndAlignment);
 
-                ComputedInstanceFieldLayout result = new ComputedInstanceFieldLayout
+                var result = new ComputedInstanceFieldLayout
                 {
                     ByteCountUnaligned = instanceByteSizeAndAlignment.Size,
                     ByteCountAlignment = instanceByteSizeAndAlignment.Alignment,
@@ -61,8 +61,8 @@ namespace ILCompiler.Common.TypeSystem.Common
 
                 if (numInstanceFields > 0)
                 {
-                    FieldDef? instanceField = null;
-                    foreach (var field in type.Fields)
+                    FieldDesc? instanceField = null;
+                    foreach (var field in type.GetFields())
                     {
                         if (!field.IsStatic)
                         {
@@ -86,7 +86,7 @@ namespace ILCompiler.Common.TypeSystem.Common
             return ComputeInstanceFieldLayout(type, numInstanceFields);
         }
 
-        protected ComputedInstanceFieldLayout ComputeInstanceFieldLayout(TypeDef type, int numInstanceFields)
+        protected ComputedInstanceFieldLayout ComputeInstanceFieldLayout(MetadataType type, int numInstanceFields)
         {
             if (type.IsSequentialLayout)
             {
@@ -99,7 +99,7 @@ namespace ILCompiler.Common.TypeSystem.Common
             }
         }
 
-        protected ComputedInstanceFieldLayout ComputeSequentialFieldLayout(TypeDef type, int numInstanceFields)
+        protected ComputedInstanceFieldLayout ComputeSequentialFieldLayout(MetadataType type, int numInstanceFields)
         {
             var offsets = new FieldAndOffset[numInstanceFields];
 
@@ -112,7 +112,7 @@ namespace ILCompiler.Common.TypeSystem.Common
             int fieldOrdinal = 0;
             int packingSize = ComputePackingSize(type);
 
-            foreach (var field in type.Fields)
+            foreach (var field in type.GetFields())
             {
                 if (field.IsStatic)
                     continue;
@@ -131,7 +131,7 @@ namespace ILCompiler.Common.TypeSystem.Common
             SizeAndAlignment instanceByteSizeAndAlignment;
             var instanceSizeAndAlignment = ComputeInstanceSize(type, cumulativeInstanceFieldPos, largestAlignmentRequirement, layoutMetadata.Size, out instanceByteSizeAndAlignment);
 
-            ComputedInstanceFieldLayout computedLayout = new ComputedInstanceFieldLayout();
+            var computedLayout = new ComputedInstanceFieldLayout();
             computedLayout.FieldAlignment = instanceSizeAndAlignment.Alignment;
             computedLayout.FieldSize = instanceSizeAndAlignment.Size;
             computedLayout.ByteCountUnaligned = instanceByteSizeAndAlignment.Size;
@@ -141,12 +141,12 @@ namespace ILCompiler.Common.TypeSystem.Common
             return computedLayout;
         }
 
-        private int ComputePackingSize(TypeDef def)
+        private int ComputePackingSize(DefType def)
         {
             return _target.DefaultPackingSize;
         }
 
-        private SizeAndAlignment ComputeInstanceSize(TypeDef type, LayoutInt instanceSize, LayoutInt alignment, int classLayoutSize, out SizeAndAlignment byteCount)
+        private SizeAndAlignment ComputeInstanceSize(DefType type, LayoutInt instanceSize, LayoutInt alignment, int classLayoutSize, out SizeAndAlignment byteCount)
         {
             SizeAndAlignment result;
 
@@ -164,16 +164,7 @@ namespace ILCompiler.Common.TypeSystem.Common
                 }
                 else
                 {
-                    if (type.BaseType != null)
-                    {
-                        var baseType = type.GetBaseType(true);
-                        var baseTypeDef = baseType.ResolveTypeDef();
-                        parentSize = LayoutInt.Max(alignment, baseTypeDef.InstanceByteCountUnaligned(this));
-                    }
-                    else
-                    {
-                        parentSize = new LayoutInt(0);
-                    }    
+                    parentSize = type.BaseType!.InstanceByteCountUnaligned;
                 }
                 LayoutInt specifiedInstanceSize = parentSize + new LayoutInt(classLayoutSize);
                 instanceSize = LayoutInt.Max(specifiedInstanceSize, instanceSize);
@@ -196,11 +187,9 @@ namespace ILCompiler.Common.TypeSystem.Common
                 result.Size = _target.LayoutPointerSize;
                 result.Alignment = _target.LayoutPointerSize;
 
-                if (type.BaseType != null)
+                if (type.HasBaseType)
                 {
-                    var baseType = type.GetBaseType(true);
-                    var baseTypeDef = baseType.ResolveTypeDef();
-                    alignment = LayoutInt.Max(alignment, baseTypeDef.InstanceByteAlignment(this));
+                    alignment = LayoutInt.Max(alignment, type.BaseType!.InstanceByteAlignment);
                 }
             }
 
@@ -212,60 +201,48 @@ namespace ILCompiler.Common.TypeSystem.Common
             return result;
         }
 
-        private LayoutInt ComputeBytesUsedInParentType(TypeDef type)
+        private LayoutInt ComputeBytesUsedInParentType(DefType type)
         {
             LayoutInt cumulativeInstanceFieldPos = LayoutInt.Zero;
 
-            if (!type.IsValueType && type.BaseType != null)
+            if (!type.IsValueType && type.HasBaseType)
             {
-                var resolvedType = type.BaseType.ResolveTypeDef();
-                cumulativeInstanceFieldPos = resolvedType.InstanceByteCountUnaligned(this);
+                cumulativeInstanceFieldPos = type.BaseType!.InstanceByteCountUnaligned;
             }
 
             return cumulativeInstanceFieldPos;
         }
 
-        private SizeAndAlignment ComputeFieldSizeAndAlignment(TypeSig fieldTypeSig, int packingSize)
+        private SizeAndAlignment ComputeFieldSizeAndAlignment(TypeDesc fieldType, int packingSize)
         {
             SizeAndAlignment result;
 
-            if (fieldTypeSig.IsTypeDefOrRef)
+            if (fieldType.IsDefType)
             {
-                if (fieldTypeSig.IsValueType)
+                if (fieldType.IsValueType)
                 {
-                    var fieldTypeDefOrRef = fieldTypeSig.TryGetTypeDefOrRef();
-                    var fieldType = fieldTypeDefOrRef.ResolveTypeDef();
-
-                    if (fieldType != null)
-                    {
-                        result.Size = fieldType.InstanceFieldSize(this);
-                        result.Alignment = fieldType.InstanceFieldAlignment(this);
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException($"Failed to resolve type def for field {fieldTypeDefOrRef.Name}");
-                    }
+                    var defType = (DefType)fieldType;
+                    result.Size = defType.InstanceFieldSize;
+                    result.Alignment = defType.InstanceFieldAlignment;
                 }
                 else
                 {
-                    result.Size = _target.LayoutPointerSize;
-                    result.Alignment = _target.LayoutPointerSize;
+                    result.Size = fieldType.Context.Target.LayoutPointerSize;
+                    result.Alignment = fieldType.Context.Target.LayoutPointerSize;
                 }
+            }
+            else if (fieldType.IsArray)
+            {
+                result.Size = fieldType.Context.Target.LayoutPointerSize;
+                result.Alignment = fieldType.Context.Target.LayoutPointerSize;
             }
             else
             {
-                if (fieldTypeSig.IsSZArray)
-                {
-                    result.Size = _target.LayoutPointerSize;
-                    result.Alignment = _target.LayoutPointerSize;
-                }
-                else
-                {
-                    Debug.Assert(fieldTypeSig.IsPointer || fieldTypeSig.IsFunctionPointer);
+                Debug.Assert(fieldType.IsPointer || fieldType.IsFunctionPointer);
 
-                    result.Size = _target.LayoutPointerSize;
-                    result.Alignment = _target.LayoutPointerSize;
-                }
+                result.Size = _target.LayoutPointerSize;
+                result.Alignment = _target.LayoutPointerSize;
+
             }
 
             result.Alignment = LayoutInt.Min(result.Alignment, new LayoutInt(packingSize));

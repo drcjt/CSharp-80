@@ -12,14 +12,16 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public override string Name => Method.FullName;
 
         private readonly Factory<IMethodCompiler> _methodCompilerFactory;
+        private readonly TypeSystemContext _typeSystemContext;
 
-        public Z80MethodCodeNode(MethodDesc method, Factory<IMethodCompiler> methodCompilerFactory)
+        public Z80MethodCodeNode(MethodDesc method, Factory<IMethodCompiler> methodCompilerFactory, TypeSystemContext typeSystemContext)
         {
             Method = method;
-            ParamsCount = method.Parameters().Count;
+            ParamsCount = method.Signature.Length;
             LocalsCount = method.Body?.Variables.Count ?? 0;
 
             _methodCompilerFactory = methodCompilerFactory;
+            _typeSystemContext = typeSystemContext;
         }
 
         public bool HasExceptionHandlers => Method?.Body?.HasExceptionHandlers ?? false;
@@ -32,7 +34,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public override IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context)
         {
-            var scanner = new ILScanner(Method, context);
+            var scanner = new ILScanner(Method, context, _typeSystemContext);
             return scanner.FindDependencies();
         }
 

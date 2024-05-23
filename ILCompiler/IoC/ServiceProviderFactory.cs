@@ -1,4 +1,5 @@
-﻿using ILCompiler.Common.TypeSystem.IL;
+﻿using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler;
 using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
@@ -70,6 +71,8 @@ namespace ILCompiler.IoC
             services.AddSingleton<RTILProvider>();
 
             services.AddSingleton<CorLibModuleProvider>();
+
+            services.AddSingleton<TypeSystemContext>();
 
             _serviceProvider = services.BuildServiceProvider();
 

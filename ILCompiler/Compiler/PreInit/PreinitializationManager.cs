@@ -1,15 +1,14 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.IL;
+﻿using ILCompiler.Common.TypeSystem.Common;
 
 namespace ILCompiler.Compiler.PreInit
 {
     public class PreinitializationManager
     {
-        private readonly IDictionary<TypeDef, PreinitializationInfo> _preInitializationInfoByType = new Dictionary<TypeDef, PreinitializationInfo>();
+        private readonly IDictionary<TypeDesc, PreinitializationInfo> _preInitializationInfoByType = new Dictionary<TypeDesc, PreinitializationInfo>();
 
-        public bool IsPreinitialized(TypeDef type)
+        public bool IsPreinitialized(TypeDesc type)
         {
-            if (!type.HasStaticConstructor())
+            if (!type.HasStaticConstructor)
             {
                 return false;
             }
@@ -17,7 +16,7 @@ namespace ILCompiler.Compiler.PreInit
             return GetPreinitializationInfo(type).IsPreinitialized;
         }
 
-        public PreinitializationInfo GetPreinitializationInfo(TypeDef type)
+        public PreinitializationInfo GetPreinitializationInfo(TypeDesc type)
         {
             if (!_preInitializationInfoByType.ContainsKey(type))
             {
@@ -26,15 +25,14 @@ namespace ILCompiler.Compiler.PreInit
             return _preInitializationInfoByType[type];
         }
 
-        public bool HasLazyStaticConstructor(ITypeDefOrRef type)
+        public bool HasLazyStaticConstructor(TypeDesc type)
         {
-            var typeDef = type.ResolveTypeDef();
-            if (!typeDef.HasStaticConstructor())
+            if (!type.HasStaticConstructor)
             {
                 return false;
             }
 
-            return !IsPreinitialized(typeDef);
+            return !IsPreinitialized(type);
         }
     }
 }

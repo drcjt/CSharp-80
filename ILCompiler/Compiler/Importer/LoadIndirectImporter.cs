@@ -38,8 +38,8 @@ namespace ILCompiler.Compiler.Importer
                     break;
                 case Code.Ldobj:
                     var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-                    typeSig = context.Method.ResolveType(typeSig);
-                    type = typeSig.GetVarType();
+                    var typeDesc = context.TypeSystemContext.Create(typeSig, context.Method.Instantiation);
+                    type = typeDesc.VarType;
                     break;
 
                 default:

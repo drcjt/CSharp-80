@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(CallEntry entry, CodeGeneratorContext context)
         {
-            if (entry.Method != null && entry.Method.DeclaringType.IsInterface)
+            if (entry.Method != null && entry.Method.OwningType.IsInterface)
             {
                 GenerateCodeForInterfaceCall(entry, context);
             }
@@ -28,7 +28,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 throw new InvalidOperationException("Method must not be null for interface dispatch");
             }
 
-            var interfaceEETypeNode = context.NodeFactory.NecessaryTypeSymbol(entry.Method.DeclaringType);
+            var interfaceEETypeNode = context.NodeFactory.NecessaryTypeSymbol(entry.Method.OwningType);
             int methodSlot = VirtualMethodSlotHelper.GetVirtualMethodSlot(context.NodeFactory, entry.Method);
 
             // Stack holds this pointer and actual parameters for method call

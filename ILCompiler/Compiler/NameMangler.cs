@@ -23,27 +23,7 @@ namespace ILCompiler.Compiler
         {
             return GetMangledMethodName(method.FullName);
         }
-
-        public string GetMangledMethodName(MethodSpec calleeMethod, MethodDesc callerMethod)
-        {
-            var calleeMethodDef = calleeMethod.Method.ResolveMethodDefThrow();
-
-            IList<TypeSig> callerMethodGenericParameters = new List<TypeSig>();
-            if (callerMethod is InstantiatedMethod method)
-            {
-                callerMethodGenericParameters = method.GenericParameters;
-            }
-
-            var resolvedGenericParameters = new List<TypeSig>();
-            foreach (var genericParameter in ((MethodSpec)calleeMethod).GenericInstMethodSig.GenericArguments)
-            {
-                resolvedGenericParameters.Add(GenericTypeInstantiator.Instantiate(genericParameter, callerMethodGenericParameters));
-            }
-
-            var fullMethodName = FullNameFactory.MethodFullName(calleeMethodDef.DeclaringType?.FullName, calleeMethodDef.Name, calleeMethodDef.MethodSig, null, resolvedGenericParameters);
-            return GetMangledMethodName(fullMethodName);
-        }
-
+       
         public string GetMangledMethodName(MethodDef method)
         {
             return GetMangledMethodName(method.FullName);
@@ -67,12 +47,12 @@ namespace ILCompiler.Compiler
             return mangledName;
         }
 
-        public string GetMangledFieldName(FieldDef field)
+        public string GetMangledFieldName(FieldDesc field)
         {
             return GetMangledFieldName(field.FullName);
         }
 
-        public string GetMangledTypeName(ITypeDefOrRef type)
+        public string GetMangledTypeName(TypeDesc type)
         {
             return GetMangledTypeName(type.FullName);
         }

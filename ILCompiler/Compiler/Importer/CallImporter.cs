@@ -1,7 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -25,39 +24,45 @@ namespace ILCompiler.Compiler.Importer
 
         public static void ImportCall(Instruction instruction, ImportContext context, IILImporterProxy importer, StackEntry? newObjThis = null)
         {
-            if (instruction.Operand is not IMethod method)
-            {
-                throw new InvalidOperationException("Newobj importer called with Operand which isn't a IMethod");
-            }
+            var method = context.TypeSystemContext.Create((IMethod)instruction.Operand);
 
+            ImportCall(method, instruction, context, importer, newObjThis);
+        }
+
+        public static void ImportCall(MethodDesc method, Instruction instruction, ImportContext context, IILImporterProxy importer, StackEntry? newObjThis = null)
+        {
             var isArrayMethod = false;
-            MethodDef methodToCall;
-            if (method.DeclaringType.ToTypeSig().IsArray)
+            MethodDesc methodToCall;
+            if (method.OwningType.IsArray)
             {
-                var declaringTypeDef = method.DeclaringType.ResolveTypeDef();
-                var methodName = method.Name;
-                switch (methodName)
+                switch (method.Name)
                 {
                     case "Set":
-                        methodToCall = new MethodDefUser("Set", method.MethodSig);
-                        declaringTypeDef.Methods.Add(methodToCall);
+                        methodToCall = (MethodDesc)context.TypeSystemContext.Create(new MethodDefUser("Set", method.MethodSig));
+                        //declaringTypeDef.Methods.Add(methodToCall);
                         break;
                     case "Get":
-                        methodToCall = new MethodDefUser("Get", method.MethodSig);
-                        declaringTypeDef.Methods.Add(methodToCall);
+                        methodToCall = (MethodDesc)context.TypeSystemContext.Create(new MethodDefUser("Get", method.MethodSig));
+                        //declaringTypeDef.Methods.Add(methodToCall);
                         break;
                     case "Address":
-                        methodToCall = new MethodDefUser("Address", method.MethodSig);
-                        declaringTypeDef.Methods.Add(methodToCall);
+                        methodToCall = (MethodDesc)context.TypeSystemContext.Create(new MethodDefUser("Address", method.MethodSig));
+                        //declaringTypeDef.Methods.Add(methodToCall);
                         break;
                     default:
-                        throw new InvalidOperationException($"Unknown array intrinsic method {methodName}");
+                        throw new InvalidOperationException($"Unknown array intrinsic method {method.Name}");
                 }
                 isArrayMethod = true;
             }
             else
             {
-                methodToCall = method.ResolveMethodDefThrow();
+                methodToCall = method;
+            }
+
+            if (context.Method is InstantiatedMethod)
+            {
+                // Fully instantiate called method
+                methodToCall = methodToCall.Context.GetInstantiatedMethod(methodToCall, context.Method.Instantiation);
             }
             
             var arguments = new List<StackEntry>();
@@ -67,14 +72,23 @@ namespace ILCompiler.Compiler.Importer
             {
                 var argument = importer.PopExpression();
 
-                var parameter = methodToCall.Parameters[parameterCount - (i - firstArgIndex) - 1];
-                var parameterType = parameter.Type;
+                var parameter = methodToCall.Signature[parameterCount - (i - firstArgIndex) - 1];
+                var parameterType = parameter;
 
-                parameterType = GenericTypeInstantiator.Instantiate(parameterType, method, context.Method);
-                var parameterVarType = parameterType.GetVarType();
+                var parameterVarType = parameterType.Type.VarType;
                 if (parameterVarType.IsSmall())
                 {
-                    argument = new PutArgTypeEntry(parameterVarType, argument);
+                    /*
+                    if (argument is LocalVariableEntry localVariableEntry)
+                    {
+                        // Not need for PutArgTypeEntry here but need to override sign extend on local variable entry
+                        localVariableEntry.OverrideSignExtend = true;
+                    }
+                    else
+                    {
+                    */
+                        argument = new PutArgTypeEntry(parameterVarType, argument);
+                    //}
                 }
 
                 arguments.Add(argument);
@@ -92,7 +106,7 @@ namespace ILCompiler.Compiler.Importer
                 arguments[0] = new NullCheckEntry(arguments[0]);
             }
 
-            if (methodToCall.DeclaringType.IsInterface)
+            if (methodToCall.OwningType.IsInterface)
             {
                 // Need to add this pointer as extra param which will be consumed by InterfaceCall routine
                 var thisEntry = arguments[0];
@@ -108,7 +122,7 @@ namespace ILCompiler.Compiler.Importer
             }
 
             // Intrinsic calls
-            if (methodToCall.IsIntrinsic() || isArrayMethod)
+            if (methodToCall.IsIntrinsic || isArrayMethod)
             {
                 if (ImportIntrinsicCall(methodToCall, arguments, importer, method, context))
                 {
@@ -117,13 +131,9 @@ namespace ILCompiler.Compiler.Importer
             }
 
             string targetMethod;
-            if (methodToCall.HasGenericParameters)
+            if (methodToCall.IsPInvoke)
             {
-                targetMethod = context.NameMangler.GetMangledMethodName((MethodSpec)method, context.Method);
-            }
-            else if (methodToCall.IsPinvokeImpl)
-            {
-                targetMethod = methodToCall.ImplMap.Name;
+                targetMethod = methodToCall.PInvokeMethodName;
             }
             else if (methodToCall.IsInternalCall)
             {
@@ -141,23 +151,23 @@ namespace ILCompiler.Compiler.Importer
             }
 
             int returnBufferArgIndex = 0;
-            var returnType = GenericTypeInstantiator.Instantiate(methodToCall.ReturnType, method, context.Method);
+            var returnType = methodToCall.Signature.ReturnType;
             if (methodToCall.HasReturnType)
             {
-                if (returnType.IsStruct())
+                if (returnType.IsValueType && returnType.GetElementSize().AsInt > 4)
                 {
                     returnBufferArgIndex = FixupCallStructReturn(returnType, arguments, importer, methodToCall.HasThis);
                 }
             }
 
-            int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetInstanceFieldSize() : null;
+            int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetElementSize().AsInt : null;
 
-            var returnVarType = methodToCall.HasReturnType ? returnType.GetVarType() : VarType.Void;
+            var returnVarType = methodToCall.HasReturnType ? returnType.VarType : VarType.Void;
             StackEntry callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize, !directCall, methodToCall);
 
-            if (methodToCall.IsStatic && !context.PreinitializationManager.IsPreinitialized(methodToCall.DeclaringType))
+            if (methodToCall.IsStatic && !context.PreinitializationManager.IsPreinitialized(methodToCall.OwningType))
             {
-                callNode = InitClassHelper.ImportInitClass(methodToCall, context, importer, callNode);
+                callNode = InitClassHelper.ImportInitClass(methodToCall.OwningType, context, importer, callNode);
             }
 
             if (!methodToCall.HasReturnType)
@@ -166,12 +176,12 @@ namespace ILCompiler.Compiler.Importer
             }
             else
             {
-                if (returnType.IsStruct())
+                if (returnType.IsValueType && returnType.GetElementSize().AsInt > 4)
                 {
                     importer.ImportAppendTree(callNode, true);
 
                     // Load return buffer to stack
-                    var loadTemp = new LocalVariableEntry(returnBufferArgIndex, returnType.GetVarType(), returnType.GetInstanceFieldSize());
+                    var loadTemp = new LocalVariableEntry(returnBufferArgIndex, returnType.VarType, returnType.GetElementSize().AsInt);
                     importer.PushExpression(loadTemp);
                 }
                 else
@@ -181,10 +191,10 @@ namespace ILCompiler.Compiler.Importer
             }
         }
 
-        static private int FixupCallStructReturn(TypeSig returnType, List<StackEntry> arguments, IILImporterProxy importer, bool hasThis)
+        static private int FixupCallStructReturn(TypeDesc returnType, List<StackEntry> arguments, IILImporterProxy importer, bool hasThis)
         {
             // Create temp
-            var lclNum = importer.GrabTemp(returnType.GetVarType(), returnType.GetInstanceFieldSize());
+            var lclNum = importer.GrabTemp(returnType.VarType, returnType.GetElementSize().AsInt);
             var returnBufferPtr = new LocalVariableAddressEntry(lclNum);
 
             // Ensure return buffer parameter goes after the this parameter if present
@@ -194,7 +204,7 @@ namespace ILCompiler.Compiler.Importer
             return lclNum;
         }
 
-        private static string ImportInternalCall(MethodDef methodToCall, IList<StackEntry> arguments, IILImporterProxy importer)
+        private static string ImportInternalCall(MethodDesc methodToCall, IList<StackEntry> arguments, IILImporterProxy importer)
         {
             if (!methodToCall.HasCustomAttribute("System.Runtime", "RuntimeImportAttribute"))
             {
@@ -230,7 +240,7 @@ namespace ILCompiler.Compiler.Importer
         /// <param name="importer">importer used when generating IR</param>
         /// <returns>true if IR generated to replace call, false otherwise</returns>
         /// <exception cref="NotImplementedException"></exception>
-        private static bool ImportIntrinsicCall(MethodDef methodToCall, IList<StackEntry> arguments, IILImporterProxy importer, IMethod method, ImportContext context)
+        private static bool ImportIntrinsicCall(MethodDesc methodToCall, IList<StackEntry> arguments, IILImporterProxy importer, MethodDesc method, ImportContext context)
         {
             // Map method name to string that code generator will understand
             var targetMethodName = methodToCall.Name;
@@ -239,11 +249,11 @@ namespace ILCompiler.Compiler.Importer
                 case "Of":
                     if (IsTypeName(methodToCall, "Internal.Runtime", "EEType"))
                     {
-                        var genericParameters = ((MethodSpec)method).GenericInstMethodSig.GenericArguments;
-                        var objType = GenericTypeInstantiator.Instantiate(genericParameters[0], method, context.Method);
-                        var typeDef = objType.ToTypeDefOrRef().ResolveTypeDef();
+                        var instantiatedType = (InstantiatedMethod)methodToCall;
+                        var instantiation = instantiatedType.Instantiation;
+                        var objType = instantiation[0];
 
-                        var mangledEETypeName = context.NameMangler.GetMangledTypeName(typeDef);
+                        var mangledEETypeName = context.NameMangler.GetMangledTypeName(objType);
 
                         importer.PushExpression(new NativeIntConstantEntry(mangledEETypeName));
 
@@ -262,7 +272,7 @@ namespace ILCompiler.Compiler.Importer
                 case "Write":
                     if (IsTypeName(methodToCall, "System", "Console"))
                     {
-                        var argtype = methodToCall.Parameters[0].Type;
+                        var argtype = methodToCall.Signature[0].Type;
                         targetMethodName = argtype.FullName switch
                         {
                             "System.Char" => "WriteChar",
@@ -276,9 +286,9 @@ namespace ILCompiler.Compiler.Importer
                 case "Get":
                     {
                         // first parameter = this, remaining parameters = indices
-                        var valueType = methodToCall.Parameters[1].Type;
-                        var elemSize = valueType.GetInstanceFieldSize();
-                        var rank = methodToCall.Parameters.Count - 1;
+                        var valueType = methodToCall.Signature[1];
+                        var elemSize = valueType.Type.GetElementSize().AsInt;
+                        var rank = methodToCall.Signature.Length - 1;
 
                         // Arrays are stored in row-major order see https://github.com/stakx/ecma-335/blob/master/docs/i.8.9.1-array-types.md
 
@@ -299,7 +309,7 @@ namespace ILCompiler.Compiler.Importer
                         // Add address of array
                         var addr = new BinaryOperator(Operation.Add, isComparison: false, indexOp, arguments[0], VarType.Ptr);
 
-                        var op = new IndirectEntry(addr, valueType.GetVarType(), elemSize);
+                        var op = new IndirectEntry(addr, valueType.Type.VarType, elemSize);
                         importer.PushExpression(op);
 
                         return true;
@@ -307,9 +317,9 @@ namespace ILCompiler.Compiler.Importer
                 case "Set":
                     {
                         // first parameter = this, second parameter = value, remaining parameters = indices
-                        var valueType = methodToCall.Parameters[1].Type;
-                        var elemSize = valueType.GetInstanceFieldSize();
-                        var rank = methodToCall.Parameters.Count - 2;
+                        var valueType = methodToCall.Signature[1];
+                        var elemSize = valueType.Type.GetElementSize().AsInt;
+                        var rank = methodToCall.Signature.Length - 2;
 
                         // Arrays are stored in row-major order see https://github.com/stakx/ecma-335/blob/master/docs/i.8.9.1-array-types.md
 
@@ -330,7 +340,7 @@ namespace ILCompiler.Compiler.Importer
                         // Add address of array
                         var addr = new BinaryOperator(Operation.Add, isComparison: false, indexOp, arguments[0], VarType.Ptr);
 
-                        var op = new StoreIndEntry(addr, arguments[rank + 1], valueType.GetVarType(), 0, elemSize);
+                        var op = new StoreIndEntry(addr, arguments[rank + 1], valueType.Type.VarType, 0, elemSize);
                         importer.ImportAppendTree(op);
 
                         return true;
@@ -357,9 +367,9 @@ namespace ILCompiler.Compiler.Importer
             return false;
         }
 
-        private static bool IsTypeName(IMethodDefOrRef method, string typeNamespace, string typeName)
+        private static bool IsTypeName(MethodDesc method, string typeNamespace, string typeName)
         {
-            var metadataType = method.DeclaringType;
+            var metadataType = method.OwningType;
             if (metadataType == null)
             {
                 return false;

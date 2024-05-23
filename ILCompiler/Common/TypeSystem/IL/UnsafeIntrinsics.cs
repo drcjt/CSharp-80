@@ -58,7 +58,7 @@ namespace ILCompiler.Common.TypeSystem.IL
         {
             var body = new CilBody();
 
-            body.Instructions.Add(OpCodes.Sizeof.ToInstruction(method.ResolveType(new GenericMVar(0)).ToTypeDefOrRef()));
+            body.Instructions.Add(OpCodes.Sizeof.ToInstruction(new GenericMVar(0).ToTypeDefOrRef()));
             body.Instructions.Add(OpCodes.Ret.ToInstruction());
 
             body.UpdateInstructionOffsets();
@@ -101,7 +101,7 @@ namespace ILCompiler.Common.TypeSystem.IL
             var body = new CilBody();
 
             body.Instructions.Add(OpCodes.Ldarg_1.ToInstruction());
-            body.Instructions.Add(OpCodes.Sizeof.ToInstruction(method.ResolveType(new GenericMVar(0)).ToTypeDefOrRef()));
+            body.Instructions.Add(OpCodes.Sizeof.ToInstruction(new GenericMVar(0).ToTypeDefOrRef()));
             body.Instructions.Add(OpCodes.Conv_I.ToInstruction());
             body.Instructions.Add(OpCodes.Mul.ToInstruction());
             body.Instructions.Add(OpCodes.Ldarg_0.ToInstruction());
@@ -119,7 +119,7 @@ namespace ILCompiler.Common.TypeSystem.IL
 
             body.Instructions.Add(OpCodes.Ldarg_0.ToInstruction());
             body.Instructions.Add(OpCodes.Ldarg_1.ToInstruction());
-            body.Instructions.Add(OpCodes.Add.ToInstruction(method.ResolveType(new GenericMVar(0)).ToTypeDefOrRef()));
+            body.Instructions.Add(OpCodes.Add.ToInstruction(new GenericMVar(0).ToTypeDefOrRef()));
             body.Instructions.Add(OpCodes.Ret.ToInstruction());
 
             body.UpdateInstructionOffsets();

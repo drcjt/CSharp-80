@@ -17,6 +17,7 @@ namespace ILCompiler.Compiler
         private readonly CorLibModuleProvider _corLibModuleProvider;
         private readonly PreinitializationManager _preinitializationManager;
         private readonly NodeFactory _nodeFactory;
+        private readonly TypeSystemContext _typeSystemContext;
 
         private MethodDesc _method = null!;
         private LocalVariableTable? _locals;
@@ -56,7 +57,7 @@ namespace ILCompiler.Compiler
             public int GrabTemp(VarType type, int? exactSize) => _importer._locals!.GrabTemp(type, exactSize);
         }
 
-        public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, CorLibModuleProvider corlibModuleProvider, PreinitializationManager preinitializationManager, NodeFactory nodeFactory)
+        public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, CorLibModuleProvider corlibModuleProvider, PreinitializationManager preinitializationManager, NodeFactory nodeFactory, TypeSystemContext typeSystemContext)
         {
             _configuration = configuration;
             _basicBlocks = Array.Empty<BasicBlock>();
@@ -66,6 +67,7 @@ namespace ILCompiler.Compiler
             _corLibModuleProvider = corlibModuleProvider;
             _preinitializationManager = preinitializationManager;
             _nodeFactory = nodeFactory;
+            _typeSystemContext = typeSystemContext;
 
             _importerProxy = new ILImporterProxy(this);
         }
@@ -187,6 +189,7 @@ namespace ILCompiler.Compiler
                     CorLibModuleProvider = _corLibModuleProvider,
                     PreinitializationManager = _preinitializationManager,
                     NodeFactory = _nodeFactory,
+                    TypeSystemContext = _typeSystemContext,
                 };
 
                 bool imported = ImportInstruction(currentInstruction, importContext);
@@ -275,14 +278,14 @@ namespace ILCompiler.Compiler
             _method = method;
             _locals = locals;
 
-            var basicBlockAnalyser = new BasicBlockAnalyser(_method, _nameMangler);
+            var basicBlockAnalyser = new BasicBlockAnalyser(_method, _nameMangler, _typeSystemContext);
             var offsetToIndexMap = new Dictionary<int, int>();
             _basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
             // Trigger static constructor if required
-            if (method.IsInstanceConstructor)
+            if (method.IsDefaultConstructor)
             {
-                var staticConstructorMethod = method.DeclaringType.FindStaticConstructor();
+                var staticConstructorMethod = method.OwningType.GetStaticConstructor();
                 if (staticConstructorMethod != null)
                 {
                     var targetMethod = _nameMangler.GetMangledMethodName(staticConstructorMethod);

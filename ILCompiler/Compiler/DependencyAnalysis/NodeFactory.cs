@@ -1,5 +1,4 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.Common;
+﻿using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
 using ILCompiler.IoC;
@@ -12,22 +11,24 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly IDictionary<string, Z80MethodCodeNode> _methodNodesByFullName = new Dictionary<string, Z80MethodCodeNode>();
         private readonly IDictionary<string, VirtualMethodUseNode> _virtualMethodNodesByFullName = new Dictionary<string, VirtualMethodUseNode>();
         private readonly IDictionary<string, ConstructedEETypeNode> _constructedEETypeNodesByFullName = new Dictionary<string, ConstructedEETypeNode>();
-        private readonly IDictionary<TypeDef, VTableSliceNode> _vTableNodes = new Dictionary<TypeDef, VTableSliceNode>();
-        private readonly IDictionary<ITypeDefOrRef, EETypeNode> _necessaryTypeSymbolNodes = new Dictionary<ITypeDefOrRef, EETypeNode>();
+        private readonly IDictionary<TypeDesc, VTableSliceNode> _vTableNodes = new Dictionary<TypeDesc, VTableSliceNode>();
+        private readonly IDictionary<TypeDesc, EETypeNode> _necessaryTypeSymbolNodes = new Dictionary<TypeDesc, EETypeNode>();
         private readonly IDictionary<string, FrozenStringNode> _frozenStringNodes = new Dictionary<string, FrozenStringNode>();
 
         private readonly PreinitializationManager _preinitializationManager;
         private readonly INameMangler _nameMangler;
         private readonly Factory<IMethodCompiler> _methodCompilerFactory;
+        private readonly TypeSystemContext _typeSystemContext;
 
-        public NodeFactory(PreinitializationManager preinitializationManager, INameMangler nameMangler, Factory<IMethodCompiler> methodCompilerFactory) 
+        public NodeFactory(PreinitializationManager preinitializationManager, INameMangler nameMangler, Factory<IMethodCompiler> methodCompilerFactory, TypeSystemContext typeSystemContext) 
         {
             _preinitializationManager = preinitializationManager;
             _nameMangler = nameMangler;
             _methodCompilerFactory = methodCompilerFactory;
+            _typeSystemContext = typeSystemContext;
         }
 
-        public ConstructedEETypeNode ConstructedEETypeNode(ITypeDefOrRef type, int size)
+        public ConstructedEETypeNode ConstructedEETypeNode(TypeDesc type, int size)
         {
             if (!_constructedEETypeNodesByFullName.TryGetValue(type.FullName, out var constructedEETypeNode))
             {
@@ -38,7 +39,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return constructedEETypeNode;
         }
 
-        public EETypeNode NecessaryTypeSymbol(ITypeDefOrRef type)
+        public EETypeNode NecessaryTypeSymbol(TypeDesc type)
         {
             if (!_necessaryTypeSymbolNodes.TryGetValue(type, out var necessaryTypeSymbolNode))
             {
@@ -49,7 +50,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return necessaryTypeSymbolNode;
         }
 
-        public StaticsNode StaticsNode(FieldDef field)
+        public StaticsNode StaticsNode(FieldDesc field)
         {
             if (!_staticNodesByFullName.TryGetValue(field.FullName, out var staticNode))
             {
@@ -64,66 +65,36 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             if (!_frozenStringNodes.TryGetValue(data, out var frozenStringNode))
             {
-                frozenStringNode = new FrozenStringNode(data, _nameMangler, corLibModuleProvider);
+                frozenStringNode = new FrozenStringNode(data, _nameMangler, corLibModuleProvider, _typeSystemContext);
                 _frozenStringNodes[data] = frozenStringNode;
             }
 
             return frozenStringNode;
         }
 
-        public VirtualMethodUseNode VirtualMethodUse(IMethod method)
+        public VirtualMethodUseNode VirtualMethodUse(MethodDesc method)
         {
-            var methodDef = method.ResolveMethodDefThrow();
-            if (!_virtualMethodNodesByFullName.TryGetValue(methodDef.FullName, out var methodNode))
+            if (!_virtualMethodNodesByFullName.TryGetValue(method.FullName, out var methodNode))
             {
-                methodNode = new VirtualMethodUseNode(new MethodDesc(methodDef));
-                _virtualMethodNodesByFullName[methodDef.FullName] = methodNode;
+                methodNode = new VirtualMethodUseNode(method);
+                _virtualMethodNodesByFullName[method.FullName] = methodNode;
             }
 
             return methodNode;
         }
 
-        public Z80MethodCodeNode MethodNode(MethodSpec calleeMethod, MethodDesc callerMethod)
+        public Z80MethodCodeNode MethodNode(MethodDesc method)
         {
-            var calleeMethodDef = calleeMethod.Method.ResolveMethodDefThrow();
-
-            IList<TypeSig> callerMethodGenericParameters = new List<TypeSig>();
-            if (callerMethod is InstantiatedMethod method)
+            if (!_methodNodesByFullName.TryGetValue(method.FullName, out var methodNode))
             {
-                callerMethodGenericParameters = method.GenericParameters;
-            }
-
-            var resolvedGenericParameters = new List<TypeSig>();
-            foreach (var genericParameter in calleeMethod.GenericInstMethodSig.GenericArguments)
-            {
-                resolvedGenericParameters.Add(GenericTypeInstantiator.Instantiate(genericParameter, callerMethodGenericParameters));
-            }
-
-            var calleeMethodFullName = FullNameFactory.MethodFullName(calleeMethodDef.DeclaringType?.FullName, calleeMethodDef.Name, calleeMethodDef.MethodSig, null, resolvedGenericParameters);
-
-            if (!_methodNodesByFullName.TryGetValue(calleeMethodFullName, out var methodNode))
-            {
-                var instantiatedMethod = new InstantiatedMethod(calleeMethodDef, resolvedGenericParameters, calleeMethodFullName);
-                methodNode = new Z80MethodCodeNode(instantiatedMethod, _methodCompilerFactory);
-                _methodNodesByFullName[calleeMethodFullName] = methodNode;
+                methodNode = new Z80MethodCodeNode(method, _methodCompilerFactory, _typeSystemContext);
+                _methodNodesByFullName[method.FullName] = methodNode;
             }
 
             return methodNode;
         }
 
-        public Z80MethodCodeNode MethodNode(IMethod method)
-        {
-            var methodDef = method.ResolveMethodDefThrow();
-            if (!_methodNodesByFullName.TryGetValue(methodDef.FullName, out var methodNode))
-            {
-                methodNode = new Z80MethodCodeNode(new MethodDesc(methodDef), _methodCompilerFactory);
-                _methodNodesByFullName[methodDef.FullName] = methodNode;
-            }
-
-            return methodNode;
-        }
-
-        public VTableSliceNode VTable(TypeDef type)
+        public VTableSliceNode VTable(TypeDesc type)
         {
             if (!_vTableNodes.TryGetValue(type, out var vTableSliceNode))
             {

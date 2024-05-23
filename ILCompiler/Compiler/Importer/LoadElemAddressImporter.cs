@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Helpers;
 using ILCompiler.Interfaces;
@@ -13,12 +14,11 @@ namespace ILCompiler.Compiler.Importer
             if (instruction.OpCode.Code != Code.Ldelema) return false;
 
             var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-            typeSig = context.Method.ResolveType(typeSig);
-            var elemType = typeSig.GetVarType();
-            int elemSize = typeSig.GetInstanceFieldSize();
+            var typeDesc = context.TypeSystemContext.Create(typeSig, context.Method.Instantiation);
+            var elemType = typeDesc.VarType;
+            int elemSize = typeDesc.GetElementSize().AsInt;
 
-            // TODO
-            // Consider using a helper function instead
+            // TODO: Consider using a helper function instead
             // ryujit uses a helper function here CORINFO_HELP_LDELEMA_REF
 
             var index = importer.PopExpression();

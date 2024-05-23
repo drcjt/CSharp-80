@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -13,20 +14,19 @@ namespace ILCompiler.Compiler.Importer
 
             var isStoreStatic = instruction.OpCode == OpCodes.Stsfld;
 
-            var fieldDefOrRef = instruction.Operand as IField;
-            var fieldDef = fieldDefOrRef.ResolveFieldDefThrow();
+            var field = context.TypeSystemContext.Create((IField)instruction.Operand);
 
             var value = importer.PopExpression();
 
             StackEntry addr;
             if (isStoreStatic)
             {
-                var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDef);
+                var mangledFieldName = context.NameMangler.GetMangledFieldName(field);
                 addr = new SymbolConstantEntry(mangledFieldName);
 
-                if (!context.PreinitializationManager.IsPreinitialized(fieldDef.DeclaringType))
+                if (!context.PreinitializationManager.IsPreinitialized(field.OwningType))
                 {
-                    addr = InitClassHelper.ImportInitClass(fieldDef, context, importer, addr);
+                    addr = InitClassHelper.ImportInitClass(field.OwningType, context, importer, addr);
                 }
             }
             else
@@ -34,17 +34,10 @@ namespace ILCompiler.Compiler.Importer
                 addr = importer.PopExpression();
             }
 
-            // Ensure fields have all offsets calculated
-            if (fieldDef.FieldOffset == null)
-            {
-                fieldDef.DeclaringType.ToTypeSig().GetInstanceFieldSize();
-            }
+            var fieldSize = field.FieldType.GetElementSize().AsInt;
+            var fieldOffset = isStoreStatic ? 0 : field.Offset.AsInt;
 
-            // TODO: Can this be removed
-            var fieldSize = fieldDef.FieldType.GetInstanceFieldSize();
-            var fieldOffset = fieldDef.FieldOffset ?? 0;
-
-            var node = new StoreIndEntry(addr, value, fieldDef.FieldType.GetVarType(), fieldOffset, fieldSize);
+            var node = new StoreIndEntry(addr, value, field.FieldType.VarType, (uint)fieldOffset, fieldSize);
 
             importer.ImportAppendTree(node, true);
 

@@ -1,6 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.IL;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -14,11 +14,10 @@ namespace ILCompiler.Compiler.Importer
 
             var op2 = importer.PopExpression();
 
-            var elemTypeDef = (instruction.Operand as ITypeDefOrRef).ResolveTypeDefThrow();
-            var arrayType = elemTypeDef.MakeArrayType();
+            var elemTypeDesc = context.TypeSystemContext.Create((ITypeDefOrRef)instruction.Operand, context.Method.Instantiation);
+            var arrayType = new ArrayType(elemTypeDesc, -1);
 
-            var typeSig = context.Method.ResolveType(elemTypeDef.ToTypeSig());
-            var arrayElementSize = typeSig.GetInstanceFieldSize();
+            var arrayElementSize = elemTypeDesc.GetElementSize().AsInt;
 
             var mangledEETypeName = context.NameMangler.GetMangledTypeName(arrayType);
             var eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);

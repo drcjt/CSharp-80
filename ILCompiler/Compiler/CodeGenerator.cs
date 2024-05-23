@@ -1,4 +1,5 @@
-﻿using ILCompiler.Compiler.CodeGenerators;
+﻿using ILCompiler.Common.TypeSystem.Common.dnlib;
+using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.EvaluationStack;
@@ -41,9 +42,7 @@ namespace ILCompiler.Compiler
             string methodName;
             if (methodCodeNode.Method.HasCustomAttribute("System.Runtime", "RuntimeExportAttribute"))
             {
-                var runtimeExportAttribute = methodCodeNode.Method.FindCustomAttribute("System.Runtime.RuntimeExportAttribute");
-                var runtimeExportAttributeValue = runtimeExportAttribute.ConstructorArguments[0].Value.ToString() ?? "";
-                methodName = runtimeExportAttributeValue;
+                methodName = ((DnlibMethod)(methodCodeNode.Method)).GetRuntimeExportName();
             }
             else
             {

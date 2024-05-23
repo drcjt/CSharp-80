@@ -1,4 +1,4 @@
-﻿using dnlib.DotNet;
+﻿using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
@@ -29,7 +29,7 @@ namespace ILCompiler.Compiler.DependencyAnalysisFramework
             };
         }
 
-        public IDependencyNode AddRoot(MethodDef root)
+        public IDependencyNode AddRoot(MethodDesc root)
         {
             var rootCodeNode = _nodeFactory.MethodNode(root);
             AddToMarkStack(rootCodeNode);

@@ -5,49 +5,88 @@ namespace ILCompiler.Common.TypeSystem.Common
 {
     public class InstantiatedMethod : MethodDesc
     {
-        private readonly IList<TypeSig> _genericParameters;
-        private readonly string _fullName;
+        private readonly MethodDesc _methodDesc;
+        private readonly Instantiation _instantiation;
 
-        public InstantiatedMethod(MethodDef methodDef, IList<TypeSig> genericParameters, string fullName) : base(methodDef)
+        public InstantiatedMethod(MethodDesc methodDesc, Instantiation instantiation)
         {
-            _genericParameters = genericParameters;
-            _fullName = fullName;
+            _methodDesc = methodDesc;
+            _instantiation = instantiation;
         }
 
-        public override string FullName => _fullName;
+        public override Instantiation Instantiation { get { return _instantiation; } }
 
-        public override TypeSig ReturnType => GenericTypeInstantiator.Instantiate(_methodDef.ReturnType, _genericParameters);
+        private TypeDesc Instantiate(TypeDesc type) => type.InstantiateSignature(null, _instantiation);
 
-        public IList<TypeSig> GenericParameters => _genericParameters;
+        public override bool HasCustomAttribute(string attributeNamespace, string attributeName) => _methodDesc.HasCustomAttribute(attributeNamespace, attributeName);
 
-        public override TypeSig ResolveType(TypeSig type)
+        public override MethodSignature Signature
         {
-            return GenericTypeInstantiator.Instantiate(type, _genericParameters);
-        }
-
-        public override IList<Local> Locals()
-        {
-            var instantiatedLocals = new List<Local>();
-            foreach (var local in _methodDef.Body.Variables)
+            get
             {
-                var instantiatedType = GenericTypeInstantiator.Instantiate(local.Type, _genericParameters);
-                var instantiatedLocal = new Local(instantiatedType, local.Name, local.Index);
-                instantiatedLocals.Add(instantiatedLocal);
+                var template = _methodDesc.Signature;
+                var builder = new MethodSignatureBuilder(template);
+
+                builder.ReturnType = Instantiate(template.ReturnType);
+                for (int i = 0; i < template.Length; i++)
+                {
+                    builder[i] = Instantiate(template[i].Type);
+                }
+
+                return builder.ToSignature();
             }
-            return instantiatedLocals;
         }
 
-        public override IList<Parameter> Parameters()
+        public override string FullName => ToString();
+
+        public override bool HasReturnType => _methodDesc.HasReturnType;
+
+        public override bool IsIntrinsic => _methodDesc.IsIntrinsic;
+        public override TypeSystemContext Context => _methodDesc.Context;
+
+        public override TypeDesc OwningType => _methodDesc.OwningType;
+
+        public override CilBody Body { get => _methodDesc.Body; set => _methodDesc.Body = value; }
+
+        public override IList<MethodOverride> Overrides => _methodDesc.Overrides;
+
+        public override MethodSig MethodSig => _methodDesc.MethodSig;
+
+        public override string Name => _methodDesc.Name;
+
+        public override CustomAttributeCollection CustomAttributes => _methodDesc.CustomAttributes;
+
+        public override IList<LocalVariableDefinition> Locals
         {
-            var instantiatedParameters = new List<Parameter>();
-            foreach (var param in _methodDef.Parameters)
+            get
             {
-                var instantiatedType = GenericTypeInstantiator.Instantiate(param.Type, _genericParameters);
-                var instantiatedParameter = new Parameter(param.Index, instantiatedType);
-                instantiatedParameters.Add(instantiatedParameter);
+                var instantiatedLocals = new List<LocalVariableDefinition>();
+                foreach (var local in _methodDesc.Body.Variables)
+                {
+                    var instantiatedType = Instantiate(Context.Create(local.Type));
+                    var instantiatedLocal = new LocalVariableDefinition(instantiatedType, local.Name, local.Index);
+                    instantiatedLocals.Add(instantiatedLocal);
+                }
+                return instantiatedLocals;
             }
-
-            return instantiatedParameters;
         }
+
+        public override IList<MethodParameter> Parameters
+        {
+            get
+            {
+                var instantiatedParameters = new List<MethodParameter>();
+                foreach (var parameter in _methodDesc.Parameters)
+                {
+                    var instantiatedType = Instantiate(parameter.Type);
+                    var instantiatedParameter = new MethodParameter(instantiatedType, parameter.Name);
+                    instantiatedParameters.Add(instantiatedParameter);
+                }
+
+                return instantiatedParameters;
+            }
+        }
+
+        public override MethodDesc GetMethodDefinition() => _methodDesc;
     }
 }

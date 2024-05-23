@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
@@ -17,17 +18,17 @@ namespace ILCompiler.Compiler.Importer
 
             if (context.Method.HasReturnType)
             {
-                var returnType = context.Method.ReturnType;
+                var returnType = context.Method.Signature.ReturnType;
                 var value = importer.PopExpression();
 
-                if (returnType.IsStruct())
+                if (returnType.IsValueType && returnType.GetElementSize().AsInt > 4)
                 {
                     // Record return buffer argument index
                     // so that code gen can generate code to
                     // copy struct on top of stack to the 
                     // return buffer.
                     returnBufferArgIndex = context.Method.HasThis ? 1 : 0;
-                    returnTypeExactSize = returnType.GetInstanceFieldSize();
+                    returnTypeExactSize = returnType.GetElementSize().AsInt;
                 }
                 else
                 {

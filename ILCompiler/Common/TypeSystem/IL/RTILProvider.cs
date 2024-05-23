@@ -17,7 +17,7 @@ namespace ILCompiler.Common.TypeSystem.IL
 
         private static CilBody? TryGetIntrinsicMethodIL(MethodDesc method) 
         {
-            var declaringType = method.DeclaringType;
+            var declaringType = method.OwningType;
             switch (declaringType.Name)
             {
                 case "Unsafe":

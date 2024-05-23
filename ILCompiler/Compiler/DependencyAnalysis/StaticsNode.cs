@@ -1,4 +1,4 @@
-﻿using dnlib.DotNet;
+﻿using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.PreInit;
@@ -8,14 +8,14 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class StaticsNode : DependencyNode
     {
-        public FieldDef Field { get; private set; }
+        public FieldDesc Field { get; private set; }
 
         public override string Name => Field.FullName;
 
         private readonly PreinitializationManager _preinitializationManager;
         private readonly INameMangler _nameMangler;
 
-        public StaticsNode(FieldDef field, PreinitializationManager preinitializationManager, INameMangler nameMangler)
+        public StaticsNode(FieldDesc field, PreinitializationManager preinitializationManager, INameMangler nameMangler)
         {
             Field = field;
             _preinitializationManager = preinitializationManager;
@@ -28,9 +28,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
             var field = Field;
 
-            if (_preinitializationManager.IsPreinitialized(field.DeclaringType))
+            if (_preinitializationManager.IsPreinitialized(field.OwningType))
             {
-                var preinitializationInfo = _preinitializationManager.GetPreinitializationInfo(field.DeclaringType);
+                var preinitializationInfo = _preinitializationManager.GetPreinitializationInfo(field.OwningType);
                 var value = preinitializationInfo.GetFieldValue(field);
 
                 // Need to mangle full field name here
@@ -44,7 +44,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
             else
             {
-                var fieldSize = field.FieldType.GetInstanceFieldSize();
+                var fieldSize = field.FieldType.GetElementSize().AsInt;
                 instructionsBuilder.Comment($"Reserving {fieldSize} bytes for static field {field.FullName}");
 
                 // Need to mangle full field name here

@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Interfaces;
@@ -11,15 +12,17 @@ namespace ILCompiler.Compiler
         private readonly Z80AssemblyWriter _z80AssemblyWriter;
         private readonly DependencyAnalyzer _dependencyAnalyzer;
         private readonly CorLibModuleProvider _corLibModuleProvider;
+        private readonly TypeSystemContext _typeSystemContext;
 
         public static bool AnyExceptionHandlers { get; set; } = false;
 
-        public Compilation(IConfiguration configuration, Z80AssemblyWriter z80Writer, CorLibModuleProvider corLibModuleProvider, DependencyAnalyzer dependencyAnalyzer)
+        public Compilation(IConfiguration configuration, Z80AssemblyWriter z80Writer, CorLibModuleProvider corLibModuleProvider, DependencyAnalyzer dependencyAnalyzer, TypeSystemContext typeSystemContext)
         {
             _configuration = configuration;
             _z80AssemblyWriter = z80Writer;
             _corLibModuleProvider = corLibModuleProvider;
             _dependencyAnalyzer = dependencyAnalyzer;
+            _typeSystemContext = typeSystemContext;
         }
 
         public void Compile(string inputFilePath, string outputFilePath)
@@ -46,7 +49,7 @@ namespace ILCompiler.Compiler
 
             _corLibModuleProvider.CorLibModule = corlibModule;
 
-            var rootNode = (Z80MethodCodeNode)_dependencyAnalyzer.AddRoot(module.EntryPoint);
+            var rootNode = (Z80MethodCodeNode)_dependencyAnalyzer.AddRoot(_typeSystemContext.Create(module.EntryPoint));
 
             // Core Dependency Analysis and code output routine
             var nodes = _dependencyAnalyzer.ComputeMarkedNodes();
