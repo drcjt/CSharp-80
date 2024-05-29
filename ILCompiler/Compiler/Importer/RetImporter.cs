@@ -21,7 +21,7 @@ namespace ILCompiler.Compiler.Importer
                 var returnType = context.Method.Signature.ReturnType;
                 var value = importer.PopExpression();
 
-                if (returnType.IsValueType && returnType.GetElementSize().AsInt > 4)
+                if (returnType.IsValueType && !returnType.IsPrimitive && !returnType.IsEnum) // && returnType.GetElementSize().AsInt > 4)
                 {
                     // Record return buffer argument index
                     // so that code gen can generate code to

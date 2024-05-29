@@ -154,7 +154,7 @@ namespace ILCompiler.Compiler.Importer
             var returnType = methodToCall.Signature.ReturnType;
             if (methodToCall.HasReturnType)
             {
-                if (returnType.IsValueType && returnType.GetElementSize().AsInt > 4)
+                if (returnType.IsValueType && !returnType.IsPrimitive && !returnType.IsEnum)
                 {
                     returnBufferArgIndex = FixupCallStructReturn(returnType, arguments, importer, methodToCall.HasThis);
                 }
@@ -176,7 +176,7 @@ namespace ILCompiler.Compiler.Importer
             }
             else
             {
-                if (returnType.IsValueType && returnType.GetElementSize().AsInt > 4)
+                if (returnType.IsValueType && !returnType.IsPrimitive && !returnType.IsEnum)
                 {
                     importer.ImportAppendTree(callNode, true);
 

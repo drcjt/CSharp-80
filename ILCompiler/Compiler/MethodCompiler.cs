@@ -72,7 +72,7 @@ namespace ILCompiler.Compiler
 
         private void InitReturnBufferArg(TypeDesc returnType, bool hasThis)
         {
-            if (returnType.IsValueType && returnType.GetElementSize().AsInt > 4)
+            if (returnType.IsValueType && !returnType.IsPrimitive && !returnType.IsEnum)
             {
                 var target = new TargetDetails(Common.TypeSystem.Common.TargetArchitecture.Z80);
 
