@@ -331,7 +331,7 @@
             {
                 foreach (var methodOverride in method.Overrides.Where(x => x.MethodDeclaration.Name == name))
                 {
-                    var newRecord = new MethodImplRecord(method, type.Context.Create(methodOverride.MethodDeclaration));
+                    var newRecord = new MethodImplRecord(type.Context.Create(methodOverride.MethodDeclaration), type.Context.Create(methodOverride.MethodBody));
                     foundRecords.Add(newRecord);
                 }
             }

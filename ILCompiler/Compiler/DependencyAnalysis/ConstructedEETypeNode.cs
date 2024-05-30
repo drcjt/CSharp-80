@@ -112,21 +112,18 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 var interfaceType = runtimeInterfaces[interfaceIndex];
 
-                foreach (var method in interfaceType.GetMethods())
+                foreach (var method in interfaceType.GetAllVirtualMethods())
                 {
-                    if (method.IsVirtual)
+                    var implMethod = VirtualMethodAlgorithm.ResolveInterfaceMethodToVirtualMethodOnType(method, defType);
+                    if (implMethod != null)
                     {
-                        var implMethod = VirtualMethodAlgorithm.ResolveInterfaceMethodToVirtualMethodOnType(method, defType);
-                        if (implMethod != null)
+                        var conditionalDependency = new ConditionalDependency
                         {
-                            var conditionalDependency = new ConditionalDependency
-                            {
-                                IfNode = context.NodeFactory.VirtualMethodUse(method),
-                                ThenParent = this,
-                                ThenNode = context.NodeFactory.VirtualMethodUse(implMethod)
-                            };
-                            conditionalDependencies.Add(conditionalDependency);
-                        }
+                            IfNode = context.NodeFactory.VirtualMethodUse(method),
+                            ThenParent = this,
+                            ThenNode = context.NodeFactory.VirtualMethodUse(implMethod)
+                        };
+                        conditionalDependencies.Add(conditionalDependency);
                     }
                 }
             }
