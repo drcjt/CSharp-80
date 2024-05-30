@@ -1,4 +1,4 @@
-﻿using dnlib.DotNet;
+﻿using ILCompiler.Common.TypeSystem.Common;
 
 namespace ILCompiler.Compiler.PreInit
 {
@@ -10,9 +10,9 @@ namespace ILCompiler.Compiler.PreInit
             InstanceBytes = bytes;
         }
 
-        public ValueTypeValue(TypeSig type)
+        public ValueTypeValue(TypeDesc type)
         {
-            InstanceBytes = new byte[type.GetInstanceFieldSize()];
+            InstanceBytes = new byte[type.GetElementSize().AsInt];
         }
 
         private byte[] AsExactByteCount(int size)

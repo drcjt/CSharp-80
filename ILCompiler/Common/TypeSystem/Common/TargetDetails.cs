@@ -1,6 +1,4 @@
-﻿using dnlib.DotNet;
-
-namespace ILCompiler.Common.TypeSystem.Common
+﻿namespace ILCompiler.Common.TypeSystem.Common
 {
     public enum TargetArchitecture
     {
@@ -63,46 +61,41 @@ namespace ILCompiler.Common.TypeSystem.Common
         public int MaximumLog2PrimitiveSize => 3;
         public int MaximumPrimitiveSize => 1 << MaximumLog2PrimitiveSize;
 
-        public LayoutInt GetWellKnownTypeSize(TypeDef type)
+        public LayoutInt GetWellKnownTypeSize(DefType type)
         {
-            return GetWellKnownTypeSize(type.ToTypeSig());
-        }
-
-        public LayoutInt GetWellKnownTypeSize(TypeSig type)
-        {
-            switch (type.ElementType)
+            switch (type.Category)
             {
-                case ElementType.Void:
+                case TypeFlags.Void:
                     return new LayoutInt(PointerSize);
-                case ElementType.Boolean:
+                case TypeFlags.Boolean:
                     return new LayoutInt(1);
-                case ElementType.Char:
+                case TypeFlags.Char:
                     return new LayoutInt(2);
-                case ElementType.I1:
-                case ElementType.U1:
+                case TypeFlags.Byte:
+                case TypeFlags.SByte:
                     return new LayoutInt(1);
-                case ElementType.I2:
-                case ElementType.U2:
+                case TypeFlags.Int16:
+                case TypeFlags.UInt16:
                     return new LayoutInt(2);
-                case ElementType.I4:
-                case ElementType.U4:
+                case TypeFlags.Int32:
+                case TypeFlags.UInt32:
                     return new LayoutInt(4);
-                case ElementType.Pinned:
-                    return GetWellKnownTypeSize(type.Next);
-                case ElementType.I:
-                case ElementType.U:
-                case ElementType.Ptr:
-                case ElementType.ByRef:
-                case ElementType.Array:
-                case ElementType.SZArray:
+                //case ElementType.Pinned:
+                    //return GetWellKnownTypeSize(type.Next);
+                case TypeFlags.IntPtr:
+                case TypeFlags.UIntPtr:
+//                case TypeFlags.Ptr:
+                case TypeFlags.ByRef:
+                case TypeFlags.Array:
+                case TypeFlags.SzArray:
                     return new LayoutInt(PointerSize);
             }
 
             // Add new well known types if necessary
-            throw new InvalidOperationException($"Cannot get well known type size for type {type.ElementType}");
+            throw new InvalidOperationException($"Cannot get well known type size for type {type.Category}");
         }
 
-        public LayoutInt GetWellKnownTypeAlignment(TypeDef type)
+        public LayoutInt GetWellKnownTypeAlignment(DefType type)
         {
             // The size is the alignment
             return GetWellKnownTypeSize(type);

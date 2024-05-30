@@ -1,4 +1,4 @@
-﻿using dnlib.DotNet;
+﻿using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -6,12 +6,11 @@ namespace ILCompiler.Compiler.Importer
 {
     internal static class InitClassHelper
     {
-        public static StackEntry ImportInitClass(IMemberDef memberDef, ImportContext context, IILImporterProxy importer, StackEntry obj)
+        public static StackEntry ImportInitClass(TypeDesc type, ImportContext context, IILImporterProxy importer, StackEntry obj)
         {
             // Get the static constructor if one exists
-            var declaringType = memberDef.DeclaringType;
-            var staticConstructorMethod = declaringType.FindStaticConstructor();
-            if (staticConstructorMethod != null)
+            var staticConstructorMethod = type.GetStaticConstructor();
+            if (staticConstructorMethod != null && staticConstructorMethod.FullName != context.Method.FullName)
             {
                 // Generate call to static constructor
                 var targetMethod = context.NameMangler.GetMangledMethodName(staticConstructorMethod);

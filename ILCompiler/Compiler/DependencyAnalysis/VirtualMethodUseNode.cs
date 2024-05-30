@@ -17,7 +17,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public override void OnMarked(NodeFactory factory)
         {
             // The virtual method is being used so record that a slot is required in the VTable
-            var vTableSlice = factory.VTable(Method.DeclaringType);
+            var vTableSlice = factory.VTable(Method.OwningType);
             vTableSlice.AddEntry(Method);
         }
     }

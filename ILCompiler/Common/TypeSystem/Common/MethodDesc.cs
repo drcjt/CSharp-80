@@ -1,61 +1,101 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.IL;
+using System.Text;
 
 namespace ILCompiler.Common.TypeSystem.Common
 {
-    public class MethodDesc
+    public abstract class MethodDesc : TypeSystemEntity
     {
-        protected MethodDef _methodDef;
-
-        public MethodDesc(MethodDef methodDef)
-        {
-            _methodDef = methodDef;
-            Body = methodDef.Body;
-        }
-
         public bool LocallocUsed { get; set; } = false;
-        public bool IsIntrinsic => _methodDef.IsIntrinsic();
 
-        public bool IsPInvokeImpl => _methodDef.IsPinvokeImpl;
-        public bool IsInternalCall => _methodDef.IsInternalCall;
+        public virtual bool IsIntrinsic => false;
 
-        public bool IsStaticConstructor => _methodDef.IsStaticConstructor;
+        public virtual bool IsPInvoke => false;
 
-        public bool IsInstanceConstructor => _methodDef.IsInstanceConstructor;
+        public virtual string PInvokeMethodName => String.Empty;
 
-        public bool IsStatic => _methodDef.IsStatic;
+        public virtual bool IsInternalCall => false;
 
-        public virtual TypeSig ResolveType(TypeSig type) => type;
+        public virtual bool IsStaticConstructor => OwningType.GetStaticConstructor() == this;
 
-        public ParameterList ParameterList => _methodDef.Parameters;
+        public virtual bool IsDefaultConstructor => OwningType.GetDefaultConstructor() == this;
 
-        //public virtual IList<Parameter> Parameters => _methodDef.Parameters.ToList<Parameter>();
+        public virtual bool IsStatic => false;
 
-        public virtual IList<Parameter> Parameters() => _methodDef.Parameters.ToList<Parameter>();
+        public abstract IList<MethodParameter> Parameters { get; }
 
-        public virtual IList<Local> Locals() => _methodDef.Body.Variables.ToList<Local>();
+        public abstract IList<LocalVariableDefinition> Locals { get; }
 
-        public MethodBody MethodBody => _methodDef.MethodBody;
+        public virtual bool HasReturnType => false;
 
-        public bool HasReturnType => _methodDef.HasReturnType;
+        public virtual bool HasThis => false;
 
-        public virtual TypeSig ReturnType => _methodDef.ReturnType;
+        public virtual string FullName => String.Empty;
 
-        public bool HasThis => _methodDef.HasThis;
+        public abstract TypeDesc OwningType { get; }
 
-        public virtual string FullName => _methodDef.FullName;
+        public virtual string Name => string.Empty;
 
-        public TypeDef DeclaringType => _methodDef.DeclaringType;
-
-        public string Name => _methodDef.Name;
-
-        public CilBody Body { get; set; }
+        public abstract CilBody Body { get; set; }
 
         public bool HasExceptionHandlers => Body.ExceptionHandlers.Count > 0;
 
-        public bool HasCustomAttribute(string attributeNamespace, string attributeName) => _methodDef.HasCustomAttribute(attributeNamespace, attributeName);
+        public abstract bool HasCustomAttribute(string attributeNamespace, string attributeName);
 
-        public CustomAttribute FindCustomAttribute(string attributeName) => _methodDef.CustomAttributes.Find(attributeName);
+        public virtual bool IsVirtual => false;
+        public virtual bool IsNewSlot => false;
+
+        public virtual bool IsAbstract => false;
+
+        public abstract IList<MethodOverride> Overrides { get; }
+
+        public abstract MethodSig MethodSig { get; }
+
+        public abstract CustomAttributeCollection CustomAttributes { get; }
+        public virtual bool HasGenericParameters => false; 
+
+
+        public abstract MethodSignature Signature { get; }
+
+        public abstract Instantiation Instantiation { get; }
+
+        public virtual MethodDesc GetMethodDefinition() => this;
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+
+            var typeNameFormatter = new TypeNameFormatter();
+
+            typeNameFormatter.AppendName(sb, Signature.ReturnType);
+            sb.Append(' ');
+            sb.Append(Name);
+
+            var first = true;
+            for (var i = 0; i < Instantiation.Length; i++)
+            {
+                if (first)
+                {
+                    sb.Append('<');
+                    first = false;
+                }
+                else
+                {
+                    sb.Append(',');
+                }
+                first = false;
+                typeNameFormatter.AppendName(sb, Instantiation[i]);
+            }
+            if (!first)
+            {
+                sb.Append('>');
+            }
+
+            sb.Append('(');
+            sb.Append(Signature.ToString(includeReturnType: false));
+            sb.Append(')');
+
+            return sb.ToString();
+        }
     }
 }

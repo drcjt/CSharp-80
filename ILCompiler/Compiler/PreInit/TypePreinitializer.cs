@@ -1,42 +1,43 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 using Instruction = dnlib.DotNet.Emit.Instruction;
 
 namespace ILCompiler.Compiler.PreInit
 {
     internal class TypePreinitializer
     {
-        private readonly TypeDef _type;
+        private readonly TypeDesc _type;
         private readonly IList<Instruction> _instructions;
-        private readonly IDictionary<FieldDef, Value> _fieldValues = new Dictionary<FieldDef, Value>();
-        public TypePreinitializer(TypeDef type, IList<Instruction> instructions)
+        private readonly IDictionary<FieldDesc, Value> _fieldValues = new Dictionary<FieldDesc, Value>();
+        public TypePreinitializer(TypeDesc type, IList<Instruction> instructions)
         {
             _type = type;
             _instructions = instructions;
 
-            foreach (var field in type.Fields)
+            foreach (var field in type.GetFields())
             {
                 if (field.IsStatic && !field.IsLiteral)
                 {
-                    _fieldValues.Add(field, new ValueTypeValue(field.FieldSig.GetFieldType()));
+                    _fieldValues.Add(field, new ValueTypeValue(field.FieldType));
                 }
             }
         }
 
-        public static PreinitializationInfo ScanType(TypeDef type)
+        public static PreinitializationInfo ScanType(TypeDesc type)
         {
-            var cctor = type.FindStaticConstructor();
-            var instructions = cctor.Body.Instructions;
+            var cctor = type.GetStaticConstructor();
+            var instructions = cctor!.Body.Instructions;
 
             var typePreinitializer = new TypePreinitializer(type, instructions);
             var status = typePreinitializer.TryScanMethod();
 
             if (status)
             {
-                var values = new List<KeyValuePair<FieldDef, ISerializableValue>>();
+                var values = new List<KeyValuePair<FieldDesc, ISerializableValue>>();
                 foreach (var kvp in typePreinitializer._fieldValues)
                 {
-                    values.Add(new KeyValuePair<FieldDef, ISerializableValue>(kvp.Key, kvp.Value));
+                    values.Add(new KeyValuePair<FieldDesc, ISerializableValue>(kvp.Key, kvp.Value));
                 }
                 return new PreinitializationInfo(values);
             }
@@ -83,22 +84,22 @@ namespace ILCompiler.Compiler.PreInit
 
                     case Code.Stsfld:
                         {
-                            var fieldDefOrRef = instruction.Operand as IField;
-                            var fieldDef = fieldDefOrRef.ResolveFieldDefThrow();
+                            var fieldDefOrRef = (IField)instruction.Operand;
+                            var fieldDesc = _type.Context.Create(fieldDefOrRef);
 
-                            if (!fieldDef.IsStatic || fieldDef.IsLiteral)
+                            if (!fieldDesc.IsStatic || fieldDesc.IsLiteral)
                             {
                                 throw new InvalidProgramException();
                             }
 
-                            if (fieldDef.DeclaringType != _type)
+                            if (fieldDesc.OwningType != _type)
                             {
                                 // Store into other static
                                 return false;
                             }
 
-                            var value = stack.PopIntoLocation(fieldDef.FieldType);
-                            _fieldValues[fieldDef] = value;
+                            var value = stack.PopIntoLocation(fieldDesc.FieldType);
+                            _fieldValues[fieldDesc] = value;
                         }
                         break;
 

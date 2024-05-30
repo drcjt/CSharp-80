@@ -15,30 +15,33 @@ namespace ILCompiler.Compiler.Importer
             var op1 = importer.PopExpression();
 
             // Determine type to check reference type against
-            var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-            typeSig = context.Method.ResolveType(typeSig);
-            var typeDef = (instruction.Operand as ITypeDefOrRef).ResolveTypeDefThrow();
+            var typeDesc = context.TypeSystemContext.Create((ITypeDefOrRef)instruction.Operand);
 
-            // TODO: Implement array & interface IsInst
-            if (typeSig.IsArray || typeDef.IsInterface)
+            string helperMethodName = "IsInstanceOfClass";
+            if (typeDesc.IsArray)
+            {
+                throw new NotImplementedException();
+            }
+            else if (typeDesc.IsInterface)
             {
                 throw new NotImplementedException("IsInst only supports class types");
             }
 
             // Create call to helper method passing eetypeptr and object reference
-            var mangledEETypeName = context.NameMangler.GetMangledTypeName(typeDef);
-            var args = new List<StackEntry>() { new NativeIntConstantEntry(mangledEETypeName), op1 };
-            var node = new CallEntry(GetHelperMethod(context), args, VarType.Ref, 2);
+            var lookup = context.NodeFactory.NecessaryTypeSymbol(typeDesc);
+
+            var args = new List<StackEntry>() { new NativeIntConstantEntry(lookup.MangledTypeName), op1 };
+            var node = new CallEntry(GetHelperMethod(context, helperMethodName), args, VarType.Ref, 2);
 
             importer.PushExpression(node);
 
             return true;
         }
 
-        private static string GetHelperMethod(ImportContext context)
+        private static string GetHelperMethod(ImportContext context, string helperMethodName)
         {
             var systemRuntimeTypeCast = context.CorLibModuleProvider.FindThrow("System.Runtime.TypeCast");
-            var runtimeHelperMethod = systemRuntimeTypeCast.FindMethod("IsInstanceOfClass");
+            var runtimeHelperMethod = systemRuntimeTypeCast.FindMethod(helperMethodName);
             var mangledHelperMethod = context.NameMangler.GetMangledMethodName(runtimeHelperMethod);
 
             return mangledHelperMethod;

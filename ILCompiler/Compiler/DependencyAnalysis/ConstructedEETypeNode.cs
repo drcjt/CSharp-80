@@ -1,6 +1,4 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.Common;
-using ILCompiler.Common.TypeSystem.IL;
+﻿using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.PreInit;
@@ -12,14 +10,16 @@ namespace ILCompiler.Compiler.DependencyAnalysis
     {
         public int BaseSize { get; private set; }
 
-        public TypeDef? RelatedType { get; set; }
+        public TypeDesc? RelatedType { get; set; }
 
         public override string Name => Type.FullName + " constructed";
 
         private readonly PreinitializationManager _preinitializationManager;
         private readonly NodeFactory _nodeFactory;
 
-        public ConstructedEETypeNode(ITypeDefOrRef type, int baseSize, INameMangler nameMangler, PreinitializationManager preinitializationManager, NodeFactory nodeFactory) 
+        public override bool ShouldSkipEmitting(NodeFactory factory) => false;
+
+        public ConstructedEETypeNode(TypeDesc type, int baseSize, INameMangler nameMangler, PreinitializationManager preinitializationManager, NodeFactory nodeFactory) 
             : base(type, nameMangler)
         {
             BaseSize = baseSize;
@@ -30,37 +30,47 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public override IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context)
         {
             var dependencies = new List<IDependencyNode>();
-            if (Type.ToTypeSig().IsSZArray)
+            if (Type.IsSzArray)
             {
-                var arrayType = context.CorLibModuleProvider.FindThrow("System.Array");
+                var arrayType = (ArrayType)Type;
 
-                var allocSize = arrayType.ToTypeSig().GetInstanceByteCount();
-                var constructedEETypeNode = context.NodeFactory.ConstructedEETypeNode(arrayType, allocSize);
+                var elemType = arrayType.ElementType;
+                if (!elemType.IsInterface)
+                {
+                    RelatedType = elemType;
+                    var elemConstructedEETypeNode = context.NodeFactory.NecessaryTypeSymbol(elemType);
+                    dependencies.Add(elemConstructedEETypeNode);
+                }
+
+                TypeDesc systemArrayType = Type.Context.Create(context.CorLibModuleProvider.FindThrow("System.Array"));
+                var allocSize = ((DefType)systemArrayType).InstanceByteCount;
+                var constructedEETypeNode = context.NodeFactory.ConstructedEETypeNode(systemArrayType, allocSize.AsInt);
                 dependencies.Add(constructedEETypeNode);
             }
             else
             {
-                var baseType = Type.GetBaseType();
-                if (baseType != null)
+                if (Type.HasBaseType)
                 {
-                    var resolvedBaseType = baseType.ResolveTypeDefThrow();
-                    RelatedType = resolvedBaseType;
+                    DefType baseType = Type.BaseType!;
+                    RelatedType = baseType;
 
-                    var objType = baseType.ToTypeSig();
-                    if (!objType.IsValueType)
+                    if (!baseType.IsValueType)
                     {
-                        var allocSize = objType.GetInstanceByteCount();
-                        var constructedEETypeNode = context.NodeFactory.ConstructedEETypeNode(resolvedBaseType, allocSize);
+                        var allocSize = baseType.InstanceByteCount.AsInt;
+                        var constructedEETypeNode = context.NodeFactory.ConstructedEETypeNode(baseType, allocSize);
                         dependencies.Add(constructedEETypeNode);
                     }
                 }
             }
 
             // Enumerate each interface this type implements and add as dependencies
-            foreach (var interfaceType in Type.RuntimeInterfaces())
+            if (!Type.IsSzArray)
             {
-                var interfaceTypeNode = _nodeFactory.NecessaryTypeSymbol(interfaceType);
-                dependencies.Add(interfaceTypeNode);
+                foreach (var interfaceType in Type.RuntimeInterfaces)
+                {
+                    var interfaceTypeNode = _nodeFactory.NecessaryTypeSymbol(interfaceType);
+                    dependencies.Add(interfaceTypeNode);
+                }
             }
 
             return dependencies;
@@ -68,18 +78,19 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public override IList<ConditionalDependency> GetConditionalStaticDependencies(DependencyNodeContext context)
         {
-            var resolvedType = Type.ResolveTypeDefThrow();
+            var defType = Type.Context.GetClosestDefType(Type);
 
             IList<ConditionalDependency> conditionalDependencies = new List<ConditionalDependency>();
-            foreach (var method in VirtualMethodAlgorithm.EnumAllVirtualSlots(resolvedType))
+            foreach (var method in VirtualMethodAlgorithm.EnumAllVirtualSlots(defType))
             {
                 if (!method.HasGenericParameters)
                 {
-                    var implementation = VirtualMethodAlgorithm.FindVirtualFunctionTargetMethodOnObjectType(resolvedType, method);
+                    var implementation = VirtualMethodAlgorithm.FindVirtualFunctionTargetMethodOnObjectType(defType, method);
 
                     // Add a conditional dependency if the method implementation is on this type
                     // and is not abstract since there is no code for an abstract method
-                    if (implementation?.DeclaringType == resolvedType && !implementation.IsAbstract)
+
+                    if (implementation?.OwningType == defType && !implementation.IsAbstract)
                     {
                         var conditionalDependency = new ConditionalDependency
                         {
@@ -96,26 +107,23 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 }
             }
 
-            var runtimeInterfaces = resolvedType.RuntimeInterfaces();
+            var runtimeInterfaces = defType.RuntimeInterfaces;
             for (int interfaceIndex = 0;  interfaceIndex < runtimeInterfaces.Length; interfaceIndex++) 
             {
-                var interfaceType = runtimeInterfaces[interfaceIndex].ResolveTypeDefThrow();
+                var interfaceType = runtimeInterfaces[interfaceIndex];
 
-                foreach (var method in interfaceType.Methods)
+                foreach (var method in interfaceType.GetAllVirtualMethods())
                 {
-                    if (method.IsVirtual)
+                    var implMethod = VirtualMethodAlgorithm.ResolveInterfaceMethodToVirtualMethodOnType(method, defType);
+                    if (implMethod != null)
                     {
-                        var implMethod = VirtualMethodAlgorithm.ResolveInterfaceMethodToVirtualMethodOnType(method, resolvedType);
-                        if (implMethod != null)
+                        var conditionalDependency = new ConditionalDependency
                         {
-                            var conditionalDependency = new ConditionalDependency
-                            {
-                                IfNode = context.NodeFactory.VirtualMethodUse(method),
-                                ThenParent = this,
-                                ThenNode = context.NodeFactory.VirtualMethodUse(implMethod)
-                            };
-                            conditionalDependencies.Add(conditionalDependency);
-                        }
+                            IfNode = context.NodeFactory.VirtualMethodUse(method),
+                            ThenParent = this,
+                            ThenNode = context.NodeFactory.VirtualMethodUse(implMethod)
+                        };
+                        conditionalDependencies.Add(conditionalDependency);
                     }
                 }
             }
@@ -155,32 +163,32 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 instructionsBuilder.Dw((ushort)0, "No Related Type");
             }
 
-
             var vtableSlotCountReservation = instructionsBuilder.ReserveByte();
             var interfaceCountReservation = instructionsBuilder.ReserveByte();
 
+            var defType = Type.Context.GetClosestDefType(Type);
 
             // Emit VTable
-            OutputVirtualSlots(instructionsBuilder, Type, Type);
+            OutputVirtualSlots(instructionsBuilder, defType, defType);
             instructionsBuilder.UpdateReservation(vtableSlotCountReservation, Instruction.Create(Opcode.Db, _virtualSlotCount, "VTable slot count"));
 
             // Emit Interface map
-            OutputInterfaceMap(instructionsBuilder);
+            OutputInterfaceMap(instructionsBuilder, defType);
             instructionsBuilder.UpdateReservation(interfaceCountReservation, Instruction.Create(Opcode.Db, _interfaceSlotCount, "Interface slot count"));
 
             // Emit dispatch map
-            OutputDispatchMap(instructionsBuilder);
+            OutputDispatchMap(instructionsBuilder, defType);
 
             return instructionsBuilder.Instructions;
         }
 
         private byte _interfaceSlotCount = 0;
 
-        private void OutputInterfaceMap(InstructionsBuilder instructionsBuilder)
+        private void OutputInterfaceMap(InstructionsBuilder instructionsBuilder, DefType defType)
         {
             instructionsBuilder.Comment($"Interface map for {Type.FullName}");
 
-            var interfaces = Type.RuntimeInterfaces();
+            var interfaces = defType.RuntimeInterfaces;
 
             // Enumerate each interface this type implements
             foreach (var interfaceType in interfaces) 
@@ -192,14 +200,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
         }
 
-        private void OutputDispatchMap(InstructionsBuilder instructionsBuilder)
+        private void OutputDispatchMap(InstructionsBuilder instructionsBuilder, DefType defType)
         {
-            instructionsBuilder.Comment($"Dispatch map for {Type.FullName}");
+            instructionsBuilder.Comment($"Dispatch map for {defType.FullName}");
 
             var dispatchMapEntryCountReservation = instructionsBuilder.ReserveByte();
 
-            var resolvedType = Type.ResolveTypeDefThrow();
-            var interfaces = Type.RuntimeInterfaces();
+            var interfaces = defType.RuntimeInterfaces;
 
             byte entryCount = 0;
 
@@ -207,8 +214,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             for (int interfaceIndex = 0; interfaceIndex < interfaces.Length; interfaceIndex++) 
             {
                 var interfaceType = interfaces[interfaceIndex];
-                var resolvedInterfaceType = interfaceType.ResolveTypeDefThrow();
-                var virtualSlots = _nodeFactory.VTable(resolvedInterfaceType).GetSlots();
+                var virtualSlots = _nodeFactory.VTable(interfaceType).GetSlots();
 
                 // For each interface method slot try to emit a dispatch map
                 for (int interfaceMethodSlot = 0; interfaceMethodSlot < virtualSlots.Count; interfaceMethodSlot++) 
@@ -221,7 +227,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         throw new NotImplementedException("Static interface methods not currently supported");
                     }
 
-                    var implMethod = VirtualMethodAlgorithm.ResolveInterfaceMethodToVirtualMethodOnType(method, resolvedType);
+                    var implMethod = VirtualMethodAlgorithm.ResolveInterfaceMethodToVirtualMethodOnType(method, defType);
                     if (implMethod != null)
                     {
                         int emittedInterfaceSlot = interfaceMethodSlot;
@@ -240,7 +246,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         // No need to emit a dispatch map in this case as the runtime interface dispatch code will
                         // walk the inheritance chain
 
-                        var result = VirtualMethodAlgorithm.ResolveInterfaceMethodToDefaultImplementationOnType(method, resolvedType, out implMethod);
+                        var result = VirtualMethodAlgorithm.ResolveInterfaceMethodToDefaultImplementationOnType(method, interfaceType, out implMethod);
 
                         if (result != DefaultInterfaceMethodResolution.None)
                         {
@@ -260,27 +266,26 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private byte _virtualSlotCount = 0;
 
-        private void OutputVirtualSlots(InstructionsBuilder instructionsBuilder, ITypeDefOrRef type, ITypeDefOrRef implType)
+        private void OutputVirtualSlots(InstructionsBuilder instructionsBuilder, DefType type, DefType implType)
         {
             instructionsBuilder.Comment($"VTable slots for {type.FullName}");
 
             // Output inherited VTable slots first
-            var baseType = type.GetBaseType();
+            var baseType = type.BaseType;
             if (baseType != null)
             {
                 OutputVirtualSlots(instructionsBuilder, baseType, implType);
             }
 
             // Now get new slots
-            var resolvedType = type.ResolveTypeDefThrow();
-            var vTable = _nodeFactory.VTable(resolvedType);
+            var vTable = _nodeFactory.VTable(type);
             var virtualSlots = vTable.GetSlots();
 
             // Emit VTable entries for the new slots
             for (int i = 0; i < virtualSlots.Count; i++)
             {
                 var method = virtualSlots[i];
-                var implementation = VirtualMethodAlgorithm.FindVirtualFunctionTargetMethodOnObjectType(implType.ResolveTypeDefThrow(), method);
+                var implementation = VirtualMethodAlgorithm.FindVirtualFunctionTargetMethodOnObjectType(implType, method);
 
                 // Only generate slot entries for non abstract methods
                 if (implementation != null && !implementation.IsAbstract)

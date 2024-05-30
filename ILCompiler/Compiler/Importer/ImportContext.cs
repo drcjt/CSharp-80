@@ -16,5 +16,6 @@ namespace ILCompiler.Compiler.Importer
         public required PreinitializationManager PreinitializationManager { get; init; }
         public required CorLibModuleProvider CorLibModuleProvider { get; init; }
         public required NodeFactory NodeFactory { get; init; }
+        public required TypeSystemContext TypeSystemContext { get; init; }
     }
 }

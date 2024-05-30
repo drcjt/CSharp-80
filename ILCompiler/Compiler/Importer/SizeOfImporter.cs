@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -12,9 +13,10 @@ namespace ILCompiler.Compiler.Importer
             if (instruction.OpCode.Code != Code.Sizeof) return false;
 
             var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-            typeSig = context.Method.ResolveType(typeSig);
-            VarType elemType = typeSig.GetVarType();
-            int elemSize = typeSig.GetInstanceFieldSize();
+            var typeDesc = context.TypeSystemContext.Create(typeSig, context.Method.Instantiation);
+
+            var elemType = typeDesc.VarType;
+            int elemSize = typeDesc.GetElementSize().AsInt;
 
             importer.PushExpression(new Int32ConstantEntry(checked((int)elemSize)));
 

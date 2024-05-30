@@ -14,18 +14,20 @@ namespace ILCompiler.Compiler
         private readonly INameMangler _nameMangler;
         private readonly ILogger<Z80AssemblyWriter> _logger;
         private readonly NativeDependencyAnalyser _nativeDependencyAnalyser;
+        private readonly NodeFactory _nodeFactory;
 
         private string _inputFilePath = null!;
         private StreamWriter _out = null!;
 
         private readonly ISet<string> _calls = new HashSet<string>();
 
-        public Z80AssemblyWriter(IConfiguration configuration, INameMangler nameMangler, ILogger<Z80AssemblyWriter> logger, NativeDependencyAnalyser nativeDependencyAnalyser)
+        public Z80AssemblyWriter(IConfiguration configuration, INameMangler nameMangler, ILogger<Z80AssemblyWriter> logger, NativeDependencyAnalyser nativeDependencyAnalyser, NodeFactory nodeFactory)
         {
             _configuration = configuration;
             _nameMangler = nameMangler;
             _logger = logger;
             _nativeDependencyAnalyser = nativeDependencyAnalyser;
+            _nodeFactory = nodeFactory;
         }
 
         private ushort GetOrgAddress()
@@ -73,8 +75,8 @@ namespace ILCompiler.Compiler
             instructionsBuilder.Label("EXITRETCODE");
 
             var entryMethod = root.Method;
-            var returnType = entryMethod.ReturnType;
-            var hasReturnCode = returnType != null && returnType.GetVarType().IsInt();
+            var returnType = entryMethod.Signature.ReturnType;
+            var hasReturnCode = returnType != null && returnType.VarType.IsInt();
 
             if (!_configuration.IntegrationTests && hasReturnCode)
             {
@@ -202,8 +204,11 @@ namespace ILCompiler.Compiler
 
                 foreach (var node in nodes)
                 {
-                    var instructions = node.GetInstructions(inputFilePath);
-                    WriteInstructions(instructions);
+                    if (!node.ShouldSkipEmitting(_nodeFactory))
+                    {
+                        var instructions = node.GetInstructions(inputFilePath);
+                        WriteInstructions(instructions);
+                    }
                 }
 
                 WriteEhClauses(nodes);

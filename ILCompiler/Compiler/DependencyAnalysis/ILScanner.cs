@@ -3,7 +3,6 @@ using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
-using ILCompiler.Compiler.PreInit;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
@@ -12,11 +11,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly MethodDesc _method;
         private readonly IList<IDependencyNode> _dependencies = new List<IDependencyNode>();
         private readonly DependencyNodeContext _context;
+        private readonly TypeSystemContext _typeSystemContext;
 
-        public ILScanner(MethodDesc method, DependencyNodeContext context)
+        public ILScanner(MethodDesc method, DependencyNodeContext context, TypeSystemContext typeSystemContext)
         {
             _method = method;
             _context = context;
+            _typeSystemContext = typeSystemContext;
         }
 
         public IList<IDependencyNode> FindDependencies()
@@ -60,7 +61,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                                 break;
 
                             case Code.Isinst:
-                                ImportCasting();
+                                ImportCasting(currentInstruction);
                                 break;
 
                             case Code.Ldelema:
@@ -72,6 +73,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                             case Code.Ldelem_I1:
                             case Code.Ldelem_I2:
                             case Code.Ldelem_I4:
+                            case Code.Ldelem_U1:
+                            case Code.Ldelem_U2:
+                            case Code.Ldelem_U4:
                             case Code.Ldelem_Ref:
                                 ImportLoadElement();
                                 break;
@@ -102,7 +106,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 var systemRuntimeExceptionHandling = _context.CorLibModuleProvider.FindThrow("System.Runtime.ExceptionHandling");
                 var runtimeHelperMethod = systemRuntimeExceptionHandling.FindMethod("ThrowException");
-                var methodNode = _context.NodeFactory.MethodNode(runtimeHelperMethod);
+                var methodNode = _context.NodeFactory.MethodNode(_typeSystemContext.Create(runtimeHelperMethod));
                 _dependencies.Add(methodNode);
             }
         }
@@ -111,20 +115,36 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             foreach (var exceptionHandler in _method.Body.ExceptionHandlers)
             {
-                var catchTypeDef = exceptionHandler.CatchType.ResolveTypeDefThrow();
-                var allocSize = catchTypeDef.ToTypeSig().GetInstanceByteCount();
-                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(catchTypeDef, allocSize));
+                var catchTypeDef = (DefType)_typeSystemContext.Create(exceptionHandler.CatchType);
+                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(catchTypeDef, catchTypeDef.InstanceByteCount.AsInt));
             }
         }
 
-        private void ImportCasting()
+        private void ImportCasting(Instruction instruction)
         {
-            var systemRuntimeTypeCast = _context.CorLibModuleProvider.FindThrow("System.Runtime.TypeCast");
-            var runtimeHelperMethod = systemRuntimeTypeCast.FindMethod("IsInstanceOfClass");
+            var typeDesc = _typeSystemContext.Create((ITypeDefOrRef)instruction.Operand);
 
-            var methodNode = _context.NodeFactory.MethodNode(runtimeHelperMethod);
+            if (typeDesc.IsArray)
+            {
+                throw new NotImplementedException();
+            }
+            else if (typeDesc.IsInterface)
+            {
+                throw new NotImplementedException();
+            }
+            else if (typeDesc.IsParameterizedType)
+            {
+                throw new NotImplementedException();
+            }
+            else
+            {
+                var systemRuntimeTypeCast = _context.CorLibModuleProvider.FindThrow("System.Runtime.TypeCast");
+                var runtimeHelperMethod = systemRuntimeTypeCast.FindMethod("IsInstanceOfClass");
+                var methodNode = _context.NodeFactory.MethodNode(_typeSystemContext.Create(runtimeHelperMethod));
 
-            _dependencies.Add(methodNode);
+                _dependencies.Add(methodNode);
+                _dependencies.Add(_context.NodeFactory.NecessaryTypeSymbol(typeDesc));
+            }
         }
 
         private void ImportAddressOfElem()
@@ -162,46 +182,36 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportLoadString(Instruction instruction)
         {
-            var systemStringType = _context.CorLibModuleProvider.FindThrow("System.String");
-            var objType = systemStringType.ToTypeSig();
+            var systemStringType = (DefType)_typeSystemContext.Create(_context.CorLibModuleProvider.FindThrow("System.String"));
 
-            // Determine required size on GC heap
-            var allocSize = objType.GetInstanceByteCount();
-
-            _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(systemStringType, allocSize));
+            _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(systemStringType, systemStringType.InstanceByteCount.AsInt));
 
             _dependencies.Add(_context.NodeFactory.SerializedStringObject(instruction.OperandAs<string>(), _context.CorLibModuleProvider));
         }
 
         private void ImportFieldAccess(Instruction instruction, bool isStatic)
         {
-            var fieldDefOrRef = instruction.Operand as IField;
-            var fieldDef = fieldDefOrRef.ResolveFieldDefThrow();
+            var fieldDesc = _typeSystemContext.Create((IField)instruction.Operand);
 
-            if (isStatic || fieldDef.IsStatic)
+            if (isStatic || fieldDesc.IsStatic)
             {
-                if (isStatic && !fieldDef.IsStatic)
+                if (isStatic && !fieldDesc.IsStatic)
                 {
                     throw new InvalidProgramException();
                 }
 
-                if (fieldDef.HasFieldRVA)
-                {
-                    return;
-                }
+                _dependencies.Add(_context.NodeFactory.StaticsNode(fieldDesc));
 
-                _dependencies.Add(_context.NodeFactory.StaticsNode(fieldDef));
-
-                if (!_context.PreinitializationManager.IsPreinitialized(fieldDef.DeclaringType))
+                if (!_context.PreinitializationManager.IsPreinitialized(fieldDesc.OwningType))
                 {
-                    AddStaticTypeConstructorDependency(fieldDef.DeclaringType);
+                    AddStaticTypeConstructorDependency(fieldDesc.OwningType);
                 }
             }
         }
 
-        private void AddStaticTypeConstructorDependency(TypeDef type)
+        private void AddStaticTypeConstructorDependency(TypeDesc type)
         {
-            var staticConstructoreMethod = type.FindStaticConstructor();
+            var staticConstructoreMethod = type.GetStaticConstructor();
             if (staticConstructoreMethod != null)
             {
                 var node = _context.NodeFactory.MethodNode(staticConstructoreMethod);
@@ -216,10 +226,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportNewArray(Instruction instruction)
         {
-            var elemTypeDef = (instruction.Operand as ITypeDefOrRef).ResolveTypeDefThrow();
-            var allocSize = elemTypeDef.ToTypeSig().GetInstanceByteCount();
+            var elemTypeDef = _typeSystemContext.Create((ITypeDefOrRef)instruction.Operand, _method.Instantiation);
+            var allocSize = elemTypeDef.GetElementSize().AsInt;
 
-            var arrayType = elemTypeDef.MakeArrayType();
+            var arrayType = new ArrayType(elemTypeDef, -1);
 
             _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(arrayType, allocSize));
         }
@@ -240,89 +250,84 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 Z80MethodCodeNode methodNode;
 
-                if (method.IsMethodSpec)
+                var methodDesc = _typeSystemContext.Create(method);
+
+                if (_method is InstantiatedMethod)
                 {
-                    var methodDef = method.ResolveMethodDefThrow();
+                    methodDesc = methodDesc.Context.GetInstantiatedMethod(methodDesc, _method.Instantiation);
+                }
 
-                    if (methodDef.IsIntrinsic() && methodDef.DeclaringType.Name == "EEType" && methodDef.DeclaringType.Namespace == "Internal.Runtime" && methodDef.Name == "Of")
-                    {
-                        // Need to add constructed dependency on T
-                        var genericParameters = ((MethodSpec)method).GenericInstMethodSig.GenericArguments;
-                        var objType = GenericTypeInstantiator.Instantiate(genericParameters[0], method, _method);
-                        var typeDef = objType.ToTypeDefOrRef().ResolveTypeDef();
+                methodNode = _context.NodeFactory.MethodNode(methodDesc);
 
-                        // Determine required size on GC heap
-                        var allocSize = objType.GetInstanceByteCount();
+                if (methodDesc.IsIntrinsic && methodDesc.OwningType.Name == "EEType" && methodDesc.OwningType.Namespace == "Internal.Runtime" && methodDesc.Name == "Of")
+                {
+                    // Need to add constructed dependency on T
+                    var instantiatedMethod = (InstantiatedMethod)methodDesc;
 
-                        _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(typeDef, allocSize));
-                    }
+                    var objType = instantiatedMethod.Instantiation[0];
+                    var allocSize = objType.GetElementSize().AsInt;
 
-                    methodNode = _context.NodeFactory.MethodNode((MethodSpec)method, _method);
+                    _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(objType, allocSize));
+                }
+                if (methodDesc.IsIntrinsic && methodDesc.Name == "get_Chars")
+                {
+                    _dependencies.Add(GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException"));
+                }
+                if (methodDesc.HasCustomAttribute("System.Diagnostics.CodeAnalysis", "DynamicDependencyAttribute"))
+                {
+                    // For dynamic dependencies we need to include the method referred to as part of the dependencies
+                    // of the overall method being analysed
+                    var dependentTypeAttribute = methodDesc.CustomAttributes.Find("System.Diagnostics.CodeAnalysis.DynamicDependencyAttribute");
+
+                    var dependentMethodName = dependentTypeAttribute.ConstructorArguments[0].Value.ToString();
+                    if (dependentMethodName == null) throw new InvalidOperationException("DynamicDependencyAttribute missing method name");
+
+                    var dependentMethod = methodDesc.OwningType.FindMethodEndsWith(dependentMethodName);
+                    if (dependentMethod == null) throw new InvalidOperationException($"Cannot find dynamic dependency {dependentMethodName}");
+
+                    methodDesc = dependentMethod;
+                }
+
+                if (methodDesc.OwningType.IsInterface)
+                {
+                    _dependencies.Add(_context.NodeFactory.NecessaryTypeSymbol(methodDesc.OwningType));
+                }
+
+                bool directCall = IsDirectCall(methodDesc, instruction.OpCode.Code);
+                if (directCall)
+                {
+                    methodNode = _context.NodeFactory.MethodNode(methodDesc);
                 }
                 else
                 {
-                    var methodDef = method.ResolveMethodDefThrow();
-                    if (methodDef.IsIntrinsic() && methodDef.Name == "get_Chars")
-                    {
-                        _dependencies.Add(GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException"));
-                    }
-
-                    if (methodDef.HasCustomAttribute("System.Diagnostics.CodeAnalysis", "DynamicDependencyAttribute"))
-                    {
-                        // For dynamic dependencies we need to include the method referred to as part of the dependencies
-                        // of the overall method being analysed
-                        var dependentTypeAttribute = methodDef.CustomAttributes.Find("System.Diagnostics.CodeAnalysis.DynamicDependencyAttribute");
-
-                        var dependentMethodName = dependentTypeAttribute.ConstructorArguments[0].Value.ToString();
-                        if (dependentMethodName == null) throw new InvalidOperationException("DynamicDependencyAttribute missing method name");
-
-                        var dependentMethod = methodDef.DeclaringType.FindMethodEndsWith(dependentMethodName);
-                        if (dependentMethod == null) throw new InvalidOperationException($"Cannot find dynamic dependency {dependentMethodName}");
-
-                        method = dependentMethod;
-                    }
-
-                    if (methodDef.DeclaringType.IsInterface)
-                    {
-                        _dependencies.Add(_context.NodeFactory.NecessaryTypeSymbol(methodDef.DeclaringType));
-                    }
-
-                    bool directCall = IsDirectCall(methodDef, instruction.OpCode.Code);
-                    if (directCall)
-                    {
-                        methodNode = _context.NodeFactory.MethodNode(method);
-                    }
-                    else
-                    {
-                        _dependencies.Add(_context.NodeFactory.VirtualMethodUse(method));
-                        return;
-                    }
+                    _dependencies.Add(_context.NodeFactory.VirtualMethodUse(methodDesc));
+                    return;
                 }
 
                 // Calling a static method on a class with a static constructor is a trigger for calling
                 // the static constructor so add the static constructor as a dependency
-                var declaringType = methodNode.Method.DeclaringType;
+                var owningType = methodNode.Method.OwningType;
                 if (methodNode.Method.IsStatic)
                 {
-                    var staticConstructorMethod = declaringType.FindStaticConstructor();
-                    if (staticConstructorMethod != null && !_context.PreinitializationManager.IsPreinitialized(declaringType))
+                    var staticConstructorMethod = owningType.GetStaticConstructor();
+                    if (staticConstructorMethod != null && !_context.PreinitializationManager.IsPreinitialized(owningType))
                     {
-                        AddStaticTypeConstructorDependency(methodNode.Method.DeclaringType);
+                        AddStaticTypeConstructorDependency(owningType);
                     }
                 }
-                else if (instruction.OpCode.Code == Code.Newobj && methodNode.Method.IsInstanceConstructor
-                    && !_context.PreinitializationManager.IsPreinitialized(declaringType))
+                else if (instruction.OpCode.Code == Code.Newobj && methodNode.Method.IsDefaultConstructor
+                    && !_context.PreinitializationManager.IsPreinitialized(owningType))
                 {
                     // Add dependency on static constructor if this is a NewObj for a type with a static constructor
 
-                    AddStaticTypeConstructorDependency(methodNode.Method.DeclaringType);
+                    AddStaticTypeConstructorDependency(owningType);
                 }
 
                 _dependencies.Add(methodNode);
             }
         }
 
-        private static bool IsDirectCall(MethodDef targetMethod, Code opcode)
+        private static bool IsDirectCall(MethodDesc targetMethod, Code opcode)
         {
             bool directCall = false;
 
@@ -351,30 +356,29 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 throw new InvalidOperationException("Newobj called with Operand which isn't a IMethodDefOrRef");
             }
 
-            var declaringTypeSig = methodDefOrRef.DeclaringType.ToTypeSig();
+            var ctor = _typeSystemContext.Create(methodDefOrRef);
+            var owningType = ctor.OwningType;
 
-            if (declaringTypeSig.IsArray)
+            if (owningType is ArrayType)
             {
                 // TODO: Will need to review this when changing NewArray assembly routine to take EEType instead of size
+                throw new NotImplementedException();
             }
-            else if (declaringTypeSig.IsValueType)
+            else if (owningType.IsValueType)
             {
                 // No dependency required 
             }
-            else if (declaringTypeSig.FullName != "System.String")
+            else if (owningType.FullName != "System.String")
             {
-                var objType = declaringTypeSig.ToClassSig();
-                // Determine required size on GC heap
-                var allocSize = objType.GetInstanceByteCount();
-
-                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(objType.ToTypeDefOrRef(), allocSize));
+                var allocSize = owningType.GetElementSize().AsInt;
+                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(owningType, allocSize));
             }
         }
 
         private Z80MethodCodeNode GetHelperEntryPoint(string typeName, string methodName)
         {
             var helperMethod = _context.CorLibModuleProvider.GetHelperEntryPoint(typeName, methodName);
-            return _context.NodeFactory.MethodNode(helperMethod);
+            return _context.NodeFactory.MethodNode(_typeSystemContext.Create(helperMethod));
         }
     }
 }

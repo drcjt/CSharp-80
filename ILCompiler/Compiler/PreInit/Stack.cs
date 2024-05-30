@@ -1,4 +1,4 @@
-﻿using dnlib.DotNet;
+﻿using ILCompiler.Common.TypeSystem.Common;
 
 namespace ILCompiler.Compiler.PreInit
 {
@@ -9,18 +9,18 @@ namespace ILCompiler.Compiler.PreInit
             Push(new StackEntry(kind, value));
         }
 
-        public Value PopIntoLocation(TypeSig locationType)
+        public Value PopIntoLocation(TypeDesc locationType)
         {
             var top = Pop();
 
             switch (top.ValueKind)
             {
                 case StackValueKind.Int32:
-                    if (locationType.GetVarType() != VarType.Int 
-                        && locationType.GetVarType() != VarType.UInt)
+                    if (!locationType.IsVarType(VarType.Int)
+                        && !locationType.IsVarType(VarType.UInt))
                     {
                         int value = top.Value.AsInt32();
-                        switch (locationType.GetVarType())
+                        switch (locationType.VarType)
                         {
                             case VarType.SByte:
                             case VarType.Byte:

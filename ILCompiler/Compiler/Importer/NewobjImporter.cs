@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
@@ -12,26 +13,26 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.OpCode.Code != Code.Newobj) return false;
 
-            IMethodDefOrRef? methodDefOrRef = GetMethodDefOrRef(instruction);
+            var ctor = (IMemberRef)instruction.Operand;
+            var owningType = context.TypeSystemContext.Create(ctor.DeclaringType);
 
-            var declaringTypeSig = methodDefOrRef.DeclaringType.ToTypeSig();
-            if (declaringTypeSig.IsArray)
+            var method = context.TypeSystemContext.Create((IMethodDefOrRef)ctor);
+
+            if (owningType.IsArray)
             {
-                ImportNewObjArray(importer, declaringTypeSig);
+                ImportNewObjArray(importer, (ArrayType)owningType);
             }
             else
             {
-                var methodToCall = methodDefOrRef.ResolveMethodDefThrow();
-
-                if (IsSystemStringConstructor(methodToCall))
+                if (IsSystemStringConstructor(method))
                 {
-                    ImportNewObjString(instruction, context, importer, methodToCall);
+                    ImportNewObjString(instruction, context, importer, method);
                 }
                 else
                 {
-                    var objType = declaringTypeSig;
-                    var objVarType = objType.GetVarType();
-                    var objSize = objType.GetInstanceFieldSize();
+                    var objType = (DefType)owningType;
+                    var objVarType = objType.VarType;
+                    var objSize = objType.InstanceFieldSize.AsInt;
 
                     if (objType.IsValueType)
                     {
@@ -39,8 +40,7 @@ namespace ILCompiler.Compiler.Importer
                     }
                     else
                     {
-                        var classType = objType.ToClassSig();
-                        ImportNewObjReferenceType(instruction, context, importer, classType, objVarType, objSize);
+                        ImportNewObjReferenceType(instruction, context, importer, objType, objVarType, objSize);
                     }
                 }
             }
@@ -48,29 +48,19 @@ namespace ILCompiler.Compiler.Importer
             return true;
         }
 
-        private static IMethodDefOrRef GetMethodDefOrRef(Instruction instruction)
+        private static bool IsSystemStringConstructor(MethodDesc methodToCall)
         {
-            if (instruction.Operand is not IMethodDefOrRef methodDefOrRef)
-            {
-                throw new InvalidOperationException("Newobj importer called with Operand which isn't a IMethodDefOrRef");
-            }
-
-            return methodDefOrRef;
-        }
-
-        private static bool IsSystemStringConstructor(MethodDef methodToCall)
-        {
-            return methodToCall.DeclaringType.FullName == "System.String" &&
+            return methodToCall.OwningType.FullName == "System.String" &&
                    methodToCall.IsInternalCall &&
                    methodToCall.HasCustomAttribute("System.Diagnostics.CodeAnalysis", "DynamicDependencyAttribute");
         }
 
-        private static void ImportNewObjReferenceType(Instruction instruction, ImportContext context, IILImporterProxy importer, ClassOrValueTypeSig objType, VarType objVarType, int objSize)
+        private static void ImportNewObjReferenceType(Instruction instruction, ImportContext context, IILImporterProxy importer, DefType objType, VarType objVarType, int objSize)
         {
-            var mangledEETypeName = context.NameMangler.GetMangledTypeName(objType.ToTypeDefOrRef());
+            var mangledEETypeName = context.NameMangler.GetMangledTypeName(objType);
 
             // Determine required size on GC heap
-            var allocSize = objType.GetInstanceByteCount();
+            var allocSize = objType.InstanceByteCount.AsInt;
 
             // Allocate memory for object
             var op1 = new AllocObjEntry(mangledEETypeName, allocSize, objVarType);
@@ -102,7 +92,7 @@ namespace ILCompiler.Compiler.Importer
             importer.PushExpression(node);
         }
 
-        private static void ImportNewObjString(Instruction instruction, ImportContext context, IILImporterProxy importer, MethodDef methodToCall)
+        private static void ImportNewObjString(Instruction instruction, ImportContext context, IILImporterProxy importer, MethodDesc methodToCall)
         {
             // String constructors marked as dynamic dependencies simply
             // call the referred method which will deal with allocation and
@@ -112,22 +102,22 @@ namespace ILCompiler.Compiler.Importer
             var dependentMethodName = dependentTypeAttribute.ConstructorArguments[0].Value.ToString();
             if (dependentMethodName == null) throw new InvalidOperationException("DynamicDependencyAttribute missing method name");
 
-            var dependentMethod = methodToCall.DeclaringType.FindMethodEndsWith(dependentMethodName);
+            var dependentMethod = methodToCall.OwningType.FindMethodEndsWith(dependentMethodName);
+            if (dependentMethod == null) throw new InvalidOperationException($"Cannot find dynamic dependency {dependentMethodName}");
 
             // Replace the method to call in the instruction with the one referred to by the dynamic dependency attribute
             instruction.Operand = dependentMethod;
 
             // Call the dynamic dependency method
-            CallImporter.ImportCall(instruction, context, importer, null);
+            CallImporter.ImportCall(dependentMethod, instruction, context, importer, null);
         }
 
-        private static void ImportNewObjArray(IILImporterProxy importer, TypeSig declaringTypeSig)
+        private static void ImportNewObjArray(IILImporterProxy importer, ArrayType arrayType)
         {
             // Extract element type and number of dimensions
-            var arraySig = declaringTypeSig.ToArraySig();
-            var rank = arraySig.Rank;
-            var elemType = arraySig.Next;   // TODO: Is this the right way to determine the element type?
-            var elemSize = elemType.GetInstanceFieldSize();
+            var rank = arrayType.Rank;
+            var elemType = arrayType.ElementType;
+            var elemSize = elemType.GetElementSize().AsInt;
 
             // Need to call helper to create MD array
             // The helper should take as arguments:

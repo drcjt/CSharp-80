@@ -17,5 +17,7 @@ namespace ILCompiler.Compiler.DependencyAnalysisFramework
         public IList<IDependencyNode> Dependencies { get; set; }
 
         public string Name { get; }
+
+        public bool ShouldSkipEmitting(NodeFactory factory);
     }
 }

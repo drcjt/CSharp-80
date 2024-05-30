@@ -40,9 +40,11 @@ namespace ILCompiler.UnitTests
             var typeDef = _testModule.Find("CoreTestAssembly.Struct2", false);
 
             var target = new TargetDetails(TargetArchitecture.Z80);
-            var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var computedFieldLayout = typeDef.InstanceFieldLayout(metadataFieldLayoutAlgorithm);
+            var typeSystemContext = new TypeSystemContext(null);
+            var typeDesc = typeSystemContext.Create(typeDef);
+            var newMetaDataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
+            var computedFieldLayout = newMetaDataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
 
             // Byte count
             // bool     b1           1 + 1 padding
@@ -91,7 +93,9 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var computedFieldLayout = typeDef.InstanceFieldLayout(metadataFieldLayoutAlgorithm);
+            var typeSystemContext = new TypeSystemContext(null);
+            var typeDesc = typeSystemContext.Create(typeDef);
+            var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
 
             // Byte count
             // Base Class       2 + 2 padding
@@ -152,7 +156,9 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var computedFieldLayout = typeDef.InstanceFieldLayout(metadataFieldLayoutAlgorithm);
+            var typeSystemContext = new TypeSystemContext(null);
+            var typeDesc = typeSystemContext.Create(typeDef);
+            var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
 
             // Byte count
             // Base Class       18
@@ -193,7 +199,9 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var computedFieldLayout = typeDef.InstanceFieldLayout(metadataFieldLayoutAlgorithm);
+            var typeSystemContext = new TypeSystemContext(null);
+            var typeDesc = typeSystemContext.Create(typeDef);
+            var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
 
             // Byte count
             // bool     b1      1
@@ -249,7 +257,9 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var computedFieldLayout = typeDef.InstanceFieldLayout(metadataFieldLayoutAlgorithm);
+            var typeSystemContext = new TypeSystemContext(null);
+            var typeDesc = typeSystemContext.Create(typeDef);
+            var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
 
             // Byte count
             // struct   MyStruct0   12

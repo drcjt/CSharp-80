@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -13,27 +14,21 @@ namespace ILCompiler.Compiler.Importer
 
             var isLoadStatic = instruction.OpCode == OpCodes.Ldsfld;
 
-            var fieldDefOrRef = instruction.Operand as IField;
-            var fieldDef = fieldDefOrRef.ResolveFieldDefThrow();
+            var fieldDesc = context.TypeSystemContext.Create((IField)instruction.Operand);
 
-            // Ensure fields have all offsets calculated
-            if (fieldDef.FieldOffset == null)
-            {
-                fieldDef.DeclaringType.ToTypeSig().GetInstanceFieldSize();
-            }
-
-            var fieldOffset = fieldDef.FieldOffset ?? 0;
+            uint fieldOffset = (uint)fieldDesc.Offset.AsInt;
 
             StackEntry obj;
             if (isLoadStatic)
             {
-                var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDef);
+                var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDesc);
                 obj = new SymbolConstantEntry(mangledFieldName);
 
-                if (!context.PreinitializationManager.IsPreinitialized(fieldDef.DeclaringType))
+                if (!context.PreinitializationManager.IsPreinitialized(fieldDesc.OwningType))
                 {
-                    obj = InitClassHelper.ImportInitClass(fieldDef, context, importer, obj);
+                    obj = InitClassHelper.ImportInitClass(fieldDesc.OwningType, context, importer, obj);
                 }
+                fieldOffset = 0;
             }
             else
             {
@@ -50,9 +45,9 @@ namespace ILCompiler.Compiler.Importer
                 }
             }
 
-            var fieldSize = fieldDef.FieldType.GetInstanceFieldSize();
+            var fieldSize = fieldDesc.FieldType.GetElementSize().AsInt;
 
-            var node = new IndirectEntry(obj, fieldDef.FieldType.GetVarType(), fieldSize, fieldOffset);
+            var node = new IndirectEntry(obj, fieldDesc.FieldType.VarType, fieldSize, fieldOffset);
 
             importer.PushExpression(node);
 

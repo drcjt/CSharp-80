@@ -1,7 +1,4 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Common.TypeSystem.Common
+﻿namespace ILCompiler.Common.TypeSystem.Common
 {
     public static class MetadataRuntimeInterfacesAlgorithm
     {
@@ -11,11 +8,12 @@ namespace ILCompiler.Common.TypeSystem.Common
         /// <param name="typeDefOrRef"></param>
         /// <returns>List of interfaces </returns>
         /// <exception cref="NotImplementedException"></exception>
-        public static ITypeDefOrRef[] ComputeRuntimeInterfaces(ITypeDefOrRef typeDefOrRef)
+        public static DefType[] ComputeRuntimeInterfaces(TypeDesc typeDesc)
         {
-            if (!typeDefOrRef.ContainsGenericParameter)
+            MetadataType type = (MetadataType)typeDesc;
+            if (!type.IsInstantiatedType)
             {
-                return ComputeRuntimeInterfacesForNonInstantiatedMetadataType(typeDefOrRef);
+                return ComputeRuntimeInterfacesForNonInstantiatedMetadataType(type);
             }
 
             throw new NotImplementedException("Generic interfaces not supported");
@@ -26,14 +24,13 @@ namespace ILCompiler.Common.TypeSystem.Common
         /// </summary>
         /// <param name="typeDefOrRef"></param>
         /// <returns></returns>
-        private static ITypeDefOrRef[] ComputeRuntimeInterfacesForNonInstantiatedMetadataType(ITypeDefOrRef typeDefOrRef) 
+        private static DefType[] ComputeRuntimeInterfacesForNonInstantiatedMetadataType(MetadataType type) 
         {
-            var type = typeDefOrRef.ResolveTypeDefThrow();
-            var explicitInterfaces = type.Interfaces.Select(x => x.Interface).ToList();
-            var baseTypeInterfaces = type.BaseType?.RuntimeInterfaces() ?? Array.Empty<ITypeDefOrRef>();
+            DefType[] explicitInterfaces = type.ExplicitlyImplementedInterfaces;
+            DefType[] baseTypeInterfaces = type.HasBaseType ? type.BaseType!.RuntimeInterfaces : Array.Empty<DefType>();
 
-            var interfacesList = new List<ITypeDefOrRef>(baseTypeInterfaces);
-            foreach (ITypeDefOrRef interfaceType in explicitInterfaces)
+            var interfacesList = new List<DefType>(baseTypeInterfaces);
+            foreach (var interfaceType in explicitInterfaces)
             {
                 BuildPostOrderInterfaceList(interfaceType, interfacesList);
             }
@@ -46,12 +43,12 @@ namespace ILCompiler.Common.TypeSystem.Common
         /// </summary>
         /// <param name="interfaceType"></param>
         /// <param name="interfacesList"></param>
-        private static void BuildPostOrderInterfaceList(ITypeDefOrRef interfaceType, List<ITypeDefOrRef> interfacesList)
+        private static void BuildPostOrderInterfaceList(DefType interfaceType, List<DefType> interfacesList)
         {
             if (interfacesList.Contains(interfaceType))
                 return;
 
-            foreach (ITypeDefOrRef implementedInterface in interfaceType.RuntimeInterfaces())
+            foreach (DefType implementedInterface in interfaceType.RuntimeInterfaces)
             {
                 BuildPostOrderInterfaceList(implementedInterface, interfacesList);
             }

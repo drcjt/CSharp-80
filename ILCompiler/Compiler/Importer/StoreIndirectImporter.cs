@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
+using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -35,9 +36,9 @@ namespace ILCompiler.Compiler.Importer
 
                 case Code.Stobj:
                     var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-                    typeSig = context.Method.ResolveType(typeSig);
-                    type = typeSig.GetVarType();
-                    exactSize  = typeSig.GetInstanceFieldSize();
+                    var typeDesc = context.TypeSystemContext.Create(typeSig, context.Method.Instantiation);
+                    type = typeDesc.VarType;
+                    exactSize = typeDesc.GetElementSize().AsInt;
                     break;
 
                 default:
@@ -50,13 +51,18 @@ namespace ILCompiler.Compiler.Importer
             }
 
             var value = importer.PopExpression();
+            return ImportStoreIndValue(importer, type, exactSize, value);
+        }
+
+        public static bool ImportStoreIndValue(IILImporterProxy importer, VarType type, int exactSize, StackEntry value)
+        {
             var addr = importer.PopExpression();
 
             if (addr.Type == VarType.Int)
             {
                 var cast = CodeFolder.FoldExpression(new CastEntry(addr, VarType.Ptr));
                 addr = cast;
-            }    
+            }
 
             if (type.IsSmall() && !value.Type.IsSmall())
             {

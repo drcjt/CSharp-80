@@ -1,4 +1,4 @@
-﻿using dnlib.DotNet;
+﻿using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Interfaces;
@@ -7,13 +7,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class EETypeNode : DependencyNode
     {
-        public ITypeDefOrRef Type { get; private set; }
+        public TypeDesc Type { get; private set; }
 
         public override string Name => Type.FullName;
 
         protected readonly INameMangler _nameMangler;
 
-        public EETypeNode(ITypeDefOrRef type, INameMangler nameMangler)
+        public EETypeNode(TypeDesc type, INameMangler nameMangler)
         {
             Type = type;
             _nameMangler = nameMangler;
@@ -33,6 +33,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             instructionsBuilder.Equ(MangledTypeName, _eeTypePtr);
 
             return instructionsBuilder.Instructions;
+        }
+
+        public override bool ShouldSkipEmitting(NodeFactory factory)
+        {
+            // Skip emitting if there is a constructed version of this node
+            return factory.ConstructedEETypeNode(this.Type, 0).Mark;
         }
     }
 }

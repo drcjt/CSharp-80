@@ -1,6 +1,4 @@
-﻿using dnlib.DotNet;
-
-namespace ILCompiler.Common.TypeSystem.Common
+﻿namespace ILCompiler.Common.TypeSystem.Common
 {
     public struct ComputedInstanceFieldLayout
     {
@@ -15,10 +13,10 @@ namespace ILCompiler.Common.TypeSystem.Common
     {
         public static readonly LayoutInt InvalidOffset = new(int.MaxValue);
 
-        public readonly FieldDef Field;
+        public readonly FieldDesc Field;
         public readonly LayoutInt Offset;
 
-        public FieldAndOffset(FieldDef field, LayoutInt offset)
+        public FieldAndOffset(FieldDesc field, LayoutInt offset)
         {
             Field = field;
             Offset = offset;

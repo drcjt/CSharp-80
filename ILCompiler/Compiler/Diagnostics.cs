@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Common.TypeSystem.Common;
+using System.Text;
 
 namespace ILCompiler.Compiler
 {
@@ -6,12 +7,11 @@ namespace ILCompiler.Compiler
     {
         public static void DumpFlowGraph(string inputFilePath, MethodDesc method, IList<BasicBlock> blocks)
         {
-
             var inputFolder = Path.GetDirectoryName(inputFilePath) ?? throw new ArgumentException("inputFilePath is null");
             var flowGraphFolder = Path.Combine(inputFolder, "FlowGraph");
             Directory.CreateDirectory(flowGraphFolder);
 
-            var dotFilePath = Path.Combine(flowGraphFolder, $"{method.DeclaringType.Name}-{method.Name}.dot");
+            var dotFilePath = Path.Combine(flowGraphFolder, $"{method.OwningType.Name}-{method.Name}.dot");
 
             using (StreamWriter dotOutput = new StreamWriter(dotFilePath, append: false))
             {

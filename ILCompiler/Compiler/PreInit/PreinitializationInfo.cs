@@ -1,10 +1,10 @@
-﻿using dnlib.DotNet;
+﻿using ILCompiler.Common.TypeSystem.Common;
 
 namespace ILCompiler.Compiler.PreInit
 {
     public class PreinitializationInfo
     {
-        private readonly Dictionary<FieldDef, ISerializableValue> _fieldValues = new Dictionary<FieldDef, ISerializableValue>();
+        private readonly Dictionary<FieldDesc, ISerializableValue> _fieldValues = new Dictionary<FieldDesc, ISerializableValue>();
 
         public bool IsPreinitialized => _fieldValues.Count > 0;
 
@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler.PreInit
         { 
         }
 
-        public PreinitializationInfo(IEnumerable<KeyValuePair<FieldDef, ISerializableValue>> fieldValues)
+        public PreinitializationInfo(IEnumerable<KeyValuePair<FieldDesc, ISerializableValue>> fieldValues)
         {
             foreach (var field in fieldValues)
             {
@@ -20,7 +20,7 @@ namespace ILCompiler.Compiler.PreInit
             }
         }
 
-        public ISerializableValue GetFieldValue(FieldDef field)
+        public ISerializableValue GetFieldValue(FieldDesc field)
         {
             return _fieldValues[field];
         }

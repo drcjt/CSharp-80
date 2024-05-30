@@ -1,7 +1,4 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.IL;
-
-namespace ILCompiler.Common.TypeSystem.Common
+﻿namespace ILCompiler.Common.TypeSystem.Common
 {
     /// <summary>
     /// This static methods in this class implement the standard virtual method algorithm as described in ECMA 335.
@@ -16,15 +13,15 @@ namespace ILCompiler.Common.TypeSystem.Common
         /// </summary>
         /// <param name="type"></param>
         /// <returns></returns>
-        public static IEnumerable<MethodDef> EnumAllVirtualSlots(TypeDef type)
+        public static IEnumerable<MethodDesc> EnumAllVirtualSlots(TypeDesc type)
         {
-            var alreadyEnumerated = new List<MethodDef>();
+            var alreadyEnumerated = new List<MethodDesc>();
             if (!type.IsInterface)
             {
-                TypeDef? currentType = type;
+                TypeDesc? currentType = type;
                 do
                 {
-                    foreach (var method in currentType.Methods)
+                    foreach (var method in currentType.GetVirtualMethods())
                     {
                         if (method.IsVirtual)
                         {
@@ -36,7 +33,7 @@ namespace ILCompiler.Common.TypeSystem.Common
                             }
                         }
                     }
-                    currentType = currentType.BaseType?.ResolveTypeDefThrow();
+                    currentType = currentType.HasBaseType ? currentType.BaseType : null;
                 } while (currentType != null);
             }
         }
@@ -47,7 +44,7 @@ namespace ILCompiler.Common.TypeSystem.Common
         /// <param name="decl"></param>
         /// <param name="method"></param>
         /// <returns></returns>
-        public static MethodDef? FindVirtualFunctionTargetMethodOnObjectType(TypeDef? currentType, MethodDef method)
+        public static MethodDesc? FindVirtualFunctionTargetMethodOnObjectType(TypeDesc? currentType, MethodDesc method)
         {
             while (currentType != null)
             {
@@ -58,7 +55,7 @@ namespace ILCompiler.Common.TypeSystem.Common
                 }
 
                 // No match so move up the type hierarchy and try again
-                currentType = currentType.BaseType?.ResolveTypeDefThrow();
+                currentType = currentType.HasBaseType ? currentType.BaseType : null;
             }
 
             return null;
@@ -71,14 +68,14 @@ namespace ILCompiler.Common.TypeSystem.Common
         /// <param name="targetMethod"></param>
         /// <param name="currentType"></param>
         /// <returns></returns>
-        public static MethodDef? FindMatchingVirtualMethodOnTypeByNameAndSig(MethodDef targetMethod, TypeDef currentType)
+        public static MethodDesc? FindMatchingVirtualMethodOnTypeByNameAndSig(MethodDesc targetMethod, TypeDesc currentType)
         {
-            MethodDef? exactMatch = null;
-            MethodDef? equivalentMatch = null;
+            MethodDesc? exactMatch = null;
+            MethodDesc? equivalentMatch = null;
 
-            foreach (var candidateMethod in currentType.Methods)
+            foreach (var candidateMethod in currentType.GetAllVirtualMethods())
             {
-                if (candidateMethod.Name == targetMethod.Name && new SigComparer().Equals(candidateMethod.Signature, targetMethod.Signature))
+                if (candidateMethod.Name == targetMethod.Name && candidateMethod.Signature.EquivalentTo(targetMethod.Signature))
                 {
                     equivalentMatch = candidateMethod;
 
@@ -100,24 +97,30 @@ namespace ILCompiler.Common.TypeSystem.Common
         /// </summary>
         /// <param name="method"></param>
         /// <returns></returns>
-        public static MethodDef FindSlotDefiningMethodForVirtualMethod(IMethodDefOrRef methodDefOrRef)
+        public static MethodDesc FindSlotDefiningMethodForVirtualMethod(MethodDesc method)
         {
-            var method = methodDefOrRef.ResolveMethodDefThrow();
-            var currentType = method.DeclaringType.BaseType;
+            var owningType = method.OwningType;
+            var currentType = owningType.HasBaseType ? owningType.BaseType : null;
 
             while (currentType != null && !method.IsNewSlot)
             {
-                var foundMethod = FindMatchingVirtualMethodOnTypeByNameAndSig(method, currentType.ResolveTypeDefThrow());
+                var foundMethod = FindMatchingVirtualMethodOnTypeByNameAndSig(method, currentType);
                 if (foundMethod != null)
                 {
                     return foundMethod;
                 }
 
-                currentType = currentType.GetBaseType();
+                currentType = currentType.HasBaseType ? currentType.BaseType : null;
             }
 
             return method;
         }
+
+        public static MethodDesc? ResolveInterfaceMethodToVirtualMethodOnType(MethodDesc interfaceMethod, TypeDesc currentType)
+        {
+            return ResolveInterfaceMethodToVirtualMethodOnType(interfaceMethod, (MetadataType)currentType);
+        }
+
 
         /// <summary>
         /// Interface resolution.
@@ -126,7 +129,7 @@ namespace ILCompiler.Common.TypeSystem.Common
         /// <param name="interfaceMethod"></param>
         /// <param name="currentType"></param>
         /// <returns></returns>
-        public static MethodDef? ResolveInterfaceMethodToVirtualMethodOnType(MethodDef interfaceMethod, TypeDef currentType) 
+        public static MethodDesc? ResolveInterfaceMethodToVirtualMethodOnType(MethodDesc interfaceMethod, MetadataType currentType) 
         {
             if (!currentType.IsInterface)
             {
@@ -136,8 +139,8 @@ namespace ILCompiler.Common.TypeSystem.Common
                     return methodImpl;
                 }
 
-                var interfaceType = interfaceMethod.DeclaringType;
-                var baseType = currentType.BaseType;
+                var interfaceType = (DefType)interfaceMethod.OwningType;
+                var baseType = currentType.MetadataBaseType;
 
                 var foundExplicitInterface = IsInterfaceExplicitlyImplementedOnType(currentType, interfaceType);
                 if (foundExplicitInterface)
@@ -176,24 +179,24 @@ namespace ILCompiler.Common.TypeSystem.Common
             return null;
         }
 
-        public static DefaultInterfaceMethodResolution ResolveInterfaceMethodToDefaultImplementationOnType(MethodDef interfaceMethod, TypeDef currentType, out MethodDef? impl)
+        public static DefaultInterfaceMethodResolution ResolveInterfaceMethodToDefaultImplementationOnType(MethodDesc interfaceMethod, TypeDesc currentType, out MethodDesc? impl)
         {
-            var interfaceMethodOwningType = interfaceMethod.DeclaringType;
-            ITypeDefOrRef[] consideredInterfaces;
+            var interfaceMethodOwningType = interfaceMethod.OwningType;
+            DefType[] consideredInterfaces;
             if (currentType.IsInterface)
             {
-                consideredInterfaces = currentType.RuntimeInterfaces();
+                consideredInterfaces = currentType.RuntimeInterfaces;
             }
             else
             {
-                consideredInterfaces = new ITypeDefOrRef[currentType.RuntimeInterfaces().Length + 1];
-                Array.Copy(currentType.RuntimeInterfaces(), consideredInterfaces, currentType.RuntimeInterfaces().Length);
-                consideredInterfaces[consideredInterfaces.Length - 1] = currentType;
+                consideredInterfaces = new DefType[currentType.RuntimeInterfaces.Length + 1];
+                Array.Copy(currentType.RuntimeInterfaces, consideredInterfaces, currentType.RuntimeInterfaces.Length);
+                consideredInterfaces[consideredInterfaces.Length - 1] = (DefType)currentType;
             }
 
             impl = null;
 
-            ITypeDefOrRef? mostSpecificInterface = null;
+            DefType? mostSpecificInterface = null;
             bool diamondCase = false;
             foreach (var runtimeInterface in consideredInterfaces)
             {
@@ -205,22 +208,22 @@ namespace ILCompiler.Common.TypeSystem.Common
                         impl = interfaceMethod;
                     }
                 }
-                else if (Array.IndexOf(runtimeInterface.RuntimeInterfaces(), interfaceMethodOwningType) != 1)
+                else if (Array.IndexOf(runtimeInterface.RuntimeInterfaces, interfaceMethodOwningType) != 1)
                 {
-                    var possibleMethodOverrides = FindMethodOverridesWithMatchingDeclarationName(interfaceMethod.FullName, runtimeInterface.ResolveTypeDefThrow());
+                    var possibleMethodOverrides = FindMethodOverridesWithMatchingDeclarationName(interfaceMethod.FullName, runtimeInterface);
                     if (possibleMethodOverrides != null)
                     {
                         foreach (var methodOverride in possibleMethodOverrides) 
                         {
-                            if (methodOverride.MethodDeclaration == interfaceMethod)
+                            if (methodOverride.Decl == interfaceMethod)
                             {
-                                if (mostSpecificInterface == null || Array.IndexOf(runtimeInterface.RuntimeInterfaces(), mostSpecificInterface) != 1)
+                                if (mostSpecificInterface == null || Array.IndexOf(runtimeInterface.RuntimeInterfaces, mostSpecificInterface) != 1)
                                 {
                                     mostSpecificInterface = runtimeInterface;
-                                    impl = methodOverride.MethodBody.ResolveMethodDefThrow();
+                                    impl = methodOverride.Body;
                                     diamondCase = false;
                                 }
-                                else if (Array.IndexOf(mostSpecificInterface.RuntimeInterfaces(), runtimeInterface) == -1)
+                                else if (Array.IndexOf(mostSpecificInterface.RuntimeInterfaces, runtimeInterface) == -1)
                                 {
                                     diamondCase = true;
                                 }
@@ -241,7 +244,7 @@ namespace ILCompiler.Common.TypeSystem.Common
             {
                 return DefaultInterfaceMethodResolution.None;
             }
-            else if (impl.ResolveMethodDefThrow().IsAbstract)
+            else if (impl.IsAbstract)
             {
                 impl = null;
                 return DefaultInterfaceMethodResolution.Reabstraction;
@@ -250,16 +253,16 @@ namespace ILCompiler.Common.TypeSystem.Common
             return DefaultInterfaceMethodResolution.DefaultImplementation;
         }
 
-        private static MethodDef? ResolveInterfaceMethodToVirtualMethodOnTypeRecursive(MethodDef interfaceMethod, ITypeDefOrRef? currentType)
+        private static MethodDesc? ResolveInterfaceMethodToVirtualMethodOnTypeRecursive(MethodDesc interfaceMethod, MetadataType? currentType)
         {
-            while (currentType != null && IsInterfaceImplementedOnType(currentType, interfaceMethod.DeclaringType))
+            while (currentType != null && IsInterfaceImplementedOnType(currentType, (DefType)(interfaceMethod.OwningType)))
             {
-                var typeInterfaceResolution = ResolveInterfaceMethodToVirtualMethodOnType(interfaceMethod, currentType.ResolveTypeDefThrow());
+                var typeInterfaceResolution = ResolveInterfaceMethodToVirtualMethodOnType(interfaceMethod, currentType);
                 if (typeInterfaceResolution != null)
                 {
                     return typeInterfaceResolution;
                 }
-                currentType = currentType.GetBaseType();
+                currentType = currentType.MetadataBaseType;
             }
             return null;
         }
@@ -270,7 +273,7 @@ namespace ILCompiler.Common.TypeSystem.Common
         /// <param name="currentType"></param>
         /// <param name="interfaceType"></param>
         /// <returns>true if interface is implemented by the type</returns>
-        private static bool IsInterfaceImplementedOnType(ITypeDefOrRef currentType, TypeDef interfaceType)
+        private static bool IsInterfaceImplementedOnType(DefType currentType, DefType interfaceType)
         {
             var runtimeInterfaces = MetadataRuntimeInterfacesAlgorithm.ComputeRuntimeInterfaces(currentType);
             return runtimeInterfaces.Any(type => type == interfaceType);
@@ -282,21 +285,21 @@ namespace ILCompiler.Common.TypeSystem.Common
         /// <param name="currentType"></param>
         /// <param name="interfaceType"></param>
         /// <returns>true if interface is implemented by the type explicitly</returns>
-        private static bool IsInterfaceExplicitlyImplementedOnType(TypeDef currentType, TypeDef interfaceType)
-            => currentType.Interfaces.Any(interfaceImpl => interfaceImpl.Interface == interfaceType);
+        private static bool IsInterfaceExplicitlyImplementedOnType(MetadataType currentType, DefType interfaceType)
+            => currentType.ExplicitlyImplementedInterfaces.Any(interfaceImpl => interfaceImpl == interfaceType);
 
 
-        private static MethodDef? FindMethodsFromDeclarationsFromMethodOverrides(TypeDef currentType, MethodDef method)
+        private static MethodDesc? FindMethodsFromDeclarationsFromMethodOverrides(TypeDesc currentType, MethodDesc method)
         {
             var foundMethodOverrides = FindMethodOverridesWithMatchingDeclarationName(method.Name, currentType);
             if (foundMethodOverrides != null)
             {
-                bool isInterfaceDeclaration = method.DeclaringType.IsInterface;
+                bool isInterfaceDeclaration = method.OwningType.IsInterface;
 
                 foreach (var methodOverride in foundMethodOverrides)
                 {
-                    var declaration = methodOverride.MethodDeclaration.ResolveMethodDefThrow();
-                    if (isInterfaceDeclaration == declaration.DeclaringType.IsInterface)
+                    var declaration = methodOverride.Decl;
+                    if (isInterfaceDeclaration == declaration.OwningType.IsInterface)
                     {
                         if (!isInterfaceDeclaration)
                         {
@@ -305,7 +308,7 @@ namespace ILCompiler.Common.TypeSystem.Common
 
                         if (declaration == method)
                         {
-                            return FindSlotDefiningMethodForVirtualMethod(methodOverride.MethodBody);
+                            return FindSlotDefiningMethodForVirtualMethod(methodOverride.Body);
                         }
                     }
                 }
@@ -321,18 +324,32 @@ namespace ILCompiler.Common.TypeSystem.Common
         /// <param name="name"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        private static IEnumerable<MethodOverride> FindMethodOverridesWithMatchingDeclarationName(string name, TypeDef type)
+        private static IEnumerable<MethodImplRecord> FindMethodOverridesWithMatchingDeclarationName(string name, TypeDesc type)
         {
-            var foundRecords = new List<MethodOverride>();
-            foreach (var method in type.Methods)
+            var foundRecords = new List<MethodImplRecord>();
+            foreach (var method in type.GetVirtualMethods())
             {
                 foreach (var methodOverride in method.Overrides.Where(x => x.MethodDeclaration.Name == name))
                 {
-                    foundRecords.Add(new MethodOverride(method, methodOverride.MethodDeclaration));
+                    var newRecord = new MethodImplRecord(type.Context.Create(methodOverride.MethodDeclaration), type.Context.Create(methodOverride.MethodBody));
+                    foundRecords.Add(newRecord);
                 }
             }
 
             return foundRecords;
         }
     }
+
+    public struct MethodImplRecord
+    {
+        public readonly MethodDesc Decl;
+        public readonly MethodDesc Body;
+
+        public MethodImplRecord(MethodDesc decl, MethodDesc body)
+        {
+            Decl = decl;
+            Body = body;
+        }
+    }
+
 }

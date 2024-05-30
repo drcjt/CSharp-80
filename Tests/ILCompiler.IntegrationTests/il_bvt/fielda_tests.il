@@ -12,6 +12,13 @@
 	.field public static int16 i2SField
 	.field public static int32 i4SField
 
+	.method public void .ctor() { 
+		.maxstack 10
+		ldarg.0
+		call instance void [mscorlib]System.Object::.ctor()
+		ret
+	}
+
 	.method public void initialize() {
 	.maxstack 10
 

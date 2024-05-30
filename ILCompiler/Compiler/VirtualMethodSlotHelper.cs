@@ -1,16 +1,15 @@
-﻿using dnlib.DotNet;
+﻿using ILCompiler.Common.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysis;
 
 namespace ILCompiler.Compiler
 {
     public static class VirtualMethodSlotHelper
     {
-        public static int GetVirtualMethodSlot(NodeFactory factory, MethodDef method)
+        public static int GetVirtualMethodSlot(NodeFactory factory, MethodDesc method)
         {
-            var owningType = method.DeclaringType;
-            int baseSlots = GetNumberOfBaseSlots(factory, owningType);
+            int baseSlots = GetNumberOfBaseSlots(factory, method.OwningType);
 
-            IReadOnlyList<MethodDef> virtualSlots = factory.VTable(owningType).GetSlots();
+            IReadOnlyList<MethodDesc> virtualSlots = factory.VTable(method.OwningType).GetSlots();
             int methodSlot = -1;
             for (int slot = 0; slot < virtualSlots.Count; slot++) 
             { 
@@ -24,18 +23,17 @@ namespace ILCompiler.Compiler
             return methodSlot == -1 ? -1 : baseSlots + methodSlot;
         }
 
-        private static int GetNumberOfBaseSlots(NodeFactory factory, TypeDef owningType) 
+        private static int GetNumberOfBaseSlots(NodeFactory factory, TypeDesc owningType) 
         {
             int baseSlots = 0;
 
             var baseType = owningType.BaseType;
             while (baseType != null)
             {
-                var resolvedBaseType = baseType.ResolveTypeDefThrow();
-                IReadOnlyList<MethodDef> baseVirtualSlots = factory.VTable(resolvedBaseType).GetSlots();
+                IReadOnlyList<MethodDesc> baseVirtualSlots = factory.VTable(baseType).GetSlots();
                 baseSlots += baseVirtualSlots.Count;
 
-                baseType = baseType.GetBaseType();
+                baseType = baseType.BaseType;
             }
 
             return baseSlots;
