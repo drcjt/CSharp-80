@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.Importer
 
             var op2 = importer.PopExpression();
 
-            var elemTypeDesc = context.TypeSystemContext.Create((ITypeDefOrRef)instruction.Operand, context.Method.Instantiation);
+            var elemTypeDesc = context.Module.Create((ITypeDefOrRef)instruction.Operand, context.Method.Instantiation);
             var arrayType = new ArrayType(elemTypeDesc, -1);
 
             var arrayElementSize = elemTypeDesc.GetElementSize().AsInt;

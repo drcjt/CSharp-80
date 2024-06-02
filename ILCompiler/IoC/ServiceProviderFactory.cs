@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Common.TypeSystem.Common.Dnlib;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler;
 using ILCompiler.Compiler.CodeGenerators;
@@ -73,6 +74,7 @@ namespace ILCompiler.IoC
             services.AddSingleton<CorLibModuleProvider>();
 
             services.AddSingleton<TypeSystemContext>();
+            services.AddSingleton<DnlibModule>();
 
             _serviceProvider = services.BuildServiceProvider();
 

@@ -61,9 +61,9 @@ namespace ILCompiler.Common.TypeSystem.Common
             get
             {
                 var instantiatedLocals = new List<LocalVariableDefinition>();
-                foreach (var local in _methodDesc.Body.Variables)
+                foreach (var local in _methodDesc.Locals)
                 {
-                    var instantiatedType = Instantiate(Context.Create(local.Type));
+                    var instantiatedType = Instantiate(local.Type);
                     var instantiatedLocal = new LocalVariableDefinition(instantiatedType, local.Name, local.Index);
                     instantiatedLocals.Add(instantiatedLocal);
                 }

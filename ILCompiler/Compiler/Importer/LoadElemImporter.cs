@@ -16,7 +16,7 @@ namespace ILCompiler.Compiler.Importer
             {
                 case Code.Ldelem:
                     var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-                    var typeDesc = context.TypeSystemContext.Create(typeSig, context.Method.Instantiation);
+                    var typeDesc = context.Module.Create(typeSig, context.Method.Instantiation);
                     elemType = typeDesc.VarType;
                     elemSize = typeDesc.GetElementSize().AsInt;
                     break;

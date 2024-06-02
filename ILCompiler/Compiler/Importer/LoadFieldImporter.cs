@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.Importer
 
             var isLoadStatic = instruction.OpCode == OpCodes.Ldsfld;
 
-            var fieldDesc = context.TypeSystemContext.Create((IField)instruction.Operand);
+            var fieldDesc = context.Module.Create((IField)instruction.Operand);
 
             uint fieldOffset = (uint)fieldDesc.Offset.AsInt;
 

@@ -12,6 +12,8 @@
         }
 
         public abstract MetadataType? MetadataBaseType { get; }
+
+        public abstract MethodImplRecord[] FindMethodsImplWithMatchingDeclName(string name);
     }
 
     public struct ClassLayoutMetadata

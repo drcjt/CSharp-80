@@ -1,4 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.Common.dnlib;
+﻿using ILCompiler.Common.TypeSystem.Common.Dnlib;
 using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.Emit;

@@ -15,7 +15,7 @@ namespace ILCompiler.Compiler.Importer
             var op1 = importer.PopExpression();
 
             // Determine type to check reference type against
-            var typeDesc = context.TypeSystemContext.Create((ITypeDefOrRef)instruction.Operand);
+            var typeDesc = context.Module.Create((ITypeDefOrRef)instruction.Operand);
 
             string helperMethodName = "IsInstanceOfClass";
             if (typeDesc.IsArray)

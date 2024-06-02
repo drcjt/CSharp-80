@@ -1,6 +1,7 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Common.TypeSystem.Common.Dnlib;
 using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
 
@@ -11,13 +12,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly MethodDesc _method;
         private readonly IList<IDependencyNode> _dependencies = new List<IDependencyNode>();
         private readonly DependencyNodeContext _context;
-        private readonly TypeSystemContext _typeSystemContext;
+        private readonly DnlibModule _module;
 
-        public ILScanner(MethodDesc method, DependencyNodeContext context, TypeSystemContext typeSystemContext)
+        public ILScanner(MethodDesc method, DependencyNodeContext context, DnlibModule module)
         {
             _method = method;
             _context = context;
-            _typeSystemContext = typeSystemContext;
+            _module = module;
         }
 
         public IList<IDependencyNode> FindDependencies()
@@ -106,7 +107,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 var systemRuntimeExceptionHandling = _context.CorLibModuleProvider.FindThrow("System.Runtime.ExceptionHandling");
                 var runtimeHelperMethod = systemRuntimeExceptionHandling.FindMethod("ThrowException");
-                var methodNode = _context.NodeFactory.MethodNode(_typeSystemContext.Create(runtimeHelperMethod));
+                var methodNode = _context.NodeFactory.MethodNode(_module.Create(runtimeHelperMethod));
                 _dependencies.Add(methodNode);
             }
         }
@@ -115,14 +116,14 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             foreach (var exceptionHandler in _method.Body.ExceptionHandlers)
             {
-                var catchTypeDef = (DefType)_typeSystemContext.Create(exceptionHandler.CatchType);
+                var catchTypeDef = (DefType)_module.Create(exceptionHandler.CatchType);
                 _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(catchTypeDef, catchTypeDef.InstanceByteCount.AsInt));
             }
         }
 
         private void ImportCasting(Instruction instruction)
         {
-            var typeDesc = _typeSystemContext.Create((ITypeDefOrRef)instruction.Operand);
+            var typeDesc = _module.Create((ITypeDefOrRef)instruction.Operand);
 
             if (typeDesc.IsArray)
             {
@@ -140,7 +141,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 var systemRuntimeTypeCast = _context.CorLibModuleProvider.FindThrow("System.Runtime.TypeCast");
                 var runtimeHelperMethod = systemRuntimeTypeCast.FindMethod("IsInstanceOfClass");
-                var methodNode = _context.NodeFactory.MethodNode(_typeSystemContext.Create(runtimeHelperMethod));
+                var methodNode = _context.NodeFactory.MethodNode(_module.Create(runtimeHelperMethod));
 
                 _dependencies.Add(methodNode);
                 _dependencies.Add(_context.NodeFactory.NecessaryTypeSymbol(typeDesc));
@@ -182,16 +183,16 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportLoadString(Instruction instruction)
         {
-            var systemStringType = (DefType)_typeSystemContext.Create(_context.CorLibModuleProvider.FindThrow("System.String"));
+            var systemStringType = (DefType)_module.GetType("System", "String");
 
             _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(systemStringType, systemStringType.InstanceByteCount.AsInt));
 
-            _dependencies.Add(_context.NodeFactory.SerializedStringObject(instruction.OperandAs<string>(), _context.CorLibModuleProvider));
+            _dependencies.Add(_context.NodeFactory.SerializedStringObject(instruction.OperandAs<string>()));
         }
 
         private void ImportFieldAccess(Instruction instruction, bool isStatic)
         {
-            var fieldDesc = _typeSystemContext.Create((IField)instruction.Operand);
+            var fieldDesc = _module.Create((IField)instruction.Operand);
 
             if (isStatic || fieldDesc.IsStatic)
             {
@@ -226,7 +227,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportNewArray(Instruction instruction)
         {
-            var elemTypeDef = _typeSystemContext.Create((ITypeDefOrRef)instruction.Operand, _method.Instantiation);
+            var elemTypeDef = _module.Create((ITypeDefOrRef)instruction.Operand, _method.Instantiation);
             var allocSize = elemTypeDef.GetElementSize().AsInt;
 
             var arrayType = new ArrayType(elemTypeDef, -1);
@@ -250,7 +251,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 Z80MethodCodeNode methodNode;
 
-                var methodDesc = _typeSystemContext.Create(method);
+                var methodDesc = _module.Create(method);
 
                 if (_method is InstantiatedMethod)
                 {
@@ -356,7 +357,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 throw new InvalidOperationException("Newobj called with Operand which isn't a IMethodDefOrRef");
             }
 
-            var ctor = _typeSystemContext.Create(methodDefOrRef);
+            var ctor = _module.Create(methodDefOrRef);
             var owningType = ctor.OwningType;
 
             if (owningType is ArrayType)
@@ -378,7 +379,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private Z80MethodCodeNode GetHelperEntryPoint(string typeName, string methodName)
         {
             var helperMethod = _context.CorLibModuleProvider.GetHelperEntryPoint(typeName, methodName);
-            return _context.NodeFactory.MethodNode(_typeSystemContext.Create(helperMethod));
+            return _context.NodeFactory.MethodNode(_module.Create(helperMethod));
         }
     }
 }

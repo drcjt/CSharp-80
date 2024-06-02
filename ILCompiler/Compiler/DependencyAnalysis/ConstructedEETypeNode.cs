@@ -16,15 +16,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private readonly PreinitializationManager _preinitializationManager;
         private readonly NodeFactory _nodeFactory;
+        private readonly ModuleDesc _module;
 
         public override bool ShouldSkipEmitting(NodeFactory factory) => false;
 
-        public ConstructedEETypeNode(TypeDesc type, int baseSize, INameMangler nameMangler, PreinitializationManager preinitializationManager, NodeFactory nodeFactory) 
+        public ConstructedEETypeNode(TypeDesc type, int baseSize, INameMangler nameMangler, PreinitializationManager preinitializationManager, NodeFactory nodeFactory, ModuleDesc module) 
             : base(type, nameMangler)
         {
             BaseSize = baseSize;
             _preinitializationManager = preinitializationManager;
             _nodeFactory = nodeFactory;
+            _module = module;
         }
 
         public override IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context)
@@ -42,7 +44,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     dependencies.Add(elemConstructedEETypeNode);
                 }
 
-                TypeDesc systemArrayType = Type.Context.Create(context.CorLibModuleProvider.FindThrow("System.Array"));
+                TypeDesc systemArrayType = (TypeDesc)_module.GetType("System", "Array");
                 var allocSize = ((DefType)systemArrayType).InstanceByteCount;
                 var constructedEETypeNode = context.NodeFactory.ConstructedEETypeNode(systemArrayType, allocSize.AsInt);
                 dependencies.Add(constructedEETypeNode);

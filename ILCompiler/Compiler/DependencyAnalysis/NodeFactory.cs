@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Common.TypeSystem.Common.Dnlib;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
 using ILCompiler.IoC;
@@ -18,21 +19,21 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly PreinitializationManager _preinitializationManager;
         private readonly INameMangler _nameMangler;
         private readonly Factory<IMethodCompiler> _methodCompilerFactory;
-        private readonly TypeSystemContext _typeSystemContext;
+        private readonly DnlibModule _module;
 
-        public NodeFactory(PreinitializationManager preinitializationManager, INameMangler nameMangler, Factory<IMethodCompiler> methodCompilerFactory, TypeSystemContext typeSystemContext) 
+        public NodeFactory(PreinitializationManager preinitializationManager, INameMangler nameMangler, Factory<IMethodCompiler> methodCompilerFactory, DnlibModule module) 
         {
             _preinitializationManager = preinitializationManager;
             _nameMangler = nameMangler;
             _methodCompilerFactory = methodCompilerFactory;
-            _typeSystemContext = typeSystemContext;
+            _module = module;
         }
 
         public ConstructedEETypeNode ConstructedEETypeNode(TypeDesc type, int size)
         {
             if (!_constructedEETypeNodesByFullName.TryGetValue(type.FullName, out var constructedEETypeNode))
             {
-                constructedEETypeNode = new ConstructedEETypeNode(type, size, _nameMangler, _preinitializationManager, this);
+                constructedEETypeNode = new ConstructedEETypeNode(type, size, _nameMangler, _preinitializationManager, this, _module);
                 _constructedEETypeNodesByFullName[type.FullName] = constructedEETypeNode;
             }
 
@@ -61,11 +62,11 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return staticNode;
         }
 
-        public FrozenStringNode SerializedStringObject(string data, CorLibModuleProvider corLibModuleProvider)
+        public FrozenStringNode SerializedStringObject(string data)
         {
             if (!_frozenStringNodes.TryGetValue(data, out var frozenStringNode))
             {
-                frozenStringNode = new FrozenStringNode(data, _nameMangler, corLibModuleProvider, _typeSystemContext);
+                frozenStringNode = new FrozenStringNode(data, _nameMangler, _module);
                 _frozenStringNodes[data] = frozenStringNode;
             }
 
@@ -87,7 +88,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             if (!_methodNodesByFullName.TryGetValue(method.FullName, out var methodNode))
             {
-                methodNode = new Z80MethodCodeNode(method, _methodCompilerFactory, _typeSystemContext);
+                methodNode = new Z80MethodCodeNode(method, _methodCompilerFactory, _module);
                 _methodNodesByFullName[method.FullName] = methodNode;
             }
 

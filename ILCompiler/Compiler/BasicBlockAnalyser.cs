@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Common.TypeSystem.Common.Dnlib;
 using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler
@@ -37,17 +38,17 @@ namespace ILCompiler.Compiler
     {
         private readonly MethodDesc _method;
         private readonly INameMangler _nameMangler;
-        private readonly TypeSystemContext _typeSystemContext;
+        private readonly DnlibModule _module;
 
-        public BasicBlockAnalyser(MethodDesc method, TypeSystemContext typeSystemContext) : this(method, new NameMangler(), typeSystemContext)
+        public BasicBlockAnalyser(MethodDesc method, DnlibModule module) : this(method, new NameMangler(), module)
         {
         }
 
-        public BasicBlockAnalyser(MethodDesc method, INameMangler nameMangler, TypeSystemContext typeSystemContext)
+        public BasicBlockAnalyser(MethodDesc method, INameMangler nameMangler, DnlibModule module)
         {
             _method = method;
             _nameMangler = nameMangler;
-            _typeSystemContext = typeSystemContext;
+            _module = module;
         }
 
         public BasicBlock[] FindBasicBlocks(IDictionary<int, int> offsetToIndexMap, IList<EHClause> ehClauses)
@@ -93,8 +94,8 @@ namespace ILCompiler.Compiler
                 handlerBeginBlock.HandlerStart = true;
                 tryBeginBlock.TryStart = true;
 
-                var catchTypeDef = _typeSystemContext.Create(exceptionHandler.CatchType);
-                var catchTypeMangledName = _nameMangler.GetMangledTypeName(catchTypeDef);
+                var catchTypeDesc = _module.Create(exceptionHandler.CatchType);
+                var catchTypeMangledName = _nameMangler.GetMangledTypeName(catchTypeDesc);
 
                 tryBeginBlock.Handlers.Add(handlerBeginBlock);
 

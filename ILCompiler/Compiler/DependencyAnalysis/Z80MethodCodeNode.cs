@@ -1,4 +1,5 @@
 using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Common.TypeSystem.Common.Dnlib;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Interfaces;
@@ -12,16 +13,16 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public override string Name => Method.FullName;
 
         private readonly Factory<IMethodCompiler> _methodCompilerFactory;
-        private readonly TypeSystemContext _typeSystemContext;
+        private readonly DnlibModule _module;
 
-        public Z80MethodCodeNode(MethodDesc method, Factory<IMethodCompiler> methodCompilerFactory, TypeSystemContext typeSystemContext)
+        public Z80MethodCodeNode(MethodDesc method, Factory<IMethodCompiler> methodCompilerFactory, DnlibModule module)
         {
             Method = method;
             ParamsCount = method.Signature.Length;
             LocalsCount = method.Body?.Variables.Count ?? 0;
 
             _methodCompilerFactory = methodCompilerFactory;
-            _typeSystemContext = typeSystemContext;
+            _module = module;
         }
 
         public bool HasExceptionHandlers => Method?.Body?.HasExceptionHandlers ?? false;
@@ -34,7 +35,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public override IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context)
         {
-            var scanner = new ILScanner(Method, context, _typeSystemContext);
+            var scanner = new ILScanner(Method, context, _module);
             return scanner.FindDependencies();
         }
 

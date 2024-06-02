@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Common.TypeSystem.Common.Dnlib;
 using NUnit.Framework;
 using System.IO;
 using System.Reflection;
@@ -41,8 +42,8 @@ namespace ILCompiler.UnitTests
 
             var target = new TargetDetails(TargetArchitecture.Z80);
 
-            var typeSystemContext = new TypeSystemContext(null);
-            var typeDesc = typeSystemContext.Create(typeDef);
+            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
+            var typeDesc = module.Create(typeDef);
             var newMetaDataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
             var computedFieldLayout = newMetaDataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
 
@@ -93,8 +94,8 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var typeSystemContext = new TypeSystemContext(null);
-            var typeDesc = typeSystemContext.Create(typeDef);
+            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
+            var typeDesc = module.Create(typeDef);
             var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
 
             // Byte count
@@ -156,8 +157,8 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var typeSystemContext = new TypeSystemContext(null);
-            var typeDesc = typeSystemContext.Create(typeDef);
+            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
+            var typeDesc = module.Create(typeDef);
             var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
 
             // Byte count
@@ -199,8 +200,8 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var typeSystemContext = new TypeSystemContext(null);
-            var typeDesc = typeSystemContext.Create(typeDef);
+            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
+            var typeDesc = module.Create(typeDef);
             var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
 
             // Byte count
@@ -257,8 +258,8 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var typeSystemContext = new TypeSystemContext(null);
-            var typeDesc = typeSystemContext.Create(typeDef);
+            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
+            var typeDesc = module.Create(typeDef);
             var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
 
             // Byte count

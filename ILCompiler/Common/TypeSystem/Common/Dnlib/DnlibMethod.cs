@@ -2,24 +2,24 @@
 using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.IL;
 
-namespace ILCompiler.Common.TypeSystem.Common.dnlib
+namespace ILCompiler.Common.TypeSystem.Common.Dnlib
 {
     internal class DnlibMethod : MethodDesc
     {
-        private MethodDef _methodDef;
-        private TypeSystemContext _typeSystemContext;
-        public DnlibMethod(MethodDef methodDef, TypeSystemContext typeSystemContext)
+        private readonly MethodDef _methodDef;
+        private readonly DnlibModule _module;
+        public DnlibMethod(MethodDef methodDef, DnlibModule module)
         {
             _methodDef = methodDef;
-            _typeSystemContext = typeSystemContext;
+            _module = module;
             Body = _methodDef.Body;
         }
 
-        public override MethodSignature Signature => Context.CreateMethodSignature(_methodDef);
+        public override MethodSignature Signature => _module.CreateMethodSignature(_methodDef);
 
-        public override TypeSystemContext Context => _typeSystemContext;
+        public override TypeSystemContext Context => _module.Context;
 
-        public override TypeDesc OwningType => (TypeDesc)Context.Create(_methodDef.DeclaringType);
+        public override TypeDesc OwningType => (TypeDesc)_module.Create(_methodDef.DeclaringType);
 
         public override string Name => _methodDef.Name;
         public override string FullName => _methodDef.FullName;
@@ -44,7 +44,7 @@ namespace ILCompiler.Common.TypeSystem.Common.dnlib
                 var locals = new List<LocalVariableDefinition>();
                 foreach (var local in _methodDef.Body.Variables)
                 {
-                    var localVariableDefinition = new LocalVariableDefinition(Context.Create(local.Type), local.Name, local.Index);
+                    var localVariableDefinition = new LocalVariableDefinition(_module.Create(local.Type), local.Name, local.Index);
                     locals.Add(localVariableDefinition);
                 }
                 return locals;
@@ -58,7 +58,7 @@ namespace ILCompiler.Common.TypeSystem.Common.dnlib
                 var parameters = new List<MethodParameter>();
                 foreach (var parameter in _methodDef.Parameters)
                 {
-                    var methodParameter = new MethodParameter(Context.Create(parameter.Type), parameter.Name);
+                    var methodParameter = new MethodParameter(_module.Create(parameter.Type), parameter.Name);
                     parameters.Add(methodParameter);
                 }
                 return parameters;
@@ -88,7 +88,7 @@ namespace ILCompiler.Common.TypeSystem.Common.dnlib
                 TypeDesc[] genericParameters = new TypeDesc[genericParams.Count];
                 for (int i = 0; i < genericParams.Count; i++)
                 {
-                    genericParameters[i] = new DnlibGenericParameter(Context, genericParams[i]);
+                    genericParameters[i] = new DnlibGenericParameter(_module, genericParams[i]);
                 }
                 return new Instantiation(genericParameters);
             }

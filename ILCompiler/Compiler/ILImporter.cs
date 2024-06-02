@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Common.TypeSystem.Common.Dnlib;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
@@ -17,7 +18,7 @@ namespace ILCompiler.Compiler
         private readonly CorLibModuleProvider _corLibModuleProvider;
         private readonly PreinitializationManager _preinitializationManager;
         private readonly NodeFactory _nodeFactory;
-        private readonly TypeSystemContext _typeSystemContext;
+        private readonly DnlibModule _module;
 
         private MethodDesc _method = null!;
         private LocalVariableTable? _locals;
@@ -57,7 +58,7 @@ namespace ILCompiler.Compiler
             public int GrabTemp(VarType type, int? exactSize) => _importer._locals!.GrabTemp(type, exactSize);
         }
 
-        public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, CorLibModuleProvider corlibModuleProvider, PreinitializationManager preinitializationManager, NodeFactory nodeFactory, TypeSystemContext typeSystemContext)
+        public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, CorLibModuleProvider corlibModuleProvider, PreinitializationManager preinitializationManager, NodeFactory nodeFactory, DnlibModule module)
         {
             _configuration = configuration;
             _basicBlocks = Array.Empty<BasicBlock>();
@@ -67,7 +68,7 @@ namespace ILCompiler.Compiler
             _corLibModuleProvider = corlibModuleProvider;
             _preinitializationManager = preinitializationManager;
             _nodeFactory = nodeFactory;
-            _typeSystemContext = typeSystemContext;
+            _module = module;
 
             _importerProxy = new ILImporterProxy(this);
         }
@@ -189,7 +190,7 @@ namespace ILCompiler.Compiler
                     CorLibModuleProvider = _corLibModuleProvider,
                     PreinitializationManager = _preinitializationManager,
                     NodeFactory = _nodeFactory,
-                    TypeSystemContext = _typeSystemContext,
+                    Module = _module,
                 };
 
                 bool imported = ImportInstruction(currentInstruction, importContext);
@@ -278,7 +279,7 @@ namespace ILCompiler.Compiler
             _method = method;
             _locals = locals;
 
-            var basicBlockAnalyser = new BasicBlockAnalyser(_method, _nameMangler, _typeSystemContext);
+            var basicBlockAnalyser = new BasicBlockAnalyser(_method, _nameMangler, _module);
             var offsetToIndexMap = new Dictionary<int, int>();
             _basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
