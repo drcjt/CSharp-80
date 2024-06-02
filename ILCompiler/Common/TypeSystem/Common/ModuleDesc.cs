@@ -4,7 +4,7 @@
     {
         public override TypeSystemContext Context { get; }
 
-        public ModuleDesc(TypeSystemContext context)
+        protected ModuleDesc(TypeSystemContext context)
         {
             Context = context;
         }

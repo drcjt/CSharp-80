@@ -147,12 +147,12 @@ namespace ILCompiler.Common.TypeSystem.Common.Dnlib
             }
         }
 
-        public override MethodImplRecord[] FindMethodsImplWithMatchingDeclName(string declName)
+        public override MethodImplRecord[] FindMethodsImplWithMatchingDeclName(string name)
         {
             var foundRecords = new List<MethodImplRecord>();
             foreach (var method in GetVirtualMethods())
             {
-                foreach (var methodOverride in method.Overrides.Where(x => x.MethodDeclaration.Name == declName))
+                foreach (var methodOverride in method.Overrides.Where(x => x.MethodDeclaration.Name == name))
                 {
                     var newRecord = new MethodImplRecord(_module.Create(methodOverride.MethodDeclaration), _module.Create(methodOverride.MethodBody));
                     foundRecords.Add(newRecord);

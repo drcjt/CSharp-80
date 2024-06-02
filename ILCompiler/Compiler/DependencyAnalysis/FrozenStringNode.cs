@@ -10,15 +10,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly INameMangler _nameMangler;
         private readonly string _data;
         public readonly string Label;
-        private readonly CorLibModuleProvider _corLibModuleProvider;
         private readonly ModuleDesc _module;
 
-        public FrozenStringNode(string data, INameMangler nameMangler, CorLibModuleProvider corLibModuleProvider, ModuleDesc module)
+        public FrozenStringNode(string data, INameMangler nameMangler, ModuleDesc module)
         {
             _data = data;
             _nameMangler = nameMangler;
             Label = LabelGenerator.GetLabel(LabelType.String);
-            _corLibModuleProvider = corLibModuleProvider;
             _module = module;
         }
 

@@ -6,8 +6,8 @@ namespace ILCompiler.Common.TypeSystem.Common.Dnlib
 {
     internal class DnlibMethod : MethodDesc
     {
-        private MethodDef _methodDef;
-        private DnlibModule _module;
+        private readonly MethodDef _methodDef;
+        private readonly DnlibModule _module;
         public DnlibMethod(MethodDef methodDef, DnlibModule module)
         {
             _methodDef = methodDef;

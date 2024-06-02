@@ -4,8 +4,8 @@ namespace ILCompiler.Common.TypeSystem.Common.Dnlib
 {
     public sealed class DnlibGenericParameter : GenericParameterDesc
     {
-        private DnlibModule _module;
-        private GenericParam _genericParameter;
+        private readonly DnlibModule _module;
+        private readonly GenericParam _genericParameter;
         public DnlibGenericParameter(DnlibModule module, GenericParam genericParameter)
         {
             _module = module;

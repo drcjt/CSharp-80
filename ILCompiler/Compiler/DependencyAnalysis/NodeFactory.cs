@@ -62,11 +62,11 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return staticNode;
         }
 
-        public FrozenStringNode SerializedStringObject(string data, CorLibModuleProvider corLibModuleProvider)
+        public FrozenStringNode SerializedStringObject(string data)
         {
             if (!_frozenStringNodes.TryGetValue(data, out var frozenStringNode))
             {
-                frozenStringNode = new FrozenStringNode(data, _nameMangler, corLibModuleProvider, _module);
+                frozenStringNode = new FrozenStringNode(data, _nameMangler, _module);
                 _frozenStringNodes[data] = frozenStringNode;
             }
 

@@ -25,12 +25,13 @@ namespace ILCompiler.Common.TypeSystem.Common.Dnlib
         public FieldDesc Create(IField field)
         {
             var resolvedFieldDef = field.ResolveFieldDefThrow();
-            if (!_fieldsByFullName.ContainsKey(resolvedFieldDef.FullName))
+            if (!_fieldsByFullName.TryGetValue(resolvedFieldDef.FullName, out FieldDesc? fieldDesc))
             {
-                _fieldsByFullName[resolvedFieldDef.FullName] = new DnlibField(resolvedFieldDef, this);
+                fieldDesc = new DnlibField(resolvedFieldDef, this);
+                _fieldsByFullName[resolvedFieldDef.FullName] = fieldDesc;
             }
 
-            return _fieldsByFullName[resolvedFieldDef.FullName];
+            return fieldDesc;
         }
 
         public TypeDesc Create(TypeSig typeSig, Instantiation? instantiation = null)
@@ -86,18 +87,6 @@ namespace ILCompiler.Common.TypeSystem.Common.Dnlib
             throw new NotImplementedException();
         }
 
-        public TypeSystemEntity CreateFromTypeOrMethodDef(ITypeOrMethodDef typeOrMethodDef)
-        {
-            if (typeOrMethodDef is TypeDef)
-            {
-                return Create((ITypeDefOrRef)typeOrMethodDef);
-            }
-            else
-            {
-                return Create((IMethodDefOrRef)typeOrMethodDef);
-            }
-        }
-
         public MethodDesc Create(IMethod methodDefOrRef)
         {
             if (methodDefOrRef is MethodSpec methodSpec)
@@ -118,17 +107,15 @@ namespace ILCompiler.Common.TypeSystem.Common.Dnlib
             }
             else
             {
-                if (methodDefOrRef.IsMemberRef)
-                {
-                }
                 var methodDef = methodDefOrRef.ResolveMethodDefThrow();
 
-                if (!_dnlibMethodsByFullName.ContainsKey(methodDef.FullName))
+                if (!_dnlibMethodsByFullName.TryGetValue(methodDef.FullName, out DnlibMethod? methodDesc))
                 {
-                    _dnlibMethodsByFullName[methodDef.FullName] = new DnlibMethod(methodDef, this);
+                    methodDesc = new DnlibMethod(methodDef, this);
+                    _dnlibMethodsByFullName[methodDef.FullName] = methodDesc;
                 }
 
-                return _dnlibMethodsByFullName[methodDef.FullName];
+                return methodDesc;
             }
         }
 
@@ -142,11 +129,13 @@ namespace ILCompiler.Common.TypeSystem.Common.Dnlib
                 }
                 else
                 {
-                    if (!_defTypesByFullName.ContainsKey(td.FullName))
+                    if (!_defTypesByFullName.TryGetValue(td.FullName, out DefType? defType))
                     {
-                        _defTypesByFullName[td.FullName] = new DnlibType(td, this);
+                        defType = new DnlibType(td, this);
+                        _defTypesByFullName[td.FullName] = defType;
                     }
-                    return _defTypesByFullName[td.FullName];
+
+                    return defType;
                 }
             }
 
@@ -173,6 +162,17 @@ namespace ILCompiler.Common.TypeSystem.Common.Dnlib
             return Create(typeDefOrRef);
         }
 
+        public MethodSignature Create(MethodSig methodSig)
+        {
+            var parameters = new List<MethodParameter>();
+            foreach (var parameter in methodSig.Params)
+            {
+                parameters.Add(new MethodParameter(Create(parameter), parameter.GetName()));
+            }
+
+            return new MethodSignature(!methodSig.HasThis, Create(methodSig.RetType), parameters.ToArray());
+        }
+
         public MethodSignature CreateMethodSignature(MethodDef methodDef)
         {
             var parameters = new List<MethodParameter>();
@@ -184,15 +184,16 @@ namespace ILCompiler.Common.TypeSystem.Common.Dnlib
             return new MethodSignature(!methodDef.HasThis, Create(methodDef.ReturnType), parameters.ToArray());
         }
 
-        public MethodSignature Create(MethodSig methodSig)
+        public TypeSystemEntity CreateFromTypeOrMethodDef(ITypeOrMethodDef typeOrMethodDef)
         {
-            var parameters = new List<MethodParameter>();
-            foreach (var parameter in methodSig.Params)
+            if (typeOrMethodDef is TypeDef)
             {
-                parameters.Add(new MethodParameter(Create(parameter), parameter.GetName()));
+                return Create((ITypeDefOrRef)typeOrMethodDef);
             }
-
-            return new MethodSignature(!methodSig.HasThis, Create(methodSig.RetType), parameters.ToArray());
+            else
+            {
+                return Create((IMethodDefOrRef)typeOrMethodDef);
+            }
         }
 
         public override object GetType(string nameSpace, string name)

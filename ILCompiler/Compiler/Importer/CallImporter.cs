@@ -38,13 +38,13 @@ namespace ILCompiler.Compiler.Importer
                 switch (method.Name)
                 {
                     case "Set":
-                        methodToCall = (MethodDesc)context.Module.Create(new MethodDefUser("Set", method.MethodSig));
+                        methodToCall = context.Module.Create(new MethodDefUser("Set", method.MethodSig));
                         break;
                     case "Get":
-                        methodToCall = (MethodDesc)context.Module.Create(new MethodDefUser("Get", method.MethodSig));
+                        methodToCall = context.Module.Create(new MethodDefUser("Get", method.MethodSig));
                         break;
                     case "Address":
-                        methodToCall = (MethodDesc)context.Module.Create(new MethodDefUser("Address", method.MethodSig));
+                        methodToCall = context.Module.Create(new MethodDefUser("Address", method.MethodSig));
                         break;
                     default:
                         throw new InvalidOperationException($"Unknown array intrinsic method {method.Name}");

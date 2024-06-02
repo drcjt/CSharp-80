@@ -187,7 +187,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
             _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(systemStringType, systemStringType.InstanceByteCount.AsInt));
 
-            _dependencies.Add(_context.NodeFactory.SerializedStringObject(instruction.OperandAs<string>(), _context.CorLibModuleProvider));
+            _dependencies.Add(_context.NodeFactory.SerializedStringObject(instruction.OperandAs<string>()));
         }
 
         private void ImportFieldAccess(Instruction instruction, bool isStatic)
