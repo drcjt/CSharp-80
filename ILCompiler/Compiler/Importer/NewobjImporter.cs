@@ -1,7 +1,6 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
-using ILCompiler.Common.TypeSystem.IL;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 
@@ -14,9 +13,9 @@ namespace ILCompiler.Compiler.Importer
             if (instruction.OpCode.Code != Code.Newobj) return false;
 
             var ctor = (IMemberRef)instruction.Operand;
-            var owningType = context.TypeSystemContext.Create(ctor.DeclaringType);
+            var owningType = context.Module.Create(ctor.DeclaringType);
 
-            var method = context.TypeSystemContext.Create((IMethodDefOrRef)ctor);
+            var method = context.Module.Create((IMethodDefOrRef)ctor);
 
             if (owningType.IsArray)
             {

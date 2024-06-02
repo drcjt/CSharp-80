@@ -15,7 +15,7 @@ namespace ILCompiler.Compiler.Importer
             var address = importer.PopExpression();
 
             var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-            var typeDesc = context.TypeSystemContext.Create(typeSig, context.Method.Instantiation);
+            var typeDesc = context.Module.Create(typeSig, context.Method.Instantiation);
             int elemSize = typeDesc.GetElementSize().AsInt;
 
             var size = new Int32ConstantEntry(elemSize);

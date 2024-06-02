@@ -133,7 +133,7 @@
         {
             if (!currentType.IsInterface)
             {
-                var methodImpl = FindMethodsFromDeclarationsFromMethodOverrides(currentType, interfaceMethod);
+                var methodImpl = FindImplFromDeclFromMethodImpls(currentType, interfaceMethod);
                 if (methodImpl != null)
                 {
                     return methodImpl;
@@ -179,6 +179,34 @@
             return null;
         }
 
+        private static MethodDesc? FindImplFromDeclFromMethodImpls(MetadataType type, MethodDesc decl)
+        {
+            MethodImplRecord[] foundMethodImpls = type.FindMethodsImplWithMatchingDeclName(decl.Name);
+
+            if (foundMethodImpls == null)
+                return null;
+
+            bool interfaceDecl = decl.OwningType.IsInterface;
+
+            foreach (MethodImplRecord record in foundMethodImpls)
+            {
+                MethodDesc recordDecl = record.Decl;
+
+                if (interfaceDecl != recordDecl.OwningType.IsInterface)
+                    continue;
+
+                if (!interfaceDecl)
+                    recordDecl = FindSlotDefiningMethodForVirtualMethod(recordDecl);
+
+                if (recordDecl == decl)
+                {
+                    return FindSlotDefiningMethodForVirtualMethod(record.Body);
+                }
+            }
+
+            return null;
+        }
+
         public static DefaultInterfaceMethodResolution ResolveInterfaceMethodToDefaultImplementationOnType(MethodDesc interfaceMethod, TypeDesc currentType, out MethodDesc? impl)
         {
             var interfaceMethodOwningType = interfaceMethod.OwningType;
@@ -198,7 +226,7 @@
 
             DefType? mostSpecificInterface = null;
             bool diamondCase = false;
-            foreach (var runtimeInterface in consideredInterfaces)
+            foreach (MetadataType runtimeInterface in consideredInterfaces)
             {
                 if (runtimeInterface == interfaceMethodOwningType)
                 {
@@ -210,7 +238,7 @@
                 }
                 else if (Array.IndexOf(runtimeInterface.RuntimeInterfaces, interfaceMethodOwningType) != 1)
                 {
-                    var possibleMethodOverrides = FindMethodOverridesWithMatchingDeclarationName(interfaceMethod.FullName, runtimeInterface);
+                    var possibleMethodOverrides = runtimeInterface.FindMethodsImplWithMatchingDeclName(interfaceMethod.FullName);
                     if (possibleMethodOverrides != null)
                     {
                         foreach (var methodOverride in possibleMethodOverrides) 
@@ -287,57 +315,6 @@
         /// <returns>true if interface is implemented by the type explicitly</returns>
         private static bool IsInterfaceExplicitlyImplementedOnType(MetadataType currentType, DefType interfaceType)
             => currentType.ExplicitlyImplementedInterfaces.Any(interfaceImpl => interfaceImpl == interfaceType);
-
-
-        private static MethodDesc? FindMethodsFromDeclarationsFromMethodOverrides(TypeDesc currentType, MethodDesc method)
-        {
-            var foundMethodOverrides = FindMethodOverridesWithMatchingDeclarationName(method.Name, currentType);
-            if (foundMethodOverrides != null)
-            {
-                bool isInterfaceDeclaration = method.OwningType.IsInterface;
-
-                foreach (var methodOverride in foundMethodOverrides)
-                {
-                    var declaration = methodOverride.Decl;
-                    if (isInterfaceDeclaration == declaration.OwningType.IsInterface)
-                    {
-                        if (!isInterfaceDeclaration)
-                        {
-                            declaration = FindSlotDefiningMethodForVirtualMethod(declaration);
-                        }
-
-                        if (declaration == method)
-                        {
-                            return FindSlotDefiningMethodForVirtualMethod(methodOverride.Body);
-                        }
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Determine the method implementations where the declaration 
-        /// FindMethodsWithMatchingOverrideNamess
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        private static IEnumerable<MethodImplRecord> FindMethodOverridesWithMatchingDeclarationName(string name, TypeDesc type)
-        {
-            var foundRecords = new List<MethodImplRecord>();
-            foreach (var method in type.GetVirtualMethods())
-            {
-                foreach (var methodOverride in method.Overrides.Where(x => x.MethodDeclaration.Name == name))
-                {
-                    var newRecord = new MethodImplRecord(type.Context.Create(methodOverride.MethodDeclaration), type.Context.Create(methodOverride.MethodBody));
-                    foundRecords.Add(newRecord);
-                }
-            }
-
-            return foundRecords;
-        }
     }
 
     public struct MethodImplRecord

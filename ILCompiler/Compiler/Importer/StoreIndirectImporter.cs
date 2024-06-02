@@ -36,7 +36,7 @@ namespace ILCompiler.Compiler.Importer
 
                 case Code.Stobj:
                     var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-                    var typeDesc = context.TypeSystemContext.Create(typeSig, context.Method.Instantiation);
+                    var typeDesc = context.Module.Create(typeSig, context.Method.Instantiation);
                     type = typeDesc.VarType;
                     exactSize = typeDesc.GetElementSize().AsInt;
                     break;

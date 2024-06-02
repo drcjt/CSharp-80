@@ -24,7 +24,7 @@ namespace ILCompiler.Compiler.Importer
 
         public static void ImportCall(Instruction instruction, ImportContext context, IILImporterProxy importer, StackEntry? newObjThis = null)
         {
-            var method = context.TypeSystemContext.Create((IMethod)instruction.Operand);
+            var method = context.Module.Create((IMethod)instruction.Operand);
 
             ImportCall(method, instruction, context, importer, newObjThis);
         }
@@ -38,16 +38,13 @@ namespace ILCompiler.Compiler.Importer
                 switch (method.Name)
                 {
                     case "Set":
-                        methodToCall = (MethodDesc)context.TypeSystemContext.Create(new MethodDefUser("Set", method.MethodSig));
-                        //declaringTypeDef.Methods.Add(methodToCall);
+                        methodToCall = (MethodDesc)context.Module.Create(new MethodDefUser("Set", method.MethodSig));
                         break;
                     case "Get":
-                        methodToCall = (MethodDesc)context.TypeSystemContext.Create(new MethodDefUser("Get", method.MethodSig));
-                        //declaringTypeDef.Methods.Add(methodToCall);
+                        methodToCall = (MethodDesc)context.Module.Create(new MethodDefUser("Get", method.MethodSig));
                         break;
                     case "Address":
-                        methodToCall = (MethodDesc)context.TypeSystemContext.Create(new MethodDefUser("Address", method.MethodSig));
-                        //declaringTypeDef.Methods.Add(methodToCall);
+                        methodToCall = (MethodDesc)context.Module.Create(new MethodDefUser("Address", method.MethodSig));
                         break;
                     default:
                         throw new InvalidOperationException($"Unknown array intrinsic method {method.Name}");

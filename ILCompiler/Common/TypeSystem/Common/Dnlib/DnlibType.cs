@@ -1,16 +1,16 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Compiler;
 
-namespace ILCompiler.Common.TypeSystem.Common.dnlib
+namespace ILCompiler.Common.TypeSystem.Common.Dnlib
 {
     public sealed class DnlibType : MetadataType
     {
         private readonly TypeDef _typeDef;
-        private readonly TypeSystemContext _typeSystemContext;
-        public DnlibType(TypeDef typeDef, TypeSystemContext typeSystemContext)
+        private readonly DnlibModule _module;
+        public DnlibType(TypeDef typeDef, DnlibModule module)
         {
             _typeDef = typeDef;
-            _typeSystemContext = typeSystemContext;
+            _module = module;
             _baseType = this;
         }
 
@@ -23,7 +23,7 @@ namespace ILCompiler.Common.TypeSystem.Common.dnlib
             }
             else
             {
-                _baseType = (MetadataType)Context.Create(_typeDef.BaseType);
+                _baseType = (MetadataType)_module.Create(_typeDef.BaseType);
             }
             return _baseType;
         }
@@ -50,7 +50,7 @@ namespace ILCompiler.Common.TypeSystem.Common.dnlib
 
         public override bool HasStaticConstructor => _typeDef.FindStaticConstructor() != null;
 
-        public override TypeSystemContext Context => _typeSystemContext;
+        public override TypeSystemContext Context => _module.Context;
 
 
         public override bool IsSequentialLayout => _typeDef.IsSequentialLayout;
@@ -72,13 +72,13 @@ namespace ILCompiler.Common.TypeSystem.Common.dnlib
         public override MethodDesc? GetStaticConstructor()
         {
             var methodDef = _typeDef.FindStaticConstructor();
-            return methodDef == null ? null : Context.Create(methodDef);
+            return methodDef == null ? null : _module.Create(methodDef);
         }
 
         public override MethodDesc? GetDefaultConstructor()
         {
             var methodDef = _typeDef.FindDefaultConstructor();
-            return methodDef == null ? null : Context.Create(methodDef);
+            return methodDef == null ? null : _module.Create(methodDef);
         }
 
         public override ClassLayoutMetadata GetClassLayout()
@@ -101,7 +101,7 @@ namespace ILCompiler.Common.TypeSystem.Common.dnlib
                 if (count == 0)
                     return Array.Empty<DefType>();
 
-                return _typeDef.Interfaces.Select(x => (DefType)(Context.Create(x.Interface))).ToArray();
+                return _typeDef.Interfaces.Select(x => (DefType)(_module.Create(x.Interface))).ToArray();
             }
         }
 
@@ -109,7 +109,7 @@ namespace ILCompiler.Common.TypeSystem.Common.dnlib
         {
             foreach (var method in _typeDef.Methods)
             {
-                yield return Context.Create(method);
+                yield return _module.Create(method);
             }
         }
 
@@ -117,7 +117,7 @@ namespace ILCompiler.Common.TypeSystem.Common.dnlib
         {
             foreach (var field in _typeDef.Fields)
             {
-                yield return Context.Create(field);
+                yield return _module.Create(field);
             }
         }
 
@@ -145,6 +145,21 @@ namespace ILCompiler.Common.TypeSystem.Common.dnlib
                     _ => TypeFlags.Unknown
                 };
             }
+        }
+
+        public override MethodImplRecord[] FindMethodsImplWithMatchingDeclName(string declName)
+        {
+            var foundRecords = new List<MethodImplRecord>();
+            foreach (var method in GetVirtualMethods())
+            {
+                foreach (var methodOverride in method.Overrides.Where(x => x.MethodDeclaration.Name == declName))
+                {
+                    var newRecord = new MethodImplRecord(_module.Create(methodOverride.MethodDeclaration), _module.Create(methodOverride.MethodBody));
+                    foundRecords.Add(newRecord);
+                }
+            }
+
+            return foundRecords.ToArray();
         }
     }
 }

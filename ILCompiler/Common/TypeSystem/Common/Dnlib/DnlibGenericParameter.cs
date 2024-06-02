@@ -1,14 +1,14 @@
 ﻿using dnlib.DotNet;
 
-namespace ILCompiler.Common.TypeSystem.Common.dnlib
+namespace ILCompiler.Common.TypeSystem.Common.Dnlib
 {
     public sealed class DnlibGenericParameter : GenericParameterDesc
     {
-        private TypeSystemContext _context;
+        private DnlibModule _module;
         private GenericParam _genericParameter;
-        public DnlibGenericParameter(TypeSystemContext context, GenericParam genericParameter)
+        public DnlibGenericParameter(DnlibModule module, GenericParam genericParameter)
         {
-            _context = context;
+            _module = module;
             _genericParameter = genericParameter;
         }
 
@@ -16,8 +16,8 @@ namespace ILCompiler.Common.TypeSystem.Common.dnlib
 
         public override GenericParameterKind Kind => _genericParameter.Owner.IsGenericParam ? GenericParameterKind.Type : GenericParameterKind.Method;
 
-        public override TypeSystemEntity AssociatedTypeOrMethod => Context.CreateFromTypeOrMethodDef(_genericParameter.Owner);
+        public override TypeSystemEntity AssociatedTypeOrMethod => _module.CreateFromTypeOrMethodDef(_genericParameter.Owner);
 
-        public override TypeSystemContext Context => _context;
+        public override TypeSystemContext Context => _module.Context;
     }
 }

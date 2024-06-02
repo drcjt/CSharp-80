@@ -1,6 +1,7 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Common.TypeSystem.Common.Dnlib;
 using ILCompiler.Compiler;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace ILCompiler.Tests
     [TestFixture]
     class BasicBlockAnalyserTests
     {
-        private static MethodDesc BuildMethod(IList<Instruction> instructions, TypeSystemContext typeSystemContext)
+        private static MethodDesc BuildMethod(IList<Instruction> instructions, DnlibModule module)
         {
             instructions.UpdateInstructionOffsets();
             var methodDef = new MethodDefUser
@@ -19,19 +20,19 @@ namespace ILCompiler.Tests
                 Body = new CilBody(true, instructions, new List<ExceptionHandler>(), new List<Local>())
             };
 
-            return typeSystemContext.Create(methodDef);
+            return module.Create(methodDef);
         }
 
         [Test]
         public void FindBasicBlocks_WithNoBranches_CreatesBasicBlockWithAlwaysJumpKind()
         {
-            var typeSystemContext = new TypeSystemContext();
+            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
             var method = BuildMethod(new List<Instruction>()
             {
                 new Instruction(OpCodes.Ldc_I4_0),
                 new Instruction(OpCodes.Ldc_I4_S, 1234),
-            }, typeSystemContext);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, typeSystemContext);
+            }, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 
@@ -43,12 +44,12 @@ namespace ILCompiler.Tests
         [Test]
         public void FindBasicBlocks_WithOnlyReturn_CreatesBasicBlockWithReturnJumpKind()
         {
-            var typeSystemContext = new TypeSystemContext();
+            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
             var method = BuildMethod(new List<Instruction>()
             {
                 new Instruction(OpCodes.Ret),
-            }, typeSystemContext);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, typeSystemContext);
+            }, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 
@@ -60,13 +61,13 @@ namespace ILCompiler.Tests
         [Test]
         public void FindBasicBlocks_WithSwitch_CreatesBasicBlockWithSwitchJumpKind()
         {
-            var typeSystemContext = new TypeSystemContext();
+            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
             var method = BuildMethod(new List<Instruction>()
             {
                 new Instruction(OpCodes.Switch),
                 new Instruction(OpCodes.Ret),
-            }, typeSystemContext);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, typeSystemContext);
+            }, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 
@@ -84,9 +85,9 @@ namespace ILCompiler.Tests
             code.Add(OpCodes.Brfalse.ToInstruction(branchTarget));
             code.Add(OpCodes.Nop.ToInstruction());
             code.Add(branchTarget);
-            var typeSystemContext = new TypeSystemContext();
-            var method = BuildMethod(code, typeSystemContext);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, typeSystemContext);
+            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
+            var method = BuildMethod(code, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 
@@ -98,13 +99,13 @@ namespace ILCompiler.Tests
         [Test]
         public void FindBasicBlocks_WithNoBranches_IdentifiesSingleBasicBlock()
         {
-            var typeSystemContext = new TypeSystemContext();
+            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
             var method = BuildMethod(new List<Instruction>()
             {
                 new Instruction(OpCodes.Ldc_I4_0),
                 new Instruction(OpCodes.Ldc_I4_S, 1234),
-            }, typeSystemContext);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, typeSystemContext);
+            }, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 
@@ -123,9 +124,9 @@ namespace ILCompiler.Tests
             code.Add(OpCodes.Brfalse.ToInstruction(branchTarget));
             code.Add(OpCodes.Nop.ToInstruction());
             code.Add(branchTarget);
-            var typeSystemContext = new TypeSystemContext();
-            var method = BuildMethod(code, typeSystemContext);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, typeSystemContext);
+            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
+            var method = BuildMethod(code, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 
@@ -145,9 +146,9 @@ namespace ILCompiler.Tests
             var instructionAfterBranch = OpCodes.Nop.ToInstruction();
             code.Add(instructionAfterBranch);
             code.Add(branchTarget);
-            var typeSystemContext = new TypeSystemContext();
-            var method = BuildMethod(code, typeSystemContext);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, typeSystemContext);
+            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
+            var method = BuildMethod(code, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 
@@ -165,9 +166,9 @@ namespace ILCompiler.Tests
             code.Add(OpCodes.Nop.ToInstruction());
             code.Add(branchTarget);
             code.Add(OpCodes.Br.ToInstruction(branchTarget));
-            var typeSystemContext = new TypeSystemContext();
-            var method = BuildMethod(code, typeSystemContext);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, typeSystemContext);
+            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
+            var method = BuildMethod(code, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 

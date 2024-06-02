@@ -1,6 +1,7 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
 using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Common.TypeSystem.Common.Dnlib;
 using Instruction = dnlib.DotNet.Emit.Instruction;
 
 namespace ILCompiler.Compiler.PreInit
@@ -10,10 +11,12 @@ namespace ILCompiler.Compiler.PreInit
         private readonly TypeDesc _type;
         private readonly IList<Instruction> _instructions;
         private readonly IDictionary<FieldDesc, Value> _fieldValues = new Dictionary<FieldDesc, Value>();
-        public TypePreinitializer(TypeDesc type, IList<Instruction> instructions)
+        private readonly DnlibModule _module;
+        public TypePreinitializer(TypeDesc type, IList<Instruction> instructions, DnlibModule module)
         {
             _type = type;
             _instructions = instructions;
+            _module = module;
 
             foreach (var field in type.GetFields())
             {
@@ -24,12 +27,12 @@ namespace ILCompiler.Compiler.PreInit
             }
         }
 
-        public static PreinitializationInfo ScanType(TypeDesc type)
+        public static PreinitializationInfo ScanType(TypeDesc type, DnlibModule module)
         {
             var cctor = type.GetStaticConstructor();
             var instructions = cctor!.Body.Instructions;
 
-            var typePreinitializer = new TypePreinitializer(type, instructions);
+            var typePreinitializer = new TypePreinitializer(type, instructions, module);
             var status = typePreinitializer.TryScanMethod();
 
             if (status)
@@ -85,7 +88,7 @@ namespace ILCompiler.Compiler.PreInit
                     case Code.Stsfld:
                         {
                             var fieldDefOrRef = (IField)instruction.Operand;
-                            var fieldDesc = _type.Context.Create(fieldDefOrRef);
+                            var fieldDesc = _module.Create(fieldDefOrRef);
 
                             if (!fieldDesc.IsStatic || fieldDesc.IsLiteral)
                             {

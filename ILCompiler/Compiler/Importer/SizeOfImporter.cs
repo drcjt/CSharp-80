@@ -13,7 +13,7 @@ namespace ILCompiler.Compiler.Importer
             if (instruction.OpCode.Code != Code.Sizeof) return false;
 
             var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-            var typeDesc = context.TypeSystemContext.Create(typeSig, context.Method.Instantiation);
+            var typeDesc = context.Module.Create(typeSig, context.Method.Instantiation);
 
             var elemType = typeDesc.VarType;
             int elemSize = typeDesc.GetElementSize().AsInt;

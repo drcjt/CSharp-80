@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Common.TypeSystem.Common;
+using ILCompiler.Common.TypeSystem.Common.Dnlib;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
@@ -16,6 +17,6 @@ namespace ILCompiler.Compiler.Importer
         public required PreinitializationManager PreinitializationManager { get; init; }
         public required CorLibModuleProvider CorLibModuleProvider { get; init; }
         public required NodeFactory NodeFactory { get; init; }
-        public required TypeSystemContext TypeSystemContext { get; init; }
+        public required DnlibModule Module { get; init; }
     }
 }
