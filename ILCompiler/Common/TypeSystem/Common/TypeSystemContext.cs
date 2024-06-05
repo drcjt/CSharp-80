@@ -10,6 +10,11 @@
 
         public ModuleDesc? SystemModule { get; set; }
 
+        public InstantiatedType GetInstantiatedType(MetadataType typeDef, Instantiation instantiation)
+        {
+            return new InstantiatedType(typeDef, instantiation);
+        }
+
         public InstantiatedMethod GetInstantiatedMethod(MethodDesc methodDef, Instantiation instantiation)
         {
             if (methodDef is InstantiatedMethod instantiated)

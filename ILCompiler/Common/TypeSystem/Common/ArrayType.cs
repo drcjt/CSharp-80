@@ -22,7 +22,7 @@ namespace ILCompiler.Common.TypeSystem.Common
 
         public override VarType VarType => VarType.Ref;
 
-        public override TypeDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation methodInstantiation)
+        public override TypeDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation? methodInstantiation)
         {
             var instantiatedElementType = ElementType.InstantiateSignature(typeInstantiation, methodInstantiation);
             if (instantiatedElementType != ElementType)
