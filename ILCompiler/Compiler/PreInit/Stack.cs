@@ -1,4 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.Common;
+﻿using ILCompiler.TypeSystem.Common;
 
 namespace ILCompiler.Compiler.PreInit
 {

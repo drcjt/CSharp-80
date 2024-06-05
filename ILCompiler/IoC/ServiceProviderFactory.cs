@@ -1,6 +1,5 @@
-﻿using ILCompiler.Common.TypeSystem.Common;
-using ILCompiler.Common.TypeSystem.Common.Dnlib;
-using ILCompiler.Common.TypeSystem.IL;
+﻿using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.Dnlib;
 using ILCompiler.Compiler;
 using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
@@ -12,6 +11,7 @@ using ILCompiler.Compiler.Z80Assembler;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using ILCompiler.IL;
 
 namespace ILCompiler.IoC
 {

@@ -1,9 +1,9 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.Common;
-using ILCompiler.Common.TypeSystem.Common.Dnlib;
-using ILCompiler.Common.TypeSystem.IL;
+using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.Dnlib;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
+using ILCompiler.IL;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
@@ -253,6 +253,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 var methodDesc = _module.Create(method);
 
+                // TODO: This can be removed when we instantiate the method IL.
+                // For a case where we have a generic method passing on the generic parameters to another generic method
+                // Then the call will instantiate the method signature - see code in InstantiatedMethodIL.GetObject
                 if (_method is InstantiatedMethod)
                 {
                     methodDesc = methodDesc.Context.GetInstantiatedMethod(methodDesc, _method.Instantiation);

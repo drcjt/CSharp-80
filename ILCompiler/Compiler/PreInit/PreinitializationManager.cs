@@ -1,5 +1,5 @@
-﻿using ILCompiler.Common.TypeSystem.Common;
-using ILCompiler.Common.TypeSystem.Common.Dnlib;
+﻿using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.Dnlib;
 
 namespace ILCompiler.Compiler.PreInit
 {

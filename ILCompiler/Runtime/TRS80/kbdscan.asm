@@ -1,4 +1,8 @@
 KBDSCAN:
+	;CALL 35BH
+	;CALL 2BH
+	;CALL 3E3H
+
 	POP BC	; return address
 
 	CALL 2BH

@@ -1,4 +1,4 @@
-﻿using ILCompiler.Common.TypeSystem.Common;
+﻿using ILCompiler.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using ILCompiler.Compiler.Emit;
