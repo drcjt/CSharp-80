@@ -21,7 +21,7 @@
         {
         }
 
-        public override TypeDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation methodInstantiation)
+        public override TypeDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation? methodInstantiation)
         {
             return typeInstantiation == null ? this : typeInstantiation[Index];
         }
@@ -33,7 +33,7 @@
         {
         }
 
-        public override TypeDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation methodInstantiation)
+        public override TypeDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation? methodInstantiation)
         {
             return methodInstantiation == null ? this : methodInstantiation[Index];
         }

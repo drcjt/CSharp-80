@@ -10,7 +10,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public override VarType VarType => VarType.ByRef;
 
-        public override TypeDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation methodInstantiation)
+        public override TypeDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation? methodInstantiation)
         {
             var parameterType = this.ParameterType;
             var instantiatedParameterType = parameterType.InstantiateSignature(typeInstantiation, methodInstantiation);

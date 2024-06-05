@@ -11,7 +11,7 @@
 
         public override TypeSystemContext Context => Signature.ReturnType.Context;
 
-        public override TypeDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation methodInstantiation)
+        public override TypeDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation? methodInstantiation)
         {
             var signatureBuilder = new MethodSignatureBuilder(Signature);
             signatureBuilder.ReturnType = Signature.ReturnType.InstantiateSignature(typeInstantiation, methodInstantiation);

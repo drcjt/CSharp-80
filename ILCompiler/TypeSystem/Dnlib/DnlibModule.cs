@@ -8,7 +8,7 @@ namespace ILCompiler.TypeSystem.Dnlib
     {
         private readonly Dictionary<string, FieldDesc> _fieldsByFullName = new Dictionary<string, FieldDesc>();
         private readonly Dictionary<string, DefType> _defTypesByFullName = new Dictionary<string, DefType>();
-        private readonly Dictionary<string, DnlibMethod> _dnlibMethodsByFullName = new Dictionary<string, DnlibMethod>();
+        private readonly Dictionary<string, MethodDesc> _dnlibMethodsByFullName = new Dictionary<string, MethodDesc>();
 
         private readonly CorLibModuleProvider _corLibModuleProvider;
 
@@ -85,6 +85,29 @@ namespace ILCompiler.TypeSystem.Dnlib
                 return genericMethodParameter;
             }
 
+            if (typeSig.IsGenericInstanceType)
+            {
+                var genericType = typeSig.ToGenericInstSig().GenericType;
+                var genericParams = typeSig.ToGenericInstSig().GenericArguments;
+                TypeDesc[] genericParameters = new TypeDesc[genericParams.Count];
+                for (int i = 0; i < genericParams.Count; i++)
+                {
+                    genericParameters[i] = Create(genericParams[i]);
+                }
+                instantiation = new Instantiation(genericParameters);
+
+                MetadataType metadataType = (MetadataType)Create(genericType);
+
+                var instantiatedType = new InstantiatedType(metadataType, instantiation);
+                return instantiatedType;
+            }
+
+            if (typeSig is GenericVar genericVar)
+            {
+                var genericParameter = new DnlibGenericParameter(this, genericVar.GenericParam);
+                return genericParameter;
+            }
+
             throw new NotImplementedException();
         }
 
@@ -110,10 +133,26 @@ namespace ILCompiler.TypeSystem.Dnlib
             {
                 var methodDef = methodDefOrRef.ResolveMethodDefThrow();
 
-                if (!_dnlibMethodsByFullName.TryGetValue(methodDef.FullName, out DnlibMethod? methodDesc))
+                if (!_dnlibMethodsByFullName.TryGetValue(methodDef.FullName, out MethodDesc? methodDesc))
                 {
                     methodDesc = new DnlibMethod(methodDef, this);
                     _dnlibMethodsByFullName[methodDef.FullName] = methodDesc;
+                }
+
+                if (methodDefOrRef.DeclaringType?.NumberOfGenericParameters > 0)
+                {
+                    var genericInstSig = methodDefOrRef.DeclaringType.TryGetGenericInstSig();
+                    var genericParams = genericInstSig.GenericArguments;
+                    TypeDesc[] genericParameters = new TypeDesc[genericParams.Count];
+                    for (int i = 0; i < genericParams.Count; i++)
+                    {
+                        genericParameters[i] = Create(genericParams[i]);
+                    }
+                    var instantiation = new Instantiation(genericParameters);
+
+                    MetadataType typeDef = (MetadataType)Create(methodDef.DeclaringType);
+                    var instantiatedType = new InstantiatedType(typeDef, instantiation);
+                    methodDesc = new MethodForInstantiatedType(methodDesc, instantiatedType);
                 }
 
                 return methodDesc;
@@ -126,7 +165,12 @@ namespace ILCompiler.TypeSystem.Dnlib
             {
                 if (td.ContainsGenericParameter)
                 {
-                    return new InstantiatedType((MetadataType)Create(td));
+                    if (instantiation != null)
+                    {
+                        return new InstantiatedType((MetadataType)Create(td), instantiation);
+                    }
+
+                    throw new NotImplementedException("Open generic types not yet supported");
                 }
                 else
                 {

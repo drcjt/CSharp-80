@@ -15,6 +15,8 @@ namespace ILCompiler.TypeSystem.Common
 
         public bool IsInstantiatedType => this is InstantiatedType;
 
+        public virtual Instantiation? Instantiation => null;
+
         public virtual bool IsValueType => false;
 
         public virtual DefType? BaseType => null;
@@ -92,6 +94,6 @@ namespace ILCompiler.TypeSystem.Common
             return null;
         }
 
-        public virtual TypeDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation methodInstantiation) => this;
+        public virtual TypeDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation? methodInstantiation) => this;
     }
 }
