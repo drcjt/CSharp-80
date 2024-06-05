@@ -88,15 +88,9 @@ namespace ILCompiler.TypeSystem.Common
 
         protected ComputedInstanceFieldLayout ComputeInstanceFieldLayout(MetadataType type, int numInstanceFields)
         {
-            if (type.IsSequentialLayout)
-            {
-                return ComputeSequentialFieldLayout(type, numInstanceFields);
-            }
-            else
-            {
-                // TODO: implement auto layout https://github.com/drcjt/CSharp-80/issues/162
-                return ComputeSequentialFieldLayout(type, numInstanceFields);
-            }
+            // TODO: implement auto layout https://github.com/drcjt/CSharp-80/issues/162
+            // For now just use SequentialFieldLayout for everything
+            return ComputeSequentialFieldLayout(type, numInstanceFields);
         }
 
         protected ComputedInstanceFieldLayout ComputeSequentialFieldLayout(MetadataType type, int numInstanceFields)

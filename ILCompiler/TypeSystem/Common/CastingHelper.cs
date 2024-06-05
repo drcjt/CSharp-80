@@ -59,12 +59,12 @@
 
         private static bool CompareStructuresForEquivalence(DefType type1, DefType type2, bool enumMode)
         {
-            foreach (var method in type1.GetMethods())
+            if (type1.GetMethods().Any())
             {
                 return false;
             }
 
-            foreach (var method in type2.GetMethods())
+            if (type2.GetMethods().Any())
             {
                 return false;
             }
