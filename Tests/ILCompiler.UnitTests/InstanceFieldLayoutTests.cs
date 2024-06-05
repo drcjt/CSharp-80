@@ -1,6 +1,6 @@
 ﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.Common;
-using ILCompiler.Common.TypeSystem.Common.Dnlib;
+using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.Dnlib;
 using NUnit.Framework;
 using System.IO;
 using System.Reflection;
