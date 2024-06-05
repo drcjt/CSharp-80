@@ -1,5 +1,5 @@
 ﻿using dnlib.DotNet;
-using ILCompiler.Common.TypeSystem.Common.Dnlib;
+using ILCompiler.TypeSystem.Dnlib;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Interfaces;

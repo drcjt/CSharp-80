@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "JitDiff": {
+      "commandName": "Project",
+      "commandLineArgs": "c:\\users\\drcjt\\source\\repos\\csharp-80-base c:\\users\\drcjt\\source\\repos\\csharp-80-clean"
+    }
+  }
+}

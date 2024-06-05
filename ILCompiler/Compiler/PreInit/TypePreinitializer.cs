@@ -1,7 +1,7 @@
 ﻿using dnlib.DotNet;
 using dnlib.DotNet.Emit;
-using ILCompiler.Common.TypeSystem.Common;
-using ILCompiler.Common.TypeSystem.Common.Dnlib;
+using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.Dnlib;
 using Instruction = dnlib.DotNet.Emit.Instruction;
 
 namespace ILCompiler.Compiler.PreInit

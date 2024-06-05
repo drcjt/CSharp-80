@@ -1,9 +1,9 @@
-﻿using ILCompiler.Common.TypeSystem.Common;
-using ILCompiler.Common.TypeSystem.IL;
+﻿using ILCompiler.TypeSystem.Common;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text;
+using ILCompiler.IL;
 
 namespace ILCompiler.Compiler
 {
@@ -74,7 +74,7 @@ namespace ILCompiler.Compiler
         {
             if (returnType.IsValueType && !returnType.IsPrimitive && !returnType.IsEnum)
             {
-                var target = new TargetDetails(Common.TypeSystem.Common.TargetArchitecture.Z80);
+                var target = new TargetDetails(TypeSystem.Common.TargetArchitecture.Z80);
 
                 var returnBuffer = new LocalVariableDescriptor()
                 {
