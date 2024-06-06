@@ -149,7 +149,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DoomFire", "Samples\DoomFir
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConstantFolding", "Tests\Directed\ConstantFolding\ConstantFolding.csproj", "{3BC3BDDD-3EE0-48D9-A13B-F5B699B07B22}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JitDiff", "JitDiff\JitDiff.csproj", "{0D32A97C-AED2-4433-B967-BDF7B6DF009E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JitDiff", "JitDiff\JitDiff.csproj", "{0D32A97C-AED2-4433-B967-BDF7B6DF009E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QSort", "Samples\QSort\QSort.csproj", "{1E478B36-AC1B-4273-975C-6E6109ACFE55}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -369,6 +371,10 @@ Global
 		{0D32A97C-AED2-4433-B967-BDF7B6DF009E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D32A97C-AED2-4433-B967-BDF7B6DF009E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D32A97C-AED2-4433-B967-BDF7B6DF009E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E478B36-AC1B-4273-975C-6E6109ACFE55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E478B36-AC1B-4273-975C-6E6109ACFE55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E478B36-AC1B-4273-975C-6E6109ACFE55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E478B36-AC1B-4273-975C-6E6109ACFE55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -429,6 +435,7 @@ Global
 		{B9CBFF56-92A8-44D3-9DD8-F885223DCC84} = {4DBCD88C-3231-4CCF-8D5A-D2AA2D45750B}
 		{D6103A46-A3C0-4349-BF53-21C25A3140AD} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 		{3BC3BDDD-3EE0-48D9-A13B-F5B699B07B22} = {BA9F8E73-7E2E-4E47-A614-CF6D8AD8445D}
+		{1E478B36-AC1B-4273-975C-6E6109ACFE55} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}
