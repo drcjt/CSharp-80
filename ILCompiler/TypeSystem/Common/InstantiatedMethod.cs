@@ -60,13 +60,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public override MethodIL? MethodIL => _methodDesc.MethodIL;
 
-        public override IList<MethodOverride> Overrides => _methodDesc.Overrides;
-
-        public override MethodSig MethodSig => _methodDesc.MethodSig;
-
         public override string Name => _methodDesc.Name;
-
-        public override CustomAttributeCollection CustomAttributes => _methodDesc.CustomAttributes;
 
         public override IList<LocalVariableDefinition> Locals
         {
@@ -100,5 +94,10 @@ namespace ILCompiler.TypeSystem.Common
         }
 
         public override MethodDesc GetMethodDefinition() => _methodDesc;
+
+        // TODO: Refactor to not use dnlib types in following
+        public override IList<MethodOverride> Overrides => _methodDesc.Overrides;
+        public override MethodSig MethodSig => _methodDesc.MethodSig;
+        public override CustomAttributeCollection CustomAttributes => _methodDesc.CustomAttributes;
     }
 }

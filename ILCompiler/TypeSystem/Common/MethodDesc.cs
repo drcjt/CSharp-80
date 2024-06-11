@@ -45,13 +45,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public virtual bool IsAbstract => false;
 
-        public abstract IList<MethodOverride> Overrides { get; }
-
-        public abstract MethodSig MethodSig { get; }
-
-        public abstract CustomAttributeCollection CustomAttributes { get; }
         public virtual bool HasGenericParameters => false; 
-
 
         public abstract MethodSignature Signature { get; }
 
@@ -121,5 +115,10 @@ namespace ILCompiler.TypeSystem.Common
 
             return sb.ToString();
         }
+
+        // TODO: Refactor to not use dnlib types in following
+        public abstract IList<MethodOverride> Overrides { get; }
+        public abstract MethodSig MethodSig { get; }
+        public abstract CustomAttributeCollection CustomAttributes { get; }
     }
 }
