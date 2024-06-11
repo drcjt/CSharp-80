@@ -1,11 +1,11 @@
 ﻿using dnlib.DotNet;
-using ILCompiler.Compiler;
+using dnlib.DotNet.Emit;
 using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.TypeSystem.Dnlib
 {
-    public class DnlibInstruction : Instruction
+    public class DnlibInstruction : IL.Instruction
     {
         private readonly DnlibModule _module;
         private readonly dnlib.DotNet.Emit.Instruction _instruction;
@@ -34,49 +34,25 @@ namespace ILCompiler.TypeSystem.Dnlib
 
         public override int GetSize() => _instruction.GetSize();
 
-        public override object GetOperandAs<T>()
+        public override bool OperandIsNotNull => _instruction.Operand is not null;
+
+        public override object GetOperand()
         {
-            if (typeof(T) == typeof(FieldDesc))
-                return _module.Create(_instruction.OperandAs<IField>());
-
-            if (typeof(T) == typeof(MethodDesc))
-                return _module.Create(_instruction.OperandAs<IMethod>());
-
-            if (typeof(T) == typeof(TypeDesc))
-                return _module.Create(_instruction.OperandAs<ITypeDefOrRef>());
-
-            if (typeof(T) == typeof(string))
-                return _instruction.OperandAs<String>();
-
-            if (typeof(T) == typeof(Instruction[]))
+            return _instruction.Operand switch
             {
-                if (_instruction.Operand is not dnlib.DotNet.Emit.Instruction[] instructions) return Array.Empty<Instruction>();
-                return instructions.Select(x => new DnlibInstruction(_module, x)).ToArray();
-            }
-
-            if (typeof(T) == typeof(Instruction))
-            {
-                return new DnlibInstruction(_module, _instruction.OperandAs<dnlib.DotNet.Emit.Instruction>());
-            }
-
-            if (typeof(T) == typeof(int))
-                return _instruction.OperandAs<int>();
-            if (typeof(T) == typeof(sbyte))
-                return _instruction.OperandAs<sbyte>();
-
-            if (typeof(T) == typeof(LocalVariableDefinition))
-            {
-                var local = _instruction.OperandAs<dnlib.DotNet.Emit.Local>();
-                return new LocalVariableDefinition(_module.Create(local.Type), local.Name, local.Index);
-            }
-
-            if (typeof(T) == typeof(ParameterDefinition))
-            {
-                var parameter = _instruction.OperandAs<Parameter>();
-                return new ParameterDefinition(_module.Create(parameter.Type), parameter.Name, parameter.Index);
-            }
-
-            throw new ArgumentException("Cannot get operand of instruction as type {T}");
+                MemberRef memberRef => memberRef.IsFieldRef ? _module.Create((IField)memberRef) : _module.Create((IMethod)memberRef),
+                IField field => _module.Create(field),
+                IMethod method => _module.Create(method),
+                ITypeDefOrRef typeDefOrRef => _module.Create(typeDefOrRef),
+                dnlib.DotNet.Emit.Instruction[] instructions => instructions.Select(x => new DnlibInstruction(_module, x)).ToArray(),
+                dnlib.DotNet.Emit.Instruction instruction => new DnlibInstruction(_module, instruction),
+                Local local => new LocalVariableDefinition(_module.Create(local.Type), local.Name, local.Index),
+                Parameter parameter => new ParameterDefinition(_module.Create(parameter.Type), parameter.Name, parameter.Index),
+                String s => s,
+                int i => i,
+                sbyte sb => sb,
+                _ => throw new ArgumentException("Cannot get operand of instruction")
+            };
         }
     }
 }

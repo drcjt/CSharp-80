@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.Importer
                 case ILOpcode.starg:
                 case ILOpcode.starg_s:
                     var value = importer.PopExpression();
-                    var parameter = (ParameterDefinition)instruction.GetOperandAs<ParameterDefinition>();
+                    var parameter = (ParameterDefinition)instruction.GetOperand();
                     var node = new StoreLocalVariableEntry(parameter.Index, true, value);
                     importer.ImportAppendTree(node);
                     return true;

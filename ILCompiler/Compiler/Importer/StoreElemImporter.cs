@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.Importer
             switch (instruction.Opcode)
             {
                 case ILOpcode.stelem:
-                    var typeDesc = (TypeDesc)instruction.GetOperandAs<TypeDesc>();
+                    var typeDesc = (TypeDesc)instruction.GetOperand();
                     elemType = typeDesc.VarType;
                     elemSize = typeDesc.GetElementSize().AsInt;
                     break;

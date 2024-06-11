@@ -46,7 +46,7 @@ namespace ILCompiler.Compiler.Importer
                     return false;
             }
 
-            var target = (Instruction)instruction.GetOperandAs<Instruction>();
+            var target = (Instruction)instruction.GetOperand();
 
             var targetBlock = importer.BasicBlocks[(int)target.Offset];
             var fallthroughBlock = (code != ILOpcode.br) ? context.FallThroughBlock : null;

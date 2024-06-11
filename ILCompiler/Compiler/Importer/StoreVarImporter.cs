@@ -20,7 +20,7 @@ namespace ILCompiler.Compiler.Importer
                     break;
                 case ILOpcode.stloc:
                 case ILOpcode.stloc_s:
-                    var localVariableDefinition = (LocalVariableDefinition)instruction.GetOperandAs<LocalVariableDefinition>();
+                    var localVariableDefinition = (LocalVariableDefinition)instruction.GetOperand();
                     index = localVariableDefinition.Index;
                     break;
 

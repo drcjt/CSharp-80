@@ -21,7 +21,7 @@ namespace ILCompiler.Compiler.Importer
 
                 case ILOpcode.ldarg:
                 case ILOpcode.ldarg_s:
-                    var parameter = (ParameterDefinition)instruction.GetOperandAs<ParameterDefinition>();
+                    var parameter = (ParameterDefinition)instruction.GetOperand();
                     index = parameter.Index;
                     break;
 

@@ -15,10 +15,10 @@ namespace ILCompiler.Compiler.Importer
                     value = -1;
                     break;
                 case ILOpcode.ldc_i4:
-                    value = (int)instruction.GetOperandAs<int>();
+                    value = (int)instruction.GetOperand();
                     break;
                 case ILOpcode.ldc_i4_s:
-                    value = (sbyte)instruction.GetOperandAs<sbyte>();
+                    value = (sbyte)instruction.GetOperand();
                     break;
 
                 case ILOpcode.ldc_i4_0:

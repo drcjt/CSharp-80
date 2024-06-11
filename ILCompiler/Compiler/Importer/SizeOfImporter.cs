@@ -11,7 +11,7 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.Opcode != ILOpcode.sizeof_) return false;
 
-            var typeDesc = (TypeDesc)instruction.GetOperandAs<TypeDesc>();
+            var typeDesc = (TypeDesc)instruction.GetOperand();
 
             var elemType = typeDesc.VarType;
             int elemSize = typeDesc.GetElementSize().AsInt;

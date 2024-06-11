@@ -10,7 +10,7 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.Opcode != ILOpcode.ldstr) return false;
 
-            var node = context.NodeFactory.SerializedStringObject((string)instruction.GetOperandAs<string>());
+            var node = context.NodeFactory.SerializedStringObject((string)instruction.GetOperand());
 
             importer.PushExpression(new SymbolConstantEntry(node.Label));
 

@@ -16,32 +16,19 @@ namespace ILCompiler.TypeSystem.IL
         }
         public override ILOpcode Opcode => _instruction.Opcode;
         public override uint Offset => _instruction.Offset;
+        public override bool OperandIsNotNull => _instruction.OperandIsNotNull;
         public override int GetSize() => _instruction.GetSize();
 
-        public override object GetOperandAs<T>()
+        public override object GetOperand() => _instruction.GetOperand() switch
         {
-            if (typeof(T) == typeof(FieldDesc))
-            {
-                var fieldDesc = (FieldDesc)_instruction.GetOperandAs<FieldDesc>();
-                return fieldDesc.InstantiateSignature(_typeInstantiation, _methodInstantiation);
-
-            }
-            if (typeof(T) == typeof(MethodDesc))
-            {
-                var methodDesc = (MethodDesc)_instruction.GetOperandAs<MethodDesc>();
-                return methodDesc.InstantiateSignature(_typeInstantiation, _methodInstantiation);
-            }
-            if (typeof(T) == typeof(TypeDesc))
-            {
-                var typeDesc = (TypeDesc)_instruction.GetOperandAs<TypeDesc>();
-                return typeDesc.InstantiateSignature(_typeInstantiation, _methodInstantiation);
-            }
-
-            return _instruction.GetOperandAs<T>();
-        }
+            FieldDesc f => f.InstantiateSignature(_typeInstantiation, _methodInstantiation),
+            MethodDesc m => m.InstantiateSignature(_typeInstantiation, _methodInstantiation),
+            TypeDesc t => t.InstantiateSignature(_typeInstantiation, _methodInstantiation),
+            object o => o
+        };
     }
 
-    public class InstantiatedMethodIL : MethodIL
+        public class InstantiatedMethodIL : MethodIL
     {
         private readonly MethodIL _methodIL;
         private readonly MethodDesc _owningMethod;

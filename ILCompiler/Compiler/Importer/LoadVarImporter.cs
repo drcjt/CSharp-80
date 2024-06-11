@@ -21,7 +21,7 @@ namespace ILCompiler.Compiler.Importer
 
                 case ILOpcode.ldloc:
                 case ILOpcode.ldloc_s:
-                    var localVariableDefinition = (LocalVariableDefinition)instruction.GetOperandAs<LocalVariableDefinition>();
+                    var localVariableDefinition = (LocalVariableDefinition)instruction.GetOperand();
                     index = localVariableDefinition.Index;
                     break;
 

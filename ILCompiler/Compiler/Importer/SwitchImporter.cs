@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.Importer
 
             var op1 = importer.PopExpression();
 
-            var targets = (Instruction[])instruction.GetOperandAs<Instruction[]>();
+            var targets = (Instruction[])instruction.GetOperand();
             var jumpTable = new List<string>(targets?.Length ?? 0);
             if (targets != null)
             {

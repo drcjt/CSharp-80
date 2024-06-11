@@ -11,7 +11,7 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.Opcode != ILOpcode.newobj) return false;
 
-            var method = (MethodDesc)instruction.GetOperandAs<MethodDesc>();
+            var method = (MethodDesc)instruction.GetOperand();
             var owningType = method.OwningType;
 
 

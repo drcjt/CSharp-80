@@ -129,7 +129,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportCasting(Instruction instruction)
         {
-            var typeDesc = (TypeDesc)instruction.GetOperandAs<TypeDesc>();
+            var typeDesc = (TypeDesc)instruction.GetOperand();
 
             if (typeDesc.IsArray)
             {
@@ -193,12 +193,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
             _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(systemStringType, systemStringType.InstanceByteCount.AsInt));
 
-            _dependencies.Add(_context.NodeFactory.SerializedStringObject((string)instruction.GetOperandAs<String>()));
+            _dependencies.Add(_context.NodeFactory.SerializedStringObject((string)instruction.GetOperand()));
         }
 
         private void ImportFieldAccess(Instruction instruction, bool isStatic)
         {
-            var fieldDesc = (FieldDesc)instruction.GetOperandAs<FieldDesc>();
+            var fieldDesc = (FieldDesc)instruction.GetOperand();
 
             if (isStatic || fieldDesc.IsStatic)
             {
@@ -233,7 +233,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportNewArray(Instruction instruction)
         {
-            var elemTypeDef = (TypeDesc)instruction.GetOperandAs<TypeDesc>();
+            var elemTypeDef = (TypeDesc)instruction.GetOperand();
             var allocSize = elemTypeDef.GetElementSize().AsInt;
 
             var arrayType = new ArrayType(elemTypeDef, -1);
@@ -253,7 +253,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 CreateConstructedEETypeNodeDependencies(instruction);
             }
 
-            var methodDesc = (MethodDesc)instruction.GetOperandAs<MethodDesc>();
+            var methodDesc = (MethodDesc)instruction.GetOperand();
             if (_method is InstantiatedMethod)
             {
                 methodDesc = methodDesc.Context.GetInstantiatedMethod(methodDesc, _method.Instantiation);
@@ -352,7 +352,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void CreateConstructedEETypeNodeDependencies(Instruction instruction)
         {
-            var ctor = (MethodDesc)instruction.GetOperandAs<MethodDesc>();
+            var ctor = (MethodDesc)instruction.GetOperand();
             var owningType = ctor.OwningType;
 
             if (owningType is ArrayType)

@@ -13,7 +13,7 @@ namespace ILCompiler.Compiler.Importer
 
             var address = importer.PopExpression();
 
-            var typeDesc = (TypeDesc)instruction.GetOperandAs<TypeDesc>();
+            var typeDesc = (TypeDesc)instruction.GetOperand();
             int elemSize = typeDesc.GetElementSize().AsInt;
 
             var size = new Int32ConstantEntry(elemSize);

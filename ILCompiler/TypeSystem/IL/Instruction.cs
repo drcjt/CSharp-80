@@ -5,6 +5,7 @@
         public abstract ILOpcode Opcode { get; }
         public abstract uint Offset { get; }
         public abstract int GetSize();
-        public abstract object GetOperandAs<T>();
+        public abstract bool OperandIsNotNull { get; }
+        public abstract object GetOperand();
     }
 }

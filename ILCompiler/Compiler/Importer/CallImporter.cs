@@ -24,7 +24,7 @@ namespace ILCompiler.Compiler.Importer
 
         public static void ImportCall(Instruction instruction, ImportContext context, IILImporterProxy importer, StackEntry? newObjThis = null)
         {
-            var method = (MethodDesc)instruction.GetOperandAs<MethodDesc>();
+            var method = (MethodDesc)instruction.GetOperand();
             ImportCall(method, instruction, context, importer, newObjThis);
         }
 

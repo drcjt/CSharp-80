@@ -13,7 +13,7 @@ namespace ILCompiler.Compiler.Importer
 
             var op2 = importer.PopExpression();
 
-            var elemTypeDesc = (TypeDesc)instruction.GetOperandAs<TypeDesc>();
+            var elemTypeDesc = (TypeDesc)instruction.GetOperand();
             var arrayType = new ArrayType(elemTypeDesc, -1);
 
             var arrayElementSize = elemTypeDesc.GetElementSize().AsInt;
