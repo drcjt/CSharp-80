@@ -1,8 +1,7 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.TypeSystem.Common;
+﻿using ILCompiler.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -10,12 +9,11 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            if (instruction.OpCode.Code != Code.Newobj) return false;
+            if (instruction.Opcode != ILOpcode.newobj) return false;
 
-            var ctor = (IMemberRef)instruction.Operand;
-            var owningType = context.Module.Create(ctor.DeclaringType);
+            var method = (MethodDesc)instruction.GetOperandAs<MethodDesc>();
+            var owningType = method.OwningType;
 
-            var method = context.Module.Create((IMethodDefOrRef)ctor);
 
             if (owningType.IsArray)
             {
@@ -103,9 +101,6 @@ namespace ILCompiler.Compiler.Importer
 
             var dependentMethod = methodToCall.OwningType.FindMethodEndsWith(dependentMethodName);
             if (dependentMethod == null) throw new InvalidOperationException($"Cannot find dynamic dependency {dependentMethodName}");
-
-            // Replace the method to call in the instruction with the one referred to by the dynamic dependency attribute
-            instruction.Operand = dependentMethod;
 
             // Call the dynamic dependency method
             CallImporter.ImportCall(dependentMethod, instruction, context, importer, null);

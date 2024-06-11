@@ -1,8 +1,7 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.TypeSystem.Common;
+﻿using ILCompiler.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -12,31 +11,30 @@ namespace ILCompiler.Compiler.Importer
         {
             VarType type;
             int exactSize = 0;
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Stind_I1:
+                case ILOpcode.stind_i1:
                     type = VarType.SByte;
                     break;
 
-                case Code.Stind_I2:
+                case ILOpcode.stind_i2:
                     type = VarType.Short;
                     break;
 
-                case Code.Stind_I4:
+                case ILOpcode.stind_i4:
                     type = VarType.Int;
                     break;
 
-                case Code.Stind_I:
+                case ILOpcode.stind_i:
                     type = VarType.Ptr;
                     break;
 
-                case Code.Stind_Ref:
+                case ILOpcode.stind_ref:
                     type = VarType.Ref;
                     break;
 
-                case Code.Stobj:
-                    var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-                    var typeDesc = context.Module.Create(typeSig, context.Method.Instantiation);
+                case ILOpcode.stobj:
+                    var typeDesc = (TypeDesc)instruction.GetOperandAs<TypeDesc>();
                     type = typeDesc.VarType;
                     exactSize = typeDesc.GetElementSize().AsInt;
                     break;
@@ -45,7 +43,7 @@ namespace ILCompiler.Compiler.Importer
                     return false;
             }
 
-            if (instruction.OpCode.Code != Code.Stobj)
+            if (instruction.Opcode != ILOpcode.stobj)
             {
                 exactSize = type.GetTypeSize();
             }

@@ -1,7 +1,7 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -9,12 +9,13 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Starg:
-                case Code.Starg_S:
+                case ILOpcode.starg:
+                case ILOpcode.starg_s:
                     var value = importer.PopExpression();
-                    var node = new StoreLocalVariableEntry((instruction.OperandAs<Parameter>()).Index, true, value);
+                    var parameter = (ParameterDefinition)instruction.GetOperandAs<ParameterDefinition>();
+                    var node = new StoreLocalVariableEntry(parameter.Index, true, value);
                     importer.ImportAppendTree(node);
                     return true;
 

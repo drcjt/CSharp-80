@@ -1,16 +1,22 @@
 ﻿using dnlib.DotNet.Emit;
-using ILCompiler.IL.Stubs;
 using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.IL;
+using ILCompiler.Common.TypeSystem.IL;
+using ILCompiler.TypeSystem.Dnlib;
 
 namespace ILCompiler.IL
 {
     public class RTILProvider : ILProvider
     {
-        public override CilBody? GetMethodIL(MethodDesc method)
+        public override MethodIL? GetMethodIL(MethodDesc method, DnlibModule module)
         {
             if (method.IsIntrinsic)
             {
-                return TryGetIntrinsicMethodIL(method);
+                var cilbody = TryGetIntrinsicMethodIL(method);
+                if (cilbody != null)
+                {
+                    return new DnlibMethodIL(module, cilbody);
+                }
             }
 
             return null;

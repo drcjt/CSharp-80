@@ -1,6 +1,7 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -8,11 +9,12 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Ldloca:
-                case Code.Ldloca_S:
-                    var localNumber = importer.ParameterCount + (instruction.OperandAs<Local>()).Index;
+                case ILOpcode.ldloca:
+                case ILOpcode.ldloca_s:
+                    var localVariableDefinition = (LocalVariableDefinition)instruction.GetOperandAs<LocalVariableDefinition>();
+                    var localNumber = importer.ParameterCount + localVariableDefinition.Index;
                     importer.PushExpression(new LocalVariableAddressEntry(localNumber));
                     importer.LocalVariableTable[localNumber].AddressExposed = true;
                     return true;

@@ -1,5 +1,4 @@
 ﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
 using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
 
@@ -9,11 +8,15 @@ namespace ILCompiler.TypeSystem.Dnlib
     {
         private readonly MethodDef _methodDef;
         private readonly DnlibModule _module;
+        private readonly MethodIL? _methodIL;
         public DnlibMethod(MethodDef methodDef, DnlibModule module)
         {
             _methodDef = methodDef;
             _module = module;
-            Body = _methodDef.Body;
+            if (_methodDef.Body != null)
+            {
+                _methodIL = new DnlibMethodIL(module, _methodDef.Body);
+            }
         }
 
         public override MethodSignature Signature => _module.CreateMethodSignature(_methodDef);
@@ -23,7 +26,7 @@ namespace ILCompiler.TypeSystem.Dnlib
         public override TypeDesc OwningType => (TypeDesc)_module.Create(_methodDef.DeclaringType);
 
         public override string Name => _methodDef.Name;
-        public override string FullName => _methodDef.FullName;
+        public override string FullName => ToString();
 
         public override bool IsIntrinsic => _methodDef.IsIntrinsic();
         public override bool IsPInvoke => _methodDef.IsPinvokeImpl;
@@ -71,7 +74,7 @@ namespace ILCompiler.TypeSystem.Dnlib
         public override CustomAttributeCollection CustomAttributes => _methodDef.CustomAttributes;
 
 
-        public override CilBody Body { get; set; }
+        public override MethodIL? MethodIL => _methodIL;
 
         public override bool HasCustomAttribute(string attributeNamespace, string attributeName) => _methodDef.HasCustomAttribute(attributeNamespace, attributeName);
 

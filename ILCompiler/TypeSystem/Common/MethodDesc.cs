@@ -1,5 +1,5 @@
 ﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
+using ILCompiler.TypeSystem.IL;
 using System.Text;
 
 namespace ILCompiler.TypeSystem.Common
@@ -36,9 +36,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public virtual string Name => string.Empty;
 
-        public abstract CilBody Body { get; set; }
-
-        public bool HasExceptionHandlers => Body.ExceptionHandlers.Count > 0;
+        public abstract MethodIL? MethodIL { get; }
 
         public abstract bool HasCustomAttribute(string attributeNamespace, string attributeName);
 
@@ -59,6 +57,27 @@ namespace ILCompiler.TypeSystem.Common
 
         public abstract Instantiation Instantiation { get; }
 
+        public virtual MethodDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation? methodInstantiation)
+        {
+            var clone = new TypeDesc[Instantiation.Length];
+            var instantiation = Instantiation;
+            for (int i = 0; i < instantiation.Length; i++)
+            {
+                var uninstantiated = instantiation[i];
+                var instantiated = uninstantiated.InstantiateSignature(typeInstantiation, methodInstantiation);
+
+                clone[i] = instantiated;
+            }
+
+            var owningType = OwningType;
+            var instantiatedOwningType = owningType.InstantiateSignature(typeInstantiation, methodInstantiation);
+
+            // TODO:
+            // Check if owningType and instantiatedOwningType are different and do something!
+
+            return Context.GetInstantiatedMethod(this.GetMethodDefinition(), new Instantiation(clone));
+        }
+
         public virtual MethodDesc GetMethodDefinition() => this;
 
         public override string ToString()
@@ -69,6 +88,11 @@ namespace ILCompiler.TypeSystem.Common
 
             typeNameFormatter.AppendName(sb, Signature.ReturnType);
             sb.Append(' ');
+
+            sb.Append(OwningType.Namespace);
+            sb.Append('.');
+            sb.Append(OwningType.Name);
+            sb.Append("::");
             sb.Append(Name);
 
             var first = true;

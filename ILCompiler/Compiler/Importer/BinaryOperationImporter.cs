@@ -1,6 +1,6 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -9,21 +9,21 @@ namespace ILCompiler.Compiler.Importer
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             Operation binaryOp;
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Add:
-                case Code.Sub:
-                case Code.Mul:
-                case Code.Div:
-                case Code.Rem:
-                case Code.Div_Un:
-                case Code.Rem_Un:
-                case Code.And:
-                case Code.Or:
-                case Code.Xor:
-                    binaryOp = Operation.Add + (instruction.OpCode.Code - Code.Add);
+                case ILOpcode.add:
+                case ILOpcode.sub:
+                case ILOpcode.mul:
+                case ILOpcode.div:
+                case ILOpcode.rem:
+                case ILOpcode.div_un:
+                case ILOpcode.rem_un:
+                case ILOpcode.and:
+                case ILOpcode.or:
+                case ILOpcode.xor:
+                    binaryOp = Operation.Add + (instruction.Opcode - ILOpcode.add);
                     break;
-                case Code.Mul_Ovf_Un:
+                case ILOpcode.mul_ovf_un:
                     // For now this maps to standard multiplication as we have no exception support
                     binaryOp = Operation.Mul;
                     break;

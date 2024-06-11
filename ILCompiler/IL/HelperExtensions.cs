@@ -1,5 +1,4 @@
-﻿using dnlib.DotNet;
-using ILCompiler.Compiler;
+﻿using ILCompiler.TypeSystem.Common;
 
 namespace ILCompiler.IL
 {
@@ -7,10 +6,16 @@ namespace ILCompiler.IL
     {
         private const string HelperTypesNamespace = "Internal.Runtime.CompilerHelpers";
 
-        public static MethodDef GetHelperEntryPoint(this CorLibModuleProvider corLibModuleProvider, string typeName, string methodName)
+        public static MethodDesc GetHelperEntryPoint(this TypeSystemContext context, string typeName, string methodName)
         {
-            var compilerHelpers = corLibModuleProvider.FindThrow($"{HelperTypesNamespace}.{typeName}");
-            return compilerHelpers.FindMethod(methodName);
+            TypeDesc helperType = (TypeDesc)context.SystemModule!.GetType(HelperTypesNamespace, typeName);
+            return helperType.GetMethods().First(x => x.Name == methodName);
+        }
+
+        public static MethodDesc GetHelperEntryPoint(this TypeSystemContext context, string typeNamespace, string typeName, string methodName)
+        {
+            TypeDesc helperType = (TypeDesc)context.SystemModule!.GetType(typeNamespace, typeName);
+            return helperType.GetMethods().First(x => x.Name == methodName);
         }
     }
 }

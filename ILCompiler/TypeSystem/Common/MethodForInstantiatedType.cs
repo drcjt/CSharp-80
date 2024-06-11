@@ -1,5 +1,5 @@
 ﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.TypeSystem.Common
 {
@@ -39,7 +39,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public override IList<LocalVariableDefinition> Locals => throw new NotImplementedException();
 
-        public override CilBody Body { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public override MethodIL? MethodIL => throw new NotImplementedException();
 
         public override IList<MethodOverride> Overrides => throw new NotImplementedException();
 

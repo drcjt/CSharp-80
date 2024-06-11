@@ -244,7 +244,7 @@ namespace ILCompiler.Compiler
 
         private void ZeroInitFrame(InstructionsBuilder instructionsBuilder)
         {
-            if (_context.Method.Body.InitLocals)
+            if (_context.Method.MethodIL!.IsInitLocals)
             {
                 foreach (var variable in _context.LocalVariableTable)
                 {

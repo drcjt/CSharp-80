@@ -10,7 +10,7 @@ namespace ILCompiler.Compiler.CodeGenerators
         {
             if (!context.Configuration.SkipNullReferenceCheck)
             {
-                var throwHelperMethod = context.CorLibModuleProvider.GetHelperEntryPoint("ThrowHelpers", "ThrowNullReferenceException");
+                var throwHelperMethod = context.Method.Context.GetHelperEntryPoint("ThrowHelpers", "ThrowNullReferenceException");
                 var mangledThrowHelperMethod = context.NameMangler.GetMangledMethodName(throwHelperMethod);
 
                 context.InstructionsBuilder.Pop(HL);

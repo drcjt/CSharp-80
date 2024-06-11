@@ -53,5 +53,18 @@
         public abstract bool IsStatic { get; }
 
         public abstract bool IsLiteral { get; }
+
+        public virtual FieldDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation? methodInstantiation)
+        {
+            var field = this;
+            var instantiatedOwningType = OwningType.InstantiateSignature(typeInstantiation, methodInstantiation);
+            if (instantiatedOwningType != OwningType)
+            {
+                // TODO:
+                //field = instantiatedOwningType.Context.GetFieldForInstantiatedType(field.GetTypicalFieldDefinition(), instantiatedOwningType);
+            }
+
+            return field;
+        }
     }
 }

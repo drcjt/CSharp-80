@@ -1,6 +1,6 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -8,13 +8,13 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            if (instruction.OpCode.Code != Code.Switch) return false;
+            if (instruction.Opcode != ILOpcode.switch_) return false;
 
             var fallthroughBlock = context.FallThroughBlock;
 
             var op1 = importer.PopExpression();
 
-            var targets = instruction.Operand as Instruction[];
+            var targets = (Instruction[])instruction.GetOperandAs<Instruction[]>();
             var jumpTable = new List<string>(targets?.Length ?? 0);
             if (targets != null)
             {

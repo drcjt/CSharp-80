@@ -22,7 +22,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             
             // Emit conditional call to ThrowHelpers.ThrowIndexOutOfRangeException
-            var throwHelperMethod = context.CorLibModuleProvider.GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException");
+            var throwHelperMethod = context.Method.Context.GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException");
             var mangledThrowHelperMethod = context.NameMangler.GetMangledMethodName(throwHelperMethod);
 
             context.InstructionsBuilder.Call(Condition.C, mangledThrowHelperMethod);

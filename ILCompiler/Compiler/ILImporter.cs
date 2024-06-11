@@ -1,5 +1,4 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.TypeSystem.Common;
+﻿using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.Dnlib;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.EvaluationStack;
@@ -7,6 +6,7 @@ using ILCompiler.Compiler.Importer;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 using PreinitializationManager = ILCompiler.Compiler.PreInit.PreinitializationManager;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler
 {
@@ -21,6 +21,7 @@ namespace ILCompiler.Compiler
         private readonly DnlibModule _module;
 
         private MethodDesc _method = null!;
+        private MethodIL _methodIL = null!;
         private LocalVariableTable? _locals;
 
         private BasicBlock[] _basicBlocks;
@@ -175,7 +176,7 @@ namespace ILCompiler.Compiler
 
             while (true)
             {
-                var currentInstruction = _method.Body.Instructions[currentIndex];
+                var currentInstruction = _methodIL!.Instructions[currentIndex];
                 currentOffset += currentInstruction.GetSize();
                 currentIndex++;
 
@@ -225,11 +226,11 @@ namespace ILCompiler.Compiler
         {
             if (_configuration.IgnoreUnknownCil)
             {
-                _logger.LogWarning("Unsupported IL opcode {opcode}", currentInstruction.OpCode.Code);
+                _logger.LogWarning("Unsupported IL opcode {opcode}", currentInstruction.Opcode);
             }
             else
             {
-                throw new UnknownCilException($"Unsupported IL opcode {currentInstruction.OpCode.Code}");
+                throw new UnknownCilException($"Unsupported IL opcode {currentInstruction.Opcode}");
             }
         }
 
@@ -271,7 +272,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, LocalVariableTable locals, IList<EHClause> ehClauses)
+        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, LocalVariableTable locals, IList<EHClause> ehClauses, MethodIL? methodIL = null)
         {
             _parameterCount = parameterCount;
             _returnBufferArgIndex = returnBufferArgIndex;
@@ -279,7 +280,16 @@ namespace ILCompiler.Compiler
             _method = method;
             _locals = locals;
 
-            var basicBlockAnalyser = new BasicBlockAnalyser(_method, _nameMangler, _module);
+            if (methodIL == null)
+            {
+                _methodIL = new InstantiatedMethodIL(_method, _method.MethodIL!);
+            }
+            else
+            {
+                _methodIL = new InstantiatedMethodIL(_method, methodIL);
+            }
+
+            var basicBlockAnalyser = new BasicBlockAnalyser(_method, _nameMangler, _module, _methodIL);
             var offsetToIndexMap = new Dictionary<int, int>();
             _basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 

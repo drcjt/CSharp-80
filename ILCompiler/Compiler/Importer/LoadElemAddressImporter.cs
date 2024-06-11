@@ -1,9 +1,8 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.TypeSystem.Common;
+﻿using ILCompiler.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Helpers;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -11,10 +10,9 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            if (instruction.OpCode.Code != Code.Ldelema) return false;
+            if (instruction.Opcode != ILOpcode.ldelema) return false;
 
-            var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-            var typeDesc = context.Module.Create(typeSig, context.Method.Instantiation);
+            var typeDesc = (TypeDesc)instruction.GetOperandAs<TypeDesc>();
             var elemType = typeDesc.VarType;
             int elemSize = typeDesc.GetElementSize().AsInt;
 

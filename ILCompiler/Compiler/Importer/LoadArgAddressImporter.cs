@@ -1,7 +1,7 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -9,11 +9,12 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Ldarga:
-                case Code.Ldarga_S:
-                    var index = (instruction.OperandAs<Parameter>()).Index;
+                case ILOpcode.ldarga:
+                case ILOpcode.ldarga_s:
+                    var parameter = (ParameterDefinition)instruction.GetOperandAs<ParameterDefinition>();
+                    var index = parameter.Index;
                     var localNumber = MapIlArgNum(index, importer.ReturnBufferArgIndex);
 
                     importer.PushExpression(new LocalVariableAddressEntry(localNumber));

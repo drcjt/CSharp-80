@@ -1,8 +1,7 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.TypeSystem.Common;
+﻿using ILCompiler.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -10,11 +9,11 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            if (instruction.OpCode != OpCodes.Ldfld && instruction.OpCode != OpCodes.Ldsfld) return false;
+            if (instruction.Opcode != ILOpcode.ldfld && instruction.Opcode != ILOpcode.ldsfld) return false;
 
-            var isLoadStatic = instruction.OpCode == OpCodes.Ldsfld;
+            var isLoadStatic = instruction.Opcode == ILOpcode.ldsfld;
 
-            var fieldDesc = context.Module.Create((IField)instruction.Operand);
+            var fieldDesc = (FieldDesc)instruction.GetOperandAs<FieldDesc>();
 
             uint fieldOffset = (uint)fieldDesc.Offset.AsInt;
 

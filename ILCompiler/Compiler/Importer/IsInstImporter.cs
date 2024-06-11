@@ -1,7 +1,8 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.IL;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -9,13 +10,13 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            if (instruction.OpCode.Code != Code.Isinst) return false;
+            if (instruction.Opcode != ILOpcode.isinst) return false;
 
             // Reference type to test
             var op1 = importer.PopExpression();
 
             // Determine type to check reference type against
-            var typeDesc = context.Module.Create((ITypeDefOrRef)instruction.Operand);
+            var typeDesc = (TypeDesc)instruction.GetOperandAs<TypeDesc>();
 
             string helperMethodName = "IsInstanceOfClass";
             if (typeDesc.IsArray)
@@ -40,8 +41,7 @@ namespace ILCompiler.Compiler.Importer
 
         private static string GetHelperMethod(ImportContext context, string helperMethodName)
         {
-            var systemRuntimeTypeCast = context.CorLibModuleProvider.FindThrow("System.Runtime.TypeCast");
-            var runtimeHelperMethod = systemRuntimeTypeCast.FindMethod(helperMethodName);
+            var runtimeHelperMethod = context.Method.Context.GetHelperEntryPoint("System.Runtime", "TypeCast", helperMethodName);
             var mangledHelperMethod = context.NameMangler.GetMangledMethodName(runtimeHelperMethod);
 
             return mangledHelperMethod;

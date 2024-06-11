@@ -1,5 +1,5 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Interfaces;
+﻿using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {

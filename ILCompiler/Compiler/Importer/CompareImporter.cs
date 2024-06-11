@@ -1,7 +1,6 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -10,21 +9,21 @@ namespace ILCompiler.Compiler.Importer
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             Operation op;
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Ceq:
+                case ILOpcode.ceq:
                     op = Operation.Eq;
                     break;
-                case Code.Clt:
+                case ILOpcode.clt:
                     op = Operation.Lt;
                     break;
-                case Code.Clt_Un:
+                case ILOpcode.clt_un:
                     op = Operation.Lt_Un;
                     break;
-                case Code.Cgt:
+                case ILOpcode.cgt:
                     op = Operation.Gt;
                     break;
-                case Code.Cgt_Un:
+                case ILOpcode.cgt_un:
                     op = Operation.Gt_Un;
                     break;
 

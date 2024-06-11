@@ -20,7 +20,7 @@
     },
     "il_bvt": {
       "commandName": "Project",
-      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net8.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile fielda_tests.asm fielda_tests.exe",
+      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net8.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile field_tests.asm field_tests.exe",
       "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\Tests\\ILCompiler.IntegrationTests\\bin\\Debug\\net8.0\\il_bvt",
       "sqlDebugging": false
     },

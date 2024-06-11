@@ -1,7 +1,7 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -9,7 +9,7 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            if (instruction.OpCode != OpCodes.Ret) return false;
+            if (instruction.Opcode != ILOpcode.ret) return false;
 
             StackEntry? returnValue = null;
             int? returnBufferArgIndex = null;

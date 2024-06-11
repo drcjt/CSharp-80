@@ -1,6 +1,6 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -9,11 +9,11 @@ namespace ILCompiler.Compiler.Importer
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             Operation shiftOp;
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Shl:
-                case Code.Shr:
-                    shiftOp = Operation.Lsh + (instruction.OpCode.Code - Code.Shl);
+                case ILOpcode.shl:
+                case ILOpcode.shr:
+                    shiftOp = Operation.Lsh + (instruction.Opcode - ILOpcode.shl);
                     break;
 
                 default:

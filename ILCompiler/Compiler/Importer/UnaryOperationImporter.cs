@@ -1,6 +1,6 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -9,11 +9,11 @@ namespace ILCompiler.Compiler.Importer
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             Operation unaryOp;
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Neg:
-                case Code.Not:
-                    unaryOp = Operation.Neg + (instruction.OpCode.Code - Code.Neg);
+                case ILOpcode.neg:
+                case ILOpcode.not:
+                    unaryOp = Operation.Neg + (instruction.Opcode - ILOpcode.neg);
                     break;
                 default:
                     return false;

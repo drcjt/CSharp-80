@@ -1,6 +1,6 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -9,34 +9,34 @@ namespace ILCompiler.Compiler.Importer
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             VarType desiredType;
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Conv_I:
-                case Code.Conv_U:
+                case ILOpcode.conv_i:
+                case ILOpcode.conv_u:
                     desiredType = VarType.Ptr;
                     break;
 
-                case Code.Conv_U4:
+                case ILOpcode.conv_u4:
                     desiredType = VarType.UInt;
                     break;
 
-                case Code.Conv_I4:
+                case ILOpcode.conv_i4:
                     desiredType = VarType.Int;
                     break;
 
-                case Code.Conv_U2:
+                case ILOpcode.conv_u2:
                     desiredType = VarType.UShort;
                     break;
 
-                case Code.Conv_I2:
+                case ILOpcode.conv_i2:
                     desiredType = VarType.Short;
                     break;
 
-                case Code.Conv_U1:
+                case ILOpcode.conv_u1:
                     desiredType = VarType.Byte;
                     break;
 
-                case Code.Conv_I1:
+                case ILOpcode.conv_i1:
                     desiredType = VarType.SByte;
                     break;
 

@@ -1,6 +1,6 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -8,7 +8,7 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            if (instruction.OpCode.Code != Code.Initblk) return false;
+            if (instruction.Opcode != ILOpcode.initblk) return false;
 
             var size = importer.PopExpression(); // Size (unsigned int 32)
             var initValue = importer.PopExpression(); // Value (unsigned int 8)
