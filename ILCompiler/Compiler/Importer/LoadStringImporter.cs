@@ -1,6 +1,6 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -8,9 +8,9 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            if (instruction.OpCode.Code != Code.Ldstr) return false;
+            if (instruction.Opcode != ILOpcode.ldstr) return false;
 
-            var node = context.NodeFactory.SerializedStringObject(instruction.OperandAs<string>());
+            var node = context.NodeFactory.SerializedStringObject((string)instruction.GetOperand());
 
             importer.PushExpression(new SymbolConstantEntry(node.Label));
 

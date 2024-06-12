@@ -1,7 +1,7 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -10,35 +10,34 @@ namespace ILCompiler.Compiler.Importer
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             VarType type;
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Ldind_I:
+                case ILOpcode.ldind_i:
                     type = VarType.Ptr;
                     break;
-                case Code.Ldind_I1:
+                case ILOpcode.ldind_i1:
                     type = VarType.SByte;
                     break;
-                case Code.Ldind_U1:
+                case ILOpcode.ldind_u1:
                     type = VarType.Byte;
                     break;
-                case Code.Ldind_I2:
+                case ILOpcode.ldind_i2:
                     type = VarType.Short;
                     break;
-                case Code.Ldind_U2:
+                case ILOpcode.ldind_u2:
                     type = VarType.UShort;
                     break;
-                case Code.Ldind_U4:
+                case ILOpcode.ldind_u4:
                     type = VarType.UInt;
                     break;
-                case Code.Ldind_I4:
+                case ILOpcode.ldind_i4:
                     type = VarType.Int;
                     break;
-                case Code.Ldind_Ref:
+                case ILOpcode.ldind_ref:
                     type = VarType.Ref;
                     break;
-                case Code.Ldobj:
-                    var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-                    var typeDesc = context.Module.Create(typeSig, context.Method.Instantiation);
+                case ILOpcode.ldobj:
+                    var typeDesc = (TypeDesc)instruction.GetOperand();
                     type = typeDesc.VarType;
                     break;
 

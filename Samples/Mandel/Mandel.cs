@@ -1,5 +1,4 @@
-﻿using dnlib.DotNet.Resources;
-using System;
+﻿using System;
 
 [module: System.Runtime.CompilerServices.SkipLocalsInit]
 

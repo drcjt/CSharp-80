@@ -1,8 +1,5 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.TypeSystem.Common;
-using ILCompiler.TypeSystem.Dnlib;
-using Instruction = dnlib.DotNet.Emit.Instruction;
+﻿using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.PreInit
 {
@@ -11,12 +8,10 @@ namespace ILCompiler.Compiler.PreInit
         private readonly TypeDesc _type;
         private readonly IList<Instruction> _instructions;
         private readonly IDictionary<FieldDesc, Value> _fieldValues = new Dictionary<FieldDesc, Value>();
-        private readonly DnlibModule _module;
-        public TypePreinitializer(TypeDesc type, IList<Instruction> instructions, DnlibModule module)
+        public TypePreinitializer(TypeDesc type, IList<Instruction> instructions)
         {
             _type = type;
             _instructions = instructions;
-            _module = module;
 
             foreach (var field in type.GetFields())
             {
@@ -27,12 +22,12 @@ namespace ILCompiler.Compiler.PreInit
             }
         }
 
-        public static PreinitializationInfo ScanType(TypeDesc type, DnlibModule module)
+        public static PreinitializationInfo ScanType(TypeDesc type)
         {
             var cctor = type.GetStaticConstructor();
-            var instructions = cctor!.Body.Instructions;
+            var instructions = cctor!.MethodIL!.Instructions;
 
-            var typePreinitializer = new TypePreinitializer(type, instructions, module);
+            var typePreinitializer = new TypePreinitializer(type, instructions);
             var status = typePreinitializer.TryScanMethod();
 
             if (status)
@@ -58,37 +53,36 @@ namespace ILCompiler.Compiler.PreInit
             while (instructionCounter < _instructions.Count)
             {
                 var instruction = _instructions[instructionCounter];
-                var opcode = instruction.OpCode.Code;
+                var opcode = instruction.Opcode;
                 switch (opcode)
                 {
-                    case Code.Ldc_I4_M1:
-                    case Code.Ldc_I4_S:
-                    case Code.Ldc_I4:
-                    case Code.Ldc_I4_0:
-                    case Code.Ldc_I4_1:
-                    case Code.Ldc_I4_2:
-                    case Code.Ldc_I4_3:
-                    case Code.Ldc_I4_4:
-                    case Code.Ldc_I4_5:
-                    case Code.Ldc_I4_6:
-                    case Code.Ldc_I4_7:
-                    case Code.Ldc_I4_8:
+                    case ILOpcode.ldc_i4_m1:
+                    case ILOpcode.ldc_i4_s:
+                    case ILOpcode.ldc_i4:
+                    case ILOpcode.ldc_i4_0:
+                    case ILOpcode.ldc_i4_1:
+                    case ILOpcode.ldc_i4_2:
+                    case ILOpcode.ldc_i4_3:
+                    case ILOpcode.ldc_i4_4:
+                    case ILOpcode.ldc_i4_5:
+                    case ILOpcode.ldc_i4_6:
+                    case ILOpcode.ldc_i4_7:
+                    case ILOpcode.ldc_i4_8:
                         {
                             int value = opcode switch
                             {
-                                Code.Ldc_I4_M1 => -1,
-                                Code.Ldc_I4_S => (sbyte)instruction.Operand,
-                                Code.Ldc_I4 => (int)instruction.Operand,
-                                _ => opcode - Code.Ldc_I4_0,
+                                ILOpcode.ldc_i4_m1 => -1,
+                                ILOpcode.ldc_i4_s => (sbyte)instruction.GetOperand(),
+                                ILOpcode.ldc_i4 => (int)instruction.GetOperand(),
+                                _ => opcode - ILOpcode.ldc_i4_0,
                             };
                             stack.Push(StackValueKind.Int32, ValueTypeValue.FromInt32(value));
                         }
                         break;
 
-                    case Code.Stsfld:
+                    case ILOpcode.stsfld:
                         {
-                            var fieldDefOrRef = (IField)instruction.Operand;
-                            var fieldDesc = _module.Create(fieldDefOrRef);
+                            var fieldDesc = (FieldDesc)instruction.GetOperand();
 
                             if (!fieldDesc.IsStatic || fieldDesc.IsLiteral)
                             {
@@ -106,7 +100,7 @@ namespace ILCompiler.Compiler.PreInit
                         }
                         break;
 
-                    case Code.Ret:
+                    case ILOpcode.ret:
                         return true;
 
                     default:

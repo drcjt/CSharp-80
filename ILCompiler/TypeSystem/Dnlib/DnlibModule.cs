@@ -35,7 +35,7 @@ namespace ILCompiler.TypeSystem.Dnlib
             return fieldDesc;
         }
 
-        public TypeDesc Create(TypeSig typeSig, Instantiation? instantiation = null)
+        public TypeDesc Create(TypeSig typeSig)
         {
             if (typeSig.IsSZArray)
             {
@@ -78,10 +78,6 @@ namespace ILCompiler.TypeSystem.Dnlib
             if (typeSig.IsGenericMethodParameter)
             {
                 TypeDesc genericMethodParameter = new SignatureMethodVariable(Context, (int)((GenericSig)typeSig).Number);
-                if (instantiation != null)
-                {
-                    genericMethodParameter = genericMethodParameter.InstantiateSignature(null, instantiation);
-                }
                 return genericMethodParameter;
             }
 
@@ -94,7 +90,7 @@ namespace ILCompiler.TypeSystem.Dnlib
                 {
                     genericParameters[i] = Create(genericParams[i]);
                 }
-                instantiation = new Instantiation(genericParameters);
+                var instantiation = new Instantiation(genericParameters);
 
                 MetadataType metadataType = (MetadataType)Create(genericType);
 
@@ -159,17 +155,12 @@ namespace ILCompiler.TypeSystem.Dnlib
             }
         }
 
-        public TypeDesc Create(ITypeDefOrRef typeDefOrRef, Instantiation? instantiation = null)
+        public TypeDesc Create(ITypeDefOrRef typeDefOrRef)
         {
             if (typeDefOrRef is TypeDef td)
             {
                 if (td.ContainsGenericParameter)
                 {
-                    if (instantiation != null)
-                    {
-                        return new InstantiatedType((MetadataType)Create(td), instantiation);
-                    }
-
                     throw new NotImplementedException("Open generic types not yet supported");
                 }
                 else
@@ -200,8 +191,16 @@ namespace ILCompiler.TypeSystem.Dnlib
                 var genericSig = ts.TryGetGenericSig();
                 if (genericSig != null)
                 {
-                    return Create(genericSig, instantiation);
+                    return Create(genericSig);
                 }
+
+                var typeDefOrRefSig = ts.TryGetTypeDefOrRefSig();
+                if (typeDefOrRefSig != null)
+                {
+                    return Create(typeDefOrRefSig);
+                }
+
+                // TODO: should this also check for other sig types?
             }
 
             return Create(typeDefOrRef);

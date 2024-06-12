@@ -1,5 +1,4 @@
 ﻿using dnlib.DotNet;
-using System.Runtime.Serialization;
 
 namespace ILCompiler.Compiler
 {

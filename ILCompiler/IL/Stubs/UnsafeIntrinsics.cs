@@ -2,7 +2,7 @@
 using dnlib.DotNet.Emit;
 using ILCompiler.TypeSystem.Common;
 
-namespace ILCompiler.IL.Stubs
+namespace ILCompiler.Common.TypeSystem.IL
 {
     public static class UnsafeIntrinsics
     {
@@ -29,7 +29,7 @@ namespace ILCompiler.IL.Stubs
             return null;
         }
 
-        private static CilBody? EmitAs()
+        private static CilBody? EmitAs() 
         {
             var body = new CilBody();
 
@@ -54,7 +54,7 @@ namespace ILCompiler.IL.Stubs
             return body;
         }
 
-        private static CilBody? EmitSizeOf(MethodDesc method)
+        private static CilBody? EmitSizeOf(MethodDesc method) 
         {
             var body = new CilBody();
 
@@ -63,7 +63,7 @@ namespace ILCompiler.IL.Stubs
 
             body.UpdateInstructionOffsets();
 
-            return body;
+            return body;            
         }
 
         private static CilBody? EmitInitBlock()
@@ -113,7 +113,7 @@ namespace ILCompiler.IL.Stubs
             return body;
         }
 
-        private static CilBody? EmitAddByteOffset(MethodDesc method)
+        private static CilBody? EmitAddByteOffset(MethodDesc method) 
         {
             var body = new CilBody();
 

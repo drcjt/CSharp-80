@@ -1,8 +1,8 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.TypeSystem.Common;
+﻿using ILCompiler.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
+using dnlib.DotNet;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -10,10 +10,10 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Call:
-                case Code.Callvirt:
+                case ILOpcode.call:
+                case ILOpcode.callvirt:
                     ImportCall(instruction, context, importer);
                     return true;
 
@@ -24,8 +24,7 @@ namespace ILCompiler.Compiler.Importer
 
         public static void ImportCall(Instruction instruction, ImportContext context, IILImporterProxy importer, StackEntry? newObjThis = null)
         {
-            var method = context.Module.Create((IMethod)instruction.Operand);
-
+            var method = (MethodDesc)instruction.GetOperand();
             ImportCall(method, instruction, context, importer, newObjThis);
         }
 
@@ -97,7 +96,7 @@ namespace ILCompiler.Compiler.Importer
             }
             arguments.Reverse();
 
-            if (instruction.OpCode == OpCodes.Callvirt)
+            if (instruction.Opcode == ILOpcode.callvirt)
             {
                 // Turn first argument into throw null ref check
                 arguments[0] = new NullCheckEntry(arguments[0]);
@@ -141,7 +140,7 @@ namespace ILCompiler.Compiler.Importer
                 targetMethod = context.NameMangler.GetMangledMethodName(methodToCall);
             }
 
-            bool directCall = !(instruction.OpCode.Code == Code.Callvirt && methodToCall.IsVirtual);
+            bool directCall = !(instruction.Opcode == ILOpcode.callvirt && methodToCall.IsVirtual);
             if (methodToCall.HasGenericParameters && !directCall)
             {
                 throw new NotSupportedException("Non direct calls to generic methods not supported");

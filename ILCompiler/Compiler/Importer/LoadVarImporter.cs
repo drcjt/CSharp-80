@@ -1,6 +1,7 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -9,18 +10,19 @@ namespace ILCompiler.Compiler.Importer
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             int index;
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Ldloc_0:
-                case Code.Ldloc_1:
-                case Code.Ldloc_2:
-                case Code.Ldloc_3:
-                    index = instruction.OpCode.Code - Code.Ldloc_0;
+                case ILOpcode.ldloc_0:
+                case ILOpcode.ldloc_1:
+                case ILOpcode.ldloc_2:
+                case ILOpcode.ldloc_3:
+                    index = instruction.Opcode - ILOpcode.ldloc_0;
                     break;
 
-                case Code.Ldloc:
-                case Code.Ldloc_S:
-                    index = (instruction.OperandAs<Local>()).Index;
+                case ILOpcode.ldloc:
+                case ILOpcode.ldloc_s:
+                    var localVariableDefinition = (LocalVariableDefinition)instruction.GetOperand();
+                    index = localVariableDefinition.Index;
                     break;
 
                 default:

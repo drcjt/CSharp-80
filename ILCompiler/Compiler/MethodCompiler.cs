@@ -4,6 +4,8 @@ using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text;
 using ILCompiler.IL;
+using ILCompiler.TypeSystem.IL;
+using ILCompiler.TypeSystem.Dnlib;
 
 namespace ILCompiler.Compiler
 {
@@ -13,25 +15,25 @@ namespace ILCompiler.Compiler
         private readonly ILogger<MethodCompiler> _logger;
         private readonly IPhaseFactory _phaseFactory;
         private readonly ILProvider _ilProvider;
+        private readonly DnlibModule _module;
 
         private int _parameterCount;
         private int? _returnBufferArgIndex;
 
         private readonly LocalVariableTable _locals;
 
-        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory, RTILProvider ilProvider)
+        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory, RTILProvider ilProvider, DnlibModule module)
         {
             _configuration = configuration;
             _logger = logger;
             _locals = new LocalVariableTable();
             _phaseFactory = phaseFactory;
             _ilProvider = ilProvider;
+            _module = module;
         }
 
         private void SetupLocalVariableTable(MethodDesc method)
         {
-            var body = method.Body;
-
             // Setup local variable table - includes parameters as well as locals in method
             for (int parameterIndex = 0; parameterIndex < method.Signature.Length; parameterIndex++)
             {
@@ -47,20 +49,17 @@ namespace ILCompiler.Compiler
                 _locals.Add(local);
             }
 
-            if (body != null)
+            foreach (var local in method.Locals)
             {
-                foreach (var local in method.Locals)
+                var localVariableDescriptor = new LocalVariableDescriptor()
                 {
-                    var localVariableDescriptor = new LocalVariableDescriptor()
-                    {
-                        IsParameter = false,
-                        IsTemp = false,
-                        Name = local.Name,
-                        ExactSize = local.Type.GetElementSize().AsInt,
-                        Type = local.Type.VarType,
-                    };
-                    _locals.Add(localVariableDescriptor);
-                }
+                    IsParameter = false,
+                    IsTemp = false,
+                    Name = local.Name,
+                    ExactSize = local.Type.GetElementSize().AsInt,
+                    Type = local.Type.VarType,
+                };
+                _locals.Add(localVariableDescriptor);
             }
 
             if (!method.Signature.ReturnType.IsVoid)
@@ -107,15 +106,14 @@ namespace ILCompiler.Compiler
                 return;
             }
 
+            MethodIL? methodIL = null;
             if (method.IsIntrinsic)
             {
-                var methodIL = _ilProvider.GetMethodIL(method);
+                methodIL = _ilProvider.GetMethodIL(method, _module);
                 if (methodIL == null)
                 {
                     return;
                 }
-
-                method.Body = methodIL;
             }
 
             _parameterCount = method.Signature.Length;
@@ -125,7 +123,7 @@ namespace ILCompiler.Compiler
             var ilImporter = _phaseFactory.Create<IILImporter>();
 
             // Main phases of the compiler live here
-            var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _locals, methodCodeNodeNeedingCode.EhClauses);
+            var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _locals, methodCodeNodeNeedingCode.EhClauses, methodIL);
 
             if (_configuration.DumpFlowGraphs)
             {

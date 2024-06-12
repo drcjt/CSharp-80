@@ -31,7 +31,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             context.InstructionsBuilder.And(E);
             context.InstructionsBuilder.Ld(C, A);
 
-            if (context.Method.Body.InitLocals)
+            if (context.Method.MethodIL!.IsInitLocals)
             {
                 // zero space on stack
                 context.InstructionsBuilder.Ld(HL, 0);

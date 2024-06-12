@@ -13,7 +13,9 @@ namespace ILCompiler.Compiler
             int methodSlot = -1;
             for (int slot = 0; slot < virtualSlots.Count; slot++) 
             { 
-                if (virtualSlots[slot] == method)
+                // TODO: Compare FullName here as may have InstantiatedMethod and DnlibMethod here
+                // really need to add proper equality on MethodDescs
+                if (virtualSlots[slot].FullName == method.FullName)
                 {
                     methodSlot = slot;
                     break;

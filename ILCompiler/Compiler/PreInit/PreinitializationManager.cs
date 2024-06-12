@@ -1,16 +1,10 @@
 ﻿using ILCompiler.TypeSystem.Common;
-using ILCompiler.TypeSystem.Dnlib;
 
 namespace ILCompiler.Compiler.PreInit
 {
     public class PreinitializationManager
     {
         private readonly IDictionary<TypeDesc, PreinitializationInfo> _preInitializationInfoByType = new Dictionary<TypeDesc, PreinitializationInfo>();
-        private readonly DnlibModule _module;
-        public PreinitializationManager(DnlibModule module)
-        {
-            _module = module;
-        }
 
         public bool IsPreinitialized(TypeDesc type)
         {
@@ -26,7 +20,7 @@ namespace ILCompiler.Compiler.PreInit
         {
             if (!_preInitializationInfoByType.ContainsKey(type))
             {
-                _preInitializationInfoByType[type] = TypePreinitializer.ScanType(type, _module);
+                _preInitializationInfoByType[type] = TypePreinitializer.ScanType(type);
             }
             return _preInitializationInfoByType[type];
         }

@@ -1,7 +1,7 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.TypeSystem.Common;
+﻿using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.Dnlib;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler
 {
@@ -36,24 +36,29 @@ namespace ILCompiler.Compiler
 
     public class BasicBlockAnalyser
     {
-        private readonly MethodDesc _method;
         private readonly INameMangler _nameMangler;
-        private readonly DnlibModule _module;
+        private readonly MethodIL _methodIL;
 
-        public BasicBlockAnalyser(MethodDesc method, DnlibModule module) : this(method, new NameMangler(), module)
+        public BasicBlockAnalyser(MethodDesc method, MethodIL? methodIL = null) : this(method, new NameMangler(), methodIL)
         {
         }
 
-        public BasicBlockAnalyser(MethodDesc method, INameMangler nameMangler, DnlibModule module)
+        public BasicBlockAnalyser(MethodDesc method, INameMangler nameMangler, MethodIL? methodIL = null)
         {
-            _method = method;
             _nameMangler = nameMangler;
-            _module = module;
+            if (methodIL == null)
+            {
+                _methodIL = method.MethodIL!;
+            }
+            else
+            {
+                _methodIL = methodIL;
+            }
         }
 
         public BasicBlock[] FindBasicBlocks(IDictionary<int, int> offsetToIndexMap, IList<EHClause> ehClauses)
         {
-            var instructions = _method.Body.Instructions;
+            var instructions = _methodIL.Instructions;
             var lastInstruction = instructions[instructions.Count - 1];
             var maxOffset = (int)lastInstruction.Offset + lastInstruction.GetSize();
             var basicBlocks = new BasicBlock[maxOffset];
@@ -68,50 +73,51 @@ namespace ILCompiler.Compiler
 
         private void FindEHTargets(BasicBlock[] basicBlocks, IList<EHClause> ehClauses)
         {
-            foreach (var exceptionHandler in _method.Body.ExceptionHandlers)
+            foreach (var exceptionHandler in _methodIL.GetExceptionRegions())
             {
-                var tryBeginBlock = CreateBasicBlock(basicBlocks, (int)exceptionHandler.TryStart.Offset);
+                var tryBeginBlock = CreateBasicBlock(basicBlocks, exceptionHandler.TryOffset);
                 BasicBlock? filterBlock = null;
 
-                if (!exceptionHandler.IsCatch)
+                if (exceptionHandler.Kind != ILExceptionRegionKind.Catch)
                 {
+                    // TODO: Can this be removed
                     throw new NotSupportedException("Only catch handlers supported");
                 }
 
-                if (exceptionHandler.IsFilter)
+                if (exceptionHandler.Kind == ILExceptionRegionKind.Filter)
                 {
-                    filterBlock = CreateBasicBlock(basicBlocks, (int)exceptionHandler.FilterStart.Offset);
+                    filterBlock = CreateBasicBlock(basicBlocks, exceptionHandler.FilterOffset);
                     filterBlock.FilterStart = true;
                 }
 
-                var handlerBeginBlock = CreateBasicBlock(basicBlocks, (int)exceptionHandler.HandlerStart.Offset);
-                var handlerEndBlock = exceptionHandler.HandlerEnd != null ? basicBlocks[exceptionHandler.HandlerEnd.Offset] : null;
+                var handlerBeginBlock = CreateBasicBlock(basicBlocks, exceptionHandler.HandlerOffset);
+                var handlerEndBlock = exceptionHandler.HandlerEndOffset != null ? basicBlocks[(int)exceptionHandler.HandlerEndOffset] : null;
 
                 handlerBeginBlock.TryBlocks = GetTryBlocks(exceptionHandler, basicBlocks);
 
-                var tryEndBlock = exceptionHandler.TryEnd != null ? basicBlocks[exceptionHandler.TryEnd.Offset] : null;
+                var tryEndBlock = exceptionHandler.TryEndOffset != null ? basicBlocks[(int)exceptionHandler.TryEndOffset] : null;
 
                 handlerBeginBlock.HandlerStart = true;
                 tryBeginBlock.TryStart = true;
 
-                var catchTypeDesc = _module.Create(exceptionHandler.CatchType);
+                var catchTypeDesc = exceptionHandler.CatchType!;
                 var catchTypeMangledName = _nameMangler.GetMangledTypeName(catchTypeDesc);
 
                 tryBeginBlock.Handlers.Add(handlerBeginBlock);
 
                 EHClauseKind kind = EHClauseKind.Typed;
-                if (exceptionHandler.IsFault || exceptionHandler.IsFinally) kind = EHClauseKind.Fault;
-                else if (exceptionHandler.IsFilter) kind = EHClauseKind.Filter;
+                if (exceptionHandler.Kind == ILExceptionRegionKind.Fault || exceptionHandler.Kind == ILExceptionRegionKind.Finally) kind = EHClauseKind.Fault;
+                else if (exceptionHandler.Kind == ILExceptionRegionKind.Filter) kind = EHClauseKind.Filter;
 
                 var ehClause = new EHClause(tryBeginBlock, tryEndBlock, handlerBeginBlock, handlerEndBlock, filterBlock, kind, catchTypeMangledName);
                 ehClauses.Add(ehClause);
             }
         }
 
-        private static List<BasicBlock> GetTryBlocks(ExceptionHandler exceptionHandler, BasicBlock[] basicBlocks)
+        private static List<BasicBlock> GetTryBlocks(ILExceptionRegion exceptionHandler, BasicBlock[] basicBlocks)
         {
-            var tryStartOffset = (int)exceptionHandler.TryStart.Offset;
-            var tryEndOffset = (int?)exceptionHandler.TryEnd?.Offset ?? basicBlocks.Length;
+            var tryStartOffset = exceptionHandler.TryOffset;
+            var tryEndOffset = exceptionHandler.TryEndOffset ?? basicBlocks.Length;
 
             var tryBlocks = new List<BasicBlock>();
             for (int offset = tryStartOffset; offset < tryEndOffset; offset++)
@@ -143,10 +149,10 @@ namespace ILCompiler.Compiler
 
             var currentBlock = basicBlocks[0];
 
-            while (currentIndex < _method.Body.Instructions.Count)
+            while (currentIndex < _methodIL.Instructions.Count)
             {
                 offsetToIndexMap[currentOffset] = currentIndex;
-                var currentInstruction = _method.Body.Instructions[currentIndex];
+                var currentInstruction = _methodIL.Instructions[currentIndex];
 
                 if (basicBlocks[currentOffset] != null)
                 {
@@ -154,35 +160,35 @@ namespace ILCompiler.Compiler
                     currentBlock = basicBlocks[currentOffset];
                 }
                 
-                switch (currentInstruction.OpCode.Code)
+                switch (currentInstruction.Opcode)
                 {
-                    case Code.Blt_Un:
-                    case Code.Ble_Un:
-                    case Code.Bgt_Un:
-                    case Code.Bge_Un:
-                    case Code.Bne_Un:
-                    case Code.Blt:
-                    case Code.Ble:
-                    case Code.Bgt:
-                    case Code.Bge:
-                    case Code.Beq:
-                    case Code.Brfalse:
-                    case Code.Brtrue:
-                    case Code.Blt_Un_S:
-                    case Code.Ble_Un_S:
-                    case Code.Bgt_Un_S:
-                    case Code.Bge_Un_S:
-                    case Code.Bne_Un_S:
-                    case Code.Blt_S:
-                    case Code.Ble_S:
-                    case Code.Bgt_S:
-                    case Code.Bge_S:
-                    case Code.Beq_S:
-                    case Code.Brfalse_S:
-                    case Code.Brtrue_S:
+                    case ILOpcode.blt_un:
+                    case ILOpcode.ble_un:
+                    case ILOpcode.bgt_un:
+                    case ILOpcode.bge_un:
+                    case ILOpcode.bne_un:
+                    case ILOpcode.blt:
+                    case ILOpcode.ble:
+                    case ILOpcode.bgt:
+                    case ILOpcode.bge:
+                    case ILOpcode.beq:
+                    case ILOpcode.brfalse:
+                    case ILOpcode.brtrue:
+                    case ILOpcode.blt_un_s:
+                    case ILOpcode.ble_un_s:
+                    case ILOpcode.bgt_un_s:
+                    case ILOpcode.bge_un_s:
+                    case ILOpcode.bne_un_s:
+                    case ILOpcode.blt_s:
+                    case ILOpcode.ble_s:
+                    case ILOpcode.bgt_s:
+                    case ILOpcode.bge_s:
+                    case ILOpcode.beq_s:
+                    case ILOpcode.brfalse_s:
+                    case ILOpcode.brtrue_s:
                         {
                             currentBlock.JumpKind = JumpKind.Conditional;
-                            var target = currentInstruction.OperandAs<Instruction>();
+                            var target = (Instruction)currentInstruction.GetOperand();
                             var targetOffset = target.Offset;
                             CreateBasicBlock(basicBlocks, (int)targetOffset); // target of jump                            
                             var nextInstructionOffset = currentOffset + currentInstruction.GetSize();
@@ -190,29 +196,30 @@ namespace ILCompiler.Compiler
                         }
                         break;
 
-                    case Code.Br_S:
-                    case Code.Leave_S:
-                    case Code.Br:
-                    case Code.Leave:
+                    case ILOpcode.br_s:
+                    case ILOpcode.leave_s:
+                    case ILOpcode.br:
+                    case ILOpcode.leave:
                         {
                             currentBlock.JumpKind = JumpKind.Always;
-                            var target = currentInstruction.OperandAs<Instruction>();
+                            var target = (Instruction)currentInstruction.GetOperand();
                             CreateBasicBlock(basicBlocks, (int)target.Offset); // target of jump
                         }
                         break;
 
-                    case Code.Ret:
+                    case ILOpcode.ret:
                         {
                             currentBlock.JumpKind = JumpKind.Return;
                         }
                         break;
 
-                    case Code.Switch:
+                    case ILOpcode.switch_:
                         {
                             currentBlock.JumpKind = JumpKind.Switch;
-                            if (currentInstruction.Operand is Instruction[] targets)
+                            if (currentInstruction.OperandIsNotNull)
                             {
-                                foreach (var target in targets)
+                                var instructions = (Instruction[])currentInstruction.GetOperand();
+                                foreach (var target in instructions)
                                 {
                                     CreateBasicBlock(basicBlocks, (int)target.Offset); // target of jump
                                 }

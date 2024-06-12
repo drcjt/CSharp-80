@@ -1,5 +1,4 @@
-﻿using dnlib.W32Resources;
-using ILCompiler.Interfaces;
+﻿using ILCompiler.Interfaces;
 using System.Text.RegularExpressions;
 
 namespace ILCompiler.Compiler

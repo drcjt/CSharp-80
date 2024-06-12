@@ -1,8 +1,7 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.TypeSystem.Common;
+﻿using ILCompiler.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -12,27 +11,26 @@ namespace ILCompiler.Compiler.Importer
         {
             VarType elemType;
             int elemSize = 0;
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Stelem:
-                    var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-                    var typeDesc = context.Module.Create(typeSig, context.Method.Instantiation);
+                case ILOpcode.stelem:
+                    var typeDesc = (TypeDesc)instruction.GetOperand();
                     elemType = typeDesc.VarType;
                     elemSize = typeDesc.GetElementSize().AsInt;
                     break;
-                case Code.Stelem_I:
+                case ILOpcode.stelem_i:
                     elemType = VarType.Ptr;
                     break;
-                case Code.Stelem_I1:
+                case ILOpcode.stelem_i1:
                     elemType = VarType.Byte;
                     break;
-                case Code.Stelem_I2:
+                case ILOpcode.stelem_i2:
                     elemType = VarType.Short;
                     break;
-                case Code.Stelem_I4:
+                case ILOpcode.stelem_i4:
                     elemType = VarType.Int;
                     break;
-                case Code.Stelem_Ref:
+                case ILOpcode.stelem_ref:
                     elemType = VarType.Ref;
                     break;
 
@@ -41,7 +39,7 @@ namespace ILCompiler.Compiler.Importer
             }
             var value = importer.PopExpression();
 
-            if (instruction.OpCode.Code != Code.Stelem) 
+            if (instruction.Opcode != ILOpcode.stelem) 
             {
                 elemSize = elemType.GetTypeSize();
 

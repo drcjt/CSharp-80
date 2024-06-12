@@ -1,8 +1,7 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.TypeSystem.Common;
+﻿using ILCompiler.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -10,11 +9,11 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            if (instruction.OpCode.Code != Code.Newarr) return false;
+            if (instruction.Opcode != ILOpcode.newarr) return false;
 
             var op2 = importer.PopExpression();
 
-            var elemTypeDesc = context.Module.Create((ITypeDefOrRef)instruction.Operand, context.Method.Instantiation);
+            var elemTypeDesc = (TypeDesc)instruction.GetOperand();
             var arrayType = new ArrayType(elemTypeDesc, -1);
 
             var arrayElementSize = elemTypeDesc.GetElementSize().AsInt;

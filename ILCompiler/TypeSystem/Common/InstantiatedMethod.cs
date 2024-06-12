@@ -1,5 +1,5 @@
 ﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.TypeSystem.Common
 {
@@ -42,19 +42,25 @@ namespace ILCompiler.TypeSystem.Common
         public override bool HasReturnType => _methodDesc.HasReturnType;
 
         public override bool IsIntrinsic => _methodDesc.IsIntrinsic;
+        public override bool IsPInvoke => _methodDesc.IsPInvoke;
+        public override string PInvokeMethodName => _methodDesc.PInvokeMethodName;
+        public override bool IsInternalCall => _methodDesc.IsInternalCall;
+
+        public override bool IsStatic => _methodDesc.IsStatic;
+
+        public override bool IsVirtual => _methodDesc.IsVirtual;
+        public override bool IsNewSlot => _methodDesc.IsNewSlot;
+        public override bool IsAbstract => _methodDesc.IsAbstract;
+
+        public override bool HasThis => _methodDesc.HasThis;
+
         public override TypeSystemContext Context => _methodDesc.Context;
 
         public override TypeDesc OwningType => _methodDesc.OwningType;
 
-        public override CilBody Body { get => _methodDesc.Body; set => _methodDesc.Body = value; }
-
-        public override IList<MethodOverride> Overrides => _methodDesc.Overrides;
-
-        public override MethodSig MethodSig => _methodDesc.MethodSig;
+        public override MethodIL? MethodIL => _methodDesc.MethodIL;
 
         public override string Name => _methodDesc.Name;
-
-        public override CustomAttributeCollection CustomAttributes => _methodDesc.CustomAttributes;
 
         public override IList<LocalVariableDefinition> Locals
         {
@@ -88,5 +94,10 @@ namespace ILCompiler.TypeSystem.Common
         }
 
         public override MethodDesc GetMethodDefinition() => _methodDesc;
+
+        // TODO: Refactor to not use dnlib types in following
+        public override IList<MethodOverride> Overrides => _methodDesc.Overrides;
+        public override MethodSig MethodSig => _methodDesc.MethodSig;
+        public override CustomAttributeCollection CustomAttributes => _methodDesc.CustomAttributes;
     }
 }

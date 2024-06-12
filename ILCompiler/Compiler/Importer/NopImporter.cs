@@ -1,5 +1,5 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Interfaces;
+﻿using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            if (instruction.OpCode.Code != Code.Nop) return false;
+            if (instruction.Opcode != ILOpcode.nop) return false;
 
             // Nothing to do
             return true;

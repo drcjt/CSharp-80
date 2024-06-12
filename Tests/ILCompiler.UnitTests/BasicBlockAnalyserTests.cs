@@ -32,7 +32,7 @@ namespace ILCompiler.Tests
                 new Instruction(OpCodes.Ldc_I4_0),
                 new Instruction(OpCodes.Ldc_I4_S, 1234),
             }, module);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 
@@ -49,7 +49,7 @@ namespace ILCompiler.Tests
             {
                 new Instruction(OpCodes.Ret),
             }, module);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 
@@ -67,7 +67,7 @@ namespace ILCompiler.Tests
                 new Instruction(OpCodes.Switch),
                 new Instruction(OpCodes.Ret),
             }, module);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 
@@ -87,7 +87,7 @@ namespace ILCompiler.Tests
             code.Add(branchTarget);
             var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
             var method = BuildMethod(code, module);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 
@@ -105,7 +105,7 @@ namespace ILCompiler.Tests
                 new Instruction(OpCodes.Ldc_I4_0),
                 new Instruction(OpCodes.Ldc_I4_S, 1234),
             }, module);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 
@@ -126,7 +126,7 @@ namespace ILCompiler.Tests
             code.Add(branchTarget);
             var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
             var method = BuildMethod(code, module);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 
@@ -148,7 +148,7 @@ namespace ILCompiler.Tests
             code.Add(branchTarget);
             var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
             var method = BuildMethod(code, module);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 
@@ -168,7 +168,7 @@ namespace ILCompiler.Tests
             code.Add(OpCodes.Br.ToInstruction(branchTarget));
             var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider());
             var method = BuildMethod(code, module);
-            var basicBlockAnalyser = new BasicBlockAnalyser(method, module);
+            var basicBlockAnalyser = new BasicBlockAnalyser(method);
             var offsetToIndexMap = new Dictionary<int, int>();
             var ehClauses = new List<EHClause>();
 

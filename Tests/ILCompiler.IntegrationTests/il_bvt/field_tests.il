@@ -31,6 +31,13 @@
 	.field public static int32 i4SField
 	.field public static class field_tests ptrSField
 
+	.method public void .ctor() { 
+		.maxstack 10
+		ldarg.0
+		call instance void [mscorlib]System.Object::.ctor()
+		ret
+	}
+
 	.method public void initialize() {
 	.maxstack 10
 

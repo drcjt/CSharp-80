@@ -19,13 +19,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             Method = method;
             ParamsCount = method.Signature.Length;
-            LocalsCount = method.Body?.Variables.Count ?? 0;
+            LocalsCount = method.MethodIL?.LocalsCount ?? 0;
 
             _methodCompilerFactory = methodCompilerFactory;
             _module = module;
         }
 
-        public bool HasExceptionHandlers => Method?.Body?.HasExceptionHandlers ?? false;
+        public bool HasExceptionHandlers => Method?.MethodIL?.GetExceptionRegions().Length > 0;
         public IList<Instruction> MethodCode { get; set; } = new List<Instruction>();
 
         public IList<EHClause> EhClauses { get; set; } = new List<EHClause>();
@@ -35,7 +35,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public override IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context)
         {
-            var scanner = new ILScanner(Method, context, _module);
+            var scanner = new ILScanner(Method, Method.MethodIL!, context, _module);
             return scanner.FindDependencies();
         }
 

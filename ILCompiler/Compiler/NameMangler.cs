@@ -1,33 +1,18 @@
-﻿using dnlib.DotNet;
+﻿using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
-using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler
 {
     public class NameMangler : INameMangler
     {
+        private int nextMethodId = 0;
         private readonly Dictionary<String, String> _mangledMethodNames = new Dictionary<String, String>();
 
-        private int nextMethodId = 0;
-
+        private int nextFieldId = 0;
         private readonly Dictionary<String, String> _mangledFieldNames = new Dictionary<String, String>();
 
-        private int nextFieldId = 0;
-
-        private readonly Dictionary<String, String> _mangledTypeNames = new Dictionary<String, String>();
-
         private int nextTypeId = 0;
-
-
-        public string GetMangledMethodName(MethodSpec method)
-        {
-            return GetMangledMethodName(method.FullName);
-        }
-       
-        public string GetMangledMethodName(MethodDef method)
-        {
-            return GetMangledMethodName(method.FullName);
-        }
+        private readonly Dictionary<String, String> _mangledTypeNames = new Dictionary<String, String>();
 
         public string GetMangledMethodName(MethodDesc method)
         {

@@ -1,8 +1,7 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.TypeSystem.Common;
+﻿using ILCompiler.TypeSystem.Common;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -12,44 +11,44 @@ namespace ILCompiler.Compiler.Importer
         {
             VarType elemType;
             int elemSize = 0;
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Ldelem:
-                    var typeSig = (instruction.Operand as ITypeDefOrRef).ToTypeSig();
-                    var typeDesc = context.Module.Create(typeSig, context.Method.Instantiation);
+                case ILOpcode.ldelem:
+                    var typeDesc = (TypeDesc)instruction.GetOperand();
+
                     elemType = typeDesc.VarType;
                     elemSize = typeDesc.GetElementSize().AsInt;
                     break;
 
-                case Code.Ldelem_I:
+                case ILOpcode.ldelem_i:
                     elemType = VarType.Ptr;
                     break;
 
-                case Code.Ldelem_I1:
+                case ILOpcode.ldelem_i1:
                     elemType = VarType.SByte;
                     break;
 
-                case Code.Ldelem_U1:
+                case ILOpcode.ldelem_u1:
                     elemType = VarType.Byte;
                     break;
 
-                case Code.Ldelem_I2:
+                case ILOpcode.ldelem_i2:
                     elemType = VarType.Short;
                     break;
 
-                case Code.Ldelem_U2:
+                case ILOpcode.ldelem_u2:
                     elemType = VarType.UShort;
                     break;
 
-                case Code.Ldelem_I4:
+                case ILOpcode.ldelem_i4:
                     elemType = VarType.Int;
                     break;
 
-                case Code.Ldelem_U4:
+                case ILOpcode.ldelem_u4:
                     elemType = VarType.UInt;
                     break;
 
-                case Code.Ldelem_Ref:
+                case ILOpcode.ldelem_ref:
                     elemType = VarType.Ref;
                     break;
 
@@ -57,7 +56,7 @@ namespace ILCompiler.Compiler.Importer
                     return false;
             }
 
-            if (instruction.OpCode.Code != Code.Ldelem)
+            if (instruction.Opcode != ILOpcode.ldelem)
             {
                 elemSize = elemType.GetTypeSize();
             }

@@ -1,6 +1,6 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -8,9 +8,9 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            if (instruction.OpCode != OpCodes.Leave && instruction.OpCode != OpCodes.Leave_S) return false;
+            if (instruction.Opcode != ILOpcode.leave && instruction.Opcode != ILOpcode.leave_s) return false;
 
-            var target = instruction.OperandAs<Instruction>();
+            var target = (Instruction)instruction.GetOperand();
 
             var targetBlock = importer.BasicBlocks[(int)target.Offset];
 

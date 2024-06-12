@@ -1,6 +1,6 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -8,50 +8,50 @@ namespace ILCompiler.Compiler.Importer
     {
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
-            var code = instruction.OpCode.Code;
-            switch (instruction.OpCode.Code)
+            var code = instruction.Opcode;
+            switch (instruction.Opcode)
             {
-                case Code.Br:
-                case Code.Blt:
-                case Code.Blt_Un:
-                case Code.Bgt:
-                case Code.Bgt_Un:
-                case Code.Ble:
-                case Code.Ble_Un:
-                case Code.Bge:
-                case Code.Bge_Un:
-                case Code.Beq:
-                case Code.Bne_Un:
-                case Code.Brfalse:
-                case Code.Brtrue:
+                case ILOpcode.br:
+                case ILOpcode.blt:
+                case ILOpcode.blt_un:
+                case ILOpcode.bgt:
+                case ILOpcode.bgt_un:
+                case ILOpcode.ble:
+                case ILOpcode.ble_un:
+                case ILOpcode.bge:
+                case ILOpcode.bge_un:
+                case ILOpcode.beq:
+                case ILOpcode.bne_un:
+                case ILOpcode.brfalse:
+                case ILOpcode.brtrue:
                     break;
 
-                case Code.Br_S:
-                case Code.Blt_S:
-                case Code.Blt_Un_S:
-                case Code.Bgt_S:
-                case Code.Bgt_Un_S:
-                case Code.Ble_S:
-                case Code.Ble_Un_S:
-                case Code.Bge_S:
-                case Code.Bge_Un_S:
-                case Code.Beq_S:
-                case Code.Bne_Un_S:
-                case Code.Brfalse_S:
-                case Code.Brtrue_S:
-                    code += (Code.Br - Code.Br_S);
+                case ILOpcode.br_s:
+                case ILOpcode.blt_s:
+                case ILOpcode.blt_un_s:
+                case ILOpcode.bgt_s:
+                case ILOpcode.bgt_un_s:
+                case ILOpcode.ble_s:
+                case ILOpcode.ble_un_s:
+                case ILOpcode.bge_s:
+                case ILOpcode.bge_un_s:
+                case ILOpcode.beq_s:
+                case ILOpcode.bne_un_s:
+                case ILOpcode.brfalse_s:
+                case ILOpcode.brtrue_s:
+                    code += (ILOpcode.br - ILOpcode.br_s);
                     break;
 
                 default:
                     return false;
             }
 
-            var target = instruction.OperandAs<Instruction>();
+            var target = (Instruction)instruction.GetOperand();
 
             var targetBlock = importer.BasicBlocks[(int)target.Offset];
-            var fallthroughBlock = (code != Code.Br) ? context.FallThroughBlock : null;
+            var fallthroughBlock = (code != ILOpcode.br) ? context.FallThroughBlock : null;
 
-            if (code != Code.Br)
+            if (code != ILOpcode.br)
             {
                 var op2 = importer.PopExpression();
                 if (!op2.Type.IsInt() && op2.Type != VarType.Ptr && op2.Type != VarType.ByRef && op2.Type != VarType.Ref)
@@ -61,10 +61,10 @@ namespace ILCompiler.Compiler.Importer
 
                 StackEntry op1;
                 Operation op;
-                if (code != Code.Brfalse && code != Code.Brtrue)
+                if (code != ILOpcode.brfalse && code != ILOpcode.brtrue)
                 {
                     op1 = importer.PopExpression();
-                    op = Operation.Eq + (code - Code.Beq);
+                    op = Operation.Eq + (code - ILOpcode.beq);
 
                     // TODO: really need to check valuetypes too as valuetype can still be int32 or int16 sized
                     if (op1.Type != VarType.Struct && op2.Type != VarType.Struct)
@@ -85,7 +85,7 @@ namespace ILCompiler.Compiler.Importer
                 else
                 {
                     op1 = ConstantEntry.CreateZeroConstantEntry(op2.Type);
-                    op = (code == Code.Brfalse) ? Operation.Eq : Operation.Ne_Un;
+                    op = (code == ILOpcode.brfalse) ? Operation.Eq : Operation.Ne_Un;
                 }
 
                 var binopType = op1.Type == VarType.Ptr || op2.Type == VarType.Ptr ? VarType.Ptr : VarType.Int;

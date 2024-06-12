@@ -1,6 +1,6 @@
-﻿using dnlib.DotNet.Emit;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -9,28 +9,28 @@ namespace ILCompiler.Compiler.Importer
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             long value;
-            switch (instruction.OpCode.Code)
+            switch (instruction.Opcode)
             {
-                case Code.Ldc_I4_M1:
+                case ILOpcode.ldc_i4_m1:
                     value = -1;
                     break;
-                case Code.Ldc_I4:
-                    value = (int)instruction.Operand;
+                case ILOpcode.ldc_i4:
+                    value = (int)instruction.GetOperand();
                     break;
-                case Code.Ldc_I4_S:
-                    value = (sbyte)instruction.Operand;
+                case ILOpcode.ldc_i4_s:
+                    value = (sbyte)instruction.GetOperand();
                     break;
 
-                case Code.Ldc_I4_0:
-                case Code.Ldc_I4_1:
-                case Code.Ldc_I4_2:
-                case Code.Ldc_I4_3:
-                case Code.Ldc_I4_4:
-                case Code.Ldc_I4_5:
-                case Code.Ldc_I4_6:
-                case Code.Ldc_I4_7:
-                case Code.Ldc_I4_8:
-                    value = instruction.OpCode.Code - Code.Ldc_I4_0;
+                case ILOpcode.ldc_i4_0:
+                case ILOpcode.ldc_i4_1:
+                case ILOpcode.ldc_i4_2:
+                case ILOpcode.ldc_i4_3:
+                case ILOpcode.ldc_i4_4:
+                case ILOpcode.ldc_i4_5:
+                case ILOpcode.ldc_i4_6:
+                case ILOpcode.ldc_i4_7:
+                case ILOpcode.ldc_i4_8:
+                    value = instruction.Opcode - ILOpcode.ldc_i4_0;
                     break;
 
                 default:
