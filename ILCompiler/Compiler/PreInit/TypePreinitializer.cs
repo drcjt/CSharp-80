@@ -1,5 +1,4 @@
 ﻿using ILCompiler.TypeSystem.Common;
-using ILCompiler.TypeSystem.Dnlib;
 using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.PreInit
@@ -9,12 +8,10 @@ namespace ILCompiler.Compiler.PreInit
         private readonly TypeDesc _type;
         private readonly IList<Instruction> _instructions;
         private readonly IDictionary<FieldDesc, Value> _fieldValues = new Dictionary<FieldDesc, Value>();
-        private readonly DnlibModule _module;
-        public TypePreinitializer(TypeDesc type, IList<Instruction> instructions, DnlibModule module)
+        public TypePreinitializer(TypeDesc type, IList<Instruction> instructions)
         {
             _type = type;
             _instructions = instructions;
-            _module = module;
 
             foreach (var field in type.GetFields())
             {
@@ -25,12 +22,12 @@ namespace ILCompiler.Compiler.PreInit
             }
         }
 
-        public static PreinitializationInfo ScanType(TypeDesc type, DnlibModule module)
+        public static PreinitializationInfo ScanType(TypeDesc type)
         {
             var cctor = type.GetStaticConstructor();
             var instructions = cctor!.MethodIL!.Instructions;
 
-            var typePreinitializer = new TypePreinitializer(type, instructions, module);
+            var typePreinitializer = new TypePreinitializer(type, instructions);
             var status = typePreinitializer.TryScanMethod();
 
             if (status)

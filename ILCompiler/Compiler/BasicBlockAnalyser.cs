@@ -36,20 +36,16 @@ namespace ILCompiler.Compiler
 
     public class BasicBlockAnalyser
     {
-        private readonly MethodDesc _method;
         private readonly INameMangler _nameMangler;
-        private readonly DnlibModule _module;
         private readonly MethodIL _methodIL;
 
-        public BasicBlockAnalyser(MethodDesc method, DnlibModule module, MethodIL? methodIL = null) : this(method, new NameMangler(), module, methodIL)
+        public BasicBlockAnalyser(MethodDesc method, MethodIL? methodIL = null) : this(method, new NameMangler(), methodIL)
         {
         }
 
-        public BasicBlockAnalyser(MethodDesc method, INameMangler nameMangler, DnlibModule module, MethodIL? methodIL = null)
+        public BasicBlockAnalyser(MethodDesc method, INameMangler nameMangler, MethodIL? methodIL = null)
         {
-            _method = method;
             _nameMangler = nameMangler;
-            _module = module;
             if (methodIL == null)
             {
                 _methodIL = method.MethodIL!;

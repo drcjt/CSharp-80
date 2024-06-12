@@ -289,7 +289,7 @@ namespace ILCompiler.Compiler
                 _methodIL = new InstantiatedMethodIL(_method, methodIL);
             }
 
-            var basicBlockAnalyser = new BasicBlockAnalyser(_method, _nameMangler, _module, _methodIL);
+            var basicBlockAnalyser = new BasicBlockAnalyser(_method, _nameMangler, _methodIL);
             var offsetToIndexMap = new Dictionary<int, int>();
             _basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 

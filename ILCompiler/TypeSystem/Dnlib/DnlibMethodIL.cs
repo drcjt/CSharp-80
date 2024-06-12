@@ -6,7 +6,6 @@ namespace ILCompiler.TypeSystem.Dnlib
 {
     public class DnlibMethodIL : MethodIL
     {
-        private readonly DnlibModule _module;
         private readonly List<IL.Instruction> _instructions = new List<IL.Instruction>();
 
         private readonly ILExceptionRegion[] _exceptionRegions;
@@ -16,11 +15,9 @@ namespace ILCompiler.TypeSystem.Dnlib
 
         public DnlibMethodIL(DnlibModule module, CilBody body)
         {
-            _module = module;
-
             foreach (var instruction in body.Instructions)
             {
-                _instructions.Add(new DnlibInstruction(_module, instruction));
+                _instructions.Add(new DnlibInstruction(module, instruction));
             }
 
             _exceptionRegions = new ILExceptionRegion[body.ExceptionHandlers.Count];

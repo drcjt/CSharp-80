@@ -259,8 +259,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 methodDesc = methodDesc.Context.GetInstantiatedMethod(methodDesc, _method.Instantiation);
             }
 
-            var methodNode = _context.NodeFactory.MethodNode(methodDesc);
-
             if (methodDesc.IsIntrinsic && methodDesc.OwningType.Name == "EEType" && methodDesc.OwningType.Namespace == "Internal.Runtime" && methodDesc.Name == "Of")
             {
                 // Need to add constructed dependency on T
@@ -295,6 +293,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 _dependencies.Add(_context.NodeFactory.NecessaryTypeSymbol(methodDesc.OwningType));
             }
 
+            Z80MethodCodeNode methodNode;
             bool directCall = IsDirectCall(methodDesc, instruction.Opcode);
             if (directCall)
             {
