@@ -193,6 +193,14 @@ namespace ILCompiler.TypeSystem.Dnlib
                 {
                     return Create(genericSig);
                 }
+
+                var typeDefOrRefSig = ts.TryGetTypeDefOrRefSig();
+                if (typeDefOrRefSig != null)
+                {
+                    return Create(typeDefOrRefSig);
+                }
+
+                // TODO: should this also check for other sig types?
             }
 
             return Create(typeDefOrRef);
