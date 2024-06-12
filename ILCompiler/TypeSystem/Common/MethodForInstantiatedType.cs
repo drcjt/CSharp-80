@@ -41,22 +41,19 @@ namespace ILCompiler.TypeSystem.Common
 
         public override MethodIL? MethodIL => throw new NotImplementedException();
 
-        public override IList<MethodOverride> Overrides => throw new NotImplementedException();
-
-        public override MethodSig MethodSig => throw new NotImplementedException();
-
-        public override CustomAttributeCollection CustomAttributes => throw new NotImplementedException();
 
         public override Instantiation Instantiation => throw new NotImplementedException();
 
         public override bool HasCustomAttribute(string attributeNamespace, string attributeName)
         {
-            throw new NotImplementedException();
+            return _typicalMethodDef.HasCustomAttribute(attributeNamespace, attributeName);
         }
 
-        private TypeDesc Instantiate(TypeDesc type)
-        {
-            return type.InstantiateSignature(_instantiatedType.Instantiation, null);
-        }
+        private TypeDesc Instantiate(TypeDesc type) => type.InstantiateSignature(_instantiatedType.Instantiation, null);
+
+        // TODO: Refactor to not use dnlib types in following
+        public override IList<MethodOverride> Overrides => throw new NotImplementedException();
+        public override MethodSig MethodSig => throw new NotImplementedException();
+        public override CustomAttributeCollection CustomAttributes => throw new NotImplementedException();
     }
 }
