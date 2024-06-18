@@ -51,51 +51,45 @@
         public ArrayType GetArrayType(TypeDesc elementType, int rank)
         {
             var arrayTypeKey = $"{elementType.FullName}_{rank}";
-            if (!_arrayTypesByFullName.ContainsKey(arrayTypeKey))
-            {
-                _arrayTypesByFullName[arrayTypeKey] = new ArrayType(elementType, rank);
-            }
+            if (_arrayTypesByFullName.TryGetValue(arrayTypeKey, out var _array))
+                return _array;
 
-            return _arrayTypesByFullName[arrayTypeKey];
+            return _arrayTypesByFullName[arrayTypeKey] = new ArrayType(elementType, rank);
         }
 
         public FunctionPointerType GetFunctionPointerType(MethodSignature signature)
         {
-            if (!_functionPointerTypesBySignature.ContainsKey(signature.ToString()))
-            {
-                _functionPointerTypesBySignature[signature.ToString()] = new FunctionPointerType(signature);
-            }
-            return _functionPointerTypesBySignature[signature.ToString()];
+            if (_functionPointerTypesBySignature.TryGetValue(signature.ToString(), out var functionPointer))
+                return functionPointer;
+
+            return _functionPointerTypesBySignature[signature.ToString()] = new FunctionPointerType(signature);
         }
 
         public PointerType GetPointerType(TypeDesc parameterType)
         {
-            if (!_pointerTypesByFullName.ContainsKey(parameterType.FullName))
-            {
-                _pointerTypesByFullName[parameterType.FullName] = new PointerType(parameterType);
-            }
-            return _pointerTypesByFullName[parameterType.FullName];
+            if (_pointerTypesByFullName.TryGetValue(parameterType.FullName, out var pointer))
+                return pointer;
+
+            return _pointerTypesByFullName[parameterType.FullName] = new PointerType(parameterType);
         }
 
         public FieldDesc GetFieldForInstantiatedType(FieldDesc fieldDef, InstantiatedType instantiatedType)
         {
             // TODO: Fix key generation as fullname/instantiation may contain colons
-            var fieldForInstantiatedTypeKey = fieldDef.FullName + ":" + instantiatedType.Instantiation!.ToString();
-            if (!_fieldForInstantiatedTypesByFullName.ContainsKey(fieldForInstantiatedTypeKey))
-            {
-                _fieldForInstantiatedTypesByFullName[fieldForInstantiatedTypeKey] = new FieldForInstantiatedType(fieldDef, instantiatedType);
-            }
-            return _fieldForInstantiatedTypesByFullName[fieldForInstantiatedTypeKey];
+            var key = fieldDef.FullName + ":" + instantiatedType.Instantiation!.ToString();
+            if (_fieldForInstantiatedTypesByFullName.TryGetValue(key, out var field)) 
+                return field; 
+
+            return _fieldForInstantiatedTypesByFullName[key] = new FieldForInstantiatedType(fieldDef, instantiatedType);
         }
 
         public MethodDesc GetMethodForInstantiatedType(MethodDesc typicalMethodDef, InstantiatedType instantiatedType)
         {
             var methodForInstantiatedTypeKey = typicalMethodDef.FullName + ":" + instantiatedType.Instantiation!.ToString();
-            if (!_methodForInstantiatedTypesByFullName.ContainsKey(methodForInstantiatedTypeKey))
-            {
-                _methodForInstantiatedTypesByFullName[methodForInstantiatedTypeKey] = new MethodForInstantiatedType(typicalMethodDef, instantiatedType);
-            }
-            return _methodForInstantiatedTypesByFullName[methodForInstantiatedTypeKey];
+            if (_methodForInstantiatedTypesByFullName.TryGetValue(methodForInstantiatedTypeKey, out var method))
+                return method;
+
+            return _methodForInstantiatedTypesByFullName[methodForInstantiatedTypeKey] = new MethodForInstantiatedType(typicalMethodDef, instantiatedType);
         }
     }
 }
