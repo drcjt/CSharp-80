@@ -66,9 +66,11 @@ namespace ILCompiler.TypeSystem.Common
             var owningType = OwningType;
             var instantiatedOwningType = owningType.InstantiateSignature(typeInstantiation, methodInstantiation);
 
-            // TODO:
-            // Check if owningType and instantiatedOwningType are different and do something!
-
+            if (instantiatedOwningType is InstantiatedType)
+            {
+                return Context.GetMethodForInstantiatedType(this.GetMethodDefinition(), (InstantiatedType)instantiatedOwningType);
+            }
+            
             return Context.GetInstantiatedMethod(this.GetMethodDefinition(), new Instantiation(clone));
         }
 

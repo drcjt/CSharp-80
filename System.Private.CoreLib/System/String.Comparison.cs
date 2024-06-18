@@ -38,6 +38,9 @@
             return true;
         }
 
+        public static bool operator ==(string? a, string? b) => a.Equals(b);
+        public static bool operator !=(string? a, string? b) => !a.Equals(b);
+
         public override int GetHashCode()
         {
             // TODO: Implement hash algorithm

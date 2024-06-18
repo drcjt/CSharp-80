@@ -35,14 +35,26 @@ namespace ILCompiler.TypeSystem.Common
             }
         }
 
-        public override IList<MethodParameter> Parameters => throw new NotImplementedException();
+        public override IList<MethodParameter> Parameters => _typicalMethodDef.Parameters;
 
-        public override IList<LocalVariableDefinition> Locals => throw new NotImplementedException();
+        public override IList<LocalVariableDefinition> Locals
+        {
+            get
+            {
+                var instantiatedLocals = new List<LocalVariableDefinition>();
+                foreach (var local in _typicalMethodDef.Locals)
+                {
+                    var instantiatedLocal = new LocalVariableDefinition(Instantiate(local.Type), local.Name, local.Index);
+                    instantiatedLocals.Add(instantiatedLocal);
+                }
+                return instantiatedLocals;
+            }
+        }
 
-        public override MethodIL? MethodIL => throw new NotImplementedException();
+        public override MethodIL? MethodIL => _typicalMethodDef.MethodIL;
 
 
-        public override Instantiation Instantiation => throw new NotImplementedException();
+        public override Instantiation Instantiation => _typicalMethodDef.Instantiation;
 
         public override bool HasCustomAttribute(string attributeNamespace, string attributeName)
         {
@@ -55,5 +67,8 @@ namespace ILCompiler.TypeSystem.Common
         public override IList<MethodOverride> Overrides => throw new NotImplementedException();
         public override MethodSig MethodSig => throw new NotImplementedException();
         public override CustomAttributeCollection CustomAttributes => throw new NotImplementedException();
+        public override string Name => _typicalMethodDef.Name;
+        public override string FullName => ToString();
+        public override bool HasReturnType => _typicalMethodDef.HasReturnType;
     }
 }

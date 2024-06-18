@@ -7,7 +7,8 @@
         private readonly Dictionary<string, ArrayType> _arrayTypesByFullName = new Dictionary<string, ArrayType>();
         private readonly Dictionary<string, FunctionPointerType> _functionPointerTypesBySignature = new Dictionary<string, FunctionPointerType>();
         private readonly Dictionary<string, PointerType> _pointerTypesByFullName = new Dictionary<string, PointerType>();
-
+        private readonly Dictionary<string, FieldDesc> _fieldForInstantiatedTypesByFullName = new Dictionary<string, FieldDesc>();
+        private readonly Dictionary<string, MethodDesc> _methodForInstantiatedTypesByFullName = new Dictionary<string, MethodDesc>();
         public ModuleDesc? SystemModule { get; set; }
 
         public InstantiatedType GetInstantiatedType(MetadataType typeDef, Instantiation instantiation)
@@ -74,6 +75,27 @@
                 _pointerTypesByFullName[parameterType.FullName] = new PointerType(parameterType);
             }
             return _pointerTypesByFullName[parameterType.FullName];
+        }
+
+        public FieldDesc GetFieldForInstantiatedType(FieldDesc fieldDef, InstantiatedType instantiatedType)
+        {
+            // TODO: Fix key generation as fullname/instantiation may contain colons
+            var fieldForInstantiatedTypeKey = fieldDef.FullName + ":" + instantiatedType.Instantiation!.ToString();
+            if (!_fieldForInstantiatedTypesByFullName.ContainsKey(fieldForInstantiatedTypeKey))
+            {
+                _fieldForInstantiatedTypesByFullName[fieldForInstantiatedTypeKey] = new FieldForInstantiatedType(fieldDef, instantiatedType);
+            }
+            return _fieldForInstantiatedTypesByFullName[fieldForInstantiatedTypeKey];
+        }
+
+        public MethodDesc GetMethodForInstantiatedType(MethodDesc typicalMethodDef, InstantiatedType instantiatedType)
+        {
+            var methodForInstantiatedTypeKey = typicalMethodDef.FullName + ":" + instantiatedType.Instantiation!.ToString();
+            if (!_methodForInstantiatedTypesByFullName.ContainsKey(methodForInstantiatedTypeKey))
+            {
+                _methodForInstantiatedTypesByFullName[methodForInstantiatedTypeKey] = new MethodForInstantiatedType(typicalMethodDef, instantiatedType);
+            }
+            return _methodForInstantiatedTypesByFullName[methodForInstantiatedTypeKey];
         }
     }
 }
