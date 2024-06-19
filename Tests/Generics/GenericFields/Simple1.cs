@@ -15,8 +15,8 @@
     {
         public static int Main()
         {
-            int i = 1;
-            if (new Gen<int>().Assign(i) != i) return 1;
+            int _int = 1;
+            if (new Gen<int>().Assign(_int) != _int) return 1;
 
             string _string = "string";
             if (new Gen<string>().Assign(_string) != _string) return 1;

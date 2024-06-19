@@ -138,8 +138,9 @@ namespace ILCompiler.TypeSystem.Dnlib
                     var instantiation = new Instantiation(genericParameters);
 
                     MetadataType typeDef = (MetadataType)Create(methodDef.DeclaringType);
-                    var instantiatedType = new InstantiatedType(typeDef, instantiation);
-                    methodDesc = new MethodForInstantiatedType(methodDesc, instantiatedType);
+
+                    var instantiatedType = Context.GetInstantiatedType(typeDef, instantiation);
+                    methodDesc = Context.GetMethodForInstantiatedType(methodDesc, instantiatedType);
                 }
 
                 return methodDesc;
