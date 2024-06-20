@@ -1,4 +1,6 @@
-﻿namespace ILCompiler.TypeSystem.Common
+﻿using System.Text;
+
+namespace ILCompiler.TypeSystem.Common
 {
     public class Instantiation
     {
@@ -15,5 +17,16 @@
         }
 
         public int Length => _genericParameters.Length;
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            foreach (var t in _genericParameters)
+            {
+                sb.Append(t.FullName);
+                sb.Append(',');
+            }
+            return sb.ToString();
+        }
     }
 }

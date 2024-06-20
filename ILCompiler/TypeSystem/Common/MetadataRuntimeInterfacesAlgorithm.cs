@@ -11,12 +11,22 @@
         public static DefType[] ComputeRuntimeInterfaces(TypeDesc typeDesc)
         {
             MetadataType type = (MetadataType)typeDesc;
-            if (!type.IsInstantiatedType)
+            if (type.IsInstantiatedType)
+            {
+                return ComputeRuntimeInterfacesForInstantiatedType((InstantiatedType)type);
+            }
+            else
             {
                 return ComputeRuntimeInterfacesForNonInstantiatedMetadataType(type);
             }
 
-            throw new NotImplementedException("Generic interfaces not supported");
+        }
+
+        private static DefType[] ComputeRuntimeInterfacesForInstantiatedType(InstantiatedType instantiatedType)
+        {
+            MetadataType uninstantiatedType = (MetadataType)instantiatedType.GetTypeDefinition();
+
+            return InstantiatedType.InstantiateTypeArray(uninstantiatedType.RuntimeInterfaces, instantiatedType.Instantiation, default(Instantiation));
         }
 
         /// <summary>

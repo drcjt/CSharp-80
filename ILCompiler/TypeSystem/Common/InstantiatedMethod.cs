@@ -16,7 +16,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public override Instantiation Instantiation { get { return _instantiation; } }
 
-        private TypeDesc Instantiate(TypeDesc type) => type.InstantiateSignature(null, _instantiation);
+        private TypeDesc Instantiate(TypeDesc type) => type.InstantiateSignature(default(Instantiation), _instantiation);
 
         public override bool HasCustomAttribute(string attributeNamespace, string attributeName) => _methodDesc.HasCustomAttribute(attributeNamespace, attributeName);
 

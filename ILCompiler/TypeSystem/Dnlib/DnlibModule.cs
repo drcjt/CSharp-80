@@ -32,6 +32,14 @@ namespace ILCompiler.TypeSystem.Dnlib
                 _fieldsByFullName[resolvedFieldDef.FullName] = fieldDesc;
             }
 
+            if (field.DeclaringType.TryGetGenericInstSig() != null)
+            {
+                var typeSig = field.DeclaringType.ToTypeSig();
+
+                var instantiatedType = ResolveGenericInstanceType(typeSig);
+                fieldDesc = Context.GetFieldForInstantiatedType(fieldDesc, instantiatedType);
+            }
+
             return fieldDesc;
         }
 
@@ -83,21 +91,16 @@ namespace ILCompiler.TypeSystem.Dnlib
 
             if (typeSig.IsGenericInstanceType)
             {
-                var genericType = typeSig.ToGenericInstSig().GenericType;
-                var genericParams = typeSig.ToGenericInstSig().GenericArguments;
-                TypeDesc[] genericParameters = new TypeDesc[genericParams.Count];
-                for (int i = 0; i < genericParams.Count; i++)
-                {
-                    genericParameters[i] = Create(genericParams[i]);
-                }
-                var instantiation = new Instantiation(genericParameters);
-
-                MetadataType metadataType = (MetadataType)Create(genericType);
-
-                var instantiatedType = new InstantiatedType(metadataType, instantiation);
-                return instantiatedType;
+                return ResolveGenericInstanceType(typeSig);
             }
 
+            if (typeSig.IsGenericTypeParameter)
+            {
+                TypeDesc genericTypeParameter = new SignatureTypeVariable(Context, (int)((GenericVar)typeSig).Number);
+                return genericTypeParameter;
+            }
+
+            // TODO: Is this needed?
             if (typeSig is GenericVar genericVar)
             {
                 var genericParameter = new DnlibGenericParameter(this, genericVar.GenericParam);
@@ -111,19 +114,7 @@ namespace ILCompiler.TypeSystem.Dnlib
         {
             if (methodDefOrRef is MethodSpec methodSpec)
             {
-                var methodDef = Create(methodSpec.ResolveMethodDefThrow());
-
-                var genericInstMethodSig = methodSpec.GenericInstMethodSig;
-                var genericParams = genericInstMethodSig.GenericArguments;
-                TypeDesc[] genericParameters = new TypeDesc[genericParams.Count];
-                for (int i = 0; i < genericParams.Count; i++)
-                {
-                    genericParameters[i] = Create(genericParams[i]);
-                }
-                var instantiation = new Instantiation(genericParameters);
-
-                var instantiatedMethod = new InstantiatedMethod(methodDef, instantiation);
-                return instantiatedMethod;
+                return ResolveMethodSpecification(methodSpec);
             }
             else
             {
@@ -147,8 +138,9 @@ namespace ILCompiler.TypeSystem.Dnlib
                     var instantiation = new Instantiation(genericParameters);
 
                     MetadataType typeDef = (MetadataType)Create(methodDef.DeclaringType);
-                    var instantiatedType = new InstantiatedType(typeDef, instantiation);
-                    methodDesc = new MethodForInstantiatedType(methodDesc, instantiatedType);
+
+                    var instantiatedType = Context.GetInstantiatedType(typeDef, instantiation);
+                    methodDesc = Context.GetMethodForInstantiatedType(methodDesc, instantiatedType);
                 }
 
                 return methodDesc;
@@ -183,6 +175,12 @@ namespace ILCompiler.TypeSystem.Dnlib
 
             if (typeDefOrRef is TypeSpec ts)
             {
+                var genericInstSig = ts.TryGetGenericInstSig();
+                if (genericInstSig != null)
+                {
+                    return ResolveGenericInstanceType(genericInstSig);
+                }
+
                 var szArraySig = ts.TryGetSZArraySig();
                 if (szArraySig != null)
                 {
@@ -243,6 +241,37 @@ namespace ILCompiler.TypeSystem.Dnlib
         public override object GetType(string nameSpace, string name)
         {
             return Create(_corLibModuleProvider.FindThrow($"{nameSpace}.{name}"));
+        }
+
+        private InstantiatedType ResolveGenericInstanceType(TypeSig typeSig)
+        {
+            var genericType = typeSig.ToGenericInstSig().GenericType;
+            var genericParams = typeSig.ToGenericInstSig().GenericArguments;
+            TypeDesc[] genericParameters = new TypeDesc[genericParams.Count];
+            for (int i = 0; i < genericParams.Count; i++)
+            {
+                genericParameters[i] = Create(genericParams[i]);
+            }
+            var instantiation = new Instantiation(genericParameters);
+            MetadataType metadataType = (MetadataType)Create(genericType);
+
+            return Context.GetInstantiatedType(metadataType, instantiation);
+        }
+
+        private InstantiatedMethod ResolveMethodSpecification(MethodSpec methodSpec)
+        {
+            var methodDef = Create(methodSpec.ResolveMethodDefThrow());
+
+            var genericInstMethodSig = methodSpec.GenericInstMethodSig;
+            var genericParams = genericInstMethodSig.GenericArguments;
+            TypeDesc[] genericParameters = new TypeDesc[genericParams.Count];
+            for (int i = 0; i < genericParams.Count; i++)
+            {
+                genericParameters[i] = Create(genericParams[i]);
+            }
+            var instantiation = new Instantiation(genericParameters);
+
+            return Context.GetInstantiatedMethod(methodDef, instantiation);
         }
     }
 }

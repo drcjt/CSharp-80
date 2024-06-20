@@ -95,5 +95,7 @@ namespace ILCompiler.TypeSystem.Common
         }
 
         public virtual TypeDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation? methodInstantiation) => this;
+
+        public virtual TypeDesc GetTypeDefinition() => this;
     }
 }

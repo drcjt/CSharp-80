@@ -75,12 +75,27 @@ namespace ILCompiler.TypeSystem.Common
         {
             if (type.IsInstantiatedType)
             {
-                throw new NotImplementedException();
+                AppendNameForInstantiatedType(sb, type);
             }
             else
             {
                 AppendNameForNamespaceType(sb, type);
             }
+        }
+
+        private void AppendNameForInstantiatedType(StringBuilder sb, DefType type)
+        {
+            AppendName(sb, type.GetTypeDefinition());
+            sb.Append('<');
+
+            for (int i = 0; i < type.Instantiation!.Length; i++)
+            {
+                if (i > 0)
+                    sb.Append(", ");
+                AppendName(sb, type.Instantiation[i]);
+            }
+
+            sb.Append('>');
         }
 
         public static void AppendNameForNamespaceType(StringBuilder sb, DefType type)

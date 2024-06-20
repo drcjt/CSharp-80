@@ -60,11 +60,15 @@
             var instantiatedOwningType = OwningType.InstantiateSignature(typeInstantiation, methodInstantiation);
             if (instantiatedOwningType != OwningType)
             {
-                // TODO:
-                //field = instantiatedOwningType.Context.GetFieldForInstantiatedType(field.GetTypicalFieldDefinition(), instantiatedOwningType);
+                field = instantiatedOwningType.Context.GetFieldForInstantiatedType(field.GetTypicalFieldDefinition(), (InstantiatedType)instantiatedOwningType);
             }
 
             return field;
+        }
+
+        public virtual FieldDesc GetTypicalFieldDefinition()
+        {
+            return this;
         }
     }
 }
