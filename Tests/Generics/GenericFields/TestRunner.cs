@@ -1,6 +1,6 @@
 ﻿namespace GenericFields
 {
-    internal class TestRunner
+    internal static class TestRunner
     {
         public static int Main()
         {

@@ -4,12 +4,12 @@
     {
         public class Gen<T>
         {
-            public T Field1;
+            public T? Field1;
 
-            public bool EqualNull(T t)
+            public bool EqualNull(T? t)
             {
                 Field1 = t;
-                return ((object)Field1 == null);
+                return ((object)Field1! == null);
             }
         }
 

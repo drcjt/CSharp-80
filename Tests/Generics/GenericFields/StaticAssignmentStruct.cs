@@ -4,7 +4,7 @@
     {
         public struct Gen<T>
         {
-            static public T Field1;
+            static private T? Field1;
 
             public T Assign(T t)
             {
