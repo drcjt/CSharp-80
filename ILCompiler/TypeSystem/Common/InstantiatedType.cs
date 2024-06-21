@@ -105,5 +105,7 @@ namespace ILCompiler.TypeSystem.Common
         }
 
         public override VarType VarType => _typeDef.VarType;
+
+        public override string Name => _typeDef.Name;
     }
 }

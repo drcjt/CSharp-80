@@ -14,8 +14,6 @@
 
         public override string Name => _fieldDef.Name;
 
-        public override string FullName => _fieldDef.FullName;
-
         public override DefType OwningType => _instantiatedType;
 
         public override TypeDesc FieldType => _fieldDef.FieldType.InstantiateSignature(_instantiatedType.Instantiation, default(Instantiation));

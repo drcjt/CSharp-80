@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler;
+using System.Text;
 
 namespace ILCompiler.TypeSystem.Common
 {
@@ -97,5 +98,13 @@ namespace ILCompiler.TypeSystem.Common
         public virtual TypeDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation? methodInstantiation) => this;
 
         public virtual TypeDesc GetTypeDefinition() => this;
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            var typeNameFormatter = new TypeNameFormatter();
+            typeNameFormatter.AppendName(sb, this);
+            return sb.ToString();
+        }
     }
 }

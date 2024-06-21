@@ -85,9 +85,7 @@ namespace ILCompiler.TypeSystem.Common
             typeNameFormatter.AppendName(sb, Signature.ReturnType);
             sb.Append(' ');
 
-            sb.Append(OwningType.Namespace);
-            sb.Append('.');
-            sb.Append(OwningType.Name);
+            sb.Append(OwningType);
             sb.Append("::");
             sb.Append(Name);
 

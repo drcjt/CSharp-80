@@ -44,8 +44,6 @@
 
         public abstract string Name { get;  }
 
-        public abstract string FullName { get; }
-
         public abstract DefType OwningType { get; }
 
         public abstract TypeDesc FieldType { get; }
@@ -69,6 +67,11 @@
         public virtual FieldDesc GetTypicalFieldDefinition()
         {
             return this;
+        }
+
+        public override string ToString()
+        {
+            return $"{OwningType}.{Name}";
         }
     }
 }

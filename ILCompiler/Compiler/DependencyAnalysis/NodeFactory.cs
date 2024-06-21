@@ -53,10 +53,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public StaticsNode StaticsNode(FieldDesc field)
         {
-            if (!_staticNodesByFullName.TryGetValue(field.FullName, out var staticNode))
+            if (!_staticNodesByFullName.TryGetValue(field.ToString(), out var staticNode))
             {
                 staticNode = new StaticsNode(field, _preinitializationManager, _nameMangler);
-                _staticNodesByFullName[field.FullName] = staticNode;
+                _staticNodesByFullName[field.ToString()] = staticNode;
             }
 
             return staticNode;

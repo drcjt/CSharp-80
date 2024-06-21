@@ -32,7 +32,7 @@ NewObject:
 	; Zero rest of allocated memory
 	LD B, D
 	LD C, E
-	DEC BC	; Skip over first 1 byte of EEType
+	INC BC	; Skip over first 1 byte of EEType
 
 NewObject_ZeroLoop:
 	DEC BC

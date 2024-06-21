@@ -137,7 +137,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             var eeMangledTypeName = _nameMangler.GetMangledTypeName(Type);
 
             var instructionsBuilder = new InstructionsBuilder();
-            instructionsBuilder.Comment($"{Type.FullName}");
+            instructionsBuilder.Comment($"{Type}");
 
             // Need to mangle full field name here
             instructionsBuilder.Label(eeMangledTypeName);

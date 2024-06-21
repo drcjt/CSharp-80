@@ -34,7 +34,7 @@ namespace ILCompiler.Compiler
 
         public string GetMangledFieldName(FieldDesc field)
         {
-            return GetMangledFieldName(field.FullName);
+            return GetMangledFieldName(field.ToString());
         }
 
         public string GetMangledTypeName(TypeDesc type)
