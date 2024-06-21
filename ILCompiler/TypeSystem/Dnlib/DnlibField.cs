@@ -14,7 +14,6 @@ namespace ILCompiler.TypeSystem.Dnlib
         }
 
         public override string Name => _fieldDef.Name;
-        public override string FullName => _fieldDef.FullName;
 
         public override DefType OwningType => (DefType)_module.Create(_fieldDef.DeclaringType);
 

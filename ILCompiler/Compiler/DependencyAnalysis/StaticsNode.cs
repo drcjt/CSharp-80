@@ -10,7 +10,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
     {
         public FieldDesc Field { get; private set; }
 
-        public override string Name => Field.FullName;
+        public override string Name => Field.ToString();
 
         private readonly PreinitializationManager _preinitializationManager;
         private readonly INameMangler _nameMangler;
@@ -45,7 +45,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             else
             {
                 var fieldSize = field.FieldType.GetElementSize().AsInt;
-                instructionsBuilder.Comment($"Reserving {fieldSize} bytes for static field {field.FullName}");
+                instructionsBuilder.Comment($"Reserving {fieldSize} bytes for static field {field.ToString()}");
 
                 // Need to mangle full field name here
                 instructionsBuilder.Label(_nameMangler.GetMangledFieldName(field));

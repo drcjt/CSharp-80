@@ -11,9 +11,8 @@
             //result = InstanceEqualNullClass.RunTests(); if (result != 0) return result;
             //result = InstanceEqualNullStruct.RunTests(); if (result != 0) return result;
 
-            // TODO: Fails - statics in generic types not yet implemented
-            //int result = StaticAssignmentClass.RunTests(); if (result != 0) return result;            
-            //int result = StaticAssignmentStruct.RunTests(); if (result != 0) return result;
+            result = StaticAssignmentClass.RunTests(); if (result != 0) return result;            
+            result = StaticAssignmentStruct.RunTests(); if (result != 0) return result;
 
             return result;
         }

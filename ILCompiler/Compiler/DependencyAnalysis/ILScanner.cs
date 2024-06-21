@@ -24,7 +24,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public IList<IDependencyNode> FindDependencies()
         {
-            if (_method is InstantiatedMethod && _methodIL != null)
+            if ((_method is InstantiatedMethod || _method is MethodForInstantiatedType) && _methodIL != null)
             {
                 _methodIL = new InstantiatedMethodIL(_method, _methodIL);
             }

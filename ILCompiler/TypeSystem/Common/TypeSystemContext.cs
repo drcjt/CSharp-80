@@ -72,7 +72,7 @@
         public FieldDesc GetFieldForInstantiatedType(FieldDesc fieldDef, InstantiatedType instantiatedType)
         {
             // TODO: Fix key generation as fullname/instantiation may contain colons
-            var key = fieldDef.FullName + ":" + instantiatedType.Instantiation!.ToString();
+            var key = fieldDef.ToString() + ":" + instantiatedType.Instantiation!.ToString();
             if (_fieldForInstantiatedTypes.TryGetValue(key, out var field)) 
                 return field; 
 
