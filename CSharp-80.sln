@@ -155,6 +155,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QSort", "Samples\QSort\QSor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenericFields", "Tests\Generics\GenericFields\GenericFields.csproj", "{7B5AA120-FFFB-42B2-B81C-D25B33A3128D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GenericLocals", "Tests\Generics\GenericLocals\GenericLocals.csproj", "{76F98859-2A98-4DA4-8778-4FD925D82AD5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -381,6 +383,10 @@ Global
 		{7B5AA120-FFFB-42B2-B81C-D25B33A3128D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B5AA120-FFFB-42B2-B81C-D25B33A3128D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B5AA120-FFFB-42B2-B81C-D25B33A3128D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76F98859-2A98-4DA4-8778-4FD925D82AD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76F98859-2A98-4DA4-8778-4FD925D82AD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76F98859-2A98-4DA4-8778-4FD925D82AD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76F98859-2A98-4DA4-8778-4FD925D82AD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -443,6 +449,7 @@ Global
 		{3BC3BDDD-3EE0-48D9-A13B-F5B699B07B22} = {BA9F8E73-7E2E-4E47-A614-CF6D8AD8445D}
 		{1E478B36-AC1B-4273-975C-6E6109ACFE55} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 		{7B5AA120-FFFB-42B2-B81C-D25B33A3128D} = {35C20505-0FCB-4D27-AFC5-A0B1071C268F}
+		{76F98859-2A98-4DA4-8778-4FD925D82AD5} = {35C20505-0FCB-4D27-AFC5-A0B1071C268F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}
