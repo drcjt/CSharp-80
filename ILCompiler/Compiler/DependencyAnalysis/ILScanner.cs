@@ -277,9 +277,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 // For dynamic dependencies we need to include the method referred to as part of the dependencies
                 // of the overall method being analysed
-                var dependentTypeAttribute = methodDesc.CustomAttributes.Find("System.Diagnostics.CodeAnalysis.DynamicDependencyAttribute");
-
-                var dependentMethodName = dependentTypeAttribute.ConstructorArguments[0].Value.ToString();
+                var dependentMethodName = methodDesc.GetCustomAttributeValue("System.Diagnostics.CodeAnalysis.DynamicDependencyAttribute");
                 if (dependentMethodName == null) throw new InvalidOperationException("DynamicDependencyAttribute missing method name");
 
                 var dependentMethod = methodDesc.OwningType.FindMethodEndsWith(dependentMethodName);

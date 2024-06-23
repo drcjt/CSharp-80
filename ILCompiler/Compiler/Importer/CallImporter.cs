@@ -1,8 +1,7 @@
-﻿using ILCompiler.TypeSystem.Common;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
-using dnlib.DotNet;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -37,13 +36,13 @@ namespace ILCompiler.Compiler.Importer
                 switch (method.Name)
                 {
                     case "Set":
-                        methodToCall = context.Module.Create(new MethodDefUser("Set", method.MethodSig));
+                        methodToCall = method.CreateUserMethod("Set");
                         break;
                     case "Get":
-                        methodToCall = context.Module.Create(new MethodDefUser("Get", method.MethodSig));
+                        methodToCall = method.CreateUserMethod("Get");
                         break;
                     case "Address":
-                        methodToCall = context.Module.Create(new MethodDefUser("Address", method.MethodSig));
+                        methodToCall = method.CreateUserMethod("Address");
                         break;
                     default:
                         throw new InvalidOperationException($"Unknown array intrinsic method {method.Name}");
@@ -220,11 +219,12 @@ namespace ILCompiler.Compiler.Importer
             }
             else
             {
-                if (methodToCall.CustomAttributes[0].ConstructorArguments[0].Value is not UTF8String entryPoint)
+                var entryPoint = methodToCall.GetCustomAttributeValue("System.Runtime.RuntimeImportAttribute");
+                if (entryPoint == null)
                 {
                     throw new NotSupportedException("RuntimeImport missing entrypoint");
                 }
-                return entryPoint.String;
+                return entryPoint;
             }
         }
 

@@ -153,9 +153,9 @@ namespace ILCompiler.TypeSystem.Dnlib
             var foundRecords = new List<MethodImplRecord>();
             foreach (var method in GetVirtualMethods())
             {
-                foreach (var methodOverride in method.Overrides.Where(x => x.MethodDeclaration.Name == name))
+                foreach (var methodOverride in method.Overrides.Where(x => x.Decl.Name == name))
                 {
-                    var newRecord = new MethodImplRecord(_module.Create(methodOverride.MethodDeclaration), _module.Create(methodOverride.MethodBody));
+                    var newRecord = new MethodImplRecord(methodOverride.Decl, methodOverride.Body);
                     foundRecords.Add(newRecord);
                 }
             }

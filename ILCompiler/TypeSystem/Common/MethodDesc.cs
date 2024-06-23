@@ -1,5 +1,4 @@
-﻿using dnlib.DotNet;
-using ILCompiler.TypeSystem.IL;
+﻿using ILCompiler.TypeSystem.IL;
 using System.Text;
 
 namespace ILCompiler.TypeSystem.Common
@@ -116,9 +115,8 @@ namespace ILCompiler.TypeSystem.Common
             return sb.ToString();
         }
 
-        // TODO: Refactor to not use dnlib types in following
-        public abstract IList<MethodOverride> Overrides { get; }
-        public abstract MethodSig MethodSig { get; }
-        public abstract CustomAttributeCollection CustomAttributes { get; }
+        public abstract IEnumerable<MethodImplRecord> Overrides { get; }
+        public virtual string? GetCustomAttributeValue(string customAttributeName) => null;
+        public abstract MethodDesc CreateUserMethod(string name);
     }
 }

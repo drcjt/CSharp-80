@@ -28,7 +28,9 @@ namespace ILCompiler.TypeSystem.Dnlib
         public override string Name => _methodDef.Name;
         public override string FullName => ToString();
 
-        public override bool IsIntrinsic => _methodDef.IsIntrinsic();
+        private const string CompilerIntrinsicAttribute = "System.Runtime.CompilerServices.IntrinsicAttribute";
+        public override bool IsIntrinsic => _methodDef.HasCustomAttributes && _methodDef.CustomAttributes.IsDefined(CompilerIntrinsicAttribute);
+
         public override bool IsPInvoke => _methodDef.IsPinvokeImpl;
         public override string PInvokeMethodName => _methodDef.ImplMap.Name;
         public override bool IsInternalCall => _methodDef.IsInternalCall;
@@ -69,14 +71,64 @@ namespace ILCompiler.TypeSystem.Dnlib
             }
         }
 
-        public override IList<MethodOverride> Overrides => _methodDef.Overrides;
-        public override MethodSig MethodSig => _methodDef.MethodSig;
-        public override CustomAttributeCollection CustomAttributes => _methodDef.CustomAttributes;
+        private void InitializeMethodOverrides()
+        {
+            _methodOverrides = new MethodImplRecord[_methodDef.Overrides.Count];
+            for (int i = 0; i < _methodOverrides.Length; i++)
+            {
+                var methodBody = _module.Create(_methodDef.Overrides[i].MethodBody);
+                var methodDeclaration = _module.Create(_methodDef.Overrides[i].MethodDeclaration);
+                _methodOverrides[i] = new MethodImplRecord(methodDeclaration, methodBody);
+            }
+        }
 
+        private MethodImplRecord[]? _methodOverrides = null;
+
+        public override IEnumerable<MethodImplRecord> Overrides
+        {
+            get
+            {
+                if (_methodOverrides == null)
+                    InitializeMethodOverrides();
+
+                return _methodOverrides!;
+            }
+        }
+
+        public override MethodDesc CreateUserMethod(string name)
+        {
+            return _module.Create(new MethodDefUser(name, _methodDef.MethodSig));
+        }
+
+        public override string? GetCustomAttributeValue(string customAttributeName)
+        {
+            var customAttribute = _methodDef.CustomAttributes.Find(customAttributeName);
+            if (customAttribute != null)
+            {
+                var constructorArguments = customAttribute.ConstructorArguments;
+                if (constructorArguments != null)
+                {
+                    var constructorArgument = constructorArguments[0];
+                    object attributeValue = constructorArgument.Value;
+                    if (attributeValue != null)
+                    {
+                        if (attributeValue is UTF8String utf8String)
+                            return utf8String.String;
+                        else                        
+                            return attributeValue.ToString();
+                    }
+                }
+            }
+
+            return null;
+        }
 
         public override MethodIL? MethodIL => _methodIL;
 
-        public override bool HasCustomAttribute(string attributeNamespace, string attributeName) => _methodDef.HasCustomAttribute(attributeNamespace, attributeName);
+        public override bool HasCustomAttribute(string attributeNamespace, string attributeName)
+        {
+            return _methodDef.HasCustomAttributes && _methodDef.CustomAttributes.IsDefined(attributeNamespace + "." + attributeName);
+        }
 
         public string GetRuntimeExportName()
         {

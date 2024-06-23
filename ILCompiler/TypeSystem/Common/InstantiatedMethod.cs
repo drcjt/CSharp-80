@@ -1,5 +1,4 @@
-﻿using dnlib.DotNet;
-using ILCompiler.TypeSystem.IL;
+﻿using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.TypeSystem.Common
 {
@@ -95,9 +94,9 @@ namespace ILCompiler.TypeSystem.Common
 
         public override MethodDesc GetMethodDefinition() => _methodDesc;
 
-        // TODO: Refactor to not use dnlib types in following
-        public override IList<MethodOverride> Overrides => _methodDesc.Overrides;
-        public override MethodSig MethodSig => _methodDesc.MethodSig;
-        public override CustomAttributeCollection CustomAttributes => _methodDesc.CustomAttributes;
+        public override IEnumerable<MethodImplRecord> Overrides => _methodDesc.Overrides;
+        public override string? GetCustomAttributeValue(string customAttributeName) => _methodDesc.GetCustomAttributeValue(customAttributeName);
+
+        public override MethodDesc CreateUserMethod(string name) => throw new NotImplementedException();
     }
 }
