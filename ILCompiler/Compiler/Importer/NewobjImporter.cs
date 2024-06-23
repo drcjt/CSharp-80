@@ -94,9 +94,7 @@ namespace ILCompiler.Compiler.Importer
             // String constructors marked as dynamic dependencies simply
             // call the referred method which will deal with allocation and
             // construction.
-            var dependentTypeAttribute = methodToCall.CustomAttributes.Find("System.Diagnostics.CodeAnalysis.DynamicDependencyAttribute");
-
-            var dependentMethodName = dependentTypeAttribute.ConstructorArguments[0].Value.ToString();
+            var dependentMethodName = methodToCall.GetCustomAttributeValue("System.Diagnostics.CodeAnalysis.DynamicDependencyAttribute");
             if (dependentMethodName == null) throw new InvalidOperationException("DynamicDependencyAttribute missing method name");
 
             var dependentMethod = methodToCall.OwningType.FindMethodEndsWith(dependentMethodName);

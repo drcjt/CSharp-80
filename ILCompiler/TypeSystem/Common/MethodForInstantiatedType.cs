@@ -1,5 +1,4 @@
-﻿using dnlib.DotNet;
-using ILCompiler.TypeSystem.IL;
+﻿using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.TypeSystem.Common
 {
@@ -63,12 +62,11 @@ namespace ILCompiler.TypeSystem.Common
 
         private TypeDesc Instantiate(TypeDesc type) => type.InstantiateSignature(_instantiatedType.Instantiation, null);
 
-        // TODO: Refactor to not use dnlib types in following
-        public override IList<MethodOverride> Overrides => throw new NotImplementedException();
-        public override MethodSig MethodSig => throw new NotImplementedException();
-        public override CustomAttributeCollection CustomAttributes => throw new NotImplementedException();
+        public override IEnumerable<MethodImplRecord> Overrides => throw new NotImplementedException();
         public override string Name => _typicalMethodDef.Name;
         public override string FullName => ToString();
         public override bool HasReturnType => _typicalMethodDef.HasReturnType;
+
+        public override MethodDesc CreateUserMethod(string name) => throw new NotImplementedException();
     }
 }
