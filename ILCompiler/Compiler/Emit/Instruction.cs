@@ -34,17 +34,36 @@ namespace ILCompiler.Compiler.Emit
 
             FormatOpcode(stringBuilder);
 
+            AppendComment(stringBuilder);
+
+            return stringBuilder.ToString();
+        }
+
+        private void AppendComment(StringBuilder stringBuilder)
+        {
+            const int MaxLineLength = 120;
+
             if (!string.IsNullOrEmpty(Comment))
             {
                 if (Opcode != Opcode.None)
                 {
                     stringBuilder.Append(" ");
                 }
-                stringBuilder.Append(";");
-                stringBuilder.Append(Comment);
-            }
 
-            return stringBuilder.ToString();
+                var comment = Comment;
+                do
+                {
+                    stringBuilder.Append(";");
+                    var chunkLength = Math.Min(MaxLineLength, comment.Length);
+                    stringBuilder.Append(comment.AsSpan(0, chunkLength));
+                    comment = comment.Substring(chunkLength);
+                    if (comment.Length > 0)
+                    {
+                        stringBuilder.AppendLine();
+                    }
+
+                } while (comment.Length > 0);
+            }
         }
 
         private void FormatOpcode(StringBuilder stringBuilder)
