@@ -55,7 +55,7 @@ namespace ILCompiler.Compiler.Emit
                 {
                     stringBuilder.Append(";");
                     var chunkLength = Math.Min(MaxLineLength, comment.Length);
-                    stringBuilder.Append(comment.Substring(0, chunkLength));
+                    stringBuilder.Append(comment.AsSpan(0, chunkLength));
                     comment = comment.Substring(chunkLength);
                     if (comment.Length > 0)
                     {
