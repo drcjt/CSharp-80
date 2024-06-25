@@ -44,56 +44,60 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                         switch (currentInstruction.Opcode)
                         {
-                            case TypeSystem.IL.ILOpcode.newobj:
-                            case TypeSystem.IL.ILOpcode.call:
-                            case TypeSystem.IL.ILOpcode.callvirt:
+                            case ILOpcode.newobj:
+                            case ILOpcode.call:
+                            case ILOpcode.callvirt:
                                 ImportCall(currentInstruction);
                                 break;
 
-                            case TypeSystem.IL.ILOpcode.newarr:
+                            case ILOpcode.newarr:
                                 ImportNewArray(currentInstruction);
                                 break;
 
-                            case TypeSystem.IL.ILOpcode.ldstr:
+                            case ILOpcode.ldstr:
                                 ImportLoadString(currentInstruction);
                                 break;
 
-                            case TypeSystem.IL.ILOpcode.ldsfld:
-                            case TypeSystem.IL.ILOpcode.ldsflda:
+                            case ILOpcode.ldsfld:
+                            case ILOpcode.ldsflda:
                                 ImportLoadField(currentInstruction, true);
                                 break;
 
-                            case TypeSystem.IL.ILOpcode.stsfld:
+                            case ILOpcode.stsfld:
                                 ImportStoreField(currentInstruction, true);
                                 break;
 
-                            case TypeSystem.IL.ILOpcode.isinst:
+                            case ILOpcode.isinst:
                                 ImportCasting(currentInstruction);
                                 break;
 
-                            case TypeSystem.IL.ILOpcode.ldelema:
+                            case ILOpcode.ldelema:
                                 ImportAddressOfElem();
                                 break;
 
-                            case TypeSystem.IL.ILOpcode.ldelem:
-                            case TypeSystem.IL.ILOpcode.ldelem_i:
-                            case TypeSystem.IL.ILOpcode.ldelem_i1:
-                            case TypeSystem.IL.ILOpcode.ldelem_i2:
-                            case TypeSystem.IL.ILOpcode.ldelem_i4:
-                            case TypeSystem.IL.ILOpcode.ldelem_u1:
-                            case TypeSystem.IL.ILOpcode.ldelem_u2:
-                            case TypeSystem.IL.ILOpcode.ldelem_u4:
-                            case TypeSystem.IL.ILOpcode.ldelem_ref:
+                            case ILOpcode.ldelem:
+                            case ILOpcode.ldelem_i:
+                            case ILOpcode.ldelem_i1:
+                            case ILOpcode.ldelem_i2:
+                            case ILOpcode.ldelem_i4:
+                            case ILOpcode.ldelem_u1:
+                            case ILOpcode.ldelem_u2:
+                            case ILOpcode.ldelem_u4:
+                            case ILOpcode.ldelem_ref:
                                 ImportLoadElement();
                                 break;
 
-                            case TypeSystem.IL.ILOpcode.stelem:
-                            case TypeSystem.IL.ILOpcode.stelem_i:
-                            case TypeSystem.IL.ILOpcode.stelem_i1:
-                            case TypeSystem.IL.ILOpcode.stelem_i2:
-                            case TypeSystem.IL.ILOpcode.stelem_i4:
-                            case TypeSystem.IL.ILOpcode.stelem_ref:
+                            case ILOpcode.stelem:
+                            case ILOpcode.stelem_i:
+                            case ILOpcode.stelem_i1:
+                            case ILOpcode.stelem_i2:
+                            case ILOpcode.stelem_i4:
+                            case ILOpcode.stelem_ref:
                                 ImportStoreElement();
+                                break;
+
+                            case ILOpcode.box:
+                                ImportBox(currentInstruction);
                                 break;
                         }
                         currentOffset += currentInstruction.GetSize();
@@ -105,6 +109,14 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
 
             return _dependencies;
+        }
+
+        private void ImportBox(Instruction instruction)
+        {
+            var typeDesc = (TypeDesc)instruction.GetOperand();
+            var allocSize = typeDesc.GetElementSize().AsInt;
+
+            _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(typeDesc, allocSize));
         }
 
         private void AddThrowExceptionIfAnyExceptionHandlers()
