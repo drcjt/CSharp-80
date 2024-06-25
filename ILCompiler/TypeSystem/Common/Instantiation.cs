@@ -23,10 +23,10 @@ namespace ILCompiler.TypeSystem.Common
             var sb = new StringBuilder();
             foreach (var t in _genericParameters)
             {
-                sb.Append(t.FullName);
+                sb.Append(t.ToString());
                 sb.Append(',');
             }
             return sb.ToString();
-        }
+          }
     }
 }

@@ -107,6 +107,11 @@ namespace ILCompiler.TypeSystem.Dnlib
                 return genericParameter;
             }
 
+            if (typeSig is CModReqdSig reqdSig)
+            {
+                return Create(reqdSig.Next);
+            }
+
             throw new NotImplementedException();
         }
 
