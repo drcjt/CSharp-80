@@ -7,7 +7,7 @@ using ILCompiler.IoC;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
-    public class Z80MethodCodeNode : DependencyNode
+    public class Z80MethodCodeNode : DependencyNode, IMethodNode
     {
         public MethodDesc Method { get; }
         public override string Name => Method.FullName;
@@ -56,5 +56,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
             return MethodCode;
         }
+
+        public string GetMangledName(INameMangler nameMangler) => nameMangler.GetMangledMethodName(Method);
     }
 }

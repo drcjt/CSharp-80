@@ -303,7 +303,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 _dependencies.Add(_context.NodeFactory.NecessaryTypeSymbol(methodDesc.OwningType));
             }
 
-            Z80MethodCodeNode methodNode;
+            IMethodNode methodNode;
             bool directCall = IsDirectCall(methodDesc, instruction.Opcode);
             if (directCall)
             {
@@ -380,7 +380,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
         }
 
-        private Z80MethodCodeNode GetHelperEntryPoint(string typeName, string methodName)
+        private IMethodNode GetHelperEntryPoint(string typeName, string methodName)
         {
             var helperMethod = _module.Context.GetHelperEntryPoint(typeName, methodName);
             return _context.NodeFactory.MethodNode(helperMethod);

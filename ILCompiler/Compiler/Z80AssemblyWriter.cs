@@ -245,7 +245,7 @@ namespace ILCompiler.Compiler
                                     }
                                     else
                                     {
-                                        var methodName = _nameMangler.GetMangledMethodName(codeNode.Method);
+                                        var methodName = codeNode.GetMangledName(_nameMangler);                                            
                                         ehClausesBuilder.Dw($"{methodName}_END", "Protected Region End");
                                     }
                                     ehClausesBuilder.Dw(ehClause.HandlerBegin.Label, "Handler Start");
