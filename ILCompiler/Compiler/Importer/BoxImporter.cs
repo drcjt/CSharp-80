@@ -15,12 +15,15 @@ namespace ILCompiler.Compiler.Importer
 
             if (objType.IsValueType)
             {
+                // TODO: Consider creating a bespoke Box assembly code runtime routine to do the below
+                // Note - nativeaot implements this in C# in System.Runtime.RuntimeExports.RhBox
+
                 var lclNum = importer.GrabTemp(VarType.Ref, 2);
 
                 var mangledEETypeName = context.NameMangler.GetMangledTypeName(objType);
 
-                // Determine required size on GC heap
-                var allocSize = ((DefType)objType).InstanceByteCount.AsInt;
+                // Determine required size on GC heap. Have to explicitly add PointerSize for EETypePtr
+                var allocSize = ((DefType)objType).InstanceByteCount.AsInt + 2;
 
                 // Allocate memory for object
                 var op1 = new AllocObjEntry(mangledEETypeName, allocSize, VarType.Ref);
@@ -28,7 +31,6 @@ namespace ILCompiler.Compiler.Importer
                 importer.ImportAppendTree(asg);
 
                 // Copy value type into box
-                // TODO:change this to use cpobj when implemented
                 var newObjThisPtr = new LocalVariableEntry(lclNum, VarType.Ref, 2);
                 var headerOffset = new NativeIntConstantEntry(2);
                 var addr = new BinaryOperator(Operation.Add, isComparison: false, newObjThisPtr, headerOffset, VarType.Ptr);

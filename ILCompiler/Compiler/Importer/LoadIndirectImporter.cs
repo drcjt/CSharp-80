@@ -10,6 +10,7 @@ namespace ILCompiler.Compiler.Importer
         public bool Import(Instruction instruction, ImportContext context, IILImporterProxy importer)
         {
             VarType type;
+            int exactSize = 0;
             switch (instruction.Opcode)
             {
                 case ILOpcode.ldind_i:
@@ -38,11 +39,17 @@ namespace ILCompiler.Compiler.Importer
                     break;
                 case ILOpcode.ldobj:
                     var typeDesc = (TypeDesc)instruction.GetOperand();
+                    exactSize = typeDesc.GetElementSize().AsInt;
                     type = typeDesc.VarType;
                     break;
 
                 default:
                     return false;
+            }
+
+            if (instruction.Opcode != ILOpcode.ldobj)
+            {
+                exactSize = type.GetTypeSize();
             }
             var addr = importer.PopExpression();
 
@@ -51,8 +58,6 @@ namespace ILCompiler.Compiler.Importer
                 var cast = CodeFolder.FoldExpression(new CastEntry(addr, VarType.Ptr));
                 addr = cast;
             }
-
-            var exactSize = type.GetTypeSize();
 
             var node = new IndirectEntry(addr, type, exactSize);
             importer.PushExpression(node);
