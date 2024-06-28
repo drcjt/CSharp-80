@@ -1,8 +1,8 @@
-﻿using ILCompiler.TypeSystem.Common;
-using ILCompiler.Compiler.DependencyAnalysisFramework;
+﻿using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
@@ -98,7 +98,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         {
                             IfNode = context.NodeFactory.VirtualMethodUse(method),
                             ThenParent = this,
-                            ThenNode = context.NodeFactory.MethodNode(implementation),
+                            ThenNode = context.NodeFactory.MethodNode(implementation, defType.IsValueType),
                         };
                         conditionalDependencies.Add(conditionalDependency);
                     }
@@ -292,8 +292,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 // Only generate slot entries for non abstract methods
                 if (implementation != null && !implementation.IsAbstract)
                 {
-                    var implementationMangledName = _nameMangler.GetMangledMethodName(implementation);
-                    instructionsBuilder.Dw(implementationMangledName);
+                    var node = _nodeFactory.MethodNode(implementation, implementation.OwningType.IsValueType);
+                    instructionsBuilder.Dw(node.GetMangledName(_nameMangler));
                     _virtualSlotCount++;
                 }
             }
