@@ -1,10 +1,10 @@
 ﻿namespace GenericFields
 {
-    internal class InstanceEqualNullClass
+    internal class StaticEqualNullStruct
     {
-        public class Gen<T>
+        public struct Gen<T>
         {
-            public T? Field1;
+            public static T? Field1;
 
             public bool EqualNull(T? t)
             {
