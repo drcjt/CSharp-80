@@ -13,6 +13,9 @@
             result = StaticAssignmentClass.RunTests(); if (result != 0) return result;            
             result = StaticAssignmentStruct.RunTests(); if (result != 0) return result;
 
+            result = StaticEqualNullClass.RunTests(); if (result != 0) return result;
+            result = StaticEqualNullStruct.RunTests(); if (result != 0) return result;
+
             return result;
         }
     }
