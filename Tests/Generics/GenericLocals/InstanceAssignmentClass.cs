@@ -1,4 +1,6 @@
-﻿namespace GenericLocals
+﻿using System;
+
+namespace GenericLocals
 {
     internal class InstanceAssignmentClass
     {
@@ -11,18 +13,31 @@
             }
         }
 
-        public static int RunTests()
+        private static int _counter = 0;
+        private static bool _result = true;
+        public static void Eval(bool exp)
+        {
+            _counter++;
+            if (!exp)
+            {
+                _result = exp;
+                Console.Write("InstanceAssignmentClass failed at location: ");
+                Console.WriteLine(_counter);
+            }
+        }
+
+        public static bool RunTests()
         {
             int _int = 1;
-            if (new Gen<int>().Assign(_int) != _int) return 1;
+            Eval(new Gen<int>().Assign(_int) == _int);
 
             string _string = "string";
-            if (new Gen<string>().Assign(_string) != _string) return 2;
+            Eval(new Gen<string>().Assign(_string) == _string);
 
             var _object = new object();
-            if (new Gen<object>().Assign(_object) != _object) return 3;
+            Eval(new Gen<object>().Assign(_object) == _object);
 
-            return 0;
+            return _result;
         }
     }
 }

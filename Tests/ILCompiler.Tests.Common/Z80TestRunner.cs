@@ -1,5 +1,6 @@
 ﻿using Konamiman.Z80dotNet;
 using NUnit.Framework;
+using System.Text;
 
 namespace ILCompiler.Tests.Common
 {
@@ -54,11 +55,22 @@ namespace ILCompiler.Tests.Common
             z80.Memory.SetContents(0, GetNonZeroBytes());
 
             // Load the program bytes
-            z80.Memory.SetContents(0, z80Bytes);
+            const int orgAddress = 0x0050;
+
+            z80.Memory.SetContents(orgAddress, z80Bytes);
+
+            // Setup "Jp x050" as initial instruction - note that z80.Start
+            // sets the PC to 0
+            z80.Memory.SetContents(0, [0xC3, 0x50, 0x00]);
+
+            // Setup print char routine to just return
+            z80.Memory.SetContents(0x33, [0xc9]);
 
             z80.BeforeInstructionFetch += BeforeInstructionFetch;
 
             z80.Start();
+
+            Console.WriteLine(_consoleStringBuilder.ToString());
 
             Console.WriteLine($"Last value of PC = {z80.Registers.PC}");
 
@@ -73,7 +85,7 @@ namespace ILCompiler.Tests.Common
             // Validate we finished on the HALT instruction
             if (ilBvt)
             {
-                Assert.AreEqual(19, z80.Registers.PC);
+                Assert.AreEqual(19 + orgAddress, z80.Registers.PC);
             }
             else
             {
@@ -91,8 +103,16 @@ namespace ILCompiler.Tests.Common
             }
         }
 
+        private StringBuilder _consoleStringBuilder = new StringBuilder();
+
         private void BeforeInstructionFetch(object? sender, BeforeInstructionFetchEventArgs e)
         {
+            if (z80.Registers.PC == 0x33)
+            {
+                // Print char
+                _consoleStringBuilder.Append((char)(z80.Registers.A));
+            }
+
             if (TracePC)
             {
                 File.AppendAllText(_tracePath, $"0x{z80.Registers.PC:X}{Environment.NewLine}");

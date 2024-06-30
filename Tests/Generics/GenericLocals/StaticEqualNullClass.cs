@@ -1,4 +1,6 @@
-﻿namespace GenericLocals
+﻿using System;
+
+namespace GenericLocals
 {
     internal class StaticEqualNullClass
     {
@@ -6,25 +8,38 @@
         {
             public static bool EqualNull(T? t)
             {
-                T Field1 = t;
-                return ((object)Field1! == null);
+                T? Field1 = t;
+                return ((object?)Field1 == null);
             }
         }
 
-        public static int RunTests()
+        private static int _counter = 0;
+        private static bool _result = true;
+        public static void Eval(bool exp)
+        {
+            _counter++;
+            if (!exp)
+            {
+                _result = exp;
+                Console.Write("StaticEqualNullClass failed at location: ");
+                Console.WriteLine(_counter);
+            }
+        }
+
+        public static bool RunTests()
         {
             int _int = 1;
-            if (Gen<int>.EqualNull(_int)) return 1;
+            Eval(!Gen<int>.EqualNull(_int));
 
             string _string = "string";
-            if (Gen<string>.EqualNull(_string)) return 2;
-            if (!Gen<string>.EqualNull(null)) return 3;
+            Eval(!Gen<string>.EqualNull(_string));
+            Eval(Gen<string>.EqualNull(null));
 
             var _object = new object();
-            if (Gen<object>.EqualNull(_object)) return 4;
-            if (!Gen<object>.EqualNull(null)) return 5;
+            Eval(!Gen<object>.EqualNull(_object));
+            Eval(Gen<object>.EqualNull(null));
 
-            return 0;
+            return _result;
         }
     }
 }

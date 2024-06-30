@@ -1,4 +1,6 @@
-﻿namespace GenericTypeParameters
+﻿using System;
+
+namespace GenericTypeParameters
 {
     public struct ValX1<T> { }
     public struct ValX2<T, U> { }
@@ -15,40 +17,50 @@
             public bool DefaultTest(bool status)
             {
                 T? t = default(T);
-                return ((object)t == null) == status;
+                return ((object?)t == null) == status;
             }
         }
 
-        public static int RunTests()
+        private static int _counter = 0;
+        private static bool _result = true;
+        public static void Eval(bool exp)
         {
-            if (!new Gen<int>().DefaultTest(false)) return 1;            
-            if (!new Gen<string>().DefaultTest(true)) return 2;
-            if (!new Gen<object>().DefaultTest(true)) return 3;
+            _counter++;
+            if (!exp)
+            {
+                _result = exp;
+                Console.Write("DefaultClass failed at location: ");
+                Console.WriteLine(_counter);
+            }
+        }
 
-            if (!new Gen<RefX1<int>>().DefaultTest(true)) return 4;
-            if (!new Gen<RefX1<ValX1<int>>>().DefaultTest(true)) return 5;
-            if (!new Gen<RefX2<int, string>>().DefaultTest(true)) return 6;
+        public static bool RunTests()
+        {
+            Eval(new Gen<int>().DefaultTest(false));
+            Eval(new Gen<string>().DefaultTest(true));
+            Eval(new Gen<object>().DefaultTest(true));
 
-            if (!new Gen<RefX1<RefX1<int>>>().DefaultTest(true)) return 7;
-            if (!new Gen<RefX1<RefX1<RefX1<string>>>>().DefaultTest(true)) return 8;
-            if (!new Gen<RefX1<RefX2<int, string>>>().DefaultTest(true)) return 9;
+            Eval(new Gen<RefX1<int>>().DefaultTest(true));
+            Eval(new Gen<RefX1<ValX1<int>>>().DefaultTest(true));
+            Eval(new Gen<RefX2<int, string>>().DefaultTest(true));
+
+            Eval(new Gen<RefX1<RefX1<int>>>().DefaultTest(true));
+            Eval(new Gen<RefX1<RefX1<RefX1<string>>>>().DefaultTest(true));
+            Eval(new Gen<RefX1<RefX2<int, string>>>().DefaultTest(true));
             
-            if (!new Gen<RefX2<RefX2<RefX1<int>, RefX3<int, string, RefX1<RefX2<int, string>>>>, RefX2<RefX1<int>, RefX3<int, string, RefX1<RefX2<int, string>>>>>>().DefaultTest(true)) return 10;
+            Eval(new Gen<RefX2<RefX2<RefX1<int>, RefX3<int, string, RefX1<RefX2<int, string>>>>, RefX2<RefX1<int>, RefX3<int, string, RefX1<RefX2<int, string>>>>>>().DefaultTest(true));
 
-            // These fail - Eq on struct not implemented
-            /*
-            if (!new Gen<ValX1<int>>().DefaultTest(false)) return 11;
-            if (!new Gen<ValX1<RefX1<int>>>().DefaultTest(false)) return 12;
-            if (!new Gen<ValX2<int, string>>().DefaultTest(false)) return 13;
+            Eval(new Gen<ValX1<int>>().DefaultTest(false));
+            Eval(new Gen<ValX1<RefX1<int>>>().DefaultTest(false));
+            Eval(new Gen<ValX2<int, string>>().DefaultTest(false));
 
-            if (!new Gen<ValX1<ValX1<int>>>().DefaultTest(false)) return 14;
-            if (!new Gen<ValX1<ValX1<ValX1<string>>>>().DefaultTest(false)) return 15;
+            Eval(new Gen<ValX1<ValX1<int>>>().DefaultTest(false));
+            Eval(new Gen<ValX1<ValX1<ValX1<string>>>>().DefaultTest(false));
 
-            if (!new Gen<ValX1<ValX2<int, string>>>().DefaultTest(false)) return 16;
-            if (!new Gen<ValX2<ValX2<ValX1<int>, ValX3<int, string, ValX1<ValX2<int, string>>>>, ValX2<ValX1<int>, ValX3<int, string, ValX1<ValX2<int, string>>>>>>().DefaultTest(false)) return 17;
-            */
+            Eval(new Gen<ValX1<ValX2<int, string>>>().DefaultTest(false));
+            Eval(new Gen<ValX2<ValX2<ValX1<int>, ValX3<int, string, ValX1<ValX2<int, string>>>>, ValX2<ValX1<int>, ValX3<int, string, ValX1<ValX2<int, string>>>>>>().DefaultTest(false));
 
-            return 0;
+            return _result;
         }
     }
 }
