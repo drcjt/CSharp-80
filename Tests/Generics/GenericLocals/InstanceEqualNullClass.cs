@@ -8,8 +8,8 @@ namespace GenericLocals
         {
             public bool EqualNull(T? t)
             {
-                T Field1 = t;
-                return ((object)Field1! == null);
+                T? Field1 = t;
+                return ((object?)Field1 == null);
             }
         }
 

@@ -8,8 +8,8 @@ namespace GenericTypeParameters
         {
             public bool DefaultTest(bool status)
             {
-                T t = default(T);
-                return (((object)t == null) == status);
+                T? t = default(T);
+                return (((object?)t == null) == status);
             }
         }
 
