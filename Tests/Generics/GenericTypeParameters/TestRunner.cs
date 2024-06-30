@@ -4,10 +4,10 @@
     {
         public static int Main()
         {
-            int result = DefaultClass.RunTests(); if (result != 0) return result;
-            result = DefaultStruct.RunTests(); if (result != 0) return result;
+            var result = DefaultClass.RunTests();
+            result &= DefaultStruct.RunTests();
 
-            return result;
+            return result ? 0 : 1;
         }
     }
 }

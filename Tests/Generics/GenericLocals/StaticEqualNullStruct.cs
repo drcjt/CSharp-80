@@ -1,4 +1,6 @@
-﻿namespace GenericLocals
+﻿using System;
+
+namespace GenericLocals
 {
     internal class StaticEqualNullStruct
     {
@@ -11,20 +13,33 @@
             }
         }
 
-        public static int RunTests()
+        public static int counter = 0;
+        public static bool result = true;
+        public static void Eval(bool exp)
+        {
+            counter++;
+            if (!exp)
+            {
+                result = exp;
+                Console.Write("StaticEqualNullStruct failed at location: ");
+                Console.WriteLine(counter);
+            }
+        }
+
+        public static bool RunTests()
         {
             int _int = 1;
-            if (Gen<int>.EqualNull(_int)) return 1;
+            Eval(!Gen<int>.EqualNull(_int));
 
             string _string = "string";
-            if (Gen<string>.EqualNull(_string)) return 2;
-            if (!Gen<string>.EqualNull(null)) return 3;
+            Eval(!Gen<string>.EqualNull(_string));
+            Eval(Gen<string>.EqualNull(null));
 
             var _object = new object();
-            if (Gen<object>.EqualNull(_object)) return 4;
-            if (!Gen<object>.EqualNull(null)) return 5;
+            Eval(!Gen<object>.EqualNull(_object));
+            Eval(Gen<object>.EqualNull(null));
 
-            return 0;
+            return result;
         }
     }
 }

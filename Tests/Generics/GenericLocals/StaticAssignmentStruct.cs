@@ -1,4 +1,6 @@
-﻿namespace GenericLocals
+﻿using System;
+
+namespace GenericLocals
 {
     internal class StaticAssignmentStruct
     {
@@ -11,18 +13,31 @@
             }
         }
 
-        public static int RunTests()
+        public static int counter = 0;
+        public static bool result = true;
+        public static void Eval(bool exp)
+        {
+            counter++;
+            if (!exp)
+            {
+                result = exp;
+                Console.Write("StaticAssignmentStruct failed at location: ");
+                Console.WriteLine(counter);
+            }
+        }
+
+        public static bool RunTests()
         {
             int _int = 1;
-            if (Gen<int>.Assign(_int) != _int) return 1;
+            Eval(Gen<int>.Assign(_int) == _int);
 
             string _string = "string";
-            if (Gen<string>.Assign(_string) != _string) return 2;
+            Eval(Gen<string>.Assign(_string) == _string);
 
             var _object = new object();
-            if (Gen<object>.Assign(_object) != _object) return 3;
+            Eval(Gen<object>.Assign(_object) == _object);
 
-            return 0;
+            return result;
         }
     }
 }

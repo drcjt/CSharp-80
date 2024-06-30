@@ -10,7 +10,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             var variable = context.LocalVariableTable[entry.LocalNumber];
             var size = variable.ExactSize;
 
-            if (variable.Type.IsSmall())
+            if (variable.Type.IsSmall() || (variable.Type == VarType.Struct && size == 1))
             {
                 CopyHelper.CopySmallFromIXToStack(context.InstructionsBuilder, variable.Type.IsByte() ? 1 : 2, -variable.StackOffset, !variable.Type.IsUnsigned());
             }

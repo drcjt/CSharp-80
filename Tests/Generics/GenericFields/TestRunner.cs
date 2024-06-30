@@ -4,7 +4,7 @@
     {
         public static int Main()
         {
-            bool result = InstanceAssignmentClass.RunTests();
+            var result = InstanceAssignmentClass.RunTests();
             result &= InstanceAssignmentStruct.RunTests();
 
             result &= InstanceEqualNullClass.RunTests();
