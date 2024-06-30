@@ -5,7 +5,6 @@
         public TargetDetails Target { get; } = new TargetDetails(TargetArchitecture.Z80);
 
         private readonly Dictionary<string, ArrayType> _arrayTypes = new Dictionary<string, ArrayType>();
-        private readonly Dictionary<string, ByRefType> _byRefTypes = new Dictionary<string, ByRefType>();
         private readonly Dictionary<string, FunctionPointerType> _functionPointerTypes = new Dictionary<string, FunctionPointerType>();
         private readonly Dictionary<string, PointerType> _pointerTypes = new Dictionary<string, PointerType>();
         private readonly Dictionary<string, FieldDesc> _fieldForInstantiatedTypes = new Dictionary<string, FieldDesc>();
@@ -43,15 +42,6 @@
             }
 
             return ((DefType)type);
-        }
-
-        public ByRefType GetByRefType(TypeDesc parameterType)
-        {
-            var byrefTypeKey = parameterType.FullName;
-            if (_byRefTypes.TryGetValue(byrefTypeKey, out var byrefType))
-                return byrefType;
-
-            return _byRefTypes[byrefTypeKey] = new ByRefType(parameterType);
         }
 
         public ArrayType GetArrayType(TypeDesc elementType, int rank)
