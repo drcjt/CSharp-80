@@ -1,4 +1,6 @@
-﻿namespace GenericFields
+﻿using System;
+
+namespace GenericFields
 {
     internal class InstanceEqualNullStruct
     {
@@ -13,20 +15,33 @@
             }
         }
 
-        public static int RunTests()
+        public static int counter = 0;
+        public static bool result = true;
+        public static void Eval(bool exp)
+        {
+            counter++;
+            if (!exp)
+            {
+                result = exp;
+                Console.Write("InstanceEqualNullStruct failed at location: ");
+                Console.WriteLine(counter);
+            }
+        }
+
+        public static bool RunTests()
         {
             int _int = 1;
-            if (new Gen<int>().EqualNull(_int)) return 1;
+            Eval(!new Gen<int>().EqualNull(_int));
 
             string _string = "string";
-            if (new Gen<string>().EqualNull(_string)) return 2;
-            if (!new Gen<string>().EqualNull(null)) return 3;
+            Eval(!new Gen<string>().EqualNull(_string));
+            Eval(new Gen<string>().EqualNull(null));
 
             var _object = new object();
-            if (new Gen<object>().EqualNull(_object)) return 4;
-            if (!new Gen<object>().EqualNull(null)) return 5;
+            Eval(!new Gen<object>().EqualNull(_object));
+            Eval(new Gen<object>().EqualNull(null));
 
-            return 0;
+            return result;
         }
     }
 }

@@ -34,7 +34,7 @@ namespace ILCompiler.Compiler
         {
             if (_configuration.IntegrationTests)
             {
-                return 0x0000;
+                return 0x0050;
             }
             return _configuration.TargetArchitecture switch
             {
