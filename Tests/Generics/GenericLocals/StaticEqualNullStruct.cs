@@ -13,16 +13,16 @@ namespace GenericLocals
             }
         }
 
-        public static int counter = 0;
-        public static bool result = true;
+        private static int _counter = 0;
+        private static bool _result = true;
         public static void Eval(bool exp)
         {
-            counter++;
+            _counter++;
             if (!exp)
             {
-                result = exp;
+                _result = exp;
                 Console.Write("StaticEqualNullStruct failed at location: ");
-                Console.WriteLine(counter);
+                Console.WriteLine(_counter);
             }
         }
 
@@ -39,7 +39,7 @@ namespace GenericLocals
             Eval(!Gen<object>.EqualNull(_object));
             Eval(Gen<object>.EqualNull(null));
 
-            return result;
+            return _result;
         }
     }
 }

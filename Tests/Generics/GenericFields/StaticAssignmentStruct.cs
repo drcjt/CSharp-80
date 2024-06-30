@@ -15,16 +15,16 @@ namespace GenericFields
             }
         }
 
-        public static int counter = 0;
-        public static bool result = true;
+        private static int _counter = 0;
+        private static bool _result = true;
         public static void Eval(bool exp)
         {
-            counter++;
+            _counter++;
             if (!exp)
             {
-                result = exp;
+                _result = exp;
                 Console.Write("StaticAssignmentStruct failed at location: ");
-                Console.WriteLine(counter);
+                Console.WriteLine(_counter);
             }
         }
 
@@ -39,7 +39,7 @@ namespace GenericFields
             var _object = new object();
             Eval(new Gen<object>().Assign(_object) == _object);
 
-            return result;
+            return _result;
         }
     }
 }

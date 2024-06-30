@@ -15,16 +15,16 @@ namespace GenericFields
             }
         }
 
-        public static int counter = 0;
-        public static bool result = true;
+        private static int _counter = 0;
+        private static bool _result = true;
         public static void Eval(bool exp)
         {
-            counter++;
+            _counter++;
             if (!exp)
             {
-                result = exp;
+                _result = exp;
                 Console.Write("StaticEqualNull Struct failed at location: ");
-                Console.WriteLine(counter);
+                Console.WriteLine(_counter);
             }
         }
 
@@ -41,7 +41,7 @@ namespace GenericFields
             Eval(!new Gen<object>().EqualNull(_object));
             Eval(new Gen<object>().EqualNull(null));
 
-            return result;
+            return _result;
         }
     }
 }

@@ -21,16 +21,16 @@ namespace GenericTypeParameters
             }
         }
 
-        public static int counter = 0;
-        public static bool result = true;
+        private static int _counter = 0;
+        private static bool _result = true;
         public static void Eval(bool exp)
         {
-            counter++;
+            _counter++;
             if (!exp)
             {
-                result = exp;
+                _result = exp;
                 Console.Write("DefaultClass failed at location: ");
-                Console.WriteLine(counter);
+                Console.WriteLine(_counter);
             }
         }
 
@@ -60,7 +60,7 @@ namespace GenericTypeParameters
             Eval(new Gen<ValX1<ValX2<int, string>>>().DefaultTest(false));
             Eval(new Gen<ValX2<ValX2<ValX1<int>, ValX3<int, string, ValX1<ValX2<int, string>>>>, ValX2<ValX1<int>, ValX3<int, string, ValX1<ValX2<int, string>>>>>>().DefaultTest(false));
 
-            return result;
+            return _result;
         }
     }
 }
