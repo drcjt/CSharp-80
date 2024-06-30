@@ -4,19 +4,17 @@
     {
         public static int Main()
         {
-            bool result = true;
+            bool result = InstanceAssignmentClass.RunTests();
+            result &= InstanceAssignmentStruct.RunTests();
 
-            result = result && InstanceAssignmentClass.RunTests();
-            result = result && InstanceAssignmentStruct.RunTests();
+            result &= InstanceEqualNullClass.RunTests();
+            result &= InstanceEqualNullStruct.RunTests();
 
-            result = result && InstanceEqualNullClass.RunTests();
-            result = result && InstanceEqualNullStruct.RunTests();
+            result &= StaticAssignmentClass.RunTests();
+            result &= StaticAssignmentStruct.RunTests();
 
-            result = result && StaticAssignmentClass.RunTests();
-            result = result && StaticAssignmentStruct.RunTests();
-
-            result = result && StaticEqualNullClass.RunTests();
-            result = result && StaticEqualNullStruct.RunTests();
+            result &= StaticEqualNullClass.RunTests();
+            result &= StaticEqualNullStruct.RunTests();
 
             return result ? 0 : 1;
         }
