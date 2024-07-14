@@ -58,7 +58,7 @@ namespace ILCompiler.UnitTests
             var instanceByteAlignment = computedFieldLayout.ByteCountAlignment;
             var instanceByteCount = LayoutInt.AlignUp(instanceByteCountUnaligned, instanceByteAlignment, target);
 
-            Assert.AreEqual(56, instanceByteCount.AsInt);
+            Assert.That(instanceByteCount.AsInt, Is.EqualTo(56));
 
             foreach (var f in typeDef.Fields)
             {
@@ -70,13 +70,13 @@ namespace ILCompiler.UnitTests
                 switch (f.Name)
                 {
                     case "b1":
-                        Assert.AreEqual(0, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(0));
                         break;
                     case "fixedBuffer":
-                        Assert.AreEqual(2, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(2));
                         break;
                     case "i1":
-                        Assert.AreEqual(52, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(52));
                         break;
                     default:
                         Assert.Fail();
@@ -113,7 +113,7 @@ namespace ILCompiler.UnitTests
             var instanceByteAlignment = computedFieldLayout.ByteCountAlignment;
             var instanceByteCount = LayoutInt.AlignUp(instanceByteCountUnaligned, instanceByteAlignment, target);
 
-            Assert.AreEqual(18, instanceByteCount.AsInt);
+            Assert.That(instanceByteCount.AsInt, Is.EqualTo(18));
 
             foreach (var f in typeDef.Fields)
             {
@@ -125,22 +125,22 @@ namespace ILCompiler.UnitTests
                 switch (f.Name)
                 {
                     case "MyInt":
-                        Assert.AreEqual(4, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(4));
                         break;
                     case "MyBool":
-                        Assert.AreEqual(8, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(8));
                         break;
                     case "MyChar":
-                        Assert.AreEqual(10, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(10));
                         break;
                     case "MyString":
-                        Assert.AreEqual(12, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(12));
                         break;
                     case "MyByteArray":
-                        Assert.AreEqual(14, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(14));
                         break;
                     case "MyClass1SelfRef":
-                        Assert.AreEqual(16, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(16));
                         break;
                     default:
                         Assert.Fail();
@@ -171,7 +171,7 @@ namespace ILCompiler.UnitTests
             var instanceByteAlignment = computedFieldLayout.ByteCountAlignment;
             var instanceByteCount = LayoutInt.AlignUp(instanceByteCountUnaligned, instanceByteAlignment, target);
 
-            Assert.AreEqual(24, instanceByteCount.AsInt);
+            Assert.That(instanceByteCount.AsInt, Is.EqualTo(24));
 
             foreach (var f in typeDef.Fields)
             {
@@ -183,7 +183,7 @@ namespace ILCompiler.UnitTests
                 switch (f.Name)
                 {
                     case "MyInt2":
-                        Assert.AreEqual(20, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(20));
                         break;
                     default:
                         Assert.Fail();
@@ -217,7 +217,7 @@ namespace ILCompiler.UnitTests
             var instanceByteAlignment = computedFieldLayout.ByteCountAlignment;
             var instanceByteCount = LayoutInt.AlignUp(instanceByteCountUnaligned, instanceByteAlignment, target);
 
-            Assert.AreEqual(12, instanceByteCount.AsInt);
+            Assert.That(instanceByteCount.AsInt, Is.EqualTo(12));
 
             foreach (var f in typeDef.Fields)
             {
@@ -229,19 +229,19 @@ namespace ILCompiler.UnitTests
                 switch (f.Name)
                 {
                     case "b1":
-                        Assert.AreEqual(0, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(0));
                         break;
                     case "b2":
-                        Assert.AreEqual(1, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(1));
                         break;
                     case "b3":
-                        Assert.AreEqual(2, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(2));
                         break;
                     case "i1":
-                        Assert.AreEqual(4, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(4));
                         break;
                     case "s1":
-                        Assert.AreEqual(8, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(8));
                         break;
                     default:
                         Assert.Fail();
@@ -272,7 +272,7 @@ namespace ILCompiler.UnitTests
             var instanceByteAlignment = computedFieldLayout.ByteCountAlignment;
             var instanceByteCount = LayoutInt.AlignUp(instanceByteCountUnaligned, instanceByteAlignment, target);
 
-            Assert.AreEqual(16, instanceByteCount.AsInt);
+            Assert.That(instanceByteCount.AsInt, Is.EqualTo(16));
 
             foreach (var f in typeDef.Fields)
             {
@@ -284,10 +284,10 @@ namespace ILCompiler.UnitTests
                 switch (f.Name)
                 {
                     case "MyStruct0":
-                        Assert.AreEqual(0, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(0));
                         break;
                     case "MyBool":
-                        Assert.AreEqual(12, fieldOffset);
+                        Assert.That(fieldOffset, Is.EqualTo(12));
                         break;
                     default:
                         Assert.Fail();

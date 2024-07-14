@@ -43,7 +43,7 @@ namespace ILCompiler.Tests.Common
 
             var compiled = ILCompiler.Program.Main(arguments.Split(' '));
 
-            Assert.AreEqual(0, compiled, "IL Failed to compile");
+            Assert.That(compiled, Is.EqualTo(0), "IL Failed to compile");
         }
     }
 }
