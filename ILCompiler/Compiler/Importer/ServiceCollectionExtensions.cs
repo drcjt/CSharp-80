@@ -6,6 +6,7 @@ namespace ILCompiler.Compiler.Importer
     {
         public static IServiceCollection AddImporters(this IServiceCollection services)
         {
+            services.AddSingleton<IOpcodeImporter, UnboxImporter>();
             services.AddSingleton<IOpcodeImporter, BoxImporter>();
             services.AddSingleton<IOpcodeImporter, NopImporter>();
             services.AddSingleton<IOpcodeImporter, LoadIntImporter>();

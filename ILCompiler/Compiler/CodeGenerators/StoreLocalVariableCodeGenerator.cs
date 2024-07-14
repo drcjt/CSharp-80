@@ -1,5 +1,4 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
-using System.Diagnostics;
 using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
@@ -24,7 +23,6 @@ namespace ILCompiler.Compiler.CodeGenerators
             else
             {
                 // Storing a local variable/argument
-                Debug.Assert(variable.ExactSize % 2 == 0);
                 CopyHelper.CopyFromStackToIX(context.InstructionsBuilder, variable.ExactSize, -variable.StackOffset, restoreIX: true);
             }
         }

@@ -1,5 +1,4 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
-using System.Diagnostics;
 
 namespace ILCompiler.Compiler.CodeGenerators
 {
@@ -10,14 +9,17 @@ namespace ILCompiler.Compiler.CodeGenerators
             var variable = context.LocalVariableTable[entry.LocalNumber];
             var size = variable.ExactSize;
 
-            if (variable.Type.IsSmall() || (variable.Type == VarType.Struct && size == 1))
+            if (variable.Type.IsSmall())
             {
-                CopyHelper.CopySmallFromIXToStack(context.InstructionsBuilder, variable.Type.IsByte() ? 1 : 2, -variable.StackOffset, !variable.Type.IsUnsigned());
+                var signExtend = !variable.Type.IsUnsigned();
+                var bytesToCopy = variable.Type.IsByte() ? 1 : 2;
+
+                CopyHelper.CopySmallFromIXToStack(context.InstructionsBuilder, bytesToCopy, -variable.StackOffset, signExtend);
+
             }
             else
             {
                 // Loading a local variable/argument
-                Debug.Assert(size % 2 == 0);
                 CopyHelper.CopyFromIXToStack(context.InstructionsBuilder, size, -variable.StackOffset, restoreIX: true);
             }
         }
