@@ -1,5 +1,4 @@
-﻿using dnlib.DotNet;
-using System;
+﻿using System;
 
 namespace Exceptions
 {

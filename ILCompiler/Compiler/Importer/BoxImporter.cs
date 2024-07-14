@@ -23,7 +23,8 @@ namespace ILCompiler.Compiler.Importer
                 var mangledEETypeName = context.NameMangler.GetMangledTypeName(objType);
 
                 // Determine required size on GC heap. Have to explicitly add PointerSize for EETypePtr
-                var allocSize = ((DefType)objType).InstanceByteCount.AsInt + 2;
+                var unboxedObjectSize = objType.GetElementSize().AsInt;
+                var allocSize = unboxedObjectSize + 2;
 
                 // Allocate memory for object
                 var op1 = new AllocObjEntry(mangledEETypeName, allocSize, VarType.Ref);
@@ -37,7 +38,7 @@ namespace ILCompiler.Compiler.Importer
 
                 var value = importer.PopExpression();
 
-                var op = new StoreIndEntry(addr, value, VarType.Ref);
+                var op = new StoreIndEntry(addr, value, VarType.Ref, 0, unboxedObjectSize);
                 importer.ImportAppendTree(op);
 
                 // Push temp
