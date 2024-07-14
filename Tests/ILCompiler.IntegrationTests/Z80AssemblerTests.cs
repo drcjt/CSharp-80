@@ -25,7 +25,7 @@ namespace ILCompiler.IntegrationTests
             assembler.Assemble("testAssembly.asm");
 
             // Validate that zmac has been downloaded
-            Assert.IsTrue(File.Exists(zmacPath));
+            Assert.That(File.Exists(zmacPath), Is.True);
         }
 
         [TestCase(TargetArchitecture.TRS80, "cmd")]
@@ -48,7 +48,7 @@ namespace ILCompiler.IntegrationTests
             assembler.Assemble(assemblyFile);
 
             // Validate that the expected output file has been created by the assembler
-            Assert.IsTrue(File.Exists(expectedOutputFile));
+            Assert.That(File.Exists(expectedOutputFile), Is.True);
         }
     }
 }

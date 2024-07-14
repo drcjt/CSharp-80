@@ -85,21 +85,21 @@ namespace ILCompiler.Tests.Common
             // Validate we finished on the HALT instruction
             if (ilBvt)
             {
-                Assert.AreEqual(19 + orgAddress, z80.Registers.PC);
+                Assert.That(z80.Registers.PC, Is.EqualTo(19 + orgAddress));
             }
             else
             {
-                Assert.AreEqual(0x76, z80.Memory[z80.Registers.PC - 1]);
+                Assert.That(z80.Memory[z80.Registers.PC - 1], Is.EqualTo(0x76));
             }
 
             // Pass returns 32 bit 0 in DEHL
-            Assert.AreEqual(0, z80.Registers.DE);
-            Assert.AreEqual(0, z80.Registers.HL);
+            Assert.That(z80.Registers.DE, Is.EqualTo(0));
+            Assert.That(z80.Registers.HL, Is.EqualTo(0));
 
             if (ilBvt)
             {
                 // Make sure stack pointer ends up at original place
-                Assert.AreEqual(ILCompilerRunner.StackStart, (ushort)z80.Registers.SP);
+                Assert.That((ushort)z80.Registers.SP, Is.EqualTo(ILCompilerRunner.StackStart));
             }
         }
 

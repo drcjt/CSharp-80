@@ -38,7 +38,7 @@ namespace ILCompiler.Tests
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
-            Assert.AreEqual(JumpKind.Always, basicBlocks[0].JumpKind);
+            Assert.That(basicBlocks[0].JumpKind, Is.EqualTo(JumpKind.Always));
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace ILCompiler.Tests
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
-            Assert.AreEqual(JumpKind.Return, basicBlocks[0].JumpKind);
+            Assert.That(basicBlocks[0].JumpKind, Is.EqualTo(JumpKind.Return));
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace ILCompiler.Tests
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
-            Assert.AreEqual(JumpKind.Switch, basicBlocks[0].JumpKind);
+            Assert.That(basicBlocks[0].JumpKind, Is.EqualTo(JumpKind.Switch));
         }
 
         [Test]
@@ -93,7 +93,7 @@ namespace ILCompiler.Tests
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
-            Assert.AreEqual(JumpKind.Conditional, basicBlocks[0].JumpKind);
+            Assert.That(basicBlocks[0].JumpKind, Is.EqualTo(JumpKind.Conditional));
         }
 
         [Test]
@@ -111,8 +111,8 @@ namespace ILCompiler.Tests
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
-            Assert.AreEqual(1, basicBlocks.Count(x => x != null));
-            Assert.IsNotNull(basicBlocks[0]);
+            Assert.That(basicBlocks.Count(x => x != null), Is.EqualTo(1));
+            Assert.That(basicBlocks[0], Is.Not.Null);
         }
 
         [Test]
@@ -132,8 +132,8 @@ namespace ILCompiler.Tests
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
-            Assert.AreEqual(3, basicBlocks.Count(x => x != null));
-            Assert.IsNotNull(basicBlocks[branchTarget.Offset]);
+            Assert.That(basicBlocks.Count(x => x != null), Is.EqualTo(3));
+            Assert.That(basicBlocks[branchTarget.Offset], Is.Not.Null);
         }
 
         [Test]
@@ -154,8 +154,8 @@ namespace ILCompiler.Tests
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
-            Assert.AreEqual(3, basicBlocks.Count(x => x != null));
-            Assert.IsNotNull(basicBlocks[instructionAfterBranch.Offset]);
+            Assert.That(basicBlocks.Count(x => x != null), Is.EqualTo(3));
+            Assert.That(basicBlocks[instructionAfterBranch.Offset], Is.Not.Null);
         }
 
         [Test]
@@ -174,8 +174,8 @@ namespace ILCompiler.Tests
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
-            Assert.AreEqual(2, basicBlocks.Count(x => x != null));
-            Assert.IsNotNull(basicBlocks[branchTarget.Offset]);
+            Assert.That(basicBlocks.Count(x => x != null), Is.EqualTo(2));
+            Assert.That(basicBlocks[branchTarget.Offset], Is.Not.Null);
         }
     }
 }

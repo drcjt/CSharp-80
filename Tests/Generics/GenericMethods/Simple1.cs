@@ -60,8 +60,6 @@ namespace SimpleGenericMethod
 
             SwapInts<char>(ref c, ref d);
 
-            /*
-
             Swap<int>(ref x, ref y);
             if (x != 17) return 1;
             if (y != 12) return 1;
@@ -95,8 +93,6 @@ namespace SimpleGenericMethod
             if (barray[0] != 66) return 1;
             if (barray[1] != 65) return 1;
             if (barray[2] != 64) return 1;
-
-            */
 
             return 0;
         }
