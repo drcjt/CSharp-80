@@ -38,7 +38,7 @@
 	conv.i
 	box [mscorlib]System.IntPtr
 	unbox [mscorlib]System.IntPtr
-	ldind.i
+	ldobj [mscorlib]System.IntPtr
 
 	conv.u4
 	box [mscorlib]System.UInt32
@@ -48,7 +48,7 @@
 	conv.u
 	box [mscorlib]System.UIntPtr
 	unbox [mscorlib]System.UIntPtr
-	ldind.i
+	ldobj [mscorlib]System.UIntPtr
 
 	conv.i4
 
