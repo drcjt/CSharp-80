@@ -5,7 +5,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 {
     internal class CastCodeGenerator : ICodeGenerator<CastEntry>
     {
-        private static int CreateKey(VarType from, VarType to) => ((int)from * 256) + (int)to;
+        private static int CreateKey(VarType from, VarType to) => ((int)from << 8) + (int)to;
 
         private static Dictionary<int, Action<CodeGeneratorContext>> _codeGeneratorActionsMap = new Dictionary<int, Action<CodeGeneratorContext>>()
         {
@@ -37,7 +37,11 @@ namespace ILCompiler.Compiler.CodeGenerators
             { CreateKey(VarType.ByRef, VarType.Ptr), NullConversion },
         };
 
-        public static void NullConversion(CodeGeneratorContext context) { }
+        public static void NullConversion(CodeGeneratorContext context) 
+        { 
+            // No code required for this conversion
+        }
+
         public static void ToWordUnsigned(CodeGeneratorContext context)
         {
             context.InstructionsBuilder.Pop(HL);      // LSW
