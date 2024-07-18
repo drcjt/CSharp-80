@@ -22,8 +22,9 @@ namespace ILCompiler.Compiler.Importer
 
                 var mangledEETypeName = context.NameMangler.GetMangledTypeName(objType);
 
+                int unboxedObjectSize = GetUnboxedSize(objType);
+
                 // Determine required size on GC heap. Have to explicitly add PointerSize for EETypePtr
-                var unboxedObjectSize = objType.GetElementSize().AsInt;
                 var allocSize = unboxedObjectSize + 2;
 
                 // Allocate memory for object
@@ -47,6 +48,26 @@ namespace ILCompiler.Compiler.Importer
             }
 
             return true;
+        }
+
+        private static int GetUnboxedSize(TypeDesc objType)
+        {
+            // On stack we either have
+            // * structs - which take up exact space, so struct with a byte in it is 1 byte long
+            // * native signed/unsigned ints - which take up 2 bytes
+            // * everything else takes up 4 bytes
+
+            var unboxedObjectSize = 4;
+            if (objType.VarType == VarType.Struct)
+            {
+                unboxedObjectSize = objType.GetElementSize().AsInt;
+            }
+            if (objType.VarType.GenActualTypeIsI())
+            {
+                unboxedObjectSize = 2;
+            }
+
+            return unboxedObjectSize;
         }
     }
 }
