@@ -72,18 +72,22 @@ namespace ILCompiler.Compiler.Peephole
                     instructions[currentInstructionIndex] = Instruction.CreateComment($"\tPOP {lastInstruction?.Op0?.Register}");
                     removedInstructions += 2;
 
-                    lastInstruction = currentInstruction;
-                    lastInstructionIndex = currentInstructionIndex;
+                    // Last Instruction is now one before the Push just eliminated
+                    lastInstructionIndex = lastInstructionIndex > 0 ? lastInstructionIndex-- : 0;
+                    lastInstruction = lastInstructionIndex > 0 ? instructions[lastInstructionIndex] : null;
                 }
                 else
                 {
                     lastInstruction = currentInstruction;
                     lastInstructionIndex = currentInstructionIndex;
+                }
 
-                    do
-                    {
-                        currentInstructionIndex++;
-                    } while (currentInstructionIndex < instructions.Count && instructions[currentInstructionIndex].Opcode == Opcode.None);
+                currentInstructionIndex++;
+
+                // Skip instructions with no opcode
+                while (currentInstructionIndex < instructions.Count && instructions[currentInstructionIndex].Opcode == Opcode.None)
+                {
+                    currentInstructionIndex++;
                 }
             } while (currentInstructionIndex < instructions.Count);
 

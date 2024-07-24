@@ -1,20 +1,18 @@
-﻿using ILCompiler.TypeSystem.Dnlib;
-using ILCompiler.Compiler.CodeGenerators;
+﻿using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.Peephole;
 using ILCompiler.Interfaces;
-using Microsoft.Extensions.Logging;
+using ILCompiler.TypeSystem.Dnlib;
 using System.Diagnostics;
 using static ILCompiler.Compiler.Emit.Registers;
-using ILCompiler.Compiler.Peephole;
 
 namespace ILCompiler.Compiler
 {
     public class CodeGenerator : ICodeGenerator, IGenericStackEntryVisitor
     {
         private readonly INameMangler _nameMangler;
-        private readonly ILogger<CodeGenerator> _logger;
         private readonly ICodeGeneratorFactory _codeGeneratorFactory;
         private readonly IConfiguration _configuration;
         private readonly CorLibModuleProvider _corLibModuleProvider;
@@ -23,11 +21,10 @@ namespace ILCompiler.Compiler
 
         private CodeGeneratorContext _context = null!;
 
-        public CodeGenerator(INameMangler nameMangler, ILogger<CodeGenerator> logger, ICodeGeneratorFactory codeGeneratorFactory, 
-            IConfiguration configuration, CorLibModuleProvider corLibModuleProvider, NodeFactory nodeFactory, Optimizer optimizer)
+        public CodeGenerator(INameMangler nameMangler, ICodeGeneratorFactory codeGeneratorFactory, IConfiguration configuration, 
+            CorLibModuleProvider corLibModuleProvider, NodeFactory nodeFactory, Optimizer optimizer)
         {
             _nameMangler = nameMangler;
-            _logger = logger;
             _codeGeneratorFactory = codeGeneratorFactory;
             _configuration = configuration;
             _corLibModuleProvider = corLibModuleProvider;
