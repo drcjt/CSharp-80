@@ -1,10 +1,10 @@
-﻿using ILCompiler.TypeSystem.Dnlib;
-using ILCompiler.Compiler.CodeGenerators;
+﻿using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.Peephole;
 using ILCompiler.Interfaces;
-using Microsoft.Extensions.Logging;
+using ILCompiler.TypeSystem.Dnlib;
 using System.Diagnostics;
 using static ILCompiler.Compiler.Emit.Registers;
 
@@ -13,22 +13,23 @@ namespace ILCompiler.Compiler
     public class CodeGenerator : ICodeGenerator, IGenericStackEntryVisitor
     {
         private readonly INameMangler _nameMangler;
-        private readonly ILogger<CodeGenerator> _logger;
         private readonly ICodeGeneratorFactory _codeGeneratorFactory;
         private readonly IConfiguration _configuration;
         private readonly CorLibModuleProvider _corLibModuleProvider;
         private readonly NodeFactory _nodeFactory;
+        private readonly Optimizer _optimizer;
 
         private CodeGeneratorContext _context = null!;
 
-        public CodeGenerator(INameMangler nameMangler, ILogger<CodeGenerator> logger, ICodeGeneratorFactory codeGeneratorFactory, IConfiguration configuration, CorLibModuleProvider corLibModuleProvider, NodeFactory nodeFactory)
+        public CodeGenerator(INameMangler nameMangler, ICodeGeneratorFactory codeGeneratorFactory, IConfiguration configuration, 
+            CorLibModuleProvider corLibModuleProvider, NodeFactory nodeFactory, Optimizer optimizer)
         {
             _nameMangler = nameMangler;
-            _logger = logger;
             _codeGeneratorFactory = codeGeneratorFactory;
             _configuration = configuration;
             _corLibModuleProvider = corLibModuleProvider;
             _nodeFactory = nodeFactory;
+            _optimizer = optimizer;
         }
 
         public IList<Instruction> Generate(IList<BasicBlock> blocks, LocalVariableTable locals, Z80MethodCodeNode methodCodeNode)
@@ -94,7 +95,7 @@ namespace ILCompiler.Compiler
             _context.InstructionsBuilder.Label($"{methodName}_END");
             methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
 
-            Optimize(methodInstructions);
+            _optimizer.Optimize(methodInstructions);
 
             var totalBytes = methodInstructions.Sum<Instruction>(x => x.Bytes);
 
@@ -267,82 +268,6 @@ namespace ILCompiler.Compiler
                     }
                 }
             }
-        }
-
-        private void Optimize(IList<Instruction> instructions)
-        {
-            var removedInstructions = EliminatePushXXPopXX(instructions);
-            removedInstructions += RemoveJumpsToNextInstruction(instructions);
-
-            _logger.LogDebug("Eliminated {eliminatedInstructions} instructions", removedInstructions);
-        }
-
-        private static int RemoveJumpsToNextInstruction(IList<Instruction> instructions)
-        {
-            var removedInstructions = 0;
-            var currentInstruction = instructions[0];
-            int count = 0;
-
-            do
-            {
-                if (currentInstruction != null && currentInstruction.Opcode == Opcode.Jp 
-                    && count < instructions.Count && currentInstruction.Label == null)
-                {
-                    var target = currentInstruction.Op0?.Label;
-                    var nextInstruction = instructions[count + 1];
-                    if (target == nextInstruction.Label)
-                    {
-                        instructions.RemoveAt(count);
-                        removedInstructions++;
-                        count--;
-                    }
-                }
-                if (count + 1 < instructions.Count)
-                {
-                    currentInstruction = instructions[++count];
-                }
-            } while (count < instructions.Count - 1);
-
-            return removedInstructions;
-        }
-
-        private static int EliminatePushXXPopXX(IList<Instruction> instructions)
-        {
-            int removedInstructions = 0;
-            Instruction? lastInstruction = null;
-            int lastInstructionIndex = 0;
-            Instruction currentInstruction;
-            var currentInstructionIndex = 0;
-
-            do
-            {
-                currentInstruction = instructions[currentInstructionIndex];
-
-                if (lastInstruction?.Opcode == Opcode.Push && currentInstruction.Opcode == Opcode.Pop
-                    && lastInstruction?.Op0?.Register == currentInstruction.Op0?.Register &&
-                    currentInstruction.Label == null && lastInstruction?.Label == null)
-                {
-                    // Eliminate Push followed by Pop
-                    instructions.RemoveAt(lastInstructionIndex);
-                    instructions.RemoveAt(currentInstructionIndex - 1);
-                    removedInstructions += 2;
-
-                    currentInstructionIndex--;
-                    lastInstruction = currentInstructionIndex > 0 ? instructions[currentInstructionIndex - 1] : null;
-                }
-                else
-                {
-                    lastInstruction = currentInstruction;
-                    lastInstructionIndex = currentInstructionIndex;
-
-                    do
-                    {
-                        currentInstructionIndex++;
-                    } while (currentInstructionIndex < instructions.Count && instructions[currentInstructionIndex].Opcode == Opcode.None);
-                }
-            } while (currentInstructionIndex < instructions.Count);
-
-            return removedInstructions;
         }
     }
 }
