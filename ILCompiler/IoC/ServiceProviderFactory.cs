@@ -12,6 +12,7 @@ using ILCompiler.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ILCompiler.IL;
+using ILCompiler.Compiler.Peephole;
 
 namespace ILCompiler.IoC
 {
@@ -37,6 +38,8 @@ namespace ILCompiler.IoC
 
             services.AddFactory<IMethodCompiler>();
             services.AddTransient<IMethodCompiler, MethodCompiler>();
+
+            services.AddSingleton<Optimizer>();
 
             services.AddSingleton<IPhaseFactory, PhaseFactory>();
 
