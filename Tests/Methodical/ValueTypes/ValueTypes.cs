@@ -18,6 +18,15 @@ namespace ValueTypes
             if (o.ToString() != "25")
                 return 3;
 
+            if (!i.Equals(25))
+                return 4;
+
+            if (!((Int32)o).Equals(25))
+                return 5;
+
+            if (!o.Equals(25))
+                return 6;
+
             return 0;
         }
     }
