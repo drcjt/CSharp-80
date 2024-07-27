@@ -23,5 +23,10 @@
         {
             return Number.Int32ToDecStr(m_value);
         }
+
+        public override bool Equals(object obj)
+        {
+            return m_value == ((int)obj).m_value;
+        }
     }
 }
