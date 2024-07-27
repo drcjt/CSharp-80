@@ -145,7 +145,7 @@ namespace ILCompiler.Compiler
                 }
                 else
                 {
-                    throw new NotImplementedException($"Cannot auto detect stack start on {_configuration.TargetArchitecture}");
+                    instructionsBuilder.Ld(SP, 0xa000);
                 }
             }
         }
