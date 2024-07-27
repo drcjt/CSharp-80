@@ -10,8 +10,6 @@ namespace MethodicalTests
         private const string IlExtension = ".il";
         private const string CimExtension = ".cim";
 
-        private const int StackStart = UInt16.MaxValue;
-
         [Test]
         [TestCaseSource(typeof(MethodicalTestsRunner), nameof(MethodicalTestsCaseData))]
         public void MethodicalTest(string testname)

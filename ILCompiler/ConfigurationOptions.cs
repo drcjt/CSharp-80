@@ -14,7 +14,7 @@ namespace ILCompiler
         public readonly Option<bool> DumpFlowGraphs = new(new[] { "-dfg", "--dumpFlowGraphs" }, "Dump Flow Graphs");
 
         public readonly Option<TargetArchitecture> TargetArchitectureOption = new(new[] { "-a", "--targetArchitecture" }, getDefaultValue : () => TargetArchitecture.TRS80, "Target Architecture");
-        public readonly Option<int> StackStartOption = new(new[] { "-ss", "--stackStart" }, getDefaultValue: () => 0xa000, "Stack Start Address");
+        public readonly Option<int?> StackStartOption = new(new[] { "-ss", "--stackStart" }, "Stack Start Address");
         public readonly Option<string> AssemblerArguments = new(new[] { "-aa", "--assemblerArguments" }, "Assembler arguments");
         public readonly Option<string> AssemblerOutput = new(new[] { "-ao", "--assemblerOutput" }, "Assembler output type");
         public readonly Option<bool> NoListFile = new(new[] { "-nl", "--noListFile" }, "No list file");

@@ -6,8 +6,6 @@ namespace RegressionTests
     [TestFixture]
     public class RegressionTestsRunner
     {
-        private const int StackStart = UInt16.MaxValue;
-
         [Test]
         [TestCaseSource(typeof(RegressionTestsRunner), nameof(RegressionTestsCaseData))]
         public void RegressionTest(string testname)
