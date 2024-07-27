@@ -6,8 +6,6 @@ namespace DirectedTests
     [TestFixture]
     public class DirectedTestsRunner
     {
-        private const int StackStart = UInt16.MaxValue;
-
         [Test]
         [TestCaseSource(typeof(DirectedTestsRunner), nameof(DirectedTestsCaseData))]
         public void DirectedTest(string testname)

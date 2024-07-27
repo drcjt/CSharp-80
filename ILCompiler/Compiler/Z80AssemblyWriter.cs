@@ -66,7 +66,7 @@ namespace ILCompiler.Compiler
             instructionsBuilder.Ld(__["ORIGSP"], SP);
 
             // Relocate the stack
-            instructionsBuilder.Ld(SP, (short)_configuration.StackStart);
+            RelocateStack(instructionsBuilder);
 
             // Start the program
             instructionsBuilder.Jp("START");
@@ -128,6 +128,26 @@ namespace ILCompiler.Compiler
             instructionsBuilder.Jp("EXITRETCODE");
 
             _out.Write(instructionsBuilder.ToString());
+        }
+
+        private void RelocateStack(InstructionsBuilder instructionsBuilder)
+        {
+            if (_configuration.StackStart != null)
+            {
+                instructionsBuilder.Ld(SP, (short)_configuration.StackStart);
+            }
+            else
+            {
+                if (_configuration.TargetArchitecture == TargetArchitecture.TRS80)
+                {
+                    instructionsBuilder.Ld(HL, __[0x40B1]); // Get MEMSIZ value
+                    instructionsBuilder.Ld(SP, HL);
+                }
+                else
+                {
+                    throw new NotImplementedException($"Cannot auto detect stack start on {_configuration.TargetArchitecture}");
+                }
+            }
         }
 
         private static void WriteOOMMessage(InstructionsBuilder instructionsBuilder)

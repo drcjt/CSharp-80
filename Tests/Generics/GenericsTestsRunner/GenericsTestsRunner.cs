@@ -6,8 +6,6 @@ namespace GenericsTests
     [TestFixture]
     public class GenericsTestsRunner
     {
-        private const int StackStart = UInt16.MaxValue;
-
         [Test]
         [TestCaseSource(typeof(GenericsTestsRunner), nameof(GenericsTestsCaseData))]
         public void GenericsTest(string testname)
