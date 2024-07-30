@@ -160,6 +160,14 @@ namespace ILCompiler.Compiler
                 case Operation.Sub:
                     return MorphSub(bo);
 
+                case Operation.Lt:
+                case Operation.Le:
+                    return MorphLessThanOrEqual(bo);
+
+                case Operation.Lt_Un:
+                case Operation.Le_Un:
+                    return MorphLessThanOrEqualUnsigned(bo);
+
                 case Operation.Add:
                 case Operation.Mul:
                 case Operation.Or:
@@ -170,6 +178,20 @@ namespace ILCompiler.Compiler
                 default:
                     return new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(bo.Op1), MorphTree(bo.Op2), bo.Type);
             }
+        }
+
+        private BinaryOperator MorphLessThanOrEqual(BinaryOperator bo)
+        {
+            // Convert Le and Lt into Ge and Gt
+            var newOp = Operation.Ge + (bo.Operation - Operation.Le);
+            return new BinaryOperator(newOp, bo.IsComparison, MorphTree(bo.Op2), MorphTree(bo.Op1), bo.Type);
+        }
+
+        private BinaryOperator MorphLessThanOrEqualUnsigned(BinaryOperator bo)
+        {
+            // Convert Le_Un and Lt_Un into Ge_Un and Gt_Un
+            var newOp = Operation.Ge_Un + (bo.Operation - Operation.Le_Un);
+            return new BinaryOperator(newOp, bo.IsComparison, MorphTree(bo.Op2), MorphTree(bo.Op1), bo.Type);
         }
 
         private BinaryOperator MorphSub(BinaryOperator bo)
