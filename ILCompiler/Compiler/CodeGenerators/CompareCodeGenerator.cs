@@ -12,15 +12,11 @@ namespace ILCompiler.Compiler.CodeGenerators
             { Tuple.Create(Operation.Ge, VarType.Int), "i_ge" },
             { Tuple.Create(Operation.Gt, VarType.Int), "i_gt" },
             { Tuple.Create(Operation.Gt_Un, VarType.Int), "i_gt_un" },
-            { Tuple.Create(Operation.Le, VarType.Int), "i_le" },
-            { Tuple.Create(Operation.Lt, VarType.Int), "i_lt" },
-            { Tuple.Create(Operation.Lt_Un, VarType.Int), "i_lt_un" },
             { Tuple.Create(Operation.Ne_Un, VarType.Int), "i_neq" },
 
             { Tuple.Create(Operation.Ne_Un, VarType.Ptr), "i_neq16" },
             { Tuple.Create(Operation.Eq, VarType.Ptr), "i_eq16" },
-            { Tuple.Create(Operation.Lt_Un, VarType.Ptr), "i_lt16" },
-            { Tuple.Create(Operation.Le_Un, VarType.Ptr), "i_le16" },
+            { Tuple.Create(Operation.Ge_Un, VarType.Ptr), "i_ge16" },
             { Tuple.Create(Operation.Gt_Un, VarType.Ptr), "i_gt16" },
             { Tuple.Create(Operation.Gt, VarType.Ptr), "i_gt16" },
             { Tuple.Create(Operation.Ge, VarType.Ptr), "i_ge16" },
@@ -36,6 +32,11 @@ namespace ILCompiler.Compiler.CodeGenerators
         public static void GenerateCode(BinaryOperator entry, CodeGeneratorContext context)
         {
             Debug.Assert(entry.IsComparison);
+
+            Debug.Assert(entry.Operation != Operation.Lt);
+            Debug.Assert(entry.Operation != Operation.Le);
+            Debug.Assert(entry.Operation != Operation.Lt_Un);
+            Debug.Assert(entry.Operation != Operation.Le_Un);
 
             var op1Type = entry.Op1.Type.IsInt() ? VarType.Int : entry.Op1.Type;
 

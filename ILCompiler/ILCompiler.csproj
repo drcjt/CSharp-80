@@ -43,13 +43,8 @@
     <None Remove="Runtime\i_gt16.asm" />
     <None Remove="Runtime\i_gt_un.asm" />
     <None Remove="Runtime\i_gt_un16.asm" />
-    <None Remove="Runtime\i_le.asm" />
-    <None Remove="Runtime\i_le16.asm" />
     <None Remove="Runtime\i_lsh.asm" />
     <None Remove="Runtime\i_lsh16.asm" />
-    <None Remove="Runtime\i_lt.asm" />
-    <None Remove="Runtime\i_lt16.asm" />
-    <None Remove="Runtime\i_lt_un.asm" />
 	<None Remove="Runtime\i_mul.asm" />
     <None Remove="Runtime\i_mul16.asm" />
     <None Remove="Runtime\i_neg.asm" />
@@ -115,9 +110,6 @@
     <EmbeddedResource Include="Runtime\i_gt16.asm" />
     <EmbeddedResource Include="Runtime\i_gt_un.asm" />
     <EmbeddedResource Include="Runtime\i_ge16.asm" />
-    <EmbeddedResource Include="Runtime\i_lt_un.asm" />
-    <EmbeddedResource Include="Runtime\i_le16.asm" />
-    <EmbeddedResource Include="Runtime\i_lt16.asm" />
     <EmbeddedResource Include="Runtime\GCGetTotalMemory.asm" />
     <EmbeddedResource Include="Runtime\Memcpy.asm" />
     <EmbeddedResource Include="Runtime\Memset.asm" />
@@ -166,8 +158,6 @@
     <EmbeddedResource Include="Runtime\i_eq.asm" />
     <EmbeddedResource Include="Runtime\i_ge.asm" />
     <EmbeddedResource Include="Runtime\i_gt.asm" />
-    <EmbeddedResource Include="Runtime\i_le.asm" />
-    <EmbeddedResource Include="Runtime\i_lt.asm" />
     <EmbeddedResource Include="Runtime\i_neq16.asm" />
     <EmbeddedResource Include="Runtime\TRS80\cls.asm" />
     <EmbeddedResource Include="Runtime\TRS80\printchr.asm" />
