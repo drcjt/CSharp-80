@@ -73,9 +73,9 @@ namespace ILCompiler.Compiler
         }
     }
 
-    public class FlowGraphNaturalLoops(FlowgraphDfsTree dfsTree)
+    public class FlowGraphNaturalLoops()
     {
-        private IList<FlowGraphNaturalLoop> _loops = [];
+        private readonly IList<FlowGraphNaturalLoop> _loops = [];
 
         public IEnumerable<FlowGraphNaturalLoop> InPostOrder => _loops.Reverse();
 
@@ -96,7 +96,7 @@ namespace ILCompiler.Compiler
                 logger.LogDebug($"{rpoNumber} -> {block.Label} [{block.PreOrderNum}, {block.PostOrderNum}]");
             }
 
-            var loops = new FlowGraphNaturalLoops(dfsTree);
+            var loops = new FlowGraphNaturalLoops();
 
             // Check if tree has any cycles if not skip
             if (!dfsTree.HasCycle)
@@ -111,16 +111,7 @@ namespace ILCompiler.Compiler
                 FlowGraphNaturalLoop? loop = null;
 
                 // If a block is a ancestor of one of its predecessors then the block is a loop header
-                foreach (var predecessorBlock in header.Predecessors)
-                {
-                    if (dfsTree.PostOrder.Contains(predecessorBlock) && FlowgraphDfsTree.IsAncestor(header, predecessorBlock))
-                    {
-                        loop = loop ?? new FlowGraphNaturalLoop(dfsTree, header);
-                        loop.BackEdges.Add(new FlowEdge(predecessorBlock, header));
-
-                        logger.LogDebug($"{predecessorBlock.Label} -> {header.Label} is a backedge");
-                    }
-                }
+                loop = FindBackEdges(dfsTree, logger, header, loop);
 
                 if (loop == null)
                     continue;
@@ -140,44 +131,13 @@ namespace ILCompiler.Compiler
                 logger.LogDebug($"Loop has {loop.Blocks.Count} blocks");
 
                 // Find the exit edges
-                loop.VisitLoopBlocksReversePostOrder(loopBlock =>
-                {
-                    foreach (var successor in loopBlock.Successors)
-                    {
-                        if (!loop.ContainsBlock(successor))
-                        {
-                            FlowEdge exitEdge = new FlowEdge(loopBlock, successor);
-                            loop.ExitEdges.Add(exitEdge);
-
-                            logger.LogDebug($"{loopBlock.Label} -> {successor.Label} is an exit edge");
-                        }
-                    }
-                    return true;
-                });
+                FindExitEdges(logger, loop);
 
                 // Find the entry edges
-                foreach (var predecessor in header.Predecessors)
-                {
-                    if (dfsTree.PostOrder.Contains(predecessor) && FlowgraphDfsTree.IsAncestor(header, predecessor))
-                    {
-                        loop.EntryEdges.Add(new FlowEdge(predecessor, header));
-
-                        logger.LogDebug($"{predecessor.Label} -> {header.Label} is an entry edge");
-                    }
-                }
+                FindEntryEdges(dfsTree, logger, header, loop);
 
                 // Search for parent loop
-                foreach (var otherLoop in loops.InPostOrder)
-                {
-                    if (otherLoop.ContainsBlock(header))
-                    {
-                        loop.Parent = otherLoop;
-
-                        logger.LogDebug($"Nested within loop starting at {otherLoop.Header.Label}");
-
-                        break;
-                    }
-                }
+                FindParentLoop(logger, loops, header, loop);
 
                 loops.Add(loop);
 
@@ -185,6 +145,68 @@ namespace ILCompiler.Compiler
             }
 
             return loops;
+        }
+
+        private static FlowGraphNaturalLoop? FindBackEdges(FlowgraphDfsTree dfsTree, ILogger<LoopFinder> logger, BasicBlock header, FlowGraphNaturalLoop? loop)
+        {
+            foreach (var predecessorBlock in header.Predecessors)
+            {
+                if (dfsTree.PostOrder.Contains(predecessorBlock) && FlowgraphDfsTree.IsAncestor(header, predecessorBlock))
+                {
+                    loop = loop ?? new FlowGraphNaturalLoop(dfsTree, header);
+                    loop.BackEdges.Add(new FlowEdge(predecessorBlock, header));
+
+                    logger.LogDebug($"{predecessorBlock.Label} -> {header.Label} is a backedge");
+                }
+            }
+
+            return loop;
+        }
+
+        private static void FindParentLoop(ILogger<LoopFinder> logger, FlowGraphNaturalLoops loops, BasicBlock header, FlowGraphNaturalLoop loop)
+        {
+            foreach (var otherLoop in loops.InPostOrder)
+            {
+                if (otherLoop.ContainsBlock(header))
+                {
+                    loop.Parent = otherLoop;
+
+                    logger.LogDebug($"Nested within loop starting at {otherLoop.Header.Label}");
+
+                    break;
+                }
+            }
+        }
+
+        private static void FindEntryEdges(FlowgraphDfsTree dfsTree, ILogger<LoopFinder> logger, BasicBlock header, FlowGraphNaturalLoop loop)
+        {
+            foreach (var predecessor in header.Predecessors)
+            {
+                if (dfsTree.PostOrder.Contains(predecessor) && FlowgraphDfsTree.IsAncestor(header, predecessor))
+                {
+                    loop.EntryEdges.Add(new FlowEdge(predecessor, header));
+
+                    logger.LogDebug($"{predecessor.Label} -> {header.Label} is an entry edge");
+                }
+            }
+        }
+
+        private static void FindExitEdges(ILogger<LoopFinder> logger, FlowGraphNaturalLoop loop)
+        {
+            loop.VisitLoopBlocksReversePostOrder(loopBlock =>
+            {
+                foreach (var successor in loopBlock.Successors)
+                {
+                    if (!loop.ContainsBlock(successor))
+                    {
+                        FlowEdge exitEdge = new FlowEdge(loopBlock, successor);
+                        loop.ExitEdges.Add(exitEdge);
+
+                        logger.LogDebug($"{loopBlock.Label} -> {successor.Label} is an exit edge");
+                    }
+                }
+                return true;
+            });
         }
 
         private static bool FindNaturalLoopBlocks(FlowGraphNaturalLoop loop, Stack<BasicBlock> worklist, ILogger<LoopFinder> logger)
