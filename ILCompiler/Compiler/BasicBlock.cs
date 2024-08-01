@@ -19,6 +19,7 @@ namespace ILCompiler.Compiler
 
         public JumpKind JumpKind { get; set; }
 
+        public uint PreOrderNum { get; set; }
         public uint PostOrderNum { get; set; }
 
         public BasicBlock? ImmediateDominator { get; set; }
