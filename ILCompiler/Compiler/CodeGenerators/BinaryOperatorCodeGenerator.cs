@@ -32,12 +32,22 @@ namespace ILCompiler.Compiler.CodeGenerators
         };
 
         private static bool IsAddOrSub(BinaryOperator op) => op.Operation == Operation.Add || op.Operation == Operation.Sub;
+        private static bool IsShift(BinaryOperator op) => op.Operation == Operation.Lsh || op.Operation == Operation.Rsh;
         public static void GenerateCode(BinaryOperator entry, CodeGeneratorContext context)
         {
             Debug.Assert(!entry.IsComparison);
 
             // Treat all int types as Int
             var operatorType = entry.Type.IsInt() ? VarType.Int : entry.Type;
+
+            if (IsShift(entry))
+            {
+                if (entry.Op2.IsContainedIntOrI())
+                {
+                    GenerateContainedIntShift(entry, context);
+                    return;
+                }
+            }
 
             if (IsAddOrSub(entry))
             {
@@ -87,6 +97,102 @@ namespace ILCompiler.Compiler.CodeGenerators
             }
 
             throw new NotImplementedException($"Binary operator {entry.Operation} for type {operatorType} not yet implemented");
+        }
+
+        private static void GenerateContainedIntShift(BinaryOperator entry, CodeGeneratorContext context)
+        {
+            switch (entry.Operation)
+            {
+                case Operation.Lsh: GenerateContainedIntLeftShift(entry, context); break;
+                case Operation.Rsh: GenerateContainedIntRightShift(entry, context); break;
+                default: throw new InvalidOperationException();
+            };
+        }
+
+        private static void GenerateContainedIntLeftShift(BinaryOperator entry, CodeGeneratorContext context)
+        {
+            int value = entry.Op2.As<Int32ConstantEntry>().Value;
+
+            context.InstructionsBuilder.Pop(HL);
+            context.InstructionsBuilder.Pop(DE);
+
+            if (value == 1)
+            {
+
+                context.InstructionsBuilder.Ld(A, E);
+                context.InstructionsBuilder.Add(HL, HL);
+                context.InstructionsBuilder.Rla();
+                context.InstructionsBuilder.Rl(D);
+                context.InstructionsBuilder.Ld(E, A);
+            }
+            else if (value == 8)
+            {
+                context.InstructionsBuilder.Ld(D, E);
+                context.InstructionsBuilder.Ld(E, H);
+                context.InstructionsBuilder.Ld(H, L);
+                context.InstructionsBuilder.Ld(L, 0);
+            }
+            else if (value == 16)
+            {
+                context.InstructionsBuilder.Ld(D, H);
+                context.InstructionsBuilder.Ld(E, L);
+                context.InstructionsBuilder.Ld(HL, 0);
+            }
+            else if (value > 31)
+            {
+                context.InstructionsBuilder.Ld(DE, 0);
+                context.InstructionsBuilder.Ld(HL, 0);
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+
+            context.InstructionsBuilder.Push(DE);
+            context.InstructionsBuilder.Push(HL);
+        }
+
+        private static void GenerateContainedIntRightShift(BinaryOperator entry, CodeGeneratorContext context)
+        {
+            int value = entry.Op2.As<Int32ConstantEntry>().Value;
+
+            context.InstructionsBuilder.Pop(HL);
+            context.InstructionsBuilder.Pop(DE);
+
+            if (value == 1)
+            {
+                context.InstructionsBuilder.Ld(A, E);
+                context.InstructionsBuilder.Sra(D);
+                context.InstructionsBuilder.Rra();
+                context.InstructionsBuilder.Rr(H);
+                context.InstructionsBuilder.Rr(L);
+                context.InstructionsBuilder.Ld(E, A);
+            }
+            else if (value == 8)
+            {
+                context.InstructionsBuilder.Ld(L, H);
+                context.InstructionsBuilder.Ld(H, E);
+                context.InstructionsBuilder.Ld(E, D);
+                context.InstructionsBuilder.Ld(D, 0);
+            }
+            else if (value == 16)
+            {
+                context.InstructionsBuilder.Ld(H, D);
+                context.InstructionsBuilder.Ld(L, E);
+                context.InstructionsBuilder.Ld(DE, 0);
+            }
+            else if (value > 31)
+            {
+                context.InstructionsBuilder.Ld(HL, 0);
+                context.InstructionsBuilder.Ld(DE, 0);
+            }
+            else
+            {
+                throw new InvalidOperationException();
+            }
+
+            context.InstructionsBuilder.Push(DE);
+            context.InstructionsBuilder.Push(HL);
         }
 
         private static void GenerateContainedIntAddOrSub(BinaryOperator entry, CodeGeneratorContext context)

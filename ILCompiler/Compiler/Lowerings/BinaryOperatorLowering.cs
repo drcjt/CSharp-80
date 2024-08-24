@@ -12,12 +12,10 @@ namespace ILCompiler.Compiler.Lowerings
             switch (entry.Operation)
             {
                 case Operation.Mul:
-                    LowerMul(entry);
-                    break;
+                    return LowerMul(entry);
 
                 case Operation.Div:
-                    LowerDiv(entry);
-                    break;
+                    return LowerDiv(entry);
 
                 case Operation.Add:
                     LowerAdd(entry);
@@ -26,12 +24,17 @@ namespace ILCompiler.Compiler.Lowerings
                 case Operation.Sub: 
                     LowerSub(entry);
                     break;
+
+                case Operation.Lsh:
+                case Operation.Rsh:
+                    LowerShift(entry);
+                    break;
             }
 
             return null;
         }
 
-        private static void LowerMul(BinaryOperator mul)
+        private static StackEntry? LowerMul(BinaryOperator mul)
         {
             // Convert multiplication by power of 2 into a left shift
             if (mul.Op2 is Int32ConstantEntry)
@@ -41,11 +44,15 @@ namespace ILCompiler.Compiler.Lowerings
                 {
                     mul.Operation = Operation.Lsh;
                     multiplier.Value = GetLog2(multiplier.Value);
+
+                    return mul;
                 }
             }
+
+            return null;
         }
 
-        private static void LowerDiv(BinaryOperator div)
+        private static StackEntry? LowerDiv(BinaryOperator div)
         {
             if (div.Op2 is Int32ConstantEntry)
             {
@@ -54,8 +61,12 @@ namespace ILCompiler.Compiler.Lowerings
                 {
                     div.Operation = Operation.Rsh;
                     divisor.Value = GetLog2(divisor.Value);
+
+                    return div;
                 }
             }
+
+            return null;
         }
 
         private static void LowerAdd(BinaryOperator add)
@@ -66,6 +77,19 @@ namespace ILCompiler.Compiler.Lowerings
         private static void LowerSub(BinaryOperator sub)
         {
             ContainCheckBinary(sub);
+        }
+
+        private static void LowerShift(BinaryOperator lsh)
+        {
+            if (lsh.Op2.IsIntCnsOrI())
+            {
+                var shiftBy = lsh.Op2.As<Int32ConstantEntry>().Value;
+
+                if (shiftBy == 1 || shiftBy == 8 || shiftBy == 16 || shiftBy > 31)
+                {
+                    ContainCheckBinary(lsh);
+                }
+            }
         }
 
         private static bool IsPow2(int i)
