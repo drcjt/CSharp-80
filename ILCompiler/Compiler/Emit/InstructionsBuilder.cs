@@ -95,7 +95,13 @@ namespace ILCompiler.Compiler.Emit
         public void Pop(Register16 register) => AddInstruction(Instruction.Create(Opcode.Pop, register, register.IsIndexRegister() ? 2 : 1));
         public void Push(Register16 register) => AddInstruction(Instruction.Create(Opcode.Push, register, register.IsIndexRegister() ? 2 : 1));
         public void Ret() => AddInstruction(Instruction.Create(Opcode.Ret));
+
+        public void Rla() => AddInstruction(Instruction.Create(Opcode.Rla));
+        public void Rl(Register8 target) => AddInstruction(Instruction.Create(Opcode.Rl, target, 2));
+        public void Rra() => AddInstruction(Instruction.Create(Opcode.Rra));
+        public void Sra(Register8 target) => AddInstruction(Instruction.Create(Opcode.Sra, target, 2));
         public void Rr(Register8 target) => AddInstruction(Instruction.Create(Opcode.Rr, target, 2));
+
         public void Rst(ushort target) => AddInstruction(Instruction.Create(Opcode.Rst, target));
         public void Sbc(Register16 target, Register16 source) => AddInstruction(Instruction.Create(Opcode.Sbc, target, source, 2));
         public void Sbc(Register8 target, Register8 source) => AddInstruction(Instruction.Create(Opcode.Sbc, target, source, 2));
