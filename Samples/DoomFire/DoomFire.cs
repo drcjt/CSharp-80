@@ -32,7 +32,7 @@ namespace DoomFire
             var startTime = DateTime.Now;
 #endif
 
-            byte* currentSrc = firePixels + Width + 1;
+            byte* currentSrc = firePixels + Width;
             byte* endSrc = firePixels + Width + Width;
             byte* endSrc2 = firePixels + (Width * Height);
 
@@ -40,7 +40,8 @@ namespace DoomFire
             {
                 byte* srcOffset = currentSrc++;
 
-                while (srcOffset < endSrc2)
+                int row = Height - 1;
+                while (row > 0)
                 {
                     byte pixel = *srcOffset;
                     if (pixel == 0)
@@ -54,6 +55,7 @@ namespace DoomFire
                         *(dst - Width) = (byte)(pixel - (rand & 1));
                     }
                     srcOffset += Width;
+                    row--;
                 }
             }
 
