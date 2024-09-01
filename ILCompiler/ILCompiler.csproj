@@ -32,7 +32,6 @@
     <None Remove="Runtime\i_add16.asm" />
     <None Remove="Runtime\i_and.asm" />
     <None Remove="Runtime\i_and16.asm" />
-    <None Remove="Runtime\i_cmp.asm" />
     <None Remove="Runtime\i_div.asm" />
     <None Remove="Runtime\i_div_un.asm" />
     <None Remove="Runtime\i_eq.asm" />
@@ -154,7 +153,6 @@
     <EmbeddedResource Include="Runtime\l_inc_dehl.asm" />
     <EmbeddedResource Include="Runtime\TRS80\setxy.asm" />
     <EmbeddedResource Include="Runtime\stoi.asm" />
-    <EmbeddedResource Include="Runtime\i_cmp.asm" />
     <EmbeddedResource Include="Runtime\i_eq.asm" />
     <EmbeddedResource Include="Runtime\i_ge.asm" />
     <EmbeddedResource Include="Runtime\i_gt.asm" />
