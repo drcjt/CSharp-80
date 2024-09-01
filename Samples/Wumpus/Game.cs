@@ -55,7 +55,7 @@ namespace Wumpus
 
                 if (ch == 'M')
                 {
-                    Move(GetRoomNumber());
+                    Move(GetRoomNumber() - 1);
                 }
                 else if (ch == 'S')
                 {
@@ -187,7 +187,7 @@ namespace Wumpus
 
         private void Move(int roomNumber)
         {
-            _currentRoom = _rooms[roomNumber - 1];
+            _currentRoom = _rooms[roomNumber];
 
             if (_currentRoom == _wumpusRoom)
             {
