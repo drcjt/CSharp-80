@@ -6,29 +6,32 @@ namespace Life
     public unsafe class CellMap
     {
         private readonly byte* _cells;
+        private readonly byte* _workerCells;
         private readonly int _width;
         private readonly int _height;
         private readonly int _lengthInBytes;
+        private readonly int _lastRowOffset;
 
-        public CellMap(int h, int w, byte* cells)
+        public CellMap(int h, int w, byte* cells, byte* workerCells)
         {
             _width = w;
             _height = h;
             _cells = cells;
+            _workerCells = workerCells;
             _lengthInBytes = w * h;
+            _lastRowOffset = _lengthInBytes - _width;
 
             Unsafe.InitBlock(_cells, 0, (uint)_lengthInBytes);
         }
 
-        public void SetCell(int x, int y)
+        public void SetCell(int x, int y, byte* cellPtr)
         {
-            byte* cellPtr = _cells + (y * _width) + x;
             *(cellPtr) |= 1;
 
             var xoleft = x == 0 ? _width - 1 : -1;
-            var yoabove = y == 0 ? _lengthInBytes - _width : -_width;
+            var yoabove = y == 0 ? _lastRowOffset : -_width;
             var xoright = x == (_width - 1) ? -(_width - 1) : 1;
-            var yobelow = y == (_height - 1) ? -(_lengthInBytes - _width) : _width;
+            var yobelow = y == (_height - 1) ? -_lastRowOffset : _width;
 
             *(cellPtr + yoabove + xoleft) += 2;
             *(cellPtr + yoabove) += 2;
@@ -40,15 +43,14 @@ namespace Life
             *(cellPtr + yobelow + xoright) += 2;
         }
 
-        public void ClearCell(int x, int y)
+        public void ClearCell(int x, int y, byte* cellPtr)
         {
-            byte* cellPtr = _cells + (y * _width) + x;
             *cellPtr &= 254; // clear bit 1
 
             var xoleft = x == 0 ? _width - 1 : -1;
-            var yoabove = y == 0 ? _lengthInBytes - _width : -_width;
+            var yoabove = y == 0 ? _lastRowOffset : -_width;
             var xoright = x == (_width - 1) ? -(_width - 1) : 1;
-            var yobelow = y == (_height - 1) ? -(_lengthInBytes - _width) : _width;
+            var yobelow = y == (_height - 1) ? -_lastRowOffset : _width;
 
             *(cellPtr + yoabove + xoleft) -= 2;
             *(cellPtr + yoabove) -= 2;
@@ -75,7 +77,8 @@ namespace Life
                 var y = random.Next(_height);
                 if (CellState(x, y) == 0)
                 {
-                    SetCell(x, y);
+                    byte* cellPtr = _cells + (y * _width) + x;
+                    SetCell(x, y, cellPtr);
                     SetPixel(x, y);
                 }
             }
@@ -84,30 +87,24 @@ namespace Life
         public void NextGeneration()
         {
             // Create copy of cells to work through
-            byte* cellPtr = stackalloc byte[_lengthInBytes];
-            Unsafe.CopyBlock(cellPtr, _cells, (uint)_lengthInBytes);
+            byte* currentGenerationCellPtr = _workerCells;
+            byte* _nextGenerationCellPtr = _cells;
+
+            Unsafe.CopyBlock(_workerCells, _cells, (uint)_lengthInBytes);
 
             for (var y = 0; y < _height; y++)
             {
-                int x = 0;
-                do
+                for (var x = 0; x < _width; x++)
                 {
-                    // Skip cells which are not set and have no neighbours
-                    while (*cellPtr == 0 && x < _width)
+                    if (*currentGenerationCellPtr != 0)
                     {
-                        cellPtr++;
-                        x++;
-                    }
-
-                    if (x < _width)
-                    {
-                        var neighbourCount = *cellPtr >> 1;
-                        if ((*cellPtr & 1) == 1)
+                        var neighbourCount = *currentGenerationCellPtr >> 1;
+                        if ((*currentGenerationCellPtr & 1) == 1)
                         {
                             // Cells which are on are have < 2 or > 3 neighbours are cleared
                             if ((neighbourCount != 2) && (neighbourCount != 3))
                             {
-                                ClearCell(x, y);
+                                ClearCell(x, y, _nextGenerationCellPtr);
                                 ClearPixel(x, y);
                             }
                         }
@@ -116,15 +113,15 @@ namespace Life
                             // Not set cells with three neighbours come back to life
                             if (neighbourCount == 3)
                             {
-                                SetCell(x, y);
+                                SetCell(x, y, _nextGenerationCellPtr);
                                 SetPixel(x, y);
                             }
                         }
-
-                        cellPtr++;
-                        x++;
                     }
-                } while (x < _width);
+
+                    currentGenerationCellPtr++;
+                    _nextGenerationCellPtr++;
+                }
             }
         }
 

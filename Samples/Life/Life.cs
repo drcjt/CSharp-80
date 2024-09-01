@@ -12,11 +12,14 @@ namespace Life
             var columns = Console.WindowWidth - 1;
 
             byte* currentCells = stackalloc byte[rows * columns];
-            var currentMap = new CellMap(rows, columns, currentCells);
+            byte* workerCells = stackalloc byte[rows * columns];
+            var currentMap = new CellMap(rows, columns, currentCells, workerCells);
 
             Console.Clear();
 
             currentMap.Init();
+
+            var startTime = DateTime.Now;
 
             for (var generation = 1; generation < 50; generation++)
             {
@@ -24,17 +27,23 @@ namespace Life
                 Console.Write("Generation : ");
                 Console.Write(generation);
 
-                var startTime = DateTime.Now;
+                var nextGenerationStartTime = DateTime.Now;
 
                 currentMap.NextGeneration();
 
-                var endTime = DateTime.Now;
-                var elapsedTime = endTime.TotalSeconds - startTime.TotalSeconds;
+                var nextGenerationEndTime = DateTime.Now;
+                var elapsedTime = nextGenerationEndTime.TotalSeconds - nextGenerationStartTime.TotalSeconds;
 
                 Console.SetCursorPosition(25, 0);
                 Console.Write("Time: ");
                 Console.Write(elapsedTime);
             }
+
+            var endTime = DateTime.Now;
+            var overallTime = endTime.TotalSeconds - startTime.TotalSeconds;
+            Console.SetCursorPosition(25, 0);
+            Console.Write("Overall Time: ");
+            Console.Write(overallTime);
         }
     }
 }
