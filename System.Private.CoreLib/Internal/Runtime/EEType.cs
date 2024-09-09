@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Internal.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 
 namespace Internal.Runtime
 {
@@ -7,6 +8,8 @@ namespace Internal.Runtime
         private ushort _usFlags;
         private ushort _usBaseSize;
         private EEType* _relatedType;
+        private byte _numVtableSlots;
+        private byte _numInterfaces;
 
         internal readonly ushort GetFlags() { return _usFlags; }
 
@@ -22,5 +25,10 @@ namespace Internal.Runtime
                 return _usFlags == 1;
             }
         }
+
+        internal byte NumVTableSlots => _numVtableSlots;
+        internal byte NumInterfaces => _numInterfaces;
+
+        internal EEType** InterfaceMap => (EEType**)((byte*)Unsafe.AsPointer(ref this) + sizeof(EEType) + sizeof(void*) * _numVtableSlots);
     }
 }
