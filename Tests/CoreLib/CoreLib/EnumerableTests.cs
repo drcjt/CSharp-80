@@ -33,7 +33,7 @@ namespace CoreLib
         }
     }
 
-    public class EnumerableTests
+    public static class EnumerableTests
     {
         public static void ArrayEnumerator_EnumeratesArrayElements()
         {
