@@ -25,7 +25,7 @@ namespace ILCompiler.Compiler.Importer
             }
             else if (typeDesc.IsInterface)
             {
-                throw new NotImplementedException("IsInst only supports class types");
+                helperMethodName = "IsInstanceOfInterface";
             }
 
             // Create call to helper method passing eetypeptr and object reference
