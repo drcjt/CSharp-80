@@ -32,6 +32,9 @@
             InterpolatedStringHandlerTests.AppendLiteral();
             InterpolatedStringHandlerTests.AppendFormatted();
 
+            EnumerableTests.ArrayEnumerator_EnumeratesArrayElements();
+            EnumerableTests.FibonacciEnumerable_FirstFifteenNumbers_AreCorrect();
+
             return 0;
         }
     }
