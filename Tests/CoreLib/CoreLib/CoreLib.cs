@@ -27,6 +27,7 @@
             ArrayTests.ForEachArrayEnumerationTests();
 
             TypeCastTests.ClassTypeCastTests();
+            TypeCastTests.InterfaceTypeCastTests();
 
             InterpolatedStringHandlerTests.ToStringAndClear_Clears();
             InterpolatedStringHandlerTests.AppendLiteral();
