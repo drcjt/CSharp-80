@@ -5,11 +5,14 @@ namespace Internal.Runtime
 {
     internal unsafe struct EEType
     {
+        // CS0649: Field '{blah}' is never assigned to, and will always have its default value
+#pragma warning disable 649
         private ushort _usFlags;
         private ushort _usBaseSize;
         private EEType* _relatedType;
         private byte _numVtableSlots;
         private byte _numInterfaces;
+#pragma warning restore
 
         internal readonly ushort GetFlags() { return _usFlags; }
 
