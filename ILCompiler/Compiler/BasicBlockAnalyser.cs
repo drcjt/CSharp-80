@@ -80,8 +80,8 @@ namespace ILCompiler.Compiler
 
                 if (exceptionHandler.Kind != ILExceptionRegionKind.Catch)
                 {
-                    // TODO: Can this be removed
-                    throw new NotSupportedException("Only catch handlers supported");
+                    // TODO: Implement finally blocks - just ignore them for now
+                    continue;
                 }
 
                 if (exceptionHandler.Kind == ILExceptionRegionKind.Filter)

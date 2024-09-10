@@ -27,10 +27,14 @@
             ArrayTests.ForEachArrayEnumerationTests();
 
             TypeCastTests.ClassTypeCastTests();
+            TypeCastTests.InterfaceTypeCastTests();
 
             InterpolatedStringHandlerTests.ToStringAndClear_Clears();
             InterpolatedStringHandlerTests.AppendLiteral();
             InterpolatedStringHandlerTests.AppendFormatted();
+
+            EnumerableTests.ArrayEnumerator_EnumeratesArrayElements();
+            EnumerableTests.FibonacciEnumerable_FirstFifteenNumbers_AreCorrect();
 
             return 0;
         }

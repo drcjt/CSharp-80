@@ -203,6 +203,12 @@ namespace ILCompiler.TypeSystem.Dnlib
                     return Create(typeDefOrRefSig);
                 }
 
+                var ptrSig = ts.TryGetPtrSig();
+                if (ptrSig != null)
+                {
+                    return Create(ptrSig);
+                }
+
                 // TODO: should this also check for other sig types?
             }
 

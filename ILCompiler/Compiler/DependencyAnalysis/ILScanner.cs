@@ -135,7 +135,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             foreach (var exceptionHandler in _methodIL.GetExceptionRegions())
             {
                 var catchTypeDef = (DefType)exceptionHandler.CatchType!;
-                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(catchTypeDef, catchTypeDef.InstanceByteCount.AsInt));
+                if (catchTypeDef != null)
+                {
+                    _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(catchTypeDef, catchTypeDef.InstanceByteCount.AsInt));
+                }
             }
         }
 
@@ -143,27 +146,26 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             var typeDesc = (TypeDesc)instruction.GetOperand();
 
+            string helperMethodName = "IsInstanceOfClass";
             if (typeDesc.IsArray)
             {
                 throw new NotImplementedException();
             }
             else if (typeDesc.IsInterface)
             {
-                throw new NotImplementedException();
+                helperMethodName = "IsInstanceOfInterface";
             }
             else if (typeDesc.IsParameterizedType)
             {
                 throw new NotImplementedException();
             }
-            else
-            {
-                var systemRuntimeTypeCast = _context.CorLibModuleProvider.FindThrow("System.Runtime.TypeCast");
-                var runtimeHelperMethod = systemRuntimeTypeCast.FindMethod("IsInstanceOfClass");
-                var methodNode = _context.NodeFactory.MethodNode(_module.Create(runtimeHelperMethod));
 
-                _dependencies.Add(methodNode);
-                _dependencies.Add(_context.NodeFactory.NecessaryTypeSymbol(typeDesc));
-            }
+            var systemRuntimeTypeCast = _context.CorLibModuleProvider.FindThrow("System.Runtime.TypeCast");
+            var runtimeHelperMethod = systemRuntimeTypeCast.FindMethod(helperMethodName);
+            var methodNode = _context.NodeFactory.MethodNode(_module.Create(runtimeHelperMethod));
+
+            _dependencies.Add(methodNode);
+            _dependencies.Add(_context.NodeFactory.NecessaryTypeSymbol(typeDesc));
         }
 
         private void ImportAddressOfElem()
