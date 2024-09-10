@@ -1,5 +1,4 @@
 ﻿using Internal.Runtime.CompilerServices;
-using System;
 using System.Runtime.CompilerServices;
 
 namespace Internal.Runtime
@@ -8,16 +7,12 @@ namespace Internal.Runtime
     {
         // CS0649: Field '{blah}' is never assigned to, and will always have its default value
 #pragma warning disable 649
-        private ushort _usFlags = 0;
-        private ushort _usBaseSize = 0;
-        private EEType* _relatedType = null;
-        private byte _numVtableSlots = 0;
-        private byte _numInterfaces = 0;
+        private ushort _usFlags;
+        private ushort _usBaseSize;
+        private EEType* _relatedType;
+        private byte _numVtableSlots;
+        private byte _numInterfaces;
 #pragma warning restore
-
-        public EEType()
-        {
-        }
 
         internal readonly ushort GetFlags() { return _usFlags; }
 
