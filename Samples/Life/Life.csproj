@@ -23,6 +23,7 @@
 	<BaseOutputPath>bin\$(TargetPlatform)</BaseOutputPath>
 
 	<ILCompilerPath>$(SolutionDir)ILCompiler\bin\$(Configuration)\$(TargetFramework)\ILCompiler.exe</ILCompilerPath>
+	<AccelerateBuildsInVisualStudio>false</AccelerateBuildsInVisualStudio>
   </PropertyGroup>
 
   <ItemGroup>
