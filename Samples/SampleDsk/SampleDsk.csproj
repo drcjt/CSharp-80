@@ -16,6 +16,8 @@
 	  <TargetPlatform>Trs80</TargetPlatform>
 
 	  <Trs80OutDir>bin\Trs80\$(Configuration)\$(TargetFramework)</Trs80OutDir>
+
+	  <AccelerateBuildsInVisualStudio>false</AccelerateBuildsInVisualStudio>
   </PropertyGroup>
 
   <ItemGroup>
