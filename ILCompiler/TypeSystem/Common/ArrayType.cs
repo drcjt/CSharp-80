@@ -32,18 +32,5 @@ namespace ILCompiler.TypeSystem.Common
 
             return this;
         }
-
-        public override string FullName
-        {
-            get
-            {
-                var sb = new StringBuilder();
-                var typeNameFormatter = new TypeNameFormatter();
-
-                typeNameFormatter.AppendName(sb, this);
-
-                return sb.ToString();
-            }
-        }
     }
 }

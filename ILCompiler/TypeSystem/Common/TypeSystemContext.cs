@@ -16,11 +16,12 @@
 
         public InstantiatedType GetInstantiatedType(MetadataType typeDef, Instantiation instantiation)
         {
-            var key = typeDef.FullName + ":" + instantiation.ToString();
+            var newInstantiatedType = new InstantiatedType(typeDef, instantiation);
+            var key = newInstantiatedType.FullName;
             if (_instantiatedTypes.TryGetValue(key, out var instantiatedType))
                 return instantiatedType;
 
-            return _instantiatedTypes[key] = new InstantiatedType(typeDef, instantiation);
+            return _instantiatedTypes[key] = newInstantiatedType;
         }
 
         public InstantiatedMethod GetInstantiatedMethod(MethodDesc methodDef, Instantiation instantiation)

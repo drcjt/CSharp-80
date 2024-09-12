@@ -56,7 +56,6 @@ namespace ILCompiler.TypeSystem.Dnlib
 
         public override bool IsSequentialLayout => _typeDef.IsSequentialLayout;
 
-        public override string FullName => _typeDef.FullName;
         public override string Name => _typeDef.Name;
         public override string Namespace => _typeDef.Namespace;
 

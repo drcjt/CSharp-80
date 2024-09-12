@@ -136,8 +136,6 @@ namespace ILCompiler.TypeSystem.Common
 
         public override bool IsInterface => _typeDef.IsInterface;
 
-        public override string FullName => _typeDef.FullName;
-
         private MetadataType? _baseType;
 
         private MetadataType? InitializeBaseType()
