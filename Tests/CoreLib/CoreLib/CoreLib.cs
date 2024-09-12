@@ -35,6 +35,7 @@
 
             EnumerableTests.ArrayEnumerator_EnumeratesArrayElements();
             EnumerableTests.FibonacciEnumerable_FirstFifteenNumbers_AreCorrect();
+            EnumerableTests.GenericArrayEnumerator_EnumeratesArrayElements();
 
             return 0;
         }
