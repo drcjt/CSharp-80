@@ -11,6 +11,7 @@ namespace ILCompiler.TypeSystem.Common
         {
             _typeDef = typeDef;
             _instantiation = instantiation;
+            _baseType = this;
         }
 
         public override TypeSystemContext Context => _typeDef.Context;
@@ -45,7 +46,30 @@ namespace ILCompiler.TypeSystem.Common
 
         private MethodImplRecord[] InstantiateMethodImpls(MethodImplRecord[] uninstMethodImpls)
         {
-            throw new NotImplementedException();
+            if (uninstMethodImpls.Length == 0)
+                return uninstMethodImpls;
+
+            MethodImplRecord[] instMethodImpls = new MethodImplRecord[uninstMethodImpls.Length];
+
+            for (int i = 0; i < uninstMethodImpls.Length; i++)
+            {
+                MethodDesc decl;
+
+                var implTypeInstantiated = uninstMethodImpls[i].Decl.OwningType.InstantiateSignature(this.Instantiation, default(Instantiation));
+                if (implTypeInstantiated is InstantiatedType)
+                {
+                    decl = _typeDef.Context.GetMethodForInstantiatedType(uninstMethodImpls[i].Decl.GetTypicalMethodDefinition(), (InstantiatedType)implTypeInstantiated);
+                }
+                else
+                {
+                    decl = uninstMethodImpls[i].Decl;
+                }
+
+                MethodDesc body = _typeDef.Context.GetMethodForInstantiatedType(uninstMethodImpls[i].Body, this);
+                instMethodImpls[i] = new MethodImplRecord(decl, body);
+            }
+
+            return instMethodImpls;
         }
 
         public override DefType[] ExplicitlyImplementedInterfaces
@@ -109,5 +133,51 @@ namespace ILCompiler.TypeSystem.Common
         public override string Name => _typeDef.Name;
 
         public override bool IsValueType => _typeDef.IsValueType;
+
+        public override bool IsInterface => _typeDef.IsInterface;
+
+        public override string FullName => _typeDef.FullName;
+
+        private MetadataType? _baseType;
+
+        private MetadataType? InitializeBaseType()
+        {
+            var uninstantiatedBaseType = _typeDef.BaseType;
+            if (uninstantiatedBaseType != null)
+            {
+                _baseType = (MetadataType)uninstantiatedBaseType.InstantiateSignature(_instantiation, default(Instantiation));
+            }
+            else
+            {
+                _baseType = null;
+            }
+            return _baseType;
+        }
+
+        public override DefType? BaseType
+        {
+            get
+            {
+                if (_baseType == this)
+                    return InitializeBaseType();
+                return _baseType;
+            }
+        }
+
+        public override IEnumerable<MethodDesc> GetMethods()
+        {
+            foreach (var typicalMethodDef in _typeDef.GetMethods())
+            {
+                yield return _typeDef.Context.GetMethodForInstantiatedType(typicalMethodDef, this);
+            }
+        }
+
+        public override IEnumerable<MethodDesc> GetVirtualMethods()
+        {
+            foreach (var typicalMethodDef in _typeDef.GetVirtualMethods())
+            {
+                yield return _typeDef.Context.GetMethodForInstantiatedType(typicalMethodDef, this);
+            }
+        }
     }
 }

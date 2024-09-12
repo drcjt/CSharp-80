@@ -94,7 +94,8 @@ namespace ILCompiler.TypeSystem.Common
 
         public override MethodDesc GetMethodDefinition() => _methodDesc;
 
-        public override IEnumerable<MethodImplRecord> Overrides => _methodDesc.Overrides;
+        public override MethodDesc GetTypicalMethodDefinition() => _methodDesc.GetTypicalMethodDefinition();
+
         public override string? GetCustomAttributeValue(string customAttributeName) => _methodDesc.GetCustomAttributeValue(customAttributeName);
 
         public override MethodDesc CreateUserMethod(string name) => throw new NotImplementedException();
