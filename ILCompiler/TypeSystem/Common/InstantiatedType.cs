@@ -56,9 +56,9 @@ namespace ILCompiler.TypeSystem.Common
                 MethodDesc decl;
 
                 var implTypeInstantiated = uninstMethodImpls[i].Decl.OwningType.InstantiateSignature(this.Instantiation, default(Instantiation));
-                if (implTypeInstantiated is InstantiatedType)
+                if (implTypeInstantiated is InstantiatedType instantiatedType)
                 {
-                    decl = _typeDef.Context.GetMethodForInstantiatedType(uninstMethodImpls[i].Decl.GetTypicalMethodDefinition(), (InstantiatedType)implTypeInstantiated);
+                    decl = _typeDef.Context.GetMethodForInstantiatedType(uninstMethodImpls[i].Decl.GetTypicalMethodDefinition(), instantiatedType);
                 }
                 else
                 {
