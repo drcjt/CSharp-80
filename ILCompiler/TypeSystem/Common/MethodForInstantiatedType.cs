@@ -67,6 +67,10 @@ namespace ILCompiler.TypeSystem.Common
         public override string FullName => ToString();
         public override bool HasReturnType => _typicalMethodDef.HasReturnType;
 
+        public override bool IsVirtual => _typicalMethodDef.IsVirtual;
+
         public override MethodDesc CreateUserMethod(string name) => throw new NotImplementedException();
+
+        public override MethodDesc GetTypicalMethodDefinition() => _typicalMethodDef;
     }
 }

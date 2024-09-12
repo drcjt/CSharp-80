@@ -134,18 +134,21 @@ namespace ILCompiler.TypeSystem.Dnlib
                 if (methodDefOrRef.DeclaringType?.NumberOfGenericParameters > 0)
                 {
                     var genericInstSig = methodDefOrRef.DeclaringType.TryGetGenericInstSig();
-                    var genericParams = genericInstSig.GenericArguments;
-                    TypeDesc[] genericParameters = new TypeDesc[genericParams.Count];
-                    for (int i = 0; i < genericParams.Count; i++)
+                    if (genericInstSig != null)
                     {
-                        genericParameters[i] = Create(genericParams[i]);
+                        var genericParams = genericInstSig.GenericArguments;
+                        TypeDesc[] genericParameters = new TypeDesc[genericParams.Count];
+                        for (int i = 0; i < genericParams.Count; i++)
+                        {
+                            genericParameters[i] = Create(genericParams[i]);
+                        }
+                        var instantiation = new Instantiation(genericParameters);
+
+                        MetadataType typeDef = (MetadataType)Create(methodDef.DeclaringType);
+
+                        var instantiatedType = Context.GetInstantiatedType(typeDef, instantiation);
+                        methodDesc = Context.GetMethodForInstantiatedType(methodDesc, instantiatedType);
                     }
-                    var instantiation = new Instantiation(genericParameters);
-
-                    MetadataType typeDef = (MetadataType)Create(methodDef.DeclaringType);
-
-                    var instantiatedType = Context.GetInstantiatedType(typeDef, instantiation);
-                    methodDesc = Context.GetMethodForInstantiatedType(methodDesc, instantiatedType);
                 }
 
                 return methodDesc;

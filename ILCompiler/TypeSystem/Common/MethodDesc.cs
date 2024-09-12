@@ -75,6 +75,8 @@ namespace ILCompiler.TypeSystem.Common
 
         public virtual MethodDesc GetMethodDefinition() => this;
 
+        public virtual MethodDesc GetTypicalMethodDefinition() => this;
+
         public override string ToString()
         {
             var sb = new StringBuilder();

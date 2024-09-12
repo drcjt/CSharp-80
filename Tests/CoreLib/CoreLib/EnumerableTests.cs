@@ -1,7 +1,30 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace CoreLib
 {
+    public class GenericArrayEnumerable<T> : IEnumerable<T>
+    {
+        private T[] _items;
+        public GenericArrayEnumerable(T[] items) 
+        { 
+            _items = items;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            for (var index = 0; index < _items.Length; index++)
+            {
+                yield return _items[index];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
     public class ArrayEnumerable(int[] array) : IEnumerable
     {
         public IEnumerator GetEnumerator()
@@ -35,6 +58,18 @@ namespace CoreLib
 
     public static class EnumerableTests
     {
+        public static void GenericArrayEnumerator_EnumeratesArrayElements()
+        {
+            var testArray = new int[] { 1, 2, 3 };
+            var enumerable = new GenericArrayEnumerable<int>(testArray);
+
+            int index = 0;
+            foreach (var item in enumerable)
+            {
+                Assert.AreEquals(testArray[index++], item);
+            }
+        }
+
         public static void ArrayEnumerator_EnumeratesArrayElements()
         {
             var testArray = new int[] { 1, 2, 3 };

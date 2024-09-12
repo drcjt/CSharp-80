@@ -21,10 +21,28 @@ namespace ILCompiler.TypeSystem.Common
                 AppendName(sb, signatureMethod);
             else if (type is ByRefType byrefType)
                 AppendName(sb, byrefType);
+            else if (type is InstantiatedType instantiatedType)
+                AppendName(sb, instantiatedType);
             else
             {
                 Debug.Assert(type is DefType);
                 AppendName(sb, (DefType)type);
+            }
+        }
+
+        public void AppendName(StringBuilder sb, InstantiatedType instantiatedType)
+        {
+            AppendName(sb, instantiatedType.GetTypeDefinition());
+            if (instantiatedType.Instantiation != null)
+            {
+                sb.Append('<');
+                for (int i = 0; i < instantiatedType.Instantiation.Length; i++)
+                {
+                    if (i != 0)
+                        sb.Append(',');
+                    AppendName(sb, instantiatedType.Instantiation[i]);
+                }
+                sb.Append('>');
             }
         }
 

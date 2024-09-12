@@ -5,7 +5,17 @@ namespace ILCompiler.TypeSystem.Common
 {
     public abstract class TypeDesc : TypeSystemEntity
     {
-        public virtual string FullName => String.Empty;
+        public string FullName
+        {
+            get
+            {
+                var typeNameFormatter = new TypeNameFormatter();
+                StringBuilder sb = new StringBuilder();
+                typeNameFormatter.AppendName(sb, this);
+                return sb.ToString();
+            }
+        }
+
         public virtual string Name => String.Empty;
         public virtual string Namespace => String.Empty;
         public bool IsDefType => this is DefType;
