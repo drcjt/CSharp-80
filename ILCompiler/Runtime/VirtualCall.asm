@@ -8,7 +8,6 @@ VirtualCall:
 	POP DE		; Return address
 	POP HL		; This pointer
 
-	PUSH HL		; Restore stack
 	PUSH DE
 
 	LD E, (HL)	; Get EEType Ptr into HL

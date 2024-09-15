@@ -101,7 +101,7 @@ namespace ILCompiler.Compiler.Importer
                 arguments[0] = new NullCheckEntry(arguments[0]);
             }
 
-            if (methodToCall.OwningType.IsInterface)
+            if (methodToCall.OwningType.IsInterface || (instruction.Opcode == ILOpcode.callvirt && methodToCall.IsVirtual))
             {
                 // Need to add this pointer as extra param which will be consumed by InterfaceCall routine
                 var thisEntry = arguments[0];
