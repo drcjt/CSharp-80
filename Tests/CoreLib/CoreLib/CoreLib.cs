@@ -37,6 +37,8 @@
             EnumerableTests.FibonacciEnumerable_FirstFifteenNumbers_AreCorrect();
             EnumerableTests.GenericArrayEnumerator_EnumeratesArrayElements();
 
+            ArrayListTests.RunArrayListTests();
+
             return 0;
         }
     }
