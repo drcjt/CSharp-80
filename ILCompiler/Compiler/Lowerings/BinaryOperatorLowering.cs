@@ -1,5 +1,4 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
-using System.Diagnostics;
 
 namespace ILCompiler.Compiler.Lowerings
 {
@@ -14,8 +13,11 @@ namespace ILCompiler.Compiler.Lowerings
                 case Operation.Mul:
                     return LowerMul(entry);
 
+                case Operation.Div_Un:
+                    return LowerUnsignedDiv(entry);
+
                 case Operation.Div:
-                    return LowerDiv(entry);
+                    return LowerSignedDiv(entry);
 
                 case Operation.Add:
                     LowerAdd(entry);
@@ -37,9 +39,8 @@ namespace ILCompiler.Compiler.Lowerings
         private static StackEntry? LowerMul(BinaryOperator mul)
         {
             // Convert multiplication by power of 2 into a left shift
-            if (mul.Op2 is Int32ConstantEntry)
+            if (mul.Op2 is Int32ConstantEntry multiplier)
             {
-                var multiplier = mul.Op2.As<Int32ConstantEntry>();
                 if (IsPow2(multiplier.Value))
                 {
                     mul.Operation = Operation.Lsh;
@@ -52,17 +53,37 @@ namespace ILCompiler.Compiler.Lowerings
             return null;
         }
 
-        private static StackEntry? LowerDiv(BinaryOperator div)
+        private static StackEntry? LowerUnsignedDiv(BinaryOperator div)
         {
-            if (div.Op2 is Int32ConstantEntry)
+            if (div.Op2 is Int32ConstantEntry divisor)
             {
-                var divisor = div.Op2.As<Int32ConstantEntry>();
                 if (IsPow2(divisor.Value))
                 {
                     div.Operation = Operation.Rsh;
                     divisor.Value = GetLog2(divisor.Value);
 
                     return div;
+                }
+            }
+
+            return null;
+        }
+
+        private static StackEntry? LowerSignedDiv(BinaryOperator div)
+        {
+            if (div.Op2 is Int32ConstantEntry divisor)
+            {
+                if (divisor.Value == int.MinValue)
+                {
+                    // x / int.MinValue, becomes, x == int.MinValue
+                    div.Operation = Operation.Eq;
+                    return div;
+                }
+
+                if (IsPow2(divisor.Value))
+                {
+                    // TODO: Implement proper signed div for power of 2
+                    // using right shift here.
                 }
             }
 
