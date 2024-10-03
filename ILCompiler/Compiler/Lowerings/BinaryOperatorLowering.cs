@@ -1,10 +1,11 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.LinearIR;
 
 namespace ILCompiler.Compiler.Lowerings
 {
     internal class BinaryOperatorLowering : ILowering<BinaryOperator>
     {
-        public StackEntry? Lower(BinaryOperator entry)
+        public StackEntry? Lower(BinaryOperator entry, BasicBlock block, LocalVariableTable locals)
         {
             // TODO: Check whether a binary op's operands should be contained
 
@@ -17,7 +18,7 @@ namespace ILCompiler.Compiler.Lowerings
                     return LowerUnsignedDiv(entry);
 
                 case Operation.Div:
-                    return LowerSignedDiv(entry);
+                    return LowerSignedDiv(entry, block, locals);
 
                 case Operation.Add:
                     LowerAdd(entry);
@@ -69,7 +70,7 @@ namespace ILCompiler.Compiler.Lowerings
             return null;
         }
 
-        private static StackEntry? LowerSignedDiv(BinaryOperator div)
+        private static StackEntry? LowerSignedDiv(BinaryOperator div, BasicBlock block, LocalVariableTable locals)
         {
             if (div.Op2 is Int32ConstantEntry divisor)
             {
@@ -80,14 +81,58 @@ namespace ILCompiler.Compiler.Lowerings
                     return div;
                 }
 
-                if (IsPow2(divisor.Value))
+                var absDivisor = Math.Abs(divisor.Value);
+                if (IsPow2(absDivisor))
                 {
-                    // TODO: Implement proper signed div for power of 2
-                    // using right shift here.
+                    var blockRange = block;
+                    if (!blockRange.TryGetUse(div, out Use? use))
+                    {
+                        return null;        
+                    }
+
+                    Use opDividend = new Use(blockRange, new Edge<StackEntry>(() => div.Op1, x => div.Op1 = x), div);
+                    var dividend = opDividend.ReplaceWithLclVar(locals);
+
+                    var adjustment = new BinaryOperator(Operation.Rsh, false, dividend, new Int32ConstantEntry(31), VarType.Int);
+                    adjustment = new BinaryOperator(Operation.And, false, adjustment, new Int32ConstantEntry(absDivisor - 1), VarType.Int);
+                    var adjustedDividend = new BinaryOperator(Operation.Add, false, adjustment,
+                        new LocalVariableEntry(dividend.As<LocalVariableEntry>().LocalNumber, dividend.As<LocalVariableEntry>().Type, dividend.As<LocalVariableEntry>().ExactSize), VarType.Int);
+
+                    // Implement the division by right shifting the adjusted dividend
+                    var divisorValue = divisor.Value;
+                    divisor.Value = GetLog2(absDivisor);
+
+                    StackEntry newDiv = new BinaryOperator(Operation.Rsh, false, adjustedDividend, divisor, VarType.Int);
+
+                    if (divisorValue < 0)
+                    {
+                        // Negate the result if the divisor is negative
+                        newDiv = new UnaryOperator(Operation.Neg, newDiv);
+                    }
+
+                    // Remove nodes that have been reused from the linear order
+                    // as these will be re-added when the tree is resequenced
+                    blockRange.Remove(divisor);
+                    blockRange.Remove(dividend);
+
+                    // linearise the new div tree and insert before the orginal
+                    InsertTreeBefore(div, newDiv, blockRange);
+                    blockRange.Remove(div);
+
+                    // Replace the original div node with the newdiv tree
+                    use.ReplaceWith(newDiv);
+
+                    return newDiv.Next;
                 }
             }
 
             return null;
+        }
+
+        private static void InsertTreeBefore(StackEntry insertionPoint, StackEntry tree, LinearIR.Range blockRange)
+        {
+            var range = LIR.SeqTree(tree);
+            blockRange.InsertBefore(insertionPoint, range);
         }
 
         private static void LowerAdd(BinaryOperator add)
@@ -113,10 +158,7 @@ namespace ILCompiler.Compiler.Lowerings
             }
         }
 
-        private static bool IsPow2(int i)
-        {
-            return (i > 0 && ((i - 1) & i) == 0);
-        }
+        private static bool IsPow2(int i) => (i > 0 && ((i - 1) & i) == 0);
 
         private static int GetLog2(int i)
         {

@@ -176,7 +176,7 @@ namespace ILCompiler.Compiler
 
             // Lower
             var lowering = _phaseFactory.Create<ILowering>();
-            lowering.Run(basicBlocks);
+            lowering.Run(basicBlocks, _locals);
 
             var codeGenerator = _phaseFactory.Create<ICodeGenerator>();
             var instructions = codeGenerator.Generate(basicBlocks, _locals, methodCodeNodeNeedingCode);

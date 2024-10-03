@@ -1,9 +1,12 @@
-﻿namespace ILCompiler.Compiler.EvaluationStack
+﻿using ILCompiler.Compiler.LinearIR;
+using System.Diagnostics.CodeAnalysis;
+
+namespace ILCompiler.Compiler.EvaluationStack
 {
     public class IndirectEntry : StackEntry
     {
 
-        public StackEntry Op1 { get; }
+        public StackEntry Op1 { get; set; }
 
         public uint Offset { get; }
 
@@ -18,9 +21,17 @@
             return new IndirectEntry(Op1.Duplicate(), Type, ExactSize, Offset);
         }
 
-        public override void Accept(IStackEntryVisitor visitor)
+        public override void Accept(IStackEntryVisitor visitor) => visitor.Visit(this);
+
+        public override bool TryGetUse(StackEntry operand, [NotNullWhen(true)] out Edge<StackEntry>? edge)
         {
-            visitor.Visit(this);
+            if (operand == Op1)
+            {
+                edge = new Edge<StackEntry>(() => Op1, x => Op1 = x);
+                return true;
+
+            }
+            return base.TryGetUse(operand, out edge);
         }
     }
 }

@@ -1,8 +1,11 @@
-﻿namespace ILCompiler.Compiler.EvaluationStack
+﻿using ILCompiler.Compiler.LinearIR;
+using System.Diagnostics.CodeAnalysis;
+
+namespace ILCompiler.Compiler.EvaluationStack
 {
     public class ReturnEntry : StackEntry
     {
-        public StackEntry? Return { get; }
+        public StackEntry? Return { get; set; }
         public int? ReturnBufferArgIndex { get; }
         public int? ReturnTypeExactSize { get; }
 
@@ -22,9 +25,18 @@
             return new ReturnEntry(Return, ReturnBufferArgIndex, ReturnTypeExactSize);
         }
 
-        public override void Accept(IStackEntryVisitor visitor)
+        public override void Accept(IStackEntryVisitor visitor) => visitor.Visit(this);
+
+        public override bool TryGetUse(StackEntry operand, [NotNullWhen(true)] out Edge<StackEntry>? edge)
         {
-            visitor.Visit(this);
+            edge = null;
+
+            if (operand == Return)
+            {
+                edge = new Edge<StackEntry>(() => Return, x => Return = x);
+                return true;
+            }
+            return false;
         }
     }
 }

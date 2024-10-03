@@ -1,4 +1,6 @@
-﻿using ILCompiler.TypeSystem.Common;
+﻿using ILCompiler.Compiler.LinearIR;
+using ILCompiler.TypeSystem.Common;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ILCompiler.Compiler.EvaluationStack
 {
@@ -23,9 +25,19 @@ namespace ILCompiler.Compiler.EvaluationStack
             return new CallEntry(TargetMethod, Arguments, Type, ExactSize, IsVirtual, Method);
         }
 
-        public override void Accept(IStackEntryVisitor visitor)
+        public override void Accept(IStackEntryVisitor visitor) => visitor.Visit(this);
+
+        public override bool TryGetUse(StackEntry operand, [NotNullWhen(true)] out Edge<StackEntry>? edge)
         {
-            visitor.Visit(this);
+            for (int i = 0; i < Arguments.Count; i++)
+            {
+                if (Arguments[i] == operand)
+                {
+                    edge = new Edge<StackEntry>(() => Arguments[i], x => Arguments[i] = x);
+                    return true;
+                }
+            }
+            return base.TryGetUse(operand, out edge);
         }
     }
 }

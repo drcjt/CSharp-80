@@ -4,7 +4,7 @@ namespace ILCompiler.Compiler.Lowerings
 {
     internal class IndirectLowering : ILowering<IndirectEntry>
     {
-        public StackEntry? Lower(IndirectEntry entry)
+        public StackEntry? Lower(IndirectEntry entry, BasicBlock block, LocalVariableTable locals)
         {
             if (entry.Op1 is LocalVariableAddressEntry lvaAddress)
             {

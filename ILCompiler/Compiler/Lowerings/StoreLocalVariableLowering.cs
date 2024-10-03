@@ -4,7 +4,7 @@ namespace ILCompiler.Compiler.Lowerings
 {
     internal class StoreLocalVariableLowering : ILowering<StoreLocalVariableEntry>
     {
-        public StackEntry? Lower(StoreLocalVariableEntry entry)
+        public StackEntry? Lower(StoreLocalVariableEntry entry, BasicBlock block, LocalVariableTable locals)
         {
             if (entry.Op1.IsIntCnsOrI())
             {
