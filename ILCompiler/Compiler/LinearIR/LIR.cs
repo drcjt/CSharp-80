@@ -15,7 +15,6 @@ namespace ILCompiler.Compiler.LinearIR
 
             Debug.Assert(firstNode != null);
 
-            //var firstNode = tree.Next;
             lastNode.Next = null;
             firstNode.Prev = null;
 

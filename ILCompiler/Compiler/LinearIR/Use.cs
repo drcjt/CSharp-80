@@ -23,7 +23,7 @@ namespace ILCompiler.Compiler.LinearIR
 
         public void ReplaceWith(StackEntry replacement)
         {
-            User.ReplaceOperand(_edge, replacement);
+            StackEntry.ReplaceOperand(_edge, replacement);
         }
 
         public StackEntry ReplaceWithLclVar(LocalVariableTable locals)

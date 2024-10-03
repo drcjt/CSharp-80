@@ -73,6 +73,6 @@ namespace ILCompiler.Compiler.EvaluationStack
             return false;
         }
 
-        public void ReplaceOperand(Edge<StackEntry> useEdge, StackEntry replacement) => useEdge.Set(replacement);
+        public static void ReplaceOperand(Edge<StackEntry> useEdge, StackEntry replacement) => useEdge.Set(replacement);
     }
 }

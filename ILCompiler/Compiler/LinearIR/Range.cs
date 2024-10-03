@@ -34,13 +34,10 @@ namespace ILCompiler.Compiler.LinearIR
 
                 foreach (var n in range)
                 {
-                    if (n != null)
+                    if (n != null && n.TryGetUse(node, out Edge<StackEntry>? edge))
                     {
-                        if (n.TryGetUse(node, out Edge<StackEntry>? edge))
-                        {
-                            use = new Use(this, edge, n);
-                            return true;
-                        }
+                        use = new Use(this, edge, n);
+                        return true;
                     }
                 }
             }
