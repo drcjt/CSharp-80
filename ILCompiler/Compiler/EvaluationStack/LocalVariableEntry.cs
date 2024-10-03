@@ -14,9 +14,6 @@
             return new LocalVariableEntry(LocalNumber, Type, ExactSize);
         }
 
-        public override void Accept(IStackEntryVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
+        public override void Accept(IStackEntryVisitor visitor) => visitor.Visit(this);
     }
 }

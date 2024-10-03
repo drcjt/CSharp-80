@@ -15,9 +15,6 @@
             return new JumpTrueEntry(TargetLabel, Condition.Duplicate());
         }
 
-        public override void Accept(IStackEntryVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
+        public override void Accept(IStackEntryVisitor visitor) => visitor.Visit(this);
     }
 }

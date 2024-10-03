@@ -82,9 +82,6 @@
             return duplicate;
         }
 
-        public override void Accept(IStackEntryVisitor visitor)
-        {
-            visitor.Visit(this);
-        }
+        public override void Accept(IStackEntryVisitor visitor) => visitor.Visit(this);
     }
 }

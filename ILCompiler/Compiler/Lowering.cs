@@ -13,10 +13,15 @@ namespace ILCompiler.Compiler
             _loweringFactory = loweringFactory;
         }
 
-        public void Run(IList<BasicBlock> blocks)
+        private BasicBlock _currentBlock = null!;
+        private LocalVariableTable _locals = null!;
+
+        public void Run(IList<BasicBlock> blocks, LocalVariableTable locals)
         {
+            _locals = locals;
             foreach (var block in blocks)
             {
+                _currentBlock = block;
                 LowerBlock(block);
             }
         }
@@ -28,7 +33,7 @@ namespace ILCompiler.Compiler
             var lowering = _loweringFactory.GetLowering<T>();
             if (lowering != null)
             {
-                _nextNode = lowering.Lower(entry);
+                _nextNode = lowering.Lower(entry, _currentBlock, _locals);
             }
         }
 

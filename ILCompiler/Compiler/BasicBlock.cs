@@ -11,7 +11,7 @@ namespace ILCompiler.Compiler
         Switch,         // block ends with a switch statement
     }
 
-    public class BasicBlock
+    public class BasicBlock : LinearIR.Range
     {
         public BasicBlock? Next { get; set; }
         public int StartOffset { get; set; }
@@ -30,7 +30,6 @@ namespace ILCompiler.Compiler
         // High level intermediate representation - main output of importation process
         public IList<StackEntry> Statements { get; } = new List<StackEntry>();
 
-        public StackEntry? FirstNode { get; set; }
         public bool Marked { get; set; } = false;
 
         public string Label { get; private set; }

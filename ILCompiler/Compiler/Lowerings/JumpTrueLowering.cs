@@ -4,7 +4,7 @@ namespace ILCompiler.Compiler.Lowerings
 {
     internal class JumpTrueLowering : ILowering<JumpTrueEntry>
     {
-        public StackEntry? Lower(JumpTrueEntry entry)
+        public StackEntry? Lower(JumpTrueEntry entry, BasicBlock block, LocalVariableTable locals)
         {
             var condition = entry.Condition;
 

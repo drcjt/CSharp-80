@@ -1,4 +1,7 @@
-﻿namespace ILCompiler.Compiler.EvaluationStack
+﻿using ILCompiler.Compiler.LinearIR;
+using System.Diagnostics.CodeAnalysis;
+
+namespace ILCompiler.Compiler.EvaluationStack
 {
     public enum Operation
     {
@@ -57,12 +60,19 @@
 
         // TODO: Consider using a visitor to do the duplication
         public abstract StackEntry Duplicate();
-
         abstract public void Accept(IStackEntryVisitor visitor);
 
         public T As<T>() where T : StackEntry
         {
             return (T)this;
         }
+
+        public virtual bool TryGetUse(StackEntry operand, [NotNullWhen(returnValue: true)] out Edge<StackEntry>? edge)
+        {
+            edge = null;
+            return false;
+        }
+
+        public static void ReplaceOperand(Edge<StackEntry> useEdge, StackEntry replacement) => useEdge.Set(replacement);
     }
 }

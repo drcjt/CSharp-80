@@ -1,4 +1,7 @@
-﻿namespace ILCompiler.Compiler.EvaluationStack
+﻿using ILCompiler.Compiler.LinearIR;
+using System.Diagnostics.CodeAnalysis;
+
+namespace ILCompiler.Compiler.EvaluationStack
 {
     public class IntrinsicEntry : StackEntry
     {
@@ -16,9 +19,19 @@
             return new IntrinsicEntry(TargetMethod, Arguments, Type);
         }
 
-        public override void Accept(IStackEntryVisitor visitor)
+        public override void Accept(IStackEntryVisitor visitor) => visitor.Visit(this);
+
+        public override bool TryGetUse(StackEntry operand, [NotNullWhen(true)] out Edge<StackEntry>? edge)
         {
-            visitor.Visit(this);
+            for (int i = 0; i < Arguments.Count; i++)
+            {
+                if (operand == Arguments[i])
+                {
+                    edge = new Edge<StackEntry>(() => Arguments[i], x => Arguments[i] = x);
+                    return true;
+                }
+            }
+            return base.TryGetUse(operand, out edge);
         }
     }
 }
