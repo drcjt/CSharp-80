@@ -1,4 +1,6 @@
-﻿namespace ILCompiler.TypeSystem.Common
+﻿using ILCompiler.TypeSystem.Canon;
+
+namespace ILCompiler.TypeSystem.Common
 {
     public abstract class DefType : TypeDesc
     {
@@ -79,5 +81,7 @@
         }
 
         public LayoutInt InstanceByteCount => LayoutInt.AlignUp(InstanceByteCountUnaligned, InstanceByteAlignment, Context.Target);
+
+        protected override TypeDesc ConvertToCanonFormImpl(CanonicalFormKind kind) => this;
     }
 }

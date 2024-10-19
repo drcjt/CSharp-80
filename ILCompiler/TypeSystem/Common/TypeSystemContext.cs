@@ -1,4 +1,8 @@
-﻿namespace ILCompiler.TypeSystem.Common
+﻿using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Canon;
+using ILCompiler.TypeSystem.RuntimeDetermined;
+
+namespace ILCompiler.TypeSystem.Common
 {
     public class TypeSystemContext
     {        
@@ -11,8 +15,10 @@
         private readonly Dictionary<string, MethodDesc> _methodForInstantiatedTypes = new Dictionary<string, MethodDesc>();
         private readonly Dictionary<string, InstantiatedType> _instantiatedTypes = new Dictionary<string, InstantiatedType>();
         private readonly Dictionary<string, InstantiatedMethod> _instantiatedMethods = new Dictionary<string, InstantiatedMethod>();
-
+        private readonly Dictionary<string, ByRefType> _byRefTypes = new Dictionary<string, ByRefType>();
         public ModuleDesc? SystemModule { get; set; }
+
+        private readonly SharedGenericsMode _genericsMode = SharedGenericsMode.CanonicalReferenceTypes;
 
         public InstantiatedType GetInstantiatedType(MetadataType typeDef, Instantiation instantiation)
         {
@@ -70,6 +76,14 @@
             return _pointerTypes[parameterType.FullName] = new PointerType(parameterType);
         }
 
+        public ByRefType GetByRefType(TypeDesc byRefType)
+        {
+            if (_byRefTypes.TryGetValue(byRefType.FullName, out var byRef))
+                return byRef;
+
+            return _byRefTypes[byRefType.FullName] = new ByRefType(byRefType);
+        }
+
         public FieldDesc GetFieldForInstantiatedType(FieldDesc fieldDef, InstantiatedType instantiatedType)
         {
             // TODO: Fix key generation as fullname/instantiation may contain colons
@@ -88,5 +102,47 @@
 
             return _methodForInstantiatedTypes[methodForInstantiatedTypeKey] = new MethodForInstantiatedType(typicalMethodDef, instantiatedType);
         }
+
+        public Instantiation ConvertInstantiationToCanonForm(Instantiation instantiation, CanonicalFormKind kind, out bool changed)
+        {
+            if (_genericsMode == SharedGenericsMode.CanonicalReferenceTypes)
+            {
+                return RuntimeDeterminedCanonicalizationAlgorithm.ConvertInstantiationToCanonForm(instantiation, kind, out changed);
+            }
+
+            changed = false;
+            return instantiation;
+        }
+
+        public TypeDesc ConvertToCanon(TypeDesc typeToConvert, CanonicalFormKind kind)
+        {
+            if (_genericsMode == SharedGenericsMode.CanonicalReferenceTypes)
+            {
+                return RuntimeDeterminedCanonicalizationAlgorithm.ConvertToCanon(typeToConvert, kind);
+            }
+
+            return typeToConvert;
+        }
+
+        public DefType GetWellKnownType(string wellKnownNamespace, string wellKnownName)
+        {
+            return (DefType)SystemModule!.GetType(wellKnownNamespace, wellKnownName);
+        }
+
+        private CanonType? _canonType;
+        public CanonBaseType CanonType
+        {
+            get
+            {
+                _canonType ??= new CanonType(this);
+                return _canonType;
+            }
+        }
+    }
+
+    public enum SharedGenericsMode
+    {
+        Disabled,
+        CanonicalReferenceTypes,
     }
 }

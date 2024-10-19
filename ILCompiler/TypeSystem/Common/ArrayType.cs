@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler;
+using ILCompiler.TypeSystem.Canon;
 using System.Text;
 
 namespace ILCompiler.TypeSystem.Common
@@ -28,6 +29,17 @@ namespace ILCompiler.TypeSystem.Common
             if (instantiatedElementType != ElementType)
             {
                 return Context.GetArrayType(instantiatedElementType, _rank);
+            }
+
+            return this;
+        }
+
+        protected override TypeDesc ConvertToCanonFormImpl(CanonicalFormKind kind)
+        {
+            TypeDesc paramTypeConverted = Context.ConvertToCanon(ParameterType, kind);
+            if (paramTypeConverted != ParameterType)
+            {
+                return Context.GetArrayType(paramTypeConverted, _rank);
             }
 
             return this;

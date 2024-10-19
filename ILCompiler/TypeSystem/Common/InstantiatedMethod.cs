@@ -1,4 +1,5 @@
-﻿using ILCompiler.TypeSystem.IL;
+﻿using ILCompiler.TypeSystem.Canon;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.TypeSystem.Common
 {
@@ -37,6 +38,8 @@ namespace ILCompiler.TypeSystem.Common
         }
 
         public override string FullName => ToString();
+
+        public override bool IsDefaultConstructor => _methodDesc.IsDefaultConstructor;
 
         public override bool HasReturnType => _methodDesc.HasReturnType;
 
@@ -102,5 +105,19 @@ namespace ILCompiler.TypeSystem.Common
         public override string? GetCustomAttributeValue(string customAttributeName) => _methodDesc.GetCustomAttributeValue(customAttributeName);
 
         public override MethodDesc CreateUserMethod(string name) => throw new NotImplementedException();
+
+        public override MethodDesc GetCanonMethodTarget(CanonicalFormKind kind)
+        {
+            InstantiatedMethod canonicalMethodResult = this;
+            Instantiation canonInstantiation = Context.ConvertInstantiationToCanonForm(Instantiation, kind, out bool instantiationChanged);
+            MethodDesc openMethodOnCanonicalizedType = _methodDesc.GetCanonMethodTarget(kind);
+
+            if (instantiationChanged || (openMethodOnCanonicalizedType != _methodDesc))
+            {
+                canonicalMethodResult = Context.GetInstantiatedMethod(openMethodOnCanonicalizedType, canonInstantiation);
+            }
+
+            return canonicalMethodResult;
+        }
     }
 }

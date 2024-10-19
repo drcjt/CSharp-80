@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler;
+using ILCompiler.TypeSystem.Canon;
 using System.Text;
 
 namespace ILCompiler.TypeSystem.Common
@@ -116,5 +117,11 @@ namespace ILCompiler.TypeSystem.Common
             typeNameFormatter.AppendName(sb, this);
             return sb.ToString();
         }
+
+        public TypeDesc ConvertToCanonForm(CanonicalFormKind kind) => ConvertToCanonFormImpl(kind);
+
+        protected abstract TypeDesc ConvertToCanonFormImpl(CanonicalFormKind kind);
+
+        public bool IsSignatureVariable => this is SignatureTypeVariable || this is SignatureMethodVariable;
     }
 }

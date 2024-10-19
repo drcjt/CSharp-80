@@ -1,4 +1,5 @@
 ﻿using dnlib.DotNet;
+using ILCompiler.TypeSystem.Canon;
 using ILCompiler.TypeSystem.Common;
 
 namespace ILCompiler.TypeSystem.Dnlib
@@ -20,5 +21,10 @@ namespace ILCompiler.TypeSystem.Dnlib
         public override TypeSystemEntity AssociatedTypeOrMethod => _module.CreateFromTypeOrMethodDef(_genericParameter.Owner);
 
         public override TypeSystemContext Context => _module.Context;
+
+        protected sealed override TypeDesc ConvertToCanonFormImpl(CanonicalFormKind kind)
+        {
+            throw new Exception("ConvertToCanonFormImpl for an indefinite type");
+        }
     }
 }
