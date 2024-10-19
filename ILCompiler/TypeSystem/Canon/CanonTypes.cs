@@ -10,14 +10,9 @@ namespace ILCompiler.TypeSystem.Canon
         Any,
     }
 
-    public abstract partial class CanonBaseType : MetadataType
+    public abstract partial class CanonBaseType(TypeSystemContext context) : MetadataType
     {
-        private readonly TypeSystemContext _context;
-
-        public CanonBaseType(TypeSystemContext context)
-        {
-            _context = context;
-        }
+        private readonly TypeSystemContext _context = context;
 
         public sealed override TypeSystemContext Context => _context;
 
@@ -34,15 +29,11 @@ namespace ILCompiler.TypeSystem.Canon
         public override VarType VarType => VarType.Ref;
     }
 
-    internal sealed class CanonType : CanonBaseType
+    internal sealed class CanonType(TypeSystemContext context) : CanonBaseType(context)
     {
         public new string FullName => Namespace + "." + Name;
         public override string Namespace => "System";
         public override string Name => "__Canon";
-
-        public CanonType(TypeSystemContext context) : base(context)
-        {
-        }
 
         protected override TypeDesc ConvertToCanonFormImpl(CanonicalFormKind kind)
         {
