@@ -15,6 +15,7 @@ namespace Internal.Runtime.CompilerServices
             // ret
         }
 
+        [Intrinsic]
         public static T As<T>(object value) where T: class
         {
             throw new Exception();
