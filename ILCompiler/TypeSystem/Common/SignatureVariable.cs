@@ -1,4 +1,7 @@
-﻿namespace ILCompiler.TypeSystem.Common
+﻿using ILCompiler.TypeSystem.Canon;
+using System.Diagnostics;
+
+namespace ILCompiler.TypeSystem.Common
 {
     public abstract class SignatureVariable : TypeDesc
     {
@@ -25,6 +28,11 @@
         {
             return typeInstantiation == null ? this : typeInstantiation[Index];
         }
+
+        protected override TypeDesc ConvertToCanonFormImpl(CanonicalFormKind kind)
+        {
+            throw new Exception("ConvertToCanonFormImpl for an indefinite type");
+        }
     }
 
     public sealed class SignatureMethodVariable : SignatureVariable
@@ -37,5 +45,10 @@
         {
             return methodInstantiation == null ? this : methodInstantiation[Index];
         }
-    }        
+
+        protected override TypeDesc ConvertToCanonFormImpl(CanonicalFormKind kind)
+        {
+            throw new Exception("ConvertToCanonFormImpl for an indefinite type");
+        }
+    }
 }

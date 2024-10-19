@@ -1,4 +1,5 @@
-﻿using ILCompiler.TypeSystem.IL;
+﻿using ILCompiler.TypeSystem.Canon;
+using ILCompiler.TypeSystem.IL;
 using System.Text;
 
 namespace ILCompiler.TypeSystem.Common
@@ -120,5 +121,7 @@ namespace ILCompiler.TypeSystem.Common
         public abstract IEnumerable<MethodImplRecord> Overrides { get; }
         public virtual string? GetCustomAttributeValue(string customAttributeName) => null;
         public abstract MethodDesc CreateUserMethod(string name);
+
+        public virtual MethodDesc GetCanonMethodTarget(CanonicalFormKind kind) => this;
     }
 }

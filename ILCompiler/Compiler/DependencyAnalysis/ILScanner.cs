@@ -1,5 +1,6 @@
 ﻿using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.IL;
+using ILCompiler.TypeSystem.Canon;
 using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.Dnlib;
 using ILCompiler.TypeSystem.IL;
@@ -24,11 +25,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public IList<IDependencyNode> FindDependencies()
         {
-            if ((_method is InstantiatedMethod || _method is MethodForInstantiatedType) && _methodIL != null)
-            {
-                _methodIL = new InstantiatedMethodIL(_method, _methodIL);
-            }
-
             if (!_method.IsIntrinsic)
             {
                 var currentIndex = 0;
@@ -36,6 +32,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 if (_methodIL != null)
                 {
+                    _methodIL = new InstantiatedMethodIL(_method, _methodIL);
+
                     AddThrowExceptionIfAnyExceptionHandlers();
 
                     while (currentIndex < _methodIL.Instructions.Count)
@@ -268,10 +266,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
 
             var methodDesc = (MethodDesc)instruction.GetOperand();
-            if (_method is InstantiatedMethod)
-            {
-                methodDesc = methodDesc.Context.GetInstantiatedMethod(methodDesc, _method.Instantiation);
-            }
 
             if (methodDesc.IsIntrinsic && methodDesc.OwningType.Name == "EEType" && methodDesc.OwningType.Namespace == "Internal.Runtime" && methodDesc.Name == "Of")
             {
@@ -309,7 +303,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             bool directCall = IsDirectCall(methodDesc, instruction.Opcode);
             if (directCall)
             {
-                methodNode = _context.NodeFactory.MethodNode(methodDesc);
+                var targetMethod = methodDesc.GetCanonMethodTarget(CanonicalFormKind.Specific);
+                methodNode = _context.NodeFactory.MethodNode(targetMethod);
             }
             else
             {

@@ -1,4 +1,5 @@
-﻿using ILCompiler.TypeSystem.IL;
+﻿using ILCompiler.TypeSystem.Canon;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.TypeSystem.Common
 {
@@ -72,5 +73,14 @@ namespace ILCompiler.TypeSystem.Common
         public override MethodDesc CreateUserMethod(string name) => throw new NotImplementedException();
 
         public override MethodDesc GetTypicalMethodDefinition() => _typicalMethodDef;
+
+        public override MethodDesc GetCanonMethodTarget(CanonicalFormKind kind)
+        {
+            TypeDesc canonicalizedTypeOfTargetMethod = OwningType.ConvertToCanonForm(kind);
+            if (canonicalizedTypeOfTargetMethod == OwningType)
+                return this;
+
+            return Context.GetMethodForInstantiatedType(GetTypicalMethodDefinition(), (InstantiatedType)canonicalizedTypeOfTargetMethod);
+        }
     }
 }

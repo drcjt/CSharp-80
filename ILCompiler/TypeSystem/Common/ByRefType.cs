@@ -1,8 +1,9 @@
 ﻿using ILCompiler.Compiler;
+using ILCompiler.TypeSystem.Canon;
 
 namespace ILCompiler.TypeSystem.Common
 {
-    internal class ByRefType : ParameterizedType
+    public class ByRefType : ParameterizedType
     {
         public ByRefType(TypeDesc parameter) : base(parameter)
         {
@@ -16,6 +17,15 @@ namespace ILCompiler.TypeSystem.Common
             var instantiatedParameterType = parameterType.InstantiateSignature(typeInstantiation, methodInstantiation);
 
             return new ByRefType(instantiatedParameterType);
+        }
+
+        protected override TypeDesc ConvertToCanonFormImpl(CanonicalFormKind kind)
+        {
+            TypeDesc paramTypeConverted = Context.ConvertToCanon(ParameterType, kind);
+            if (paramTypeConverted != ParameterType)
+                return Context.GetByRefType(paramTypeConverted);
+
+            return this;
         }
     }
 }

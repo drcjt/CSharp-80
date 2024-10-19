@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler;
+using ILCompiler.TypeSystem.Canon;
 
 namespace ILCompiler.TypeSystem.Common
 {
@@ -176,6 +177,18 @@ namespace ILCompiler.TypeSystem.Common
             {
                 yield return _typeDef.Context.GetMethodForInstantiatedType(typicalMethodDef, this);
             }
+        }
+
+        protected override TypeDesc ConvertToCanonFormImpl(CanonicalFormKind kind)
+        {
+            var canonInstantiation = Context.ConvertInstantiationToCanonForm(Instantiation!, kind, out bool needsChange);
+            if (needsChange)
+            {
+                MetadataType openType = (MetadataType)GetTypeDefinition();
+                return Context.GetInstantiatedType(openType, canonInstantiation);
+            }                
+
+            return this;
         }
     }
 }

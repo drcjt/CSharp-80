@@ -1,6 +1,6 @@
 ﻿namespace ILCompiler.TypeSystem.Common
 {
-    public class ParameterizedType : TypeDesc
+    public abstract class ParameterizedType : TypeDesc
     {
         public TypeDesc ParameterType { get; init; }
         public ParameterizedType(TypeDesc parameterType)

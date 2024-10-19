@@ -1,4 +1,6 @@
-﻿namespace ILCompiler.TypeSystem.Common
+﻿using ILCompiler.TypeSystem.Canon;
+
+namespace ILCompiler.TypeSystem.Common
 {
     public class FunctionPointerType : TypeDesc
     {
@@ -25,6 +27,20 @@
             {
                 return Context.GetFunctionPointerType(instantiatedSignature);
             }
+
+            return this;
+        }
+
+        protected override TypeDesc ConvertToCanonFormImpl(CanonicalFormKind kind)
+        {
+            MethodSignatureBuilder sigBuilder = new MethodSignatureBuilder(Signature);
+            sigBuilder.ReturnType = Context.ConvertToCanon(Signature.ReturnType, kind);
+            for (int i = 0; i < Signature.Length; i++)
+                sigBuilder[i] = Context.ConvertToCanon(Signature[i].Type, kind);
+
+            MethodSignature canonSignature = sigBuilder.ToSignature();
+            if (canonSignature != Signature)
+                return Context.GetFunctionPointerType(canonSignature);
 
             return this;
         }

@@ -54,12 +54,6 @@ namespace ILCompiler.Compiler.Importer
                 methodToCall = method;
             }
 
-            if (context.Method is InstantiatedMethod)
-            {
-                // Fully instantiate called method
-                methodToCall = methodToCall.Context.GetInstantiatedMethod(methodToCall, context.Method.Instantiation);
-            }
-            
             var arguments = new List<StackEntry>();
             var firstArgIndex = newObjThis != null ? 1 : 0;
             var parameterCount = methodToCall.Parameters.Count;
@@ -123,6 +117,11 @@ namespace ILCompiler.Compiler.Importer
                 {
                     return;
                 }
+            }
+
+            if (!methodToCall.IsIntrinsic)
+            {
+                methodToCall = methodToCall.GetCanonMethodTarget(TypeSystem.Canon.CanonicalFormKind.Specific);
             }
 
             string targetMethod;
