@@ -1,4 +1,6 @@
-﻿namespace ILCompiler.TypeSystem.Common
+﻿using ILCompiler.TypeSystem.Canon;
+
+namespace ILCompiler.TypeSystem.Common
 {
     public enum GenericParameterKind
     {
@@ -15,5 +17,10 @@
         public abstract GenericParameterKind Kind { get; }
         public abstract TypeSystemEntity AssociatedTypeOrMethod { get; }
 
+        public override bool IsCanonicalSubtype(CanonicalFormKind policy)
+        {
+            throw new Exception("IsCanonicalSubType of an indefinite type");
+        }
+        public override bool IsRuntimeDeterminedSubtype => throw new Exception("IsRuntimeDeterminedType of an indefinite type");
     }
 }

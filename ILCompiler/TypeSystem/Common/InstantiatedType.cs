@@ -190,5 +190,17 @@ namespace ILCompiler.TypeSystem.Common
 
             return this;
         }
+
+        public override bool IsCanonicalSubtype(CanonicalFormKind policy)
+        {
+            for (int i = 0; i < _instantiation.Length; i++)
+            {
+                var t = _instantiation[i];
+                if (t.IsCanonicalSubtype(policy))
+                    return true;
+            }
+
+            return false;
+        }
     }
 }

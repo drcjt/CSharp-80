@@ -1,4 +1,5 @@
 ﻿using ILCompiler.TypeSystem.Canon;
+using ILCompiler.TypeSystem.RuntimeDetermined;
 
 namespace ILCompiler.TypeSystem.Common
 {
@@ -83,5 +84,43 @@ namespace ILCompiler.TypeSystem.Common
         public LayoutInt InstanceByteCount => LayoutInt.AlignUp(InstanceByteCountUnaligned, InstanceByteAlignment, Context.Target);
 
         protected override TypeDesc ConvertToCanonFormImpl(CanonicalFormKind kind) => this;
+
+        public DefType ConvertToSharedRuntimeDeterminedForm()
+        {
+            if (Instantiation != null && Instantiation.Length > 0)
+            {
+                MetadataType typeDefinition = (MetadataType)GetTypeDefinition();
+
+                bool changed;
+                Instantiation sharedInstantiation = RuntimeDeterminedTypeUtilities.ConvertInstantiationToSharedRuntimeForm(
+                    Instantiation, typeDefinition.Instantiation!, out changed);
+                if (changed)
+                {
+                    return Context.GetInstantiatedType(typeDefinition, sharedInstantiation);
+                }
+            }
+
+            return this;
+        }
+
+        public override bool IsRuntimeDeterminedSubtype
+        {
+            get
+            {
+                if (IsGenericDefinition)
+                    return false;
+
+                if (Instantiation != null)
+                {
+                    for (int i = 0; i < Instantiation.Length; i++)
+                    {
+                        if (Instantiation[i].IsRuntimeDeterminedSubtype)
+                            return true;
+                    }
+                }
+
+                return false;
+            }
+        }
     }
 }
