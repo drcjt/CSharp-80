@@ -2,8 +2,6 @@
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.IL;
-using System.Data;
-using dnlib.DotNet;
 
 namespace ILCompiler.Compiler.Importer
 {
