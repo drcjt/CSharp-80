@@ -54,5 +54,7 @@ namespace ILCompiler.TypeSystem.IL
         public override int LocalsCount => _methodIL.LocalsCount;
 
         public override bool IsInitLocals => _methodIL.IsInitLocals;
+
+        public override MethodIL GetMethodILDefinition() => _methodIL;
     }
 }
