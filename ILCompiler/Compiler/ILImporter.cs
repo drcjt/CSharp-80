@@ -272,7 +272,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, LocalVariableTable locals, IList<EHClause> ehClauses, MethodIL? methodIL = null)
+        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, LocalVariableTable locals, IList<EHClause> ehClauses)
         {
             _parameterCount = parameterCount;
             _returnBufferArgIndex = returnBufferArgIndex;
@@ -280,13 +280,17 @@ namespace ILCompiler.Compiler
             _method = method;
             _locals = locals;
 
-            if (methodIL == null)
+            var methodIL = method.MethodIL!;
+
+            var uninstantiatedMethodIL = methodIL.GetMethodILDefinition();            
+            if (methodIL != uninstantiatedMethodIL)
             {
-                _methodIL = new InstantiatedMethodIL(_method, _method.MethodIL!);
+                var sharedMethod = _method.GetSharedRuntimeFormMethodTarget();
+                _methodIL = new InstantiatedMethodIL(sharedMethod, methodIL);
             }
             else
             {
-                _methodIL = new InstantiatedMethodIL(_method, methodIL);
+                _methodIL = methodIL;
             }
 
             var basicBlockAnalyser = new BasicBlockAnalyser(_method, _nameMangler, _methodIL);

@@ -13,6 +13,8 @@ namespace ILCompiler.Compiler.Importer
 
             var address = importer.PopExpression();
 
+            // TODO: Support shared generics here
+
             var typeDesc = (TypeDesc)instruction.GetOperand();
             int elemSize = typeDesc.GetElementSize().AsInt;
 

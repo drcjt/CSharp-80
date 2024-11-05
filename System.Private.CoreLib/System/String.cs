@@ -38,5 +38,18 @@ namespace System
         [MethodImpl(MethodImplOptions.InternalCall)]
         [DynamicDependency("Ctor(System.Char[])")]
         public extern String(char[] value);
+
+        public bool Contains(char value)
+        {
+            for (int i = 0; i <  _length; i++)
+            {
+                if (this[i] == value)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public override string ToString() => this;
     }
 }

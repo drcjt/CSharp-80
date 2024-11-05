@@ -15,7 +15,7 @@
             StringTests.SubstringTests();
             StringTests.EqualsTests();
 
-            UnsafeTests.SizeOfTests();
+            UnsafeTests.SizeOfTests();            
             UnsafeTests.RefAs();
 
             UnsafeTests.InitBlockTests();

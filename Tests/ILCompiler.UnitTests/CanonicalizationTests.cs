@@ -43,7 +43,7 @@ namespace ILCompiler.UnitTests
             var typeSystemContext = new TypeSystemContext();
             var corLibModuleProvider = new CorLibModuleProvider();
             corLibModuleProvider.CorLibModule = corlibModule;
-            _module = new DnlibModule(typeSystemContext, corLibModuleProvider);
+            _module = new DnlibModule(typeSystemContext, corLibModuleProvider, null);
 
             _referenceType = GetType("Canonicalization", "ReferenceType");
             _otherReferenceType = GetType("Canonicalization", "OtherReferenceType");

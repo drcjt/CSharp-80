@@ -2,6 +2,7 @@
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.IL;
+using ILCompiler.TypeSystem.Canon;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -13,7 +14,6 @@ namespace ILCompiler.Compiler.Importer
 
             var method = (MethodDesc)instruction.GetOperand();
             var owningType = method.OwningType;
-
 
             if (owningType.IsArray)
             {
@@ -54,13 +54,27 @@ namespace ILCompiler.Compiler.Importer
 
         private static void ImportNewObjReferenceType(Instruction instruction, ImportContext context, IILImporterProxy importer, DefType objType, VarType objVarType, int objSize)
         {
-            var mangledEETypeName = context.NameMangler.GetMangledTypeName(objType);
+            StackEntry eeTypeNode;
+            if (objType.IsRuntimeDeterminedSubtype)
+            {
+                // TODO: Use generic lookup helper
+
+                // For generic context if method is AcquiresInstMethodTableFromThis
+                // then load this pointer as an EETypePtr
+
+                eeTypeNode = context.GetGenericContext();
+            }
+            else
+            {
+                var mangledEETypeName = context.NameMangler.GetMangledTypeName(objType);
+                eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
+            }
 
             // Determine required size on GC heap
             var allocSize = objType.InstanceByteCount.AsInt;
 
             // Allocate memory for object
-            var op1 = new AllocObjEntry(mangledEETypeName, allocSize, objVarType);
+            var op1 = new AllocObjEntry(eeTypeNode, allocSize, objVarType);
 
             // Store allocated memory address into a temp local variable
             var lclNum = importer.GrabTemp(VarType.Ref, objSize);

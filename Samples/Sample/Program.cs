@@ -1,11 +1,298 @@
-﻿using System;
+﻿using dnlib.DotNet.Writer;
+using Internal.Runtime.CompilerServices;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace MiniBCL
 {
+    public class GenericArrayEnumerable<T> : IEnumerable<T>
+    {
+        private T[] _items;
+        public GenericArrayEnumerable(T[] items)
+        {
+            _items = items;
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            for (var index = 0; index < _items.Length; index++)
+            {
+                yield return _items[index];
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+    }
+
+    public class Gen<T>
+    {
+        public T? Field1;
+
+        public bool EqualNull(T? t)
+        {
+            Field1 = t;
+            return ((object?)Field1 == null);
+        }
+    }
+
+
+    /*
+        public class Gen<T>
+        {
+            public T Assign(T t)
+            {
+                T Field1 = t;
+                return Field1;
+            }
+        }
+    */
+    public class Generic<T>
+    {
+        /// <summary>
+        /// public T[] Items { get; set; }
+        /// </summary>
+        /// <param name="x"></param>
+        //public void Frob(T x) => Console.WriteLine("Frob");
+        public T[] Frob(T x)
+        {
+            var a = new T[10];
+            a[0] = x;
+            return a;
+            //Console.WriteLine(x.ToString());
+        }
+        /*
+        {
+            Console.WriteLine(x.ToString());
+            //Console.WriteLine("Frob");
+        }
+        */
+    }
+
+    public class GenericList<T> where T : new()
+    {
+        private T _item;
+
+        public GenericList()
+        {
+            //_item = new T();
+        }
+    }
+
+    public class Measure
+    {
+        public static int a = 0xCC;
+    }
+
+    // This is not beforefieldinit
+    public class TestClass
+    {
+        static TestClass()
+        {
+            Measure.a = 8;
+        }
+    }
+
+    public class TestComplexConstructor
+    {
+        private static int _value;
+
+        static TestComplexConstructor()
+        {
+            _value = GetValue();
+        }
+
+        private static int GetValue()
+        {
+            return 25;
+        }
+
+        public static void Run()
+        {
+            Assert.IsLazyInitialized<TestComplexConstructor>();
+        }
+    }
+
+    public class Assert
+    {
+        public static void IsLazyInitialized<T>()
+        {
+            if (!RuntimeHelpers.HasCctor<T>())
+            {
+                Environment.Exit(1);
+            }
+        }
+    }
+
+    public class Foo
+    {
+        public int i, j, k;
+    }
+
+    class GenericFoo<T>
+    {
+        public GenericFoo(T i1)
+        {
+        }
+    }
+
     public static class Program
     {
+        private static int _counter = 0;
+        private static bool _result = true;
+
+        public static void Eval(bool exp)
+        {
+            _counter++;
+            if (!exp)
+            {
+                _result = exp;
+                Console.Write("InstanceAssignmentClass failed at location: ");
+                Console.WriteLine(_counter);
+            }
+        }
+
+        public static int I4_DivPow2_2(int i4) // => i4 / 2;
+        {
+            int result = i4 / 2;
+            return result;
+        }
+
+        public static int Count<T>(T[] arrayOfT)
+        {
+            return arrayOfT.Length;
+        }
+
+        private static void Swap<T>(ref T a, ref T b)
+        {
+            T temp = a;
+            a = b;
+            b = temp;
+        }
+
+        private static void SwapIndirect<T>(ref T a, ref T b)
+        {
+            Swap<T>(ref a, ref b);
+        }
+
+        static object newarr<T>()
+        {
+            object o = new T[10];
+            return o;
+        }
+
+        public static int test_0_vt_newarr()
+        {
+            object o = newarr<Foo>();
+            //if (!(o is Foo[]))
+            return 1;
+            //return 0;
+        }
+
+        static GenericFoo<T> Newobj<T>(T t1)
+        {
+            return new GenericFoo<T>(t1);
+        }
+
+
         public static int Main()
         {
+            var s = "hello";
+            Newobj(s);
+            //test_0_vt_newarr();
+            //new Gen<string>().EqualNull("string");
+            //Eval(!new Gen<string>().EqualNull(_string));
+
+            //TestComplexConstructor.Run();
+
+            /*
+            if (!RuntimeHelpers.HasCctor<Measure>())
+            {
+                Console.WriteLine("HasCctor");
+            }
+            */
+
+            /*
+            byte b = 0x0f;
+
+            if (Measure.a != 0xCC)
+            {
+                Console.WriteLine("Not 0xCC at start");
+            }
+
+            // This should trigger the cctor as ctor is an instance method
+            TestClass t = new TestClass();
+
+            if (Measure.a != 8)
+            {
+                Console.WriteLine("Not 8 at end");
+            }
+            */
+
+            /*
+            var testArray = new int[1];
+            var enumerable = new GenericArrayEnumerable<int>(testArray);
+            var enumerator = enumerable.GetEnumerator();
+            */
+
+            /*
+            int index = 0;
+            foreach (var item in enumerable)
+            {
+                Console.WriteLine(testArray[index++]);
+                //Assert.AreEquals(testArray[index++], item);
+            }
+            */
+
+            /*
+            Console.ReadLine();
+
+            string _string = "string";
+            var result = new Gen<string>().Assign(_string);
+            Console.WriteLine(result);
+            */
+
+            //var s = new GenericList<Object>();
+
+
+            //Console.WriteLine(Unsafe.SizeOf<sbyte>());
+            /*
+            int x = 12;
+            int y = 17;
+
+            SwapIndirect<int>(ref x, ref y);
+            */
+
+            //object o = "Spong";
+            //Console.WriteLine(o.ToString());
+
+            //var x = new Generic<object>();
+            //var y = new Generic<string>();
+
+            //var o = new object();
+
+            //x.Frob(x);
+            //x.Items[0] = x;
+
+            //var r = y.Frob("Frobber");
+            //Console.WriteLine(r[0]);
+
+            //var s = x.Frob("foo");
+            //Console.WriteLine(s[0].ToString());
+
+            //y.Items[0] = "Wibble";
+            //Console.WriteLine(y.Items[0]);
+            //int x = -43;
+
+            //int result = I4_DivPow2_2(42);
+            //int result = x / 2;
+
+            //Console.WriteLine(result);
+            /*
             Console.Clear();
 
             TestImplicitCasting();
@@ -60,6 +347,7 @@ namespace MiniBCL
             // Test implementation of write char completely written in C#
             //WriteChar(0, 0, 48); // Write 0 to top left corner of screen
 
+            */
             return 42;
         }
 
