@@ -106,14 +106,10 @@ namespace ILCompiler.Compiler
                 return;
             }
 
-            MethodIL? methodIL = null;
-            if (method.IsIntrinsic)
+            if (method.IsIntrinsic && method.MethodIL == null)
             {
-                methodIL = _ilProvider.GetMethodIL(method, _module);
-                if (methodIL == null)
-                {
-                    return;
-                }
+                // Deal with intrinsics handled by code gen so no need to import
+                return;
             }
 
             _parameterCount = method.Signature.Length;
@@ -123,7 +119,7 @@ namespace ILCompiler.Compiler
             var ilImporter = _phaseFactory.Create<IILImporter>();
 
             // Main phases of the compiler live here
-            var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _locals, methodCodeNodeNeedingCode.EhClauses, methodIL);
+            var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _locals, methodCodeNodeNeedingCode.EhClauses);
 
             if (_configuration.DumpFlowGraphs)
             {
