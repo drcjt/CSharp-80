@@ -51,8 +51,16 @@ namespace ILCompiler.TypeSystem.Common
             }
         }
 
-        public override MethodIL? MethodIL => _typicalMethodDef.MethodIL;
-
+        public override MethodIL? MethodIL
+        {
+            get
+            {
+                var methodDefinitionIL = GetTypicalMethodDefinition().MethodIL;
+                if (methodDefinitionIL == null)
+                    return null;
+                return new InstantiatedMethodIL(this, methodDefinitionIL);
+            }
+        }
 
         public override Instantiation Instantiation => _typicalMethodDef.Instantiation;
 
@@ -81,6 +89,11 @@ namespace ILCompiler.TypeSystem.Common
                 return this;
 
             return Context.GetMethodForInstantiatedType(GetTypicalMethodDefinition(), (InstantiatedType)canonicalizedTypeOfTargetMethod);
+        }
+
+        public override bool IsCanonicalMethod(CanonicalFormKind policy)
+        {
+            return OwningType.IsCanonicalSubtype(policy);
         }
     }
 }

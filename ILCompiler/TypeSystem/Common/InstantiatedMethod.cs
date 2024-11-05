@@ -60,7 +60,16 @@ namespace ILCompiler.TypeSystem.Common
 
         public override TypeDesc OwningType => _methodDesc.OwningType;
 
-        public override MethodIL? MethodIL => _methodDesc.MethodIL;
+        public override MethodIL? MethodIL
+        {
+            get
+            {
+                var methodDefinitionIL = GetTypicalMethodDefinition().MethodIL;
+                if (methodDefinitionIL == null)
+                    return null;
+                return new InstantiatedMethodIL(this, methodDefinitionIL);
+            }
+        }
 
         public override string Name => _methodDesc.Name;
 
@@ -118,6 +127,25 @@ namespace ILCompiler.TypeSystem.Common
             }
 
             return canonicalMethodResult;
+        }
+
+        public override bool IsCanonicalMethod(CanonicalFormKind policy)
+        {
+            if (OwningType.HasInstantiation && OwningType.IsCanonicalSubtype(policy))
+            {
+                return true;
+            }
+
+            for (int i = 0; i < Instantiation.Length; i++)
+            {
+                var type = Instantiation[i];
+                if (type.IsCanonicalSubtype(policy))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
