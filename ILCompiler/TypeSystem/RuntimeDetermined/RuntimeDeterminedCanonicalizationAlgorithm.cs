@@ -37,6 +37,11 @@ namespace ILCompiler.TypeSystem.RuntimeDetermined
 
         public static TypeDesc ConvertToCanon(TypeDesc typeToConvert, CanonicalFormKind kind)
         {
+            return ConvertToCanon(typeToConvert, ref kind);
+        }
+
+        public static TypeDesc ConvertToCanon(TypeDesc typeToConvert, ref CanonicalFormKind kind)
+        {
             TypeSystemContext context = typeToConvert.Context;
 
             if (kind == CanonicalFormKind.Specific)
