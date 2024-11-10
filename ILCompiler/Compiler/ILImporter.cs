@@ -286,7 +286,7 @@ namespace ILCompiler.Compiler
             if (methodIL != uninstantiatedMethodIL)
             {
                 var sharedMethod = _method.GetSharedRuntimeFormMethodTarget();
-                _methodIL = new InstantiatedMethodIL(sharedMethod, methodIL);
+                _methodIL = new InstantiatedMethodIL(sharedMethod, uninstantiatedMethodIL);
             }
             else
             {

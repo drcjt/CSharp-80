@@ -36,7 +36,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     if (_methodIL != uninstantiatedMethodIL)
                     {
                         var sharedMethod = _method.GetSharedRuntimeFormMethodTarget();
-                        _methodIL = new InstantiatedMethodIL(sharedMethod, _methodIL);
+                        _methodIL = new InstantiatedMethodIL(sharedMethod, uninstantiatedMethodIL);
                     }
 
                     AddThrowExceptionIfAnyExceptionHandlers();
@@ -116,10 +116,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportBox(Instruction instruction)
         {
-            var typeDesc = (TypeDesc)instruction.GetOperand();
-            var allocSize = typeDesc.GetElementSize().AsInt;
+            var runtimeDeterminedType = (TypeDesc)instruction.GetOperand();
+            var allocSize = runtimeDeterminedType.GetElementSize().AsInt;
 
-            _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(typeDesc, allocSize));
+            if (runtimeDeterminedType.IsRuntimeDeterminedSubtype)
+            {
+                // Can't add dependency on type as will be decided at runtime
+            }
+            else
+            {
+                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(runtimeDeterminedType, allocSize));
+            }
         }
 
         private void AddThrowExceptionIfAnyExceptionHandlers()
