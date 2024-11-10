@@ -1,8 +1,8 @@
-﻿using ILCompiler.TypeSystem.Common;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
-using ILCompiler.TypeSystem.IL;
 using ILCompiler.TypeSystem.Canon;
+using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -12,8 +12,11 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.Opcode != ILOpcode.newobj) return false;
 
-            var method = (MethodDesc)instruction.GetOperand();
-            var owningType = method.OwningType;
+            var runtimeDeterminedMethod = (MethodDesc)instruction.GetOperand();
+            var retType = runtimeDeterminedMethod.OwningType;
+            var canonMethod = runtimeDeterminedMethod.GetCanonMethodTarget(CanonicalFormKind.Specific);
+
+            var owningType = runtimeDeterminedMethod.OwningType;
 
             if (owningType.IsArray)
             {
@@ -21,9 +24,9 @@ namespace ILCompiler.Compiler.Importer
             }
             else
             {
-                if (IsSystemStringConstructor(method))
+                if (IsSystemStringConstructor(runtimeDeterminedMethod))
                 {
-                    ImportNewObjString(instruction, context, importer, method);
+                    ImportNewObjString(instruction, context, importer, runtimeDeterminedMethod);
                 }
                 else
                 {
