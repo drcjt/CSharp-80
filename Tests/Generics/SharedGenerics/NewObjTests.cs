@@ -2,15 +2,28 @@
 {
     internal class NewObjTests
     {
-        static GenericFoo<T> Newobj<T>(T t1)
+        class NewObjWrapper<T>
         {
-            return new GenericFoo<T>(t1);
+            public T Newobj(T t1)
+            {
+                var genericFoo = new GenericFoo<T>(t1);
+                return genericFoo.Value;
+            }
         }
 
-        public static int Run()
+        class GenericFoo<T>
         {
-            var g1 = Newobj(1);
-            return 0;
+            public T Value;
+            public GenericFoo(T t) 
+            { 
+                Value = t;
+            }
+        }
+
+        public static bool Run()
+        {
+            var newObjWrapper = new NewObjWrapper<int>();
+            return newObjWrapper.Newobj(1) == 1;
         }
     }
 }

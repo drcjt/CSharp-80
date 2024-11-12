@@ -2,16 +2,19 @@
 {
     public class NewArrTests
     {
-        static object Newarr<T>()
+        public class NewArrWrapper<T>
         {
-            object o = new T[10];
-            return o;
+            public object NewArr()
+            {
+                return new T[10];
+            }
         }
 
-        public static int Run()
+        public static bool Run()
         {
-            object o = Newarr<Foo>();
-            return 0;
+            var wrapper = new NewArrWrapper<Foo>();
+            object o = wrapper.NewArr();
+            return true;
         }
     }
 }

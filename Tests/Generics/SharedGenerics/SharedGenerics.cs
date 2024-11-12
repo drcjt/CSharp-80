@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace SharedGenerics
+﻿namespace SharedGenerics
 {
     public class Foo
     {
@@ -22,7 +20,7 @@ namespace SharedGenerics
             var result = NewArrTests.Run();
             result &= NewObjTests.Run();
 
-            return result;
+            return result ? 0 : 1;
         }
     }
 }
