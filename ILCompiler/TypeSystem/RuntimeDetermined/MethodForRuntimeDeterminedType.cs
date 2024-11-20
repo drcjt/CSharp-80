@@ -5,8 +5,8 @@ namespace ILCompiler.TypeSystem.RuntimeDetermined
 {
     internal class MethodForRuntimeDeterminedType : MethodDesc
     {
-        private MethodDesc _typicalMethodDef;
-        private RuntimeDeterminedType _rdType;
+        private readonly MethodDesc _typicalMethodDef;
+        private readonly RuntimeDeterminedType _rdType;
 
         public MethodForRuntimeDeterminedType(MethodDesc typicalMethodDef, RuntimeDeterminedType rdType)
         {

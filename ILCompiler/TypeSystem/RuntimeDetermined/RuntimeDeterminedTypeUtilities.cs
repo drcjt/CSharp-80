@@ -3,7 +3,7 @@ using ILCompiler.TypeSystem.Common;
 
 namespace ILCompiler.TypeSystem.RuntimeDetermined
 {
-    public class RuntimeDeterminedTypeUtilities
+    public static class RuntimeDeterminedTypeUtilities
     {
         public static Instantiation ConvertInstantiationToSharedRuntimeForm(Instantiation instantiation, Instantiation openInstantiation, out bool changed)
         {

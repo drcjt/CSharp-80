@@ -6,7 +6,7 @@ namespace ILCompiler.TypeSystem.Common
 {
     public abstract class TypeDesc : TypeSystemEntity
     {
-        public static readonly TypeDesc[] EmptyTypes = new TypeDesc[0];
+        public static readonly TypeDesc[] EmptyTypes = [];
         public string FullName
         {
             get
