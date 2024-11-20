@@ -1,4 +1,6 @@
-﻿namespace ILCompiler.TypeSystem.Common
+﻿using ILCompiler.TypeSystem.Canon;
+
+namespace ILCompiler.TypeSystem.Common
 {
     public abstract class MetadataType : DefType 
     {
@@ -14,6 +16,8 @@
         public abstract MetadataType? MetadataBaseType { get; }
 
         public abstract MethodImplRecord[] FindMethodsImplWithMatchingDeclName(string name);
+
+        public override bool IsCanonicalSubtype(CanonicalFormKind policy) => false;
     }
 
     public struct ClassLayoutMetadata

@@ -10,6 +10,11 @@ namespace ILCompiler.TypeSystem.IL
         public abstract bool IsInitLocals { get; }
 
         public abstract int LocalsCount { get; }
+
+        public virtual MethodIL GetMethodILDefinition()
+        {
+            return this;
+        }
     }
 
     public enum ILExceptionRegionKind

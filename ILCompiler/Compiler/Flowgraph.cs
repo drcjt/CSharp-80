@@ -163,6 +163,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(AllocObjEntry entry)
         {
+            entry.EETypeNode.Accept(this);
             SetNext(entry);
         }
 

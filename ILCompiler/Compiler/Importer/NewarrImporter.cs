@@ -2,6 +2,7 @@
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.IL;
+using System.Diagnostics;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -11,17 +12,30 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.Opcode != ILOpcode.newarr) return false;
 
-            var op2 = importer.PopExpression();
+            var numElements = importer.PopExpression();
 
-            var elemTypeDesc = (TypeDesc)instruction.GetOperand();
-            var arrayType = new ArrayType(elemTypeDesc, -1);
+            var runtimeDeterminedType = (TypeDesc)instruction.GetOperand();
+            var runtimeDeterminedArrayType = new ArrayType(runtimeDeterminedType, -1);
 
-            var arrayElementSize = elemTypeDesc.GetElementSize().AsInt;
+            StackEntry eeTypeNode;
+            if (runtimeDeterminedType.IsRuntimeDeterminedSubtype)
+            {
+                // Only handle AcquiresInstMethodTableFromThis which will get
+                // the EETypePtr from this pointer.
+                Debug.Assert(context.Method.AcquiresInstMethodTableFromThis());
 
-            var mangledEETypeName = context.NameMangler.GetMangledTypeName(arrayType);
-            var eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
+                eeTypeNode = context.GetGenericContext();
+            }
+            else
+            {
+                var mangledEETypeName = context.NameMangler.GetMangledTypeName(runtimeDeterminedArrayType);
+                eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
+            }
 
-            var args = new List<StackEntry>() { op2, new Int32ConstantEntry(arrayElementSize), eeTypeNode };
+            // TODO: Change NewArray to get this from the eeType
+            var arrayElementSize = runtimeDeterminedArrayType.ElementType.GetElementSize().AsInt;
+
+            var args = new List<StackEntry>() { numElements, new Int32ConstantEntry(arrayElementSize), eeTypeNode };
             var node = new CallEntry("NewArray", args, VarType.Ref, 2);
             importer.PushExpression(node);
 

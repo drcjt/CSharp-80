@@ -44,5 +44,34 @@ namespace ILCompiler.TypeSystem.Common
 
             return this;
         }
+
+        public override bool IsCanonicalSubtype(CanonicalFormKind policy)
+        {
+            if (Signature.ReturnType.IsCanonicalSubtype(policy))
+                return true;
+
+            for (int i = 0; i < Signature.Length; i++)
+            {
+                if (Signature[i].Type.IsCanonicalSubtype(policy))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public override bool IsRuntimeDeterminedSubtype
+        {
+            get
+            {
+                if (Signature.ReturnType.IsRuntimeDeterminedSubtype)
+                    return true;
+
+                for (int i = 0; i < Signature.Length; i++)
+                    if (Signature[i].Type.IsRuntimeDeterminedSubtype)
+                        return true;
+
+                return false;
+            }
+        }
     }
 }

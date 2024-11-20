@@ -16,6 +16,8 @@ namespace ILCompiler.TypeSystem.Common
         private readonly Dictionary<string, InstantiatedType> _instantiatedTypes = new Dictionary<string, InstantiatedType>();
         private readonly Dictionary<string, InstantiatedMethod> _instantiatedMethods = new Dictionary<string, InstantiatedMethod>();
         private readonly Dictionary<string, ByRefType> _byRefTypes = new Dictionary<string, ByRefType>();
+        private readonly Dictionary<string, RuntimeDeterminedType> _runtimeDeterminedTypes = new Dictionary<string, RuntimeDeterminedType>();
+        private readonly Dictionary<string, MethodForRuntimeDeterminedType> _methodForRuntimeDeterminedTypes = new Dictionary<string, MethodForRuntimeDeterminedType>();
         public ModuleDesc? SystemModule { get; set; }
 
         private readonly SharedGenericsMode _genericsMode = SharedGenericsMode.CanonicalReferenceTypes;
@@ -103,6 +105,24 @@ namespace ILCompiler.TypeSystem.Common
             return _methodForInstantiatedTypes[methodForInstantiatedTypeKey] = new MethodForInstantiatedType(typicalMethodDef, instantiatedType);
         }
 
+        public RuntimeDeterminedType GetRuntimeDeterminedType(DefType plainCanonType, GenericParameterDesc detailsType)
+        {
+            var runtimeDeterminedTypeKey = plainCanonType.FullName + ":" + detailsType.ToString();
+            if (_runtimeDeterminedTypes.TryGetValue(runtimeDeterminedTypeKey, out var runtimeDeterminedType))
+                return runtimeDeterminedType;
+
+            return _runtimeDeterminedTypes[runtimeDeterminedTypeKey] = new RuntimeDeterminedType(plainCanonType, detailsType);
+        }
+
+        public MethodDesc GetMethodForRuntimeDeterminedType(MethodDesc typicalMethodDef, RuntimeDeterminedType rdType)
+        {
+            var methodForRDTypeKey = typicalMethodDef.FullName + ":" + rdType.CanonicalType.FullName;
+            if (_methodForRuntimeDeterminedTypes.TryGetValue(methodForRDTypeKey, out var methodForRDType))
+                return methodForRDType;
+
+            return _methodForRuntimeDeterminedTypes[methodForRDTypeKey] = new MethodForRuntimeDeterminedType(typicalMethodDef, rdType);
+        }
+
         public Instantiation ConvertInstantiationToCanonForm(Instantiation instantiation, CanonicalFormKind kind, out bool changed)
         {
             if (_genericsMode == SharedGenericsMode.CanonicalReferenceTypes)
@@ -124,6 +144,14 @@ namespace ILCompiler.TypeSystem.Common
             return typeToConvert;
         }
 
+        public TypeDesc ConvertToCanon(TypeDesc typeToConvert, ref CanonicalFormKind kind)
+        {
+            if (_genericsMode == SharedGenericsMode.CanonicalReferenceTypes)
+                return RuntimeDeterminedCanonicalizationAlgorithm.ConvertToCanon(typeToConvert, ref kind);
+
+            return typeToConvert;
+        }
+
         public DefType GetWellKnownType(string wellKnownNamespace, string wellKnownName)
         {
             return (DefType)SystemModule!.GetType(wellKnownNamespace, wellKnownName);
@@ -138,6 +166,13 @@ namespace ILCompiler.TypeSystem.Common
                 return _canonType;
             }
         }
+
+        public bool IsCanonicalDefinitionType(TypeDesc type, CanonicalFormKind kind) => kind switch
+        {
+            CanonicalFormKind.Any => type == CanonType,
+            CanonicalFormKind.Specific => type == CanonType,
+            _ => false,
+        };
     }
 
     public enum SharedGenericsMode

@@ -3,6 +3,8 @@ using ILCompiler.TypeSystem.Dnlib;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
+using ILCompiler.Compiler.EvaluationStack;
+using StackEntry = ILCompiler.Compiler.EvaluationStack.StackEntry;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -18,5 +20,20 @@ namespace ILCompiler.Compiler.Importer
         public required CorLibModuleProvider CorLibModuleProvider { get; init; }
         public required NodeFactory NodeFactory { get; init; }
         public required DnlibModule Module { get; init; }
+
+        public StackEntry GetGenericContext()
+        {
+            if (Method.AcquiresInstMethodTableFromThis())
+            {
+                var thisPtr = new LocalVariableEntry(0, VarType.Ref, 2);
+                var thisType = new IndirectEntry(thisPtr, VarType.Ptr, 2);
+
+                return thisType;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }

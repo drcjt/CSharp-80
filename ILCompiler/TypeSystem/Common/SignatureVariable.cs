@@ -16,6 +16,8 @@ namespace ILCompiler.TypeSystem.Common
 
         public int Index => _index;
         public override TypeSystemContext Context => _context;
+
+        public override bool IsRuntimeDeterminedSubtype => throw new Exception("IsRuntimeDeterminedSubtype of an indefinite type");
     }
 
     public sealed class SignatureTypeVariable : SignatureVariable
@@ -33,6 +35,11 @@ namespace ILCompiler.TypeSystem.Common
         {
             throw new Exception("ConvertToCanonFormImpl for an indefinite type");
         }
+
+        public override bool IsCanonicalSubtype(CanonicalFormKind policy)
+        {
+            throw new Exception("IsCanonicalSubtype of an indefinite type");
+        }
     }
 
     public sealed class SignatureMethodVariable : SignatureVariable
@@ -49,6 +56,11 @@ namespace ILCompiler.TypeSystem.Common
         protected override TypeDesc ConvertToCanonFormImpl(CanonicalFormKind kind)
         {
             throw new Exception("ConvertToCanonFormImpl for an indefinite type");
+        }
+
+        public override bool IsCanonicalSubtype(CanonicalFormKind policy)
+        {
+            throw new Exception("IsCanonicalSubtype of an indefinite type");
         }
     }
 }

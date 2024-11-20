@@ -1,11 +1,8 @@
-﻿using ILCompiler.TypeSystem.Common;
-using ILCompiler.Compiler.DependencyAnalysis;
+﻿using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
 using Microsoft.Extensions.Logging;
 using System.Text;
-using ILCompiler.IL;
-using ILCompiler.TypeSystem.IL;
-using ILCompiler.TypeSystem.Dnlib;
 
 namespace ILCompiler.Compiler
 {
@@ -14,22 +11,18 @@ namespace ILCompiler.Compiler
         private readonly IConfiguration _configuration;
         private readonly ILogger<MethodCompiler> _logger;
         private readonly IPhaseFactory _phaseFactory;
-        private readonly ILProvider _ilProvider;
-        private readonly DnlibModule _module;
 
         private int _parameterCount;
         private int? _returnBufferArgIndex;
 
         private readonly LocalVariableTable _locals;
 
-        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory, RTILProvider ilProvider, DnlibModule module)
+        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory)
         {
             _configuration = configuration;
             _logger = logger;
             _locals = new LocalVariableTable();
             _phaseFactory = phaseFactory;
-            _ilProvider = ilProvider;
-            _module = module;
         }
 
         private void SetupLocalVariableTable(MethodDesc method)
@@ -106,14 +99,10 @@ namespace ILCompiler.Compiler
                 return;
             }
 
-            MethodIL? methodIL = null;
-            if (method.IsIntrinsic)
+            if (method.IsIntrinsic && method.MethodIL == null)
             {
-                methodIL = _ilProvider.GetMethodIL(method, _module);
-                if (methodIL == null)
-                {
-                    return;
-                }
+                // Deal with intrinsics handled by code gen so no need to import
+                return;
             }
 
             _parameterCount = method.Signature.Length;
@@ -123,7 +112,7 @@ namespace ILCompiler.Compiler
             var ilImporter = _phaseFactory.Create<IILImporter>();
 
             // Main phases of the compiler live here
-            var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _locals, methodCodeNodeNeedingCode.EhClauses, methodIL);
+            var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _locals, methodCodeNodeNeedingCode.EhClauses);
 
             if (_configuration.DumpFlowGraphs)
             {

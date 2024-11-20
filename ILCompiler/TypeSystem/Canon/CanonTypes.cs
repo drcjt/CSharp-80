@@ -40,5 +40,10 @@ namespace ILCompiler.TypeSystem.Canon
             Debug.Assert(kind == CanonicalFormKind.Specific);
             return this;
         }
+
+        public override bool IsCanonicalSubtype(CanonicalFormKind policy)
+        {
+            return policy == CanonicalFormKind.Specific || policy == CanonicalFormKind.Any;
+        }
     }
 }

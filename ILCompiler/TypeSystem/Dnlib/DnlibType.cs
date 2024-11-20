@@ -221,5 +221,36 @@ namespace ILCompiler.TypeSystem.Dnlib
                     throw new NotSupportedException($"ElementType : {typeSig.ElementType} cannot be converted to VarType");
             }
         }
+
+        private TypeDesc[]? _genericParameters;
+
+        private void ComputeGenericParameters()
+        {
+            var genericParameters = _typeDef.GenericParameters;
+            if (genericParameters.Count > 0)
+            {
+                _genericParameters = new TypeDesc[genericParameters.Count];
+                for (int i = 0; i < genericParameters.Count; i++)
+                {
+                    _genericParameters[i] = new DnlibGenericParameter(_module, genericParameters[i]);
+                }
+            }
+            else
+            {
+                _genericParameters = TypeDesc.EmptyTypes;
+            }
+        }
+
+        public override Instantiation? Instantiation
+        {
+            get
+            {
+                if (_genericParameters == null)
+                {
+                    ComputeGenericParameters();
+                }
+                return new Instantiation(_genericParameters!);
+            }
+        }
     }
 }

@@ -13,19 +13,19 @@ namespace ILCompiler.Compiler.Importer
 
             var isLoadStatic = instruction.Opcode == ILOpcode.ldsfld;
 
-            var fieldDesc = (FieldDesc)instruction.GetOperand();
+            var runtimeDeterminedType = (FieldDesc)instruction.GetOperand();
 
-            uint fieldOffset = (uint)fieldDesc.Offset.AsInt;
+            uint fieldOffset = (uint)runtimeDeterminedType.Offset.AsInt;
 
             StackEntry obj;
             if (isLoadStatic)
             {
-                var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDesc);
+                var mangledFieldName = context.NameMangler.GetMangledFieldName(runtimeDeterminedType);
                 obj = new SymbolConstantEntry(mangledFieldName);
 
-                if (!context.PreinitializationManager.IsPreinitialized(fieldDesc.OwningType))
+                if (!context.PreinitializationManager.IsPreinitialized(runtimeDeterminedType.OwningType))
                 {
-                    obj = InitClassHelper.ImportInitClass(fieldDesc.OwningType, context, importer, obj);
+                    obj = InitClassHelper.ImportInitClass(runtimeDeterminedType.OwningType, context, importer, obj);
                 }
                 fieldOffset = 0;
             }
@@ -44,9 +44,17 @@ namespace ILCompiler.Compiler.Importer
                 }
             }
 
-            var fieldSize = fieldDesc.FieldType.GetElementSize().AsInt;
+            var fieldType = runtimeDeterminedType.FieldType.VarType;
+            if (runtimeDeterminedType.OwningType.IsRuntimeDeterminedSubtype)
+            {
+                // TODO: will need to revist this to deal with runtime determined types properly
+                // Use Ref for canonical types
+                fieldType = VarType.Ref;
+            }
 
-            var node = new IndirectEntry(obj, fieldDesc.FieldType.VarType, fieldSize, fieldOffset);
+            var fieldSize = runtimeDeterminedType.FieldType.GetElementSize().AsInt;
+
+            var node = new IndirectEntry(obj, fieldType, fieldSize, fieldOffset);
 
             importer.PushExpression(node);
 

@@ -6,6 +6,7 @@ namespace ILCompiler.TypeSystem.Common
 {
     public abstract class TypeDesc : TypeSystemEntity
     {
+        public static readonly TypeDesc[] EmptyTypes = [];
         public string FullName
         {
             get
@@ -27,7 +28,10 @@ namespace ILCompiler.TypeSystem.Common
 
         public bool IsInstantiatedType => this is InstantiatedType;
 
-        public virtual Instantiation? Instantiation => null;
+        // TODO: Does this need to be nullable now we have Instantiation.Empty?
+        public virtual Instantiation? Instantiation => Instantiation.Empty;
+
+        public bool HasInstantiation => Instantiation?.Length != 0;
 
         public virtual bool IsValueType => false;
 
@@ -123,5 +127,26 @@ namespace ILCompiler.TypeSystem.Common
         protected abstract TypeDesc ConvertToCanonFormImpl(CanonicalFormKind kind);
 
         public bool IsSignatureVariable => this is SignatureTypeVariable || this is SignatureMethodVariable;
+
+        public abstract bool IsCanonicalSubtype(CanonicalFormKind policy);
+
+        public bool IsCanonicalType
+        {
+            get
+            {
+                if (Context.IsCanonicalDefinitionType(this, CanonicalFormKind.Any))
+                    return true;
+                else if (this.IsValueType)
+                    return this.IsCanonicalSubtype(CanonicalFormKind.Any);
+                else
+                    return false;
+            }
+        }
+
+        public abstract bool IsRuntimeDeterminedSubtype { get; }
+
+        public bool IsGenericDefinition => HasInstantiation && IsTypeDefinition;
+
+        public bool IsTypeDefinition => GetTypeDefinition() == this;
     }
 }

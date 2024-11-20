@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Compiler;
+using ILCompiler.IL;
 using ILCompiler.TypeSystem.Common;
 
 namespace ILCompiler.TypeSystem.Dnlib
@@ -11,16 +12,13 @@ namespace ILCompiler.TypeSystem.Dnlib
         private readonly Dictionary<string, MethodDesc> _dnlibMethodsByFullName = new Dictionary<string, MethodDesc>();
 
         private readonly CorLibModuleProvider _corLibModuleProvider;
+        private readonly ILProvider _ilProvider;
 
-        public DnlibModule(TypeSystemContext context, CorLibModuleProvider corLibModuleProvider) : base(context)
+        public DnlibModule(TypeSystemContext context, CorLibModuleProvider corLibModuleProvider, RTILProvider ilProvider) : base(context)
         {
             _corLibModuleProvider = corLibModuleProvider;
             context.SystemModule = this;
-        }
-
-        public static DnlibModule Create(TypeSystemContext context, CorLibModuleProvider corLibModuleProvider)
-        {
-            return new DnlibModule(context, corLibModuleProvider);
+            _ilProvider = ilProvider;
         }
 
         public FieldDesc Create(IField field)
@@ -127,7 +125,7 @@ namespace ILCompiler.TypeSystem.Dnlib
 
                 if (!_dnlibMethodsByFullName.TryGetValue(methodDef.FullName, out MethodDesc? methodDesc))
                 {
-                    methodDesc = new DnlibMethod(methodDef, this);
+                    methodDesc = new DnlibMethod(methodDef, this, _ilProvider);
                     _dnlibMethodsByFullName[methodDef.FullName] = methodDesc;
                 }
 

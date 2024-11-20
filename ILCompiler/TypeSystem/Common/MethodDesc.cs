@@ -1,5 +1,6 @@
 ﻿using ILCompiler.TypeSystem.Canon;
 using ILCompiler.TypeSystem.IL;
+using ILCompiler.TypeSystem.RuntimeDetermined;
 using System.Text;
 
 namespace ILCompiler.TypeSystem.Common
@@ -50,6 +51,8 @@ namespace ILCompiler.TypeSystem.Common
         public abstract MethodSignature Signature { get; }
 
         public abstract Instantiation Instantiation { get; }
+
+        public bool HasInstantiation => Instantiation.Length != 0;
 
         public virtual MethodDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation? methodInstantiation)
         {
@@ -123,5 +126,59 @@ namespace ILCompiler.TypeSystem.Common
         public abstract MethodDesc CreateUserMethod(string name);
 
         public virtual MethodDesc GetCanonMethodTarget(CanonicalFormKind kind) => this;
+
+        public virtual bool IsCanonicalMethod(CanonicalFormKind policy) => false;
+        public bool IsSharedByGenericInstantiations => IsCanonicalMethod(CanonicalFormKind.Any);
+
+        public TypeDesc ImplementationType => OwningType;
+
+        public bool RequiresInstArg()
+        {
+            return IsSharedByGenericInstantiations &&
+                   (HasInstantiation ||
+                    Signature.IsStatic ||
+                    ImplementationType.IsValueType ||
+                    (ImplementationType.IsInterface && IsAbstract));
+        }
+
+        public bool RequiresInstMethodDescArg => HasInstantiation && IsSharedByGenericInstantiations;
+
+        public bool AcquiresInstMethodTableFromThis()
+        {
+            return IsSharedByGenericInstantiations &&
+                !HasInstantiation &&
+                !Signature.IsStatic &&
+                !ImplementationType.IsValueType &&
+                !(ImplementationType.IsInterface && !IsAbstract);
+        }
+
+        public MethodDesc GetSharedRuntimeFormMethodTarget()
+        {
+            MethodDesc result = this;
+            if (OwningType is DefType owningType)
+            {
+                DefType sharedRuntimeOwningType = owningType.ConvertToSharedRuntimeDeterminedForm();
+                if (sharedRuntimeOwningType != owningType)
+                {
+                    result = Context.GetMethodForInstantiatedType(GetTypicalMethodDefinition(), (InstantiatedType)sharedRuntimeOwningType);
+                }
+
+                if (result.HasInstantiation)
+                {
+                    MethodDesc uninstantiatedMethod = result.GetMethodDefinition();
+
+                    Instantiation sharedInstantiation = RuntimeDeterminedTypeUtilities.ConvertInstantiationToSharedRuntimeForm(
+                        Instantiation, uninstantiatedMethod.Instantiation, out bool changed);
+
+                    if (changed || result != this)
+                    {
+                        // Find matching instantiated method if the instantiation changed or the owning type was switched
+                        result = Context.GetInstantiatedMethod(uninstantiatedMethod, sharedInstantiation);
+                    }
+                }
+            }
+
+            return result;
+        }
     }
 }

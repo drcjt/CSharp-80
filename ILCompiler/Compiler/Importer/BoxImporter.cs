@@ -1,4 +1,5 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.DependencyAnalysis;
+using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
@@ -21,6 +22,7 @@ namespace ILCompiler.Compiler.Importer
                 var lclNum = importer.GrabTemp(VarType.Ref, 2);
 
                 var mangledEETypeName = context.NameMangler.GetMangledTypeName(objType);
+                var eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
 
                 int unboxedObjectSize = GetUnboxedSize(objType);
 
@@ -28,7 +30,7 @@ namespace ILCompiler.Compiler.Importer
                 var allocSize = unboxedObjectSize + 2;
 
                 // Allocate memory for object
-                var op1 = new AllocObjEntry(mangledEETypeName, allocSize, VarType.Ref);
+                var op1 = new AllocObjEntry(eeTypeNode, allocSize, VarType.Ref);
                 var asg = new StoreLocalVariableEntry(lclNum, false, op1);
                 importer.ImportAppendTree(asg);
 

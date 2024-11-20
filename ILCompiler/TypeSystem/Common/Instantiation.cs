@@ -4,6 +4,8 @@ namespace ILCompiler.TypeSystem.Common
 {
     public class Instantiation
     {
+        public static readonly Instantiation Empty = new Instantiation(TypeDesc.EmptyTypes);
+
         private readonly TypeDesc[] _genericParameters;
 
         public Instantiation(params TypeDesc[] genericParameters)

@@ -1,4 +1,6 @@
-﻿namespace ILCompiler.TypeSystem.Common
+﻿using ILCompiler.TypeSystem.Canon;
+
+namespace ILCompiler.TypeSystem.Common
 {
     public abstract class ParameterizedType : TypeDesc
     {
@@ -9,5 +11,12 @@
         }
 
         public override TypeSystemContext Context => ParameterType.Context;
+
+        public override bool IsCanonicalSubtype(CanonicalFormKind policy)
+        {
+            return ParameterType.IsCanonicalSubtype(policy);
+        }
+
+        public override bool IsRuntimeDeterminedSubtype => ParameterType.IsRuntimeDeterminedSubtype;
     }
 }

@@ -32,7 +32,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 if (_methodIL != null)
                 {
-                    _methodIL = new InstantiatedMethodIL(_method, _methodIL);
+                    var uninstantiatedMethodIL = _methodIL.GetMethodILDefinition();
+                    if (_methodIL != uninstantiatedMethodIL)
+                    {
+                        var sharedMethod = _method.GetSharedRuntimeFormMethodTarget();
+                        _methodIL = new InstantiatedMethodIL(sharedMethod, uninstantiatedMethodIL);
+                    }
 
                     AddThrowExceptionIfAnyExceptionHandlers();
 
@@ -111,10 +116,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportBox(Instruction instruction)
         {
-            var typeDesc = (TypeDesc)instruction.GetOperand();
-            var allocSize = typeDesc.GetElementSize().AsInt;
+            var runtimeDeterminedType = (TypeDesc)instruction.GetOperand();
+            var allocSize = runtimeDeterminedType.GetElementSize().AsInt;
 
-            _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(typeDesc, allocSize));
+            if (runtimeDeterminedType.IsRuntimeDeterminedSubtype)
+            {
+                // Can't add dependency on type as will be decided at runtime
+            }
+            else
+            {
+                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(runtimeDeterminedType, allocSize));
+            }
         }
 
         private void AddThrowExceptionIfAnyExceptionHandlers()
@@ -299,12 +311,59 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 _dependencies.Add(_context.NodeFactory.NecessaryTypeSymbol(methodDesc.OwningType));
             }
 
+            bool exactContextNeedsRuntimeLookup;
+            if (methodDesc.HasInstantiation)
+            {
+                exactContextNeedsRuntimeLookup = methodDesc.IsSharedByGenericInstantiations;
+            }
+            else
+            {
+                exactContextNeedsRuntimeLookup = methodDesc.OwningType.IsCanonicalSubtype(CanonicalFormKind.Any);
+            }
+
             IMethodNode methodNode;
             bool directCall = IsDirectCall(methodDesc, instruction.Opcode);
             if (directCall)
             {
                 var targetMethod = methodDesc.GetCanonMethodTarget(CanonicalFormKind.Specific);
-                methodNode = _context.NodeFactory.MethodNode(targetMethod);
+                if (exactContextNeedsRuntimeLookup)
+                {
+                    if (targetMethod.RequiresInstMethodDescArg)
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else
+                    {
+                        methodNode = _context.NodeFactory.MethodNode(targetMethod);
+                    }
+                }
+                else
+                {
+                    if (targetMethod.RequiresInstMethodDescArg)
+                    {
+                        // TODO: Get the Inst Param and add a dependency to it
+                    }
+
+                    methodNode = _context.NodeFactory.MethodNode(targetMethod);
+                }
+            }
+            else if (methodDesc.HasInstantiation)
+            {
+                // TODO: Generic Virtual Method Call
+                throw new NotImplementedException("Generic Virtual Method Call");
+            }
+            else if (methodDesc.OwningType.IsInterface)
+            {
+                if (exactContextNeedsRuntimeLookup)
+                {
+                    // TODO: Interface Method Call
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    _dependencies.Add(_context.NodeFactory.VirtualMethodUse(methodDesc));
+                    return;
+                }
             }
             else
             {
