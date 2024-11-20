@@ -167,14 +167,12 @@ namespace ILCompiler.TypeSystem.Common
                 {
                     MethodDesc uninstantiatedMethod = result.GetMethodDefinition();
 
-                    bool changed;
                     Instantiation sharedInstantiation = RuntimeDeterminedTypeUtilities.ConvertInstantiationToSharedRuntimeForm(
-                        Instantiation, uninstantiatedMethod.Instantiation, out changed);
+                        Instantiation, uninstantiatedMethod.Instantiation, out bool changed);
 
-                    // If either the instantiation changed, or we switched the owning type, we need to find the matching
-                    // instantiated method.
                     if (changed || result != this)
                     {
+                        // Find matching instantiated method if the instantiation changed or the owning type was switched
                         result = Context.GetInstantiatedMethod(uninstantiatedMethod, sharedInstantiation);
                     }
                 }

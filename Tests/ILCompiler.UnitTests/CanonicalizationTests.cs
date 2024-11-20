@@ -1,5 +1,6 @@
 ﻿using dnlib.DotNet;
 using ILCompiler.Compiler;
+using ILCompiler.IL;
 using ILCompiler.TypeSystem.Canon;
 using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.Dnlib;
@@ -43,7 +44,7 @@ namespace ILCompiler.UnitTests
             var typeSystemContext = new TypeSystemContext();
             var corLibModuleProvider = new CorLibModuleProvider();
             corLibModuleProvider.CorLibModule = corlibModule;
-            _module = new DnlibModule(typeSystemContext, corLibModuleProvider, null);
+            _module = new DnlibModule(typeSystemContext, corLibModuleProvider, new RTILProvider());
 
             _referenceType = GetType("Canonicalization", "ReferenceType");
             _otherReferenceType = GetType("Canonicalization", "OtherReferenceType");

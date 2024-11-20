@@ -20,10 +20,8 @@ namespace ILCompiler.Compiler.Importer
             StackEntry eeTypeNode;
             if (runtimeDeterminedType.IsRuntimeDeterminedSubtype)
             {
-                // TODO: Use generic lookup helper
-
-                // For generic context if method is AcquiresInstMethodTableFromThis
-                // then load this pointer as an EETypePtr
+                // Only handle AcquiresInstMethodTableFromThis which will get
+                // the EETypePtr from this pointer.
                 Debug.Assert(context.Method.AcquiresInstMethodTableFromThis());
 
                 eeTypeNode = context.GetGenericContext();
@@ -36,7 +34,6 @@ namespace ILCompiler.Compiler.Importer
 
             // TODO: Change NewArray to get this from the eeType
             var arrayElementSize = runtimeDeterminedArrayType.ElementType.GetElementSize().AsInt;
-            //var arrayElementSize = runtimeDeterminedType.GetElementSize().AsInt;
 
             var args = new List<StackEntry>() { numElements, new Int32ConstantEntry(arrayElementSize), eeTypeNode };
             var node = new CallEntry("NewArray", args, VarType.Ref, 2);

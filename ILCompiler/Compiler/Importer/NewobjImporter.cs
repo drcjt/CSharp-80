@@ -3,6 +3,7 @@ using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Canon;
 using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
+using System.Diagnostics;
 
 namespace ILCompiler.Compiler.Importer
 {
@@ -13,8 +14,6 @@ namespace ILCompiler.Compiler.Importer
             if (instruction.Opcode != ILOpcode.newobj) return false;
 
             var runtimeDeterminedMethod = (MethodDesc)instruction.GetOperand();
-            var retType = runtimeDeterminedMethod.OwningType;
-            var canonMethod = runtimeDeterminedMethod.GetCanonMethodTarget(CanonicalFormKind.Specific);
 
             var owningType = runtimeDeterminedMethod.OwningType;
 
@@ -60,10 +59,9 @@ namespace ILCompiler.Compiler.Importer
             StackEntry eeTypeNode;
             if (objType.IsRuntimeDeterminedSubtype)
             {
-                // TODO: Use generic lookup helper
-
-                // For generic context if method is AcquiresInstMethodTableFromThis
-                // then load this pointer as an EETypePtr
+                // Only handle AcquiresInstMethodTableFromThis which will get
+                // the EETypePtr from this pointer.
+                Debug.Assert(context.Method.AcquiresInstMethodTableFromThis());
 
                 eeTypeNode = context.GetGenericContext();
             }

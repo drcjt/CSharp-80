@@ -8,56 +8,35 @@ namespace ILCompiler.TypeSystem.RuntimeDetermined
         public static Instantiation ConvertInstantiationToSharedRuntimeForm(Instantiation instantiation, Instantiation openInstantiation, out bool changed)
         {
             TypeDesc[]? sharedInstantiation = null;
+            var currentPolicy = CanonicalFormKind.Specific;
 
-            CanonicalFormKind currentPolicy = CanonicalFormKind.Specific;
-            CanonicalFormKind startLoopPolicy;
-
-            do
+            for (int instantiationIndex = 0; instantiationIndex < instantiation.Length; instantiationIndex++)
             {
-                startLoopPolicy = currentPolicy;
+                var typeToConvert = instantiation[instantiationIndex];
+                var context = typeToConvert.Context;
+                var canonForm = context.ConvertToCanon(typeToConvert, ref currentPolicy);
+                var runtimeDeterminedForm = typeToConvert;
 
-                for (int instantiationIndex = 0; instantiationIndex < instantiation.Length; instantiationIndex++)
+                if ((typeToConvert != canonForm) || typeToConvert.IsCanonicalType)
                 {
-                    TypeDesc typeToConvert = instantiation[instantiationIndex];
-                    TypeSystemContext context = typeToConvert.Context;
-                    TypeDesc canonForm = context.ConvertToCanon(typeToConvert, ref currentPolicy);
-                    TypeDesc runtimeDeterminedForm = typeToConvert;
-
-                    if ((typeToConvert != canonForm) || typeToConvert.IsCanonicalType)
+                    if (sharedInstantiation == null)
                     {
-                        if (sharedInstantiation == null)
-                        {
-                            sharedInstantiation = new TypeDesc[instantiation.Length];
-                            for (int i = 0; i < instantiationIndex; i++)
-                                sharedInstantiation[i] = instantiation[i];
-                        }
-
-                        runtimeDeterminedForm = context.GetRuntimeDeterminedType(
-                            (DefType)canonForm, (GenericParameterDesc)openInstantiation[instantiationIndex]);
+                        sharedInstantiation = new TypeDesc[instantiation.Length];
+                        for (int i = 0; i < instantiationIndex; i++)
+                            sharedInstantiation[i] = instantiation[i];
                     }
 
-                    if (sharedInstantiation != null)
-                    {
-                        sharedInstantiation[instantiationIndex] = runtimeDeterminedForm;
-                    }
+                    runtimeDeterminedForm = context.GetRuntimeDeterminedType((DefType)canonForm, (GenericParameterDesc)openInstantiation[instantiationIndex]);
                 }
 
-                // Optimization: even if canonical policy changed, we don't actually need to re-run the loop
-                // for instantiations that only have a single element.
-                if (instantiation.Length == 1)
+                if (sharedInstantiation != null)
                 {
-                    break;
+                    sharedInstantiation[instantiationIndex] = runtimeDeterminedForm;
                 }
-
-            } while (currentPolicy != startLoopPolicy);
-
-            changed = sharedInstantiation != null;
-            if (sharedInstantiation != null)
-            {
-                return new Instantiation(sharedInstantiation);
             }
 
-            return instantiation;
+            changed = sharedInstantiation != null;
+            return sharedInstantiation != null ? new Instantiation(sharedInstantiation) : instantiation;
         }
     }
 }

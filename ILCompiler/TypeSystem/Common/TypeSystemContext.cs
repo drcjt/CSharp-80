@@ -17,7 +17,7 @@ namespace ILCompiler.TypeSystem.Common
         private readonly Dictionary<string, InstantiatedMethod> _instantiatedMethods = new Dictionary<string, InstantiatedMethod>();
         private readonly Dictionary<string, ByRefType> _byRefTypes = new Dictionary<string, ByRefType>();
         private readonly Dictionary<string, RuntimeDeterminedType> _runtimeDeterminedTypes = new Dictionary<string, RuntimeDeterminedType>();
-        private readonly Dictionary<string, MethodForRuntimeDeterminedType> _methodForRDTypes = new Dictionary<string, MethodForRuntimeDeterminedType>();
+        private readonly Dictionary<string, MethodForRuntimeDeterminedType> _methodForRuntimeDeterminedTypes = new Dictionary<string, MethodForRuntimeDeterminedType>();
         public ModuleDesc? SystemModule { get; set; }
 
         private readonly SharedGenericsMode _genericsMode = SharedGenericsMode.CanonicalReferenceTypes;
@@ -117,10 +117,10 @@ namespace ILCompiler.TypeSystem.Common
         public MethodDesc GetMethodForRuntimeDeterminedType(MethodDesc typicalMethodDef, RuntimeDeterminedType rdType)
         {
             var methodForRDTypeKey = typicalMethodDef.FullName + ":" + rdType.CanonicalType.FullName;
-            if (_methodForRDTypes.TryGetValue(methodForRDTypeKey, out var methodForRDType))
+            if (_methodForRuntimeDeterminedTypes.TryGetValue(methodForRDTypeKey, out var methodForRDType))
                 return methodForRDType;
 
-            return _methodForRDTypes[methodForRDTypeKey] = new MethodForRuntimeDeterminedType(typicalMethodDef, rdType);
+            return _methodForRuntimeDeterminedTypes[methodForRDTypeKey] = new MethodForRuntimeDeterminedType(typicalMethodDef, rdType);
         }
 
         public Instantiation ConvertInstantiationToCanonForm(Instantiation instantiation, CanonicalFormKind kind, out bool changed)
