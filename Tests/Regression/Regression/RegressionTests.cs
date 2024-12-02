@@ -15,6 +15,8 @@
 
             Assert.Equals(2, new SpillImportAppendTests().SpillOnStFldImport());
 
+            Assert.Equals(10, Bug545Method<int>().Length);
+
             return 0;
         }
 
@@ -47,6 +49,22 @@
         private static nuint MethodCall_WithNuintParameter_CompilesWithoutErrors(nuint n)
         {
             return n;
+        }
+
+        public static T[] Bug545Method<T>()
+        {
+            var t = new Bug545Test<T>();
+            return t.ToArray();
+        }
+
+    }
+
+    public class Bug545Test<T>()
+    {
+        public T[] ToArray()
+        {
+            var array = new T[10];
+            return array;
         }
     }
 }
