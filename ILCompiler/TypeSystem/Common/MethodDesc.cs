@@ -71,7 +71,7 @@ namespace ILCompiler.TypeSystem.Common
 
             if (instantiatedOwningType is InstantiatedType)
             {
-                return Context.GetMethodForInstantiatedType(this.GetMethodDefinition(), (InstantiatedType)instantiatedOwningType);
+                return Context.GetMethodForInstantiatedType(this.GetTypicalMethodDefinition(), (InstantiatedType)instantiatedOwningType);
             }
             
             return Context.GetInstantiatedMethod(this.GetMethodDefinition(), new Instantiation(clone));
