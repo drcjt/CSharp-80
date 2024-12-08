@@ -36,7 +36,7 @@
                         object[] newItems = new object[value];
                         if (_size > 0)
                         {
-                            Array.Copy(newItems, _items, _size);
+                            Array.Copy(_items, newItems, _size);
                         }
                         _items = newItems;
                     }
