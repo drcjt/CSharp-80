@@ -293,7 +293,7 @@
         private void IndexOf_ReturnsFirstMatchingValue(int count)
         {
             var list = NonGenericIListFactory(count);
-            var originalItems = new object[count];
+            var originalItems = new object?[count];
 
             // TODO: Replace with CopyTo when its implemented
             for (int i = 0; i < count; i++)
@@ -444,8 +444,7 @@
             var list = NonGenericIListFactory(count);
             var enumerator = list.GetEnumerator();
 
-            // Go to end of the enumerator
-            while (enumerator.MoveNext()) ;
+            while (enumerator.MoveNext()) { /* Move to end of enumerator */ }
 
             // Current shouldn't fail
             if (count > 0)

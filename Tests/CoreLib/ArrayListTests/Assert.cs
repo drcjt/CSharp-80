@@ -34,17 +34,17 @@
             }
         }
 
-        public static void Equal(object? expected, object? actual)
+        public static void AreEquals(object expected, object actual)
         {
-            if (expected != actual)
+            if (!expected.Equals(actual))
             {
                 Environment.Exit(1);
             }
         }
 
-        public static void AreEquals(object expected, object actual)
+        public static void Equal(object? expected, object? actual)
         {
-            if (!expected.Equals((object)actual))
+            if (expected != actual)
             {
                 Environment.Exit(1);
             }
