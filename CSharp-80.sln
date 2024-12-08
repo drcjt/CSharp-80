@@ -195,6 +195,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DivConst", "Tests\CodeGen\D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedGenerics", "Tests\Generics\SharedGenerics\SharedGenerics.csproj", "{3A68377F-F75A-4080-B321-2F6CF1638F40}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "System.Collections.NonGeneric", "System.Collections.NonGeneric", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArrayListTests", "Tests\CoreLib\ArrayListTests\ArrayListTests.csproj", "{58F1EF68-538E-EBF9-4F25-FF1F528E3660}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -485,6 +489,10 @@ Global
 		{3A68377F-F75A-4080-B321-2F6CF1638F40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A68377F-F75A-4080-B321-2F6CF1638F40}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A68377F-F75A-4080-B321-2F6CF1638F40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58F1EF68-538E-EBF9-4F25-FF1F528E3660}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58F1EF68-538E-EBF9-4F25-FF1F528E3660}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58F1EF68-538E-EBF9-4F25-FF1F528E3660}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58F1EF68-538E-EBF9-4F25-FF1F528E3660}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -567,6 +575,8 @@ Global
 		{39F81DAF-91EE-4630-9653-3F173A3DA9A2} = {0487B618-E2E2-4C81-8056-73751DDA3D49}
 		{615757CD-4602-4A45-A838-54B757941BAF} = {0487B618-E2E2-4C81-8056-73751DDA3D49}
 		{3A68377F-F75A-4080-B321-2F6CF1638F40} = {35C20505-0FCB-4D27-AFC5-A0B1071C268F}
+		{02EA681E-C7D8-13C7-8484-4AC65E1B71E8} = {2076ADF1-E63E-4A71-AF00-DCD6570B5ECF}
+		{58F1EF68-538E-EBF9-4F25-FF1F528E3660} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}
