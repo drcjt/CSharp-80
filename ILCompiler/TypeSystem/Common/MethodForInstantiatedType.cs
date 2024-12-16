@@ -77,6 +77,7 @@ namespace ILCompiler.TypeSystem.Common
         public override bool HasReturnType => _typicalMethodDef.HasReturnType;
 
         public override bool IsVirtual => _typicalMethodDef.IsVirtual;
+        public override bool IsAbstract => _typicalMethodDef.IsAbstract;
 
         public override MethodDesc CreateUserMethod(string name) => throw new NotImplementedException();
 
