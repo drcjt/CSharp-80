@@ -4,20 +4,20 @@
     {
         public static void IsBetweenCharTests()
         {
-            Assert.AreEquals(true, char.IsBetween('a', 'a', 'a'));
-            Assert.AreEquals(false, char.IsBetween((char)('a' - 1), 'a', 'a'));
-            Assert.AreEquals(false, char.IsBetween((char)('a' + 1), 'a', 'a'));
-            Assert.AreEquals(true, char.IsBetween('a', 'a', 'b'));
-            Assert.AreEquals(true, char.IsBetween('b', 'a', 'b'));
-            Assert.AreEquals(false, char.IsBetween((char)('a' - 1), 'a', 'b'));
-            Assert.AreEquals(false, char.IsBetween((char)('b' + 1), 'a', 'b'));
-            Assert.AreEquals(true, char.IsBetween('a', 'a', 'z'));
-            Assert.AreEquals(true, char.IsBetween('m', 'a', 'z'));
-            Assert.AreEquals(true, char.IsBetween('z', 'a', 'z'));
-            Assert.AreEquals(false, char.IsBetween((char)('a' - 1), 'a', 'z'));
-            Assert.AreEquals(false, char.IsBetween((char)('z' + 1), 'a', 'z'));
-            Assert.AreEquals(false, char.IsBetween('b', 'c', 'd'));
-            Assert.AreEquals(true, char.IsBetween('b', 'd', 'c'));
+            Assert.AreEqual(true, char.IsBetween('a', 'a', 'a'));
+            Assert.AreEqual(false, char.IsBetween((char)('a' - 1), 'a', 'a'));
+            Assert.AreEqual(false, char.IsBetween((char)('a' + 1), 'a', 'a'));
+            Assert.AreEqual(true, char.IsBetween('a', 'a', 'b'));
+            Assert.AreEqual(true, char.IsBetween('b', 'a', 'b'));
+            Assert.AreEqual(false, char.IsBetween((char)('a' - 1), 'a', 'b'));
+            Assert.AreEqual(false, char.IsBetween((char)('b' + 1), 'a', 'b'));
+            Assert.AreEqual(true, char.IsBetween('a', 'a', 'z'));
+            Assert.AreEqual(true, char.IsBetween('m', 'a', 'z'));
+            Assert.AreEqual(true, char.IsBetween('z', 'a', 'z'));
+            Assert.AreEqual(false, char.IsBetween((char)('a' - 1), 'a', 'z'));
+            Assert.AreEqual(false, char.IsBetween((char)('z' + 1), 'a', 'z'));
+            Assert.AreEqual(false, char.IsBetween('b', 'c', 'd'));
+            Assert.AreEqual(true, char.IsBetween('b', 'd', 'c'));
         }
 
         public static void IsAsciiDigit_WithAsciiDigits_ReturnsTrue()
@@ -27,7 +27,7 @@
             for (int i = 0; i < validAsciiDigits.Length; i++) 
             { 
                 char ch = validAsciiDigits[i];
-                Assert.AreEquals(true, char.IsAsciiDigit(ch));
+                Assert.AreEqual(true, char.IsAsciiDigit(ch));
             }
         }
 
@@ -58,7 +58,7 @@
             for (int i = 0; i < invalidAsciiDigits.Length; i++)
             {
                 char ch = invalidAsciiDigits[i];
-                Assert.AreEquals(false, char.IsAsciiDigit(ch));
+                Assert.AreEqual(false, char.IsAsciiDigit(ch));
             }
         }
     }
