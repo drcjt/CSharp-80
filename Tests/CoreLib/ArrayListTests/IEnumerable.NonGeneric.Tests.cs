@@ -20,7 +20,7 @@
                     foreach (var item3 in enumerable)
                         iterations++;
 
-            Assert.AreEquals(count * count * count, iterations);
+            Assert.AreEqual(count * count * count, iterations);
         }
 
         private void MoveNext_FromStartToFinish(int count)
@@ -30,7 +30,7 @@
             while (enumerator.MoveNext())
                 iterations++;
 
-            Assert.AreEquals(count, iterations);
+            Assert.AreEqual(count, iterations);
         }
 
         private void MoveNext_AfterEndOfCollection(int count)
@@ -56,9 +56,9 @@
             while (enumerator.MoveNext())
             {
                 var current = enumerator.Current;
-                Assert.AreEquals(current, enumerator.Current);
-                Assert.AreEquals(current, enumerator.Current);
-                Assert.AreEquals(current, enumerator.Current);
+                Assert.AreEqual(current, enumerator.Current);
+                Assert.AreEqual(current, enumerator.Current);
+                Assert.AreEqual(current, enumerator.Current);
             }
         }
 
@@ -77,7 +77,7 @@
                 enumerator.Reset();
                 if (enumerator.MoveNext())
                 {
-                    Assert.AreEquals(current, enumerator.Current);
+                    Assert.AreEqual(current, enumerator.Current);
                 }
             }
         }

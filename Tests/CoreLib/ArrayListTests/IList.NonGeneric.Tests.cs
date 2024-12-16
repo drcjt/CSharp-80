@@ -83,8 +83,16 @@
 
         protected virtual object CreateT(int seed)
         {
-            // TODO: Improve to create value and reference types and to use seed
-            return new object();
+            if (seed % 2 == 0)
+            {
+                var ch = (char)(0x41 + (seed % 64));
+                return new string([ch]);
+            }
+            else
+            {
+                Random rand = new Random(seed);
+                return rand.Next();
+            }
         }
 
         private object CreateTNotInList(int seed, IList list)
@@ -111,7 +119,7 @@
                 var list = NonGenericIListFactory(count);
                 object value = CreateT(0);
                 list[0] = value;
-                Assert.Equal(value, list[0]);
+                Assert.AreEqual(value, list[0]);
             }
         }
 
@@ -122,7 +130,7 @@
                 var list = NonGenericIListFactory(count);
                 object? value = null;
                 list[0] = value;
-                Assert.Equal(value, list[0]);
+                Assert.AreEqual(value, list[0]);
             }            
         }
 
@@ -134,7 +142,7 @@
                 object value = CreateT(0);
                 var lastIndex = count - 1;
                 list[lastIndex] = value;
-                Assert.Equal(value, list[lastIndex]);
+                Assert.AreEqual(value, list[lastIndex]);
             }
         }
 
@@ -146,7 +154,7 @@
                 object? value = null;
                 var lastIndex = count - 1;
                 list[lastIndex] = value;
-                Assert.Equal(value, list[lastIndex]);
+                Assert.AreEqual(value, list[lastIndex]);
             }
         }
 
@@ -158,8 +166,8 @@
                 object value = CreateT(0);
                 list[0] = value;
                 list[1] = value;
-                Assert.Equal(value, list[0]);
-                Assert.Equal(value, list[1]);
+                Assert.AreEqual(value, list[0]);
+                Assert.AreEqual(value, list[1]);
             }
         }
 
@@ -167,7 +175,7 @@
         {
             var list = NonGenericIListFactory(count);
             list.Add(null);
-            Assert.AreEquals(count + 1, list.Count);
+            Assert.AreEqual(count + 1, list.Count);
         }
 
         private void Add_DuplicateValues(int count)
@@ -176,7 +184,7 @@
             object duplicateValue = CreateT(0);
             list.Add(duplicateValue);
             list.Add(duplicateValue);
-            Assert.AreEquals(count + 2, list.Count);
+            Assert.AreEqual(count + 2, list.Count);
         }
 
         private void Add_AfterCallingClear(int count)
@@ -184,7 +192,7 @@
             var list = NonGenericIListFactory(count);
             list.Clear();
             AddToCollection(list, 5);
-            Assert.AreEquals(5, list.Count);
+            Assert.AreEqual(5, list.Count);
         }
 
         private void Add_AfterRemovingAnyValue(int count)
@@ -207,7 +215,7 @@
             for (int i = 0; i < count; i++)
                 list.Remove(arr[i]);
             list.Add(CreateT(0));
-            Assert.AreEquals(1, list.Count);
+            Assert.AreEqual(1, list.Count);
         }
 
         private void Add_AfterRemoving(int count)
@@ -223,7 +231,7 @@
         {
             var list = NonGenericIListFactory(count);
             list.Clear();
-            Assert.AreEquals(0, list.Count);
+            Assert.AreEqual(0, list.Count);
         }
 
         private void Contains_ValueNotInListNotContainingValue(int count)
@@ -256,7 +264,7 @@
         private void IndexOf_NullNotContainedInList(int count)
         {
             var list = NonGenericIListFactory(count);
-            Assert.AreEquals(-1, list.IndexOf(null));
+            Assert.AreEqual(-1, list.IndexOf(null));
         }
 
         private void IndexOf_NullContainedInList(int count)
@@ -265,7 +273,7 @@
             {
                 var list = NonGenericIListFactory(count);
                 list[0] = null;
-                Assert.AreEquals(0, list.IndexOf(null));
+                Assert.AreEqual(0, list.IndexOf(null));
             }
         }
 
@@ -277,7 +285,7 @@
                 var value = CreateT(0);
                 list[0] = value;
                 list[count / 2] = value;
-                Assert.AreEquals(0, list.IndexOf(value));
+                Assert.AreEqual(0, list.IndexOf(value));
             }
         }
 
@@ -286,7 +294,7 @@
             var list = NonGenericIListFactory(count);
             for (int i = 0; i < count; i++)
             {
-                Assert.AreEquals(i, list.IndexOf(list[i]));
+                Assert.AreEqual(i, list.IndexOf(list[i]));
             }
         }
 
@@ -304,7 +312,7 @@
 
             for (int i = 0; i < count; i++)
             {
-                Assert.AreEquals(i, list.IndexOf(originalItems[i]));
+                Assert.AreEqual(i, list.IndexOf(originalItems[i]));
             }
         }
 
@@ -313,8 +321,8 @@
             var list = NonGenericIListFactory(count);
             var toInsert = CreateT(0);
             list.Insert(count, toInsert);
-            Assert.AreEquals(count + 1, list.Count);
-            Assert.Equal(toInsert, list[count]);
+            Assert.AreEqual(count + 1, list.Count);
+            Assert.AreEqual(toInsert, list[count]);
         }
 
         private void Insert_FirstItemToNonNull(int count)
@@ -322,16 +330,16 @@
             var list = NonGenericIListFactory(count);
             var toInsert = CreateT(0);
             list.Insert(0, toInsert);
-            Assert.Equal(toInsert, list[0]);
-            Assert.AreEquals(count + 1, list.Count);
+            Assert.AreEqual(toInsert, list[0]);
+            Assert.AreEqual(count + 1, list.Count);
         }
 
         private void Insert_FirstItemToNull(int count)
         {
             var list = NonGenericIListFactory(count);
             list.Insert(0, null);
-            Assert.Equal(null, list[0]);
-            Assert.AreEquals(count + 1, list.Count);
+            Assert.AreEqual(null, list[0]);
+            Assert.AreEqual(count + 1, list.Count);
         }
 
         private void Insert_LastItemToNonNull(int count)
@@ -340,8 +348,8 @@
             var toInsert = CreateT(0);
             int lastIndex = count > 0 ? count - 1 : 0;
             list.Insert(lastIndex, toInsert);
-            Assert.Equal(toInsert, list[lastIndex]);
-            Assert.AreEquals(count + 1, list.Count);
+            Assert.AreEqual(toInsert, list[lastIndex]);
+            Assert.AreEqual(count + 1, list.Count);
         }
 
         private void Insert_LastItemToNull(int count)
@@ -349,8 +357,8 @@
             var list = NonGenericIListFactory(count);
             int lastIndex = count > 0 ? count - 1 : 0;
             list.Insert(lastIndex, null);
-            Assert.Equal(null, list[lastIndex]);
-            Assert.AreEquals(count + 1, list.Count);
+            Assert.AreEqual(null, list[lastIndex]);
+            Assert.AreEqual(count + 1, list.Count);
         }
 
         private void Insert_DuplicateValues(int count)
@@ -359,16 +367,16 @@
             var toInsert = CreateT(0);
             list.Insert(0, toInsert);
             list.Insert(1, toInsert);
-            Assert.Equal(toInsert, list[0]);
-            Assert.Equal(toInsert, list[1]);
-            Assert.AreEquals(count + 2, list.Count);
+            Assert.AreEqual(toInsert, list[0]);
+            Assert.AreEqual(toInsert, list[1]);
+            Assert.AreEqual(count + 2, list.Count);
         }
 
         private void Remove_NullNotContainedInList(int count)
         {
             var list = NonGenericIListFactory(count);
             list.Remove(null);
-            Assert.AreEquals(count, list.Count);
+            Assert.AreEqual(count, list.Count);
         }
 
         private void Remove_NonNullNotContainedInList(int count)
@@ -376,7 +384,7 @@
             var list = NonGenericIListFactory(count);
             var item = CreateTNotInList(0, list);
             list.Remove(item);
-            Assert.AreEquals(count, list.Count);
+            Assert.AreEqual(count, list.Count);
         }
 
         private void Remove_NullContainedInList(int count)
@@ -384,7 +392,7 @@
             var list = NonGenericIListFactory(count);
             list.Add(null);
             list.Remove(null);
-            Assert.AreEquals(count, list.Count);
+            Assert.AreEqual(count, list.Count);
         }
 
         private void Remove_NonNullContainedInList(int count)
@@ -393,7 +401,7 @@
             var item = CreateT(0);
             list.Add(item);
             list.Remove(item);
-            Assert.AreEquals(count, list.Count);
+            Assert.AreEqual(count, list.Count);
         }
 
         private void Remove_ValueThatExistsTwiceInList(int count)
@@ -403,7 +411,7 @@
             list.Add(item);
             list.Add(item);
             list.Remove(item);
-            Assert.AreEquals(count + 1, list.Count);
+            Assert.AreEqual(count + 1, list.Count);
         }
 
         private void Remove_AllValues(int count)
@@ -416,7 +424,7 @@
             {
                 list.Remove(items[i]);
             }
-            Assert.AreEquals(0, list.Count);
+            Assert.AreEqual(0, list.Count);
         }
 
         private void RemoveAt_AllIndices(int count)
@@ -425,7 +433,7 @@
             for (int index = count - 1; index >= 0; index--)
             {
                 list.RemoveAt(index);
-                Assert.AreEquals(index, list.Count);
+                Assert.AreEqual(index, list.Count);
             }
         }
 
@@ -435,7 +443,7 @@
             for (int index = 0; index < count; index++)
             {
                 list.RemoveAt(0);
-                Assert.AreEquals(count - index - 1, list.Count);
+                Assert.AreEqual(count - index - 1, list.Count);
             }
         }
 
