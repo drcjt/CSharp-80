@@ -127,7 +127,7 @@
             _items[_size] = null;
         }
 
-        private sealed class ArrayListEnumeratorSimple : IEnumerator
+        private struct ArrayListEnumeratorSimple : IEnumerator
         {
             private readonly ArrayList _list;
             private int _index;
@@ -155,13 +155,7 @@
                 }
             }
 
-            public object Current
-            {
-                get
-                {
-                    return _currentElement;
-                }
-            }
+            public readonly object? Current => _currentElement;
 
             public void Reset()
             {

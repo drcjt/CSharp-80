@@ -18,7 +18,7 @@
         private void Count_Validity(int count)
         {
             var collection = NonGenericICollectionFactory(count);
-            Assert.AreEquals(count, collection.Count);
+            Assert.AreEqual(count, collection.Count);
         }
 
         private void CopyTo_ExactlyEnoughSpaceInArray(int count)
@@ -29,7 +29,7 @@
             int i = 0;
             foreach (var item in collection)
             {
-                Assert.AreEquals(array[i++], item);
+                Assert.AreEqual(array[i++], item);
             }
         }
 
