@@ -19,8 +19,8 @@
 
         public Move(string uciMoveNotation)
         {
-            string fromSquare = uciMoveNotation.Substring(0, 2);
-            string toSquare = uciMoveNotation.Substring(2, 2);
+            string fromSquare = uciMoveNotation.Substring(0, 2)!;
+            string toSquare = uciMoveNotation.Substring(2, 2)!;
 
             FromSquare = Notation.ToSquare(fromSquare);
             ToSquare = Notation.ToSquare(toSquare);

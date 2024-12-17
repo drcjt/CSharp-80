@@ -24,6 +24,8 @@
 		<!--<TargetPlatform>CPM</TargetPlatform>-->
 
 		<BaseOutputPath>bin\$(TargetPlatform)</BaseOutputPath>
+
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
 	<ItemGroup Condition="'$(TargetPlatform)' == 'ZXSpectrum'">

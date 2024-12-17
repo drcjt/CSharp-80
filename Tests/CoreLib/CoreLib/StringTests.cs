@@ -2,7 +2,7 @@
 
 namespace CoreLib
 {
-    public class StringTests
+    public static class StringTests
     {
         public static unsafe void NewStringTests()
         {
@@ -21,7 +21,7 @@ namespace CoreLib
         {
             var source = "abcde";
             var middle = source.Substring(1, 3);
-            Assert.AreEqual(3, middle.Length);
+            Assert.AreEqual(3, middle!.Length);
 
             for (int i = 1; i < 4; i++)
             {

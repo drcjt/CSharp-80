@@ -2,9 +2,9 @@
 {
     public sealed partial class String
     {
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            if (this == obj)
+            if (ReferenceEquals(this, obj))
                 return true;
 
             if (obj is not string str)
@@ -17,7 +17,7 @@
             return EqualsHelper(this, str);
         }
 
-        private unsafe bool EqualsHelper(string strA, string strB)
+        private static unsafe bool EqualsHelper(string strA, string strB)
         {
             fixed (char* strABuffer = &strA._firstChar) fixed (char* strBBuffer = &strB._firstChar)
             {

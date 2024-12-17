@@ -4,7 +4,9 @@
     {
         bool MoveNext();
 
+#nullable disable
         object Current
+#nullable restore
         {
             get;
         }

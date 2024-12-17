@@ -12,8 +12,10 @@ namespace System
             return new RuntimeTypeHandle((IntPtr)m_pEEType);
         }
 
-        public virtual bool Equals(object obj) => obj == this;
+        public virtual bool Equals(object? obj) => obj == this;
         public virtual int GetHashCode() => 0;
         public virtual string ToString() => "";
+
+        public static bool ReferenceEquals(object? objA, object? objB) => objA == objB;
     }
 }

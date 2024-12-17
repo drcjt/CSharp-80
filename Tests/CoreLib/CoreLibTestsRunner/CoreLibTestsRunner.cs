@@ -27,13 +27,16 @@ namespace CoreLibTests
                 string[] coreLibTestsPaths = Directory.GetDirectories(coreLibTestsPath);
                 foreach (string coreLibTestPath in coreLibTestsPaths) 
                 {
-                    var coreLibTestName = Path.GetFileName(coreLibTestPath);
-                    if (coreLibTestName != nameof(CoreLibTestsRunner))
+                    if (Directory.GetFiles(coreLibTestPath, "*.csproj").Length > 0)
                     {
-                        var temp = Path.Combine(binConfigTargetPath, $"{coreLibTestName}.cim");
-                        var testAssemblyPath = Path.Combine(coreLibTestPath, temp);
+                        var coreLibTestName = Path.GetFileName(coreLibTestPath);
+                        if (coreLibTestName != nameof(CoreLibTestsRunner))
+                        {
+                            var temp = Path.Combine(binConfigTargetPath, $"{coreLibTestName}.cim");
+                            var testAssemblyPath = Path.Combine(coreLibTestPath, temp);
 
-                        yield return new TestCaseData(testAssemblyPath).SetName(Path.GetFileNameWithoutExtension(coreLibTestName));
+                            yield return new TestCaseData(testAssemblyPath).SetName(coreLibTestName);
+                        }
                     }
                 }
             }
