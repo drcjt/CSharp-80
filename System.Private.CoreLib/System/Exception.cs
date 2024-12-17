@@ -2,7 +2,7 @@
 {
     public class Exception
     {
-        internal string _message = null;
+        internal string? _message = null;
 
         public Exception() { }
 
@@ -11,6 +11,6 @@
             _message = message;
         }
 
-        public string Message => _message;
+        public string Message => _message ?? "";
     }
 }

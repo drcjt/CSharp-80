@@ -26,7 +26,6 @@ namespace System.Collections.Tests
             ItemSet_LastItemToDefaultValue(size);
             ItemSet_DuplicateValues(size);
 
-
             Add_DefaultValue(size);
             Add_DuplicateValues(size);
             Add_AfterCallingClear(size);
@@ -105,7 +104,7 @@ namespace System.Collections.Tests
             if (count > 0)
             {
                 var list = GenericIListFactory(count);
-                list[0] = default(T);
+                list[0] = default!;
                 Assert.AreEqual(default(T), list[0]);
             }            
         }
@@ -128,7 +127,7 @@ namespace System.Collections.Tests
             {
                 var list = GenericIListFactory(count);
                 var lastIndex = count - 1;
-                list[lastIndex] = default(T);
+                list[lastIndex] = default!;
                 Assert.AreEqual(default(T), list[lastIndex]);
             }
         }
@@ -149,7 +148,7 @@ namespace System.Collections.Tests
         private void Add_DefaultValue(int count)
         {
             var list = GenericIListFactory(count);
-            list.Add(default(T));
+            list.Add(default!);
             Assert.AreEqual(count + 1, list.Count);
         }
 
@@ -226,20 +225,20 @@ namespace System.Collections.Tests
         private void Contains_DefaultValueNotInListNotContainingDefaultValue(int count)
         {
             var list = GenericIListFactory(count);
-            Assert.IsFalse(list.Contains(default(T)));
+            Assert.IsFalse(list.Contains(default!));
         }
 
         private void Contains_DefaultValueInListContainingDefaultValue(int count)
         {
             var list = GenericIListFactory(count);
-            list.Add(default(T));
-            Assert.IsTrue(list.Contains(default(T)));
+            list.Add(default!);
+            Assert.IsTrue(list.Contains(default!));
         }
 
         private void IndexOf_DefaultValueNotContainedInList(int count)
         {
             var list = GenericIListFactory(count);
-            Assert.AreEqual(-1, list.IndexOf(default(T)));
+            Assert.AreEqual(-1, list.IndexOf(default!));
         }
 
         private void IndexOf_DefaultValueContainedInList(int count)
@@ -247,8 +246,8 @@ namespace System.Collections.Tests
             if (count > 0)
             {
                 var list = GenericIListFactory(count);
-                list[0] = default(T);
-                Assert.AreEqual(0, list.IndexOf(default(T)));
+                list[0] = default!;
+                Assert.AreEqual(0, list.IndexOf(default!));
             }
         }
 
@@ -312,7 +311,7 @@ namespace System.Collections.Tests
         private void Insert_FirstItemToDefaultValue(int count)
         {
             var list = GenericIListFactory(count);
-            list.Insert(0, default(T));
+            list.Insert(0, default!);
             Assert.AreEqual(default(T), list[0]);
             Assert.AreEqual(count + 1, list.Count);
         }
@@ -331,7 +330,7 @@ namespace System.Collections.Tests
         {
             var list = GenericIListFactory(count);
             int lastIndex = count > 0 ? count - 1 : 0;
-            list.Insert(lastIndex, default(T));
+            list.Insert(lastIndex, default!);
             Assert.AreEqual(default(T), list[lastIndex]);
             Assert.AreEqual(count + 1, list.Count);
         }
@@ -350,7 +349,7 @@ namespace System.Collections.Tests
         private void Remove_DefaultValueNotContainedInList(int count)
         {
             var list = GenericIListFactory(count);
-            list.Remove(default(T));
+            list.Remove(default!);
             Assert.AreEqual(count, list.Count);
         }
 
@@ -365,8 +364,8 @@ namespace System.Collections.Tests
         private void Remove_DefaultValueContainedInList(int count)
         {
             var list = GenericIListFactory(count);
-            list.Add(default(T));
-            list.Remove(default(T));
+            list.Add(default!);
+            list.Remove(default!);
             Assert.AreEqual(count, list.Count);
         }
 

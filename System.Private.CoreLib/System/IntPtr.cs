@@ -15,7 +15,7 @@
         public static unsafe bool operator ==(IntPtr value1, IntPtr value2) => value1._value == value2._value;
         public static unsafe bool operator !=(IntPtr value1, IntPtr value2) => value1._value != value2._value;
 
-        public override bool Equals(object obj) => (obj is nint other) && Equals(other);
+        public override bool Equals(object? obj) => (obj is nint other) && Equals(other);
         public override unsafe int GetHashCode() => (int)_value;
     }
 }

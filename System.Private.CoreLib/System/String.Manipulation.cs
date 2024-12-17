@@ -25,7 +25,7 @@ namespace System
                 (uint)src.Length);
         }
 
-        public string Substring(int startIndex, int length) 
+        public string? Substring(int startIndex, int length) 
         { 
             if (length == 0)
             {

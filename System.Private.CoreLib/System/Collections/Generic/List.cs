@@ -118,7 +118,7 @@
             {
                 Array.Copy(_items, index + 1, _items, index, _size - index);
             }
-            _items[_size] = default(T);
+            _items[_size] = default!;
         }
 
         public IEnumerator<T> GetEnumerator() => new ListEnumeratorSimple(this);

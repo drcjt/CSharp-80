@@ -2,7 +2,7 @@
 
 namespace CoreLib
 {
-    public class StringTests
+    public static class StringTests
     {
         public static unsafe void NewStringTests()
         {

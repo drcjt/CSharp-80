@@ -4,7 +4,7 @@ namespace System.Runtime
 {
     internal static class TypeCast
     {
-        public static unsafe object IsInstanceOfInterface(EEType* pTargetType, object obj)
+        public static unsafe object? IsInstanceOfInterface(EEType* pTargetType, object? obj)
         {
             if (obj == null)
             {
@@ -30,7 +30,7 @@ namespace System.Runtime
             return null;
         }
 
-        public static unsafe object IsInstanceOfClass(EEType* pTargetType, object obj)
+        public static unsafe object? IsInstanceOfClass(EEType* pTargetType, object? obj)
         {
             if (obj == null)
             {

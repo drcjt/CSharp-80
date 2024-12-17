@@ -6,14 +6,12 @@ namespace System.Collections.Generic
     {
         private const int DefaultCapacity = 4;
 
-        private T[]? _array;
+        private T[] _array;
         private int _count;
 
         public ArrayBuilder(int capacity)
         {
-            Debug.Assert(capacity >= 0);
-            if (capacity > 0)
-                _array = new T[capacity];
+            _array = new T[capacity];
         }
 
         public readonly int Capacity => _array == null ? 0 : _array.Length;
@@ -23,7 +21,7 @@ namespace System.Collections.Generic
             if (_count == Capacity)
                 EnsureCapacity(_count + 1);
 
-            _array![_count++] = item;
+            _array[_count++] = item;
         }
 
         private void EnsureCapacity(int minimum)

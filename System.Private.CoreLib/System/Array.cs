@@ -10,7 +10,7 @@ namespace System
             get;
         }
 
-        public static void Copy(object[] source, object[] destination, int length)
+        public static void Copy(object?[] source, object?[] destination, int length)
         {
             Copy(source, 0, destination, 0, length);
         }
@@ -41,7 +41,7 @@ namespace System
         }
 
 
-        public static void Copy(object[] source, int sourceIndex, object[] destination, int destinationIndex, int length)
+        public static void Copy(object?[] source, int sourceIndex, object?[] destination, int destinationIndex, int length)
         {
             if (destinationIndex > sourceIndex)
             {
@@ -59,7 +59,7 @@ namespace System
             }
         }
 
-        public static int IndexOf(object[] array, object? value, int startIndex, int count)
+        public static int IndexOf(object?[] array, object? value, int startIndex, int count)
         {
             int endIndex = startIndex + count;
             if (value is null)
@@ -110,19 +110,19 @@ namespace System
             return -1;
         }
 
-        public static void Clear(object[] array, int index, int length)
+        public static void Clear(object?[] array, int index, int length)
         {
             for (int i = index; i < index + length; i++)
             {
-                array[i] = default(object);
+                array[i] = default;
             }
         }
 
-        public static void Clear<T>(T[] array, int index, int length)
+        public static void Clear<T>(T?[] array, int index, int length)
         {
             for (int i = index; i < index + length; i++)
             {
-                array[i] = default(T);
+                array[i] = default;
             }
         }
     }

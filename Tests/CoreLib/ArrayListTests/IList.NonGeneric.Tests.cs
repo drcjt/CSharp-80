@@ -1,4 +1,6 @@
-﻿namespace System.Collections.Tests
+﻿using System.Collections.Generic;
+
+namespace System.Collections.Tests
 {
     public abstract class IList_NonGeneric_Tests : ICollection_NonGeneric_Tests
     {
@@ -7,23 +9,28 @@
         protected virtual IList NonGenericIListFactory(int count)
         {
             var list = NonGenericIListFactory();
-            AddToList(list, count);
+            AddToCollection(list, count);
             return list;
         }
 
-        protected virtual void AddToList(IList list, int count)
+        protected override void AddToCollection(ICollection collection, int count)
         {
-            int seed = 0;
-            while (list.Count < count)
-            {
-                object toAdd = CreateT(seed++);
-                while (list.Contains(toAdd))
-                    toAdd = CreateT(seed++);
-                list.Add(toAdd);
-            }
+            var list = collection as IList;
+            if (list != null)
+                AddToCollection(list, count);
         }
 
-        protected override void AddToCollection(ICollection collection, int count) => AddToList(collection as IList, count);
+        protected virtual void AddToCollection(IList collection, int count)
+        {
+            int seed = 0;
+            while (collection.Count < count)
+            {
+                object toAdd = CreateT(seed++);
+                while (collection.Contains(toAdd))
+                    toAdd = CreateT(seed++);
+                collection.Add(toAdd);
+            }
+        }
 
         public override void RunTests(int size)
         {

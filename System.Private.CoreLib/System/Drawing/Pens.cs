@@ -2,7 +2,7 @@
 {
     public sealed class Pens
     {
-        private static Pen s_white = null;
+        private static Pen? s_white = null;
         public static Pen White
         {
             get
@@ -15,7 +15,7 @@
             }
         }
 
-        private static Pen s_black = null;
+        private static Pen? s_black = null;
         public static Pen Black
         {
             get
