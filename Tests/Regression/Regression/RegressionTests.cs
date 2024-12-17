@@ -7,15 +7,15 @@
             Bug87();
 
             nuint testValue = 123;
-            Assert.Equals(testValue, MethodCall_WithNuintParameter_CompilesWithoutErrors(testValue));
+            Assert.AreEqual(testValue, MethodCall_WithNuintParameter_CompilesWithoutErrors(testValue));
 
-            Assert.Equals(1, Bug210_SpillStack());
+            Assert.AreEqual(1, Bug210_SpillStack());
 
-            Assert.Equals(0, Bug206(0));
+            Assert.AreEqual(0, Bug206(0));
 
-            Assert.Equals(2, new SpillImportAppendTests().SpillOnStFldImport());
+            Assert.AreEqual(2, new SpillImportAppendTests().SpillOnStFldImport());
 
-            Assert.Equals(10, Bug545Method<int>().Length);
+            Assert.AreEqual(10, Bug545Method<int>().Length);
 
             return 0;
         }
