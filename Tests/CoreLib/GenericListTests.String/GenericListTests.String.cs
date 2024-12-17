@@ -2,7 +2,7 @@
 
 namespace GenericListTests.String
 {
-    internal class Tests
+    public static class Tests
     {
         public static int Main()
         {
