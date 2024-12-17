@@ -6,14 +6,14 @@ namespace CoreLib
     {
         public static void SizeOfTests()
         {
-            Assert.AreEquals(1, Unsafe.SizeOf<sbyte>());
-            Assert.AreEquals(1, Unsafe.SizeOf<byte>());
-            Assert.AreEquals(2, Unsafe.SizeOf<short>());
-            Assert.AreEquals(2, Unsafe.SizeOf<ushort>());
-            Assert.AreEquals(4, Unsafe.SizeOf<int>());
-            Assert.AreEquals(4, Unsafe.SizeOf<uint>());
-            Assert.AreEquals(4, Unsafe.SizeOf<Byte4>());
-            Assert.AreEquals(8, Unsafe.SizeOf<Byte4Short2>());
+            Assert.AreEqual(1, Unsafe.SizeOf<sbyte>());
+            Assert.AreEqual(1, Unsafe.SizeOf<byte>());
+            Assert.AreEqual(2, Unsafe.SizeOf<short>());
+            Assert.AreEqual(2, Unsafe.SizeOf<ushort>());
+            Assert.AreEqual(4, Unsafe.SizeOf<int>());
+            Assert.AreEqual(4, Unsafe.SizeOf<uint>());
+            Assert.AreEqual(4, Unsafe.SizeOf<Byte4>());
+            Assert.AreEqual(8, Unsafe.SizeOf<Byte4Short2>());
         }
 
         private static unsafe void InitBlockStack(int numBytes, byte value)
@@ -22,7 +22,7 @@ namespace CoreLib
             Unsafe.InitBlock(stackPtr, value, (uint)numBytes);
             for (int i = 0; i < numBytes; i++) 
             {
-                Assert.AreEquals(value, stackPtr[i]);
+                Assert.AreEqual(value, stackPtr[i]);
             }
         }
 
@@ -52,8 +52,8 @@ namespace CoreLib
             for (int i = 0; i < numBytes; i++)
             {
                 byte value = (byte)(i & 255);
-                Assert.AreEquals(value, destination[i]);
-                Assert.AreEquals(source[i], destination[i]);
+                Assert.AreEqual(value, destination[i]);
+                Assert.AreEqual(source[i], destination[i]);
             }
         }
 
@@ -75,12 +75,12 @@ namespace CoreLib
             testBytes.B3 = 0x42;
 
             ref int r = ref Unsafe.As<byte, int>(ref testBytes.B0);
-            Assert.AreEquals(0x42424242, r);
+            Assert.AreEqual(0x42424242, r);
 
             byte[] b = new byte[4] { 0x42, 0x42, 0x42, 0x42 };
             ref int r2 = ref Unsafe.As<byte, int>(ref b[0]);
 
-            Assert.AreEquals(0x42424242, r2);
+            Assert.AreEqual(0x42424242, r2);
         }
     }
 

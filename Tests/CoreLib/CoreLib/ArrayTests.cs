@@ -17,7 +17,7 @@
                 sum += i;
             }
 
-            Assert.AreEquals(55, sum);
+            Assert.AreEqual(55, sum);
         }
     }
 }

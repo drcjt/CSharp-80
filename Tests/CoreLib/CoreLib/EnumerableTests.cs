@@ -66,7 +66,7 @@ namespace CoreLib
             int index = 0;
             foreach (var item in enumerable)
             {
-                Assert.AreEquals(testArray[index++], item);
+                Assert.AreEqual(testArray[index++], item);
             }
         }
 
@@ -78,7 +78,7 @@ namespace CoreLib
             int index = 0;
             foreach (var item in enumerable)
             {
-                Assert.AreEquals(testArray[index++], item);
+                Assert.AreEqual(testArray[index++], item);
             }
         }
 
@@ -87,28 +87,28 @@ namespace CoreLib
             var sequence = new FibonacciEnumerable().GetEnumerator();
 
             Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEquals(0, sequence.Current);
+            Assert.AreEqual(0, sequence.Current);
 
             Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEquals(1, sequence.Current);
+            Assert.AreEqual(1, sequence.Current);
 
             Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEquals(1, sequence.Current);
+            Assert.AreEqual(1, sequence.Current);
 
             Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEquals(2, sequence.Current);
+            Assert.AreEqual(2, sequence.Current);
 
             Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEquals(3, sequence.Current);
+            Assert.AreEqual(3, sequence.Current);
 
             Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEquals(5, sequence.Current);
+            Assert.AreEqual(5, sequence.Current);
 
             Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEquals(8, sequence.Current);
+            Assert.AreEqual(8, sequence.Current);
 
             Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEquals(13, sequence.Current);
+            Assert.AreEqual(13, sequence.Current);
         }
     }
 }

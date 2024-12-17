@@ -24,7 +24,7 @@ namespace CoreLib
             // -----------------------
             // Total                14
 
-            Assert.AreEquals(14, GC.GetTotalMemory() - totalMemory);
+            Assert.AreEqual(14, GC.GetTotalMemory() - totalMemory);
         }
 
         private static void AllocObjectSizeTest()
@@ -41,7 +41,7 @@ namespace CoreLib
             // -----------------------
             //                      10
 
-            Assert.AreEquals(10, GC.GetTotalMemory() - totalMemory);
+            Assert.AreEqual(10, GC.GetTotalMemory() - totalMemory);
         }
 
         private static void AllocArraySizeTest()
@@ -57,7 +57,7 @@ namespace CoreLib
             // -----------------------
             // Total                14
 
-            Assert.AreEquals(14, GC.GetTotalMemory() - totalMemory);
+            Assert.AreEqual(14, GC.GetTotalMemory() - totalMemory);
         }
 
         static public void AllocSizeTests()
@@ -73,16 +73,16 @@ namespace CoreLib
             var str2 = new String(new char[3]);
 
             // Check EEType is same for both string objects
-            Assert.AreEquals(str1.GetEEType(), str2.GetEEType());
+            Assert.AreEqual(str1.GetEEType(), str2.GetEEType());
 
             var class1 = new TestClass();
             var class2 = new TestClass();
 
             // Check EEType is same for both instances of TestClass
-            Assert.AreEquals(class1.GetEEType(), class2.GetEEType());
+            Assert.AreEqual(class1.GetEEType(), class2.GetEEType());
 
             // Check EEType is different for String and TestClass instances
-            Assert.AreNotEquals(str1.GetEEType(), class1.GetEEType());
+            Assert.AreNotEqual(str1.GetEEType(), class1.GetEEType());
         }
     }
 }

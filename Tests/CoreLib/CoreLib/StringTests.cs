@@ -8,7 +8,7 @@ namespace CoreLib
         {
             var chars = new char[25];
             string newString = new String(chars);
-            Assert.AreEquals(25, newString.Length);
+            Assert.AreEqual(25, newString.Length);
         }
 
         public static void SubstringTests()
@@ -21,11 +21,11 @@ namespace CoreLib
         {
             var source = "abcde";
             var middle = source.Substring(1, 3);
-            Assert.AreEquals(3, middle.Length);
+            Assert.AreEqual(3, middle.Length);
 
             for (int i = 1; i < 4; i++)
             {
-                Assert.AreEquals(true, source[i] == middle[i - 1]);
+                Assert.AreEqual(true, source[i] == middle[i - 1]);
             }
         }
 
@@ -33,10 +33,10 @@ namespace CoreLib
         {
             var source = "abcde";
             var invalid1 = source.Substring(10, 2);
-            Assert.AreEquals(true, invalid1 == null);
+            Assert.AreEqual(true, invalid1 == null);
 
             var invalid2 = source.Substring(1, 10);
-            Assert.AreEquals(true, invalid2 == null);
+            Assert.AreEqual(true, invalid2 == null);
         }
 
         public static void EqualsTests()

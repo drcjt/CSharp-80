@@ -4,7 +4,7 @@ namespace CoreLib
 {
     internal static class Assert
     {
-        public static void AreEquals(bool expected, bool actual)
+        public static void AreEqual(bool expected, bool actual)
         {
             if (expected != actual)
             {
@@ -12,7 +12,7 @@ namespace CoreLib
             }
         }
 
-        public static void AreEquals(int expected, int actual)
+        public static void AreEqual(int expected, int actual)
         {
             if (expected != actual)
             {
@@ -20,7 +20,7 @@ namespace CoreLib
             }
         }
 
-        public static void AreEquals(RuntimeTypeHandle expected, RuntimeTypeHandle actual)
+        public static void AreEqual(RuntimeTypeHandle expected, RuntimeTypeHandle actual)
         {
             if (!expected.Equals(actual))
             {
@@ -28,17 +28,24 @@ namespace CoreLib
             }
         }
 
-        public static void AreNotEquals(RuntimeTypeHandle expected, RuntimeTypeHandle actual)
+        public static void AreEqual(object? expected, object? actual)
         {
-            if (expected.Equals(actual))
+            if (expected is null)
+            {
+                if (actual is not null)
+                {
+                    Environment.Exit(1);
+                }
+            }
+            else if (!expected.Equals(actual))
             {
                 Environment.Exit(1);
             }
         }
 
-        public static void AreEquals(object expected, object actual)
+        public static void AreNotEqual(RuntimeTypeHandle expected, RuntimeTypeHandle actual)
         {
-            if (!expected.Equals((object)actual))
+            if (expected.Equals(actual))
             {
                 Environment.Exit(1);
             }
