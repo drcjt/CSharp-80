@@ -86,10 +86,26 @@ namespace System
 
         public static int IndexOf<T>(T[] array, object? value, int startIndex, int count)
         {
-            for (int i = startIndex; i < startIndex + count; i++)
+            
+            int endIndex = startIndex + count;
+            if (value is null)
             {
-                if (array[i].Equals(value))
-                    return i;
+                for (int i = startIndex; i < endIndex; i++)
+                {
+                    if (array[i] is null)
+                    {
+                        return i;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = startIndex; i < endIndex; i++)
+                {
+                    object? obj = array[i];
+                    if (obj is not null && obj.Equals(value))
+                        return i;
+                }
             }
             return -1;
         }
