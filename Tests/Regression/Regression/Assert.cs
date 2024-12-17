@@ -4,7 +4,7 @@ namespace Regression
 {
     internal static class Assert
     {
-        public static void Equals(bool expected, bool actual)
+        public static void AreEqual(bool expected, bool actual)
         {
             if (expected != actual)
             {
@@ -12,7 +12,7 @@ namespace Regression
             }
         }
 
-        public static void Equals(int expected, int actual)
+        public static void AreEqual(int expected, int actual)
         {
             if (expected != actual)
             {
@@ -20,7 +20,7 @@ namespace Regression
             }
         }
 
-        public static void Equals(nuint expected, nuint actual)
+        public static void AreEqual(nuint expected, nuint actual)
         {
             if (expected != actual)
             {
