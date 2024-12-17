@@ -42,6 +42,7 @@ namespace ILCompiler.UnitTests
             _testModule = ModuleDefMD.Load(inputFilePath, options);
 
             var typeSystemContext = new TypeSystemContext();
+            typeSystemContext.GenericsMode = SharedGenericsMode.CanonicalReferenceTypes;
             var corLibModuleProvider = new CorLibModuleProvider();
             corLibModuleProvider.CorLibModule = corlibModule;
             _module = new DnlibModule(typeSystemContext, corLibModuleProvider, new RTILProvider());

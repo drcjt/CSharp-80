@@ -20,7 +20,7 @@ namespace ILCompiler.TypeSystem.Common
         private readonly Dictionary<string, MethodForRuntimeDeterminedType> _methodForRuntimeDeterminedTypes = new Dictionary<string, MethodForRuntimeDeterminedType>();
         public ModuleDesc? SystemModule { get; set; }
 
-        private readonly SharedGenericsMode _genericsMode = SharedGenericsMode.CanonicalReferenceTypes;
+        public SharedGenericsMode GenericsMode { get; set; } = SharedGenericsMode.Disabled;
 
         public InstantiatedType GetInstantiatedType(MetadataType typeDef, Instantiation instantiation)
         {
@@ -125,7 +125,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public Instantiation ConvertInstantiationToCanonForm(Instantiation instantiation, CanonicalFormKind kind, out bool changed)
         {
-            if (_genericsMode == SharedGenericsMode.CanonicalReferenceTypes)
+            if (GenericsMode == SharedGenericsMode.CanonicalReferenceTypes)
             {
                 return RuntimeDeterminedCanonicalizationAlgorithm.ConvertInstantiationToCanonForm(instantiation, kind, out changed);
             }
@@ -136,7 +136,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public TypeDesc ConvertToCanon(TypeDesc typeToConvert, CanonicalFormKind kind)
         {
-            if (_genericsMode == SharedGenericsMode.CanonicalReferenceTypes)
+            if (GenericsMode == SharedGenericsMode.CanonicalReferenceTypes)
             {
                 return RuntimeDeterminedCanonicalizationAlgorithm.ConvertToCanon(typeToConvert, kind);
             }
@@ -146,7 +146,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public TypeDesc ConvertToCanon(TypeDesc typeToConvert, ref CanonicalFormKind kind)
         {
-            if (_genericsMode == SharedGenericsMode.CanonicalReferenceTypes)
+            if (GenericsMode == SharedGenericsMode.CanonicalReferenceTypes)
                 return RuntimeDeterminedCanonicalizationAlgorithm.ConvertToCanon(typeToConvert, ref kind);
 
             return typeToConvert;
