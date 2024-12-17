@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+	 <Nullable>enable</Nullable>
+
+    <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        
+    <!--Disable .NET Core SDK libs-->
+    <NoStdLib>true</NoStdLib>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+	  <!-- Prevent .NET Core 3+ from generating exe -->
+	  <UseAppHost>false</UseAppHost>
+
+	  <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="System\**" />
+    <EmbeddedResource Remove="System\**" />
+    <None Remove="System\**" />
+	<Compile Include="..\GenericListTests.Common\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
+    <ProjectReference Include="..\..\..\ILCompiler\ILCompiler.csproj" />
+  </ItemGroup>
+  
+</Project>
