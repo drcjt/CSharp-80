@@ -68,7 +68,13 @@ namespace ILCompiler.Tests.Common
 
             z80.BeforeInstructionFetch += BeforeInstructionFetch;
 
+            var startHeap = BitConverter.ToUInt16(z80.Memory.GetContents(orgAddress + 1, 2), 0);
+
             z80.Start();
+
+            const int heapNextAddress = 0x0065;
+            var endHeap = BitConverter.ToUInt16(z80.Memory.GetContents(heapNextAddress, 2), 0);
+            var bytesAllocated = endHeap - startHeap;
 
             Console.WriteLine(_consoleStringBuilder.ToString());
 
@@ -80,7 +86,7 @@ namespace ILCompiler.Tests.Common
                 bw.WriteBenchmark(testName.Replace(_solutionPath, ""), z80.TStatesElapsedSinceStart);
             }
 
-            Console.WriteLine($"Test {testName} ran in {z80.TStatesElapsedSinceStart} T-states");
+            Console.WriteLine($"Test {testName} ran in {z80.TStatesElapsedSinceStart} T-states, allocated {bytesAllocated} bytes");
 
             // Validate we finished on the HALT instruction
             if (ilBvt)
