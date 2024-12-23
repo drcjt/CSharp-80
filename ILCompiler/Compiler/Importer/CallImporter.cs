@@ -97,13 +97,10 @@ namespace ILCompiler.Compiler.Importer
                     if (constrained.IsRuntimeDeterminedSubtype)
                         constrained = constrained.ConvertToCanonForm(TypeSystem.Canon.CanonicalFormKind.Specific);
 
-                    MethodDesc? directMethod = null;
                     var constrainedType = constrained.Context.GetClosestDefType(constrained);
-                    //var directMethod = constrainedType.TryResolveConstraintMethodApprox(method.OwningType, method, out forceUseRuntimeLookup);
 
-                    // if (forceUseRuntimeLookup)
-                    //    throw new NotImplementedException();
-
+                    // TODO: attempt to resolve constrained method into direct method call
+                    MethodDesc? directMethod = null;
                     if (directMethod is not null)
                     {
                         throw new NotImplementedException();
@@ -111,14 +108,14 @@ namespace ILCompiler.Compiler.Importer
                     else if (constrained.IsValueType)
                     {
                         // Deference this ptr and box it
-                        var dereferencedThisPtr = new IndirectEntry(arguments[0], constrainedType.VarType, constrainedType.GetElementSize().AsInt);
+                        var dereferencedThisPtr = DereferenceThisPtr(arguments[0], constrainedType);
                         var boxedNode = BoxImporter.BoxValue(dereferencedThisPtr, constrainedType, context, importer);
                         arguments[0] = boxedNode;
                     }
                     else
                     {
                         // Dereference this ptr
-                        arguments[0] = new IndirectEntry(arguments[0], VarType.Ref, 2);
+                        arguments[0] = DereferenceThisPtr(arguments[0], constrainedType);
                     }
 
                     context.Constrained = null;
@@ -403,6 +400,11 @@ namespace ILCompiler.Compiler.Importer
                 return false;
             }
             return metadataType.Namespace == typeNamespace && metadataType.Name == typeName;
+        }
+
+        private static StackEntry DereferenceThisPtr(StackEntry thisPtr, TypeDesc thisType)
+        {
+            return new IndirectEntry(thisPtr, thisType.VarType, thisType.GetElementSize().AsInt);
         }
     }
 }

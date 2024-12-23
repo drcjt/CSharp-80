@@ -226,7 +226,7 @@ namespace ILCompiler.Compiler
         {
             if (_configuration.IgnoreUnknownCil)
             {
-                _logger.LogWarning("Unsupported IL opcode {opcode} in {_method.FullName}", currentInstruction.Opcode);
+                _logger.LogWarning("Unsupported IL opcode {Opcode} in {MethodFullName}", currentInstruction.Opcode, _method.FullName);
             }
             else
             {
