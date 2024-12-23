@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace System
 {
@@ -84,27 +85,14 @@ namespace System
             return -1;
         }
 
-        public static int IndexOf<T>(T[] array, object? value, int startIndex, int count)
+        public static int IndexOf<T>(T[] array, T value, int startIndex, int count)
         {
-            
             int endIndex = startIndex + count;
-            if (value is null)
+            for (int i = startIndex; i < endIndex; i++)
             {
-                for (int i = startIndex; i < endIndex; i++)
+                if (EqualOnlyComparer<T>.Equals(array[i], value))
                 {
-                    if (array[i] is null)
-                    {
-                        return i;
-                    }
-                }
-            }
-            else
-            {
-                for (int i = startIndex; i < endIndex; i++)
-                {
-                    object? obj = array[i];
-                    if (obj is not null && obj.Equals(value))
-                        return i;
+                    return i;
                 }
             }
             return -1;
