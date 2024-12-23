@@ -10,7 +10,7 @@
         public static bool Equals(UInt32 x, UInt32 y) => x == y;
     }
 
-    internal class EqualOnlyComparer<T>
+    internal static class EqualOnlyComparer<T>
     {
         public static bool Equals(T x, T y)
         {
