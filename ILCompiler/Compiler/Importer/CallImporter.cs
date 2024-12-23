@@ -91,6 +91,36 @@ namespace ILCompiler.Compiler.Importer
 
             if (instruction.Opcode == ILOpcode.callvirt)
             {
+                if (newObjThis == null && context.Constrained != null)
+                {
+                    TypeDesc constrained = context.Constrained;
+                    if (constrained.IsRuntimeDeterminedSubtype)
+                        constrained = constrained.ConvertToCanonForm(TypeSystem.Canon.CanonicalFormKind.Specific);
+
+                    var constrainedType = constrained.Context.GetClosestDefType(constrained);
+
+                    // TODO: attempt to resolve constrained method into direct method call
+                    MethodDesc? directMethod = null;
+                    if (directMethod is not null)
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else if (constrained.IsValueType)
+                    {
+                        // Deference this ptr and box it
+                        var dereferencedThisPtr = DereferenceThisPtr(arguments[0], constrainedType);
+                        var boxedNode = BoxImporter.BoxValue(dereferencedThisPtr, constrainedType, context, importer);
+                        arguments[0] = boxedNode;
+                    }
+                    else
+                    {
+                        // Dereference this ptr
+                        arguments[0] = DereferenceThisPtr(arguments[0], constrainedType);
+                    }
+
+                    context.Constrained = null;
+                }
+
                 // Turn first argument into throw null ref check
                 arguments[0] = new NullCheckEntry(arguments[0]);
             }
@@ -370,6 +400,11 @@ namespace ILCompiler.Compiler.Importer
                 return false;
             }
             return metadataType.Namespace == typeNamespace && metadataType.Name == typeName;
+        }
+
+        private static StackEntry DereferenceThisPtr(StackEntry thisPtr, TypeDesc thisType)
+        {
+            return new IndirectEntry(thisPtr, thisType.VarType, thisType.GetElementSize().AsInt);
         }
     }
 }

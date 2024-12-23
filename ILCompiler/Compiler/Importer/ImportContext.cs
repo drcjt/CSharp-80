@@ -1,9 +1,9 @@
-﻿using ILCompiler.TypeSystem.Common;
-using ILCompiler.TypeSystem.Dnlib;
-using ILCompiler.Compiler.DependencyAnalysis;
+﻿using ILCompiler.Compiler.DependencyAnalysis;
+using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
-using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.Dnlib;
 using StackEntry = ILCompiler.Compiler.EvaluationStack.StackEntry;
 
 namespace ILCompiler.Compiler.Importer
@@ -11,7 +11,7 @@ namespace ILCompiler.Compiler.Importer
     public record ImportContext
     {
         public required BasicBlock CurrentBlock { get; init; }
-        public required BasicBlock? FallThroughBlock { get; init; }
+        public BasicBlock? FallThroughBlock { get; set; } = null;
         public bool StopImporting { get; set; }
         public required MethodDesc Method { get; init; }
         public required INameMangler NameMangler { get; init; }
@@ -20,6 +20,7 @@ namespace ILCompiler.Compiler.Importer
         public required CorLibModuleProvider CorLibModuleProvider { get; init; }
         public required NodeFactory NodeFactory { get; init; }
         public required DnlibModule Module { get; init; }
+        public TypeDesc? Constrained { get; set; } = null;
 
         public StackEntry GetGenericContext()
         {
