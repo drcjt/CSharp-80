@@ -91,6 +91,39 @@ namespace ILCompiler.Compiler.Importer
 
             if (instruction.Opcode == ILOpcode.callvirt)
             {
+                if (newObjThis == null && context.Constrained != null)
+                {
+                    TypeDesc constrained = context.Constrained;
+                    if (constrained.IsRuntimeDeterminedSubtype)
+                        constrained = constrained.ConvertToCanonForm(TypeSystem.Canon.CanonicalFormKind.Specific);
+
+                    MethodDesc? directMethod = null;
+                    var constrainedType = constrained.Context.GetClosestDefType(constrained);
+                    //var directMethod = constrainedType.TryResolveConstraintMethodApprox(method.OwningType, method, out forceUseRuntimeLookup);
+
+                    // if (forceUseRuntimeLookup)
+                    //    throw new NotImplementedException();
+
+                    if (directMethod is not null)
+                    {
+                        throw new NotImplementedException();
+                    }
+                    else if (constrained.IsValueType)
+                    {
+                        // Deference this ptr and box it
+                        var dereferencedThisPtr = new IndirectEntry(arguments[0], constrainedType.VarType, constrainedType.GetElementSize().AsInt);
+                        var boxedNode = BoxImporter.BoxValue(dereferencedThisPtr, constrainedType, context, importer);
+                        arguments[0] = boxedNode;
+                    }
+                    else
+                    {
+                        // Dereference this ptr
+                        arguments[0] = new IndirectEntry(arguments[0], VarType.Ref, 2);
+                    }
+
+                    context.Constrained = null;
+                }
+
                 // Turn first argument into throw null ref check
                 arguments[0] = new NullCheckEntry(arguments[0]);
             }

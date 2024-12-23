@@ -174,25 +174,25 @@ namespace ILCompiler.Compiler
             var currentOffset = block.StartOffset;
             var currentIndex = offsetToIndexMap[currentOffset];
 
+            var importContext = new ImportContext
+            {
+                CurrentBlock = block,
+                Method = _method,
+                NameMangler = _nameMangler,
+                Configuration = _configuration,
+                CorLibModuleProvider = _corLibModuleProvider,
+                PreinitializationManager = _preinitializationManager,
+                NodeFactory = _nodeFactory,
+                Module = _module,
+            };
+
             while (true)
             {
                 var currentInstruction = _methodIL!.Instructions[currentIndex];
                 currentOffset += currentInstruction.GetSize();
                 currentIndex++;
 
-                var fallThroughBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null;
-                var importContext = new ImportContext
-                {
-                    CurrentBlock = block,
-                    FallThroughBlock = fallThroughBlock,
-                    Method = _method,
-                    NameMangler = _nameMangler,
-                    Configuration = _configuration,
-                    CorLibModuleProvider = _corLibModuleProvider,
-                    PreinitializationManager = _preinitializationManager,
-                    NodeFactory = _nodeFactory,
-                    Module = _module,
-                };
+                importContext.FallThroughBlock = currentOffset < _basicBlocks.Length ? _basicBlocks[currentOffset] : null;
 
                 bool imported = ImportInstruction(currentInstruction, importContext);
 
@@ -226,11 +226,11 @@ namespace ILCompiler.Compiler
         {
             if (_configuration.IgnoreUnknownCil)
             {
-                _logger.LogWarning("Unsupported IL opcode {opcode}", currentInstruction.Opcode);
+                _logger.LogWarning("Unsupported IL opcode {opcode} in {_method.FullName}", currentInstruction.Opcode);
             }
             else
             {
-                throw new UnknownCilException($"Unsupported IL opcode {currentInstruction.Opcode}");
+                throw new UnknownCilException($"Unsupported IL opcode {currentInstruction.Opcode} in {_method.FullName}");
             }
         }
 
@@ -282,7 +282,7 @@ namespace ILCompiler.Compiler
 
             var methodIL = method.MethodIL!;
 
-            var uninstantiatedMethodIL = methodIL.GetMethodILDefinition();            
+            var uninstantiatedMethodIL = methodIL.GetMethodILDefinition();
             if (methodIL != uninstantiatedMethodIL)
             {
                 var sharedMethod = _method.GetSharedRuntimeFormMethodTarget();
