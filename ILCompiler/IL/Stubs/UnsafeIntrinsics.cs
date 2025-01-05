@@ -119,7 +119,7 @@ namespace ILCompiler.Common.TypeSystem.IL
 
             body.Instructions.Add(OpCodes.Ldarg_0.ToInstruction());
             body.Instructions.Add(OpCodes.Ldarg_1.ToInstruction());
-            body.Instructions.Add(OpCodes.Add.ToInstruction(new GenericMVar(0).ToTypeDefOrRef()));
+            body.Instructions.Add(OpCodes.Add.ToInstruction());
             body.Instructions.Add(OpCodes.Ret.ToInstruction());
 
             body.UpdateInstructionOffsets();
