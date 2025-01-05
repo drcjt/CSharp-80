@@ -117,7 +117,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private void ImportBox(Instruction instruction)
         {
             var runtimeDeterminedType = (TypeDesc)instruction.GetOperand();
-            var allocSize = runtimeDeterminedType.GetElementSize().AsInt;
 
             if (runtimeDeterminedType.IsRuntimeDeterminedSubtype)
             {
@@ -125,7 +124,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
             else
             {
-                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(runtimeDeterminedType, allocSize));
+                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(runtimeDeterminedType));
             }
         }
 
@@ -147,7 +146,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 var catchTypeDef = (DefType)exceptionHandler.CatchType!;
                 if (catchTypeDef != null)
                 {
-                    _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(catchTypeDef, catchTypeDef.InstanceByteCount.AsInt));
+                    _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(catchTypeDef));
                 }
             }
         }
@@ -215,7 +214,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             var systemStringType = (DefType)_module.GetType("System", "String");
 
-            _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(systemStringType, systemStringType.InstanceByteCount.AsInt));
+            _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(systemStringType));
 
             _dependencies.Add(_context.NodeFactory.SerializedStringObject((string)instruction.GetOperand()));
         }
@@ -258,11 +257,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private void ImportNewArray(Instruction instruction)
         {
             var elemTypeDef = (TypeDesc)instruction.GetOperand();
-            var allocSize = elemTypeDef.GetElementSize().AsInt;
-
-            var arrayType = new ArrayType(elemTypeDef, -1);
-
-            _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(arrayType, allocSize));
+            var arrayType = elemTypeDef.MakeArrayType();
+            _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(arrayType));
         }
 
         private void ImportCall(Instruction instruction)
@@ -285,9 +281,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 var instantiatedMethod = (InstantiatedMethod)methodDesc;
 
                 var objType = instantiatedMethod.Instantiation[0];
-                var allocSize = objType.GetElementSize().AsInt;
 
-                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(objType, allocSize));
+                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(objType));
             }
             if (methodDesc.IsIntrinsic && methodDesc.Name == "get_Chars")
             {
@@ -326,6 +321,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             if (directCall)
             {
                 var targetMethod = methodDesc.GetCanonMethodTarget(CanonicalFormKind.Specific);
+
+                if (targetMethod.IsAbstract)
+                {
+                    throw new Exception("Bad IL cannot direct call abstract method");
+                }
+
                 if (exactContextNeedsRuntimeLookup)
                 {
                     if (targetMethod.RequiresInstMethodDescArg)
@@ -431,8 +432,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
             else if (owningType.FullName != "System.String")
             {
-                var allocSize = owningType.GetElementSize().AsInt;
-                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(owningType, allocSize));
+                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(owningType));
             }
         }
 

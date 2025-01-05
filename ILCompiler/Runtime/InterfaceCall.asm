@@ -14,8 +14,8 @@
 ;
 ; On Entry: BC = Interface EEType Ptr, E = method slot, this pointer is on stack behind return address
 
-; EEType contains, flags (2 bytes), base size (2 bytes), related type (2 bytes), vtable slot count (1 byte), inteface slot count (1 byte)
-BaseTypeOffset:		EQU 4
+; EEType contains, Component Size (2 bytes), flags (2 bytes), base size (2 bytes), related type (2 bytes), vtable slot count (1 byte), inteface slot count (1 byte)
+BaseTypeOffset:		EQU 2 + 2 + 2
 
 InterfaceCall:	
 	LD (REQDINTERFACE), BC
