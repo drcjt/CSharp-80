@@ -71,11 +71,8 @@ namespace ILCompiler.Compiler.Importer
                 eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
             }
 
-            // Determine required size on GC heap
-            var allocSize = objType.InstanceByteCount.AsInt;
-
             // Allocate memory for object
-            var op1 = new AllocObjEntry(eeTypeNode, allocSize, objVarType);
+            var op1 = new AllocObjEntry(eeTypeNode, objVarType);
 
             // Store allocated memory address into a temp local variable
             var lclNum = importer.GrabTemp(VarType.Ref, objSize);

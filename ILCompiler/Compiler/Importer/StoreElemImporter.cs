@@ -15,8 +15,18 @@ namespace ILCompiler.Compiler.Importer
             {
                 case ILOpcode.stelem:
                     var typeDesc = (TypeDesc)instruction.GetOperand();
-                    elemType = typeDesc.VarType;
-                    elemSize = typeDesc.GetElementSize().AsInt;
+                    if (typeDesc.IsRuntimeDeterminedSubtype)
+                    {
+                        // TODO: will need to revist this to deal with runtime determined types properly
+                        // Use Ref for canonical types
+                        elemType = VarType.Ref;
+                        elemSize = 2;
+                    }
+                    else
+                    {
+                        elemType = typeDesc.VarType;
+                        elemSize = typeDesc.GetElementSize().AsInt;
+                    }
                     break;
                 case ILOpcode.stelem_i:
                     elemType = VarType.Ptr;

@@ -8,10 +8,8 @@ namespace ILCompiler.Compiler.CodeGenerators
         public void GenerateCode(AllocObjEntry entry, CodeGeneratorContext context)
         {
             // Allocate memory on the heap using simple zero GC/increment a pointer approach
-            context.InstructionsBuilder.Pop(BC); // eeType
-            context.InstructionsBuilder.Ld(DE, (ushort)entry.Size);
-            context.InstructionsBuilder.Call("NewObject");
-            context.InstructionsBuilder.Push(HL);
+            context.InstructionsBuilder.Pop(HL); // eeType
+            context.InstructionsBuilder.Call("NewObjectNoSize");
         }
     }
 }

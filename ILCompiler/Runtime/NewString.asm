@@ -30,8 +30,7 @@ NewString:
 	; Allocate object
 	CALL NEWOBJECT
 
-	; HL = pointer to allocated object
-
+	POP HL	; pointer to allocated object
 	POP DE
 	PUSH HL
 
