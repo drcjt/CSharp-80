@@ -16,7 +16,7 @@ namespace Internal.Runtime.CompilerServices
         }
 
         [Intrinsic]
-        public static T As<T>(object value) where T: class
+        public static T As<T>(object value) where T : class
         {
             throw new Exception();
 
@@ -37,6 +37,17 @@ namespace Internal.Runtime.CompilerServices
         public static ref T AddByteOffset<T>(ref T source, IntPtr byteOffset)
         {
             throw new Exception();
+
+            // ldarg.0
+            // ldarg.1
+            // add
+            // ret
+        }
+
+        [Intrinsic]
+        public static ref T AddByteOffset<T>(ref T source, nuint byteOffset)
+        {
+            return ref AddByteOffset(ref source, (IntPtr)(void*)byteOffset);
 
             // ldarg.0
             // ldarg.1
@@ -85,6 +96,18 @@ namespace Internal.Runtime.CompilerServices
 
         [Intrinsic]
         public static void CopyBlock(void* destination, void* source, uint byteCount)
+        {
+            throw new Exception();
+
+            // ldarg.0
+            // ldarg.1
+            // ldarg.2
+            // cpblk
+            // ret
+        }
+
+        [Intrinsic]
+        public static void CopyBlock(ref byte destination, ref byte source, uint byteCount)
         {
             throw new Exception();
 

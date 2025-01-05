@@ -35,11 +35,8 @@ namespace ILCompiler.Compiler.Importer
 
             int unboxedObjectSize = GetUnboxedSize(objType);
 
-            // Determine required size on GC heap. Have to explicitly add PointerSize for EETypePtr
-            var allocSize = unboxedObjectSize + 2;
-
             // Allocate memory for object
-            var op1 = new AllocObjEntry(eeTypeNode, allocSize, VarType.Ref);
+            var op1 = new AllocObjEntry(eeTypeNode, VarType.Ref);
             var asg = new StoreLocalVariableEntry(lclNum, false, op1);
             importer.ImportAppendTree(asg);
 

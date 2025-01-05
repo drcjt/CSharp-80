@@ -1,15 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using Internal.Runtime;
+using Internal.Runtime.CompilerServices;
+using System.Collections;
+using System.Collections.Generic;
+using System.Runtime;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace System
 {
-    public class Array
+    public class Array : IList
     {
-        public extern int Length
-        {
-            [MethodImpl(MethodImplOptions.InternalCall)]
-            get;
-        }
+        // This field should be the first field in Array
+        private ushort _numComponents;
+
+        public int Length => Unsafe.As<RawArrayData>(this).Length;
+
+        public unsafe ushort ElementSize => this.GetMethodTable()->ComponentSize;
 
         public static void Copy(object?[] source, object?[] destination, int length)
         {
@@ -112,6 +118,128 @@ namespace System
             {
                 array[i] = default;
             }
+        }
+
+        internal unsafe object? InternalGetValue(nint flattenedIndex)
+        {
+            ref byte element = ref Unsafe.AddByteOffset(ref MemoryMarshal.GetArrayDataReference(this), flattenedIndex * ElementSize);
+            EEType* pElementEEType = ElementEEType;
+
+            if (pElementEEType->IsValueType)
+            {
+                return RuntimeExports.Box(pElementEEType, ref element);
+            }
+            else
+            {
+                return Unsafe.As<byte, object>(ref element);
+            }
+        }
+
+        internal unsafe void InternalSetValue(object? value, nint flattenedIndex)
+        {
+            throw new NotImplementedException();
+        }
+
+        public object? GetValue(int index) => InternalGetValue(index);
+        public void SetValue(object? value, int index) => InternalSetValue(value, index);
+
+        internal unsafe EEType* ElementEEType => this.GetMethodTable()->RelatedType;
+
+        public IEnumerator GetEnumerator()
+        {
+            return new ArrayEnumerator(this);
+        }
+
+        public void CopyTo(Array array, int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Add(object? value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool Contains(object? value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Clear()
+        {
+            throw new NotImplementedException();
+        }
+
+        public int IndexOf(object? value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Insert(int index, object? value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Remove(object? value)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveAt(int index)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int Count => Length;
+
+        public object? this[int index]
+        {
+            get => GetValue(index);
+            set => SetValue(value, index);
+        }
+
+        private sealed class ArrayEnumerator : IEnumerator
+        {
+            private readonly Array _array;
+            private int _index;
+            private readonly int _endIndex; // cache array length, since it's a little slow.
+
+            internal ArrayEnumerator(Array array)
+            {
+                _array = array;
+                _index = -1;
+                _endIndex = array.Length;
+            }
+
+            public bool MoveNext()
+            {
+                if (_index < _endIndex)
+                {
+                    _index++;
+                    return (_index < _endIndex);
+                }
+                return false;
+            }
+
+            public void Reset()
+            {
+                _index = -1;
+            }
+
+            public object Current => _array.InternalGetValue(_index);
+        }
+    }
+
+    public class Array<T> : Array, IEnumerable<T>
+    {
+        public IEnumerator<T> GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
         }
     }
 }

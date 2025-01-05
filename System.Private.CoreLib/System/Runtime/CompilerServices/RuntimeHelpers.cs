@@ -1,4 +1,5 @@
 ﻿using Internal.Runtime;
+using System.Runtime.InteropServices;
 
 namespace System.Runtime.CompilerServices
 {
@@ -13,5 +14,18 @@ namespace System.Runtime.CompilerServices
         // TODO: This should be removed when better support for reflection has been
         // added via Type class.
         public unsafe static bool HasCctor<T>() => EEType.Of<T>()->HasCctor;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal class RawArrayData
+    {
+        public ushort Length;
+        public byte Data;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal class RawData
+    {
+        public byte Data;
     }
 }

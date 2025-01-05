@@ -7,6 +7,7 @@ namespace Internal.Runtime
     {
         // CS0649: Field '{blah}' is never assigned to, and will always have its default value
 #pragma warning disable 649
+        private ushort _usComponentSize;
         private ushort _usFlags;
         private ushort _usBaseSize;
         private EEType* _relatedType;
@@ -14,7 +15,7 @@ namespace Internal.Runtime
         private byte _numInterfaces;
 #pragma warning restore
 
-        internal readonly ushort GetFlags() { return _usFlags; }
+        public readonly ushort GetFlags() { return _usFlags; }
 
         internal readonly EEType* RelatedType => _relatedType;
 
@@ -33,5 +34,15 @@ namespace Internal.Runtime
         internal byte NumInterfaces => _numInterfaces;
 
         internal EEType** InterfaceMap => (EEType**)((byte*)Unsafe.AsPointer(ref this) + sizeof(EEType) + sizeof(void*) * _numVtableSlots);
+
+        internal ushort ComponentSize => _usComponentSize;
+
+        internal ushort BaseSize => _usBaseSize;
+
+        internal bool IsValueType => ElementType < EETypeElementType.Class;
+
+        internal EETypeElementType ElementType => (EETypeElementType)((_usFlags & (ushort)EETypeFlags.ElementTypeMask) >> (byte)EETypeFlags.ElementTypeShift);
+
+        internal uint ValueTypeSize => (uint)(BaseSize - 2);
     }
 }

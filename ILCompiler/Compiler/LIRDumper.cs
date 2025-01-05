@@ -193,7 +193,7 @@ namespace ILCompiler.Compiler
         public void Visit(AllocObjEntry entry)
         {
             _sb.AppendLine($"       ┌──▌  t{entry.EETypeNode.TreeID}");
-            _sb.AppendLine($"       allocObj {entry.Size}");
+            _sb.AppendLine($"       allocObj");
         }
 
         public void Visit(LocalHeapEntry entry)

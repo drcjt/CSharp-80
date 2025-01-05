@@ -3,12 +3,31 @@ using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
+using Internal.Runtime;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
+    /// <summary>
+    /// Given a type, ConstructedEETypeNode writes an EEType data structure in the format expected by the runtime
+    /// 
+    /// Format of an EEType:
+    /// 
+    /// Field Size        | Contents
+    /// ---------------------------------------------------
+    /// UInt16            | Component Size
+    /// UInt16            | Flags
+    /// UInt16            | Base size
+    /// [Pointer Size]    | Related type, this is the base type for regular types, and the element type for arrays / pointer types.
+    /// UInt8             | Number of VTable slots (X)
+    /// UInt8             | Number of interfaces implemented by type (Y)
+    /// X * [Ptr Size]    | VTable entries (optional)
+    /// Y * [Ptr Size]    | Pointers to interface map data structures (optional)
+    /// </summary>
     public class ConstructedEETypeNode : EETypeNode
     {
-        public int BaseSize { get; private set; }
+        public int BaseSize => ComputeBaseSize(Type);
+
+        public int ComponentSize { get; private set; }
 
         public TypeDesc? RelatedType { get; set; }
 
@@ -20,10 +39,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public override bool ShouldSkipEmitting(NodeFactory factory) => false;
 
-        public ConstructedEETypeNode(TypeDesc type, int baseSize, INameMangler nameMangler, PreinitializationManager preinitializationManager, NodeFactory nodeFactory, ModuleDesc module) 
+        public ConstructedEETypeNode(TypeDesc type, INameMangler nameMangler, PreinitializationManager preinitializationManager, NodeFactory nodeFactory, ModuleDesc module) 
             : base(type, nameMangler)
         {
-            BaseSize = baseSize;
             _preinitializationManager = preinitializationManager;
             _nodeFactory = nodeFactory;
             _module = module;
@@ -40,13 +58,22 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 if (!elemType.IsInterface)
                 {
                     RelatedType = elemType;
+                    ComponentSize = elemType.GetElementSize().AsInt;
+
+                    // For arrays of value types conservatively assume that element types of constructed arrays
+                    // may also be constructed. This handles case of APIs on arrays that allow allocating element
+                    // types via runtime magic such as "(Array)new NotAllocated[1]).GetValue(0)" or IEnumerable.
+                    if (elemType.IsValueType)
+                    {
+                        dependencies.Add(context.NodeFactory.ConstructedEETypeNode(elemType));
+                    }
+
                     var elemConstructedEETypeNode = context.NodeFactory.NecessaryTypeSymbol(elemType);
                     dependencies.Add(elemConstructedEETypeNode);
                 }
 
                 TypeDesc systemArrayType = (TypeDesc)_module.GetType("System", "Array");
-                var allocSize = ((DefType)systemArrayType).InstanceByteCount;
-                var constructedEETypeNode = context.NodeFactory.ConstructedEETypeNode(systemArrayType, allocSize.AsInt);
+                var constructedEETypeNode = context.NodeFactory.ConstructedEETypeNode(systemArrayType);
                 dependencies.Add(constructedEETypeNode);
             }
             else
@@ -58,8 +85,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                     if (!baseType.IsValueType)
                     {
-                        var allocSize = baseType.InstanceByteCount.AsInt;
-                        var constructedEETypeNode = context.NodeFactory.ConstructedEETypeNode(baseType, allocSize);
+                        var constructedEETypeNode = context.NodeFactory.ConstructedEETypeNode(baseType);
                         dependencies.Add(constructedEETypeNode);
                     }
                 }
@@ -142,12 +168,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             // Need to mangle full field name here
             instructionsBuilder.Label(eeMangledTypeName);
 
+            // Emit data for EEType Component Size
+            OutputComponentSize(instructionsBuilder);
+
             // Emit data for EEType flags here
-            ushort flags = 0;
+            ushort flags = ComputeFlags(Type);
+            /*
             if (_preinitializationManager.HasLazyStaticConstructor(Type))
             {
                 flags = 1;
             }
+            */
             instructionsBuilder.Dw(flags, "EEType flags");
 
             // Emit data for EEType here
@@ -155,15 +186,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
             instructionsBuilder.Dw((ushort)baseSize, "Base Size");
 
-            if (RelatedType != null)
-            {
-                var relatedTypeMangledTypeName = _nameMangler.GetMangledTypeName(RelatedType);
-                instructionsBuilder.Dw(relatedTypeMangledTypeName, "Related Type");
-            }
-            else
-            {
-                instructionsBuilder.Dw((ushort)0, "No Related Type");
-            }
+            OutputRelatedType(instructionsBuilder);
 
             var vtableSlotCountReservation = instructionsBuilder.ReserveByte();
             var interfaceCountReservation = instructionsBuilder.ReserveByte();
@@ -182,6 +205,37 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             OutputDispatchMap(instructionsBuilder, defType);
 
             return instructionsBuilder.Instructions;
+        }
+
+        private void OutputRelatedType(InstructionsBuilder instructionsBuilder)
+        {
+            if (RelatedType != null)
+            {
+                var relatedTypeMangledTypeName = _nameMangler.GetMangledTypeName(RelatedType);
+                instructionsBuilder.Dw(relatedTypeMangledTypeName, "Related Type");
+            }
+            else
+            {
+                instructionsBuilder.Dw((ushort)0, "No Related Type");
+            }
+        }
+
+        private void OutputComponentSize(InstructionsBuilder instructionsBuilder)
+        {
+            if (Type.IsArray)
+            {
+                TypeDesc elementType = ((ArrayType)Type).ElementType;
+                int elementSize = elementType.GetElementSize().AsInt;
+                instructionsBuilder.Dw((ushort)elementSize, "EEType Component Size");
+            }
+            else if (Type.IsString)
+            {
+                instructionsBuilder.Dw(2, "EEType Component Size");
+            }
+            else
+            {
+                instructionsBuilder.Dw(0, "EEType Component Size");
+            }
         }
 
         private byte _interfaceSlotCount = 0;
@@ -297,6 +351,52 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     _virtualSlotCount++;
                 }
             }
+        }
+
+        private static ushort ComputeFlags(TypeDesc type)
+        {
+            // Enums are represented as their underlying type
+            type = type.UnderlyingType;
+
+            if (type.IsValueType)
+            {
+                return (ushort)EETypeElementType.ValueType;
+            }
+            if (type.IsWellKnownType(WellKnownType.Array))
+            {
+                return (ushort)EETypeElementType.SystemArray;
+            }
+            return 0;
+        }
+
+        private static int ComputeBaseSize(TypeDesc type)
+        {
+            int pointerSize = type.Context.Target.PointerSize;
+            int objectSize = 0;
+            if (type.IsInterface)
+            {
+                return 0;
+            }
+            else if (type.IsDefType)
+            {
+                LayoutInt instanceByteCount = ((DefType)type).InstanceByteCount;
+                objectSize = instanceByteCount.AsInt;
+
+                if (type.IsValueType)
+                    objectSize += pointerSize; // + EETypePtr field inherited from System.Object
+            }
+            else if (type.IsArray)
+            {
+                objectSize = 2 * pointerSize; // EETypePtr + Length
+            }
+
+            if (type.IsString)
+            {
+                // For strings we have EETypePtr + length + firstChar
+                objectSize = 1 * pointerSize + sizeof(Int16) + sizeof(char);
+            }
+
+            return objectSize;
         }
     }
 }

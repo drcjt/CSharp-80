@@ -1,4 +1,6 @@
 ﻿using Internal.Runtime;
+using Internal.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace System
 {
@@ -17,5 +19,18 @@ namespace System
         public virtual string ToString() => "";
 
         public static bool ReferenceEquals(object? objA, object? objB) => objA == objB;
+
+        internal EEType* GetMethodTable() => m_pEEType;
+
+        [StructLayout(LayoutKind.Sequential)]
+        private sealed class RawData
+        {
+            public byte Data;
+        }
+
+        internal ref byte GetRawData()
+        {
+            return ref Unsafe.As<RawData>(this).Data;
+        }
     }
 }

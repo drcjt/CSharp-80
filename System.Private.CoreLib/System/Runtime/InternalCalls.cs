@@ -1,9 +1,15 @@
-﻿using System.Runtime.InteropServices;
+﻿using Internal.Runtime;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace System.Runtime
 {
     internal static class InternalCalls
     {
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        [RuntimeImport("NEWOBJECTNOSIZE")]
+        internal static extern unsafe object NewObject(EEType* pEEType);
+
         [DllImport(Libraries.Runtime, EntryPoint = "CALLCATCHHANDLER")]
         internal static extern unsafe void CallCatchHandler(object exception, byte* pCatchHandler, ref StackFrameIterator frameIter);
 

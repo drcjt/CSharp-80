@@ -38,7 +38,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public override bool ShouldSkipEmitting(NodeFactory factory)
         {
             // Skip emitting if there is a constructed version of this node
-            return factory.ConstructedEETypeNode(this.Type, 0).Mark;
+            return factory.ConstructedEETypeNode(this.Type).Mark;
         }
     }
 }

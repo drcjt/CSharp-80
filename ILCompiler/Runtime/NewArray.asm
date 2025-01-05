@@ -61,8 +61,7 @@ newarr_nomul16:
 	; Allocate object
 	CALL NEWOBJECT
 
-	; HL = ptr to new object
-
+	POP HL	; ptr to new object
 	POP DE
 	PUSH HL
 

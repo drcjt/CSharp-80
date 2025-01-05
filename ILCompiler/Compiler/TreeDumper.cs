@@ -213,7 +213,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(AllocObjEntry entry)
         {
-            Print($"ALLOCOBJ {entry.Size}");
+            Print($"ALLOCOBJ");
             _indent++;
             entry.EETypeNode.Accept(this);
             _indent--;

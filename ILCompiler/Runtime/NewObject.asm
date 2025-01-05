@@ -5,6 +5,19 @@
 ; On Entry: BC = EETypePtr, DE = size to allocate
 ; On Exit: HL = pointer to allocated object
 
+NewObjectNoSize:	
+
+	; EETypePtr is in HL here
+	; Get Base Size from EETypePtr into DE
+
+	LD B, H
+	LD C, L
+	LD DE, 4	; Offset to BaseSize
+	ADD HL, DE
+	LD E, (HL)
+	INC HL
+	LD D, (HL)
+
 NewObject:	
 
 	; Allocate and check if hit stack
@@ -45,9 +58,11 @@ NewObject_ZeroLoop:
 	JR NewObject_ZeroLoop
 
 NewObject_ZeroLoopEnd:
+	POP BC
 	POP HL
+	PUSH BC
 
-	RET
+	JP (HL)
 
 AllocFailed:
 

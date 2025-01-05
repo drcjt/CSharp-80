@@ -53,6 +53,8 @@ namespace ILCompiler.TypeSystem.Common
             return ((DefType)type);
         }
 
+        public ArrayType GetArrayType(TypeDesc elementType) => GetArrayType(elementType, -1);
+
         public ArrayType GetArrayType(TypeDesc elementType, int rank)
         {
             var arrayTypeKey = $"{elementType.FullName}_{rank}";
@@ -152,11 +154,6 @@ namespace ILCompiler.TypeSystem.Common
             return typeToConvert;
         }
 
-        public DefType GetWellKnownType(string wellKnownNamespace, string wellKnownName)
-        {
-            return (DefType)SystemModule!.GetType(wellKnownNamespace, wellKnownName);
-        }
-
         private CanonType? _canonType;
         public CanonBaseType CanonType
         {
@@ -173,6 +170,20 @@ namespace ILCompiler.TypeSystem.Common
             CanonicalFormKind.Specific => type == CanonType,
             _ => false,
         };
+
+        public DefType? GetWellKnownType(WellKnownType wellKnownType, bool throwIfNotFound = true)
+        {
+            switch (wellKnownType)
+            {
+                case WellKnownType.String:
+                    return (DefType)SystemModule!.GetType("System", "String");
+                default:
+                    if (throwIfNotFound)
+                        throw new TypeLoadException();
+                    else
+                        return null;
+            }
+        }
     }
 
     public enum SharedGenericsMode
