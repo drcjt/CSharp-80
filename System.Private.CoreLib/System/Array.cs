@@ -202,7 +202,7 @@ namespace System
         {
             private readonly Array _array;
             private int _index;
-            private int _endIndex; // cache array length, since it's a little slow.
+            private readonly int _endIndex; // cache array length, since it's a little slow.
 
             internal ArrayEnumerator(Array array)
             {

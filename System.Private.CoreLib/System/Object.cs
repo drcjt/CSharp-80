@@ -23,7 +23,7 @@ namespace System
         internal EEType* GetMethodTable() => m_pEEType;
 
         [StructLayout(LayoutKind.Sequential)]
-        private class RawData
+        private sealed class RawData
         {
             public byte Data;
         }

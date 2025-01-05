@@ -19,8 +19,7 @@ namespace System.Runtime.InteropServices
             // The BaseSize of an array includes all the fields before the array data,
             // including the method table. The reference to RawData.Data
             // points at the number of components, skipping over the method table pointer-sized field.
-            int offset = (ushort)array.GetMethodTable()->BaseSize - (1 * 2 /* sizeof(IntPtr) */);
-            return ref Unsafe.AddByteOffset(ref Unsafe.As<RawData>(array).Data, (nint)offset);
+            return ref Unsafe.AddByteOffset(ref Unsafe.As<RawData>(array).Data, (nint)array.GetMethodTable()->BaseSize - (1 * 2 /* sizeof(IntPtr) */));
         }
     }
 }

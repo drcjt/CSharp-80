@@ -2,7 +2,7 @@
 
 namespace System.Tests
 {
-    internal class ArrayTests
+    internal static class ArrayTests
     {
         public static void GetValue_RankOneInt_SetValue()
         {
@@ -31,7 +31,9 @@ namespace System.Tests
 
         public static void GetEnumerator(Array array)
         {
-            Assert.IsTrue(array.GetEnumerator() != array.GetEnumerator());
+            var enumerator1 = array.GetEnumerator();
+            var enumerator2 = array.GetEnumerator();
+            Assert.IsTrue(enumerator1 != enumerator2);
 
             IEnumerator enumerator = array.GetEnumerator();
             for (int i = 0; i < 2; i++)

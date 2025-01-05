@@ -73,7 +73,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 }
 
                 TypeDesc systemArrayType = (TypeDesc)_module.GetType("System", "Array");
-                var allocSize = ((DefType)systemArrayType).InstanceByteCount;
                 var constructedEETypeNode = context.NodeFactory.ConstructedEETypeNode(systemArrayType);
                 dependencies.Add(constructedEETypeNode);
             }
@@ -86,7 +85,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                     if (!baseType.IsValueType)
                     {
-                        var allocSize = baseType.InstanceByteCount.AsInt;
                         var constructedEETypeNode = context.NodeFactory.ConstructedEETypeNode(baseType);
                         dependencies.Add(constructedEETypeNode);
                     }
