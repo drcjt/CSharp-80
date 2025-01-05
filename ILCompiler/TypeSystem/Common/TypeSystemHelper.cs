@@ -20,5 +20,12 @@ namespace ILCompiler.TypeSystem.Common
         {
             return type.Context.GetAllVirtualMethods(type);
         }
+
+        public static bool IsWellKnownType(this TypeDesc type, WellKnownType wellKnownType)
+        {
+            return type == type.Context.GetWellKnownType(wellKnownType, false);
+        }
+
+        public static ArrayType MakeArrayType(this TypeDesc type) => type.Context.GetArrayType(type);
     }
 }

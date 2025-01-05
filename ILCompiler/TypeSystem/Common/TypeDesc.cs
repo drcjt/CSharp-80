@@ -48,6 +48,8 @@ namespace ILCompiler.TypeSystem.Common
         public bool IsArray => this is ArrayType;
         public bool IsSzArray => this is ArrayType type && type.IsSzArray;
 
+        public bool IsString => this.IsWellKnownType(WellKnownType.String);
+
         public bool IsVoid => IsVarType(VarType.Void);
 
         public virtual IEnumerable<FieldDesc> GetFields() => FieldDesc.EmptyFields;
