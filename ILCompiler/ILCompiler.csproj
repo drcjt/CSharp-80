@@ -98,6 +98,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Common\Internal\Runtime\EETypeElementType.cs" Link="Common\EETypeElementType.cs" />
+    <Compile Include="..\Common\Internal\Runtime\EETypeFlags.cs" Link="Common\EETypeFlags.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Runtime\CPM\cls.asm" />
     <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
     <EmbeddedResource Include="Runtime\CallCatchHandler.asm" />
