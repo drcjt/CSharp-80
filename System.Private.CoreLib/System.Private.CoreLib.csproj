@@ -61,4 +61,10 @@
 		<Compile Include="Pal\DateTime.CPM.cs" />
 	</ItemGroup>
 
+	<ItemGroup>
+		<Compile Include="..\Common\Internal\Runtime\EEType.cs" Link="Internal\Runtime\EEType.cs" />
+		<Compile Include="..\Common\Internal\Runtime\EETypeElementType.cs" Link="Internal\Runtime\EETypeElementType.cs" />
+		<Compile Include="..\Common\Internal\Runtime\EETypeFlags.cs" Link="Internal\Runtime\EETypeFlags.cs" />
+	</ItemGroup>
+
 </Project>
