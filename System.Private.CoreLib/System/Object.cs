@@ -14,7 +14,15 @@ namespace System
             return new RuntimeTypeHandle((IntPtr)m_pEEType);
         }
 
-        public virtual bool Equals(object? obj) => obj == this;
+        public virtual bool Equals(object? obj) => this == obj;
+
+        public static bool Equals(object? obj1, object? obj2)
+        {
+            if (obj1 == obj2) return true;
+            if (obj1 == null || obj2 == null) return false;
+            return obj1.Equals(obj2);
+        }
+
         public virtual int GetHashCode() => 0;
         public virtual string ToString() => "";
 

@@ -47,7 +47,7 @@ namespace ILCompiler.TypeSystem.Dnlib
             {
                 var elemTypeSig = typeSig.Next;
                 var elemTypeDesc = Create(elemTypeSig);
-                return Context.GetArrayType(elemTypeDesc, -1);
+                return elemTypeDesc.MakeArrayType();
             }
             if (typeSig.IsFunctionPointer)
             {
