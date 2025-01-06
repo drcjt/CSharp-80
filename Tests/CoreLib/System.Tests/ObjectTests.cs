@@ -15,7 +15,7 @@
             EqualsTest(null, obj1, false);
         }
 
-        public static void EqualsTest(object obj1, object obj2, bool expected)
+        public static void EqualsTest(object? obj1, object? obj2, bool expected)
         {
             if (obj1 != null)
             {
