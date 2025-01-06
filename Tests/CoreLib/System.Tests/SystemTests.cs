@@ -7,6 +7,8 @@
             ArrayTests.GetValue_RankOneInt_SetValue();
             ArrayTests.GetEnumerator();
 
+            ObjectTests.EqualsTests();
+
             return 0;
         }
     }

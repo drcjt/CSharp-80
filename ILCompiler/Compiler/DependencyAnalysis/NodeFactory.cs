@@ -9,7 +9,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
     public class NodeFactory
     {
         private readonly IDictionary<string, StaticsNode> _staticNodesByFullName = new Dictionary<string, StaticsNode>();
-        private readonly IDictionary<string, Z80MethodCodeNode> _methodNodesByFullName = new Dictionary<string, Z80MethodCodeNode>();
+        private readonly IDictionary<MethodDesc, Z80MethodCodeNode> _methodNodesByFullName = new Dictionary<MethodDesc, Z80MethodCodeNode>();
         private readonly IDictionary<string, UnboxingStubNode> _unboxingStubsByFullName = new Dictionary<string, UnboxingStubNode>();
 
         private readonly IDictionary<string, VirtualMethodUseNode> _virtualMethodNodesByFullName = new Dictionary<string, VirtualMethodUseNode>();
@@ -88,10 +88,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public IMethodNode MethodNode(MethodDesc method, bool unboxingStub = false)
         {
-            if (!_methodNodesByFullName.TryGetValue(method.FullName, out var methodNode))
+            if (!_methodNodesByFullName.TryGetValue(method, out var methodNode))
             {
                 methodNode = new Z80MethodCodeNode(method, _methodCompilerFactory, _module);
-                _methodNodesByFullName[method.FullName] = methodNode;
+                _methodNodesByFullName[method] = methodNode;
             }
 
             if (unboxingStub)

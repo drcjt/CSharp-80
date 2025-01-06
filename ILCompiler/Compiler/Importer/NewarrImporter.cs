@@ -15,7 +15,7 @@ namespace ILCompiler.Compiler.Importer
             var numElements = importer.PopExpression();
 
             var runtimeDeterminedType = (TypeDesc)instruction.GetOperand();
-            var runtimeDeterminedArrayType = new ArrayType(runtimeDeterminedType, -1);
+            var runtimeDeterminedArrayType = runtimeDeterminedType.MakeArrayType();
 
             StackEntry eeTypeNode;
             if (runtimeDeterminedType.IsRuntimeDeterminedSubtype)
