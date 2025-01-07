@@ -4,6 +4,9 @@
     {
         private readonly int m_value;
 
+        public const int MaxValue = 2147483647;
+        public const int MinValue = -2147483648;
+
         public static int Parse(string s)
         {
             int result = 0;

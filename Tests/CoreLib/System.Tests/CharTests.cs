@@ -1,7 +1,26 @@
-﻿namespace CoreLib
+﻿namespace System.Tests
 {
-    public class CharTests
+    internal static class CharTests
     {
+        public static void EqualsTests()
+        {
+            EqualsTest('a', 'a', true);
+            EqualsTest('a', 'A', false);
+            EqualsTest('a', 'b', false);
+            EqualsTest('a', (int)'a', false);
+            EqualsTest('a', "a", false);
+            EqualsTest('a', null, false);
+        }
+
+        private static void EqualsTest(char c, object? obj, bool expected)
+        {
+            if (obj is char v)
+            {
+                Assert.AreEqual(expected, c.Equals(v));
+            }
+            Assert.AreEqual(expected, c.Equals(obj));
+        }
+
         public static void IsBetweenCharTests()
         {
             Assert.AreEqual(true, char.IsBetween('a', 'a', 'a'));
@@ -24,8 +43,8 @@
         {
             char[] validAsciiDigits = new char[] { '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039' };
 
-            for (int i = 0; i < validAsciiDigits.Length; i++) 
-            { 
+            for (int i = 0; i < validAsciiDigits.Length; i++)
+            {
                 char ch = validAsciiDigits[i];
                 Assert.AreEqual(true, char.IsAsciiDigit(ch));
             }
@@ -33,8 +52,8 @@
 
         public static void IsAsciiDigit_WithNonAsciiDigits_ReturnsFalse()
         {
-            char[] invalidAsciiDigits = new char[] 
-            { 
+            char[] invalidAsciiDigits = new char[]
+            {
                 '\u0047','\u004c','\u0051','\u0056','\u00c0','\u00c5','\u00ca','\u00cf','\u00d4','\u00da', /* Uppercase Letters */
                 '\u0062','\u0068','\u006e','\u0074','\u007a','\u00e1','\u00e7','\u00ed','\u00f3','\u00fa', /* Lowercase Letters */
                 '\u00aa','\u00ba', /* Other Letters */

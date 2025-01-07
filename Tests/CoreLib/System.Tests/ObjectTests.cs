@@ -23,5 +23,38 @@
             }
             Assert.AreEqual(expected, Equals(obj1, obj2));
         }
+
+        public static void ReferenceEqualsTests()
+        {
+            var equalsTester1 = new EqualsTester();
+            var equalsTester2 = new EqualsTester();
+
+            EqualsTester.EqualsCalled = false;
+            Assert.IsFalse(ReferenceEquals(equalsTester1, equalsTester2));
+            Assert.IsFalse(EqualsTester.EqualsCalled);
+
+            EqualsTester.EqualsCalled = false;
+            Assert.IsTrue(ReferenceEquals(equalsTester1, equalsTester1));
+            Assert.IsFalse(EqualsTester.EqualsCalled);
+
+            EqualsTester.EqualsCalled = false;
+            Assert.IsFalse(ReferenceEquals(equalsTester1, null));
+            Assert.IsFalse(EqualsTester.EqualsCalled);
+
+            EqualsTester.EqualsCalled = false;
+            Assert.IsFalse(ReferenceEquals(null, equalsTester1));
+            Assert.IsFalse(EqualsTester.EqualsCalled);
+        }
+
+        private class EqualsTester
+        {
+            public static bool EqualsCalled = false;
+
+            public override bool Equals(object? obj)
+            {
+                EqualsCalled = true;
+                return base.Equals(obj);
+            }
+        }
     }
 }
