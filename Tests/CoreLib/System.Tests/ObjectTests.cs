@@ -23,5 +23,44 @@
             }
             Assert.AreEqual(expected, Equals(obj1, obj2));
         }
+
+        public static void ReferenceEqualsTests()
+        {
+            var equalsTester1 = new EqualsTester(7);
+            var equalsTester2 = new EqualsTester(8);
+
+            EqualsTester.EqualsCalled = false;
+            Assert.IsFalse(ReferenceEquals(equalsTester1, equalsTester2));
+            Assert.IsFalse(EqualsTester.EqualsCalled);
+
+            EqualsTester.EqualsCalled = false;
+            Assert.IsTrue(ReferenceEquals(equalsTester1, equalsTester1));
+            Assert.IsFalse(EqualsTester.EqualsCalled);
+
+            EqualsTester.EqualsCalled = false;
+            Assert.IsFalse(ReferenceEquals(equalsTester1, null));
+            Assert.IsFalse(EqualsTester.EqualsCalled);
+
+            EqualsTester.EqualsCalled = false;
+            Assert.IsFalse(ReferenceEquals(null, equalsTester1));
+            Assert.IsFalse(EqualsTester.EqualsCalled);
+        }
+
+        private sealed class EqualsTester(int x)
+        {
+            public int X = x;
+            public static bool EqualsCalled = false;
+
+            public override bool Equals(object? obj)
+            {
+                EqualsCalled = true;
+
+                EqualsTester? et = obj as EqualsTester;
+                if (et == null) return false;
+                return et.X == X;
+            }
+
+            public override int GetHashCode() => 42;
+        }
     }
 }

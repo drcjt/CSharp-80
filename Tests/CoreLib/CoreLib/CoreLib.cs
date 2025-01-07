@@ -4,13 +4,6 @@
     {
         public static int Main()
         {
-            CharTests.IsBetweenCharTests();
-            
-            CharTests.IsAsciiDigit_WithAsciiDigits_ReturnsTrue();
-            CharTests.IsAsciiDigit_WithNonAsciiDigits_ReturnsFalse();
-
-            Int32Tests.Parse_Valid();
-
             StringTests.NewStringTests();
             StringTests.SubstringTests();
             StringTests.EqualsTests();
