@@ -4,8 +4,9 @@
     {
         public static int Main()
         {
-            ArrayTests.GetValue_RankOneInt_SetValue();
             ArrayTests.GetEnumerator();
+            ArrayTests.GetValue_RankOneInt_SetValue();
+            ArrayTests.IndexOf_ArrayTests();
 
             ObjectTests.EqualsTests();
             ObjectTests.ReferenceEqualsTests();

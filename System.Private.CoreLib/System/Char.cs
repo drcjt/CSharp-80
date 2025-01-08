@@ -18,5 +18,6 @@
             return m_value == ((char)obj).m_value;
         }
 
+        public override int GetHashCode() => (int)m_value | ((int)m_value << 16);
     }
 }

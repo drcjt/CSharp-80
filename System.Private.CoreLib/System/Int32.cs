@@ -33,5 +33,7 @@
                 return false;
             return m_value == ((int)obj).m_value;
         }
+
+        public override int GetHashCode() => m_value;
     }
 }
