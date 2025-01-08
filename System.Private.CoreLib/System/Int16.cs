@@ -10,5 +10,7 @@
                 return false;
             return m_value == ((short)obj).m_value;
         }
+
+        public override int GetHashCode() => m_value;
     }
 }

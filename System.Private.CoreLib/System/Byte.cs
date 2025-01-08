@@ -10,5 +10,7 @@
                 return false;
             return m_value == ((byte)obj).m_value;
         }
+
+        public override int GetHashCode() => m_value;
     }
 }
