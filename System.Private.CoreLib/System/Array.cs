@@ -137,7 +137,16 @@ namespace System
 
         internal unsafe void InternalSetValue(object? value, nint flattenedIndex)
         {
-            throw new NotImplementedException();
+            ref byte element = ref Unsafe.AddByteOffset(ref MemoryMarshal.GetArrayDataReference(this), flattenedIndex * ElementSize);
+            EEType* pElementEEType = ElementEEType;
+            if (pElementEEType->IsValueType)
+            {
+                RuntimeExports.Unbox(value, ref element, pElementEEType);
+            }
+            else
+            {
+                Unsafe.As<byte, object?>(ref element) = value;
+            }
         }
 
         public object? GetValue(int index) => InternalGetValue(index);
@@ -162,7 +171,7 @@ namespace System
 
         public bool Contains(object? value)
         {
-            throw new NotImplementedException();
+            return IndexOf(value) >= 0;
         }
 
         public void Clear()
@@ -172,7 +181,22 @@ namespace System
 
         public int IndexOf(object? value)
         {
-            throw new NotImplementedException();
+            for (int i = 0; i < Length; i++)
+            {
+                var obj = GetValue(i);
+                if (obj is null)
+                {
+                    if (value is null)
+                        return i;
+                }
+                else
+                {
+                    if (obj.Equals(value))
+                        return i;
+                }
+            }
+
+            return -1;
         }
 
         public void Insert(int index, object? value)

@@ -15,5 +15,12 @@ namespace System.Runtime
 
             return result;
         }
+
+        internal static unsafe void Unbox(object? obj, ref byte data, EEType* pUnboxToEEType)
+        {
+            EEType* pEEType = obj.GetMethodTable();
+            ref byte fields = ref obj.GetRawData();
+            Unsafe.CopyBlock(ref data, ref fields, pEEType->ValueTypeSize);
+        }
     }
 }
