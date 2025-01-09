@@ -142,6 +142,7 @@ namespace ILCompiler.TypeSystem.Dnlib
                     ElementType.ByRef => TypeFlags.ByRef,
                     ElementType.Array => TypeFlags.Array,
                     ElementType.SZArray => TypeFlags.SzArray,
+                    ElementType.Object => TypeFlags.Class,
                     _ => TypeFlags.Unknown
                 };
             }

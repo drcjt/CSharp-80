@@ -355,18 +355,24 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private static ushort ComputeFlags(TypeDesc type)
         {
+            EETypeElementType elementType = ComputeEETypeElementType(type);
+            return (ushort)elementType;
+        }
+
+        private static EETypeElementType ComputeEETypeElementType(TypeDesc type)
+        {
             // Enums are represented as their underlying type
             type = type.UnderlyingType;
 
-            if (type.IsValueType)
-            {
-                return (ushort)EETypeElementType.ValueType;
-            }
             if (type.IsWellKnownType(WellKnownType.Array))
             {
-                return (ushort)EETypeElementType.SystemArray;
+                return EETypeElementType.SystemArray;
             }
-            return 0;
+            else
+            {
+                EETypeElementType elementType = (EETypeElementType)type.Category;
+                return elementType;
+            }
         }
 
         private static int ComputeBaseSize(TypeDesc type)

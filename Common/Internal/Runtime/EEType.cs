@@ -41,7 +41,7 @@ namespace Internal.Runtime
 
         internal bool IsValueType => ElementType < EETypeElementType.Class;
 
-        internal EETypeElementType ElementType => (EETypeElementType)((_usFlags & (ushort)EETypeFlags.ElementTypeMask) >> (byte)EETypeFlags.ElementTypeShift);
+        internal EETypeElementType ElementType => (EETypeElementType)(_usFlags);
 
         internal uint ValueTypeSize => (uint)(BaseSize - 2);
     }
