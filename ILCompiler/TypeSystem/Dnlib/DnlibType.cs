@@ -197,11 +197,6 @@ namespace ILCompiler.TypeSystem.Dnlib
                 case ElementType.U4:
                     return VarType.UInt;
 
-                case ElementType.I8:
-                    return VarType.Long;
-                case ElementType.U8:
-                    return VarType.ULong;
-
                 case ElementType.Ptr:
                 case ElementType.I:
                 case ElementType.U:
