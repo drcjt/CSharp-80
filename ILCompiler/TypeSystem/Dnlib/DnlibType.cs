@@ -142,6 +142,7 @@ namespace ILCompiler.TypeSystem.Dnlib
                     ElementType.ByRef => TypeFlags.ByRef,
                     ElementType.Array => TypeFlags.Array,
                     ElementType.SZArray => TypeFlags.SzArray,
+                    ElementType.Object => TypeFlags.Class,
                     _ => TypeFlags.Unknown
                 };
             }
@@ -195,6 +196,11 @@ namespace ILCompiler.TypeSystem.Dnlib
                     return VarType.Int;
                 case ElementType.U4:
                     return VarType.UInt;
+
+                case ElementType.I8:
+                    return VarType.Long;
+                case ElementType.U8:
+                    return VarType.ULong;
 
                 case ElementType.Ptr:
                 case ElementType.I:
