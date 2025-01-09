@@ -70,8 +70,6 @@ namespace System.Tests
             IndexOf_SZArray<bool>(boolArray, false, 1);
             IndexOf_SZArray<bool>(new bool[0], true, -1);
 
-            /*
-             * Needs missing explicit conversion operators on IntPtr and UIntPtr
             var intPtrArray = new IntPtr[] { (IntPtr)1, (IntPtr)2, (IntPtr)3, (IntPtr)3 };
             IndexOf_SZArray<IntPtr>(intPtrArray, (IntPtr)1, 0);
             IndexOf_SZArray<IntPtr>(intPtrArray, (IntPtr)3, 2);
@@ -83,7 +81,6 @@ namespace System.Tests
             IndexOf_SZArray<UIntPtr>(uintPtrArray, (UIntPtr)3, 2);
             IndexOf_SZArray<UIntPtr>(uintPtrArray, (UIntPtr)2, 1);
             IndexOf_SZArray<UIntPtr>(new UIntPtr[0], (UIntPtr)1, -1);
-            */
         }
 
         private static void IndexOf_SZArray<T>(T[] array, T value, int expected)
