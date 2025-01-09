@@ -95,7 +95,7 @@
             return new ArrayListEnumeratorSimple(this);
         }
 
-        public int IndexOf(object? value) => Array.IndexOf(_items, value, 0, _size);
+        public int IndexOf(object? value) => Array.IndexOf((Array)_items, value, 0, _size);
 
         public void Insert(int index, object? value)
         {
