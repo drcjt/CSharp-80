@@ -66,7 +66,12 @@ namespace System
             }
         }
 
-        public static int IndexOf(object?[] array, object? value, int startIndex, int count)
+        public static int IndexOf(Array array, object? value)
+        {
+            return IndexOf(array, value, 0, array.Length);
+        }
+
+        public static int IndexOf(Array array, object? value, int startIndex, int count)
         {
             int endIndex = startIndex + count;
             if (value is null)
@@ -131,7 +136,7 @@ namespace System
             }
             else
             {
-                return Unsafe.As<byte, object>(ref element);
+                return Unsafe.As<byte, object?>(ref element);
             }
         }
 
@@ -179,25 +184,7 @@ namespace System
             throw new NotImplementedException();
         }
 
-        public int IndexOf(object? value)
-        {
-            for (int i = 0; i < Length; i++)
-            {
-                var obj = GetValue(i);
-                if (obj is null)
-                {
-                    if (value is null)
-                        return i;
-                }
-                else
-                {
-                    if (obj.Equals(value))
-                        return i;
-                }
-            }
-
-            return -1;
-        }
+        public int IndexOf(object? value) => IndexOf(this, value);
 
         public void Insert(int index, object? value)
         {
@@ -250,7 +237,7 @@ namespace System
                 _index = -1;
             }
 
-            public object Current => _array.InternalGetValue(_index);
+            public object? Current => _array.InternalGetValue(_index);
         }
     }
 
