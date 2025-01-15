@@ -15,6 +15,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly DependencyNodeContext _context;
         private readonly DnlibModule _module;
 
+        private TypeDesc? _constrained;
+
         public ILScanner(MethodDesc method, MethodIL methodIL, DependencyNodeContext context, DnlibModule module)
         {
             _method = method;
@@ -102,6 +104,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                             case ILOpcode.box:
                                 ImportBox(currentInstruction);
                                 break;
+
+                            case ILOpcode.constrained:
+                                ImportConstrainedPrefix(currentInstruction);
+                                break;
                         }
                         currentOffset += currentInstruction.GetSize();
                         currentIndex++;
@@ -112,6 +118,11 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
 
             return _dependencies;
+        }
+
+        private void ImportConstrainedPrefix(Instruction instruction)
+        {
+            _constrained = (TypeDesc)instruction.GetOperand();
         }
 
         private void ImportBox(Instruction instruction)
@@ -301,26 +312,60 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 methodDesc = dependentMethod;
             }
 
-            if (methodDesc.OwningType.IsInterface)
+            TypeDesc exactType = methodDesc.OwningType;
+
+            bool resolvedConstraint = false;
+
+            MethodDesc methodAfterConstraintResolution = methodDesc;
+            if (_constrained != null)
             {
-                _dependencies.Add(_context.NodeFactory.NecessaryTypeSymbol(methodDesc.OwningType));
+                TypeDesc constrained = _constrained;
+                if (constrained.IsRuntimeDeterminedSubtype)
+                    constrained = constrained.ConvertToCanonForm(TypeSystem.Canon.CanonicalFormKind.Specific);
+
+                var constrainedType = constrained.Context.GetClosestDefType(constrained);
+                MethodDesc? directMethod = constrainedType.TryResolveConstraintMethodApprox(methodDesc.OwningType, methodDesc);
+                if (directMethod != null)
+                {
+                    methodAfterConstraintResolution = directMethod;
+                    exactType = directMethod.OwningType;
+                    resolvedConstraint = true;
+                }
+                else if (methodDesc.Signature.IsStatic)
+                {
+                    exactType = constrained;
+                }
+                else
+                {
+                    // Boxing is not done by helper methods currently so
+                    // no need to add any dependencies here
+                }
+
+                _constrained = null;
+            }
+
+            MethodDesc targetMethod = methodAfterConstraintResolution;
+
+            if (targetMethod.OwningType.IsInterface)
+            {
+                _dependencies.Add(_context.NodeFactory.NecessaryTypeSymbol(targetMethod.OwningType));
             }
 
             bool exactContextNeedsRuntimeLookup;
-            if (methodDesc.HasInstantiation)
+            if (targetMethod.HasInstantiation)
             {
-                exactContextNeedsRuntimeLookup = methodDesc.IsSharedByGenericInstantiations;
+                exactContextNeedsRuntimeLookup = targetMethod.IsSharedByGenericInstantiations;
             }
             else
             {
-                exactContextNeedsRuntimeLookup = methodDesc.OwningType.IsCanonicalSubtype(CanonicalFormKind.Any);
+                exactContextNeedsRuntimeLookup = exactType.IsCanonicalSubtype(CanonicalFormKind.Any);
             }
 
             IMethodNode methodNode;
-            bool directCall = IsDirectCall(methodDesc, instruction.Opcode);
+            bool directCall = IsDirectCall(targetMethod, instruction.Opcode, resolvedConstraint);
             if (directCall)
             {
-                var targetMethod = methodDesc.GetCanonMethodTarget(CanonicalFormKind.Specific);
+                targetMethod = targetMethod.GetCanonMethodTarget(CanonicalFormKind.Specific);
 
                 if (targetMethod.IsAbstract)
                 {
@@ -348,12 +393,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     methodNode = _context.NodeFactory.MethodNode(targetMethod);
                 }
             }
-            else if (methodDesc.HasInstantiation)
+            else if (targetMethod.HasInstantiation)
             {
                 // TODO: Generic Virtual Method Call
                 throw new NotImplementedException("Generic Virtual Method Call");
             }
-            else if (methodDesc.OwningType.IsInterface)
+            else if (exactType.IsInterface)
             {
                 if (exactContextNeedsRuntimeLookup)
                 {
@@ -362,13 +407,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 }
                 else
                 {
-                    _dependencies.Add(_context.NodeFactory.VirtualMethodUse(methodDesc));
+                    _dependencies.Add(_context.NodeFactory.VirtualMethodUse(targetMethod));
                     return;
                 }
             }
             else
             {
-                _dependencies.Add(_context.NodeFactory.VirtualMethodUse(methodDesc));
+                _dependencies.Add(_context.NodeFactory.VirtualMethodUse(targetMethod));
                 return;
             }
 
@@ -394,7 +439,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             _dependencies.Add(methodNode);
         }
 
-        private static bool IsDirectCall(MethodDesc targetMethod, ILOpcode opcode)
+        private static bool IsDirectCall(MethodDesc targetMethod, ILOpcode opcode, bool resolvedConstraint)
         {
             bool directCall = false;
 
@@ -402,7 +447,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 directCall = true;
             }
-            else if (opcode != ILOpcode.callvirt)
+            else if (opcode != ILOpcode.callvirt || resolvedConstraint)
             {
                 directCall = true;
             }

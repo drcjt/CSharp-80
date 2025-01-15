@@ -31,6 +31,7 @@ namespace ILCompiler.Compiler.Importer
         {
             var isArrayMethod = false;
             MethodDesc methodToCall;
+            var opcode = instruction.Opcode;
             if (method.OwningType.IsArray)
             {
                 switch (method.Name)
@@ -89,25 +90,26 @@ namespace ILCompiler.Compiler.Importer
             }
             arguments.Reverse();
 
-            if (instruction.Opcode == ILOpcode.callvirt)
+            if (opcode == ILOpcode.callvirt)
             {
-                if (newObjThis == null && context.Constrained != null)
+                if (context.Constrained != null)
                 {
                     TypeDesc constrained = context.Constrained;
                     if (constrained.IsRuntimeDeterminedSubtype)
                         constrained = constrained.ConvertToCanonForm(TypeSystem.Canon.CanonicalFormKind.Specific);
 
                     var constrainedType = constrained.Context.GetClosestDefType(constrained);
+                    TypeDesc owningType = method.OwningType;
+                    MethodDesc? directMethod = constrainedType.TryResolveConstraintMethodApprox(owningType, method);
 
-                    // TODO: attempt to resolve constrained method into direct method call
-                    MethodDesc? directMethod = null;
                     if (directMethod is not null)
                     {
-                        throw new NotImplementedException();
+                        methodToCall = directMethod;
+                        opcode = ILOpcode.call;
                     }
                     else if (constrained.IsValueType)
                     {
-                        // Deference this ptr and box it
+                        // Dereference this ptr and box it
                         var dereferencedThisPtr = DereferenceThisPtr(arguments[0], constrainedType);
                         var boxedNode = BoxImporter.BoxValue(dereferencedThisPtr, constrainedType, context, importer);
                         arguments[0] = boxedNode;
@@ -125,7 +127,7 @@ namespace ILCompiler.Compiler.Importer
                 arguments[0] = new NullCheckEntry(arguments[0]);
             }
 
-            if (methodToCall.OwningType.IsInterface || (instruction.Opcode == ILOpcode.callvirt && methodToCall.IsVirtual))
+            if (methodToCall.OwningType.IsInterface || (opcode == ILOpcode.callvirt && methodToCall.IsVirtual))
             {
                 // Need to add this pointer as extra param which will be consumed by InterfaceCall routine
                 var thisEntry = arguments[0];
@@ -168,7 +170,7 @@ namespace ILCompiler.Compiler.Importer
                 targetMethod = context.NameMangler.GetMangledMethodName(methodToCall);
             }
 
-            bool directCall = !(instruction.Opcode == ILOpcode.callvirt && methodToCall.IsVirtual);
+            bool directCall = !(opcode == ILOpcode.callvirt && methodToCall.IsVirtual);
             if (methodToCall.HasGenericParameters && !directCall)
             {
                 throw new NotSupportedException("Non direct calls to generic methods not supported");
@@ -244,7 +246,6 @@ namespace ILCompiler.Compiler.Importer
                         _ => throw new NotSupportedException("Unknown internal call"),
                     };
                 }
-                throw new NotSupportedException("Unknown internal call");
             }
             else
             {
@@ -255,6 +256,8 @@ namespace ILCompiler.Compiler.Importer
                 }
                 return entryPoint;
             }
+
+            throw new NotSupportedException("Unknown internal call");
         }
 
         /// <summary>
