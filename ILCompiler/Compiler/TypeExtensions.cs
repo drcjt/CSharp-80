@@ -10,7 +10,7 @@ namespace ILCompiler.Compiler
         public static MethodDesc? TryResolveConstraintMethodApprox(this TypeDesc constrainedType, TypeDesc interfaceType, MethodDesc interfaceMethod)
         {
             bool isStaticVirtualMethod = interfaceMethod.Signature.IsStatic;
-            
+
             // Don't try resolving calls for reference types
             if (!constrainedType.IsValueType && (!isStaticVirtualMethod || constrainedType.IsCanonicalDefinitionType(CanonicalFormKind.Any)))
             {
@@ -22,39 +22,13 @@ namespace ILCompiler.Compiler
 
             // Find the method that would implement the constraint if we were making the call on a boxed value type
             TypeDesc canonType = constrainedType.ConvertToCanonForm(CanonicalFormKind.Specific);
-            TypeSystemContext context = constrainedType.Context;
 
             MethodDesc genInterfaceMethod = interfaceMethod.GetMethodDefinition();
-            MethodDesc? method = null;
+            MethodDesc? method;
             if (genInterfaceMethod.OwningType.IsInterface)
             {
                 // Find all potential interface implementations
-                int potentialMatchingInterfaces = 0;
-                foreach (DefType potentialInterfaceType in canonType.RuntimeInterfaces)
-                {
-                    if (potentialInterfaceType.ConvertToCanonForm(CanonicalFormKind.Specific) == interfaceType.ConvertToCanonForm(CanonicalFormKind.Specific))
-                    {
-                        potentialMatchingInterfaces++;
-
-                        if (isStaticVirtualMethod)
-                            continue;
-
-                        // Try and prevent the match from requiring boxing
-                        MethodDesc potentialInterfaceMethod = genInterfaceMethod;
-                        if (potentialInterfaceMethod.OwningType != potentialInterfaceType)
-                        {
-                            potentialInterfaceMethod = context.GetMethodForInstantiatedType(potentialInterfaceMethod.GetTypicalMethodDefinition(), (InstantiatedType)potentialInterfaceType);
-                        }
-
-                        method = canonType.ResolveInterfaceMethodToVirtualMethodOnType(potentialInterfaceMethod);
-
-                        // Avoid trying to return the parent method
-                        if (method != null && !method.OwningType.IsValueType)
-                        {
-                            return null;
-                        }
-                    }
-                }
+                method = EnumeratePotentialInterfaceImplementations(canonType, interfaceType, interfaceMethod, constrainedType, out int potentialMatchingInterfaces);
 
                 if (potentialMatchingInterfaces > 1)
                 {
@@ -101,6 +75,43 @@ namespace ILCompiler.Compiler
             if (method.IsCanonicalMethod(CanonicalFormKind.Any) && !method.OwningType.IsValueType)
             {
                 return null;
+            }
+
+            return method;
+        }
+
+        private static MethodDesc? EnumeratePotentialInterfaceImplementations(TypeDesc canonType, TypeDesc interfaceType, MethodDesc interfaceMethod, TypeDesc constrainedType, out int potentialMatchingInterfaces)
+        {
+            MethodDesc genInterfaceMethod = interfaceMethod.GetMethodDefinition();
+            bool isStaticVirtualMethod = interfaceMethod.Signature.IsStatic;
+            var context = constrainedType.Context;
+
+            MethodDesc? method = null;
+            potentialMatchingInterfaces = 0;
+            foreach (DefType potentialInterfaceType in canonType.RuntimeInterfaces)
+            {
+                if (potentialInterfaceType.ConvertToCanonForm(CanonicalFormKind.Specific) == interfaceType.ConvertToCanonForm(CanonicalFormKind.Specific))
+                {
+                    potentialMatchingInterfaces++;
+
+                    if (isStaticVirtualMethod)
+                        continue;
+
+                    // Try and prevent the match from requiring boxing
+                    MethodDesc potentialInterfaceMethod = genInterfaceMethod;
+                    if (potentialInterfaceMethod.OwningType != potentialInterfaceType)
+                    {
+                        potentialInterfaceMethod = context.GetMethodForInstantiatedType(potentialInterfaceMethod.GetTypicalMethodDefinition(), (InstantiatedType)potentialInterfaceType);
+                    }
+
+                    method = canonType.ResolveInterfaceMethodToVirtualMethodOnType(potentialInterfaceMethod);
+
+                    // Avoid trying to return the parent method
+                    if (method != null && !method.OwningType.IsValueType)
+                    {
+                        return null;
+                    }
+                }
             }
 
             return method;
