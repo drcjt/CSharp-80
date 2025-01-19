@@ -13,11 +13,6 @@
             result += value;
         }
 
-        public void AppendFormatted(int value)
-        {
-            result += value.ToString();
-        }
-
         public void AppendFormatted<T>(T value)
         {
             result += value?.ToString();
