@@ -12,5 +12,7 @@
         internal static unsafe IntPtr GetValueInternal(RuntimeTypeHandle handle) => handle._EEType;
 
         public readonly bool Equals(RuntimeTypeHandle handle) => handle._EEType == _EEType;
+
+        public override string ToString() => _EEType.ToString();
     }
 }

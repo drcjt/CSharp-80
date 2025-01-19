@@ -52,6 +52,7 @@ namespace ILCompiler.Compiler
             }
             else
             {
+                // Calling a non virtual instance method on System.Object
                 method = null;
             }
 
