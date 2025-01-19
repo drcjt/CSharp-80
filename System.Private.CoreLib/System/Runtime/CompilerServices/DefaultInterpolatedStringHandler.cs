@@ -18,13 +18,10 @@
             result += value.ToString();
         }
 
-        // TODO: This requires the constrained IL opcode to be implemented
-        /*
         public void AppendFormatted<T>(T value)
         {
-            result += value.ToString();
+            result += value?.ToString();
         }
-        */
 
         public string ToStringAndClear()
         {
