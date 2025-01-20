@@ -337,8 +337,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 }
                 else
                 {
-                    // Boxing is not done by helper methods currently so
-                    // no need to add any dependencies here
+                    // Boxing will allocate new object of the constrained type
+                    // so must include the constrained type as a constructed ee type
+                    // in the dependency graph
+                    _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(constrained));
                 }
 
                 _constrained = null;
