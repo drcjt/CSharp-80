@@ -19,6 +19,6 @@
         public bool Equals(nint other) => _value == other;
 
         public override unsafe int GetHashCode() => (int)_value;
-        public override string ToString() => _value.ToString();
+        public override string ToString() => ((int)_value).ToString();
     }
 }
