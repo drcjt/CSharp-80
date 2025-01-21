@@ -203,6 +203,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenericListTests.String", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Tests", "Tests\CoreLib\System.Tests\System.Tests.csproj", "{1966FCB9-03C0-A419-0C0A-EC1319A5E25B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenericConstrainedCall", "Tests\Generics\GenericConstrainedCall\GenericConstrainedCall.csproj", "{5D0B35F5-C8BE-BDA7-E493-2BB0AEF0A834}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -509,6 +511,10 @@ Global
 		{1966FCB9-03C0-A419-0C0A-EC1319A5E25B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1966FCB9-03C0-A419-0C0A-EC1319A5E25B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1966FCB9-03C0-A419-0C0A-EC1319A5E25B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D0B35F5-C8BE-BDA7-E493-2BB0AEF0A834}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D0B35F5-C8BE-BDA7-E493-2BB0AEF0A834}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D0B35F5-C8BE-BDA7-E493-2BB0AEF0A834}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D0B35F5-C8BE-BDA7-E493-2BB0AEF0A834}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -595,6 +601,7 @@ Global
 		{551E05B0-CC68-7920-7287-55EC02E97BA9} = {2076ADF1-E63E-4A71-AF00-DCD6570B5ECF}
 		{481D2A34-0496-6672-9B66-A0DF3D45FEDA} = {2076ADF1-E63E-4A71-AF00-DCD6570B5ECF}
 		{1966FCB9-03C0-A419-0C0A-EC1319A5E25B} = {2076ADF1-E63E-4A71-AF00-DCD6570B5ECF}
+		{5D0B35F5-C8BE-BDA7-E493-2BB0AEF0A834} = {35C20505-0FCB-4D27-AFC5-A0B1071C268F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}
