@@ -29,9 +29,9 @@ namespace GenericConstrainedCall
                 return 1;
             }
 
-            // Perform a constrained instance method call on System.Object method
-            var eeType = ObjectInstanceMethodCaller<int>.M(123);
-            var expectedEEType = 123.GetEEType();
+            // Perform a constrained instance method call using a value type on System.Object method
+            var eeType = ObjectInstanceMethodCaller<char>.M('a');
+            var expectedEEType = 'b'.GetEEType();
             if (!eeType.Equals(expectedEEType))
             {
                 Console.WriteLine("FAILED 2");
@@ -40,11 +40,23 @@ namespace GenericConstrainedCall
                 return 1;
             }
 
+            // Perform a constrained instance method call using a reference type on System.Object method
+            eeType = ObjectInstanceMethodCaller<string>.M("Hello");
+            expectedEEType = "World".GetEEType();
+            if (!eeType.Equals(expectedEEType))
+            {
+                Console.WriteLine("FAILED 3");
+                Console.WriteLine($"Expected: {expectedEEType}, Actual: {eeType}");
+
+                return 1;
+            }
+
+
             var myCounter = new MyCounter<MyInt>(new MyInt());
             myCounter.Increment();
             if (myCounter.Value != 100)
             {
-                Console.WriteLine("FAILED 3");
+                Console.WriteLine("FAILED 4");
                 Console.WriteLine($"Expected: 100, Actual: {myCounter.Value}");
 
                 return 1;
@@ -53,7 +65,7 @@ namespace GenericConstrainedCall
             myCounter.Decrement();
             if (myCounter.Value != 0)
             {
-                Console.WriteLine("FAILED 4");
+                Console.WriteLine("FAILED 5");
                 Console.WriteLine($"Expected: 100, Actual: {myCounter.Value}");
 
                 return 2;
@@ -63,7 +75,7 @@ namespace GenericConstrainedCall
             myArrayCounter.Increment(0, new MyInt());
             if (myArrayCounter.Value(0) != 100)
             {
-                Console.WriteLine("FAILED 5");
+                Console.WriteLine("FAILED 6");
                 Console.WriteLine($"Expected: 100, Actual: {myCounter.Value}");
 
                 return 3;
@@ -72,7 +84,7 @@ namespace GenericConstrainedCall
             myArrayCounter.Decrement(0);
             if (myArrayCounter.Value(0) != 0)
             {
-                Console.WriteLine("FAILED 6");
+                Console.WriteLine("FAILED 7");
                 Console.WriteLine($"Expected: 100, Actual: {myCounter.Value}");
 
                 return 4;
@@ -82,7 +94,7 @@ namespace GenericConstrainedCall
             myCounter.Increment(mi);
             if (myCounter.Value != 100)
             {
-                Console.WriteLine("FAILED 7");
+                Console.WriteLine("FAILED 8");
                 Console.WriteLine($"Expected: 100, Actual: {myCounter.Value}");
 
                 return 5;
@@ -91,7 +103,7 @@ namespace GenericConstrainedCall
             myCounter.Decrement(mi);
             if (myCounter.Value != 0)
             {
-                Console.WriteLine("FAILED 8");
+                Console.WriteLine("FAILED 9");
                 Console.WriteLine($"Expected: 100, Actual: {myCounter.Value}");
 
                 return 6;
