@@ -44,9 +44,17 @@ namespace System.Collections.Generic
             if (y is not null) return false;
             return true;
         }
+
         public override bool Equals(object? obj) => throw new NotImplementedException();
 
-        public override int GetHashCode(T obj) => obj?.GetHashCode() ?? 0;
+        public override int GetHashCode(T obj)
+        {
+            if (obj is not null)
+                return obj.GetHashCode();
+
+            return 0;
+        }
+
         public override int GetHashCode() => throw new NotImplementedException();
     }
 }
