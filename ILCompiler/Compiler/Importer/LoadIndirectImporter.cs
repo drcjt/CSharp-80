@@ -38,7 +38,7 @@ namespace ILCompiler.Compiler.Importer
                     type = VarType.Ref;
                     break;
                 case ILOpcode.ldobj:
-                    var typeDesc = (TypeDesc)instruction.GetOperand();
+                    var typeDesc = (TypeDesc)instruction.Operand;
                     exactSize = typeDesc.GetElementSize().AsInt;
                     type = typeDesc.VarType;
                     break;

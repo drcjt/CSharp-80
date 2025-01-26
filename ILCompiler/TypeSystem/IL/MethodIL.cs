@@ -2,14 +2,14 @@
 
 namespace ILCompiler.TypeSystem.IL
 {
-    public abstract class MethodIL
+    public class MethodIL
     {
-        public abstract IList<Instruction> Instructions { get; }
+        public virtual IList<Instruction> Instructions { get; } = new List<Instruction>();
 
-        public abstract ILExceptionRegion[] GetExceptionRegions();
-        public abstract bool IsInitLocals { get; }
+        public virtual ILExceptionRegion[] GetExceptionRegions() => new ILExceptionRegion[0];
+        public virtual bool IsInitLocals { get; }
 
-        public abstract int LocalsCount { get; }
+        public virtual int LocalsCount { get; }
 
         public virtual MethodIL GetMethodILDefinition()
         {

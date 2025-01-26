@@ -98,14 +98,26 @@ namespace System
 
         public static int IndexOf<T>(T[] array, T value, int startIndex, int count)
         {
+            EqualityComparer<T> comparer = EqualityComparerHelpers.GetComparerForReferenceTypesOnly<T>();
+
             int endIndex = startIndex + count;
-            for (int i = startIndex; i < endIndex; i++)
+            if (comparer != null)
             {
-                if (EqualOnlyComparer<T>.Equals(array[i], value))
+                for (int i = startIndex; i < endIndex; i++)
                 {
-                    return i;
+                    if (comparer.Equals(array[i], value))
+                        return i;
                 }
             }
+            else
+            {
+                for (int i = startIndex; i < endIndex; i++)
+                {
+                    if (EqualityComparerHelpers.StructOnlyEquals<T>(array[i], value))
+                        return i;
+                }
+            }
+
             return -1;
         }
 

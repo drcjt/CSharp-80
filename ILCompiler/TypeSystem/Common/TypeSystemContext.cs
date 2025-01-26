@@ -177,6 +177,10 @@ namespace ILCompiler.TypeSystem.Common
             {
                 case WellKnownType.String:
                     return (DefType)SystemModule!.GetType("System", "String");
+                case WellKnownType.Char:
+                    return (DefType)SystemModule!.GetType("System", "Char");
+                case WellKnownType.Object:
+                    return (DefType)SystemModule!.GetType("System", "Object");
                 default:
                     if (throwIfNotFound)
                         throw new TypeLoadException();

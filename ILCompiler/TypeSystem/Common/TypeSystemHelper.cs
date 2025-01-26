@@ -85,5 +85,10 @@
         {
             return methodDef.Context.GetInstantiatedMethod(methodDef, instantiation);
         }
+
+        public static InstantiatedType MakeInstantiatedType(this MetadataType typeDef, params TypeDesc[] genericParameters)
+        {
+            return typeDef.Context.GetInstantiatedType(typeDef, new Instantiation(genericParameters));
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace ILCompiler.Compiler.Importer
 
             var isStoreStatic = instruction.Opcode == ILOpcode.stsfld;
 
-            var field = (FieldDesc)instruction.GetOperand();
+            var field = (FieldDesc)instruction.Operand;
 
             var value = importer.PopExpression();
 

@@ -1,6 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
-using ILCompiler.TypeSystem.Canon;
 using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
 using System.Diagnostics;
@@ -13,7 +12,7 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.Opcode != ILOpcode.newobj) return false;
 
-            var runtimeDeterminedMethod = (MethodDesc)instruction.GetOperand();
+            var runtimeDeterminedMethod = (MethodDesc)instruction.Operand;
 
             var owningType = runtimeDeterminedMethod.OwningType;
 

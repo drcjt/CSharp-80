@@ -13,7 +13,7 @@ namespace ILCompiler.Compiler.Importer
 
             var isLoadStatic = instruction.Opcode == ILOpcode.ldsflda;
 
-            var fieldDesc = (FieldDesc)instruction.GetOperand();
+            var fieldDesc = (FieldDesc)instruction.Operand;
 
             if (isLoadStatic)
             {

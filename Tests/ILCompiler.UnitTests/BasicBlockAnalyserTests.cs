@@ -65,7 +65,7 @@ namespace ILCompiler.Tests
             var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider(), new RTILProvider());
             var method = BuildMethod(new List<Instruction>()
             {
-                new Instruction(OpCodes.Switch),
+                new Instruction(OpCodes.Switch, new Instruction[0]),
                 new Instruction(OpCodes.Ret),
             }, module);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);

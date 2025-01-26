@@ -14,6 +14,8 @@ namespace ILCompiler.TypeSystem.Dnlib
         private readonly CorLibModuleProvider _corLibModuleProvider;
         private readonly ILProvider _ilProvider;
 
+        public ILProvider ILProvider => _ilProvider;
+
         public DnlibModule(TypeSystemContext context, CorLibModuleProvider corLibModuleProvider, RTILProvider ilProvider) : base(context)
         {
             _corLibModuleProvider = corLibModuleProvider;

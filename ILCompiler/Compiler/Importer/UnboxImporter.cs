@@ -11,7 +11,7 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.Opcode != ILOpcode.unbox_any && instruction.Opcode != ILOpcode.unbox) return false;
 
-            var objType = (TypeDesc)instruction.GetOperand();
+            var objType = (TypeDesc)instruction.Operand;
 
             if (!objType.IsValueType)
             {

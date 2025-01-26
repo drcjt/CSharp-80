@@ -10,7 +10,7 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.Opcode != ILOpcode.leave && instruction.Opcode != ILOpcode.leave_s) return false;
 
-            var target = (Instruction)instruction.GetOperand();
+            var target = (Instruction)instruction.Operand;
 
             var targetBlock = importer.BasicBlocks[(int)target.Offset];
 

@@ -188,7 +188,7 @@ namespace ILCompiler.Compiler
                     case ILOpcode.brtrue_s:
                         {
                             currentBlock.JumpKind = JumpKind.Conditional;
-                            var target = (Instruction)currentInstruction.GetOperand();
+                            var target = (Instruction)currentInstruction.Operand;
                             var targetOffset = target.Offset;
                             CreateBasicBlock(basicBlocks, (int)targetOffset); // target of jump                            
                             var nextInstructionOffset = currentOffset + currentInstruction.GetSize();
@@ -202,7 +202,7 @@ namespace ILCompiler.Compiler
                     case ILOpcode.leave:
                         {
                             currentBlock.JumpKind = JumpKind.Always;
-                            var target = (Instruction)currentInstruction.GetOperand();
+                            var target = (Instruction)currentInstruction.Operand;
                             CreateBasicBlock(basicBlocks, (int)target.Offset); // target of jump
                         }
                         break;
@@ -216,13 +216,10 @@ namespace ILCompiler.Compiler
                     case ILOpcode.switch_:
                         {
                             currentBlock.JumpKind = JumpKind.Switch;
-                            if (currentInstruction.OperandIsNotNull)
+                            var instructions = (Instruction[])currentInstruction.Operand;
+                            foreach (var target in instructions)
                             {
-                                var instructions = (Instruction[])currentInstruction.GetOperand();
-                                foreach (var target in instructions)
-                                {
-                                    CreateBasicBlock(basicBlocks, (int)target.Offset); // target of jump
-                                }
+                                CreateBasicBlock(basicBlocks, (int)target.Offset); // target of jump
                             }
                             var nextInstructionOffset = currentOffset + currentInstruction.GetSize();
                             CreateBasicBlock(basicBlocks, nextInstructionOffset); // instruction after jump

@@ -85,6 +85,8 @@ namespace System.Tests
 
         private static void IndexOf_SZArray<T>(T[] array, T value, int expected)
         {
+            Assert.AreEqual(expected, Array.IndexOf<T>(array, value, 0, array.Length));
+
             IndexOf_Array(array, value, expected);
         }
 

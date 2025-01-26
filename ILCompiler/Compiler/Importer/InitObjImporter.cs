@@ -15,7 +15,7 @@ namespace ILCompiler.Compiler.Importer
 
             // TODO: Support shared generics here
 
-            var typeDesc = (TypeDesc)instruction.GetOperand();
+            var typeDesc = (TypeDesc)instruction.Operand;
             int elemSize = typeDesc.GetElementSize().AsInt;
 
             var size = new Int32ConstantEntry(elemSize);

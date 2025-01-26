@@ -27,94 +27,91 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public IList<IDependencyNode> FindDependencies()
         {
-            if (!_method.IsIntrinsic)
+            var currentIndex = 0;
+            var currentOffset = 0;
+
+            if (_methodIL != null)
             {
-                var currentIndex = 0;
-                var currentOffset = 0;
-
-                if (_methodIL != null)
+                var uninstantiatedMethodIL = _methodIL.GetMethodILDefinition();
+                if (_methodIL != uninstantiatedMethodIL)
                 {
-                    var uninstantiatedMethodIL = _methodIL.GetMethodILDefinition();
-                    if (_methodIL != uninstantiatedMethodIL)
-                    {
-                        var sharedMethod = _method.GetSharedRuntimeFormMethodTarget();
-                        _methodIL = new InstantiatedMethodIL(sharedMethod, uninstantiatedMethodIL);
-                    }
-
-                    AddThrowExceptionIfAnyExceptionHandlers();
-
-                    while (currentIndex < _methodIL.Instructions.Count)
-                    {
-                        var currentInstruction = _methodIL.Instructions[currentIndex];
-
-                        switch (currentInstruction.Opcode)
-                        {
-                            case ILOpcode.newobj:
-                            case ILOpcode.call:
-                            case ILOpcode.callvirt:
-                                ImportCall(currentInstruction);
-                                break;
-
-                            case ILOpcode.newarr:
-                                ImportNewArray(currentInstruction);
-                                break;
-
-                            case ILOpcode.ldstr:
-                                ImportLoadString(currentInstruction);
-                                break;
-
-                            case ILOpcode.ldsfld:
-                            case ILOpcode.ldsflda:
-                                ImportLoadField(currentInstruction, true);
-                                break;
-
-                            case ILOpcode.stsfld:
-                                ImportStoreField(currentInstruction, true);
-                                break;
-
-                            case ILOpcode.isinst:
-                                ImportCasting(currentInstruction);
-                                break;
-
-                            case ILOpcode.ldelema:
-                                ImportAddressOfElem();
-                                break;
-
-                            case ILOpcode.ldelem:
-                            case ILOpcode.ldelem_i:
-                            case ILOpcode.ldelem_i1:
-                            case ILOpcode.ldelem_i2:
-                            case ILOpcode.ldelem_i4:
-                            case ILOpcode.ldelem_u1:
-                            case ILOpcode.ldelem_u2:
-                            case ILOpcode.ldelem_u4:
-                            case ILOpcode.ldelem_ref:
-                                ImportLoadElement();
-                                break;
-
-                            case ILOpcode.stelem:
-                            case ILOpcode.stelem_i:
-                            case ILOpcode.stelem_i1:
-                            case ILOpcode.stelem_i2:
-                            case ILOpcode.stelem_i4:
-                            case ILOpcode.stelem_ref:
-                                ImportStoreElement();
-                                break;
-
-                            case ILOpcode.box:
-                                ImportBox(currentInstruction);
-                                break;
-
-                            case ILOpcode.constrained:
-                                ImportConstrainedPrefix(currentInstruction);
-                                break;
-                        }
-                        currentOffset += currentInstruction.GetSize();
-                        currentIndex++;
-                    }
-
-                    AddCatchTypeDependencies();
+                    var sharedMethod = _method.GetSharedRuntimeFormMethodTarget();
+                    _methodIL = new InstantiatedMethodIL(sharedMethod, uninstantiatedMethodIL);
                 }
+
+                AddThrowExceptionIfAnyExceptionHandlers();
+
+                while (currentIndex < _methodIL.Instructions.Count)
+                {
+                    var currentInstruction = _methodIL.Instructions[currentIndex];
+
+                    switch (currentInstruction.Opcode)
+                    {
+                        case ILOpcode.newobj:
+                        case ILOpcode.call:
+                        case ILOpcode.callvirt:
+                            ImportCall(currentInstruction);
+                            break;
+
+                        case ILOpcode.newarr:
+                            ImportNewArray(currentInstruction);
+                            break;
+
+                        case ILOpcode.ldstr:
+                            ImportLoadString(currentInstruction);
+                            break;
+
+                        case ILOpcode.ldsfld:
+                        case ILOpcode.ldsflda:
+                            ImportLoadField(currentInstruction, true);
+                            break;
+
+                        case ILOpcode.stsfld:
+                            ImportStoreField(currentInstruction, true);
+                            break;
+
+                        case ILOpcode.isinst:
+                            ImportCasting(currentInstruction);
+                            break;
+
+                        case ILOpcode.ldelema:
+                            ImportAddressOfElem();
+                            break;
+
+                        case ILOpcode.ldelem:
+                        case ILOpcode.ldelem_i:
+                        case ILOpcode.ldelem_i1:
+                        case ILOpcode.ldelem_i2:
+                        case ILOpcode.ldelem_i4:
+                        case ILOpcode.ldelem_u1:
+                        case ILOpcode.ldelem_u2:
+                        case ILOpcode.ldelem_u4:
+                        case ILOpcode.ldelem_ref:
+                            ImportLoadElement();
+                            break;
+
+                        case ILOpcode.stelem:
+                        case ILOpcode.stelem_i:
+                        case ILOpcode.stelem_i1:
+                        case ILOpcode.stelem_i2:
+                        case ILOpcode.stelem_i4:
+                        case ILOpcode.stelem_ref:
+                            ImportStoreElement();
+                            break;
+
+                        case ILOpcode.box:
+                            ImportBox(currentInstruction);
+                            break;
+
+                        case ILOpcode.constrained:
+                            ImportConstrainedPrefix(currentInstruction);
+                            break;
+                    }
+                    currentOffset += currentInstruction.GetSize();
+                    currentIndex++;
+                }
+
+                AddCatchTypeDependencies();
             }
 
             return _dependencies;
@@ -122,12 +119,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportConstrainedPrefix(Instruction instruction)
         {
-            _constrained = (TypeDesc)instruction.GetOperand();
+            _constrained = (TypeDesc)instruction.Operand;
         }
 
         private void ImportBox(Instruction instruction)
         {
-            var runtimeDeterminedType = (TypeDesc)instruction.GetOperand();
+            var runtimeDeterminedType = (TypeDesc)instruction.Operand;
 
             if (runtimeDeterminedType.IsRuntimeDeterminedSubtype)
             {
@@ -164,7 +161,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportCasting(Instruction instruction)
         {
-            var typeDesc = (TypeDesc)instruction.GetOperand();
+            var typeDesc = (TypeDesc)instruction.Operand;
 
             string helperMethodName = "IsInstanceOfClass";
             if (typeDesc.IsArray)
@@ -227,12 +224,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
             _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(systemStringType));
 
-            _dependencies.Add(_context.NodeFactory.SerializedStringObject((string)instruction.GetOperand()));
+            _dependencies.Add(_context.NodeFactory.SerializedStringObject((string)instruction.Operand));
         }
 
         private void ImportFieldAccess(Instruction instruction, bool isStatic)
         {
-            var fieldDesc = (FieldDesc)instruction.GetOperand();
+            var fieldDesc = (FieldDesc)instruction.Operand;
 
             if (isStatic || fieldDesc.IsStatic)
             {
@@ -267,7 +264,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void ImportNewArray(Instruction instruction)
         {
-            var elemTypeDef = (TypeDesc)instruction.GetOperand();
+            var elemTypeDef = (TypeDesc)instruction.Operand;
             var arrayType = elemTypeDef.MakeArrayType();
             _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(arrayType));
         }
@@ -284,7 +281,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 CreateConstructedEETypeNodeDependencies(instruction);
             }
 
-            var methodDesc = (MethodDesc)instruction.GetOperand();
+            var methodDesc = (MethodDesc)instruction.Operand;
 
             if (methodDesc.IsIntrinsic && methodDesc.OwningType.Name == "EEType" && methodDesc.OwningType.Namespace == "Internal.Runtime" && methodDesc.Name == "Of")
             {
@@ -299,6 +296,16 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             {
                 _dependencies.Add(GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException"));
             }
+            if (methodDesc.IsIntrinsic && methodDesc.OwningType.Name == "Console" && methodDesc.OwningType.Namespace == "System" && methodDesc.Name == "Write")
+            {
+                var parameter = methodDesc.Parameters[0];
+                if (parameter.Type == methodDesc.Context.GetWellKnownType(WellKnownType.Char))
+                {
+                    // No need to add any dependencies as this gets inlined
+                    return;
+                }
+            }
+
             if (methodDesc.HasCustomAttribute("System.Diagnostics.CodeAnalysis", "DynamicDependencyAttribute"))
             {
                 // For dynamic dependencies we need to include the method referred to as part of the dependencies
@@ -465,7 +472,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private void CreateConstructedEETypeNodeDependencies(Instruction instruction)
         {
-            var ctor = (MethodDesc)instruction.GetOperand();
+            var ctor = (MethodDesc)instruction.Operand;
             var owningType = ctor.OwningType;
 
             if (owningType is ArrayType)

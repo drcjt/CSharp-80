@@ -34,7 +34,7 @@ namespace ILCompiler.Compiler.Importer
                     break;
 
                 case ILOpcode.stobj:
-                    var typeDesc = (TypeDesc)instruction.GetOperand();
+                    var typeDesc = (TypeDesc)instruction.Operand;
                     type = typeDesc.VarType;
                     exactSize = typeDesc.GetElementSize().AsInt;
                     break;

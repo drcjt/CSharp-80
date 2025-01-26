@@ -19,7 +19,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             Method = method;
             ParamsCount = method.Signature.Length;
-            LocalsCount = method.MethodIL?.LocalsCount ?? 0;
 
             _methodCompilerFactory = methodCompilerFactory;
             _module = module;
@@ -31,7 +30,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public IList<EHClause> EhClauses { get; set; } = new List<EHClause>();
 
         public int ParamsCount { get; set; }
-        public int LocalsCount { get; set; }
+        public int LocalsCount => Method.MethodIL?.LocalsCount ?? 0;
 
         public override IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context)
         {
