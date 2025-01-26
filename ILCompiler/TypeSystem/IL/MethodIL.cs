@@ -6,7 +6,7 @@ namespace ILCompiler.TypeSystem.IL
     {
         public virtual IList<Instruction> Instructions { get; } = new List<Instruction>();
 
-        public virtual ILExceptionRegion[] GetExceptionRegions() => new ILExceptionRegion[0];
+        public virtual ILExceptionRegion[] GetExceptionRegions() => [];
         public virtual bool IsInitLocals { get; }
 
         public virtual int LocalsCount { get; }

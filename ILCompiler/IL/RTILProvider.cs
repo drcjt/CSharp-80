@@ -11,7 +11,7 @@ namespace ILCompiler.IL
     {
         public override MethodIL? GetMethodIL(MethodDesc method, DnlibModule module)
         {
-            if (method is DnlibMethod dnlibMethod)
+            if (method is DnlibMethod)
             {
                 if (method.IsIntrinsic)
                 {
