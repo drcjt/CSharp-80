@@ -10,7 +10,7 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.Opcode != ILOpcode.constrained) return false;
 
-            context.Constrained = (TypeDesc)instruction.GetOperand();
+            context.Constrained = (TypeDesc)instruction.Operand;
 
             return true;
         }

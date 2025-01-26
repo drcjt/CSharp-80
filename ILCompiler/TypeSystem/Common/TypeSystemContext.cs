@@ -173,10 +173,15 @@ namespace ILCompiler.TypeSystem.Common
 
         public DefType? GetWellKnownType(WellKnownType wellKnownType, bool throwIfNotFound = true)
         {
+            const string SystemNameSpace = "System";
             switch (wellKnownType)
             {
                 case WellKnownType.String:
-                    return (DefType)SystemModule!.GetType("System", "String");
+                    return (DefType)SystemModule!.GetType(SystemNameSpace, "String");
+                case WellKnownType.Char:
+                    return (DefType)SystemModule!.GetType(SystemNameSpace, "Char");
+                case WellKnownType.Object:
+                    return (DefType)SystemModule!.GetType(SystemNameSpace, "Object");
                 default:
                     if (throwIfNotFound)
                         throw new TypeLoadException();

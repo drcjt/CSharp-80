@@ -133,7 +133,8 @@ namespace ILCompiler.TypeSystem.Dnlib
                         // Use IL Provider
                         _methodIL = _ilProvider.GetMethodIL(this, _module);
                     }
-                    else if (_methodDef.Body != null)
+
+                    if (_methodIL == null && _methodDef.Body != null)
                     {
                         _methodIL = new DnlibMethodIL(_module, _methodDef.Body);
                     }

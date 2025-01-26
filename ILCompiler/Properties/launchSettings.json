@@ -14,8 +14,8 @@
     },
     "Snake": {
       "commandName": "Project",
-      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net8.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile snake.asm snake.dll",
-      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\Samples\\Snake\\bin\\Trs80\\Debug\\net8.0",
+      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile snake.asm snake.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Samples\\Snake\\bin\\Trs80\\Debug\\net9.0",
       "sqlDebugging": false
     },
     "il_bvt": {
@@ -62,14 +62,14 @@
     },
     "Checksum": {
       "commandName": "Project",
-      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\System.Private.CoreLib\\bin\\Debug\\net8.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile checksum.asm checksum.dll",
-      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\Samples\\Checksum\\bin\\Debug\\net8.0",
+      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile checksum.asm checksum.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Samples\\Checksum\\bin\\Trs80\\Debug\\net9.0",
       "sqlDebugging": false
     },
     "Sample": {
       "commandName": "Project",
-      "commandLineArgs": "-ao cim -aa \"-n\" --printReturnCode --dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net8.0\\System.Private.CoreLib.dll --ignoreUnknownCil --outputFile sample.asm sample.dll",
-      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\Samples\\sample\\bin\\Trs80\\Debug\\net8.0",
+      "commandLineArgs": "-ao cim -aa \"-n\" --printReturnCode --dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil --outputFile sample.asm sample.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Samples\\sample\\bin\\Trs80\\Debug\\net9.0",
       "sqlDebugging": false
     },
     "Life": {
@@ -98,8 +98,8 @@
     },
     "Chess": {
       "commandName": "Project",
-      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net8.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile chess.asm chess.dll",
-      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\Samples\\Chess\\bin\\Trs80\\Debug\\net8.0",
+      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile chess.asm chess.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Samples\\Chess\\bin\\Trs80\\Debug\\net9.0",
       "sqlDebugging": false
     },
     "Netbot": {

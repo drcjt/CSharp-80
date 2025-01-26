@@ -13,7 +13,7 @@ namespace ILCompiler.Compiler.Importer
             {
                 case ILOpcode.ldarga:
                 case ILOpcode.ldarga_s:
-                    var parameter = (ParameterDefinition)instruction.GetOperand();
+                    var parameter = (ParameterDefinition)instruction.Operand;
                     var index = parameter.Index;
                     var localNumber = MapIlArgNum(index, importer.ReturnBufferArgIndex);
 

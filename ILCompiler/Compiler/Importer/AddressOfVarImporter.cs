@@ -13,7 +13,7 @@ namespace ILCompiler.Compiler.Importer
             {
                 case ILOpcode.ldloca:
                 case ILOpcode.ldloca_s:
-                    var localVariableDefinition = (LocalVariableDefinition)instruction.GetOperand();
+                    var localVariableDefinition = (LocalVariableDefinition)instruction.Operand;
                     var localNumber = importer.ParameterCount + localVariableDefinition.Index;
                     importer.PushExpression(new LocalVariableAddressEntry(localNumber));
                     importer.LocalVariableTable[localNumber].AddressExposed = true;

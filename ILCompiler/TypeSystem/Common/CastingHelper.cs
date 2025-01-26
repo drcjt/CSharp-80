@@ -1,7 +1,100 @@
-﻿namespace ILCompiler.TypeSystem.Common
+﻿using System.Diagnostics;
+
+namespace ILCompiler.TypeSystem.Common
 {
     public static class CastingHelper
     {
+        /// <summary>
+        /// Returns trus if '<paramref name="thisType"/>' can be cast to '<paramref name="otherType"/>'.
+        /// If '<paramref name="thisType"/>' is a value type assume it is boxed, so
+        /// CanCastTo of System.Int32 to System.Object will return true
+        /// </summary>
+        /// <param name="thisType"></param>
+        /// <param name="otherType"></param>
+        /// <returns></returns>
+        public static bool CanCastTo(this TypeDesc thisType, TypeDesc otherType)
+        {
+            return thisType.CanCastToInternal(otherType);
+        }
+        private static bool CanCastToInternal(this TypeDesc thisType, TypeDesc otherType)
+        {
+            if (thisType == otherType)
+            {
+                return true;
+            }
+            
+            // TODO: Handle GenericParameters, Arrays, SzArrays, ByRefs, Pointers, FunctionPointers
+
+            Debug.Assert(thisType.IsDefType);
+            return thisType.CanCastToClassOrInterface(otherType);
+        }
+
+        private static bool CanCastToClassOrInterface(this TypeDesc thisType, TypeDesc otherType)
+        {
+            if (otherType.IsInterface)
+            {
+                return thisType.CanCastToInterface(otherType);
+            }
+            else
+            {
+                return thisType.CanCastToClass(otherType);
+            }
+        }
+
+        private static bool CanCastToInterface(this TypeDesc thisType, TypeDesc otherType)
+        {
+            // TODO: Handle variance properly
+
+            if (thisType.CanCastByVarianceToInterfaceOrDelegate(otherType))
+            {
+                return true;
+            }
+
+            foreach (var interfaceType in thisType.RuntimeInterfaces)
+            {
+                if (interfaceType.CanCastByVarianceToInterfaceOrDelegate(otherType))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool CanCastByVarianceToInterfaceOrDelegate(this TypeDesc thisType, TypeDesc otherType)
+        {
+            if (thisType == otherType)
+            {
+                return true;
+            }
+
+            // TODO: Handle non trivial case
+
+            return false;
+        }
+
+        private static bool CanCastToClass(this TypeDesc thisType, TypeDesc otherType)
+        {
+            TypeDesc? currentType = thisType;
+
+            if (currentType.IsInterface && otherType.IsObject)
+            {
+                return true;
+            }
+
+            // TODO: support variance properly
+            do
+            {
+                if (currentType.IsEquivalentTo(otherType))
+                    return true;
+
+                currentType = currentType.BaseType;
+            } while (currentType != null);
+
+            return false;
+        }
+
+
         public static bool IsEquivalentTo(this TypeDesc thisType, TypeDesc otherType)
         {
             if (thisType == otherType)

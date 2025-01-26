@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler.Importer
         {
             if (instruction.Opcode != ILOpcode.ldelema) return false;
 
-            var typeDesc = (TypeDesc)instruction.GetOperand();
+            var typeDesc = (TypeDesc)instruction.Operand;
             var elemType = typeDesc.VarType;
             int elemSize = typeDesc.GetElementSize().AsInt;
 

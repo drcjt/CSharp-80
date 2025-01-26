@@ -72,8 +72,8 @@ namespace ILCompiler.Compiler.PreInit
                             int value = opcode switch
                             {
                                 ILOpcode.ldc_i4_m1 => -1,
-                                ILOpcode.ldc_i4_s => (sbyte)instruction.GetOperand(),
-                                ILOpcode.ldc_i4 => (int)instruction.GetOperand(),
+                                ILOpcode.ldc_i4_s => (sbyte)instruction.Operand,
+                                ILOpcode.ldc_i4 => (int)instruction.Operand,
                                 _ => opcode - ILOpcode.ldc_i4_0,
                             };
                             stack.Push(StackValueKind.Int32, ValueTypeValue.FromInt32(value));
@@ -82,7 +82,7 @@ namespace ILCompiler.Compiler.PreInit
 
                     case ILOpcode.stsfld:
                         {
-                            var fieldDesc = (FieldDesc)instruction.GetOperand();
+                            var fieldDesc = (FieldDesc)instruction.Operand;
 
                             if (!fieldDesc.IsStatic || fieldDesc.IsLiteral)
                             {
