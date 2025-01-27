@@ -1,7 +1,7 @@
 ﻿namespace System
 {
-    public interface IEquatable<T>
+    public interface IEquatable<T> // where T : allows ref struct
     {
-        bool Equals(T other);
+        bool Equals(T? other);
     }
 }

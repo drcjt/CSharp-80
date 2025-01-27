@@ -1,6 +1,6 @@
 ﻿namespace System
 {
-    public readonly struct IntPtr
+    public readonly struct IntPtr : IEquatable<nint>
     {
         private readonly nint _value;
 

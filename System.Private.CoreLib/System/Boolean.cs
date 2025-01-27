@@ -1,11 +1,13 @@
 ﻿namespace System
 {
-    public struct Boolean
+    public readonly struct Boolean : IEquatable<bool>
     {
         private readonly bool m_value;
 
         internal const int True = 1;
         internal const int False = 0;
+
+        public override int GetHashCode() => m_value ? True : False;
 
         public override bool Equals(object? obj)
         {
@@ -14,9 +16,9 @@
             return m_value == ((bool)obj).m_value;
         }
 
-        public override int GetHashCode()
+        public bool Equals(bool obj)
         {
-            return m_value ? True : False;
+            return m_value == obj;
         }
     }
 }

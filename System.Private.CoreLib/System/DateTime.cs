@@ -1,6 +1,6 @@
 ﻿namespace System
 {
-    public readonly partial struct DateTime
+    public readonly partial struct DateTime : IEquatable<DateTime>
     {
         public int Day { get; }
         public int Hour { get; }
@@ -18,5 +18,17 @@
             Minute = minute;
             Second = second;
         }
+
+        public override int GetHashCode() => TotalSeconds;
+        public override bool Equals(object? obj)
+        {
+            return obj is DateTime dt && this == dt;
+        }
+
+        public bool Equals(DateTime value) => this == value;
+
+        public static bool operator ==(DateTime d1, DateTime d2) => d1.TotalSeconds == d2.TotalSeconds;
+        public static bool operator !=(DateTime d1, DateTime d2) => !(d1 == d2);
+
     }
 }
