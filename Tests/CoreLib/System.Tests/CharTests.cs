@@ -17,6 +17,7 @@
             if (obj is char v)
             {
                 Assert.AreEqual(expected, c.Equals(v));
+                Assert.AreEqual(expected, c.GetHashCode().Equals(obj.GetHashCode()));
             }
             Assert.AreEqual(expected, c.Equals(obj));
         }

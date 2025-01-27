@@ -1,6 +1,6 @@
 ﻿namespace System
 {
-    public struct Char
+    public readonly struct Char : IEquatable<char>
     {
         private readonly char m_value;
 
@@ -11,6 +11,8 @@
         public static char ToLower(char c) => (char)(c | 32);
         public static char ToUpper(char c) => (char)(c & ~32);
 
+        public override int GetHashCode() => (int)m_value | ((int)m_value << 16);
+
         public override bool Equals(object? obj)
         {
             if (obj is not char)
@@ -18,6 +20,10 @@
             return m_value == ((char)obj).m_value;
         }
 
-        public override int GetHashCode() => (int)m_value | ((int)m_value << 16);
+
+        public bool Equals(char obj)
+        {
+            return m_value == obj;
+        }
     }
 }

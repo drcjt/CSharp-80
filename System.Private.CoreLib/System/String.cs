@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace System
 {
-    public sealed partial class String
+    public sealed partial class String : IEquatable<string>
     {
         // The layout of the string type is a contract with the compiler
 

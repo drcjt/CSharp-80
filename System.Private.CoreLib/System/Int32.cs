@@ -27,6 +27,8 @@
             return Number.Int32ToDecStr(m_value);
         }
 
+        public override int GetHashCode() => m_value;
+
         public override bool Equals(object? obj)
         {
             if (obj is not int)
@@ -38,7 +40,5 @@
         {
             return m_value == obj;
         }
-
-        public override int GetHashCode() => m_value;
     }
 }

@@ -33,7 +33,7 @@ namespace ILCompiler.Compiler.Importer
             var mangledEETypeName = context.NameMangler.GetMangledTypeName(objType);
             var eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
 
-            int unboxedObjectSize = GetUnboxedSize(objType);
+            int unboxedObjectSize = objType.GetElementSize().AsInt;
 
             // Allocate memory for object
             var op1 = new AllocObjEntry(eeTypeNode, VarType.Ref);
@@ -51,26 +51,6 @@ namespace ILCompiler.Compiler.Importer
             // Push temp
             var node = new LocalVariableEntry(lclNum, VarType.Ref, 2);
             return node;
-        }
-
-        private static int GetUnboxedSize(TypeDesc objType)
-        {
-            // On stack we either have
-            // * structs - which take up exact space, so struct with a byte in it is 1 byte long
-            // * native signed/unsigned ints - which take up 2 bytes
-            // * everything else takes up 4 bytes
-
-            var unboxedObjectSize = 4;
-            if (objType.VarType == VarType.Struct)
-            {
-                unboxedObjectSize = objType.GetElementSize().AsInt;
-            }
-            if (objType.VarType.GenActualTypeIsI())
-            {
-                unboxedObjectSize = 2;
-            }
-
-            return unboxedObjectSize;
         }
     }
 }
