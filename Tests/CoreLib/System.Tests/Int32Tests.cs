@@ -50,6 +50,7 @@
             if (obj is int j)
             {
                 Assert.AreEqual(expected, i.Equals(j));
+                Assert.AreEqual(expected, i.GetHashCode().Equals(j.GetHashCode()));
             }
             Assert.AreEqual(expected, i.Equals(obj));
         }

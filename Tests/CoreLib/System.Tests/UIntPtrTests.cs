@@ -1,24 +1,24 @@
 ﻿namespace System.Tests
 {
-    internal static class IntPtrTests
+    internal static class UIntPtrTests
     {
         public static void EqualsTests()
         {
-            EqualsTest((nint)42, (nint)42, true);
-            EqualsTest((nint)42, (nint)43, false);
-            EqualsTest((nint)42, 42, false);
-            EqualsTest((nint)42, null, false);
+            EqualsTest((nuint)42, (nuint)42, true);
+            EqualsTest((nuint)42, (nuint)43, false);
+            EqualsTest((nuint)42, 42, false);
+            EqualsTest((nuint)42, null, false);
         }
 
-        private static void EqualsTest(nint value, object? obj, bool expected)
+        private static void EqualsTest(nuint value, object? obj, bool expected)
         {
-            if (obj is nint other)
+            if (obj is nuint other)
             {
                 Assert.AreEqual(expected, value == other);
                 Assert.AreEqual(!expected, value != other);
                 Assert.AreEqual(expected, value.GetHashCode().Equals(other.GetHashCode()));
 
-                IEquatable<nint> iEquatable = value;
+                IEquatable<nuint> iEquatable = value;
                 Assert.AreEqual(expected, iEquatable.Equals(other));
 
             }
