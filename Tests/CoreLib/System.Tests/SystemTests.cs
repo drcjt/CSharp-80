@@ -52,6 +52,11 @@
 
             UIntPtrTests.EqualsTests();
 
+            StringTests.Ctor_CharArray_EmptyString();
+            StringTests.Ctor_CharArray_Tests();
+            StringTests.Contains_Char_Tests();
+            StringTests.EqualsTests();
+
             return 0;
         }
     }
