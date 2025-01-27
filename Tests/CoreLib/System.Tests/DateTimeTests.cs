@@ -25,7 +25,7 @@
             EqualsTest(new DateTime(10, 9, 8, 7), null, false);
         }
 
-        public static void EqualsTest(DateTime date, object other, bool expected)
+        public static void EqualsTest(DateTime date, object? other, bool expected)
         {
             if (other is DateTime otherDate)
             {
