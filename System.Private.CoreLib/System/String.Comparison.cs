@@ -17,6 +17,20 @@
             return EqualsHelper(this, str);
         }
 
+        public bool Equals(String? value)
+        {
+            if (ReferenceEquals(this, value))
+                return true;
+
+            if (value == null)
+                return false;
+
+            if (this.Length != value.Length)
+                return false;
+
+            return EqualsHelper(this, value);
+        }
+
         private static unsafe bool EqualsHelper(string strA, string strB)
         {
             fixed (char* strABuffer = &strA._firstChar) fixed (char* strBBuffer = &strB._firstChar)
