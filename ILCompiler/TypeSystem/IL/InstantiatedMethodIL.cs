@@ -47,7 +47,7 @@ namespace ILCompiler.TypeSystem.IL
             var dnlibModule = (DnlibModule)context.SystemModule!;
             var ilProvider = dnlibModule.ILProvider;
 
-            _methodIL = ilProvider.GetMethodIL(owningMethod, dnlibModule) ?? methodIL;
+            _methodIL = ilProvider.GetMethodIL(owningMethod) ?? methodIL;
 
             foreach (var instruction in _methodIL.Instructions)
             {
