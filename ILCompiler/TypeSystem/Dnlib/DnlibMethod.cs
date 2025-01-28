@@ -131,7 +131,7 @@ namespace ILCompiler.TypeSystem.Dnlib
                     if (IsIntrinsic)
                     {
                         // Use IL Provider
-                        _methodIL = _ilProvider.GetMethodIL(this, _module);
+                        _methodIL = _ilProvider.GetMethodIL(this);
                     }
 
                     if (_methodIL == null && _methodDef.Body != null)

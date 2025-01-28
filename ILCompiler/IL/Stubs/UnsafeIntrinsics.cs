@@ -1,12 +1,11 @@
-﻿using dnlib.DotNet;
-using dnlib.DotNet.Emit;
-using ILCompiler.TypeSystem.Common;
+﻿using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Common.TypeSystem.IL
 {
     public static class UnsafeIntrinsics
     {
-        public static CilBody? EmitIL(MethodDesc method)
+        public static MethodIL? EmitIL(MethodDesc method)
         {
             switch (method.Name)
             {
@@ -29,100 +28,86 @@ namespace ILCompiler.Common.TypeSystem.IL
             return null;
         }
 
-        private static CilBody? EmitAs() 
+        private static MethodIL? EmitAs() 
         {
-            var body = new CilBody();
+            var body = new MethodIL();
 
-            body.Instructions.Add(OpCodes.Ldarg_0.ToInstruction());
-            body.Instructions.Add(OpCodes.Ret.ToInstruction());
-
-            body.UpdateInstructionOffsets();
+            body.Instructions.Add(new Instruction(ILOpcode.ldarg_0, 0));
+            body.Instructions.Add(new Instruction(ILOpcode.ret, 1));
 
             return body;
         }
 
-        private static CilBody? EmitAsPointer()
+        private static MethodIL? EmitAsPointer()
         {
-            var body = new CilBody();
+            var body = new MethodIL();
 
-            body.Instructions.Add(OpCodes.Ldarg_0.ToInstruction());
-            body.Instructions.Add(OpCodes.Conv_U.ToInstruction());
-            body.Instructions.Add(OpCodes.Ret.ToInstruction());
-
-            body.UpdateInstructionOffsets();
+            body.Instructions.Add(new Instruction(ILOpcode.ldarg_0, 0));
+            body.Instructions.Add(new Instruction(ILOpcode.conv_u, 1));
+            body.Instructions.Add(new Instruction(ILOpcode.ret, 2));
 
             return body;
         }
 
-        private static CilBody? EmitSizeOf(MethodDesc method) 
+        private static MethodIL? EmitSizeOf(MethodDesc method) 
         {
-            var body = new CilBody();
+            var body = new MethodIL();
 
-            body.Instructions.Add(OpCodes.Sizeof.ToInstruction(new GenericMVar(0).ToTypeDefOrRef()));
-            body.Instructions.Add(OpCodes.Ret.ToInstruction());
-
-            body.UpdateInstructionOffsets();
-
-            return body;            
-        }
-
-        private static CilBody? EmitInitBlock()
-        {
-            var body = new CilBody();
-
-            body.Instructions.Add(OpCodes.Ldarg_0.ToInstruction());
-            body.Instructions.Add(OpCodes.Ldarg_1.ToInstruction());
-            body.Instructions.Add(OpCodes.Ldarg_2.ToInstruction());
-            body.Instructions.Add(OpCodes.Initblk.ToInstruction());
-            body.Instructions.Add(OpCodes.Ret.ToInstruction());
-
-            body.UpdateInstructionOffsets();
+            body.Instructions.Add(new Instruction(ILOpcode.sizeof_, 0, new SignatureMethodVariable(method.Context, 0)));
+            body.Instructions.Add(new Instruction(ILOpcode.ret, 1));
 
             return body;
         }
 
-        private static CilBody? EmitCopyBlock()
+        private static MethodIL? EmitInitBlock()
         {
-            var body = new CilBody();
+            var body = new MethodIL();
 
-            body.Instructions.Add(OpCodes.Ldarg_0.ToInstruction());
-            body.Instructions.Add(OpCodes.Ldarg_1.ToInstruction());
-            body.Instructions.Add(OpCodes.Ldarg_2.ToInstruction());
-            body.Instructions.Add(OpCodes.Cpblk.ToInstruction());
-            body.Instructions.Add(OpCodes.Ret.ToInstruction());
-
-            body.UpdateInstructionOffsets();
+            body.Instructions.Add(new Instruction(ILOpcode.ldarg_0, 0));
+            body.Instructions.Add(new Instruction(ILOpcode.ldarg_1, 1));
+            body.Instructions.Add(new Instruction(ILOpcode.ldarg_2, 2));
+            body.Instructions.Add(new Instruction(ILOpcode.initblk, 3));
+            body.Instructions.Add(new Instruction(ILOpcode.ret, 4));
 
             return body;
         }
 
-        private static CilBody? EmitAdd(MethodDesc method)
+        private static MethodIL? EmitCopyBlock()
         {
-            var body = new CilBody();
+            var body = new MethodIL();
 
-            body.Instructions.Add(OpCodes.Ldarg_1.ToInstruction());
-            body.Instructions.Add(OpCodes.Sizeof.ToInstruction(new GenericMVar(0).ToTypeDefOrRef()));
-            body.Instructions.Add(OpCodes.Conv_I.ToInstruction());
-            body.Instructions.Add(OpCodes.Mul.ToInstruction());
-            body.Instructions.Add(OpCodes.Ldarg_0.ToInstruction());
-            body.Instructions.Add(OpCodes.Add.ToInstruction());
-            body.Instructions.Add(OpCodes.Ret.ToInstruction());
-
-            body.UpdateInstructionOffsets();
+            body.Instructions.Add(new Instruction(ILOpcode.ldarg_0, 0));
+            body.Instructions.Add(new Instruction(ILOpcode.ldarg_1, 1));
+            body.Instructions.Add(new Instruction(ILOpcode.ldarg_2, 2));
+            body.Instructions.Add(new Instruction(ILOpcode.cpblk, 3));
+            body.Instructions.Add(new Instruction(ILOpcode.ret, 4));
 
             return body;
         }
 
-        private static CilBody? EmitAddByteOffset(MethodDesc method) 
+        private static MethodIL? EmitAdd(MethodDesc method)
         {
-            var body = new CilBody();
+            var body = new MethodIL();
 
-            body.Instructions.Add(OpCodes.Ldarg_0.ToInstruction());
-            body.Instructions.Add(OpCodes.Ldarg_1.ToInstruction());
-            body.Instructions.Add(OpCodes.Add.ToInstruction());
-            body.Instructions.Add(OpCodes.Ret.ToInstruction());
+            body.Instructions.Add(new Instruction(ILOpcode.ldarg_1, 0));
+            body.Instructions.Add(new Instruction(ILOpcode.sizeof_, 1, new SignatureMethodVariable(method.Context, 0)));
+            body.Instructions.Add(new Instruction(ILOpcode.conv_i, 2));
+            body.Instructions.Add(new Instruction(ILOpcode.mul, 3));
+            body.Instructions.Add(new Instruction(ILOpcode.ldarg_0, 4));
+            body.Instructions.Add(new Instruction(ILOpcode.add, 5));
+            body.Instructions.Add(new Instruction(ILOpcode.ret, 6));
 
-            body.UpdateInstructionOffsets();
+            return body;
+        }
+
+        private static MethodIL? EmitAddByteOffset(MethodDesc method) 
+        {
+            var body = new MethodIL();
+
+            body.Instructions.Add(new Instruction(ILOpcode.ldarg_0, 0));
+            body.Instructions.Add(new Instruction(ILOpcode.ldarg_1, 1));
+            body.Instructions.Add(new Instruction(ILOpcode.add, 2));
+            body.Instructions.Add(new Instruction(ILOpcode.ret, 3));
 
             return body;
         }
