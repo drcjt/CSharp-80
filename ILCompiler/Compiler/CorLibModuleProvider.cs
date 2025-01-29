@@ -13,7 +13,7 @@ namespace ILCompiler.Compiler
                 return typeDef;
             }
 
-            throw new CorLibTypeResolutionException("System.String type cannot be found in corlib module");
+            throw new CorLibTypeResolutionException($"{name} type cannot be found in corlib module");
         }
     }
 
