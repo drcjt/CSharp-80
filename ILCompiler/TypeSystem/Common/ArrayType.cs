@@ -1,6 +1,5 @@
 ﻿using ILCompiler.Compiler;
 using ILCompiler.TypeSystem.Canon;
-using System.Text;
 
 namespace ILCompiler.TypeSystem.Common
 {
@@ -44,5 +43,7 @@ namespace ILCompiler.TypeSystem.Common
 
             return this;
         }
+
+        public override TypeFlags Category => _rank == -1 ? TypeFlags.SzArray : TypeFlags.Array;
     }
 }
