@@ -20,6 +20,17 @@
                 _items = new T[capacity];
         }
 
+        public List(IEnumerable<T> collection)
+        {
+            _items = new T[0];
+
+            IEnumerator<T> enumerator = collection.GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                Add(enumerator.Current);
+            }
+        }
+
         public int Capacity
         {
             get => _items.Length;

@@ -31,11 +31,13 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             _module = module;
         }
 
+        public bool ConstructedEETypeNodeDefined(TypeDesc type) => _constructedEETypeNodesByFullName.ContainsKey(type.FullName);
+
         public ConstructedEETypeNode ConstructedEETypeNode(TypeDesc type)
         {
             if (!_constructedEETypeNodesByFullName.TryGetValue(type.FullName, out var constructedEETypeNode))
             {
-                constructedEETypeNode = new ConstructedEETypeNode(type, _nameMangler, _preinitializationManager, this, _module);
+                constructedEETypeNode = new ConstructedEETypeNode(type, _nameMangler, _preinitializationManager, this);
                 _constructedEETypeNodesByFullName[type.FullName] = constructedEETypeNode;
             }
 

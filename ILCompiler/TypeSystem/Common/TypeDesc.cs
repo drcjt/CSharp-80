@@ -1,5 +1,6 @@
 ﻿using ILCompiler.Compiler;
 using ILCompiler.TypeSystem.Canon;
+using ILCompiler.TypeSystem.Utilities;
 using System.Text;
 
 namespace ILCompiler.TypeSystem.Common
@@ -46,8 +47,10 @@ namespace ILCompiler.TypeSystem.Common
 
         public virtual bool IsInterface {  get; }
 
-        public bool IsArray => this is ArrayType;
-        public bool IsSzArray => this is ArrayType type && type.IsSzArray;
+        public virtual bool IsArray => false;
+
+        public virtual bool IsMdArray => false;
+        public virtual bool IsSzArray => false;
 
         public bool IsString => this.IsWellKnownType(WellKnownType.String);
 
@@ -87,7 +90,28 @@ namespace ILCompiler.TypeSystem.Common
         {
             get
             {
-                return MetadataRuntimeInterfacesAlgorithm.ComputeRuntimeInterfaces(this);
+                if (this.IsDefType)
+                {
+                    return MetadataRuntimeInterfacesAlgorithm.ComputeRuntimeInterfaces(this);
+                }
+                else if (this.IsArray)
+                {
+                    ArrayType arrayType = (ArrayType)this;
+                    var elementType = arrayType.ElementType;
+                    if (arrayType.IsSzArray && !elementType.IsPointer && !elementType.IsFunctionPointer)
+                    {
+                        return ArrayOfTRuntimeInterfacesAlgorithm.ComputeRuntimeInterfaces(this);
+                    }
+                    else
+                    {
+                        // TODO: multi-dimensional arrays, and arrays of pointers or function pointers
+                        throw new NotImplementedException();
+                    }
+                }
+                else
+                {
+                    throw new NotImplementedException();
+                }
             }
         }
 

@@ -77,7 +77,7 @@ jobs:
         run: dotnet test --configuration Release --no-restore --collect:"XPlat Code Coverage;Format=opencover" --logger:trx --results-directory "TestResults" -p:BuildInParallel=false -m:1 
 
       - name: Upload dotnet test results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dotnet-results
           path: TestResults
@@ -85,7 +85,7 @@ jobs:
         if: ${{ always() }}
 
       - name: Upload benchmark results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
           path: benchmark-results.txt

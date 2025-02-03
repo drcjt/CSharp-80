@@ -8,10 +8,13 @@ using System.Runtime.InteropServices;
 
 namespace System
 {
-    public class Array : IList
+    public abstract class Array : IList
     {
         // This field should be the first field in Array
         private ushort _numComponents;
+
+        // Stop C# from generating a protected constructor
+        private protected Array() { }
 
         public int Length => Unsafe.As<RawArrayData>(this).Length;
 
@@ -244,10 +247,7 @@ namespace System
                 return false;
             }
 
-            public void Reset()
-            {
-                _index = -1;
-            }
+            public void Reset() => _index = -1;
 
             public object? Current => _array.InternalGetValue(_index);
         }
@@ -255,14 +255,51 @@ namespace System
 
     public class Array<T> : Array, IEnumerable<T>
     {
-        public IEnumerator<T> GetEnumerator()
+        public new IEnumerator<T> GetEnumerator()
         {
-            throw new NotImplementedException();
+            T[] @this = Unsafe.As<T[]>(this);
+            int length = @this.Length;
+
+            return new SZGenericArrayEnumerator<T>(@this, length);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
             throw new NotImplementedException();
         }
+    }
+
+    internal sealed class SZGenericArrayEnumerator<T> : IEnumerator<T>
+    {
+        private readonly T[]? _array;
+        private int _index;
+        private readonly int _endIndex;
+
+        internal SZGenericArrayEnumerator(T[]? array, int endIndex)
+        {
+            _index = -1;
+            _endIndex = endIndex;
+            _array = array;
+        }
+
+        public T Current => _array![_index];
+
+        object IEnumerator.Current => Current;
+
+        public void Dispose()
+        {
+        }
+
+        public bool MoveNext()
+        {
+            if (_index < _endIndex)
+            {
+                _index++;
+                return (_index < _endIndex);
+            }
+            return false;
+        }
+
+        public void Reset() => _index = -1;
     }
 }

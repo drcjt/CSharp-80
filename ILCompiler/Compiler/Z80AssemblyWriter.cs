@@ -2,6 +2,7 @@
 using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
 using Microsoft.Extensions.Logging;
 using System.Text;
 using static ILCompiler.Compiler.Emit.Registers;
@@ -118,6 +119,17 @@ namespace ILCompiler.Compiler
             if (hasReturnCode && _configuration.PrintReturnCode)
             {
                 WriteReturnCodeMessage(instructionsBuilder);
+            }
+
+            DefType systemArrayType = entryMethod.Context.GetWellKnownType(WellKnownType.Array)!;
+            if (_nodeFactory.ConstructedEETypeNodeDefined(systemArrayType))
+            {
+                var systemArrayTypeLabel = _nameMangler.GetMangledTypeName(systemArrayType);
+                instructionsBuilder.Equ("SYSTEMARRAY", systemArrayTypeLabel);
+            }
+            else
+            {
+                instructionsBuilder.Equ("SYSTEMARRAY", 0);
             }
 
             instructionsBuilder.Label("START");

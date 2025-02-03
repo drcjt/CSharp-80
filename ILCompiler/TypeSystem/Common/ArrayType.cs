@@ -1,6 +1,5 @@
 ﻿using ILCompiler.Compiler;
 using ILCompiler.TypeSystem.Canon;
-using System.Text;
 
 namespace ILCompiler.TypeSystem.Common
 {
@@ -16,8 +15,9 @@ namespace ILCompiler.TypeSystem.Common
         public TypeDesc ElementType => this.ParameterType;
 
 
-        public new bool IsSzArray => _rank < 0;
-        public bool IsMdArray => _rank > 0;
+        public override bool IsArray => true;
+        public override bool IsSzArray => _rank < 0;
+        public override bool IsMdArray => _rank > 0;
 
         public int Rank => _rank < 0 ? 1 : _rank;
 
@@ -44,5 +44,7 @@ namespace ILCompiler.TypeSystem.Common
 
             return this;
         }
+
+        public override TypeFlags Category => _rank == -1 ? TypeFlags.SzArray : TypeFlags.Array;
     }
 }

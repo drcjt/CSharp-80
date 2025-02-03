@@ -92,7 +92,7 @@ jobs:
 
       - name: Upload dotnet test results
         if: matrix.platform == 'Trs80' && always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dotnet-results-${{ matrix.platform }}
           path: TestResults
@@ -100,7 +100,7 @@ jobs:
       - name: Upload benchmark results
         # Use always() to always run this step to publish benchmark results when there are test failures
         if: matrix.platform == 'Trs80' && always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
           path: benchmark-results.txt
@@ -131,7 +131,7 @@ jobs:
 
       - name: Upload .cmd, .dsk files for trs80 platform if they exist
         if: matrix.platform == 'Trs80'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: samples-${{ matrix.platform }}
           path: |
@@ -140,14 +140,14 @@ jobs:
 
       - name: Upload .tap files for zx spectrum platform if they exist
         if: matrix.platform == 'ZXSpectrum'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: samples-${{ matrix.platform }}
           path: Samples/**/*.tap
 
       - name: Upload .hex files for cpm platform if they exist
         if: matrix.platform == 'CPM'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: samples-${{ matrix.platform }}
           path: Samples/**/*.hex

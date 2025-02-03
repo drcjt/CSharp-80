@@ -21,7 +21,7 @@
 
         public static bool IsWellKnownType(this TypeDesc type, WellKnownType wellKnownType)
         {
-            return type == type.Context.GetWellKnownType(wellKnownType, false);
+            return type == type.Context.GetWellKnownType(wellKnownType);
         }
 
         public static ArrayType MakeArrayType(this TypeDesc type) => type.Context.GetArrayType(type);

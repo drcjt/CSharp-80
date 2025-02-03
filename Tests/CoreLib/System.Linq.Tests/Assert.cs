@@ -1,7 +1,21 @@
-﻿namespace System.Tests
+﻿using System.Collections.Generic;
+
+namespace System.Linq.Tests
 {
     internal static class Assert
     {
+        public static void AreEnumerablesEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual)
+        {
+            Assert.AreEqual(expected.Count(), actual.Count());
+
+            var expectedEnumerator = expected.GetEnumerator();
+            var actualEnumerator = actual.GetEnumerator();
+            while (expectedEnumerator.MoveNext() && actualEnumerator.MoveNext())
+            {
+                Assert.AreEqual(expectedEnumerator.Current, actualEnumerator.Current);
+            }
+        }
+
         public static void AreEqual(RuntimeTypeHandle expected, RuntimeTypeHandle actual)
         {
             if (!expected.Equals(actual))

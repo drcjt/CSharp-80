@@ -110,6 +110,10 @@ namespace ILCompiler.Compiler.Emit
         public static Instruction Create(Opcode opcode, string label, ushort value)
             => new() { Opcode = opcode, Label = label, Op0 = new() { Immediate = value }, Bytes = 2 };
 
+        public static Instruction Create(Opcode opcode, string label, string valueAsLabel)
+            => new() { Opcode = opcode, Label = label, Op0 = new() { Label = valueAsLabel }, Bytes = 2 };
+
+
         public static Instruction Create(Opcode opcode, ushort target, string? comment = null, int bytes = 1)
             => new() { Opcode = opcode, Op0 = new() { Immediate = target }, Comment = comment, Bytes = bytes };
 

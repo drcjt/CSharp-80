@@ -117,5 +117,16 @@ namespace ILCompiler.Compiler
 
             return method;
         }
+
+        public static bool IsArrayTypeWithoutGenericInterfaces(this TypeDesc type)
+        {
+            if (type is ArrayType arrayType)
+            {
+                var elementType = arrayType.ElementType;
+                return elementType.IsMdArray || elementType.IsFunctionPointer || elementType.IsPointer;
+            }
+
+            return false;
+        }
     }
 }

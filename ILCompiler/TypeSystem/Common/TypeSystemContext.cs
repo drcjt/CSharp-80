@@ -1,4 +1,5 @@
-﻿using ILCompiler.Interfaces;
+﻿using ILCompiler.Compiler;
+using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Canon;
 using ILCompiler.TypeSystem.RuntimeDetermined;
 
@@ -47,7 +48,13 @@ namespace ILCompiler.TypeSystem.Common
         {
             if (type.IsArray)
             {
-                return (DefType)SystemModule!.GetType("System", "Array");
+                if (!type.IsArrayTypeWithoutGenericInterfaces())
+                {
+                    MetadataType arrayShadowType = (MetadataType)SystemModule!.GetType("System", "Array`1");
+                    return arrayShadowType.MakeInstantiatedType(((ArrayType)type).ElementType);
+                }
+
+                return GetWellKnownType(WellKnownType.Array);
             }
 
             return ((DefType)type);
@@ -171,7 +178,7 @@ namespace ILCompiler.TypeSystem.Common
             _ => false,
         };
 
-        public DefType? GetWellKnownType(WellKnownType wellKnownType, bool throwIfNotFound = true)
+        public DefType GetWellKnownType(WellKnownType wellKnownType)
         {
             const string SystemNameSpace = "System";
             switch (wellKnownType)
@@ -182,11 +189,10 @@ namespace ILCompiler.TypeSystem.Common
                     return (DefType)SystemModule!.GetType(SystemNameSpace, "Char");
                 case WellKnownType.Object:
                     return (DefType)SystemModule!.GetType(SystemNameSpace, "Object");
+                case WellKnownType.Array:
+                    return (DefType)SystemModule!.GetType(SystemNameSpace, "Array");
                 default:
-                    if (throwIfNotFound)
-                        throw new TypeLoadException();
-                    else
-                        return null;
+                    throw new TypeLoadException();
             }
         }
     }
