@@ -25,11 +25,9 @@
             _items = new T[0];
 
             IEnumerator<T> enumerator = collection.GetEnumerator();
+            while (enumerator.MoveNext())
             {
-                while (enumerator.MoveNext())
-                {
-                    Add(enumerator.Current);
-                }
+                Add(enumerator.Current);
             }
         }
 
