@@ -35,16 +35,14 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private readonly PreinitializationManager _preinitializationManager;
         private readonly NodeFactory _nodeFactory;
-        private readonly ModuleDesc _module;
 
         public override bool ShouldSkipEmitting(NodeFactory factory) => false;
 
-        public ConstructedEETypeNode(TypeDesc type, INameMangler nameMangler, PreinitializationManager preinitializationManager, NodeFactory nodeFactory, ModuleDesc module) 
+        public ConstructedEETypeNode(TypeDesc type, INameMangler nameMangler, PreinitializationManager preinitializationManager, NodeFactory nodeFactory) 
             : base(type, nameMangler)
         {
             _preinitializationManager = preinitializationManager;
             _nodeFactory = nodeFactory;
-            _module = module;
         }
 
         public override IList<IDependencyNode> GetStaticDependencies(DependencyNodeContext context)

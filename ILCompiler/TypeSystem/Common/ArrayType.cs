@@ -15,8 +15,9 @@ namespace ILCompiler.TypeSystem.Common
         public TypeDesc ElementType => this.ParameterType;
 
 
-        public new bool IsSzArray => _rank < 0;
-        public bool IsMdArray => _rank > 0;
+        public override bool IsArray => true;
+        public override bool IsSzArray => _rank < 0;
+        public override bool IsMdArray => _rank > 0;
 
         public int Rank => _rank < 0 ? 1 : _rank;
 

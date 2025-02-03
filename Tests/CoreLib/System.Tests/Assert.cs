@@ -2,22 +2,6 @@
 {
     internal static class Assert
     {
-        public static void AreEqual(bool expected, bool actual)
-        {
-            if (expected != actual)
-            {
-                Environment.Exit(1);
-            }
-        }
-
-        public static void AreEqual(int expected, int actual)
-        {
-            if (expected != actual)
-            {
-                Environment.Exit(1);
-            }
-        }
-
         public static void AreEqual(RuntimeTypeHandle expected, RuntimeTypeHandle actual)
         {
             if (!expected.Equals(actual))

@@ -47,10 +47,10 @@ namespace ILCompiler.TypeSystem.Common
 
         public virtual bool IsInterface {  get; }
 
-        public bool IsArray => this is ArrayType;
+        public virtual bool IsArray => false;
 
-        public bool IsMdArray => this is ArrayType type && type.IsMdArray;
-        public bool IsSzArray => this is ArrayType type && type.IsSzArray;
+        public virtual bool IsMdArray => false;
+        public virtual bool IsSzArray => false;
 
         public bool IsString => this.IsWellKnownType(WellKnownType.String);
 

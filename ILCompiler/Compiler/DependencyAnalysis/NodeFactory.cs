@@ -37,7 +37,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             if (!_constructedEETypeNodesByFullName.TryGetValue(type.FullName, out var constructedEETypeNode))
             {
-                constructedEETypeNode = new ConstructedEETypeNode(type, _nameMangler, _preinitializationManager, this, _module);
+                constructedEETypeNode = new ConstructedEETypeNode(type, _nameMangler, _preinitializationManager, this);
                 _constructedEETypeNodesByFullName[type.FullName] = constructedEETypeNode;
             }
 
