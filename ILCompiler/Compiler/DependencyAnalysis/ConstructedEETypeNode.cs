@@ -72,7 +72,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     dependencies.Add(elemConstructedEETypeNode);
                 }
 
-                TypeDesc systemArrayType = (TypeDesc)_module.GetType("System", "Array");
+                var systemArrayType = Type.Context.GetClosestDefType(Type);
                 var constructedEETypeNode = context.NodeFactory.ConstructedEETypeNode(systemArrayType);
                 dependencies.Add(constructedEETypeNode);
             }
@@ -91,14 +91,11 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 }
             }
 
-            // Enumerate each interface this type implements and add as dependencies
-            if (!Type.IsSzArray)
+            // Enumerate each interface this type implements and add as dependencies           
+            foreach (var interfaceType in Type.RuntimeInterfaces)
             {
-                foreach (var interfaceType in Type.RuntimeInterfaces)
-                {
-                    var interfaceTypeNode = _nodeFactory.NecessaryTypeSymbol(interfaceType);
-                    dependencies.Add(interfaceTypeNode);
-                }
+                var interfaceTypeNode = _nodeFactory.NecessaryTypeSymbol(interfaceType);
+                dependencies.Add(interfaceTypeNode);
             }
 
             return dependencies;
@@ -317,21 +314,21 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 }
             }
 
-            instructionsBuilder.UpdateReservation(dispatchMapEntryCountReservation, Instruction.Create(Opcode.Db, entryCount));
+            instructionsBuilder.UpdateReservation(dispatchMapEntryCountReservation, Instruction.Create(Opcode.Db, entryCount, "Dispatch Map Size"));
         }
 
         private byte _virtualSlotCount = 0;
 
         private void OutputVirtualSlots(InstructionsBuilder instructionsBuilder, DefType type, DefType implType)
         {
-            instructionsBuilder.Comment($"VTable slots for {type.FullName}");
-
             // Output inherited VTable slots first
             var baseType = type.BaseType;
             if (baseType != null)
             {
                 OutputVirtualSlots(instructionsBuilder, baseType, implType);
             }
+
+            instructionsBuilder.Comment($"VTable slots for {type.FullName}");
 
             // Now get new slots
             var vTable = _nodeFactory.VTable(type);
