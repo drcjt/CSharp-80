@@ -33,8 +33,44 @@ InterfaceCall:
 	LD (BASETYPE), DE
 
 CheckType:
+
+; Only check if type is array if System.Array is constructed type
+if SYSTEMARRAY
 	LD HL, (BASETYPE)
 
+	; If flags = 0x18 then this is an SzArray so use the System.Array EEType as the base type
+
+	INC HL
+	INC HL
+	LD C, (HL)
+	INC HL
+	LD B, (HL)
+	INC HL
+
+	; BC = flags
+
+	LD HL, 0x18
+	OR A
+	SBC HL, BC
+	JR NZ, GetBaseType
+
+	; Use System.Array EEType as BASETYPE
+
+	LD DE, (BASETYPE)
+	LD HL, SYSTEMARRAY
+	LD (BASETYPE), HL
+
+	EX DE, HL
+	LD DE, BaseTypeOffset + 2
+	ADD HL, DE
+
+	JR SearchDispatchMap
+
+endif
+
+GetBaseType:
+
+	LD HL, (BASETYPE)	
 	LD DE, BaseTypeOffset
 	ADD HL, DE
 
@@ -43,6 +79,8 @@ CheckType:
 	LD B, (HL)
 	INC HL
 	LD (BASETYPE), BC
+
+SearchDispatchMap:
 
 	LD B, (HL)	; vtable slot count
 	INC HL
