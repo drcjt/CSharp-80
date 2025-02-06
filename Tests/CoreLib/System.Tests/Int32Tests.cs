@@ -32,8 +32,7 @@
 
         public static void ToStringTests()
         {
-            // This is failing, results in -(
-            //ToStringTest(int.MinValue, "-2147483648");
+            ToStringTest(int.MinValue, "-2147483648");
             ToStringTest(-4567, "-4567");
             ToStringTest(0, "0");
             ToStringTest(4567, "4567");
