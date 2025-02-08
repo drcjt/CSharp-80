@@ -5,13 +5,10 @@ namespace System
 {
     internal static class Number
     {
-        public unsafe static string Int32ToDecStr(int value)
-        {
-            if (value >= 0)
-                return UInt32ToDecStr((uint)value);
-            else
-                return NegativeInt32ToDecStr(value);
-        }
+        public unsafe static string Int32ToDecStr(int value) 
+            => value >= 0 ? 
+                UInt32ToDecStr((uint)value) : 
+                NegativeInt32ToDecStr(value);
 
         private static unsafe string UInt32ToDecStr(uint value)
         {
