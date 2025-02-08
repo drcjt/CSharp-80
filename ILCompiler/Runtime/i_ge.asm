@@ -1,40 +1,42 @@
 ; 32 bit signed greater than equal comparison
+; Result = primary >= secondary
 ; Entry: primary, secondary on stack
 ; Exit: Carry set if true
+
 i_ge:
-	POP BC
+	POP HL
 	EXX
 
-	POP DE
+	POP DE		; primary
 	POP BC
 
+	POP HL		; secondary LSW
+
+	LD A, E
+	SUB A, L
+	LD A, D
+	SBC A, H
+
 	POP HL
 
-	XOR A			; Clear carry flag
-	SBC HL, DE
+	LD A, C
+	SBC A, L
+	LD A, B
+	SBC A, H
+	
+	JP PO, $+5
+	XOR A, 0x80
+	JP M, i_ge_1
 
-	EX DE, HL
+	EXX
 
-	POP HL
-	SBC HL, BC
+	SCF
 
-	LD A, H	
-	ADD A, A
-	JR C, i_ge_1
-
-	LD A, H
-	OR L
-	OR D
-	OR E
+	JP (HL)
 
 i_ge_1:
 	EXX
-	PUSH BC
 
-	RET C
+	AND A
 
-	SCF 
-	RET Z
-
-	CCF
-	RET
+	JP (HL)
