@@ -1,27 +1,25 @@
-; 16 bit greater than comparison
+; 16 bit signed greater than comparison
 ; Args from Stack, HL > DE
 ; Carry set if true
 
 i_gt16:
-	POP BC
-
 	POP HL
-	POP DE
 
-	AND A			; Clear zero flag
-	SBC HL, DE
+	POP DE		; min
+	POP BC		; one
 
-	JR C, i_gt16_1
+	LD A, C
+	SUB A, E
+	LD A, B
+	SBC A, D
 
-	JR Z, i_gt16_1
+	JP PO, $+5
+	XOR A, 0x80
+	JP M, i_gt16_1
 
-	SCF				; set carry flag
-
-	JP i_gt16_2
+	AND A
+	JP (HL)
 
 i_gt16_1:
-	XOR A			; Clear carry flag
-
-i_gt16_2:
-	PUSH BC
-	RET
+	SCF
+	JP (HL)
