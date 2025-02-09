@@ -106,6 +106,8 @@
     <EmbeddedResource Include="Runtime\CPM\cls.asm" />
     <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
     <EmbeddedResource Include="Runtime\CallCatchHandler.asm" />
+    <EmbeddedResource Include="Runtime\i_ge16_un.asm" />
+    <EmbeddedResource Include="Runtime\i_gt16_un.asm" />
     <EmbeddedResource Include="Runtime\SFINext.asm" />
     <EmbeddedResource Include="Runtime\EHEnumNext.asm" />
     <EmbeddedResource Include="Runtime\EHEnumInit.asm" />

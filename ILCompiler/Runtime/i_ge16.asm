@@ -1,25 +1,25 @@
-; 16 bit greater than or equal comparison
+; 16 bit signed greater than or equal comparison
 ; Args from Stack, HL >= DE
 ; Carry set if true
 
 i_ge16:
-	POP BC
-
 	POP HL
+
+	POP BC
 	POP DE
 
-	AND A			; Clear carry flag
-	SBC HL, DE
+	LD A, C
+	SUB A, E
+	LD A, B
+	SBC A, D
 
-	JR C, i_ge16_1	; value1 >= value2
+	JP PO, $+5
+	XOR A, 0x80
+	JP M, i_ge16_1
 
-	SCF				; set carry flag
-
-	JP i_ge16_2
+	SCF
+	JP (HL)
 
 i_ge16_1:
-	XOR A			; Clear carry flag
-
-i_ge16_2:
-	PUSH BC
-	RET
+	AND A
+	JP (HL)
