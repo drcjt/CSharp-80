@@ -4,16 +4,15 @@ namespace System.Collections.Generic
 {
     public abstract class EqualityComparer<T> : IEqualityComparer, IEqualityComparer<T>
     {
-        public static EqualityComparer<T> Default
+        // TODO: Use Intrinsic to pick appropraite comparer here
+        [Intrinsic]
+        private static EqualityComparer<T> Create()
         {
-            [Intrinsic]
-            get
-            {
-                // TODO: Use Intrinsic to pick appropriate comparer here
-                return new ObjectEqualityComparer<T>();
-            }
+            Console.WriteLine("Creating ObjectEqualityComparer");
+            return new ObjectEqualityComparer<T>();
         }
 
+        public static EqualityComparer<T> Default { get; } = Create();
         public abstract bool Equals(T? x, T? y);
         public abstract int GetHashCode(T obj);
 
