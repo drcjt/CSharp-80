@@ -79,6 +79,7 @@ namespace ILCompiler.TypeSystem.Common
         public override bool IsVirtual => _typicalMethodDef.IsVirtual;
         public override bool IsAbstract => _typicalMethodDef.IsAbstract;
 
+        public override bool IsIntrinsic => _typicalMethodDef.IsIntrinsic;
         public override MethodDesc CreateUserMethod(string name) => throw new NotImplementedException();
 
         public override MethodDesc GetTypicalMethodDefinition() => _typicalMethodDef;
