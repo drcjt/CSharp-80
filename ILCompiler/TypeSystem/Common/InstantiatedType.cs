@@ -133,6 +133,8 @@ namespace ILCompiler.TypeSystem.Common
 
         public override string Name => _typeDef.Name;
 
+        public override string Namespace => _typeDef.Namespace;
+
         public override bool IsValueType => _typeDef.IsValueType;
 
         public override bool IsInterface => _typeDef.IsInterface;
