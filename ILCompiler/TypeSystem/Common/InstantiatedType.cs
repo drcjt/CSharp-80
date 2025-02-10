@@ -137,6 +137,16 @@ namespace ILCompiler.TypeSystem.Common
 
         public override bool IsInterface => _typeDef.IsInterface;
 
+        public override bool HasStaticConstructor => _typeDef.HasStaticConstructor;
+
+        public override MethodDesc? GetStaticConstructor()
+        {
+            var typicalCctor = _typeDef.GetStaticConstructor();
+            if (typicalCctor == null)
+                return null;
+            return _typeDef.Context.GetMethodForInstantiatedType(typicalCctor, this);
+        }
+
         private MetadataType? _baseType;
 
         private MetadataType? InitializeBaseType()
