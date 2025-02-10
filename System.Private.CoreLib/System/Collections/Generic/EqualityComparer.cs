@@ -4,7 +4,7 @@ namespace System.Collections.Generic
 {
     public abstract class EqualityComparer<T> : IEqualityComparer, IEqualityComparer<T>
     {
-        // TODO: Use Intrinsic to pick appropraite comparer here
+        // TODO: Use Intrinsic to pick appropriate comparer here
         [Intrinsic]
         private static EqualityComparer<T> Create()
         {
