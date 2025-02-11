@@ -207,6 +207,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenericConstrainedCall", "T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Linq.Tests", "Tests\CoreLib\System.Linq.Tests\System.Linq.Tests.csproj", "{271614EC-F2F0-12C7-C5A8-A6FD9D88985D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Collections.Tests", "Tests\CoreLib\System.Collections.Tests\System.Collections.Tests.csproj", "{2A3F21F8-AECB-178B-70EC-FF459814810F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -521,6 +523,10 @@ Global
 		{271614EC-F2F0-12C7-C5A8-A6FD9D88985D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{271614EC-F2F0-12C7-C5A8-A6FD9D88985D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{271614EC-F2F0-12C7-C5A8-A6FD9D88985D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A3F21F8-AECB-178B-70EC-FF459814810F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A3F21F8-AECB-178B-70EC-FF459814810F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A3F21F8-AECB-178B-70EC-FF459814810F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A3F21F8-AECB-178B-70EC-FF459814810F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -609,6 +615,7 @@ Global
 		{1966FCB9-03C0-A419-0C0A-EC1319A5E25B} = {2076ADF1-E63E-4A71-AF00-DCD6570B5ECF}
 		{5D0B35F5-C8BE-BDA7-E493-2BB0AEF0A834} = {35C20505-0FCB-4D27-AFC5-A0B1071C268F}
 		{271614EC-F2F0-12C7-C5A8-A6FD9D88985D} = {2076ADF1-E63E-4A71-AF00-DCD6570B5ECF}
+		{2A3F21F8-AECB-178B-70EC-FF459814810F} = {2076ADF1-E63E-4A71-AF00-DCD6570B5ECF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}

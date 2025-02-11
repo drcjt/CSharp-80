@@ -44,6 +44,14 @@ namespace ILCompiler.IL
                         }
                     }
                     break;
+                case "EqualityComparer`1":
+                    {
+                        if (declaringType.Namespace == "System.Collections.Generic")
+                        {
+                            return ComparerIntrinsics.EmitEqualityComparer(method);
+                        }
+                    }
+                    break;
             }
 
             return null;
