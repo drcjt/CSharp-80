@@ -7,6 +7,7 @@
             ArrayTests.GetEnumerator();
             ArrayTests.GetValue_RankOneInt_SetValue();
             ArrayTests.IndexOf_ArrayTests();
+            ArrayTests.EmptyTests();
 
             ObjectTests.EqualsTests();
             ObjectTests.ReferenceEqualsTests();
