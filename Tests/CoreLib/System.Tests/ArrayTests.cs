@@ -127,5 +127,16 @@ namespace System.Tests
                 enumerator.Reset();
             }
         }
+
+        public static void EmptyTests()
+        {
+            Assert.IsTrue(Array.Empty<int>() != null);
+            Assert.AreEqual(0, Array.Empty<int>().Length);
+            Assert.AreSame(Array.Empty<int>(), Array.Empty<int>());
+
+            Assert.IsTrue(Array.Empty<object>() != null);
+            Assert.AreEqual(0, Array.Empty<object>().Length);
+            Assert.AreSame(Array.Empty<object>(), Array.Empty<object>());
+        }
     }
 }

@@ -9,14 +9,14 @@
 
         public ArrayList()
         {
-            _items = new object[0]; // Array.Empty<object>();
+            _items = Array.Empty<object>();
         }
 
         public ArrayList(int capacity)
         {
             if (capacity == 0)
             {
-                _items = new object[0]; // Array.Empty<object>();
+                _items = Array.Empty<object>();
             }
             else
             {

@@ -9,20 +9,20 @@
 
         public List()
         {
-            _items = new T[0];
+            _items = Array.Empty<T>();
         }
 
         public List(int capacity)
         {
             if (capacity == 0)
-                _items = new T[0];
+                _items = Array.Empty<T>();
             else
                 _items = new T[capacity];
         }
 
         public List(IEnumerable<T> collection)
         {
-            _items = new T[0];
+            _items = Array.Empty<T>();
 
             IEnumerator<T> enumerator = collection.GetEnumerator();
             while (enumerator.MoveNext())

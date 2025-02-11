@@ -140,6 +140,13 @@ namespace System
             }
         }
 
+        private static class EmptyArray<T>
+        {
+            internal static readonly T[] Value = new T[0];
+        }
+
+        public static T[] Empty<T>() => EmptyArray<T>.Value;
+
         internal unsafe object? InternalGetValue(nint flattenedIndex)
         {
             ref byte element = ref Unsafe.AddByteOffset(ref MemoryMarshal.GetArrayDataReference(this), flattenedIndex * ElementSize);
