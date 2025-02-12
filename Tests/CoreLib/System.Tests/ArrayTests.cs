@@ -28,25 +28,25 @@ namespace System.Tests
             IndexOf_SZArray<sbyte>(sbyteArray, (sbyte)1, 0);            
             IndexOf_SZArray<sbyte>(sbyteArray, (sbyte)3, 2);
             IndexOf_SZArray<sbyte>(sbyteArray, (sbyte)2, 1);
-            IndexOf_SZArray<sbyte>(new sbyte[0], (sbyte)1, -1);
+            IndexOf_SZArray<sbyte>(Array.Empty<sbyte>(), (sbyte)1, -1);
 
             var byteArray = new byte[] { 1, 2, 3, 3 };
             IndexOf_SZArray<byte>(byteArray, (byte)1, 0);
             IndexOf_SZArray<byte>(byteArray, (byte)3, 2);
             IndexOf_SZArray<byte>(byteArray, (byte)2, 1);
-            IndexOf_SZArray<byte>(new byte[0], (byte)1, -1);
+            IndexOf_SZArray<byte>(Array.Empty<byte>(), (byte)1, -1);
 
             var shortArray = new short[] { 1, 2, 3, 3 };
             IndexOf_SZArray<short>(shortArray, (short)1, 0);
             IndexOf_SZArray<short>(shortArray, (short)3, 2);
             IndexOf_SZArray<short>(shortArray, (short)2, 1);
-            IndexOf_SZArray<short>(new short[0], (short)1, -1);
+            IndexOf_SZArray<short>(Array.Empty<short>(), (short)1, -1);
 
             var ushortArray = new ushort[] { 1, 2, 3, 3 };
             IndexOf_SZArray<ushort>(ushortArray, (ushort)1, 0);
             IndexOf_SZArray<ushort>(ushortArray, (ushort)3, 2);
             IndexOf_SZArray<ushort>(ushortArray, (ushort)2, 1);
-            IndexOf_SZArray<ushort>(new ushort[0], (ushort)1, -1);
+            IndexOf_SZArray<ushort>(Array.Empty<ushort>(), (ushort)1, -1);
 
             var intArray = new int[] { 7, 7, 8, 8, 9, 9 };
             IndexOf_SZArray<int>(intArray, 8, 2);
@@ -63,24 +63,24 @@ namespace System.Tests
             IndexOf_SZArray<char>(charArray, (char)1, 0);
             IndexOf_SZArray<char>(charArray, (char)3, 2);
             IndexOf_SZArray<char>(charArray, (char)2, 1);
-            IndexOf_SZArray<char>(new char[0], (char)1, -1);
+            IndexOf_SZArray<char>(Array.Empty<char>(), (char)1, -1);
 
             var boolArray = new bool[] { true, false, false, true };
             IndexOf_SZArray<bool>(boolArray, true, 0);
             IndexOf_SZArray<bool>(boolArray, false, 1);
-            IndexOf_SZArray<bool>(new bool[0], true, -1);
+            IndexOf_SZArray<bool>(Array.Empty<bool>(), true, -1);
 
             var intPtrArray = new IntPtr[] { (IntPtr)1, (IntPtr)2, (IntPtr)3, (IntPtr)3 };
             IndexOf_SZArray<IntPtr>(intPtrArray, (IntPtr)1, 0);
             IndexOf_SZArray<IntPtr>(intPtrArray, (IntPtr)3, 2);
             IndexOf_SZArray<IntPtr>(intPtrArray, (IntPtr)2, 1);
-            IndexOf_SZArray<IntPtr>(new IntPtr[0], (IntPtr)1, -1);
+            IndexOf_SZArray<IntPtr>(Array.Empty<IntPtr>(), (IntPtr)1, -1);
 
             var uintPtrArray = new UIntPtr[] { (UIntPtr)1, (UIntPtr)2, (UIntPtr)3, (UIntPtr)3 };
             IndexOf_SZArray<UIntPtr>(uintPtrArray, (UIntPtr)1, 0);
             IndexOf_SZArray<UIntPtr>(uintPtrArray, (UIntPtr)3, 2);
             IndexOf_SZArray<UIntPtr>(uintPtrArray, (UIntPtr)2, 1);
-            IndexOf_SZArray<UIntPtr>(new UIntPtr[0], (UIntPtr)1, -1);
+            IndexOf_SZArray<UIntPtr>(Array.Empty<UIntPtr>(), (UIntPtr)1, -1);
         }
 
         private static void IndexOf_SZArray<T>(T[] array, T value, int expected)
@@ -100,7 +100,7 @@ namespace System.Tests
 
         public static void GetEnumerator()
         {
-            GetEnumerator(new int[0]);
+            GetEnumerator(Array.Empty<int>());
             GetEnumerator(new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
             GetEnumerator(new char[] { 'a', 'b', 'c' });
         }
