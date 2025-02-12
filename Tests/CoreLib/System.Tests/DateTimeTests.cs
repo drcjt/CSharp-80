@@ -2,10 +2,10 @@
 {
     internal static class DateTimeTests
     {
+        private static readonly DateTime _testDateTime = new DateTime(10, 9, 8, 7);
         public static void Ctor_Int_Int_Int_Int()
         {
-            var datetime = new DateTime(10, 9, 8, 7);
-            VerifyDateTime(datetime, 10, 9, 8, 7);
+            VerifyDateTime(_testDateTime, 10, 9, 8, 7);
         }
 
         private static void VerifyDateTime(DateTime dateTime, int day, int hour, int minute, int second)
@@ -18,11 +18,11 @@
 
         public static void Equals_Tests()
         {
-            EqualsTest(new DateTime(10, 9, 8, 7), new DateTime(10, 9, 8, 7), true);
-            EqualsTest(new DateTime(10, 9, 8, 7), new DateTime(11, 10, 9, 8), false);
-            EqualsTest(new DateTime(10, 9, 8, 7), new DateTime(9, 8, 7, 6), false);
-            EqualsTest(new DateTime(10, 9, 8, 7), new object(), false);
-            EqualsTest(new DateTime(10, 9, 8, 7), null, false);
+            EqualsTest(_testDateTime, _testDateTime, true);
+            EqualsTest(_testDateTime, new DateTime(11, 10, 9, 8), false);
+            EqualsTest(_testDateTime, new DateTime(9, 8, 7, 6), false);
+            EqualsTest(_testDateTime, new object(), false);
+            EqualsTest(_testDateTime, null, false);
         }
 
         public static void EqualsTest(DateTime date, object? other, bool expected)
@@ -37,7 +37,6 @@
             }
 
             Assert.AreEqual(expected, date.Equals(other));
-
         }
     }
 }
