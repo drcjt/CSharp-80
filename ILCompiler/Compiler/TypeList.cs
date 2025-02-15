@@ -1,6 +1,4 @@
-﻿using ILCompiler.Compiler.Ssa;
-
-namespace ILCompiler.Compiler
+﻿namespace ILCompiler.Compiler
 {
     public enum VarType
     {
@@ -15,8 +13,8 @@ namespace ILCompiler.Compiler
         Int,
         UInt,
 
-        Long,
-        ULong,
+        //Long,
+        //ULong,
 
         //Float,
         //Double,
@@ -25,7 +23,7 @@ namespace ILCompiler.Compiler
         ByRef,
         Struct,     // Custom Value Types
 
-        Ptr,        // Unmanaged pointers, Native sized Integers
+        Ptr,        // Unmanaged pointers, NativeInt, NativeUInt
     }
 
     public static class VarTypeExtensions
