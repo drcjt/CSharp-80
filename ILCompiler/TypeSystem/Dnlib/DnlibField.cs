@@ -42,5 +42,15 @@ namespace ILCompiler.TypeSystem.Dnlib
             FieldAttributes.FamORAssem => EffectiveVisibility.FamilyOrAssembly,
             _ => throw new NotSupportedException()
         };
+
+        public byte[] GetRvaData() => _fieldDef.InitialValue;
+    }
+
+    public static class DnlibFieldExtensions
+    {
+        public static byte[] GetFieldRvaData(this DnlibField field)
+        {
+            return field.GetRvaData();
+        }
     }
 }
