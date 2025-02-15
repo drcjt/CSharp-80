@@ -4,6 +4,7 @@
     {
         BasicBlock,
         String,
+        FieldRVAData
     }
 
     public static class LabelGenerator
@@ -12,6 +13,7 @@
         {
             { LabelType.BasicBlock, "bb{0}" },
             { LabelType.String, "s{0}" },
+            { LabelType.FieldRVAData, "frva{0}" }
         };
 
 
