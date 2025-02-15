@@ -1,8 +1,8 @@
-﻿using ILCompiler.TypeSystem.Common;
-using ILCompiler.TypeSystem.Dnlib;
-using ILCompiler.Compiler.PreInit;
+﻿using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
 using ILCompiler.IoC;
+using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.Dnlib;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
@@ -17,6 +17,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private readonly IDictionary<TypeDesc, VTableSliceNode> _vTableNodes = new Dictionary<TypeDesc, VTableSliceNode>();
         private readonly IDictionary<TypeDesc, EETypeNode> _necessaryTypeSymbolNodes = new Dictionary<TypeDesc, EETypeNode>();
         private readonly IDictionary<string, FrozenStringNode> _frozenStringNodes = new Dictionary<string, FrozenStringNode>();
+        private readonly IDictionary<FieldDesc, FieldRvaDataNode> _fieldRvaDataNodes = new Dictionary<FieldDesc, FieldRvaDataNode>();
 
         private readonly PreinitializationManager _preinitializationManager;
         private readonly INameMangler _nameMangler;
@@ -75,6 +76,17 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
 
             return frozenStringNode;
+        }
+
+        public FieldRvaDataNode FieldRvaDataNode(FieldDesc field)
+        {
+            if (!_fieldRvaDataNodes.TryGetValue(field, out var fieldRvaDataNode))
+            {
+                fieldRvaDataNode = new FieldRvaDataNode(((DnlibField)field).GetFieldRvaData());
+                _fieldRvaDataNodes[field] = fieldRvaDataNode;
+            }
+
+            return fieldRvaDataNode;
         }
 
         public VirtualMethodUseNode VirtualMethodUse(MethodDesc method)
