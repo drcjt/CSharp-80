@@ -14,6 +14,12 @@ namespace System.Runtime.CompilerServices
         // TODO: This should be removed when better support for reflection has been
         // added via Type class.
         public unsafe static bool HasCctor<T>() => EEType.Of<T>()->HasCctor;
+
+        [Intrinsic]
+        public static void InitializeArray(Array array, RuntimeFieldHandle fldHandle)
+        {
+            //throw new PlatformNotSupportedException();
+        }
     }
 
     [StructLayout(LayoutKind.Sequential)]
