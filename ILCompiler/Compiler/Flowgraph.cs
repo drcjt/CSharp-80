@@ -215,6 +215,11 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
+        public void Visit(TokenEntry entry)
+        {
+            SetNext(entry);
+        }
+
         private void SetNext(StackEntry entry)
         {
             if (Current != null)

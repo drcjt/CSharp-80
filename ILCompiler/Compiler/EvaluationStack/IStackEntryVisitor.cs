@@ -35,5 +35,6 @@
         public void Visit(BoundsCheck entry);
         public void Visit(NullCheckEntry entry);
         public void Visit(CatchArgumentEntry entry);
+        public void Visit(TokenEntry entry);
     }
 }

@@ -112,6 +112,11 @@ namespace ILCompiler.Compiler
             _sb.AppendLine($"t{entry.TreeID,-3} = phiarg {entry.Type} V{entry.LocalNumber:00} ssa{entry.SsaNumber}");
         }
 
+        public void Visit(TokenEntry entry)
+        {
+            _sb.AppendLine($"       token {entry.Field.Name}");
+        }
+
         public void Visit(CallEntry entry)
         {
             var firstArg = true;

@@ -36,5 +36,6 @@
         public void Visit(BoundsCheck entry) => _genericStackEntryVisitor.Visit<BoundsCheck>(entry);
         public void Visit(NullCheckEntry entry) => _genericStackEntryVisitor.Visit<NullCheckEntry>(entry);
         public void Visit(CatchArgumentEntry entry) => _genericStackEntryVisitor.Visit<CatchArgumentEntry>(entry);
+        public void Visit(TokenEntry entry) => _genericStackEntryVisitor.Visit<TokenEntry>(entry);
     }
 }
