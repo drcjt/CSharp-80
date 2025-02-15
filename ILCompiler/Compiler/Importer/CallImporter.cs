@@ -1,6 +1,7 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.Dnlib;
 using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
@@ -274,6 +275,13 @@ namespace ILCompiler.Compiler.Importer
             var targetMethodName = methodToCall.Name;
             switch (targetMethodName)
             {
+                case "InitializeArray":
+                    if (IsTypeName(methodToCall, "System.Runtime.CompilerServices", "RuntimeHelpers"))
+                    {
+                        return ImportInitializeArray(arguments, importer, methodToCall.Context);
+                    }
+                    break;
+
                 case "Of":
                     if (IsTypeName(methodToCall, "Internal.Runtime", "EEType"))
                     {
@@ -393,6 +401,28 @@ namespace ILCompiler.Compiler.Importer
             }
             // Treat as normal call
             return false;
+        }
+
+        private static bool ImportInitializeArray(IList<StackEntry> arguments, IILImporterProxy importer, TypeSystemContext context)
+        {
+            var arrayObjPtr = arguments[0];
+            TokenEntry fieldSlot = (TokenEntry)arguments[1];
+
+            var sourceAddress = new SymbolConstantEntry(fieldSlot.Label);
+
+            int pointerSize = context.Target.PointerSize;
+            var arrayBaseSize = new NativeIntConstantEntry((short)(pointerSize + sizeof(ushort)));    // EEType Ptr and array length
+            StackEntry destinationAddress = new BinaryOperator(Operation.Add, isComparison: false, arrayObjPtr, arrayBaseSize, VarType.Ptr);
+
+            var arrayData = ((DnlibField)fieldSlot.Field).GetFieldRvaData();
+            var size = new Int32ConstantEntry((short)arrayData.Length);
+
+            var args = new List<StackEntry>() { size, sourceAddress, destinationAddress };
+
+            var node = new CallEntry("Memcpy", args, VarType.Void, null);
+            importer.ImportAppendTree(node);
+
+            return true;
         }
 
         private static bool IsTypeName(MethodDesc method, string typeNamespace, string typeName)

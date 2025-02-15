@@ -43,8 +43,7 @@ namespace System.Collections.Generic
         {   
             if (_count == 0)
             {
-                // TODO: Use Array.Empty<T>
-                return new T[0];
+                return Array.Empty<T>();
             }
 
             T[] result = _array;
