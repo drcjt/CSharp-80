@@ -10,6 +10,7 @@ namespace ILCompiler.Common.TypeSystem.IL
             switch (method.Name)
             {
                 case "As":
+                case "AsRef":
                     return EmitAs();
                 case "AsPointer":
                     return EmitAsPointer();
