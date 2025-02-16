@@ -18,7 +18,7 @@ namespace System.Runtime.CompilerServices
         [Intrinsic]
         public static void InitializeArray(Array array, RuntimeFieldHandle fldHandle)
         {
-            //throw new PlatformNotSupportedException();
+            throw new PlatformNotSupportedException();
         }
     }
 
