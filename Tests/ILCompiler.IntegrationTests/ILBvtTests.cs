@@ -42,7 +42,11 @@ namespace CSharp80.Tests.BVT
                     var targetFilePath = Path.Combine(@".\il_bvt", Path.GetFileName(file));
                     File.Copy(file, targetFilePath, true);
 
-                    yield return new TestCaseData(targetFilePath).SetName(Path.GetFileNameWithoutExtension(targetFilePath));
+                    // Visual Studio doesn't like .'s in test names so replace with a character that looks like a dot but isn't
+                    var testName = Path.GetFileNameWithoutExtension(targetFilePath);
+                    testName = testName.Replace('.', '\u2024');
+
+                    yield return new TestCaseData(targetFilePath).SetName(testName);
                 }
             }
         }

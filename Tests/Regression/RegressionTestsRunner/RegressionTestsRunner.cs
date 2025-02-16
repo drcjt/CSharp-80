@@ -32,7 +32,11 @@ namespace RegressionTests
                         var temp = Path.Combine(binConfigTargetPath, $"{regressionTestName}.cim");
                         var testAssemblyPath = Path.Combine(regressionTestPath, temp);
 
-                        yield return new TestCaseData(testAssemblyPath).SetName(Path.GetFileNameWithoutExtension(regressionTestName));
+                        // Visual Studio doesn't like .'s in test names so replace with a character that looks like a dot but isn't
+                        var testName = Path.GetFileNameWithoutExtension(regressionTestName);
+                        testName = testName.Replace('.', '\u2024');
+
+                        yield return new TestCaseData(testAssemblyPath).SetName(testName);
                     }
                 }
             }

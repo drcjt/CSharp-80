@@ -33,7 +33,11 @@ namespace CodeGenTests
                         var temp = Path.Combine(binConfigTargetPath, $"{codeGenTestName}.cim");
                         var testAssemblyPath = Path.Combine(codeGenTestPath, temp);
 
-                        yield return new TestCaseData(testAssemblyPath).SetName(Path.GetFileNameWithoutExtension(codeGenTestName));
+                        // Visual Studio doesn't like .'s in test names so replace with a character that looks like a dot but isn't
+                        var testName = Path.GetFileNameWithoutExtension(codeGenTestName);
+                        testName = testName.Replace('.', '\u2024');
+
+                        yield return new TestCaseData(testAssemblyPath).SetName(testName);
                     }
                 }
             }
