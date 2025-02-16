@@ -7,7 +7,7 @@ namespace System
         [Intrinsic]
         private static void _Exit(int exitCode)
         {
-            throw new Exception();
+            throw new PlatformNotSupportedException();
         }
 
         public static void Exit(int exitCode) => _Exit(exitCode);

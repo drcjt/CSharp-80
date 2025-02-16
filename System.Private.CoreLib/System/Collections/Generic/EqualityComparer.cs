@@ -7,7 +7,7 @@ namespace System.Collections.Generic
         [Intrinsic]
         private static EqualityComparer<T> Create()
         {
-            throw new Exception();
+            throw new PlatformNotSupportedException();
         }
 
         public static EqualityComparer<T> Default { get; } = Create();

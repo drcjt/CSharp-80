@@ -8,7 +8,7 @@ namespace Internal.Runtime.CompilerServices
         [Intrinsic]
         public static void* AsPointer<T>(ref T value)
         {
-            throw new Exception();
+            throw new PlatformNotSupportedException();
 
             // ldarg.0
             // conv.u
@@ -16,9 +16,9 @@ namespace Internal.Runtime.CompilerServices
         }
 
         [Intrinsic]
-        public static T As<T>(object value) where T : class
+        public static T As<T>(object? value) where T : class
         {
-            throw new Exception();
+            throw new PlatformNotSupportedException();
 
             // ldarg.0
             // ret
@@ -27,7 +27,7 @@ namespace Internal.Runtime.CompilerServices
         [Intrinsic]
         public static ref TTo As<TFrom, TTo>(ref TFrom source)
         {
-            throw new Exception();
+            throw new PlatformNotSupportedException();
 
             // ldarg.0
             // ret
@@ -36,7 +36,7 @@ namespace Internal.Runtime.CompilerServices
         [Intrinsic]
         public static ref T AddByteOffset<T>(ref T source, IntPtr byteOffset)
         {
-            throw new Exception();
+            throw new PlatformNotSupportedException();
 
             // ldarg.0
             // ldarg.1
@@ -61,16 +61,21 @@ namespace Internal.Runtime.CompilerServices
         [Intrinsic]
         public static ref T Add<T>(ref T source, int elementOffset)
         {
-            throw new Exception();
+            return ref AddByteOffset(ref source, elementOffset * (nint)sizeof(T));
+
+            // ldarg .0
+            // ldarg .1
+            // sizeof !!T
+            // conv.i
+            // mul
+            // add
+            // ret
         }
 
         [Intrinsic]
         public static int SizeOf<T>()
         {
-            throw new Exception();
-
-            // sizeof !!0
-            // ret
+            return sizeof(T);
         }
 
         /// <summary>
@@ -79,13 +84,16 @@ namespace Internal.Runtime.CompilerServices
         [Intrinsic]
         public static ref T AsRef<T>(in T source)
         {
-            throw new Exception();
+            throw new PlatformNotSupportedException();
+
+            // ldarg.0
+            // ret
         }
 
         [Intrinsic]
         public static void InitBlock(void* startAddress, byte value, uint byteCount)
         {
-            throw new Exception();
+            throw new PlatformNotSupportedException();
 
             // ldarg.0
             // ldarg.1
@@ -97,7 +105,7 @@ namespace Internal.Runtime.CompilerServices
         [Intrinsic]
         public static void CopyBlock(void* destination, void* source, uint byteCount)
         {
-            throw new Exception();
+            throw new PlatformNotSupportedException();
 
             // ldarg.0
             // ldarg.1
@@ -109,7 +117,7 @@ namespace Internal.Runtime.CompilerServices
         [Intrinsic]
         public static void CopyBlock(ref byte destination, ref byte source, uint byteCount)
         {
-            throw new Exception();
+            throw new PlatformNotSupportedException();
 
             // ldarg.0
             // ldarg.1

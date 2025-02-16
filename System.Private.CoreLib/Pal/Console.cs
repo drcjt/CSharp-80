@@ -82,7 +82,7 @@ namespace System
         {
             // This is still intrinsic as it allows for the native
             // code to be inlined
-            throw new Exception();
+            throw new PlatformNotSupportedException();
         }
 
         [DllImport(Libraries.Runtime, EntryPoint = "CLS")]
