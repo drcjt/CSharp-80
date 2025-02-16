@@ -33,7 +33,11 @@ namespace DirectedTests
                         var temp = Path.Combine(binConfigTargetPath, $"{directedTestName}.cim");
                         var testAssemblyPath = Path.Combine(directedTestPath, temp);
 
-                        yield return new TestCaseData(testAssemblyPath).SetName(Path.GetFileNameWithoutExtension(directedTestName));
+                        // Visual Studio doesn't like .'s in test names so replace with a character that looks like a dot but isn't
+                        var testName = Path.GetFileNameWithoutExtension(directedTestName);
+                        testName = testName.Replace('.', '\u2024');
+
+                        yield return new TestCaseData(testAssemblyPath).SetName(testName);
                     }
                 }
             }

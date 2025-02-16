@@ -61,7 +61,11 @@ namespace MethodicalTests
                             var temp = Path.Combine(binConfigTargetPath, $"{methodicalTestName}{CimExtension}");
                             var testAssemblyPath = Path.Combine(methodicalTestPath, temp);
 
-                            yield return new TestCaseData(testAssemblyPath).SetName(methodicalTestName);
+                            // Visual Studio doesn't like .'s in test names so replace with a character that looks like a dot but isn't
+                            var testName = Path.GetFileNameWithoutExtension(methodicalTestName);
+                            testName = testName.Replace('.', '\u2024');
+
+                            yield return new TestCaseData(testAssemblyPath).SetName(testName);
                         }
                         else
                         {
@@ -72,6 +76,9 @@ namespace MethodicalTests
                                 var testAssemblyPath = Path.Combine(methodicalTestPath, temp);
 
                                 var testName = $"{methodicalTestName} ({Path.GetFileNameWithoutExtension(ilFile)})";
+
+                                // Visual Studio doesn't like .'s in test names so replace with a character that looks like a dot but isn't
+                                testName = testName.Replace('.', '\u2024');
 
                                 yield return new TestCaseData(testAssemblyPath).SetName(testName);
                             }

@@ -32,7 +32,11 @@ namespace GenericsTests
                         var temp = Path.Combine(binConfigTargetPath, $"{genericsTestName}.cim");
                         var testAssemblyPath = Path.Combine(genericsTestPath, temp);
 
-                        yield return new TestCaseData(testAssemblyPath).SetName(Path.GetFileNameWithoutExtension(genericsTestName));
+                        // Visual Studio doesn't like .'s in test names so replace with a character that looks like a dot but isn't
+                        var testName = Path.GetFileNameWithoutExtension(genericsTestName);
+                        testName = testName.Replace('.', '\u2024');
+
+                        yield return new TestCaseData(testAssemblyPath).SetName(testName);
                     }
                 }
             }

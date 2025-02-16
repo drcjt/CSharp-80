@@ -35,6 +35,9 @@ namespace CoreLibTests
                             var temp = Path.Combine(binConfigTargetPath, $"{coreLibTestName}.cim");
                             var testAssemblyPath = Path.Combine(coreLibTestPath, temp);
 
+                            // Visual Studio doesn't like .'s in test names so replace with a character that looks like a dot but isn't
+                            coreLibTestName = coreLibTestName.Replace('.', '\u2024');
+
                             yield return new TestCaseData(testAssemblyPath).SetName(coreLibTestName);
                         }
                     }
