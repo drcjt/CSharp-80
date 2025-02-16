@@ -78,6 +78,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                             ImportAddressOfElem();
                             break;
 
+                        case ILOpcode.ldtoken:
+                            ImportLoadToken(currentInstruction);
+                            break;
+
                         case ILOpcode.ldelem:
                         case ILOpcode.ldelem_i:
                         case ILOpcode.ldelem_i1:
@@ -247,6 +251,18 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
         }
 
+        private void ImportLoadToken(Instruction instruction)
+        {
+            if (instruction.Operand is FieldDesc field)
+            {
+                _dependencies.Add(_context.NodeFactory.FieldRvaDataNode(field));
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         private void AddStaticTypeConstructorDependency(TypeDesc type)
         {
             var staticConstructoreMethod = type.GetStaticConstructor();
@@ -304,6 +320,11 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     // No need to add any dependencies as this gets inlined
                     return;
                 }
+            }
+            if (methodDesc.IsIntrinsic && methodDesc.OwningType.Name == "RuntimeHelpers" && methodDesc.OwningType.Namespace == "System.Runtime.CompilerServices" && methodDesc.Name == "InitializeArray")
+            {
+                // This gets handled in codegen
+                return;
             }
 
             if (methodDesc.HasCustomAttribute("System.Diagnostics.CodeAnalysis", "DynamicDependencyAttribute"))

@@ -77,6 +77,11 @@ namespace ILCompiler.Compiler
             Print($"JMP {entry.TargetLabel}");
         }
 
+        public void Visit(TokenEntry entry)
+        {
+            Print($"TOKEN {entry.Field.Name}");
+        }
+
         public void Visit(SwitchEntry entry)
         {
             _indent++;
