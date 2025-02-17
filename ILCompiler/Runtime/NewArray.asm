@@ -12,9 +12,11 @@ NewArray:
 	; EETypePtr
 	POP HL
 
-	; Element Size
-	POP BC
-	POP AF
+	; Get Element Size from EEType
+	LD C, (HL)
+	INC HL
+	LD B, (HL)
+	DEC HL
 
 	; Element Count
 	POP DE

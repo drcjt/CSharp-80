@@ -115,38 +115,16 @@ namespace ILCompiler.Compiler.Importer
             CallImporter.ImportCall(dependentMethod, instruction, context, importer, null);
         }
 
+        /// <summary>
+        /// All zero based one dimensional arrays, SZArrays, are created using Newarr.
+        /// Only multidimensional arrays, or one-dimensional arrays which aren't zero based
+        /// are created by Newobj
+        /// </summary>
+        /// <param name="importer"></param>
+        /// <param name="arrayType"></param>
         private static void ImportNewObjArray(IILImporterProxy importer, ArrayType arrayType)
         {
-            // Extract element type and number of dimensions
-            var rank = arrayType.Rank;
-            var elemType = arrayType.ElementType;
-            var elemSize = elemType.GetElementSize().AsInt;
-
-            // Need to call helper to create MD array
-            // The helper should take as arguments:
-            //   * Number of dimensions
-            //   * Elem Size
-            //   * Size of each dimension
-            // If we arrange the arguments such that the last item on the stack is the number of dimensions
-            // then the helper can easily pop off each dimensions size.
-
-            // Helper should calculate required size for the array
-            // e.g. size of dimensions multipled together * elem size + (number of dimensions * 2)
-            // This assumes dimension size can be no bigger than a short
-
-            // Calculate size of dimensions e.g. dim1 * dim2 * dim3 * ...
-            // TODO: currently does not allocate space for array bounds at all
-            StackEntry sizeOp = importer.PopExpression();
-            for (var dimension = 1; dimension < rank; dimension++)
-            {
-                var dimensionOp = importer.PopExpression();
-                sizeOp = new BinaryOperator(Operation.Mul, isComparison: false, sizeOp, dimensionOp, VarType.Ptr);
-            }
-
-            // Create node to new up the array
-            var args = new List<StackEntry>() { sizeOp, new Int32ConstantEntry(elemSize) };
-            var node = new CallEntry("NewArray", args, VarType.Ref, 2);
-            importer.PushExpression(node);
+            throw new NotImplementedException();
         }
     }
 }
