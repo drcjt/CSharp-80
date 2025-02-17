@@ -32,10 +32,7 @@ namespace ILCompiler.Compiler.Importer
                 eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
             }
 
-            // TODO: Change NewArray to get this from the eeType
-            var arrayElementSize = runtimeDeterminedArrayType.ElementType.GetElementSize().AsInt;
-
-            var args = new List<StackEntry>() { numElements, new Int32ConstantEntry(arrayElementSize), eeTypeNode };
+            var args = new List<StackEntry>() { numElements, eeTypeNode };
             var node = new CallEntry("NewArray", args, VarType.Ref, 2);
             importer.PushExpression(node);
 
