@@ -18,7 +18,35 @@ namespace ILCompiler.Tests.Common
             _benchmarkResultsPath = Path.Combine(solutionPath, "benchmark-results.txt");
         }
 
+        private static void RetryFileOperation(Action fileAction, int maxRetries = 3, int delayMilliseconds = 1000)
+        {
+            int attempt = 0;
+            while (attempt < maxRetries)
+            {
+                try
+                {
+                    fileAction();
+                    return;
+                }
+                catch (IOException ex)
+                {
+                    attempt++;
+                    if (attempt >= maxRetries)
+                    {
+                        throw;
+                    }
+                    Console.WriteLine($"Attempt {attempt} failed: {ex.Message}. Retrying in {delayMilliseconds}ms...");
+                    Thread.Sleep(delayMilliseconds);
+                }
+            }
+        }
+
         public void WriteBenchmark(string testName, ulong tStates)
+        {
+            RetryFileOperation(() => { WriteBenchmarkOperation(testName, tStates); });
+        }
+
+        private void WriteBenchmarkOperation(string testName, ulong tStates)
         {
             var serializeOptions = new JsonSerializerOptions
             {
@@ -27,24 +55,30 @@ namespace ILCompiler.Tests.Common
             };
 
             var benchmarks = new List<BenchmarkData>();
-            if (File.Exists(_benchmarkResultsPath))
+
+            using (var stream = new FileStream(_benchmarkResultsPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None))
             {
-                using (FileStream benchmarkFile = File.OpenRead(_benchmarkResultsPath)) 
+                using (var reader = new StreamReader(stream, leaveOpen: true))
                 {
-                    benchmarks = JsonSerializer.Deserialize<List<BenchmarkData>>(benchmarkFile, serializeOptions);
+                    var currentJson = reader.ReadToEnd();
+                    benchmarks = JsonSerializer.Deserialize<List<BenchmarkData>>(currentJson, serializeOptions);
+                }
+
+                if (benchmarks == null)
+                {
+                    throw new NullReferenceException($"Deserialization of benchmark file {_benchmarkResultsPath} failed");
+                }
+
+                benchmarks.Add(new BenchmarkData() { Name = testName, Unit = "T-States", Value = (int)tStates });
+
+                var updatedJson = JsonSerializer.Serialize<List<BenchmarkData>>(benchmarks, serializeOptions);
+
+                stream.SetLength(0);
+                using (var writer = new StreamWriter(stream))
+                {
+                    writer.Write(updatedJson);
                 }
             }
-            
-            if (benchmarks == null)
-            {
-                throw new NullReferenceException($"Deserialization of benchmark file {_benchmarkResultsPath} failed");
-            }
-
-            benchmarks.Add(new BenchmarkData() { Name = testName, Unit = "T-States", Value = (int)tStates });
-
-            var json = JsonSerializer.Serialize<List<BenchmarkData>>(benchmarks, serializeOptions);
-
-            File.WriteAllText(_benchmarkResultsPath, json);
         }
     }
 }
