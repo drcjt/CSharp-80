@@ -61,12 +61,15 @@ namespace ILCompiler.Tests.Common
                 using (var reader = new StreamReader(stream, leaveOpen: true))
                 {
                     var currentJson = reader.ReadToEnd();
-                    benchmarks = JsonSerializer.Deserialize<List<BenchmarkData>>(currentJson, serializeOptions);
-                }
+                    if (currentJson.Length > 0)
+                    {
+                        benchmarks = JsonSerializer.Deserialize<List<BenchmarkData>>(currentJson, serializeOptions);
 
-                if (benchmarks == null)
-                {
-                    throw new NullReferenceException($"Deserialization of benchmark file {_benchmarkResultsPath} failed");
+                        if (benchmarks == null)
+                        {
+                            throw new NullReferenceException($"Deserialization of benchmark file {_benchmarkResultsPath} failed");
+                        }
+                    }
                 }
 
                 benchmarks.Add(new BenchmarkData() { Name = testName, Unit = "T-States", Value = (int)tStates });
