@@ -153,7 +153,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
             return conditionalDependencies;
         }
-        public override IList<Instruction> GetInstructions(string inputFilePath)
+        public override IList<Instruction> GetInstructions(string inputFilePath, IList<string> modules)
         {
             var eeMangledTypeName = _nameMangler.GetMangledTypeName(Type);
 

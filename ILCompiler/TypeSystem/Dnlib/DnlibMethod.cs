@@ -2,6 +2,7 @@
 using ILCompiler.IL;
 using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
+using ILCompiler.TypeSystem.Interop;
 
 namespace ILCompiler.TypeSystem.Dnlib
 {
@@ -31,7 +32,18 @@ namespace ILCompiler.TypeSystem.Dnlib
         public override bool IsIntrinsic => _methodDef.HasCustomAttributes && _methodDef.CustomAttributes.IsDefined(CompilerIntrinsicAttribute);
 
         public override bool IsPInvoke => _methodDef.IsPinvokeImpl;
-        public override string PInvokeMethodName => _methodDef.ImplMap.Name;
+
+        public override PInvokeMetaData? GetPInvokeMetaData()
+        {
+            if (!IsPInvoke)
+                return default;
+
+            var name = _methodDef.ImplMap.Name;
+            var module = _methodDef.ImplMap.Module.Name;
+
+            return new PInvokeMetaData(name, module);
+        }
+
         public override bool IsInternalCall => _methodDef.IsInternalCall;
         public override bool IsNewSlot => _methodDef.IsNewSlot;
         public override bool IsAbstract => _methodDef.IsAbstract;

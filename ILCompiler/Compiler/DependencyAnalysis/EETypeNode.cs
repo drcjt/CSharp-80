@@ -25,7 +25,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         private static ushort _nextEETypePtr = 1;
 
         private readonly ushort _eeTypePtr;
-        public override IList<Instruction> GetInstructions(string inputFilePath)
+        public override IList<Instruction> GetInstructions(string inputFilePath, IList<string> modules)
         {
             var instructionsBuilder = new InstructionsBuilder();
             instructionsBuilder.Comment($"{Type.FullName}");

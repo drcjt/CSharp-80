@@ -39,13 +39,29 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         }
 
         private bool _compiled = false;
-        public override IList<Instruction> GetInstructions(string inputFilePath) 
+        public override IList<Instruction> GetInstructions(string inputFilePath, IList<string> modules) 
         {
             if (!_compiled)
             {
                 var methodCompiler = _methodCompilerFactory.Create();
                 methodCompiler.CompileMethod(this, inputFilePath);
                 _compiled = true;
+            }
+
+            if (Method.IsPInvoke)
+            {
+                var module = Method.GetPInvokeMetaData()!.Module;
+                if (File.Exists(module))
+                {
+                    if (!modules.Contains(module))
+                    {
+                        modules.Add(module);
+                    }
+                }
+                else if (module != "Runtime")
+                {
+                    throw new FileNotFoundException($"File {module} not found");
+                }
             }
 
             if (MethodCode.Count > 0)

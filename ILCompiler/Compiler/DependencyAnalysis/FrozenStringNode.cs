@@ -22,7 +22,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public override string Name => "Frozen String Node";
 
-        public override IList<Instruction> GetInstructions(string inputFilePath)
+        public override IList<Instruction> GetInstructions(string inputFilePath, IList<string> modules)
         {
             var instructionsBuilder = new InstructionsBuilder();
 

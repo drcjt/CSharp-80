@@ -24,7 +24,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return new List<IDependencyNode>() { methodNode };
         }
 
-        public override IList<Instruction> GetInstructions(string inputFilePath)
+        public override IList<Instruction> GetInstructions(string inputFilePath, IList<string> modules)
         {
             // Generate instructions to unbox this parameter and jump to real method
             InstructionsBuilder builder = new InstructionsBuilder();

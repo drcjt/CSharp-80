@@ -12,7 +12,7 @@ namespace ILCompiler.Compiler.DependencyAnalysisFramework
 
         public IList<ConditionalDependency> GetConditionalStaticDependencies(DependencyNodeContext context);
 
-        public IList<Instruction> GetInstructions(string inputFilePath);
+        public IList<Instruction> GetInstructions(string inputFilePath, IList<string> modules);
 
         public IList<IDependencyNode> Dependencies { get; set; }
 
