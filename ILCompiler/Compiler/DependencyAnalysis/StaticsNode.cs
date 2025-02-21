@@ -22,7 +22,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             _nameMangler = nameMangler;
         }
 
-        public override IList<Instruction> GetInstructions(string inputFilePath)
+        public override IList<Instruction> GetInstructions(string inputFilePath, IList<string> modules)
         {
             var instructionsBuilder = new InstructionsBuilder();
 

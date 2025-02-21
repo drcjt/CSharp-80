@@ -24,12 +24,12 @@ namespace ILCompiler.Tests.Common
             return new ILCompilerRunner(solutionPath);
         }
 
-        public void CompileILAndAssemble(string ilFileName, bool createLibrary = true, string optionalArguments = "")
+        public void CompileILAndAssemble(string ilFileName, bool createLibrary = true, string optionalArguments = "", bool setCurrentDirectory = true)
         {
-            CompileIL(ilFileName, createLibrary, optionalArguments);
+            CompileIL(ilFileName, createLibrary, optionalArguments, setCurrentDirectory);
         }
 
-        private void CompileIL(string ilFileName, bool createLibrary, string optionalArguments)
+        private void CompileIL(string ilFileName, bool createLibrary, string optionalArguments, bool setCurrentDirectory)
         {
             var asmFileName = Path.ChangeExtension(ilFileName, "dasm");
             var exeFileName = Path.ChangeExtension(ilFileName, createLibrary ? "dll" : "exe");
@@ -41,7 +41,12 @@ namespace ILCompiler.Tests.Common
                 arguments += " " + optionalArguments;
             }
 
-            var compiled = ILCompiler.Program.Main(arguments.Split(' '));
+            if (setCurrentDirectory)
+            {
+                Directory.SetCurrentDirectory(Path.GetDirectoryName(ilFileName)!);
+            }
+
+            var compiled = Program.Main(arguments.Split(' '));
 
             Assert.That(compiled, Is.EqualTo(0), "IL Failed to compile");
         }

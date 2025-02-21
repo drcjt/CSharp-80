@@ -1,5 +1,6 @@
 ﻿using ILCompiler.TypeSystem.Canon;
 using ILCompiler.TypeSystem.IL;
+using ILCompiler.TypeSystem.Interop;
 
 namespace ILCompiler.TypeSystem.Common
 {
@@ -45,7 +46,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public override bool IsIntrinsic => _methodDesc.IsIntrinsic;
         public override bool IsPInvoke => _methodDesc.IsPInvoke;
-        public override string PInvokeMethodName => _methodDesc.PInvokeMethodName;
+        public override PInvokeMetaData? GetPInvokeMetaData() => _methodDesc.GetPInvokeMetaData();
         public override bool IsInternalCall => _methodDesc.IsInternalCall;
 
         public override bool IsStatic => _methodDesc.IsStatic;

@@ -160,7 +160,7 @@ namespace ILCompiler.Compiler.Importer
             string targetMethod;
             if (methodToCall.IsPInvoke)
             {
-                targetMethod = methodToCall.PInvokeMethodName;
+                targetMethod = methodToCall.GetPInvokeMetaData()!.Name;
             }
             else if (methodToCall.IsInternalCall)
             {

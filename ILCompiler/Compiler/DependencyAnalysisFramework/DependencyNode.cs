@@ -17,7 +17,7 @@ namespace ILCompiler.Compiler.DependencyAnalysisFramework
 
         public abstract string Name { get; }
 
-        public virtual IList<Instruction> GetInstructions(string inputFilePath) => Array.Empty<Instruction>();
+        public virtual IList<Instruction> GetInstructions(string inputFilePath, IList<string> modules) => Array.Empty<Instruction>();
 
         public virtual bool ShouldSkipEmitting(NodeFactory factory) => false;
     }

@@ -1,5 +1,6 @@
 ﻿using ILCompiler.TypeSystem.Canon;
 using ILCompiler.TypeSystem.IL;
+using ILCompiler.TypeSystem.Interop;
 using ILCompiler.TypeSystem.RuntimeDetermined;
 using System.Text;
 
@@ -13,7 +14,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public virtual bool IsPInvoke => false;
 
-        public virtual string PInvokeMethodName => String.Empty;
+        public virtual PInvokeMetaData? GetPInvokeMetaData() => default;
 
         public virtual bool IsInternalCall => false;
 

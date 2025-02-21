@@ -226,9 +226,23 @@ namespace ILCompiler.Compiler
             _out.Write(instructionsBuilder.ToString());
         }
 
+        private void WritePInvokeModules(IList<string> pinvokeModules)
+        {
+            foreach (var module in pinvokeModules)
+            {
+                _out.WriteLine();
+                _out.WriteLine($"; External file: {module}");
+                _out.WriteLine();
+                _out.Write(File.ReadAllText(module));
+                _out.WriteLine();
+            }
+        }
+
         public void WriteCode(Z80MethodCodeNode rootNode, IReadOnlyCollection<IDependencyNode> nodes, string inputFilePath, string outputFilePath)
         {
             _inputFilePath = inputFilePath;
+
+            var modules = new List<string>();
 
             using (_out = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, false), Encoding.ASCII))
             {
@@ -238,12 +252,14 @@ namespace ILCompiler.Compiler
                 {
                     if (!node.ShouldSkipEmitting(_nodeFactory))
                     {
-                        var instructions = node.GetInstructions(inputFilePath);
+                        var instructions = node.GetInstructions(inputFilePath, modules);
                         WriteInstructions(instructions);
                     }
                 }
 
                 WriteEhClauses(nodes);
+
+                WritePInvokeModules(modules);
 
                 WriteEpilog();
             }

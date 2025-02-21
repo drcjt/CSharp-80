@@ -16,7 +16,7 @@ namespace CSharp80.Tests.BVT
             {
                 Assert.Fail("Failed to assemble IL");
             }
-            ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(ilFileName, createLibrary: false);
+            ILCompilerRunner.Create(SolutionPath).CompileILAndAssemble(ilFileName, createLibrary: false, setCurrentDirectory: false);
 
             var cimFileName = Path.Combine(TestContext.CurrentContext.TestDirectory, ".\\il_bvt\\" + NUnit.Framework.TestContext.CurrentContext.Test.Name + ".cim");
             Z80TestRunner.Create(SolutionPath).RunTest(cimFileName, true);
