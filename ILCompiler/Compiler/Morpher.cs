@@ -99,7 +99,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case StoreIndEntry sie:
-                    tree = new StoreIndEntry(MorphTree(sie.Addr), MorphTree(sie.Op1), sie.Type, sie.FieldOffset, sie.ExactSize);
+                    tree = MorphStoreIndEntry(sie);
                     break;
 
                 case StoreLocalVariableEntry slve:
@@ -155,14 +155,28 @@ namespace ILCompiler.Compiler
 
         private StackEntry MorphIndirectEntry(IndirectEntry tree)
         {
+            var offset = tree.Offset;
             if (tree.Op1 is SymbolConstantEntry sce)
             {
                 // Move offset into SymbolConstantEntry
                 sce.Offset += (int)tree.Offset;
-                return new IndirectEntry(sce, tree.Type, tree.ExactSize, 0);
+                offset = 0;
             }
 
-            return new IndirectEntry(MorphTree(tree.Op1), tree.Type, tree.ExactSize, tree.Offset);
+            return new IndirectEntry(MorphTree(tree.Op1), tree.Type, tree.ExactSize, offset);
+        }
+
+        private StackEntry MorphStoreIndEntry(StoreIndEntry sie)
+        {
+            var fieldOffset = sie.FieldOffset;
+            if (sie.Addr is SymbolConstantEntry sce)
+            {
+                // Move offset into SymbolConstantEntry
+                sce.Offset += (int)fieldOffset;
+                fieldOffset = 0;
+            }
+
+            return new StoreIndEntry(MorphTree(sie.Addr), MorphTree(sie.Op1), sie.Type, fieldOffset, sie.ExactSize);
         }
 
         private BinaryOperator MorphBinaryOperator(BinaryOperator bo)
