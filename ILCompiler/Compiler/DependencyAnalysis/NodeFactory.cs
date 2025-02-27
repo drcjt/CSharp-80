@@ -8,7 +8,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class NodeFactory
     {
-        private readonly IDictionary<string, StaticsNode> _staticNodesByFullName = new Dictionary<string, StaticsNode>();
+        private readonly IDictionary<TypeDesc, StaticsNode> _staticNodes = new Dictionary<TypeDesc, StaticsNode>();
         private readonly IDictionary<MethodDesc, Z80MethodCodeNode> _methodNodesByFullName = new Dictionary<MethodDesc, Z80MethodCodeNode>();
         private readonly IDictionary<string, UnboxingStubNode> _unboxingStubsByFullName = new Dictionary<string, UnboxingStubNode>();
 
@@ -56,12 +56,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return necessaryTypeSymbolNode;
         }
 
-        public StaticsNode StaticsNode(FieldDesc field)
+        public StaticsNode StaticsNode(MetadataType type)
         {
-            if (!_staticNodesByFullName.TryGetValue(field.ToString(), out var staticNode))
+            if (!_staticNodes.TryGetValue(type, out var staticNode))
             {
-                staticNode = new StaticsNode(field, _preinitializationManager, _nameMangler);
-                _staticNodesByFullName[field.ToString()] = staticNode;
+                staticNode = new StaticsNode(type, _preinitializationManager, _nameMangler);
+                _staticNodes[type] = staticNode;
             }
 
             return staticNode;

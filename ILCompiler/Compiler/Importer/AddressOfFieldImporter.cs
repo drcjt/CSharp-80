@@ -17,9 +17,8 @@ namespace ILCompiler.Compiler.Importer
 
             if (isLoadStatic)
             {
-                var mangledFieldName = context.NameMangler.GetMangledFieldName(fieldDesc);
-
-                StackEntry obj = new SymbolConstantEntry(mangledFieldName);
+                var staticsBase = context.NameMangler.GetMangledTypeName(fieldDesc.OwningType) + "_statics";
+                StackEntry obj = new SymbolConstantEntry(staticsBase, fieldDesc.Offset.AsInt);
                 if (!context.PreinitializationManager.IsPreinitialized(fieldDesc.OwningType))
                 {
                     obj = InitClassHelper.ImportInitClass(fieldDesc.OwningType, context, importer, obj);

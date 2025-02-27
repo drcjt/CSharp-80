@@ -10,6 +10,48 @@ namespace ILCompiler.TypeSystem.Common
             _target = target;
         }
 
+        public ComputedStaticFieldLayout ComputeStaticFieldLayout(DefType defType)
+        {
+            MetadataType type = (MetadataType)defType;
+            int numStaticFields = 0;
+
+            foreach (var field in type.GetFields())
+            {
+                if (!field.IsStatic || field.IsLiteral)
+                    continue;
+
+                numStaticFields++;
+            }
+
+            ComputedStaticFieldLayout result = new ComputedStaticFieldLayout();
+            result.Size = new LayoutInt(0);
+
+            if (numStaticFields == 0)
+            {
+                result.Offsets = Array.Empty<FieldAndOffset>();
+                return result;
+            }
+
+            result.Offsets = new FieldAndOffset[numStaticFields];
+
+            int index = 0;
+            foreach (var field in type.GetFields())
+            {
+                if (!field.IsStatic || field.IsLiteral)
+                    continue;
+
+                var fieldType = field.FieldType;
+                SizeAndAlignment sizeAndAlignment = ComputeFieldSizeAndAlignment(fieldType, 1);
+
+                result.Size = LayoutInt.AlignUp(result.Size, sizeAndAlignment.Alignment, _target);
+                result.Offsets[index] = new FieldAndOffset(field, result.Size);
+                result.Size += sizeAndAlignment.Size;
+
+                index++;
+            }
+            return result;
+        }
+
         public ComputedInstanceFieldLayout ComputeInstanceLayout(DefType defType)
         {
             MetadataType type = (MetadataType)defType;

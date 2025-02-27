@@ -9,6 +9,14 @@
 
         public FieldAndOffset[] Offsets { get; set; }
     }
+
+    public struct ComputedStaticFieldLayout
+    {
+        public LayoutInt Size { get; set; }
+
+        public FieldAndOffset[] Offsets { get; set; }
+    }
+
     public readonly struct FieldAndOffset
     {
         public static readonly LayoutInt InvalidOffset = new(int.MaxValue);

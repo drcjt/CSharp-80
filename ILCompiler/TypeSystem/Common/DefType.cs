@@ -6,10 +6,13 @@ namespace ILCompiler.TypeSystem.Common
     public abstract class DefType : TypeDesc
     {
         private bool _computedInstanceLayout;
+        private bool _computedStaticLayout;
         private LayoutInt? _instanceFieldSize;
         private LayoutInt? _instanceFieldAlignment;
         private LayoutInt? _instanceByteCountUnaligned;
         private LayoutInt? _instanceByteAlignment;
+
+        private LayoutInt? _staticFieldSize;
 
         public void ComputeInstanceLayout()
         {
@@ -31,6 +34,37 @@ namespace ILCompiler.TypeSystem.Common
             }
 
             _computedInstanceLayout = true;
+        }
+
+        public void ComputeStaticFieldLayout()
+        {
+            var target = new TargetDetails(TargetArchitecture.Z80);
+            var fieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
+
+            var computedStaticLayout = fieldLayoutAlgorithm.ComputeStaticFieldLayout(this);
+            _staticFieldSize = computedStaticLayout.Size;
+
+            if (computedStaticLayout.Offsets != null)
+            {
+                foreach (var fieldAndOffset in computedStaticLayout.Offsets)
+                {
+                    fieldAndOffset.Field.InitializeOffset(fieldAndOffset.Offset);
+                }
+            }
+
+            _computedStaticLayout = true;
+        }
+
+        public LayoutInt StaticFieldSize
+        {
+            get
+            {
+                if (!_computedStaticLayout)
+                {
+                    ComputeStaticFieldLayout();
+                }
+                return _staticFieldSize!;
+            }
         }
 
         public LayoutInt InstanceFieldSize

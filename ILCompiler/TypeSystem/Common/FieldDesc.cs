@@ -26,7 +26,7 @@
                 {
                     if (IsStatic)
                     {
-                        // TODO: ComputeStaticFieldLayout
+                        OwningType.ComputeStaticFieldLayout();
                     }
                     else
                     {

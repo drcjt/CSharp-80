@@ -9,7 +9,14 @@ namespace ILCompiler.Compiler.CodeGenerators
         {
             var mangledFieldName = entry.Value;
 
-            context.InstructionsBuilder.Ld(HL, mangledFieldName);
+            if (entry.Offset != 0)
+            {
+                context.InstructionsBuilder.Ld(HL, $"{mangledFieldName} + {entry.Offset}");
+            }
+            else
+            {
+                context.InstructionsBuilder.Ld(HL, mangledFieldName);
+            }
             context.InstructionsBuilder.Push(HL);
         }
     }

@@ -1,6 +1,6 @@
-﻿using ILCompiler.TypeSystem.Common;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
@@ -20,8 +20,8 @@ namespace ILCompiler.Compiler.Importer
             StackEntry addr;
             if (isStoreStatic)
             {
-                var mangledFieldName = context.NameMangler.GetMangledFieldName(field);
-                addr = new SymbolConstantEntry(mangledFieldName);
+                var staticsBase = context.NameMangler.GetMangledTypeName(field.OwningType) + "_statics";
+                addr = new SymbolConstantEntry(staticsBase);
 
                 if (!context.PreinitializationManager.IsPreinitialized(field.OwningType))
                 {
@@ -34,7 +34,7 @@ namespace ILCompiler.Compiler.Importer
             }
 
             var fieldSize = field.FieldType.GetElementSize().AsInt;
-            var fieldOffset = isStoreStatic ? 0 : field.Offset.AsInt;
+            var fieldOffset = field.Offset.AsInt;
 
             var node = new StoreIndEntry(addr, value, field.FieldType.VarType, (uint)fieldOffset, fieldSize);
 
