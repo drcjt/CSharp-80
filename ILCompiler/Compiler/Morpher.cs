@@ -63,7 +63,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case IndirectEntry ie:
-                    tree = new IndirectEntry(MorphTree(ie.Op1), ie.Type, ie.ExactSize, ie.Offset);
+                    tree = MorphIndirectEntry(ie);
                     break;
 
                 case IntrinsicEntry ie:
@@ -151,6 +151,18 @@ namespace ILCompiler.Compiler
             addr = MorphTree(addr);
 
             return addr;
+        }
+
+        private StackEntry MorphIndirectEntry(IndirectEntry tree)
+        {
+            if (tree.Op1 is SymbolConstantEntry sce)
+            {
+                // Move offset into SymbolConstantEntry
+                sce.Offset += (int)tree.Offset;
+                return new IndirectEntry(sce, tree.Type, tree.ExactSize, 0);
+            }
+
+            return new IndirectEntry(MorphTree(tree.Op1), tree.Type, tree.ExactSize, tree.Offset);
         }
 
         private BinaryOperator MorphBinaryOperator(BinaryOperator bo)
