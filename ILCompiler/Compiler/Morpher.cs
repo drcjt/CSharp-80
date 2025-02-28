@@ -163,6 +163,13 @@ namespace ILCompiler.Compiler
                 offset = 0;
             }
 
+            if (tree.Op1 is CommaEntry ce && ce.Op2 is SymbolConstantEntry sce2)
+            {
+                // Move offset into SymbolConstantEntry
+                sce2.Offset += (int)tree.Offset;
+                offset = 0;
+            }
+
             return new IndirectEntry(MorphTree(tree.Op1), tree.Type, tree.ExactSize, offset);
         }
 
@@ -173,6 +180,13 @@ namespace ILCompiler.Compiler
             {
                 // Move offset into SymbolConstantEntry
                 sce.Offset += (int)fieldOffset;
+                fieldOffset = 0;
+            }
+
+            if (sie.Op1 is CommaEntry ce && ce.Op2 is SymbolConstantEntry sce2)
+            {
+                // Move offset into SymbolConstantEntry
+                sce2.Offset += (int)fieldOffset;
                 fieldOffset = 0;
             }
 
