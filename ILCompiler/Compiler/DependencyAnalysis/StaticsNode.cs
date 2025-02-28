@@ -8,16 +8,16 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class StaticsNode : DependencyNode
     {
-        public FieldDesc Field { get; private set; }
+        private readonly MetadataType _type;
 
-        public override string Name => Field.ToString();
+        public override string Name => $"StaticsNode_{_type.ToString()}";
 
         private readonly PreinitializationManager _preinitializationManager;
         private readonly INameMangler _nameMangler;
 
-        public StaticsNode(FieldDesc field, PreinitializationManager preinitializationManager, INameMangler nameMangler)
+        public StaticsNode(MetadataType type, PreinitializationManager preinitializationManager, INameMangler nameMangler)
         {
-            Field = field;
+            _type = type;
             _preinitializationManager = preinitializationManager;
             _nameMangler = nameMangler;
         }
@@ -26,35 +26,54 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             var instructionsBuilder = new InstructionsBuilder();
 
-            var field = Field;
+            instructionsBuilder.Comment($"Bytes for static fields for type {_type.ToString()}");
+            instructionsBuilder.Label(_nameMangler.GetMangledTypeName(_type) + "_" + "statics");
 
-            if (_preinitializationManager.IsPreinitialized(field.OwningType))
+            if (_preinitializationManager.IsPreinitialized(_type))
             {
-                var preinitializationInfo = _preinitializationManager.GetPreinitializationInfo(field.OwningType);
+                BuildInstructionsForPreinitializedStatics(instructionsBuilder);
+            }
+            else
+            {
+                var staticsSize = _type.StaticFieldSize.AsInt;
+
+                foreach (var field in _type.GetFields())
+                {
+                    if (!field.IsStatic || field.IsLiteral)
+                        continue;
+
+                    instructionsBuilder.Comment($"Field {field.Name} offset: {field.Offset.AsInt}");
+                }
+
+                instructionsBuilder.Dc((ushort)staticsSize, 0);
+            }
+
+            return instructionsBuilder.Instructions;
+        }
+
+        private void BuildInstructionsForPreinitializedStatics(InstructionsBuilder instructionsBuilder)
+        {
+            var preinitializationInfo = _preinitializationManager.GetPreinitializationInfo(_type);
+
+            int byteCount = 0;
+            foreach (var field in _type.GetFields())
+            {
+                if (!field.IsStatic || field.IsLiteral)
+                    continue;
+
+                instructionsBuilder.Comment($"Field {field.Name} offset: {field.Offset.AsInt}");
+
+                int padding = field.Offset.AsInt - byteCount;
+                instructionsBuilder.Dc((ushort)padding, 0);
+
                 var value = preinitializationInfo.GetFieldValue(field);
-
-                // Need to mangle full field name here
-                instructionsBuilder.Label(_nameMangler.GetMangledFieldName(field));
-
                 var bytes = value.GetRawData();
                 foreach (var b in bytes)
                 {
                     instructionsBuilder.Db(b);
+                    byteCount++;
                 }
             }
-            else
-            {
-                var fieldSize = field.FieldType.GetElementSize().AsInt;
-                instructionsBuilder.Comment($"Reserving {fieldSize} bytes for static field {field.ToString()}");
-
-                // Need to mangle full field name here
-                instructionsBuilder.Label(_nameMangler.GetMangledFieldName(field));
-
-                // Emit fieldSize bytes with value 0
-                instructionsBuilder.Dc((ushort)fieldSize, 0);
-            }
-
-            return instructionsBuilder.Instructions;
         }
     }
 }

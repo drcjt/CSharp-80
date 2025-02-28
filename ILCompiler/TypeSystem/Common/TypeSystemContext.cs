@@ -1,5 +1,4 @@
 ﻿using ILCompiler.Compiler;
-using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Canon;
 using ILCompiler.TypeSystem.RuntimeDetermined;
 

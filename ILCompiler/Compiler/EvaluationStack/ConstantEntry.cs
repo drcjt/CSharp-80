@@ -31,13 +31,16 @@
 
     public class SymbolConstantEntry : ConstantEntry<string>
     {
-        public SymbolConstantEntry(String name) : base(VarType.Ptr, name, 2)
+        public int Offset { get; set; } = 0;
+
+        public SymbolConstantEntry(String name, int offset = 0) : base(VarType.Ptr, name, 2)
         {
+            Offset = offset;
         }
 
         public override SymbolConstantEntry Duplicate()
         {
-            return new SymbolConstantEntry(Value);
+            return new SymbolConstantEntry(Value, Offset);
         }
 
         public override void Accept(IStackEntryVisitor visitor)

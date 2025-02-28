@@ -8,16 +8,16 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class NodeFactory
     {
-        private readonly IDictionary<string, StaticsNode> _staticNodesByFullName = new Dictionary<string, StaticsNode>();
-        private readonly IDictionary<MethodDesc, Z80MethodCodeNode> _methodNodesByFullName = new Dictionary<MethodDesc, Z80MethodCodeNode>();
-        private readonly IDictionary<string, UnboxingStubNode> _unboxingStubsByFullName = new Dictionary<string, UnboxingStubNode>();
+        private readonly Dictionary<TypeDesc, StaticsNode> _staticNodes = [];
+        private readonly Dictionary<MethodDesc, Z80MethodCodeNode> _methodNodesByFullName = [];
+        private readonly Dictionary<string, UnboxingStubNode> _unboxingStubsByFullName = [];
 
-        private readonly IDictionary<string, VirtualMethodUseNode> _virtualMethodNodesByFullName = new Dictionary<string, VirtualMethodUseNode>();
-        private readonly IDictionary<string, ConstructedEETypeNode> _constructedEETypeNodesByFullName = new Dictionary<string, ConstructedEETypeNode>();
-        private readonly IDictionary<TypeDesc, VTableSliceNode> _vTableNodes = new Dictionary<TypeDesc, VTableSliceNode>();
-        private readonly IDictionary<TypeDesc, EETypeNode> _necessaryTypeSymbolNodes = new Dictionary<TypeDesc, EETypeNode>();
-        private readonly IDictionary<string, FrozenStringNode> _frozenStringNodes = new Dictionary<string, FrozenStringNode>();
-        private readonly IDictionary<FieldDesc, FieldRvaDataNode> _fieldRvaDataNodes = new Dictionary<FieldDesc, FieldRvaDataNode>();
+        private readonly Dictionary<string, VirtualMethodUseNode> _virtualMethodNodesByFullName = [];
+        private readonly Dictionary<string, ConstructedEETypeNode> _constructedEETypeNodesByFullName = [];
+        private readonly Dictionary<TypeDesc, VTableSliceNode> _vTableNodes = [];
+        private readonly Dictionary<TypeDesc, EETypeNode> _necessaryTypeSymbolNodes = [];
+        private readonly Dictionary<string, FrozenStringNode> _frozenStringNodes = [];
+        private readonly Dictionary<FieldDesc, FieldRvaDataNode> _fieldRvaDataNodes = [];
 
         private readonly PreinitializationManager _preinitializationManager;
         private readonly INameMangler _nameMangler;
@@ -56,12 +56,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return necessaryTypeSymbolNode;
         }
 
-        public StaticsNode StaticsNode(FieldDesc field)
+        public StaticsNode StaticsNode(MetadataType type)
         {
-            if (!_staticNodesByFullName.TryGetValue(field.ToString(), out var staticNode))
+            if (!_staticNodes.TryGetValue(type, out var staticNode))
             {
-                staticNode = new StaticsNode(field, _preinitializationManager, _nameMangler);
-                _staticNodesByFullName[field.ToString()] = staticNode;
+                staticNode = new StaticsNode(type, _preinitializationManager, _nameMangler);
+                _staticNodes[type] = staticNode;
             }
 
             return staticNode;

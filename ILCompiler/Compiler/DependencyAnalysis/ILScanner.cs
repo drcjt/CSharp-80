@@ -242,7 +242,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     throw new InvalidProgramException();
                 }
 
-                _dependencies.Add(_context.NodeFactory.StaticsNode(fieldDesc));
+                var metadataType = fieldDesc.OwningType as MetadataType;
+                _dependencies.Add(_context.NodeFactory.StaticsNode(metadataType!));
 
                 if (!_context.PreinitializationManager.IsPreinitialized(fieldDesc.OwningType))
                 {

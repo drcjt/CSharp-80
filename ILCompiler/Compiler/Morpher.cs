@@ -63,7 +63,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case IndirectEntry ie:
-                    tree = new IndirectEntry(MorphTree(ie.Op1), ie.Type, ie.ExactSize, ie.Offset);
+                    tree = MorphIndirectEntry(ie);
                     break;
 
                 case IntrinsicEntry ie:
@@ -99,7 +99,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case StoreIndEntry sie:
-                    tree = new StoreIndEntry(MorphTree(sie.Addr), MorphTree(sie.Op1), sie.Type, sie.FieldOffset, sie.ExactSize);
+                    tree = MorphStoreIndEntry(sie);
                     break;
 
                 case StoreLocalVariableEntry slve:
@@ -151,6 +151,46 @@ namespace ILCompiler.Compiler
             addr = MorphTree(addr);
 
             return addr;
+        }
+
+        private IndirectEntry MorphIndirectEntry(IndirectEntry tree)
+        {
+            var offset = tree.Offset;
+            if (tree.Op1 is SymbolConstantEntry sce)
+            {
+                // Move offset into SymbolConstantEntry
+                sce.Offset += (int)tree.Offset;
+                offset = 0;
+            }
+
+            if (tree.Op1 is CommaEntry ce && ce.Op2 is SymbolConstantEntry sce2)
+            {
+                // Move offset into SymbolConstantEntry
+                sce2.Offset += (int)tree.Offset;
+                offset = 0;
+            }
+
+            return new IndirectEntry(MorphTree(tree.Op1), tree.Type, tree.ExactSize, offset);
+        }
+
+        private StoreIndEntry MorphStoreIndEntry(StoreIndEntry sie)
+        {
+            var fieldOffset = sie.FieldOffset;
+            if (sie.Addr is SymbolConstantEntry sce)
+            {
+                // Move offset into SymbolConstantEntry
+                sce.Offset += (int)fieldOffset;
+                fieldOffset = 0;
+            }
+
+            if (sie.Op1 is CommaEntry ce && ce.Op2 is SymbolConstantEntry sce2)
+            {
+                // Move offset into SymbolConstantEntry
+                sce2.Offset += (int)fieldOffset;
+                fieldOffset = 0;
+            }
+
+            return new StoreIndEntry(MorphTree(sie.Addr), MorphTree(sie.Op1), sie.Type, fieldOffset, sie.ExactSize);
         }
 
         private BinaryOperator MorphBinaryOperator(BinaryOperator bo)

@@ -1,6 +1,6 @@
-﻿using ILCompiler.TypeSystem.Common;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.Importer
@@ -20,14 +20,13 @@ namespace ILCompiler.Compiler.Importer
             StackEntry obj;
             if (isLoadStatic)
             {
-                var mangledFieldName = context.NameMangler.GetMangledFieldName(runtimeDeterminedType);
-                obj = new SymbolConstantEntry(mangledFieldName);
+                var staticsBase = context.NameMangler.GetMangledTypeName(runtimeDeterminedType.OwningType) + "_statics";
+                obj = new SymbolConstantEntry(staticsBase);
 
                 if (!context.PreinitializationManager.IsPreinitialized(runtimeDeterminedType.OwningType))
                 {
                     obj = InitClassHelper.ImportInitClass(runtimeDeterminedType.OwningType, context, importer, obj);
                 }
-                fieldOffset = 0;
             }
             else
             {
