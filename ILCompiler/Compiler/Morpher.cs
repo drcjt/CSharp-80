@@ -153,7 +153,7 @@ namespace ILCompiler.Compiler
             return addr;
         }
 
-        private StackEntry MorphIndirectEntry(IndirectEntry tree)
+        private IndirectEntry MorphIndirectEntry(IndirectEntry tree)
         {
             var offset = tree.Offset;
             if (tree.Op1 is SymbolConstantEntry sce)
@@ -173,7 +173,7 @@ namespace ILCompiler.Compiler
             return new IndirectEntry(MorphTree(tree.Op1), tree.Type, tree.ExactSize, offset);
         }
 
-        private StackEntry MorphStoreIndEntry(StoreIndEntry sie)
+        private StoreIndEntry MorphStoreIndEntry(StoreIndEntry sie)
         {
             var fieldOffset = sie.FieldOffset;
             if (sie.Addr is SymbolConstantEntry sce)

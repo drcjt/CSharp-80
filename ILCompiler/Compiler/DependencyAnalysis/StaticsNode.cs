@@ -27,33 +27,11 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             var instructionsBuilder = new InstructionsBuilder();
 
             instructionsBuilder.Comment($"Bytes for static fields for type {_type.ToString()}");
-
             instructionsBuilder.Label(_nameMangler.GetMangledTypeName(_type) + "_" + "statics");
-
 
             if (_preinitializationManager.IsPreinitialized(_type))
             {
-                var preinitializationInfo = _preinitializationManager.GetPreinitializationInfo(_type);
-
-                int byteCount = 0;
-                foreach (var field in _type.GetFields())
-                {
-                    if (!field.IsStatic || field.IsLiteral)
-                        continue;
-
-                    instructionsBuilder.Comment($"Field {field.Name} offset: {field.Offset.AsInt}");
-
-                    int padding = field.Offset.AsInt - byteCount;
-                    instructionsBuilder.Dc((ushort)padding, 0);
-
-                    var value = preinitializationInfo.GetFieldValue(field);
-                    var bytes = value.GetRawData();
-                    foreach (var b in bytes)
-                    {
-                        instructionsBuilder.Db(b);
-                        byteCount++;
-                    }
-                }
+                BuildInstructionsForPreinitializedStatics(instructionsBuilder);
             }
             else
             {
@@ -71,6 +49,31 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
 
             return instructionsBuilder.Instructions;
+        }
+
+        private void BuildInstructionsForPreinitializedStatics(InstructionsBuilder instructionsBuilder)
+        {
+            var preinitializationInfo = _preinitializationManager.GetPreinitializationInfo(_type);
+
+            int byteCount = 0;
+            foreach (var field in _type.GetFields())
+            {
+                if (!field.IsStatic || field.IsLiteral)
+                    continue;
+
+                instructionsBuilder.Comment($"Field {field.Name} offset: {field.Offset.AsInt}");
+
+                int padding = field.Offset.AsInt - byteCount;
+                instructionsBuilder.Dc((ushort)padding, 0);
+
+                var value = preinitializationInfo.GetFieldValue(field);
+                var bytes = value.GetRawData();
+                foreach (var b in bytes)
+                {
+                    instructionsBuilder.Db(b);
+                    byteCount++;
+                }
+            }
         }
     }
 }
