@@ -21,7 +21,7 @@
             if (w < 0) dx2 = -1; else if (w > 0) dx2 = 1;
             int longest = Math.Abs(w);
             int shortest = Math.Abs(h);
-            if (!(longest>shortest))
+            if (longest <= shortest)
             {
                 longest = Math.Abs(h);
                 shortest = Math.Abs(w);
@@ -33,7 +33,7 @@
             {
                 SetPixel(x1, y1, pen.Color);
                 numerator += shortest;
-                if (!(numerator < longest))
+                if (numerator >= longest)
                 {
                     numerator -= longest;
                     x1 += dx1;
@@ -137,12 +137,20 @@
                     qy -= 2;
                 }
             }   // End of while loop
-            return;
         }
 
         private static void DrawPoint(Pen pen, int x, int y)
         {
             SetPixel(x, y, pen.Color);
+        }
+
+        public static void DrawPolygon(Pen pen, Point[] points)
+        {
+            for (int i = 0; i < points.Length - 1; i++)
+            {
+                DrawLine(pen, points[i].X, points[i].Y, points[i + 1].X, points[i + 1].Y);
+            }
+            DrawLine(pen, points[points.Length - 1].X, points[points.Length - 1].Y, points[0].X, points[0].Y);
         }
     }
 }
