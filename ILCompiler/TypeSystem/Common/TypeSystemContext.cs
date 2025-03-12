@@ -18,6 +18,7 @@ namespace ILCompiler.TypeSystem.Common
         private readonly Dictionary<string, ByRefType> _byRefTypes = new Dictionary<string, ByRefType>();
         private readonly Dictionary<string, RuntimeDeterminedType> _runtimeDeterminedTypes = new Dictionary<string, RuntimeDeterminedType>();
         private readonly Dictionary<string, MethodForRuntimeDeterminedType> _methodForRuntimeDeterminedTypes = new Dictionary<string, MethodForRuntimeDeterminedType>();
+        private readonly Dictionary<uint, SignatureVariable> _signatureVariables = new Dictionary<uint, SignatureVariable>();
         public ModuleDesc? SystemModule { get; set; }
 
         public SharedGenericsMode GenericsMode { get; set; } = SharedGenericsMode.Disabled;
@@ -68,6 +69,15 @@ namespace ILCompiler.TypeSystem.Common
                 return _array;
 
             return _arrayTypes[arrayTypeKey] = new ArrayType(elementType, rank);
+        }
+
+        public SignatureVariable GetSignatureVariable(int index, bool method)
+        {
+            uint combinedIndex = method ? ((uint) index | 0x80000000) : (uint)index;
+            if (_signatureVariables.TryGetValue(combinedIndex, out var signatureVariable))
+                return signatureVariable;
+
+            return _signatureVariables[combinedIndex] = method ? new SignatureMethodVariable(this, index) : new SignatureTypeVariable(this, index);
         }
 
         public FunctionPointerType GetFunctionPointerType(MethodSignature signature)
@@ -190,6 +200,10 @@ namespace ILCompiler.TypeSystem.Common
                     return (DefType)SystemModule!.GetType(SystemNameSpace, "Object");
                 case WellKnownType.Array:
                     return (DefType)SystemModule!.GetType(SystemNameSpace, "Array");
+                case WellKnownType.Int32:
+                    return (DefType)SystemModule!.GetType(SystemNameSpace, "Int32");
+                case WellKnownType.Void:
+                    return (DefType)SystemModule!.GetType(SystemNameSpace, "Void");
                 default:
                     throw new TypeLoadException();
             }
