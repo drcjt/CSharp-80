@@ -18,7 +18,6 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public Z80MethodCodeNode(MethodDesc method, Factory<IMethodCompiler> methodCompilerFactory, DnlibModule module)
         {
             Method = method;
-            ParamsCount = method.Signature.Length;
 
             _methodCompilerFactory = methodCompilerFactory;
             _module = module;
