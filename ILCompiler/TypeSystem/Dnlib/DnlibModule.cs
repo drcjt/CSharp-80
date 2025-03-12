@@ -257,26 +257,32 @@ namespace ILCompiler.TypeSystem.Dnlib
                     return method;
                 }
 
-                var baseType = typeDescToInspect.BaseType;
-                if (baseType != null)
-                {
-                    // handle generic base types
-                    Instantiation? newInstantiation = typeDescToInspect.GetTypeDefinition().BaseType?.Instantiation;
-                    if (instantiation is not null && newInstantiation is not null)
-                    {
-                        TypeDesc[] newSubstitutionTypes = new TypeDesc[newInstantiation.Length];
-                        for (int i = 0; i < newInstantiation.Length; i++)
-                        {
-                            newSubstitutionTypes[i] = newInstantiation[i].InstantiateSignature(instantiation, default(Instantiation));
-                        }
-                        newInstantiation = new Instantiation(newSubstitutionTypes);
-                    }
-                    instantiation = newInstantiation;
-                }
-                typeDescToInspect = baseType;
+                typeDescToInspect = GetBaseType(typeDescToInspect, ref instantiation);
             } while (typeDescToInspect != null);
 
-            throw new Exception($"Missing Method Failure {name}, {methodSig}");
+            throw new InvalidOperationException($"Missing Method Failure {name}, {methodSig}");
+        }
+
+        private static DefType? GetBaseType(TypeDesc typeDescToInspect, ref Instantiation? instantiation)
+        {
+            var baseType = typeDescToInspect.BaseType;
+            if (baseType != null)
+            {
+                // handle generic base types
+                Instantiation? newInstantiation = typeDescToInspect.GetTypeDefinition().BaseType?.Instantiation;
+                if (instantiation is not null && newInstantiation is not null)
+                {
+                    TypeDesc[] newSubstitutionTypes = new TypeDesc[newInstantiation.Length];
+                    for (int i = 0; i < newInstantiation.Length; i++)
+                    {
+                        newSubstitutionTypes[i] = newInstantiation[i].InstantiateSignature(instantiation, default(Instantiation));
+                    }
+                    newInstantiation = new Instantiation(newSubstitutionTypes);
+                }
+                instantiation = newInstantiation;
+            }
+
+            return baseType;
         }
 
         public MethodSignature CreateMethodSignature(MethodDef methodDef)
