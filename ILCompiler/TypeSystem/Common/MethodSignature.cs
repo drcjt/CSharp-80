@@ -61,7 +61,7 @@ namespace ILCompiler.TypeSystem.Common
             if (!TypeIsEqualHelper(this.ReturnType, other!.ReturnType, allowEquivalence))
                 return false;
 
-            if (this.Length != other?.Length) return false;
+            if (this.Length != other.Length) return false;
 
 
             for (int parameterIndex = 0; parameterIndex < Length; parameterIndex++)

@@ -12,7 +12,6 @@ namespace ILCompiler.Compiler
         private readonly ILogger<MethodCompiler> _logger;
         private readonly IPhaseFactory _phaseFactory;
 
-        private int _parameterCount;
         private int? _returnBufferArgIndex;
 
         private readonly LocalVariableTable _locals;
@@ -123,12 +122,12 @@ namespace ILCompiler.Compiler
                 return;
             }
 
-            _parameterCount = SetupLocalVariableTable(method);
+            var parameterCount = SetupLocalVariableTable(method);
 
             var ilImporter = _phaseFactory.Create<IILImporter>();
 
             // Main phases of the compiler live here
-            var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _locals, methodCodeNodeNeedingCode.EhClauses);
+            var basicBlocks = ilImporter.Import(parameterCount, _returnBufferArgIndex, method, _locals, methodCodeNodeNeedingCode.EhClauses);
 
             if (_configuration.DumpFlowGraphs)
             {
