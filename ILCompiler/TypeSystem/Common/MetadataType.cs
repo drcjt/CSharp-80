@@ -18,6 +18,8 @@ namespace ILCompiler.TypeSystem.Common
         public abstract MethodImplRecord[] FindMethodsImplWithMatchingDeclName(string name);
 
         public override bool IsCanonicalSubtype(CanonicalFormKind policy) => false;
+
+        public abstract override DefType? ContainingType { get; }
     }
 
     public struct ClassLayoutMetadata
