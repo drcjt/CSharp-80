@@ -31,6 +31,9 @@ namespace ILCompiler.TypeSystem.Common
         public virtual bool HasReturnType => false;
 
         public virtual bool HasThis => false;
+        public virtual bool IsExplicitThis => false;
+
+        public bool IsConstructor => Name == ".ctor";
 
         public virtual string FullName => String.Empty;
 
