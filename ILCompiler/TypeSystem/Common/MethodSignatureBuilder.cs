@@ -20,7 +20,7 @@
 
         public MethodSignature ToSignature()
         {
-            _template = new MethodSignature(_template.IsStatic, _returnType, _parameters);
+            _template = new MethodSignature(_template.Flags, _returnType, _parameters);
             return _template;
         }
 
