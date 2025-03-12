@@ -50,9 +50,9 @@ namespace ILCompiler.TypeSystem.RuntimeDetermined
 
         public override bool IsRuntimeDeterminedSubtype => true;
 
-        public override MethodDesc? GetMethodWithEquivalentSignature(string name, MethodSignature? signature, Instantiation? substitution)
+        public override MethodDesc? GetMethodWithEquivalentSignature(string name, MethodSignature? signature, Instantiation? instantiation)
         {
-            MethodDesc? method = CanonicalType.GetMethodWithEquivalentSignature(name, signature, substitution);
+            MethodDesc? method = CanonicalType.GetMethodWithEquivalentSignature(name, signature, instantiation);
             if (method == null)
                 return null;
             return Context.GetMethodForRuntimeDeterminedType(method.GetTypicalMethodDefinition(), this);
