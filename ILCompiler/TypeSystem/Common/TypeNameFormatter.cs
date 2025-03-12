@@ -97,9 +97,25 @@ namespace ILCompiler.TypeSystem.Common
             }
             else
             {
-                AppendNameForNamespaceType(sb, type);
+                DefType? containingType = type.ContainingType;
+                if (containingType is not null)
+                {
+                    AppendNameForNestedType(sb, type, containingType);
+                }
+                else
+                {
+                    AppendNameForNamespaceType(sb, type);
+                }
             }
         }
+
+        protected void AppendNameForNestedType(StringBuilder sb, DefType nestedType, DefType containingType)
+        {
+            AppendName(sb, containingType);
+            sb.Append('+');
+            sb.Append(nestedType.Name);
+        }
+
 
         private void AppendNameForInstantiatedType(StringBuilder sb, DefType type)
         {

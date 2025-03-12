@@ -214,5 +214,24 @@ namespace ILCompiler.TypeSystem.Common
 
             return false;
         }
+
+        public override MethodDesc? GetMethod(string name, MethodSignature? signature, Instantiation? instantiation)
+        {
+            MethodDesc? typicalMethodDef = _typeDef.GetMethod(name, signature, instantiation);
+            if (typicalMethodDef == null)
+                return null;
+            return _typeDef.Context.GetMethodForInstantiatedType(typicalMethodDef, this);
+        }
+
+
+        public override MethodDesc? GetMethodWithEquivalentSignature(string name, MethodSignature? signature, Instantiation? instantiation)
+        {
+            MethodDesc? typicalMethodDef = _typeDef.GetMethodWithEquivalentSignature(name, signature, instantiation);
+            if (typicalMethodDef == null)
+                return null;
+            return _typeDef.Context.GetMethodForInstantiatedType(typicalMethodDef, this);
+        }
+
+        public override DefType? ContainingType => _typeDef.ContainingType;
     }
 }

@@ -175,5 +175,32 @@ namespace ILCompiler.TypeSystem.Common
         public bool IsGenericDefinition => HasInstantiation && IsTypeDefinition;
 
         public bool IsTypeDefinition => GetTypeDefinition() == this;
+
+        public virtual MethodDesc? GetMethod(string name, MethodSignature? signature, Instantiation? instantiation)
+        {
+            foreach (var method in GetMethods())
+            {
+                if (method.Name == name)
+                {
+                    if (signature == null || signature.Equals(method.Signature.ApplySubstitution(instantiation)))
+                        return method;
+                }
+            }
+            return null;
+        }
+
+
+        public virtual MethodDesc? GetMethodWithEquivalentSignature(string name, MethodSignature? signature, Instantiation? instantiation)
+        {
+            foreach (var method in GetMethods())
+            {
+                if (method.Name == name)
+                {
+                    if (signature == null || signature.EquivalentTo(method.Signature.ApplySubstitution(instantiation)))
+                        return method;
+                }
+            }
+            return null;
+        }
     }
 }

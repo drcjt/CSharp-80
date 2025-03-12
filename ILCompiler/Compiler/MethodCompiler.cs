@@ -12,7 +12,6 @@ namespace ILCompiler.Compiler
         private readonly ILogger<MethodCompiler> _logger;
         private readonly IPhaseFactory _phaseFactory;
 
-        private int _parameterCount;
         private int? _returnBufferArgIndex;
 
         private readonly LocalVariableTable _locals;
@@ -25,8 +24,24 @@ namespace ILCompiler.Compiler
             _phaseFactory = phaseFactory;
         }
 
-        private void SetupLocalVariableTable(MethodDesc method)
+        private int SetupLocalVariableTable(MethodDesc method)
         {
+            int paramterCount = 0;
+
+            if (method.HasThis)
+            {
+                var local = new LocalVariableDescriptor()
+                {
+                    IsParameter = true,
+                    IsTemp = false,
+                    Name = "",
+                    ExactSize = 2,
+                    Type = VarType.Ref,
+                };
+                _locals.Add(local);
+                paramterCount++;
+            }
+
             // Setup local variable table - includes parameters as well as locals in method
             for (int parameterIndex = 0; parameterIndex < method.Signature.Length; parameterIndex++)
             {
@@ -40,6 +55,7 @@ namespace ILCompiler.Compiler
                     Type = parameter.Type.VarType,
                 };
                 _locals.Add(local);
+                paramterCount++;
             }
 
             foreach (var local in method.Locals)
@@ -58,11 +74,13 @@ namespace ILCompiler.Compiler
             if (!method.Signature.ReturnType.IsVoid)
             {
                 var returnType = method.Signature.ReturnType;
-                InitReturnBufferArg(returnType, !method.Signature.IsStatic);
+                InitReturnBufferArg(returnType, method.HasThis, ref paramterCount);
             }
+
+            return paramterCount;
         }
 
-        private void InitReturnBufferArg(TypeDesc returnType, bool hasThis)
+        private void InitReturnBufferArg(TypeDesc returnType, bool hasThis, ref int parameterCount)
         {
             if (returnType.IsValueType && !returnType.IsPrimitive && !returnType.IsEnum)
             {
@@ -79,8 +97,7 @@ namespace ILCompiler.Compiler
                 // Ensure return buffer parameter goes after the this parameter if present
                 _returnBufferArgIndex = hasThis ? 1 : 0;
                 _locals.Insert(_returnBufferArgIndex.Value, returnBuffer);
-
-                _parameterCount++;
+                parameterCount++;
             }
         }
 
@@ -105,14 +122,12 @@ namespace ILCompiler.Compiler
                 return;
             }
 
-            _parameterCount = method.Signature.Length;
-
-            SetupLocalVariableTable(method);
+            var parameterCount = SetupLocalVariableTable(method);
 
             var ilImporter = _phaseFactory.Create<IILImporter>();
 
             // Main phases of the compiler live here
-            var basicBlocks = ilImporter.Import(_parameterCount, _returnBufferArgIndex, method, _locals, methodCodeNodeNeedingCode.EhClauses);
+            var basicBlocks = ilImporter.Import(parameterCount, _returnBufferArgIndex, method, _locals, methodCodeNodeNeedingCode.EhClauses);
 
             if (_configuration.DumpFlowGraphs)
             {

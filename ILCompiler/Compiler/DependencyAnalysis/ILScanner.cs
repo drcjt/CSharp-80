@@ -497,18 +497,31 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             var ctor = (MethodDesc)instruction.Operand;
             var owningType = ctor.OwningType;
 
-            if (owningType is ArrayType)
-            {
-                // TODO: Will need to review this when changing NewArray assembly routine to take EEType instead of size
-                throw new NotImplementedException();
-            }
-            else if (owningType.IsValueType)
+            if (owningType.IsValueType)
             {
                 // No dependency required 
             }
             else if (owningType.FullName != "System.String")
             {
-                _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(owningType));
+                if (owningType.IsRuntimeDeterminedSubtype)
+                {
+                    // TODO: Handle runtime determined subtypes
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(owningType));
+                }
+
+                if (owningType.IsMdArray)
+                {
+                    // TODO: Add dependency for newing up multi-dimensional arrays
+                    throw new NotImplementedException();
+                }
+                else
+                {
+                    // TODO: Add dependency on helper for NewObject
+                }
             }
         }
 

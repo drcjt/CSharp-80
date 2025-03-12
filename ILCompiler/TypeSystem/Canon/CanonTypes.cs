@@ -27,6 +27,8 @@ namespace ILCompiler.TypeSystem.Canon
         public override ClassLayoutMetadata GetClassLayout() => default;
 
         public override VarType VarType => VarType.Ref;
+
+        public override DefType? ContainingType => null;
     }
 
     internal sealed class CanonType(TypeSystemContext context) : CanonBaseType(context)

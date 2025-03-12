@@ -9,7 +9,6 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public InstructionsBuilder InstructionsBuilder { get; } = new();
         public LocalVariableTable LocalVariableTable { get; }
-        public int ParamsCount => _method.ParamsCount;
         public int LocalsCount => _method.LocalsCount;
         public MethodDesc Method => _method.Method;
 

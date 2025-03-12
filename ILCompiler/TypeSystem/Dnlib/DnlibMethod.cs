@@ -52,6 +52,7 @@ namespace ILCompiler.TypeSystem.Dnlib
         public override bool HasGenericParameters => _methodDef.HasGenericParameters;
         public override bool HasReturnType => _methodDef.HasReturnType;
         public override bool HasThis => _methodDef.HasThis;
+        public override bool IsExplicitThis => _methodDef.ExplicitThis;
 
 
         public override IList<LocalVariableDefinition> Locals

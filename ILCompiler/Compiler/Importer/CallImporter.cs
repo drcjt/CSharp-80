@@ -57,13 +57,11 @@ namespace ILCompiler.Compiler.Importer
             }
 
             var arguments = new List<StackEntry>();
-            var firstArgIndex = newObjThis != null ? 1 : 0;
-            var parameterCount = methodToCall.Parameters.Count;
-            for (var i = firstArgIndex; i < parameterCount; i++)
+            for (var i = methodToCall.Signature.Length - 1; i >= 0; i--)
             {
                 var argument = importer.PopExpression();
 
-                var parameter = methodToCall.Signature[parameterCount - (i - firstArgIndex) - 1];
+                var parameter = methodToCall.Signature[i];
                 var parameterType = parameter;
 
                 var parameterVarType = parameterType.Type.VarType;
@@ -84,12 +82,19 @@ namespace ILCompiler.Compiler.Importer
 
                 arguments.Add(argument);
             }
+
             // Add the this pointer if required, e.g. if part of newobj
             if (newObjThis != null)
             {
                 arguments.Add(newObjThis);
             }
+            else if (methodToCall.HasThis)
+            {
+                var thisPtr = importer.PopExpression();
+                arguments.Add(thisPtr);
+            }
             arguments.Reverse();
+
 
             if (opcode == ILOpcode.callvirt)
             {
@@ -322,9 +327,9 @@ namespace ILCompiler.Compiler.Importer
                 case "Get":
                     {
                         // first parameter = this, remaining parameters = indices
-                        var valueType = methodToCall.Signature[1];
+                        var valueType = methodToCall.Signature[0];
                         var elemSize = valueType.Type.GetElementSize().AsInt;
-                        var rank = methodToCall.Signature.Length - 1;
+                        var rank = methodToCall.Signature.Length;
 
                         // Arrays are stored in row-major order see https://github.com/stakx/ecma-335/blob/master/docs/i.8.9.1-array-types.md
 
@@ -353,9 +358,9 @@ namespace ILCompiler.Compiler.Importer
                 case "Set":
                     {
                         // first parameter = this, second parameter = value, remaining parameters = indices
-                        var valueType = methodToCall.Signature[1];
+                        var valueType = methodToCall.Signature[0];
                         var elemSize = valueType.Type.GetElementSize().AsInt;
-                        var rank = methodToCall.Signature.Length - 2;
+                        var rank = methodToCall.Signature.Length - 1;
 
                         // Arrays are stored in row-major order see https://github.com/stakx/ecma-335/blob/master/docs/i.8.9.1-array-types.md
 

@@ -109,21 +109,20 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             context.InstructionsBuilder.Pop(BC);      // Store return address in BC
 
-            if (context.ParamsCount > 0)
+            // Calculate size of parameters
+            var totalParametersSize = 0;
+            foreach (var local in context.LocalVariableTable)
             {
-                // Calculate size of parameters
-                var totalParametersSize = 0;
-                foreach (var local in context.LocalVariableTable)
+                if (local.IsParameter)
                 {
-                    if (local.IsParameter)
-                    {
-                        totalParametersSize += local.ExactSize;
-                    }
+                    totalParametersSize += local.ExactSize;
                 }
+            }
 
+            if (totalParametersSize > 0)
+            {
                 // Remove parameters from stack
                 CodeGeneratorHelper.AddSPFromHL(context.InstructionsBuilder, (short)(totalParametersSize));
-
             }
 
             if (hasReturnValue && !entry.ReturnBufferArgIndex.HasValue)

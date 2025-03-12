@@ -26,6 +26,8 @@
 
         public static ArrayType MakeArrayType(this TypeDesc type) => type.Context.GetArrayType(type);
 
+        public static ArrayType MakeArrayType(this TypeDesc type, int rank) => type.Context.GetArrayType(type, rank);
+
         public static MethodDesc? FindMethodOnTypeWithMatchingTypicalMethod(this TypeDesc targetType, MethodDesc method)
         {
             if (!method.HasInstantiation && !method.OwningType.HasInstantiation)

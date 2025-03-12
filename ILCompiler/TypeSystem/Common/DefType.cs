@@ -156,5 +156,7 @@ namespace ILCompiler.TypeSystem.Common
                 return false;
             }
         }
+
+        public virtual DefType? ContainingType => null;
     }
 }

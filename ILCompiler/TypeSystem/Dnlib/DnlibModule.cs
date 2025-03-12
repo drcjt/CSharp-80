@@ -51,6 +51,13 @@ namespace ILCompiler.TypeSystem.Dnlib
                 var elemTypeDesc = Create(elemTypeSig);
                 return elemTypeDesc.MakeArrayType();
             }
+            if (typeSig.IsArray)
+            {
+                var arraySig = typeSig.ToArraySig();
+                var elemTypeSig = typeSig.Next;
+                var elemTypeDesc = Create(elemTypeSig);
+                return elemTypeDesc.MakeArrayType((int)arraySig.Rank);
+            }
             if (typeSig.IsFunctionPointer)
             {
                 var fnPtrSig = (FnPtrSig)typeSig;
@@ -68,7 +75,7 @@ namespace ILCompiler.TypeSystem.Dnlib
             {
                 var parameterTypeSig = typeSig.Next;
                 var parameterType = Create(parameterTypeSig);
-                return new PointerType(parameterType);
+                return Context.GetPointerType(parameterType);
             }
 
             if (typeSig.IsPinned)
@@ -85,7 +92,7 @@ namespace ILCompiler.TypeSystem.Dnlib
 
             if (typeSig.IsGenericMethodParameter)
             {
-                TypeDesc genericMethodParameter = new SignatureMethodVariable(Context, (int)((GenericSig)typeSig).Number);
+                TypeDesc genericMethodParameter = Context.GetSignatureVariable((int)((GenericSig)typeSig).Number, method:true);
                 return genericMethodParameter;
             }
 
@@ -96,7 +103,7 @@ namespace ILCompiler.TypeSystem.Dnlib
 
             if (typeSig.IsGenericTypeParameter)
             {
-                TypeDesc genericTypeParameter = new SignatureTypeVariable(Context, (int)((GenericVar)typeSig).Number);
+                TypeDesc genericTypeParameter = Context.GetSignatureVariable((int)((GenericVar)typeSig).Number, method:false);
                 return genericTypeParameter;
             }
 
@@ -121,38 +128,29 @@ namespace ILCompiler.TypeSystem.Dnlib
             {
                 return ResolveMethodSpecification(methodSpec);
             }
-            else
+            else if (methodDefOrRef is MemberRef memberRef)
             {
-                var methodDef = methodDefOrRef.ResolveMethodDefThrow();
-
+                return ResolveMemberReference(memberRef);
+            }
+            else if (methodDefOrRef is MethodDef methodDef)
+            {
                 if (!_dnlibMethodsByFullName.TryGetValue(methodDef.FullName, out MethodDesc? methodDesc))
                 {
                     methodDesc = new DnlibMethod(methodDef, this, _ilProvider);
-                    _dnlibMethodsByFullName[methodDef.FullName] = methodDesc;
+                    _dnlibMethodsByFullName[methodDefOrRef.FullName] = methodDesc;
                 }
 
-                if (methodDefOrRef.DeclaringType?.NumberOfGenericParameters > 0)
+                if (methodDef.DeclaringType.TryGetGenericInstSig() != null)
                 {
-                    var genericInstSig = methodDefOrRef.DeclaringType.TryGetGenericInstSig();
-                    if (genericInstSig != null)
-                    {
-                        var genericParams = genericInstSig.GenericArguments;
-                        TypeDesc[] genericParameters = new TypeDesc[genericParams.Count];
-                        for (int i = 0; i < genericParams.Count; i++)
-                        {
-                            genericParameters[i] = Create(genericParams[i]);
-                        }
-                        var instantiation = new Instantiation(genericParameters);
-
-                        MetadataType typeDef = (MetadataType)Create(methodDef.DeclaringType);
-
-                        var instantiatedType = Context.GetInstantiatedType(typeDef, instantiation);
-                        methodDesc = Context.GetMethodForInstantiatedType(methodDesc, instantiatedType);
-                    }
+                    var typeSig = methodDef.DeclaringType.ToTypeSig();
+                    var instantiatedType = ResolveGenericInstanceType(typeSig);
+                    methodDesc = Context.GetMethodForInstantiatedType(methodDesc, instantiatedType);
                 }
 
                 return methodDesc;
             }
+
+            throw new NotImplementedException();
         }
 
         public TypeDesc Create(ITypeDefOrRef typeDefOrRef)
@@ -226,7 +224,65 @@ namespace ILCompiler.TypeSystem.Dnlib
                 parameters.Add(new MethodParameter(Create(parameter), parameter.GetName()));
             }
 
-            return new MethodSignature(!methodSig.HasThis, Create(methodSig.RetType), parameters.ToArray());
+            MethodSignatureFlags flags = 0;
+            if (!methodSig.HasThis)
+                flags |= MethodSignatureFlags.Static;
+
+            if (methodSig.ExplicitThis)
+                flags |= MethodSignatureFlags.ExplicitThis;
+
+            return new MethodSignature(flags, Create(methodSig.RetType), parameters.ToArray());
+        }
+
+        private MethodDesc ResolveMemberReference(MemberRef memberReference)
+        {
+            TypeDesc? parentTypeDesc = Create(memberReference.DeclaringType.ToTypeSig());
+
+            string name = memberReference.Name.String;
+
+            MethodSignature? methodSig = Create(memberReference.MethodSig);
+            TypeDesc? typeDescToInspect = parentTypeDesc;
+            Instantiation? instantiation = null;
+
+            // Try to resolve the name and signature in the current type or any of the base types
+            do
+            {
+                MethodDesc? method = typeDescToInspect.GetMethod(name, methodSig, instantiation);
+                if (method != null)
+                {
+                    // Instance constructors are not inherited
+                    if (typeDescToInspect != parentTypeDesc && method.IsConstructor)
+                        break;
+
+                    return method;
+                }
+
+                typeDescToInspect = GetBaseType(typeDescToInspect, ref instantiation);
+            } while (typeDescToInspect != null);
+
+            throw new InvalidOperationException($"Missing Method Failure {name}, {methodSig}");
+        }
+
+        private static DefType? GetBaseType(TypeDesc typeDescToInspect, ref Instantiation? instantiation)
+        {
+            var baseType = typeDescToInspect.BaseType;
+            if (baseType != null)
+            {
+                // handle generic base types
+                Instantiation? newInstantiation = typeDescToInspect.GetTypeDefinition().BaseType?.Instantiation;
+                if (instantiation is not null && newInstantiation is not null)
+                {
+                    TypeDesc[] newSubstitutionTypes = new TypeDesc[newInstantiation.Length];
+                    for (int i = 0; i < newInstantiation.Length; i++)
+                    {
+                        newSubstitutionTypes[i] = newInstantiation[i].InstantiateSignature(instantiation, default(Instantiation));
+                    }
+                    newInstantiation = new Instantiation(newSubstitutionTypes);
+                }
+                instantiation = newInstantiation;
+            }
+
+            return baseType;
         }
 
         public MethodSignature CreateMethodSignature(MethodDef methodDef)
@@ -234,10 +290,19 @@ namespace ILCompiler.TypeSystem.Dnlib
             var parameters = new List<MethodParameter>();
             foreach (var parameter in methodDef.Parameters)
             {
-                parameters.Add(new MethodParameter(Create(parameter.Type), parameter.Name));
+                if (!parameter.IsHiddenThisParameter)
+                {
+                    parameters.Add(new MethodParameter(Create(parameter.Type), parameter.Name));
+                }
             }
 
-            return new MethodSignature(!methodDef.HasThis, Create(methodDef.ReturnType), parameters.ToArray());
+            MethodSignatureFlags flags = 0;
+            if (!methodDef.HasThis)
+                flags |= MethodSignatureFlags.Static;
+            if (methodDef.ExplicitThis)
+                flags |= MethodSignatureFlags.ExplicitThis;
+
+            return new MethodSignature(flags, Create(methodDef.ReturnType), parameters.ToArray());
         }
 
         public TypeSystemEntity CreateFromTypeOrMethodDef(ITypeOrMethodDef typeOrMethodDef)
@@ -274,8 +339,6 @@ namespace ILCompiler.TypeSystem.Dnlib
 
         private InstantiatedMethod ResolveMethodSpecification(MethodSpec methodSpec)
         {
-            var methodDef = Create(methodSpec.ResolveMethodDefThrow());
-
             var genericInstMethodSig = methodSpec.GenericInstMethodSig;
             var genericParams = genericInstMethodSig.GenericArguments;
             TypeDesc[] genericParameters = new TypeDesc[genericParams.Count];
@@ -284,6 +347,7 @@ namespace ILCompiler.TypeSystem.Dnlib
                 genericParameters[i] = Create(genericParams[i]);
             }
             var instantiation = new Instantiation(genericParameters);
+            var methodDef = Create(methodSpec.ResolveMethodDefThrow());
 
             return Context.GetInstantiatedMethod(methodDef, instantiation);
         }
