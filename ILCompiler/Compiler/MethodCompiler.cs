@@ -25,8 +25,24 @@ namespace ILCompiler.Compiler
             _phaseFactory = phaseFactory;
         }
 
-        private void SetupLocalVariableTable(MethodDesc method)
+        private int SetupLocalVariableTable(MethodDesc method)
         {
+            int paramterCount = 0;
+
+            if (method.HasThis)
+            {
+                var local = new LocalVariableDescriptor()
+                {
+                    IsParameter = true,
+                    IsTemp = false,
+                    Name = "",
+                    ExactSize = 2,
+                    Type = VarType.Ref,
+                };
+                _locals.Add(local);
+                paramterCount++;
+            }
+
             // Setup local variable table - includes parameters as well as locals in method
             for (int parameterIndex = 0; parameterIndex < method.Signature.Length; parameterIndex++)
             {
@@ -40,6 +56,7 @@ namespace ILCompiler.Compiler
                     Type = parameter.Type.VarType,
                 };
                 _locals.Add(local);
+                paramterCount++;
             }
 
             foreach (var local in method.Locals)
@@ -60,6 +77,8 @@ namespace ILCompiler.Compiler
                 var returnType = method.Signature.ReturnType;
                 InitReturnBufferArg(returnType, !method.Signature.IsStatic);
             }
+
+            return paramterCount;
         }
 
         private void InitReturnBufferArg(TypeDesc returnType, bool hasThis)
@@ -105,9 +124,7 @@ namespace ILCompiler.Compiler
                 return;
             }
 
-            _parameterCount = method.Signature.Length;
-
-            SetupLocalVariableTable(method);
+            _parameterCount = SetupLocalVariableTable(method);
 
             var ilImporter = _phaseFactory.Create<IILImporter>();
 
