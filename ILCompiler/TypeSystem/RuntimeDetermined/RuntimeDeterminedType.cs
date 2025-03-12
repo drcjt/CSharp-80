@@ -49,5 +49,13 @@ namespace ILCompiler.TypeSystem.RuntimeDetermined
         public override bool IsCanonicalSubtype(CanonicalFormKind policy) => false;
 
         public override bool IsRuntimeDeterminedSubtype => true;
+
+        public override MethodDesc? GetMethodWithEquivalentSignature(string name, MethodSignature? signature, Instantiation? substitution)
+        {
+            MethodDesc? method = CanonicalType.GetMethodWithEquivalentSignature(name, signature, substitution);
+            if (method == null)
+                return null;
+            return Context.GetMethodForRuntimeDeterminedType(method.GetTypicalMethodDefinition(), this);
+        }
     }
 }

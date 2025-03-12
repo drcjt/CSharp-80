@@ -113,6 +113,23 @@ namespace ILCompiler.TypeSystem.Dnlib
             }
         }
 
+        public override MethodDesc? GetMethod(string name, MethodSignature? signature, Instantiation? instantiation)
+        {
+            foreach (var method  in _typeDef.Methods)
+            {
+                if (method.Name == name)
+                {
+                    var methodDesc = _module.Create(method);
+                    if (signature is null || signature.Equals(methodDesc.Signature.ApplySubstitution(instantiation)))
+                    {
+                        return methodDesc;
+                    }
+                }
+            }
+
+            return null;
+        }
+
         public override IEnumerable<FieldDesc> GetFields()
         {
             foreach (var field in _typeDef.Fields)
@@ -251,6 +268,17 @@ namespace ILCompiler.TypeSystem.Dnlib
                     ComputeGenericParameters();
                 }
                 return new Instantiation(_genericParameters!);
+            }
+        }
+
+        public override DefType? ContainingType
+        {
+            get
+            {
+                if (!_typeDef.IsNested)
+                    return null;
+
+                return (DefType)_module.Create(_typeDef.DeclaringType);
             }
         }
     }
