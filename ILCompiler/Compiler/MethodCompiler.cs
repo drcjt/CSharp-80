@@ -75,13 +75,13 @@ namespace ILCompiler.Compiler
             if (!method.Signature.ReturnType.IsVoid)
             {
                 var returnType = method.Signature.ReturnType;
-                InitReturnBufferArg(returnType, !method.Signature.IsStatic);
+                InitReturnBufferArg(returnType, method.HasThis, ref paramterCount);
             }
 
             return paramterCount;
         }
 
-        private void InitReturnBufferArg(TypeDesc returnType, bool hasThis)
+        private void InitReturnBufferArg(TypeDesc returnType, bool hasThis, ref int parameterCount)
         {
             if (returnType.IsValueType && !returnType.IsPrimitive && !returnType.IsEnum)
             {
@@ -98,8 +98,7 @@ namespace ILCompiler.Compiler
                 // Ensure return buffer parameter goes after the this parameter if present
                 _returnBufferArgIndex = hasThis ? 1 : 0;
                 _locals.Insert(_returnBufferArgIndex.Value, returnBuffer);
-
-                _parameterCount++;
+                parameterCount++;
             }
         }
 
