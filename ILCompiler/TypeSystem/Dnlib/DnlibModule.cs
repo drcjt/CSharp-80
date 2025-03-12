@@ -242,12 +242,12 @@ namespace ILCompiler.TypeSystem.Dnlib
 
             MethodSignature? methodSig = Create(memberReference.MethodSig);
             TypeDesc? typeDescToInspect = parentTypeDesc;
-            Instantiation? substitution = null;
+            Instantiation? instantiation = null;
 
             // Try to resolve the name and signature in the current type or any of the base types
             do
             {
-                MethodDesc? method = typeDescToInspect.GetMethod(name, methodSig, substitution);
+                MethodDesc? method = typeDescToInspect.GetMethod(name, methodSig, instantiation);
                 if (method != null)
                 {
                     // Instance constructors are not inherited
@@ -261,17 +261,17 @@ namespace ILCompiler.TypeSystem.Dnlib
                 if (baseType != null)
                 {
                     // handle generic base types
-                    Instantiation? newSubstitution = typeDescToInspect.GetTypeDefinition().BaseType?.Instantiation;
-                    if (substitution is not null && newSubstitution is not null)
+                    Instantiation? newInstantiation = typeDescToInspect.GetTypeDefinition().BaseType?.Instantiation;
+                    if (instantiation is not null && newInstantiation is not null)
                     {
-                        TypeDesc[] newSubstitutionTypes = new TypeDesc[newSubstitution.Length];
-                        for (int i = 0; i < newSubstitution.Length; i++)
+                        TypeDesc[] newSubstitutionTypes = new TypeDesc[newInstantiation.Length];
+                        for (int i = 0; i < newInstantiation.Length; i++)
                         {
-                            newSubstitutionTypes[i] = newSubstitution[i].InstantiateSignature(substitution, default(Instantiation));
+                            newSubstitutionTypes[i] = newInstantiation[i].InstantiateSignature(instantiation, default(Instantiation));
                         }
-                        newSubstitution = new Instantiation(newSubstitutionTypes);
+                        newInstantiation = new Instantiation(newSubstitutionTypes);
                     }
-                    substitution = newSubstitution;
+                    instantiation = newInstantiation;
                 }
                 typeDescToInspect = baseType;
             } while (typeDescToInspect != null);
