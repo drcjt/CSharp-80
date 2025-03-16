@@ -2,61 +2,77 @@
 ;
 ; Uses: HL, DE
 
-; On entry on stack: EETypePtr, element size, element count
+; On entry on stack: EETypePtr, element count
+
+NewArrayRuntimeImport:
+	POP BC	; Ret Addr
+	POP DE	; EE Type Ptr
+
+	PUSH HL	; Element Count
+	PUSH HL	; Ignored
+	PUSH DE	; EE Type Ptr
+	PUSH BC ; Ret Addr
 
 NewArray:
 	; Save return address
-	POP AF
-	EX AF, AF'
+	POP HL
+	EXX
 
 	; EETypePtr
 	POP HL
-
-	; Get Element Size from EEType
-	LD C, (HL)
-	INC HL
-	LD B, (HL)
-	DEC HL
 
 	; Element Count
 	POP DE
 	POP AF
 
 	; Save EETypePtr & Element Count
-	PUSH DE
-	PUSH HL
+	PUSH DE ; DE = Element Count
+	PUSH HL	; HL = EETypePtr
+
+	; Get Element Size from EEType
+	LD C, (HL)
+	INC HL
+	LD B, (HL)
+
 
 	; HL = EETypePtr
 	; BC = Element Size
 	; DE = Element Count
 
 	; Multipy size (DE) by element size (BC)
-	LD A, 16
-	LD HL, 0
-newarr_mul16loop:
+	; Result is in HL
+	LD A, B
+	LD B, 16
+NEWARR_MUL16LOOP:
 	ADD HL, HL
-	RL E
-	RL D
-	JP NC, newarr_nomul16
-	ADD HL, BC
-	JP NC, newarr_nomul16
-	INC DE
-newarr_nomul16:
-	DEC A
-	JP NZ, newarr_mul16loop
+	SLA C
+	RLA
+	JR NC, NEWARR_NOMUL16
+	ADD HL, DE
+NEWARR_NOMUL16:
+	DJNZ NEWARR_MUL16LOOP
 
 	; HL = size in bytes of elements
 	; BC = Element Size
 	; DE = 0
 
-	; Add 4 to HL to cater for EETypePtr and element count
-	LD DE, 4
+	POP BC	; EEType Ptr
+
+	PUSH HL
+
+	; Add base size to bytes to allocate
+	LD HL, 4
+	ADD HL, BC
+	LD E, (HL)
+	INC HL
+	LD D, (HL)
+
+	; Base size in DE
+
+	; Add base size to element size * element count
+	POP HL
 	ADD HL, DE
-
-	LD D, H
-	LD E, L
-
-	POP BC
+	EX DE, HL
 
 	; DE = size to allocate
 	; BC = EETypePtr
@@ -67,14 +83,14 @@ newarr_nomul16:
 	POP DE
 	PUSH HL
 
+	; Skip past the EETypePtr
+	INC HL
+	INC HL
+
 	; Set the new object's element count
-	INC HL
-	INC HL
 	LD (HL), E
 	INC HL
 	LD (HL), D
 
-	EX AF, AF'
-	PUSH AF		; Restore return address
-
-	RET
+	EXX
+	JP (HL)

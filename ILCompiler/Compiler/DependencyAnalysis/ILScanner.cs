@@ -295,7 +295,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
             if (instruction.Opcode == ILOpcode.newobj)
             {
-                CreateConstructedEETypeNodeDependencies(instruction);
+                if (CreateConstructedEETypeNodeDependencies(instruction))
+                    return;
             }
 
             var methodDesc = (MethodDesc)instruction.Operand;
@@ -492,7 +493,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return directCall;
         }
 
-        private void CreateConstructedEETypeNodeDependencies(Instruction instruction)
+        private bool CreateConstructedEETypeNodeDependencies(Instruction instruction)
         {
             var ctor = (MethodDesc)instruction.Operand;
             var owningType = ctor.OwningType;
@@ -515,14 +516,16 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 if (owningType.IsMdArray)
                 {
-                    // TODO: Add dependency for newing up multi-dimensional arrays
-                    throw new NotImplementedException();
+                    _dependencies.Add(GetHelperEntryPoint("ArrayHelpers", "NewObjArray"));
+                    return true;
                 }
                 else
                 {
                     // TODO: Add dependency on helper for NewObject
                 }
             }
+
+            return false;
         }
 
         private IMethodNode GetHelperEntryPoint(string typeName, string methodName)

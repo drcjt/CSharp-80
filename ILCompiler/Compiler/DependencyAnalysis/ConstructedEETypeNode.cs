@@ -389,6 +389,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             else if (type.IsArray)
             {
                 objectSize = 2 * pointerSize; // EETypePtr + Length
+                if (type.IsMdArray)
+                    objectSize +=
+                        1 * 2 /* sizeof(nint) */ * ((ArrayType)type).Rank; // Only use upper bounds on md arrays
             }
 
             if (type.IsString)

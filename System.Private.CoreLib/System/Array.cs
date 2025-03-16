@@ -258,6 +258,35 @@ namespace System
 
             public object? Current => _array.InternalGetValue(_index);
         }
+
+        private ref nint GetRawMultiDimArrayBounds()
+        {
+            return ref Unsafe.As<byte, nint>(ref Unsafe.As<RawArrayData>(this).Data);
+        }
+
+        internal unsafe static Array NewMultiDimArray(EEType* pEEType, int* pLengths, int rank)
+        {
+            // Calculate required size for array elements
+            uint totalLength = 1;
+            for (int i = 0; i < rank; i++)
+            {
+                totalLength *= (uint)pLengths[i];
+            }
+
+            // Allocate array - note size allocated is totalLength + array base size
+            // The base size incorporates the bounds for all dimensions plus the
+            // eetype pointer and the number of components
+            Array result = RuntimeImports.NewArray(pEEType, (int)totalLength);
+
+            // Setup upper bounds of dimensions as nints
+            ref nint bounds = ref result.GetRawMultiDimArrayBounds();
+            for (int i = 0; i < rank; i++)
+            {
+                Unsafe.Add(ref bounds, i) = (nint)pLengths[i];
+            }
+
+            return result;
+        }
     }
 
     public class Array<T> : Array, IEnumerable<T>
