@@ -1,29 +1,19 @@
 ; This routine allocates space for 1-dimensional arrays in the heap
 ;
-; Uses: HL, DE
+; Uses: HL, DE, BC, AF, HL'
 
-; On entry on stack: EETypePtr, element count
-
-NewArrayRuntimeImport:
-	POP BC	; Ret Addr
-	POP DE	; EE Type Ptr
-
-	PUSH HL	; Element Count
-	PUSH HL	; Ignored
-	PUSH DE	; EE Type Ptr
-	PUSH BC ; Ret Addr
+; On entry on stack: EETypePtr, ElementCount in DEHL
 
 NewArray:
 	; Save return address
-	POP HL
-	EXX
-
-	; EETypePtr
-	POP HL
-
-	; Element Count
-	POP DE
 	POP AF
+	EX AF, AF'
+
+	; Get Element count into DE
+	EX DE, HL
+
+	; Get EETypePtr
+	POP HL
 
 	; Save EETypePtr & Element Count
 	PUSH DE ; DE = Element Count
@@ -33,7 +23,6 @@ NewArray:
 	LD C, (HL)
 	INC HL
 	LD B, (HL)
-
 
 	; HL = EETypePtr
 	; BC = Element Size
@@ -80,7 +69,7 @@ NEWARR_NOMUL16:
 	CALL NEWOBJECT
 
 	POP HL	; ptr to new object
-	POP DE
+	POP DE	; element count
 	PUSH HL
 
 	; Skip past the EETypePtr
@@ -92,5 +81,6 @@ NEWARR_NOMUL16:
 	INC HL
 	LD (HL), D
 
-	EXX
-	JP (HL)
+	EX AF, AF'
+	PUSH AF
+	RET
