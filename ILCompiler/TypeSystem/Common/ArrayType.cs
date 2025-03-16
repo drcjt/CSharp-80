@@ -15,6 +15,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public TypeDesc ElementType => this.ParameterType;
 
+        public override DefType BaseType => Context.GetWellKnownType(WellKnownType.Array);
 
         public override bool IsArray => true;
         public override bool IsSzArray => _rank < 0;

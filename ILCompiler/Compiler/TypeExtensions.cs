@@ -123,7 +123,7 @@ namespace ILCompiler.Compiler
             if (type is ArrayType arrayType)
             {
                 var elementType = arrayType.ElementType;
-                return elementType.IsMdArray || elementType.IsFunctionPointer || elementType.IsPointer;
+                return type.IsMdArray || elementType.IsFunctionPointer || elementType.IsPointer;
             }
 
             return false;

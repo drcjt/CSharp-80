@@ -105,12 +105,12 @@ namespace ILCompiler.TypeSystem.Common
                     else
                     {
                         // TODO: multi-dimensional arrays, and arrays of pointers or function pointers
-                        throw new NotImplementedException();
+                        return this.BaseType!.RuntimeInterfaces;
                     }
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    return Array.Empty<DefType>();
                 }
             }
         }

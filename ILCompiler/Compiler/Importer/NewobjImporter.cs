@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.IL;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
@@ -18,7 +19,7 @@ namespace ILCompiler.Compiler.Importer
 
             if (owningType.IsArray)
             {
-                ImportNewObjArray(importer, (ArrayType)owningType);
+                ImportNewObjArray(context, importer, (ArrayType)owningType);
             }
             else
             {
@@ -122,9 +123,36 @@ namespace ILCompiler.Compiler.Importer
         /// </summary>
         /// <param name="importer"></param>
         /// <param name="arrayType"></param>
-        private static void ImportNewObjArray(IILImporterProxy importer, ArrayType arrayType)
+        private static void ImportNewObjArray(ImportContext context, IILImporterProxy importer, ArrayType arrayType)
         {
-            throw new NotImplementedException();
+            Debug.Assert(arrayType.Rank > 0);
+
+            var mangledEETypeName = context.NameMangler.GetMangledTypeName(arrayType);
+            var eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
+            var rank = new Int32ConstantEntry(arrayType.Rank);
+
+            // Allocate a local temp to hold the array dimensions
+            var dimensionsLocalNumber = importer.GrabTemp(VarType.Struct, arrayType.Rank * 4);
+
+            var pLengths = new LocalVariableAddressEntry(dimensionsLocalNumber);
+            StackEntry node = pLengths;
+
+            // Initialize the dimensions
+            for (int i = 0; i < arrayType.Rank; i++)
+            {
+                var dimension = importer.PopExpression();
+                var store = new StoreIndEntry(new LocalVariableAddressEntry(dimensionsLocalNumber), dimension, VarType.Int, (uint)(i * 4));
+                node = new CommaEntry(store, node);
+            }
+
+            var args = new List<StackEntry>() { eeTypeNode, rank, node };
+
+            var runtimeHelperMethod = context.Method.Context.GetHelperEntryPoint("Internal.Runtime.CompilerHelpers", "ArrayHelpers", "NewObjArray");
+            var mangledHelperMethod = context.NameMangler.GetMangledMethodName(runtimeHelperMethod);
+
+            node = new CallEntry(mangledHelperMethod, args, VarType.Ref, 2);
+
+            importer.PushExpression(node);
         }
     }
 }

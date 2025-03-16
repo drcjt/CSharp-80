@@ -1,6 +1,7 @@
-﻿using ILCompiler.TypeSystem.Common;
-using ILCompiler.Compiler.EvaluationStack;
+﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.IL;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
 using System.Diagnostics;
 
@@ -32,8 +33,10 @@ namespace ILCompiler.Compiler.Importer
                 eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
             }
 
-            var args = new List<StackEntry>() { numElements, eeTypeNode };
-            var node = new CallEntry("NewArray", args, VarType.Ref, 2);
+            var runtimeHelperMethod = context.Method.Context.GetHelperEntryPoint("System.Runtime", "RuntimeImports", "NewArray");
+
+            var args = new List<StackEntry>() { eeTypeNode, numElements };
+            var node = new CallEntry("NewArray", args, VarType.Ref, 2, runtimeHelperMethod.IsVirtual, runtimeHelperMethod);
             importer.PushExpression(node);
 
             return true;
