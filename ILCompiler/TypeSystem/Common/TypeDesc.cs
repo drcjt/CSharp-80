@@ -58,6 +58,16 @@ namespace ILCompiler.TypeSystem.Common
 
         public virtual IEnumerable<FieldDesc> GetFields() => FieldDesc.EmptyFields;
 
+        public virtual FieldDesc? GetField(string name)
+        {
+            foreach (var field in GetFields())
+            {
+                if (field.Name == name)
+                    return field;
+            }
+            return null;
+        }
+
         public virtual TypeDesc UnderlyingType
         {
             get

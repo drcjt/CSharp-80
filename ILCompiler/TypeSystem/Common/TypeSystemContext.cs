@@ -202,6 +202,8 @@ namespace ILCompiler.TypeSystem.Common
                     return (DefType)SystemModule!.GetType(SystemNameSpace, "Array");
                 case WellKnownType.Int32:
                     return (DefType)SystemModule!.GetType(SystemNameSpace, "Int32");
+                case WellKnownType.IntPtr:
+                    return (DefType)SystemModule!.GetType(SystemNameSpace, "IntPtr");
                 case WellKnownType.Void:
                     return (DefType)SystemModule!.GetType(SystemNameSpace, "Void");
                 default:

@@ -287,6 +287,19 @@ namespace System
 
             return result;
         }
+
+        public int GetLength(int dimension) => GetUpperBound(dimension) + 1;
+
+        public int GetUpperBound(int dimension)
+        {
+            //if (!IsSzArray)
+            {
+                ref nint bounds = ref GetRawMultiDimArrayBounds();
+                return (int)(Unsafe.Add(ref bounds, dimension) - 1);
+            }
+
+            //return Length - 1;
+        }
     }
 
     public class Array<T> : Array, IEnumerable<T>

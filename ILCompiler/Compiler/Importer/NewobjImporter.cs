@@ -138,7 +138,7 @@ namespace ILCompiler.Compiler.Importer
             StackEntry node = pLengths;
 
             // Initialize the dimensions
-            for (int i = 0; i < arrayType.Rank; i++)
+            for (int i = arrayType.Rank - 1; i >= 0; i--)
             {
                 var dimension = importer.PopExpression();
                 var store = new StoreIndEntry(new LocalVariableAddressEntry(dimensionsLocalNumber), dimension, VarType.Int, (uint)(i * 4));

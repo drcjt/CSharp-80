@@ -130,6 +130,19 @@ namespace ILCompiler.TypeSystem.Dnlib
             return null;
         }
 
+        public override FieldDesc? GetField(string name)
+        {
+            foreach (var field in _typeDef.Fields)
+            {
+                if (field.Name == name)
+                {
+                    return _module.Create(field);
+                }
+            }
+
+            return null;
+        }
+
         public override IEnumerable<FieldDesc> GetFields()
         {
             foreach (var field in _typeDef.Fields)

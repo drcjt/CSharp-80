@@ -9,7 +9,7 @@ namespace ILCompiler.TypeSystem.IL
         public virtual ILExceptionRegion[] GetExceptionRegions() => [];
         public virtual bool IsInitLocals { get; }
 
-        public virtual int LocalsCount { get; }
+        public virtual int LocalsCount { get; set; }
 
         public virtual MethodIL GetMethodILDefinition()
         {
