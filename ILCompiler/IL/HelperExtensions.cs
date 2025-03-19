@@ -27,6 +27,16 @@ namespace ILCompiler.IL
             return method;
         }
 
+        public static FieldDesc GetKnownField(this TypeDesc type, string name)
+        {
+            FieldDesc? field = type.GetField(name);
+            if (field == null)
+            {
+                throw new InvalidOperationException($"Expected field '{name}' not found on type '{type}");
+            }
+            return field;
+        }
+
         public static MethodDesc GetHelperEntryPoint(this TypeSystemContext context, string typeName, string methodName)
         {
             TypeDesc helperType = (TypeDesc)context.SystemModule!.GetType(HelperTypesNamespace, typeName);

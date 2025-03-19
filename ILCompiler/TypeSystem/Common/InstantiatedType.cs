@@ -232,6 +232,14 @@ namespace ILCompiler.TypeSystem.Common
             return _typeDef.Context.GetMethodForInstantiatedType(typicalMethodDef, this);
         }
 
+        public override FieldDesc? GetField(string name)
+        {
+            var fieldDesc = _typeDef.GetField(name);
+            if (fieldDesc == null)
+                return null;
+            return _typeDef.Context.GetFieldForInstantiatedType(fieldDesc, this);
+        }
+
         public override DefType? ContainingType => _typeDef.ContainingType;
     }
 }
