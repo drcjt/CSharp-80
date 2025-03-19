@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler;
+using ILCompiler.IL.Stubs;
 using ILCompiler.TypeSystem.Canon;
 using ILCompiler.TypeSystem.IL;
 
@@ -112,26 +113,56 @@ namespace ILCompiler.TypeSystem.Common
     public class ArrayMethod : MethodDesc
     {
         private readonly ArrayType _owningType;
-        private readonly ArrayMethodKind _kind;
+        public ArrayMethodKind Kind { get; }
 
         public ArrayMethod(ArrayType owningType, ArrayMethodKind kind)
         {
             _owningType = owningType;
-            _kind = kind;
+            Kind = kind;
         }
 
         public override TypeSystemContext Context => _owningType.Context;
 
         public override TypeDesc OwningType => _owningType;
 
+
+        public override bool HasReturnType 
+            => Kind switch
+            {
+                ArrayMethodKind.Get or ArrayMethodKind.Address or ArrayMethodKind.AddressWithHiddenArg => true,
+                _ => false,
+            };
+
+        public override bool HasThis
+            => Kind switch
+            {
+                ArrayMethodKind.Get or ArrayMethodKind.Set or ArrayMethodKind.AddressWithHiddenArg => true,
+                _ => false,
+            };
+
         public override MethodSignature Signature
         {
             get
             {
-                switch (_kind)
+                switch (Kind)
                 {
                     case ArrayMethodKind.Get:
+                        {
+                            var parameters = new MethodParameter[_owningType.Rank];
+                            for (int i = 0; i < _owningType.Rank; i++)
+                                parameters[i] = new MethodParameter(_owningType.Context.GetWellKnownType(WellKnownType.Int32), String.Empty);
+                            return new MethodSignature(MethodSignatureFlags.None, _owningType.ElementType, parameters);
+                        }
+
                     case ArrayMethodKind.Set:
+                        {
+                            var parameters = new MethodParameter[_owningType.Rank + 1];
+                            for (int i = 0; i < _owningType.Rank; i++)
+                                parameters[i] = new MethodParameter(_owningType.Context.GetWellKnownType(WellKnownType.Int32), String.Empty);
+                            parameters[_owningType.Rank] = new MethodParameter(_owningType.ElementType, String.Empty);
+                            return new MethodSignature(MethodSignatureFlags.None, this.Context.GetWellKnownType(WellKnownType.Void), parameters);
+                        }
+
                     case ArrayMethodKind.Address:
                     case ArrayMethodKind.AddressWithHiddenArg:
                         throw new NotImplementedException();
@@ -141,11 +172,11 @@ namespace ILCompiler.TypeSystem.Common
                             int numberOfParameters;
                             if (_owningType.IsSzArray)
                             {
-                                numberOfParameters = 1 + (int)_kind - (int)ArrayMethodKind.Ctor;
+                                numberOfParameters = 1 + (int)Kind - (int)ArrayMethodKind.Ctor;
                             }
                             else
                             {
-                                numberOfParameters = (_kind == ArrayMethodKind.Ctor) ? _owningType.Rank : 2 * _owningType.Rank;
+                                numberOfParameters = (Kind == ArrayMethodKind.Ctor) ? _owningType.Rank : 2 * _owningType.Rank;
                             }
                             var parameters = new MethodParameter[numberOfParameters];
                             for (int i = 0; i < numberOfParameters; i++)
@@ -161,23 +192,15 @@ namespace ILCompiler.TypeSystem.Common
         }
 
         public override string Name
-        {
-            get
+            => Kind switch
             {
-                switch (_kind)
-                {
-                    case ArrayMethodKind.Get:
-                        return "Get";
-                    case ArrayMethodKind.Set:
-                        return "Set";
-                    case ArrayMethodKind.Address:
-                    case ArrayMethodKind.AddressWithHiddenArg:
-                        return "Address";
-                    default:
-                        return ".ctor";
-                }
-            }
-        }
+                ArrayMethodKind.Get => "Get",
+                ArrayMethodKind.Set => "Set",
+                ArrayMethodKind.Address or ArrayMethodKind.AddressWithHiddenArg => "Address",
+                _ => ".ctor",
+            };
+
+        public override string FullName => ToString();
 
         public override bool HasCustomAttribute(string attributeNamespace, string attributeName) => false;
 
@@ -188,7 +211,7 @@ namespace ILCompiler.TypeSystem.Common
 
             if (owningType != instantiatedOwningType)
             {
-                return ((ArrayType)instantiatedOwningType).GetArrayMethod(_kind);
+                return ((ArrayType)instantiatedOwningType).GetArrayMethod(Kind);
             }
 
             return this;
@@ -200,13 +223,22 @@ namespace ILCompiler.TypeSystem.Common
 
         public override IList<MethodParameter> Parameters => Signature.Parameters;
 
-        public override IList<LocalVariableDefinition> Locals => throw new NotImplementedException();
+        private readonly IList<LocalVariableDefinition> _locals = [];
+        public override IList<LocalVariableDefinition> Locals => _locals;
 
-        public override MethodIL? MethodIL => throw new NotImplementedException();
-
-        public override MethodDesc CreateUserMethod(string name)
+        private MethodIL? _methodIL;
+        public override MethodIL? MethodIL
         {
-            throw new NotImplementedException();
+            get
+            {
+                if (_methodIL == null)
+                {
+                    _methodIL = ArrayMethodILEmitter.EmitIL(this, _locals);
+                }
+                return _methodIL;
+            }
         }
+
+        public override MethodDesc CreateUserMethod(string name) => throw new NotImplementedException();
     }
 }

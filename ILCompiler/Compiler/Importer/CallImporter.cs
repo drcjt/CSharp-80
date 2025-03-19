@@ -33,7 +33,7 @@ namespace ILCompiler.Compiler.Importer
             var isArrayMethod = false;
             MethodDesc methodToCall;
             var opcode = instruction.Opcode;
-            if (method.OwningType.IsArray)
+            if (method.OwningType.IsSzArray)
             {
                 switch (method.Name)
                 {
