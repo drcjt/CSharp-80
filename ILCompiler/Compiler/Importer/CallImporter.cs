@@ -410,14 +410,28 @@ namespace ILCompiler.Compiler.Importer
 
         private static bool ImportInitializeArray(IList<StackEntry> arguments, IILImporterProxy importer, TypeSystemContext context)
         {
-            var arrayObjPtr = arguments[0];
+            var arrayRef = arguments[0];
             TokenEntry fieldSlot = (TokenEntry)arguments[1];
 
             var sourceAddress = new SymbolConstantEntry(fieldSlot.Label);
 
-            int pointerSize = context.Target.PointerSize;
-            var arrayBaseSize = new NativeIntConstantEntry((short)(pointerSize + sizeof(ushort)));    // EEType Ptr and array length
-            StackEntry destinationAddress = new BinaryOperator(Operation.Add, isComparison: false, arrayObjPtr, arrayBaseSize, VarType.Ptr);
+            var pointerSize = context.Target.PointerSize;
+
+            // Use local to store the array reference as will be used twice
+            // Once to get the base size and once to get the array ptr itself
+
+            var arrayRefTemporaryNumber = importer.GrabTemp(arrayRef.Type, pointerSize);
+            var arrayRefDefinition = new StoreLocalVariableEntry(arrayRefTemporaryNumber, false, arrayRef);
+            importer.ImportAppendTree(arrayRefDefinition);
+
+            arrayRef = new LocalVariableEntry(arrayRefTemporaryNumber, arrayRef.Type, pointerSize);
+            var arrayRef2 = new LocalVariableEntry(arrayRefTemporaryNumber, arrayRef.Type, pointerSize);
+
+            // Get the base size
+            var eeTypePtr = new IndirectEntry(arrayRef, VarType.Ptr, pointerSize);
+            var baseSize = new IndirectEntry(eeTypePtr, VarType.Ptr, pointerSize, 4);   // Base size is at offset 4
+
+            StackEntry destinationAddress = new BinaryOperator(Operation.Add, isComparison: false, arrayRef2, baseSize, VarType.Ptr);
 
             var arrayData = ((DnlibField)fieldSlot.Field).GetFieldRvaData();
             var size = new Int32ConstantEntry((short)arrayData.Length);
