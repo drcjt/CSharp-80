@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MDArrays
+namespace MDArrays.@int
 {
     public struct VT
     {

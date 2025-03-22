@@ -1,4 +1,7 @@
-﻿namespace MDArrays
+﻿using MDArrays.@bool;
+using MDArrays.@int;
+
+namespace MDArrays
 {
     public static class Test
     {
@@ -7,6 +10,7 @@
             int result = Simple_MDArray_Test(); if (result != 0) return result;
             result = InitializeArray_Test(); if (result != 0) return result;
             result = DataTypesInt.TestEntryPoint(); if (result != 0) return result;
+            result = DataTypesBool.TestEntryPoint(); if (result != 0) return result;
 
             return result;
         }
