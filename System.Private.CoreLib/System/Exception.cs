@@ -6,7 +6,7 @@
 
         public Exception() { }
 
-        public Exception(string message)
+        public Exception(string? message)
         {
             _message = message;
         }

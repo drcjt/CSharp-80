@@ -4,6 +4,9 @@
     {
         private readonly char m_value;
 
+        public const char MaxValue = (char)0xFFFF;
+        public const char MinValue = (char)0x00;
+
         public static bool IsBetween(char c, char minInclusive, char maxInclusive) => (uint)(c - minInclusive) <= (uint)(maxInclusive - minInclusive);
 
         public static bool IsAsciiDigit(char c) => IsBetween(c, '0', '9');
