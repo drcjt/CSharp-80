@@ -192,6 +192,11 @@ namespace ILCompiler.TypeSystem.Dnlib
                 {
                     return Create(szArraySig);
                 }
+                var arraySig = ts.TryGetArraySig();
+                if (arraySig != null)
+                {
+                    return Create(arraySig);
+                }
                 var genericSig = ts.TryGetGenericSig();
                 if (genericSig != null)
                 {
