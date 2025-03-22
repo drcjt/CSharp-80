@@ -6,6 +6,7 @@
         {
             int result = Simple_MDArray_Test(); if (result != 0) return result;
             result = InitializeArray_Test(); if (result != 0) return result;
+            result = DataTypesInt.TestEntryPoint(); if (result != 0) return result;
 
             return result;
         }
