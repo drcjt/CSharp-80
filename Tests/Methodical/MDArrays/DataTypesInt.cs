@@ -250,6 +250,5 @@ namespace MDArrays.@int
 
             return 0;
         }
-
     }
 }
