@@ -3,6 +3,7 @@
     public static class Convert
     {
         public static bool ToBoolean(int value) => value != 0;
+        public static bool ToBoolean(byte value) => value != 0;
 
         public static byte ToByte(bool value) => value ? (byte)bool.True : (byte)bool.False;
         public static byte ToByte(int value) => ToByte((uint)value);
@@ -18,7 +19,14 @@
             if (value < sbyte.MinValue || value > sbyte.MaxValue) ThrowSByteOverflowException();
             return (sbyte)value;
         }
+        public static sbyte ToSByte(byte value)
+        {
+            if (value > sbyte.MaxValue) ThrowSByteOverflowException();
+            return (sbyte)value;
+        }
 
+
+        public static uint ToUInt32(byte value) => value;
         public static uint ToUInt32(bool value) => value ? (uint)bool.True : (uint)bool.False;
         public static uint ToUInt32(int value)
         {
@@ -26,6 +34,7 @@
             return (uint)value;
         }
 
+        public static ushort ToUInt16(byte value) => value;
         public static ushort ToUInt16(bool value) => value ? (ushort)bool.True : (ushort)bool.False;
         public static ushort ToUInt16(int value) => ToUInt16((uint)value);
         public static ushort ToUInt16(uint value)
@@ -34,6 +43,7 @@
             return (ushort)value;
         }
 
+        public static char ToChar(byte value) => (char)value;
         public static char ToChar(int value) => ToChar((uint)value);
         public static char ToChar(uint value)
         {
@@ -41,8 +51,10 @@
             return (char)value;
         }
 
+        public static short ToInt16(byte value) => value;
         public static short ToInt16(bool value) => value ? (short)bool.True : (short)bool.False;
 
+        public static int ToInt32(byte value) => value;
         public static int ToInt32(bool value) => value ? bool.True : bool.False;
 
         private static void ThrowCharOverflowException() { throw new OverflowException("Char"); }
