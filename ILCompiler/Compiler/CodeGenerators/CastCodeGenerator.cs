@@ -28,6 +28,7 @@ namespace ILCompiler.Compiler.CodeGenerators
             { CreateKey(VarType.SByte, VarType.Byte), NullConversion },
 
             { CreateKey(VarType.Byte, VarType.Ptr), ToPtr },
+            { CreateKey(VarType.Byte, VarType.SByte), NullConversion },
             { CreateKey(VarType.Byte, VarType.Short), NullConversion },
 
             { CreateKey(VarType.Ptr, VarType.Int), WidenPtr },
