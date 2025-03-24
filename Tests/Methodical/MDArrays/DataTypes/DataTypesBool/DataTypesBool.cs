@@ -22,7 +22,7 @@ namespace MDArrays.@bool
         static readonly bool[][,] ja1 = new bool[2][,];
         static readonly bool[][,,] ja2 = new bool[2][,,];
 
-        public static int TestEntryPoint()
+        public static int Main()
         {
             VT vt1;
             vt1.bool2darr = new bool[,] { { false, true }, { false, false } };

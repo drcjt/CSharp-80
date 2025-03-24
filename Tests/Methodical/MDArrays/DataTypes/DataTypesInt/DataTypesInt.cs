@@ -37,7 +37,7 @@ namespace MDArrays.@int
         static readonly int[][,] ja1_c = new int[2][,];
         static readonly int[][,,] ja2_c = new int[2][,,];
 
-        public static int TestEntryPoint()
+        public static int Main()
         {
             VT vt1;
             vt1.int2darr = new int[,] { { 0, -1 }, { 0, 0 } };

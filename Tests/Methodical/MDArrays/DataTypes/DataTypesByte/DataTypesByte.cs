@@ -30,7 +30,7 @@ namespace MDArrays.@byte
         static readonly byte[][,] ja1_b = new byte[2][,];
         static readonly byte[][,,] ja2_b = new byte[2][,,];
 
-        public static int TestEntryPoint()
+        public static int Main()
         {
             VT vt1;
             vt1.byte2darr = new byte[,] { { 0, 1 }, { 0, 0 } };
