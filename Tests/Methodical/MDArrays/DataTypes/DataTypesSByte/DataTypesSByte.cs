@@ -69,7 +69,6 @@ namespace MDArrays.@sbyte
             result = SByteToUInt16Tests(vt1, cl1);
             if (result != 0) return result;
 
-
             return 0;
         }
 
@@ -142,16 +141,16 @@ namespace MDArrays.@sbyte
             byte expected = 1;
 
             // 2d
-            if (expected != Convert.ToSByte(sbyte2darr[0, 1])) return SByteToByteErrorBase + 1;
-            if (expected != Convert.ToSByte(vt1.sbyte2darr[0, 1])) return SByteToByteErrorBase + 2;
-            if (expected != Convert.ToSByte(cl1.sbyte2darr[0, 1])) return SByteToByteErrorBase + 3;
-            if (expected != Convert.ToSByte(ja1[0][0, 1])) return SByteToByteErrorBase + 4;
+            if (expected != Convert.ToByte(sbyte2darr[0, 1])) return SByteToByteErrorBase + 1;
+            if (expected != Convert.ToByte(vt1.sbyte2darr[0, 1])) return SByteToByteErrorBase + 2;
+            if (expected != Convert.ToByte(cl1.sbyte2darr[0, 1])) return SByteToByteErrorBase + 3;
+            if (expected != Convert.ToByte(ja1[0][0, 1])) return SByteToByteErrorBase + 4;
 
             // 3d
-            if (expected != Convert.ToSByte(sbyte3darr[1, 0, 1])) return SByteToByteErrorBase + 5;
-            if (expected != Convert.ToSByte(vt1.sbyte3darr[1, 0, 1])) return SByteToByteErrorBase + 6;
-            if (expected != Convert.ToSByte(cl1.sbyte3darr[1, 0, 1])) return SByteToByteErrorBase + 7;
-            if (expected != Convert.ToSByte(ja2[1][1, 0, 1])) return SByteToByteErrorBase + 8;
+            if (expected != Convert.ToByte(sbyte3darr[1, 0, 1])) return SByteToByteErrorBase + 5;
+            if (expected != Convert.ToByte(vt1.sbyte3darr[1, 0, 1])) return SByteToByteErrorBase + 6;
+            if (expected != Convert.ToByte(cl1.sbyte3darr[1, 0, 1])) return SByteToByteErrorBase + 7;
+            if (expected != Convert.ToByte(ja2[1][1, 0, 1])) return SByteToByteErrorBase + 8;
 
             return 0;
         }
