@@ -40,6 +40,10 @@ namespace MDArrays.@bool
             result = BoolToByteTests(vt1, cl1);
             if (result != 0) return result;
 
+            // No valid conversion from bool to char
+            // result = BoolToCharTests(vt1, cl1);
+            // if (result != 0) return result;
+
             result = BoolToInt32Tests(vt1, cl1);
             if (result != 0) return result;
 
@@ -101,7 +105,7 @@ namespace MDArrays.@bool
 
         private static int BoolToInt32Tests(VT vt1, CL cl1)
         {
-            const int BoolToInt32ErrorBase = 300;
+            const int BoolToInt32ErrorBase = 400;
 
             int expected = 1;
 
@@ -122,7 +126,7 @@ namespace MDArrays.@bool
 
         private static int BoolToSByteTests(VT vt1, CL cl1)
         {
-            const int BoolToSByteErrorBase = 400;
+            const int BoolToSByteErrorBase = 500;
 
             sbyte expected = 1;
 
@@ -143,7 +147,7 @@ namespace MDArrays.@bool
 
         private static int BoolToInt16Tests(VT vt1, CL cl1)
         {
-            const int BoolToInt16ErrorBase = 500;
+            const int BoolToInt16ErrorBase = 600;
 
             short expected = 1;
 
@@ -164,7 +168,7 @@ namespace MDArrays.@bool
 
         private static int BoolToUInt32Tests(VT vt1, CL cl1)
         {
-            const int BoolToUInt32ErrorBase = 600;
+            const int BoolToUInt32ErrorBase = 700;
 
             uint expected = 1;
 
@@ -185,7 +189,7 @@ namespace MDArrays.@bool
 
         private static int BoolToUInt16Tests(VT vt1, CL cl1)
         {
-            const int BoolToUInt16ErrorBase = 700;
+            const int BoolToUInt16ErrorBase = 800;
 
             ushort expected = 1;
 

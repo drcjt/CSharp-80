@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 
 namespace MDArrays.@uint
 {
@@ -46,10 +45,7 @@ namespace MDArrays.@uint
             ja1_b[0] = new uint[,] { { 0, 49 }, { 0, 0 } };
             ja2_b[1] = new uint[,,] { { { 0, 0 } }, { { 0, 49 } }, { { 0, 0 } } };
 
-            int result = UInt32Tests(vt1, cl1);
-            if (result != 0) return result;
-
-            result = UInt32ToBoolTests(vt1, cl1);
+            int result = UInt32ToBoolTests(vt1, cl1);
             if (result != 0) return result;
 
             result = UInt32ToByteTests(vt1, cl1);
@@ -61,41 +57,24 @@ namespace MDArrays.@uint
             result = UInt32ToInt32Tests(vt1, cl1);
             if (result != 0) return result;
 
+            result = UInt32ToSByteTests(vt1, cl1);
+            if (result != 0) return result;
+
             result = UInt32ToInt16Tests(vt1, cl1);
+            if (result != 0) return result;
+
+            result = UInt32Tests(vt1, cl1);
             if (result != 0) return result;
 
             result = UInt32ToUInt16Tests(vt1, cl1);
             if (result != 0) return result;
-
-            result = UInt32ToSByteTests(vt1, cl1);
-            if (result != 0) return result;
-
-            return 0;
-        }
-
-        private static int UInt32Tests(VT vt1, CL cl1)
-        {
-            const int uint32ErrorBase = 100;
-
-            uint expected = 1;
-            // 2d
-            if (expected != uint2darr[0, 1]) return uint32ErrorBase + 1;
-            if (expected != vt1.uint2darr[0, 1]) return uint32ErrorBase + 2;
-            if (expected != cl1.uint2darr[0, 1]) return uint32ErrorBase + 3;
-            if (expected != ja1[0][0, 1]) return uint32ErrorBase + 4;
-
-            // 3d
-            if (expected != uint3darr[1, 0, 1]) return uint32ErrorBase + 5;
-            if (expected != vt1.uint3darr[1, 0, 1]) return uint32ErrorBase + 6;
-            if (expected != cl1.uint3darr[1, 0, 1]) return uint32ErrorBase + 7;
-            if (expected != ja2[1][1, 0, 1]) return uint32ErrorBase + 8;
 
             return 0;
         }
 
         private static int UInt32ToBoolTests(VT vt1, CL cl1)
         {
-            const int uint32ToBoolErrorBase = 200;
+            const int uint32ToBoolErrorBase = 100;
 
             bool expected = true;
 
@@ -116,7 +95,7 @@ namespace MDArrays.@uint
 
         private static int UInt32ToByteTests(VT vt1, CL cl1)
         {
-            const int int16ToByteErrorBase = 300;
+            const int int16ToByteErrorBase = 200;
 
             byte expected = 1;
 
@@ -137,7 +116,7 @@ namespace MDArrays.@uint
 
         private static int UInt32ToCharTests(VT vt1, CL cl1)
         {
-            const int uint32ToCharErrorBase = 400;
+            const int uint32ToCharErrorBase = 300;
 
             char expected = '1';
 
@@ -158,7 +137,7 @@ namespace MDArrays.@uint
 
         private static int UInt32ToInt32Tests(VT vt1, CL cl1)
         {
-            const int uint32ToInt32ErrorBase = 500;
+            const int uint32ToInt32ErrorBase = 400;
 
             int expected = 1;
 
@@ -173,6 +152,27 @@ namespace MDArrays.@uint
             if (expected != Convert.ToInt32(vt1.uint3darr[1, 0, 1])) return uint32ToInt32ErrorBase + 6;
             if (expected != Convert.ToInt32(cl1.uint3darr[1, 0, 1])) return uint32ToInt32ErrorBase + 7;
             if (expected != Convert.ToInt32(ja2[1][1, 0, 1])) return uint32ToInt32ErrorBase + 8;
+
+            return 0;
+        }
+
+        private static int UInt32ToSByteTests(VT vt1, CL cl1)
+        {
+            const int uint32ToSByteErrorBase = 500;
+
+            sbyte expected = 1;
+
+            // 2d
+            if (expected != Convert.ToSByte(uint2darr[0, 1])) return uint32ToSByteErrorBase + 1;
+            if (expected != Convert.ToSByte(vt1.uint2darr[0, 1])) return uint32ToSByteErrorBase + 2;
+            if (expected != Convert.ToSByte(cl1.uint2darr[0, 1])) return uint32ToSByteErrorBase + 3;
+            if (expected != Convert.ToSByte(ja1[0][0, 1])) return uint32ToSByteErrorBase + 4;
+
+            // 3d
+            if (expected != Convert.ToSByte(uint3darr[1, 0, 1])) return uint32ToSByteErrorBase + 5;
+            if (expected != Convert.ToSByte(vt1.uint3darr[1, 0, 1])) return uint32ToSByteErrorBase + 6;
+            if (expected != Convert.ToSByte(cl1.uint3darr[1, 0, 1])) return uint32ToSByteErrorBase + 7;
+            if (expected != Convert.ToSByte(ja2[1][1, 0, 1])) return uint32ToSByteErrorBase + 8;
 
             return 0;
         }
@@ -198,9 +198,29 @@ namespace MDArrays.@uint
             return 0;
         }
 
+        private static int UInt32Tests(VT vt1, CL cl1)
+        {
+            const int uint32ErrorBase = 700;
+
+            uint expected = 1;
+            // 2d
+            if (expected != uint2darr[0, 1]) return uint32ErrorBase + 1;
+            if (expected != vt1.uint2darr[0, 1]) return uint32ErrorBase + 2;
+            if (expected != cl1.uint2darr[0, 1]) return uint32ErrorBase + 3;
+            if (expected != ja1[0][0, 1]) return uint32ErrorBase + 4;
+
+            // 3d
+            if (expected != uint3darr[1, 0, 1]) return uint32ErrorBase + 5;
+            if (expected != vt1.uint3darr[1, 0, 1]) return uint32ErrorBase + 6;
+            if (expected != cl1.uint3darr[1, 0, 1]) return uint32ErrorBase + 7;
+            if (expected != ja2[1][1, 0, 1]) return uint32ErrorBase + 8;
+
+            return 0;
+        }
+
         private static int UInt32ToUInt16Tests(VT vt1, CL cl1)
         {
-            const int UInt32ToUInt16ErrorBase = 700;
+            const int UInt32ToUInt16ErrorBase = 800;
 
             ushort expected = 1;
 
@@ -215,27 +235,6 @@ namespace MDArrays.@uint
             if (expected != Convert.ToUInt16(vt1.uint3darr[1, 0, 1])) return UInt32ToUInt16ErrorBase + 6;
             if (expected != Convert.ToUInt16(cl1.uint3darr[1, 0, 1])) return UInt32ToUInt16ErrorBase + 7;
             if (expected != Convert.ToUInt16(ja2[1][1, 0, 1])) return UInt32ToUInt16ErrorBase + 8;
-
-            return 0;
-        }
-
-        private static int UInt32ToSByteTests(VT vt1, CL cl1)
-        {
-            const int uint32ToSByteErrorBase = 800;
-
-            sbyte expected = 1;
-
-            // 2d
-            if (expected != Convert.ToSByte(uint2darr[0, 1])) return uint32ToSByteErrorBase + 1;
-            if (expected != Convert.ToSByte(vt1.uint2darr[0, 1])) return uint32ToSByteErrorBase + 2;
-            if (expected != Convert.ToSByte(cl1.uint2darr[0, 1])) return uint32ToSByteErrorBase + 3;
-            if (expected != Convert.ToSByte(ja1[0][0, 1])) return uint32ToSByteErrorBase + 4;
-
-            // 3d
-            if (expected != Convert.ToSByte(uint3darr[1, 0, 1])) return uint32ToSByteErrorBase + 5;
-            if (expected != Convert.ToSByte(vt1.uint3darr[1, 0, 1])) return uint32ToSByteErrorBase + 6;
-            if (expected != Convert.ToSByte(cl1.uint3darr[1, 0, 1])) return uint32ToSByteErrorBase + 7;
-            if (expected != Convert.ToSByte(ja2[1][1, 0, 1])) return uint32ToSByteErrorBase + 8;
 
             return 0;
         }

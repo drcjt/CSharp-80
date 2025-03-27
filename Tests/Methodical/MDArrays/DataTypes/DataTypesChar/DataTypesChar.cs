@@ -33,11 +33,14 @@ namespace MDArrays.@char
             ja1[0] = new char[,] { { '0', '1' }, { '0', '0' } };
             ja2[1] = new char[,,] { { { '0', '0' } }, { { '0', '1' } }, { { '0', '0' } } };
 
+            // No valid conversion from char to bool
+            // int result = CharToBoolTests(vt1, cl1);
+            // if (result != 0) return result;
 
-            int result = CharTests(vt1, cl1);
+            int result = CharToByteTests(vt1, cl1);
             if (result != 0) return result;
 
-            result = CharToByteTests(vt1, cl1);
+            result = CharTests(vt1, cl1);
             if (result != 0) return result;
 
             result = CharToInt32Tests(vt1, cl1);
@@ -54,27 +57,6 @@ namespace MDArrays.@char
 
             result = CharToUInt16Tests(vt1, cl1);
             if (result != 0) return result;
-
-            return 0;
-        }
-
-        private static int CharTests(VT vt1, CL cl1)
-        {
-            const int CharErrorBase = 100;
-
-            char expected = '1';
-
-            // 2d
-            if (expected != char2darr[0, 1]) return CharErrorBase + 1;
-            if (expected != vt1.char2darr[0, 1]) return CharErrorBase + 2;
-            if (expected != cl1.char2darr[0, 1]) return CharErrorBase + 3;
-            if (expected != ja1[0][0, 1]) return CharErrorBase + 4;
-
-            // 3d
-            if (expected != char3darr[1, 0, 1]) return CharErrorBase + 5;
-            if (expected != vt1.char3darr[1, 0, 1]) return CharErrorBase + 6;
-            if (expected != cl1.char3darr[1, 0, 1]) return CharErrorBase + 7;
-            if (expected != ja2[1][1, 0, 1]) return CharErrorBase + 8;
 
             return 0;
         }
@@ -100,9 +82,30 @@ namespace MDArrays.@char
             return 0;
         }
 
+        private static int CharTests(VT vt1, CL cl1)
+        {
+            const int CharErrorBase = 300;
+
+            char expected = '1';
+
+            // 2d
+            if (expected != char2darr[0, 1]) return CharErrorBase + 1;
+            if (expected != vt1.char2darr[0, 1]) return CharErrorBase + 2;
+            if (expected != cl1.char2darr[0, 1]) return CharErrorBase + 3;
+            if (expected != ja1[0][0, 1]) return CharErrorBase + 4;
+
+            // 3d
+            if (expected != char3darr[1, 0, 1]) return CharErrorBase + 5;
+            if (expected != vt1.char3darr[1, 0, 1]) return CharErrorBase + 6;
+            if (expected != cl1.char3darr[1, 0, 1]) return CharErrorBase + 7;
+            if (expected != ja2[1][1, 0, 1]) return CharErrorBase + 8;
+
+            return 0;
+        }
+
         private static int CharToInt32Tests(VT vt1, CL cl1)
         {
-            const int CharToInt32ErrorBase = 300;
+            const int CharToInt32ErrorBase = 400;
 
             int expected = 49;
 
@@ -123,7 +126,7 @@ namespace MDArrays.@char
 
         private static int CharToSByteTests(VT vt1, CL cl1)
         {
-            const int CharToSByteErrorBase = 400;
+            const int CharToSByteErrorBase = 500;
 
             sbyte expected = 49;
 
@@ -144,7 +147,7 @@ namespace MDArrays.@char
 
         private static int CharToInt16Tests(VT vt1, CL cl1)
         {
-            const int CharToInt16ErrorBase = 500;
+            const int CharToInt16ErrorBase = 600;
 
             short expected = 49;
 
@@ -165,7 +168,7 @@ namespace MDArrays.@char
 
         private static int CharToUInt32Tests(VT vt1, CL cl1)
         {
-            const int CharToUInt32ErrorBase = 600;
+            const int CharToUInt32ErrorBase = 700;
 
             uint expected = 49;
 
@@ -186,7 +189,7 @@ namespace MDArrays.@char
 
         private static int CharToUInt16Tests(VT vt1, CL cl1)
         {
-            const int CharToUInt16ErrorBase = 700;
+            const int CharToUInt16ErrorBase = 800;
 
             ushort expected = 49;
 

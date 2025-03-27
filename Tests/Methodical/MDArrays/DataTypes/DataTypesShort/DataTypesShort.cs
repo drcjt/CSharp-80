@@ -45,10 +45,13 @@ namespace MDArrays.@short
             ja1_b[0] = new short[,] { { 0, 49 }, { 0, 0 } };
             ja2_b[1] = new short[,,] { { { 0, 0 } }, { { 0, 49 } }, { { 0, 0 } } };
 
-            int result = Int16Tests(vt1, cl1);
+            int result = Int16ToBoolTests(vt1, cl1);
             if (result != 0) return result;
 
             result = Int16ToByteTests(vt1, cl1);
+            if (result != 0) return result;
+
+            result = Int16ToCharTests(vt1, cl1);
             if (result != 0) return result;
 
             result = Int16ToInt32Tests(vt1, cl1);
@@ -57,37 +60,35 @@ namespace MDArrays.@short
             result = Int16ToSByteTests(vt1, cl1);
             if (result != 0) return result;
 
+            result = Int16Tests(vt1, cl1);
+            if (result != 0) return result;
+
             result = Int16ToUInt32Tests(vt1, cl1);
             if (result != 0) return result;
 
             result = Int16ToUInt16Tests(vt1, cl1);
             if (result != 0) return result;
 
-            result = Int16ToCharTests(vt1, cl1);
-            if (result != 0) return result;
-
-            result = Int16ToBoolTests(vt1, cl1);
-            if (result != 0) return result;
-
             return 0;
         }
 
-        private static int Int16Tests(VT vt1, CL cl1)
+        private static int Int16ToBoolTests(VT vt1, CL cl1)
         {
-            const int int16ErrorBase = 100;
+            const int int16ToBoolErrorBase = 100;
 
-            short expected = 1;
+            bool expected = true;
+
             // 2d
-            if (expected != short2darr[0, 1]) return int16ErrorBase + 1;
-            if (expected != vt1.short2darr[0, 1]) return int16ErrorBase + 2;
-            if (expected != cl1.short2darr[0, 1]) return int16ErrorBase + 3;
-            if (expected != ja1[0][0, 1]) return int16ErrorBase + 4;
+            if (expected != Convert.ToBoolean(short2darr[0, 1])) return int16ToBoolErrorBase + 1;
+            if (expected != Convert.ToBoolean(vt1.short2darr[0, 1])) return int16ToBoolErrorBase + 2;
+            if (expected != Convert.ToBoolean(cl1.short2darr[0, 1])) return int16ToBoolErrorBase + 3;
+            if (expected != Convert.ToBoolean(ja1[0][0, 1])) return int16ToBoolErrorBase + 4;
 
             // 3d
-            if (expected != short3darr[1, 0, 1]) return int16ErrorBase + 5;
-            if (expected != vt1.short3darr[1, 0, 1]) return int16ErrorBase + 6;
-            if (expected != cl1.short3darr[1, 0, 1]) return int16ErrorBase + 7;
-            if (expected != ja2[1][1, 0, 1]) return int16ErrorBase + 8;
+            if (expected != Convert.ToBoolean(short3darr[1, 0, 1])) return int16ToBoolErrorBase + 5;
+            if (expected != Convert.ToBoolean(vt1.short3darr[1, 0, 1])) return int16ToBoolErrorBase + 6;
+            if (expected != Convert.ToBoolean(cl1.short3darr[1, 0, 1])) return int16ToBoolErrorBase + 7;
+            if (expected != Convert.ToBoolean(ja2[1][1, 0, 1])) return int16ToBoolErrorBase + 8;
 
             return 0;
         }
@@ -113,9 +114,30 @@ namespace MDArrays.@short
             return 0;
         }
 
+        private static int Int16ToCharTests(VT vt1, CL cl1)
+        {
+            const int int16ToCharErrorBase = 300;
+
+            char expected = '1';
+
+            // 2d
+            if (expected != Convert.ToChar(short2darr_b[0, 1])) return int16ToCharErrorBase + 1;
+            if (expected != Convert.ToChar(vt1.short2darr_b[0, 1])) return int16ToCharErrorBase + 2;
+            if (expected != Convert.ToChar(cl1.short2darr_b[0, 1])) return int16ToCharErrorBase + 3;
+            if (expected != Convert.ToChar(ja1_b[0][0, 1])) return int16ToCharErrorBase + 4;
+
+            // 3d
+            if (expected != Convert.ToChar(short3darr_b[1, 0, 1])) return int16ToCharErrorBase + 5;
+            if (expected != Convert.ToChar(vt1.short3darr_b[1, 0, 1])) return int16ToCharErrorBase + 6;
+            if (expected != Convert.ToChar(cl1.short3darr_b[1, 0, 1])) return int16ToCharErrorBase + 7;
+            if (expected != Convert.ToChar(ja2_b[1][1, 0, 1])) return int16ToCharErrorBase + 8;
+
+            return 0;
+        }
+
         private static int Int16ToInt32Tests(VT vt1, CL cl1)
         {
-            const int int16ToInt32ErrorBase = 300;
+            const int int16ToInt32ErrorBase = 400;
 
             int expected = 1;
 
@@ -136,7 +158,7 @@ namespace MDArrays.@short
 
         private static int Int16ToSByteTests(VT vt1, CL cl1)
         {
-            const int int16ToSByteErrorBase = 400;
+            const int int16ToSByteErrorBase = 500;
 
             sbyte expected = 1;
 
@@ -155,9 +177,29 @@ namespace MDArrays.@short
             return 0;
         }
 
+        private static int Int16Tests(VT vt1, CL cl1)
+        {
+            const int int16ErrorBase = 600;
+
+            short expected = 1;
+            // 2d
+            if (expected != short2darr[0, 1]) return int16ErrorBase + 1;
+            if (expected != vt1.short2darr[0, 1]) return int16ErrorBase + 2;
+            if (expected != cl1.short2darr[0, 1]) return int16ErrorBase + 3;
+            if (expected != ja1[0][0, 1]) return int16ErrorBase + 4;
+
+            // 3d
+            if (expected != short3darr[1, 0, 1]) return int16ErrorBase + 5;
+            if (expected != vt1.short3darr[1, 0, 1]) return int16ErrorBase + 6;
+            if (expected != cl1.short3darr[1, 0, 1]) return int16ErrorBase + 7;
+            if (expected != ja2[1][1, 0, 1]) return int16ErrorBase + 8;
+
+            return 0;
+        }
+
         private static int Int16ToUInt32Tests(VT vt1, CL cl1)
         {
-            const int Int16ToUInt32ErrorBase = 500;
+            const int Int16ToUInt32ErrorBase = 700;
 
             uint expected = 1;
 
@@ -178,7 +220,7 @@ namespace MDArrays.@short
 
         private static int Int16ToUInt16Tests(VT vt1, CL cl1)
         {
-            const int Int16ToUInt16ErrorBase = 600;
+            const int Int16ToUInt16ErrorBase = 800;
 
             ushort expected = 1;
 
@@ -193,48 +235,6 @@ namespace MDArrays.@short
             if (expected != Convert.ToUInt16(vt1.short3darr[1, 0, 1])) return Int16ToUInt16ErrorBase + 6;
             if (expected != Convert.ToUInt16(cl1.short3darr[1, 0, 1])) return Int16ToUInt16ErrorBase + 7;
             if (expected != Convert.ToUInt16(ja2[1][1, 0, 1])) return Int16ToUInt16ErrorBase + 8;
-
-            return 0;
-        }
-
-        private static int Int16ToCharTests(VT vt1, CL cl1)
-        {
-            const int int16ToCharErrorBase = 700;
-
-            char expected = '1';
-
-            // 2d
-            if (expected != Convert.ToChar(short2darr_b[0, 1])) return int16ToCharErrorBase + 1;
-            if (expected != Convert.ToChar(vt1.short2darr_b[0, 1])) return int16ToCharErrorBase + 2;
-            if (expected != Convert.ToChar(cl1.short2darr_b[0, 1])) return int16ToCharErrorBase + 3;
-            if (expected != Convert.ToChar(ja1_b[0][0, 1])) return int16ToCharErrorBase + 4;
-
-            // 3d
-            if (expected != Convert.ToChar(short3darr_b[1, 0, 1])) return int16ToCharErrorBase + 5;
-            if (expected != Convert.ToChar(vt1.short3darr_b[1, 0, 1])) return int16ToCharErrorBase + 6;
-            if (expected != Convert.ToChar(cl1.short3darr_b[1, 0, 1])) return int16ToCharErrorBase + 7;
-            if (expected != Convert.ToChar(ja2_b[1][1, 0, 1])) return int16ToCharErrorBase + 8;
-
-            return 0;
-        }
-
-        private static int Int16ToBoolTests(VT vt1, CL cl1)
-        {
-            const int int16ToBoolErrorBase = 800;
-
-            bool expected = true;
-
-            // 2d
-            if (expected != Convert.ToBoolean(short2darr[0, 1])) return int16ToBoolErrorBase + 1;
-            if (expected != Convert.ToBoolean(vt1.short2darr[0, 1])) return int16ToBoolErrorBase + 2;
-            if (expected != Convert.ToBoolean(cl1.short2darr[0, 1])) return int16ToBoolErrorBase + 3;
-            if (expected != Convert.ToBoolean(ja1[0][0, 1])) return int16ToBoolErrorBase + 4;
-
-            // 3d
-            if (expected != Convert.ToBoolean(short3darr[1, 0, 1])) return int16ToBoolErrorBase + 5;
-            if (expected != Convert.ToBoolean(vt1.short3darr[1, 0, 1])) return int16ToBoolErrorBase + 6;
-            if (expected != Convert.ToBoolean(cl1.short3darr[1, 0, 1])) return int16ToBoolErrorBase + 7;
-            if (expected != Convert.ToBoolean(ja2[1][1, 0, 1])) return int16ToBoolErrorBase + 8;
 
             return 0;
         }

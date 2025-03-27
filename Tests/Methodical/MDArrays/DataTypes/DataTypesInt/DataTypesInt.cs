@@ -56,14 +56,16 @@ namespace MDArrays.@int
             ja1_c[0] = new int[,] { { 0, 49 }, { 0, 0 } };
             ja2_c[1] = new int[,,] { { { 0, 0 } }, { { 0, 49 } }, { { 0, 0 } } };
 
-
-            int result = Int32Tests(vt1, cl1);
-            if (result != 0) return result;
-
-            result = Int32ToBoolTests(vt1, cl1);
+            int result = Int32ToBoolTests(vt1, cl1);
             if (result != 0) return result;
 
             result = Int32ToByteTests(vt1, cl1);
+            if (result != 0) return result;
+
+            result = Int32ToCharTests(vt1, cl1);
+            if (result != 0) return result;
+
+            result = Int32Tests(vt1, cl1);
             if (result != 0) return result;
 
             result = Int32ToSByteTests(vt1, cl1);
@@ -78,35 +80,12 @@ namespace MDArrays.@int
             result = Int32ToUInt16Tests(vt1, cl1);
             if (result != 0) return result;
 
-            result = Int32ToCharTests(vt1, cl1);
-            if (result != 0) return result;
-
-            return 0;
-        }
-
-        private static int Int32Tests(VT vt1, CL cl1)
-        {
-            const int Int32ErrorBase = 100;
-
-            int expected = -1;
-            // 2d
-            if (expected != int2darr[0, 1]) return Int32ErrorBase + 1;
-            if (expected != vt1.int2darr[0, 1]) return Int32ErrorBase + 2;
-            if (expected != cl1.int2darr[0, 1]) return Int32ErrorBase + 3;
-            if (expected != ja1[0][0, 1]) return Int32ErrorBase + 4;
-
-            // 3d
-            if (expected != int3darr[1, 0, 1]) return Int32ErrorBase + 5;
-            if (expected != vt1.int3darr[1, 0, 1]) return Int32ErrorBase + 6;
-            if (expected != cl1.int3darr[1, 0, 1]) return Int32ErrorBase + 7;
-            if (expected != ja2[1][1, 0, 1]) return Int32ErrorBase + 8;
-
             return 0;
         }
 
         private static int Int32ToBoolTests(VT vt1, CL cl1)
         {
-            const int Int32ToBoolErrorBase = 200;
+            const int Int32ToBoolErrorBase = 100;
 
             bool expected = true;
 
@@ -127,7 +106,7 @@ namespace MDArrays.@int
 
         private static int Int32ToByteTests(VT vt1, CL cl1)
         {
-            const int Int32ToByteErrorBase = 300;
+            const int Int32ToByteErrorBase = 200;
 
             byte expected = 1;
 
@@ -146,9 +125,49 @@ namespace MDArrays.@int
             return 0;
         }
 
+        private static int Int32ToCharTests(VT vt1, CL cl1)
+        {
+            const int Int32ToCharErrorBase = 300;
+
+            char expected = '1';
+
+            // 2d
+            if (expected != Convert.ToChar(int2darr_c[0, 1])) return Int32ToCharErrorBase + 1;
+            if (expected != Convert.ToChar(vt1.int2darr_c[0, 1])) return Int32ToCharErrorBase + 2;
+            if (expected != Convert.ToChar(cl1.int2darr_c[0, 1])) return Int32ToCharErrorBase + 3;
+            if (expected != Convert.ToChar(ja1_c[0][0, 1])) return Int32ToCharErrorBase + 4;
+
+            // 3d
+            if (expected != Convert.ToChar(int3darr_c[1, 0, 1])) return Int32ToCharErrorBase + 5;
+            if (expected != Convert.ToChar(vt1.int3darr_c[1, 0, 1])) return Int32ToCharErrorBase + 6;
+            if (expected != Convert.ToChar(cl1.int3darr_c[1, 0, 1])) return Int32ToCharErrorBase + 7;
+            if (expected != Convert.ToChar(ja2_c[1][1, 0, 1])) return Int32ToCharErrorBase + 8;
+
+            return 0;
+        }
+
+        private static int Int32Tests(VT vt1, CL cl1)
+        {
+            const int Int32ErrorBase = 400;
+
+            int expected = -1;
+            // 2d
+            if (expected != int2darr[0, 1]) return Int32ErrorBase + 1;
+            if (expected != vt1.int2darr[0, 1]) return Int32ErrorBase + 2;
+            if (expected != cl1.int2darr[0, 1]) return Int32ErrorBase + 3;
+            if (expected != ja1[0][0, 1]) return Int32ErrorBase + 4;
+
+            // 3d
+            if (expected != int3darr[1, 0, 1]) return Int32ErrorBase + 5;
+            if (expected != vt1.int3darr[1, 0, 1]) return Int32ErrorBase + 6;
+            if (expected != cl1.int3darr[1, 0, 1]) return Int32ErrorBase + 7;
+            if (expected != ja2[1][1, 0, 1]) return Int32ErrorBase + 8;
+
+            return 0;
+        }
         private static int Int32ToSByteTests(VT vt1, CL cl1)
         {
-            const int Int32ToSByteErrorBase = 400;
+            const int Int32ToSByteErrorBase = 500;
 
             sbyte expected = -1;
 
@@ -169,7 +188,7 @@ namespace MDArrays.@int
 
         private static int Int32ToInt16Tests(VT vt1, CL cl1)
         {
-            const int Int32ToInt16ErrorBase = 500;
+            const int Int32ToInt16ErrorBase = 600;
 
             short expected = -1;
 
@@ -190,7 +209,7 @@ namespace MDArrays.@int
 
         private static int Int32ToUInt32Tests(VT vt1, CL cl1)
         {
-            const int Int32ToUInt32ErrorBase = 600;
+            const int Int32ToUInt32ErrorBase = 700;
 
             uint expected = 1;
 
@@ -211,7 +230,7 @@ namespace MDArrays.@int
 
         private static int Int32ToUInt16Tests(VT vt1, CL cl1)
         {
-            const int Int32ToUInt16ErrorBase = 700;
+            const int Int32ToUInt16ErrorBase = 800;
 
             ushort expected = 1;
 
@@ -226,27 +245,6 @@ namespace MDArrays.@int
             if (expected != Convert.ToUInt16(vt1.int3darr_b[1, 0, 1])) return Int32ToUInt16ErrorBase + 6;
             if (expected != Convert.ToUInt16(cl1.int3darr_b[1, 0, 1])) return Int32ToUInt16ErrorBase + 7;
             if (expected != Convert.ToUInt16(ja2_b[1][1, 0, 1])) return Int32ToUInt16ErrorBase + 8;
-
-            return 0;
-        }
-
-        private static int Int32ToCharTests(VT vt1, CL cl1)
-        {
-            const int Int32ToCharErrorBase = 800;
-
-            char expected = '1';
-
-            // 2d
-            if (expected != Convert.ToChar(int2darr_c[0, 1])) return Int32ToCharErrorBase + 1;
-            if (expected != Convert.ToChar(vt1.int2darr_c[0, 1])) return Int32ToCharErrorBase + 2;
-            if (expected != Convert.ToChar(cl1.int2darr_c[0, 1])) return Int32ToCharErrorBase + 3;
-            if (expected != Convert.ToChar(ja1_c[0][0, 1])) return Int32ToCharErrorBase + 4;
-
-            // 3d
-            if (expected != Convert.ToChar(int3darr_c[1, 0, 1])) return Int32ToCharErrorBase + 5;
-            if (expected != Convert.ToChar(vt1.int3darr_c[1, 0, 1])) return Int32ToCharErrorBase + 6;
-            if (expected != Convert.ToChar(cl1.int3darr_c[1, 0, 1])) return Int32ToCharErrorBase + 7;
-            if (expected != Convert.ToChar(ja2_c[1][1, 0, 1])) return Int32ToCharErrorBase + 8;
 
             return 0;
         }

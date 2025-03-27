@@ -45,10 +45,13 @@ namespace MDArrays.@uushort
             ja1_b[0] = new ushort[,] { { 0, 49 }, { 0, 0 } };
             ja2_b[1] = new ushort[,,] { { { 0, 0 } }, { { 0, 49 } }, { { 0, 0 } } };
 
-            int result = UInt16Tests(vt1, cl1);
+            int result = UInt16ToBoolTests(vt1, cl1);
             if (result != 0) return result;
 
             result = UInt16ToByteTests(vt1, cl1);
+            if (result != 0) return result;
+
+            result = UInt16ToCharTests(vt1, cl1);
             if (result != 0) return result;
 
             result = UInt16ToInt32Tests(vt1, cl1);
@@ -57,37 +60,35 @@ namespace MDArrays.@uushort
             result = UInt16ToSByteTests(vt1, cl1);
             if (result != 0) return result;
 
-            result = UInt16ToUInt32Tests(vt1, cl1);
-            if (result != 0) return result;
-
             result = UInt16ToInt16Tests(vt1, cl1);
             if (result != 0) return result;
 
-            result = UInt16ToCharTests(vt1, cl1);
+            result = UInt16ToUInt32Tests(vt1, cl1);
             if (result != 0) return result;
 
-            result = UInt16ToBoolTests(vt1, cl1);
+            result = UInt16Tests(vt1, cl1);
             if (result != 0) return result;
 
             return 0;
         }
 
-        private static int UInt16Tests(VT vt1, CL cl1)
+        private static int UInt16ToBoolTests(VT vt1, CL cl1)
         {
-            const int uint16ErrorBase = 100;
+            const int uint16ToBoolErrorBase = 100;
 
-            ushort expected = 1;
+            bool expected = true;
+
             // 2d
-            if (expected != ushort2darr[0, 1]) return uint16ErrorBase + 1;
-            if (expected != vt1.ushort2darr[0, 1]) return uint16ErrorBase + 2;
-            if (expected != cl1.ushort2darr[0, 1]) return uint16ErrorBase + 3;
-            if (expected != ja1[0][0, 1]) return uint16ErrorBase + 4;
+            if (expected != Convert.ToBoolean(ushort2darr[0, 1])) return uint16ToBoolErrorBase + 1;
+            if (expected != Convert.ToBoolean(vt1.ushort2darr[0, 1])) return uint16ToBoolErrorBase + 2;
+            if (expected != Convert.ToBoolean(cl1.ushort2darr[0, 1])) return uint16ToBoolErrorBase + 3;
+            if (expected != Convert.ToBoolean(ja1[0][0, 1])) return uint16ToBoolErrorBase + 4;
 
             // 3d
-            if (expected != ushort3darr[1, 0, 1]) return uint16ErrorBase + 5;
-            if (expected != vt1.ushort3darr[1, 0, 1]) return uint16ErrorBase + 6;
-            if (expected != cl1.ushort3darr[1, 0, 1]) return uint16ErrorBase + 7;
-            if (expected != ja2[1][1, 0, 1]) return uint16ErrorBase + 8;
+            if (expected != Convert.ToBoolean(ushort3darr[1, 0, 1])) return uint16ToBoolErrorBase + 5;
+            if (expected != Convert.ToBoolean(vt1.ushort3darr[1, 0, 1])) return uint16ToBoolErrorBase + 6;
+            if (expected != Convert.ToBoolean(cl1.ushort3darr[1, 0, 1])) return uint16ToBoolErrorBase + 7;
+            if (expected != Convert.ToBoolean(ja2[1][1, 0, 1])) return uint16ToBoolErrorBase + 8;
 
             return 0;
         }
@@ -113,9 +114,30 @@ namespace MDArrays.@uushort
             return 0;
         }
 
+        private static int UInt16ToCharTests(VT vt1, CL cl1)
+        {
+            const int uint16ToCharErrorBase = 300;
+
+            char expected = '1';
+
+            // 2d
+            if (expected != Convert.ToChar(ushort2darr_b[0, 1])) return uint16ToCharErrorBase + 1;
+            if (expected != Convert.ToChar(vt1.ushort2darr_b[0, 1])) return uint16ToCharErrorBase + 2;
+            if (expected != Convert.ToChar(cl1.ushort2darr_b[0, 1])) return uint16ToCharErrorBase + 3;
+            if (expected != Convert.ToChar(ja1_b[0][0, 1])) return uint16ToCharErrorBase + 4;
+
+            // 3d
+            if (expected != Convert.ToChar(ushort3darr_b[1, 0, 1])) return uint16ToCharErrorBase + 5;
+            if (expected != Convert.ToChar(vt1.ushort3darr_b[1, 0, 1])) return uint16ToCharErrorBase + 6;
+            if (expected != Convert.ToChar(cl1.ushort3darr_b[1, 0, 1])) return uint16ToCharErrorBase + 7;
+            if (expected != Convert.ToChar(ja2_b[1][1, 0, 1])) return uint16ToCharErrorBase + 8;
+
+            return 0;
+        }
+
         private static int UInt16ToInt32Tests(VT vt1, CL cl1)
         {
-            const int uint16ToInt32ErrorBase = 300;
+            const int uint16ToInt32ErrorBase = 400;
 
             int expected = 1;
 
@@ -136,7 +158,7 @@ namespace MDArrays.@uushort
 
         private static int UInt16ToSByteTests(VT vt1, CL cl1)
         {
-            const int uint16ToSByteErrorBase = 400;
+            const int uint16ToSByteErrorBase = 500;
 
             sbyte expected = 1;
 
@@ -151,27 +173,6 @@ namespace MDArrays.@uushort
             if (expected != Convert.ToSByte(vt1.ushort3darr[1, 0, 1])) return uint16ToSByteErrorBase + 6;
             if (expected != Convert.ToSByte(cl1.ushort3darr[1, 0, 1])) return uint16ToSByteErrorBase + 7;
             if (expected != Convert.ToSByte(ja2[1][1, 0, 1])) return uint16ToSByteErrorBase + 8;
-
-            return 0;
-        }
-
-        private static int UInt16ToUInt32Tests(VT vt1, CL cl1)
-        {
-            const int uInt16ToUInt32ErrorBase = 500;
-
-            uint expected = 1;
-
-            // 2d
-            if (expected != Convert.ToUInt32(ushort2darr[0, 1])) return uInt16ToUInt32ErrorBase + 1;
-            if (expected != Convert.ToUInt32(vt1.ushort2darr[0, 1])) return uInt16ToUInt32ErrorBase + 2;
-            if (expected != Convert.ToUInt32(cl1.ushort2darr[0, 1])) return uInt16ToUInt32ErrorBase + 3;
-            if (expected != Convert.ToUInt32(ja1[0][0, 1])) return uInt16ToUInt32ErrorBase + 4;
-
-            // 3d
-            if (expected != Convert.ToUInt32(ushort3darr[1, 0, 1])) return uInt16ToUInt32ErrorBase + 5;
-            if (expected != Convert.ToUInt32(vt1.ushort3darr[1, 0, 1])) return uInt16ToUInt32ErrorBase + 6;
-            if (expected != Convert.ToUInt32(cl1.ushort3darr[1, 0, 1])) return uInt16ToUInt32ErrorBase + 7;
-            if (expected != Convert.ToUInt32(ja2[1][1, 0, 1])) return uInt16ToUInt32ErrorBase + 8;
 
             return 0;
         }
@@ -197,44 +198,43 @@ namespace MDArrays.@uushort
             return 0;
         }
 
-        private static int UInt16ToCharTests(VT vt1, CL cl1)
+        private static int UInt16ToUInt32Tests(VT vt1, CL cl1)
         {
-            const int uint16ToCharErrorBase = 700;
+            const int uInt16ToUInt32ErrorBase = 700;
 
-            char expected = '1';
+            uint expected = 1;
 
             // 2d
-            if (expected != Convert.ToChar(ushort2darr_b[0, 1])) return uint16ToCharErrorBase + 1;
-            if (expected != Convert.ToChar(vt1.ushort2darr_b[0, 1])) return uint16ToCharErrorBase + 2;
-            if (expected != Convert.ToChar(cl1.ushort2darr_b[0, 1])) return uint16ToCharErrorBase + 3;
-            if (expected != Convert.ToChar(ja1_b[0][0, 1])) return uint16ToCharErrorBase + 4;
+            if (expected != Convert.ToUInt32(ushort2darr[0, 1])) return uInt16ToUInt32ErrorBase + 1;
+            if (expected != Convert.ToUInt32(vt1.ushort2darr[0, 1])) return uInt16ToUInt32ErrorBase + 2;
+            if (expected != Convert.ToUInt32(cl1.ushort2darr[0, 1])) return uInt16ToUInt32ErrorBase + 3;
+            if (expected != Convert.ToUInt32(ja1[0][0, 1])) return uInt16ToUInt32ErrorBase + 4;
 
             // 3d
-            if (expected != Convert.ToChar(ushort3darr_b[1, 0, 1])) return uint16ToCharErrorBase + 5;
-            if (expected != Convert.ToChar(vt1.ushort3darr_b[1, 0, 1])) return uint16ToCharErrorBase + 6;
-            if (expected != Convert.ToChar(cl1.ushort3darr_b[1, 0, 1])) return uint16ToCharErrorBase + 7;
-            if (expected != Convert.ToChar(ja2_b[1][1, 0, 1])) return uint16ToCharErrorBase + 8;
+            if (expected != Convert.ToUInt32(ushort3darr[1, 0, 1])) return uInt16ToUInt32ErrorBase + 5;
+            if (expected != Convert.ToUInt32(vt1.ushort3darr[1, 0, 1])) return uInt16ToUInt32ErrorBase + 6;
+            if (expected != Convert.ToUInt32(cl1.ushort3darr[1, 0, 1])) return uInt16ToUInt32ErrorBase + 7;
+            if (expected != Convert.ToUInt32(ja2[1][1, 0, 1])) return uInt16ToUInt32ErrorBase + 8;
 
             return 0;
         }
 
-        private static int UInt16ToBoolTests(VT vt1, CL cl1)
+        private static int UInt16Tests(VT vt1, CL cl1)
         {
-            const int uint16ToBoolErrorBase = 800;
+            const int uint16ErrorBase = 800;
 
-            bool expected = true;
-
+            ushort expected = 1;
             // 2d
-            if (expected != Convert.ToBoolean(ushort2darr[0, 1])) return uint16ToBoolErrorBase + 1;
-            if (expected != Convert.ToBoolean(vt1.ushort2darr[0, 1])) return uint16ToBoolErrorBase + 2;
-            if (expected != Convert.ToBoolean(cl1.ushort2darr[0, 1])) return uint16ToBoolErrorBase + 3;
-            if (expected != Convert.ToBoolean(ja1[0][0, 1])) return uint16ToBoolErrorBase + 4;
+            if (expected != ushort2darr[0, 1]) return uint16ErrorBase + 1;
+            if (expected != vt1.ushort2darr[0, 1]) return uint16ErrorBase + 2;
+            if (expected != cl1.ushort2darr[0, 1]) return uint16ErrorBase + 3;
+            if (expected != ja1[0][0, 1]) return uint16ErrorBase + 4;
 
             // 3d
-            if (expected != Convert.ToBoolean(ushort3darr[1, 0, 1])) return uint16ToBoolErrorBase + 5;
-            if (expected != Convert.ToBoolean(vt1.ushort3darr[1, 0, 1])) return uint16ToBoolErrorBase + 6;
-            if (expected != Convert.ToBoolean(cl1.ushort3darr[1, 0, 1])) return uint16ToBoolErrorBase + 7;
-            if (expected != Convert.ToBoolean(ja2[1][1, 0, 1])) return uint16ToBoolErrorBase + 8;
+            if (expected != ushort3darr[1, 0, 1]) return uint16ErrorBase + 5;
+            if (expected != vt1.ushort3darr[1, 0, 1]) return uint16ErrorBase + 6;
+            if (expected != cl1.ushort3darr[1, 0, 1]) return uint16ErrorBase + 7;
+            if (expected != ja2[1][1, 0, 1]) return uint16ErrorBase + 8;
 
             return 0;
         }
