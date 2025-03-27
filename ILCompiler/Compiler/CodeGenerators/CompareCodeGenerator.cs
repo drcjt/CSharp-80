@@ -10,6 +10,7 @@ namespace ILCompiler.Compiler.CodeGenerators
         {
             { Tuple.Create(Operation.Eq, VarType.Int), "i_eq" },
             { Tuple.Create(Operation.Ge, VarType.Int), "i_ge" },
+            { Tuple.Create(Operation.Ge_Un, VarType.Int), "i_ge_un" },
             { Tuple.Create(Operation.Gt, VarType.Int), "i_gt" },
             { Tuple.Create(Operation.Gt_Un, VarType.Int), "i_gt_un" },
             { Tuple.Create(Operation.Ne_Un, VarType.Int), "i_neq" },
