@@ -41,15 +41,31 @@ namespace MethodicalTests
 
         private readonly string SolutionPath = Path.Combine(TestContext.CurrentContext.TestDirectory, @".\..\..\..\..\..\..");
 
+        private static ICollection<string> GetFilesIncludingSubfolders(string path, string searchPattern)
+        {
+            var paths = new List<string>();
+            var directories = Directory.GetDirectories(path);
+            foreach (var directory in directories)
+            {
+                paths.AddRange(GetFilesIncludingSubfolders(directory, searchPattern));
+            }
+            paths.AddRange(Directory.GetFiles(path, searchPattern).ToList());
+            return paths;
+        }
+
         private static IEnumerable<TestCaseData> MethodicalTestsCaseData
         {
             get
             {
                 var methodicalTestsPath = TestContext.CurrentContext.TestDirectory.RemoveDirectories(4);
                 var binConfigTargetPath = TestContext.CurrentContext.TestDirectory.GetLastDirectories(3);
-                string[] methodicalTestsPaths = Directory.GetDirectories(methodicalTestsPath);
-                foreach (string methodicalTestPath in methodicalTestsPaths) 
+
+                var projectFiles = GetFilesIncludingSubfolders(methodicalTestsPath, "*.csproj");
+
+                foreach (var projectFile in projectFiles)
                 {
+                    var methodicalTestPath = Path.GetDirectoryName(projectFile);
+
                     var methodicalTestName = Path.GetFileName(methodicalTestPath);
                     if (methodicalTestName != nameof(MethodicalTestsRunner))
                     {

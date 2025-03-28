@@ -22,8 +22,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
-    <ProjectReference Include="..\..\..\ILCompiler\ILCompiler.csproj" />
+    <ProjectReference Include="..\..\..\..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
+    <ProjectReference Include="..\..\..\..\..\ILCompiler\ILCompiler.csproj" />
   </ItemGroup>
   
 </Project>

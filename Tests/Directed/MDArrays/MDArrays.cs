@@ -6,8 +6,6 @@ namespace SimpleMDArray
     {
         public static int Main()
         {
-            // TODO: Reinstate this when MD arrays are implemented properly
-            /*
             int SIZE = 10;
 
             Int32[,,] foo = new Int32[SIZE, SIZE, SIZE];
@@ -46,9 +44,6 @@ namespace SimpleMDArray
             {
                 return 1;
             }
-            */
-
-            return 0;
         }
     }
 }

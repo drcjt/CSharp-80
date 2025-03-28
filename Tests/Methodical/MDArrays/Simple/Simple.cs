@@ -1,4 +1,4 @@
-﻿namespace MDArrays
+﻿namespace Simple
 {
     public static class Test
     {
