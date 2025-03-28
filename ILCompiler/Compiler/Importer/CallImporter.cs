@@ -30,31 +30,8 @@ namespace ILCompiler.Compiler.Importer
 
         public static void ImportCall(MethodDesc method, Instruction instruction, ImportContext context, IILImporterProxy importer, StackEntry? newObjThis = null)
         {
-            var isArrayMethod = false;
-            MethodDesc methodToCall;
+            MethodDesc methodToCall = method;
             var opcode = instruction.Opcode;
-            if (method.OwningType.IsSzArray)
-            {
-                switch (method.Name)
-                {
-                    case "Set":
-                        methodToCall = method.CreateUserMethod("Set");
-                        break;
-                    case "Get":
-                        methodToCall = method.CreateUserMethod("Get");
-                        break;
-                    case "Address":
-                        methodToCall = method.CreateUserMethod("Address");
-                        break;
-                    default:
-                        throw new InvalidOperationException($"Unknown array intrinsic method {method.Name}");
-                }
-                isArrayMethod = true;
-            }
-            else
-            {
-                methodToCall = method;
-            }
 
             var arguments = new List<StackEntry>();
             for (var i = methodToCall.Signature.Length - 1; i >= 0; i--)
@@ -149,15 +126,14 @@ namespace ILCompiler.Compiler.Importer
             }
 
             // Intrinsic calls
-            if (methodToCall.IsIntrinsic || isArrayMethod)
+            if (methodToCall.IsIntrinsic)
             {
                 if (ImportIntrinsicCall(methodToCall, arguments, importer, method, context))
                 {
                     return;
                 }
             }
-
-            if (!methodToCall.IsIntrinsic)
+            else
             {
                 methodToCall = methodToCall.GetCanonMethodTarget(TypeSystem.Canon.CanonicalFormKind.Specific);
             }
@@ -324,70 +300,6 @@ namespace ILCompiler.Compiler.Importer
                         return true;
                     }
                     break;
-                case "Get":
-                    {
-                        // first parameter = this, remaining parameters = indices
-                        var valueType = methodToCall.Signature[0];
-                        var elemSize = valueType.Type.GetElementSize().AsInt;
-                        var rank = methodToCall.Signature.Length;
-
-                        // Arrays are stored in row-major order see https://github.com/stakx/ecma-335/blob/master/docs/i.8.9.1-array-types.md
-
-                        // Calculation should follow details here https://en.wikipedia.org/wiki/Row-_and_column-major_order
-                        // The calculation below is incorrect
-
-                        // Calculate indices multipled together
-                        StackEntry indexOp = new CastEntry(arguments[1], VarType.Ptr);
-                        for (var dimension = 1; dimension < rank; dimension++)
-                        {
-                            var nextIndexOp = new CastEntry(arguments[dimension + 1], VarType.Ptr);
-                            indexOp = new BinaryOperator(Operation.Mul, isComparison: false, indexOp, nextIndexOp, VarType.Ptr);
-                        }
-                        // Multiply by elemSize
-                        var size = new NativeIntConstantEntry((short)elemSize);
-                        indexOp = new BinaryOperator(Operation.Mul, isComparison: false, indexOp, size, VarType.Ptr);
-
-                        // Add address of array
-                        var addr = new BinaryOperator(Operation.Add, isComparison: false, indexOp, arguments[0], VarType.Ptr);
-
-                        var op = new IndirectEntry(addr, valueType.Type.VarType, elemSize);
-                        importer.PushExpression(op);
-
-                        return true;
-                    }
-                case "Set":
-                    {
-                        // first parameter = this, second parameter = value, remaining parameters = indices
-                        var valueType = methodToCall.Signature[0];
-                        var elemSize = valueType.Type.GetElementSize().AsInt;
-                        var rank = methodToCall.Signature.Length - 1;
-
-                        // Arrays are stored in row-major order see https://github.com/stakx/ecma-335/blob/master/docs/i.8.9.1-array-types.md
-
-                        // Calculation should follow details here https://en.wikipedia.org/wiki/Row-_and_column-major_order
-                        // The calcualtion below is incorrect
-
-                        // Calculate indices multipled together
-                        StackEntry indexOp = new CastEntry(arguments[1], VarType.Ptr);
-                        for (var dimension = 1; dimension < rank; dimension++)
-                        {
-                            var nextIndexOp = new CastEntry(arguments[dimension + 1], VarType.Ptr);
-                            indexOp = new BinaryOperator(Operation.Mul, isComparison: false, indexOp, nextIndexOp, VarType.Ptr);
-                        }
-                        // Multiply by elemSize
-                        var size = new NativeIntConstantEntry((short)elemSize);
-                        indexOp = new BinaryOperator(Operation.Mul, isComparison: false, indexOp, size, VarType.Ptr);
-
-                        // Add address of array
-                        var addr = new BinaryOperator(Operation.Add, isComparison: false, indexOp, arguments[0], VarType.Ptr);
-
-                        var op = new StoreIndEntry(addr, arguments[rank + 1], valueType.Type.VarType, 0, elemSize);
-                        importer.ImportAppendTree(op);
-
-                        return true;
-                    }
-                case "Address":
-                    throw new NotImplementedException("Multidimensional arrays not supported");
 
                 case "get_Chars":
                     {
