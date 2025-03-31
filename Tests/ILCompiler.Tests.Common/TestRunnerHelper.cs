@@ -1,8 +1,9 @@
 ﻿using NUnit.Framework;
+using System.Diagnostics;
 
 namespace ILCompiler.Tests.Common
 {
-    public class TestRunnerHelper
+    public static class TestRunnerHelper
     {
         private const string IlExtension = ".il";
         private const string CimExtension = ".cim";
@@ -34,7 +35,7 @@ namespace ILCompiler.Tests.Common
             }
         }
 
-        private static ICollection<string> GetFilesIncludingSubfolders(string path, string searchPattern)
+        private static List<string> GetFilesIncludingSubfolders(string path, string searchPattern)
         {
             var paths = new List<string>();
             var directories = Directory.GetDirectories(path);
@@ -42,7 +43,7 @@ namespace ILCompiler.Tests.Common
             {
                 paths.AddRange(GetFilesIncludingSubfolders(directory, searchPattern));
             }
-            paths.AddRange(Directory.GetFiles(path, searchPattern).ToList());
+            paths.AddRange([.. Directory.GetFiles(path, searchPattern)]);
             return paths;
         }
 
@@ -58,6 +59,8 @@ namespace ILCompiler.Tests.Common
             {
                 var testPath = Path.GetDirectoryName(projectFile);
                 var testName = Path.GetFileNameWithoutExtension(projectFile);
+
+                Debug.Assert(testPath != null);
 
                 if (!IsTestRunner(projectFile))
                 {
@@ -99,7 +102,7 @@ namespace ILCompiler.Tests.Common
                             }
                             else
                             {
-                                relativePath += $"\\{testName}";
+                                relativePath += $"{Path.DirectorySeparatorChar}{testName}";
                             }
 
                             testName = $"{relativePath} ({Path.GetFileNameWithoutExtension(ilFile)})";
