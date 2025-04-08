@@ -128,5 +128,11 @@ namespace ILCompiler.Compiler
 
             return false;
         }
+
+        public static bool IsArrayAddressMethod(this MethodDesc method)
+        {
+            var arrayMethod = method as ArrayMethod;
+            return arrayMethod != null && arrayMethod.Kind == ArrayMethodKind.Address;
+        }
     }
 }
