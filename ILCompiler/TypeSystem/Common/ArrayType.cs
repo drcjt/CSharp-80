@@ -136,8 +136,8 @@ namespace ILCompiler.TypeSystem.Common
         public override bool HasThis
             => Kind switch
             {
-                ArrayMethodKind.Get or ArrayMethodKind.Set or ArrayMethodKind.AddressWithHiddenArg => true,
-                _ => false,
+                ArrayMethodKind.Ctor => false,
+                _ => true,
             };
 
         public override MethodSignature Signature
@@ -164,8 +164,21 @@ namespace ILCompiler.TypeSystem.Common
                         }
 
                     case ArrayMethodKind.Address:
+                        {
+                            var parameters = new MethodParameter[_owningType.Rank];
+                            for (int i = 0; i < _owningType.Rank; i++)
+                                parameters[i] = new MethodParameter(_owningType.Context.GetWellKnownType(WellKnownType.Int32), String.Empty);
+                            return new MethodSignature(MethodSignatureFlags.None, _owningType.ElementType.MakeByRefType(), parameters);
+                        }
+
                     case ArrayMethodKind.AddressWithHiddenArg:
-                        throw new NotImplementedException();
+                        {
+                            var parameters = new MethodParameter[_owningType.Rank + 1];
+                            parameters[0] = new MethodParameter(_owningType.Context.GetPointerType(_owningType.Context.GetWellKnownType(WellKnownType.Void)), String.Empty);
+                            for (int i = 0; i < _owningType.Rank; i++)
+                                parameters[i + 1] = new MethodParameter(_owningType.Context.GetWellKnownType(WellKnownType.Int32), String.Empty);
+                            return new MethodSignature(MethodSignatureFlags.None, _owningType.ElementType.MakeByRefType(), parameters);
+                        }
 
                     default:
                         {
