@@ -104,7 +104,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             if (!_methodNodesByFullName.TryGetValue(method, out var methodNode))
             {
-                methodNode = new Z80MethodCodeNode(method, _methodCompilerFactory, _module);
+                methodNode = CreateMethodEntryPoint(method);
                 _methodNodesByFullName[method] = methodNode;
             }
 
@@ -120,6 +120,16 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
 
             return methodNode;
+        }
+
+        private Z80MethodCodeNode CreateMethodEntryPoint(MethodDesc method)
+        {
+            if (method.IsArrayAddressMethod())
+            {
+                return new Z80MethodCodeNode(((ArrayType)method.OwningType).GetArrayMethod(ArrayMethodKind.AddressWithHiddenArg), _methodCompilerFactory, _module);
+            }
+
+            return new Z80MethodCodeNode(method, _methodCompilerFactory, _module);
         }
 
         public VTableSliceNode VTable(TypeDesc type)
