@@ -92,5 +92,10 @@
         {
             return typeDef.Context.GetInstantiatedType(typeDef, new Instantiation(genericParameters));
         }
+
+        public static ByRefType MakeByRefType(this TypeDesc type)
+        {
+            return type.Context.GetByRefType(type);
+        }
     }
 }

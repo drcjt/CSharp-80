@@ -87,7 +87,7 @@ namespace ILCompiler.TypeSystem.Dnlib
             if (typeSig.IsByRef)
             {
                 var byRefTypeSig = (ByRefSig)typeSig;
-                return new ByRefType(Create(byRefTypeSig.Next));
+                return Context.GetByRefType(Create(byRefTypeSig.Next));
             }
 
             if (typeSig.IsGenericMethodParameter)

@@ -136,59 +136,72 @@ namespace ILCompiler.TypeSystem.Common
         public override bool HasThis
             => Kind switch
             {
-                ArrayMethodKind.Get or ArrayMethodKind.Set or ArrayMethodKind.AddressWithHiddenArg => true,
-                _ => false,
+                ArrayMethodKind.Ctor => false,
+                _ => true,
             };
 
         public override MethodSignature Signature
-        {
-            get
+            => Kind switch
             {
-                switch (Kind)
-                {
-                    case ArrayMethodKind.Get:
-                        {
-                            var parameters = new MethodParameter[_owningType.Rank];
-                            for (int i = 0; i < _owningType.Rank; i++)
-                                parameters[i] = new MethodParameter(_owningType.Context.GetWellKnownType(WellKnownType.Int32), String.Empty);
-                            return new MethodSignature(MethodSignatureFlags.None, _owningType.ElementType, parameters);
-                        }
+                ArrayMethodKind.Get => CreateGetMethodSignature(),
+                ArrayMethodKind.Set => CreateSetMethodSignature(),
+                ArrayMethodKind.Address => CreateAddressMethodSignature(),
+                ArrayMethodKind.AddressWithHiddenArg => CreateAddressWithHiddenArgMethodSignature(),
+                _ => CreateCtorMethodSignature(),
+            };
 
-                    case ArrayMethodKind.Set:
-                        {
-                            var parameters = new MethodParameter[_owningType.Rank + 1];
-                            for (int i = 0; i < _owningType.Rank; i++)
-                                parameters[i] = new MethodParameter(_owningType.Context.GetWellKnownType(WellKnownType.Int32), String.Empty);
-                            parameters[_owningType.Rank] = new MethodParameter(_owningType.ElementType, String.Empty);
-                            return new MethodSignature(MethodSignatureFlags.None, this.Context.GetWellKnownType(WellKnownType.Void), parameters);
-                        }
-
-                    case ArrayMethodKind.Address:
-                    case ArrayMethodKind.AddressWithHiddenArg:
-                        throw new NotImplementedException();
-
-                    default:
-                        {
-                            int numberOfParameters;
-                            if (_owningType.IsSzArray)
-                            {
-                                numberOfParameters = 1 + (int)Kind - (int)ArrayMethodKind.Ctor;
-                            }
-                            else
-                            {
-                                numberOfParameters = (Kind == ArrayMethodKind.Ctor) ? _owningType.Rank : 2 * _owningType.Rank;
-                            }
-                            var parameters = new MethodParameter[numberOfParameters];
-                            for (int i = 0; i < numberOfParameters; i++)
-                            {
-                                parameters[i] = new MethodParameter(Context.GetWellKnownType(WellKnownType.Int32), String.Empty);
-                            }
-
-                            return new MethodSignature(MethodSignatureFlags.None, Context.GetWellKnownType(WellKnownType.Void), parameters);
-                        }
-                }
-                throw new NotImplementedException();
+        private MethodSignature CreateCtorMethodSignature()
+        {
+            int numberOfParameters;
+            if (_owningType.IsSzArray)
+            {
+                numberOfParameters = 1 + (int)Kind - (int)ArrayMethodKind.Ctor;
             }
+            else
+            {
+                numberOfParameters = (Kind == ArrayMethodKind.Ctor) ? _owningType.Rank : 2 * _owningType.Rank;
+            }
+            var parameters = new MethodParameter[numberOfParameters];
+            for (int i = 0; i < numberOfParameters; i++)
+            {
+                parameters[i] = new MethodParameter(Context.GetWellKnownType(WellKnownType.Int32), String.Empty);
+            }
+
+            return new MethodSignature(MethodSignatureFlags.None, Context.GetWellKnownType(WellKnownType.Void), parameters);
+        }
+
+        private MethodSignature CreateAddressWithHiddenArgMethodSignature()
+        {
+            var parameters = new MethodParameter[_owningType.Rank + 1];
+            parameters[0] = new MethodParameter(_owningType.Context.GetPointerType(_owningType.Context.GetWellKnownType(WellKnownType.Void)), String.Empty);
+            for (int i = 0; i < _owningType.Rank; i++)
+                parameters[i + 1] = new MethodParameter(_owningType.Context.GetWellKnownType(WellKnownType.Int32), String.Empty);
+            return new MethodSignature(MethodSignatureFlags.None, _owningType.ElementType.MakeByRefType(), parameters);
+        }
+
+        private MethodSignature CreateAddressMethodSignature()
+        {
+            var parameters = new MethodParameter[_owningType.Rank];
+            for (int i = 0; i < _owningType.Rank; i++)
+                parameters[i] = new MethodParameter(_owningType.Context.GetWellKnownType(WellKnownType.Int32), String.Empty);
+            return new MethodSignature(MethodSignatureFlags.None, _owningType.ElementType.MakeByRefType(), parameters);
+        }
+
+        private MethodSignature CreateSetMethodSignature()
+        {
+            var parameters = new MethodParameter[_owningType.Rank + 1];
+            for (int i = 0; i < _owningType.Rank; i++)
+                parameters[i] = new MethodParameter(_owningType.Context.GetWellKnownType(WellKnownType.Int32), String.Empty);
+            parameters[_owningType.Rank] = new MethodParameter(_owningType.ElementType, String.Empty);
+            return new MethodSignature(MethodSignatureFlags.None, this.Context.GetWellKnownType(WellKnownType.Void), parameters);
+        }
+
+        private MethodSignature CreateGetMethodSignature()
+        {
+            var parameters = new MethodParameter[_owningType.Rank];
+            for (int i = 0; i < _owningType.Rank; i++)
+                parameters[i] = new MethodParameter(_owningType.Context.GetWellKnownType(WellKnownType.Int32), String.Empty);
+            return new MethodSignature(MethodSignatureFlags.None, _owningType.ElementType, parameters);
         }
 
         public override string Name

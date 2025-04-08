@@ -118,7 +118,7 @@ namespace ILCompiler.IL.Stubs
                     body.Instructions.Add(new Instruction(ILOpcode.stobj, offset++, elementType));
                     break;
 
-                case ArrayMethodKind.Address:
+                case ArrayMethodKind.AddressWithHiddenArg:
                     break;
             }
 
