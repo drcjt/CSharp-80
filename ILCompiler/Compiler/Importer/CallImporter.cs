@@ -60,6 +60,13 @@ namespace ILCompiler.Compiler.Importer
                 arguments.Add(argument);
             }
 
+            if (methodToCall.IsArrayAddressMethod())
+            {
+                // Ptr to typedesc for array type
+                var arrayTypeDescPtr = new NativeIntConstantEntry(context.NameMangler.GetMangledTypeName(methodToCall.OwningType));
+                arguments.Add(arrayTypeDescPtr);
+            }
+
             // Add the this pointer if required, e.g. if part of newobj
             if (newObjThis != null)
             {
@@ -71,7 +78,6 @@ namespace ILCompiler.Compiler.Importer
                 arguments.Add(thisPtr);
             }
             arguments.Reverse();
-
 
             if (opcode == ILOpcode.callvirt)
             {
@@ -149,7 +155,7 @@ namespace ILCompiler.Compiler.Importer
             }
             else
             {
-                targetMethod = context.NameMangler.GetMangledMethodName(methodToCall);
+                targetMethod = context.NameMangler.GetMangledMethodName(context.NodeFactory.MethodNode(methodToCall).Method);
             }
 
             bool directCall = !(opcode == ILOpcode.callvirt && methodToCall.IsVirtual);
