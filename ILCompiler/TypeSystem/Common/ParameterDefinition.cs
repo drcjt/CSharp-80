@@ -1,6 +1,6 @@
 ﻿namespace ILCompiler.TypeSystem.Common
 {
-    internal class ParameterDefinition
+    public class ParameterDefinition
     {
         public readonly TypeDesc Type;
         public readonly string Name;
