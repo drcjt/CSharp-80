@@ -236,8 +236,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public override IList<MethodParameter> Parameters => Signature.Parameters;
 
-        private readonly IList<LocalVariableDefinition> _locals = [];
-        public override IList<LocalVariableDefinition> Locals => _locals;
+        public override IList<LocalVariableDefinition> Locals => _methodIL?.Locals ?? [];
 
         private MethodIL? _methodIL;
         public override MethodIL? MethodIL
@@ -246,7 +245,7 @@ namespace ILCompiler.TypeSystem.Common
             {
                 if (_methodIL == null)
                 {
-                    _methodIL = ArrayMethodILEmitter.EmitIL(this, _locals);
+                    _methodIL = ArrayMethodILEmitter.EmitIL(this);
                 }
                 return _methodIL;
             }

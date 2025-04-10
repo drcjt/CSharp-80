@@ -1,11 +1,18 @@
 ﻿using ILCompiler.Compiler;
+using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Canon;
 using ILCompiler.TypeSystem.RuntimeDetermined;
 
 namespace ILCompiler.TypeSystem.Common
 {
     public class TypeSystemContext
-    {        
+    {   
+        public IConfiguration Configuration { get; init; }
+        public TypeSystemContext(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
+
         public TargetDetails Target { get; } = new TargetDetails(TargetArchitecture.Z80);
 
         private readonly Dictionary<string, ArrayType> _arrayTypes = new Dictionary<string, ArrayType>();

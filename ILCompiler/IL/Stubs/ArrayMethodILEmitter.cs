@@ -1,5 +1,6 @@
 ﻿using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
+using ILCompiler.TypeSystem.IL.Stubs;
 using System.Diagnostics;
 
 namespace ILCompiler.IL.Stubs
@@ -7,39 +8,37 @@ namespace ILCompiler.IL.Stubs
     public class ArrayMethodILEmitter
     {
         private readonly ArrayMethod _method;
-        private readonly LocalVariableDefinition _totalLocal;
-        private readonly LocalVariableDefinition _lengthLocal;
-            
-        private ArrayMethodILEmitter(ArrayMethod method, IList<LocalVariableDefinition> locals)
+        private readonly ILEmitter _emitter;
+        
+        private ArrayMethodILEmitter(ArrayMethod method)
         {
             _method = method;
-            var context = _method.Context;
+            _emitter = new ILEmitter();
+        }
 
-            _totalLocal = new LocalVariableDefinition(context.GetWellKnownType(WellKnownType.IntPtr), "total", 0);
-            _lengthLocal = new LocalVariableDefinition(context.GetWellKnownType(WellKnownType.IntPtr), "length", 1);
+        public static MethodIL EmitIL(ArrayMethod arrayMethod)
+        {
+            return new ArrayMethodILEmitter(arrayMethod).EmitIL();
+        }
 
-            if (_method.Kind != ArrayMethodKind.Ctor)
+        private MethodIL EmitIL()
+        {
+            switch (_method.Kind)
             {
-                locals.Add(_totalLocal);
-                locals.Add(_lengthLocal);
+                case ArrayMethodKind.Get:
+                case ArrayMethodKind.Set:
+                case ArrayMethodKind.AddressWithHiddenArg:
+                    EmitILForAccessor();
+                    break;
+
+                default:
+                    throw new InvalidOperationException();
             }
+
+            return _emitter.Link();
         }
 
-        public static MethodIL? EmitIL(ArrayMethod arrayMethod, IList<LocalVariableDefinition> locals)
-        {
-            return new ArrayMethodILEmitter(arrayMethod, locals).EmitIL();
-        }
-
-        private MethodIL? EmitIL()
-        {
-            return _method.Kind switch
-            {
-                ArrayMethodKind.Get or ArrayMethodKind.Set or ArrayMethodKind.AddressWithHiddenArg => EmitILForAccessor(),
-                _ => throw new InvalidOperationException(),
-            };
-        }
-
-        private MethodIL? EmitILForAccessor()
+        private void EmitILForAccessor()
         {
             Debug.Assert(_method.OwningType.IsMdArray);
 
@@ -54,8 +53,10 @@ namespace ILCompiler.IL.Stubs
 
             var helperField = _method.Context.GetWellKnownType(WellKnownType.Object).GetKnownField("m_pEEType");
 
-            var body = new MethodIL() { LocalsCount = 2 };
-            uint offset = 0;
+            var codeStream = _emitter.NewCodeStream();
+
+            var totalLocal = _emitter.NewLocal(context.GetWellKnownType(WellKnownType.IntPtr), "total");
+            var lengthLocal = _emitter.NewLocal(context.GetWellKnownType(WellKnownType.IntPtr), "length");
 
             // TODO: ArrayTypeMismatchException checks
 
@@ -64,74 +65,91 @@ namespace ILCompiler.IL.Stubs
                 throw new NotImplementedException("Methods on rank 1 MdArray not yet implemented");
             }
 
+            var skipRangeCheck = context.Configuration.SkipArrayBoundsCheck;
+
+            var rangeExceptionLabel = ILEmitter.NewCodeLabel();
+
             for (int i = 0; i < rank; i++)
             {
                 // First field is EETypePtr, then we have total length, followed by the lengths of each dimension
                 int lengthOffset = (2 * pointerSize + i * 2 /* sizeof(nint) */);
 
-                EmitLoadInteriorAddress(helperField, body, ref offset, lengthOffset);
+                EmitLoadInteriorAddress(codeStream, helperField, lengthOffset);
+                codeStream.Emit(ILOpcode.ldind_i);
+                codeStream.EmitStLoc(lengthLocal);
 
-                body.Instructions.Add(new Instruction(ILOpcode.ldind_i, offset++));
-                body.Instructions.Add(new Instruction(ILOpcode.stloc, offset++, _lengthLocal));
+                codeStream.EmitLdArg(new ParameterDefinition(_method.OwningType, "", i + argStartOffset));
+                codeStream.Emit(ILOpcode.conv_i);
 
-                body.Instructions.Add(new Instruction(ILOpcode.ldarg, offset++, new ParameterDefinition(_method.OwningType, "", i + argStartOffset)));
-                body.Instructions.Add(new Instruction(ILOpcode.conv_i, offset++));
-
-                // TODO: range check
+                if (!skipRangeCheck)
+                {
+                    codeStream.Emit(ILOpcode.dup);
+                    codeStream.EmitLdLoc(lengthLocal);
+                    codeStream.Emit(ILOpcode.conv_i);
+                    codeStream.Emit(ILOpcode.bge_un, rangeExceptionLabel);
+                }
 
                 if (i > 0)
                 {
-                    body.Instructions.Add(new Instruction(ILOpcode.ldloc, offset++, _totalLocal));
-                    body.Instructions.Add(new Instruction(ILOpcode.ldloc, offset++, _lengthLocal));
-                    body.Instructions.Add(new Instruction(ILOpcode.mul, offset++));
-                    body.Instructions.Add(new Instruction(ILOpcode.add, offset++));
+                    codeStream.EmitLdLoc(totalLocal);
+                    codeStream.EmitLdLoc(lengthLocal);
+                    codeStream.Emit(ILOpcode.mul);
+                    codeStream.Emit(ILOpcode.add);
                 }
 
-                body.Instructions.Add(new Instruction(ILOpcode.stloc, offset++, _totalLocal));
+                codeStream.EmitStLoc(totalLocal);
             }
 
             // Compute offset of first element in the array
             // First field is EETypePtr, then we have total length, followed by the lengths of each dimension
             int firstElementOffset = (2 * pointerSize + 1 * rank * 2 /* sizeof(nint) */);
 
-            EmitLoadInteriorAddress(helperField, body, ref offset, firstElementOffset);
+            EmitLoadInteriorAddress(codeStream, helperField, firstElementOffset);
 
-            body.Instructions.Add(new Instruction(ILOpcode.ldloc, offset++, _totalLocal));
-            body.Instructions.Add(new Instruction(ILOpcode.conv_u, offset++));
+            codeStream.EmitLdLoc(totalLocal);
+            codeStream.Emit(ILOpcode.conv_u);
 
             int elementSize = elementType.GetElementSize().AsInt;
             if (elementSize != 1)
             {
-                body.Instructions.Add(new Instruction(ILOpcode.ldc_i4, offset++, elementSize));
-                body.Instructions.Add(new Instruction(ILOpcode.mul, offset++));
+                codeStream.EmitLdcI4(elementSize);
+                codeStream.Emit(ILOpcode.mul);
             }
-            body.Instructions.Add(new Instruction(ILOpcode.add, offset++));
+            codeStream.Emit(ILOpcode.add);
 
             switch (_method.Kind)
             {
                 case ArrayMethodKind.Get:
-                    body.Instructions.Add(new Instruction(ILOpcode.ldobj, offset++, elementType));
+                    codeStream.Emit(ILOpcode.ldobj, elementType);
                     break;
 
                 case ArrayMethodKind.Set:
-                    body.Instructions.Add(new Instruction(ILOpcode.ldarg, offset++, new ParameterDefinition(_method.OwningType, "", argStartOffset + rank)));
-                    body.Instructions.Add(new Instruction(ILOpcode.stobj, offset++, elementType));
+                    codeStream.EmitLdArg(new ParameterDefinition(_method.OwningType, "", argStartOffset + rank));
+                    codeStream.Emit(ILOpcode.stobj, elementType);
                     break;
 
                 case ArrayMethodKind.AddressWithHiddenArg:
                     break;
             }
 
-            body.Instructions.Add(new Instruction(ILOpcode.ret, offset));
-            return body;
+            codeStream.Emit(ILOpcode.ret);
+
+            if (!skipRangeCheck)
+            {
+                codeStream.EmitLabel(rangeExceptionLabel);
+                codeStream.Emit(ILOpcode.pop);
+
+                var throwHelperMethod = _method.Context.GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException");
+                codeStream.Emit(ILOpcode.call, throwHelperMethod);
+            }
         }
 
-        private static void EmitLoadInteriorAddress(FieldDesc helperField, MethodIL body, ref uint offset, int lengthOffset)
+        private static void EmitLoadInteriorAddress(ILCodeStream codeStream, FieldDesc helperField, int lengthOffset)
         {
-            body.Instructions.Add(new Instruction(ILOpcode.ldarg_0, offset++));
-            body.Instructions.Add(new Instruction(ILOpcode.ldflda, offset++, helperField));
-            body.Instructions.Add(new Instruction(ILOpcode.ldc_i4, offset++, lengthOffset));
-            body.Instructions.Add(new Instruction(ILOpcode.add, offset++));
+            codeStream.Emit(ILOpcode.ldarg_0); // this pointer
+            codeStream.EmitLdFlda(helperField); 
+            codeStream.EmitLdcI4(lengthOffset);
+            codeStream.Emit(ILOpcode.add);
         }
     }
 }

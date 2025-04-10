@@ -4,12 +4,14 @@ namespace ILCompiler.TypeSystem.IL
 {
     public class MethodIL
     {
-        public virtual IList<Instruction> Instructions { get; } = new List<Instruction>();
+        public virtual IList<Instruction> Instructions { get; set; } = new List<Instruction>();
 
         public virtual ILExceptionRegion[] GetExceptionRegions() => [];
         public virtual bool IsInitLocals { get; }
 
         public virtual int LocalsCount { get; set; }
+
+        public List<LocalVariableDefinition> Locals { get; set; } = new List<LocalVariableDefinition>();
 
         public virtual MethodIL GetMethodILDefinition()
         {

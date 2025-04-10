@@ -41,7 +41,8 @@ namespace ILCompiler.UnitTests
             string inputFilePath = Path.Combine(SolutionPath, $@".\Tests\CoreTestAssembly\bin\{buildConfigurationName}\net9.0\CoreTestAssembly.dll");
             _testModule = ModuleDefMD.Load(inputFilePath, options);
 
-            var typeSystemContext = new TypeSystemContext();
+            var configuration = new Configuration();
+            var typeSystemContext = new TypeSystemContext(configuration);
             typeSystemContext.GenericsMode = SharedGenericsMode.CanonicalReferenceTypes;
             var corLibModuleProvider = new CorLibModuleProvider();
             corLibModuleProvider.CorLibModule = corlibModule;

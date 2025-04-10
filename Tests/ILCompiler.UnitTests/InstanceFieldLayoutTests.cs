@@ -36,6 +36,14 @@ namespace ILCompiler.UnitTests
             _testModule = ModuleDefMD.Load(inputFilePath, options);
         }
 
+        private static DnlibModule CreateModule()
+        {
+            return new DnlibModule(
+                new TypeSystemContext(new Configuration()),
+                new Compiler.CorLibModuleProvider(),
+                new RTILProvider());
+        }
+
         [Test]
         public void TestSequentialTypeLayout_WithFixedSizeBuffer()
         {
@@ -43,7 +51,7 @@ namespace ILCompiler.UnitTests
 
             var target = new TargetDetails(TargetArchitecture.Z80);
 
-            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider(), new RTILProvider());
+            var module = CreateModule();
             var typeDesc = module.Create(typeDef);
             var newMetaDataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
             var computedFieldLayout = newMetaDataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
@@ -95,7 +103,7 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider(), new RTILProvider());
+            var module = CreateModule();
             var typeDesc = module.Create(typeDef);
             var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
 
@@ -158,7 +166,7 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider(), new RTILProvider());
+            var module = CreateModule();
             var typeDesc = module.Create(typeDef);
             var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
 
@@ -201,7 +209,7 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider(), new RTILProvider());
+            var module = CreateModule();
             var typeDesc = module.Create(typeDef);
             var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
 
@@ -259,7 +267,7 @@ namespace ILCompiler.UnitTests
             var target = new TargetDetails(TargetArchitecture.Z80);
             var metadataFieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
-            var module = new DnlibModule(new TypeSystemContext(), new Compiler.CorLibModuleProvider(), new RTILProvider());
+            var module = CreateModule();
             var typeDesc = module.Create(typeDef);
             var computedFieldLayout = metadataFieldLayoutAlgorithm.ComputeInstanceLayout(typeDesc as DefType);
 
