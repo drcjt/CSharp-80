@@ -24,7 +24,7 @@ namespace ILCompiler.Tests
             return module.Create(methodDef);
         }
 
-        private DnlibModule CreateModule()
+        private static DnlibModule CreateModule()
         {
             return new DnlibModule(
                 new TypeSystemContext(new Configuration()), 

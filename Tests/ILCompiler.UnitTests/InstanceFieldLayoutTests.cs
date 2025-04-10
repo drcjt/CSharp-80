@@ -36,7 +36,7 @@ namespace ILCompiler.UnitTests
             _testModule = ModuleDefMD.Load(inputFilePath, options);
         }
 
-        private DnlibModule CreateModule()
+        private static DnlibModule CreateModule()
         {
             return new DnlibModule(
                 new TypeSystemContext(new Configuration()),
