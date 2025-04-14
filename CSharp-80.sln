@@ -264,6 +264,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StructStatic", "Tests\Gener
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeCheck", "Tests\Methodical\MDArrays\RangeCheck\RangeCheck.csproj", "{90C14ECD-8045-79B5-0C92-53B04A47D9F8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maze", "Samples\Maze\Maze.csproj", "{437E2E5A-062B-B8AB-4F92-87EE6F1A3917}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -654,6 +656,10 @@ Global
 		{90C14ECD-8045-79B5-0C92-53B04A47D9F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90C14ECD-8045-79B5-0C92-53B04A47D9F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90C14ECD-8045-79B5-0C92-53B04A47D9F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{437E2E5A-062B-B8AB-4F92-87EE6F1A3917}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{437E2E5A-062B-B8AB-4F92-87EE6F1A3917}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{437E2E5A-062B-B8AB-4F92-87EE6F1A3917}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{437E2E5A-062B-B8AB-4F92-87EE6F1A3917}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -766,6 +772,7 @@ Global
 		{E6A7ABA6-594F-ADC1-B9C6-F34E0E35BC75} = {5C9ADC0F-8239-4B4C-8D41-5A79CC7127C3}
 		{B78CE740-C5E3-F5E8-193D-8D49FCE9C4E3} = {5C9ADC0F-8239-4B4C-8D41-5A79CC7127C3}
 		{90C14ECD-8045-79B5-0C92-53B04A47D9F8} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{437E2E5A-062B-B8AB-4F92-87EE6F1A3917} = {793AD8ED-EEB7-4A86-BEFA-2A5C7FA56D72}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}
