@@ -1,5 +1,6 @@
 ﻿using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
+using ILCompiler.TypeSystem.IL.Stubs;
 
 namespace ILCompiler.Common.TypeSystem.IL
 {
@@ -19,7 +20,7 @@ namespace ILCompiler.Common.TypeSystem.IL
                 case "Add":
                     return EmitAdd(method);
                 case "AddByteOffset":
-                    return EmitAddByteOffset(method);
+                    return EmitAddByteOffset();
                 case "InitBlock":
                     return EmitInitBlock();
                 case "CopyBlock":
@@ -31,86 +32,93 @@ namespace ILCompiler.Common.TypeSystem.IL
 
         private static MethodIL? EmitAs() 
         {
-            var body = new MethodIL();
+            var emitter = new ILEmitter();
+            var codeStream = emitter.NewCodeStream();
 
-            body.Instructions.Add(new Instruction(ILOpcode.ldarg_0, 0));
-            body.Instructions.Add(new Instruction(ILOpcode.ret, 1));
+            codeStream.Emit(ILOpcode.ldarg_0);
+            codeStream.Emit(ILOpcode.ret);
 
-            return body;
+            return emitter.Link();
         }
 
         private static MethodIL? EmitAsPointer()
         {
-            var body = new MethodIL();
+            var emitter = new ILEmitter();
+            var codeStream = emitter.NewCodeStream();
 
-            body.Instructions.Add(new Instruction(ILOpcode.ldarg_0, 0));
-            body.Instructions.Add(new Instruction(ILOpcode.conv_u, 1));
-            body.Instructions.Add(new Instruction(ILOpcode.ret, 2));
+            codeStream.Emit(ILOpcode.ldarg_0);
+            codeStream.Emit(ILOpcode.conv_u);
+            codeStream.Emit(ILOpcode.ret);
 
-            return body;
+            return emitter.Link();
         }
 
         private static MethodIL? EmitSizeOf(MethodDesc method) 
         {
-            var body = new MethodIL();
+            var emitter = new ILEmitter();
+            var codeStream = emitter.NewCodeStream();
 
-            body.Instructions.Add(new Instruction(ILOpcode.sizeof_, 0, new SignatureMethodVariable(method.Context, 0)));
-            body.Instructions.Add(new Instruction(ILOpcode.ret, 1));
+            codeStream.Emit(ILOpcode.sizeof_, new SignatureMethodVariable(method.Context, 0));
+            codeStream.Emit(ILOpcode.ret);
 
-            return body;
+            return emitter.Link();
         }
 
         private static MethodIL? EmitInitBlock()
         {
-            var body = new MethodIL();
+            var emitter = new ILEmitter();
+            var codeStream = emitter.NewCodeStream();
 
-            body.Instructions.Add(new Instruction(ILOpcode.ldarg_0, 0));
-            body.Instructions.Add(new Instruction(ILOpcode.ldarg_1, 1));
-            body.Instructions.Add(new Instruction(ILOpcode.ldarg_2, 2));
-            body.Instructions.Add(new Instruction(ILOpcode.initblk, 3));
-            body.Instructions.Add(new Instruction(ILOpcode.ret, 4));
+            codeStream.Emit(ILOpcode.ldarg_0);
+            codeStream.Emit(ILOpcode.ldarg_1);
+            codeStream.Emit(ILOpcode.ldarg_2);
+            codeStream.Emit(ILOpcode.initblk);
+            codeStream.Emit(ILOpcode.ret);
 
-            return body;
+            return emitter.Link();
         }
 
         private static MethodIL? EmitCopyBlock()
         {
-            var body = new MethodIL();
+            var emitter = new ILEmitter();
+            var codeStream = emitter.NewCodeStream();
 
-            body.Instructions.Add(new Instruction(ILOpcode.ldarg_0, 0));
-            body.Instructions.Add(new Instruction(ILOpcode.ldarg_1, 1));
-            body.Instructions.Add(new Instruction(ILOpcode.ldarg_2, 2));
-            body.Instructions.Add(new Instruction(ILOpcode.cpblk, 3));
-            body.Instructions.Add(new Instruction(ILOpcode.ret, 4));
+            codeStream.Emit(ILOpcode.ldarg_0);
+            codeStream.Emit(ILOpcode.ldarg_1);
+            codeStream.Emit(ILOpcode.ldarg_2);
+            codeStream.Emit(ILOpcode.cpblk);
+            codeStream.Emit(ILOpcode.ret);
 
-            return body;
+            return emitter.Link();
         }
 
         private static MethodIL? EmitAdd(MethodDesc method)
         {
-            var body = new MethodIL();
+            var emitter = new ILEmitter();
+            var codeStream = emitter.NewCodeStream();
 
-            body.Instructions.Add(new Instruction(ILOpcode.ldarg_1, 0));
-            body.Instructions.Add(new Instruction(ILOpcode.sizeof_, 1, new SignatureMethodVariable(method.Context, 0)));
-            body.Instructions.Add(new Instruction(ILOpcode.conv_i, 2));
-            body.Instructions.Add(new Instruction(ILOpcode.mul, 3));
-            body.Instructions.Add(new Instruction(ILOpcode.ldarg_0, 4));
-            body.Instructions.Add(new Instruction(ILOpcode.add, 5));
-            body.Instructions.Add(new Instruction(ILOpcode.ret, 6));
+            codeStream.Emit(ILOpcode.ldarg_1);
+            codeStream.Emit(ILOpcode.sizeof_, new SignatureMethodVariable(method.Context, 0));
+            codeStream.Emit(ILOpcode.conv_i);
+            codeStream.Emit(ILOpcode.mul);
+            codeStream.Emit(ILOpcode.ldarg_0);
+            codeStream.Emit(ILOpcode.add);
+            codeStream.Emit(ILOpcode.ret);
 
-            return body;
+            return emitter.Link();
         }
 
-        private static MethodIL? EmitAddByteOffset(MethodDesc method) 
+        private static MethodIL? EmitAddByteOffset() 
         {
-            var body = new MethodIL();
+            var emitter = new ILEmitter();
+            var codeStream = emitter.NewCodeStream();
 
-            body.Instructions.Add(new Instruction(ILOpcode.ldarg_0, 0));
-            body.Instructions.Add(new Instruction(ILOpcode.ldarg_1, 1));
-            body.Instructions.Add(new Instruction(ILOpcode.add, 2));
-            body.Instructions.Add(new Instruction(ILOpcode.ret, 3));
+            codeStream.Emit(ILOpcode.ldarg_0);
+            codeStream.Emit(ILOpcode.ldarg_1);
+            codeStream.Emit(ILOpcode.add);
+            codeStream.Emit(ILOpcode.ret);
 
-            return body;
+            return emitter.Link();
         }
     }
 }
