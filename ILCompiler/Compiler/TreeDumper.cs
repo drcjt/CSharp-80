@@ -171,6 +171,14 @@ namespace ILCompiler.Compiler
             _indent--;
         }
 
+        public void Visit(ArrayLengthEntry entry)
+        {
+            Print($"ARRAYLENGTH {entry.Type}");
+            _indent++;
+            entry.ArrayReference.Accept(this);
+            _indent--;
+        }
+
         public void Visit(NullCheckEntry entry)
         {
             Print($"NULLCHECK");

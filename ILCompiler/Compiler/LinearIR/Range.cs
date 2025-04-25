@@ -119,6 +119,16 @@ namespace ILCompiler.Compiler.LinearIR
             FinishInsertionAfter(insertionPoint, node1, node2);
         }
 
+        public void InsertAfter(StackEntry insertionPoint, StackEntry node1, StackEntry node2, StackEntry node3)
+        {
+            node1.Next = node2;
+            node2.Prev = node1;
+            node2.Next = node3;
+            node3.Prev = node2;
+
+            FinishInsertionAfter(insertionPoint, node1, node3);
+        }
+
         private void FinishInsertionAfter(StackEntry insertionPoint, StackEntry first, StackEntry last)
         {
             if (insertionPoint == null)
