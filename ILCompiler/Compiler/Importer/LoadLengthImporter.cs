@@ -11,9 +11,7 @@ namespace ILCompiler.Compiler.Importer
             if (instruction.Opcode != ILOpcode.ldlen) return false;
 
             var addr = importer.PopExpression();
-            var arraySizeOffset = new NativeIntConstantEntry(2);
-            addr = new BinaryOperator(Operation.Add, isComparison: false, addr, arraySizeOffset, VarType.Ptr);
-            var node = new IndirectEntry(addr, VarType.Ptr, 2);
+            var node = new ArrayLengthEntry(addr);
             importer.PushExpression(node);
             return true;
         }

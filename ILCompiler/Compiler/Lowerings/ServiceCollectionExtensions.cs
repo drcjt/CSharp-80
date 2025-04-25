@@ -11,6 +11,7 @@ namespace ILCompiler.Compiler.Lowerings
             services.AddSingleton<ILowering<JumpTrueEntry>, JumpTrueLowering>();
             services.AddSingleton<ILowering<StoreLocalVariableEntry>, StoreLocalVariableLowering>();
             services.AddSingleton<ILowering<IndirectEntry>, IndirectLowering>();
+            services.AddSingleton<ILowering<ArrayLengthEntry>, ArrayLengthLowering>();
             return services;
         }
     }

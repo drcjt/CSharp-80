@@ -161,6 +161,12 @@ namespace ILCompiler.Compiler
             _sb.AppendLine($"       cast {entry.Type}");
         }
 
+        public void Visit(ArrayLengthEntry entry)
+        {
+            _sb.AppendLine($"       ┌──▌  t{entry.ArrayReference.TreeID}");
+            _sb.AppendLine($"       arrayLength {entry.Type}");
+        }
+
         public void Visit(NullCheckEntry entry)
         {
             _sb.AppendLine($"       nullcheck {entry.Op1.TreeID}");

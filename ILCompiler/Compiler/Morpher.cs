@@ -125,6 +125,10 @@ namespace ILCompiler.Compiler
                 case NullCheckEntry nullCheckEntry:
                     tree = new NullCheckEntry(MorphTree(nullCheckEntry.Op1));
                     break;
+
+                case ArrayLengthEntry arrayLengthEntry:
+                    tree = new ArrayLengthEntry(MorphTree(arrayLengthEntry.ArrayReference));
+                    break;
             }
             return tree;
         }

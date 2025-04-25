@@ -220,6 +220,12 @@ namespace ILCompiler.Compiler
             SetNext(entry);
         }
 
+        public void Visit(ArrayLengthEntry entry)
+        {
+            entry.ArrayReference.Accept(this);
+            SetNext(entry);
+        }
+
         private void SetNext(StackEntry entry)
         {
             if (Current != null)
