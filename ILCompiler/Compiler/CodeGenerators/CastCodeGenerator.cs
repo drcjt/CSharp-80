@@ -123,6 +123,12 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             var key = CreateKey(actualType, desiredType);
 
+            // If the types are the same, no cast is needed
+            if (actualType == desiredType)
+            {
+                return;
+            }
+
             if (_codeGeneratorActionsMap.TryGetValue(key, out Action<CodeGeneratorContext>? generateCastCode))
             {
                 generateCastCode(context);

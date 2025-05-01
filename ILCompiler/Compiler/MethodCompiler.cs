@@ -166,6 +166,10 @@ namespace ILCompiler.Compiler
             var ssaBuilder = _phaseFactory.Create<ISsaBuilder>();
             ssaBuilder.Build(basicBlocks, _locals, _configuration.DumpSsa);
 
+            // Early Value Propagation
+            var earlyValuePropagation = _phaseFactory.Create<IEarlyValuePropagation>();
+            earlyValuePropagation.Run(basicBlocks, _locals);
+
             // Rationalize
             // LIR valid from here on - nodes are fully linked across statements
             var rationalizer = _phaseFactory.Create<IRationalizer>();
