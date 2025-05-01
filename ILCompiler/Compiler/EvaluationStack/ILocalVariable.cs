@@ -3,6 +3,6 @@
     public interface ILocalVariable
     {
         public int LocalNumber { get; }
-        public int SsaNumber { get; }
+        public int SsaNumber { get; set; }
     }
 }

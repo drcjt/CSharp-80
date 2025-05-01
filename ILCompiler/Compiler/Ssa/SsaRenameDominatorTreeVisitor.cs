@@ -1,5 +1,4 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
-using System.Diagnostics;
 
 namespace ILCompiler.Compiler.Ssa
 {
@@ -30,7 +29,7 @@ namespace ILCompiler.Compiler.Ssa
             {
                 foreach (var statement in successor.Statements)
                 {
-                    if (statement is StoreLocalVariableEntry store && store.Op1 is PhiNode phi)
+                    if (statement.RootNode is StoreLocalVariableEntry store && store.Op1 is PhiNode phi)
                     {
                         var localNumber = store.LocalNumber;
                         var ssaNumber = _renameStack.Top(localNumber);
@@ -41,7 +40,7 @@ namespace ILCompiler.Compiler.Ssa
             }
         }
 
-        private void AddPhiArg(BasicBlock block, StackEntry statement, PhiNode phi, int localNumber, int ssaNumber, BasicBlock predecessor)
+        private void AddPhiArg(BasicBlock block, Statement statement, PhiNode phi, int localNumber, int ssaNumber, BasicBlock predecessor)
         {
             // First check if there is already a phi arg for this predecessor, if so it should have the same ssaNumber, is so then nothing to do
             foreach (var phiArg in phi.Arguments)
@@ -58,29 +57,29 @@ namespace ILCompiler.Compiler.Ssa
             }
 
             // Need to add a new phi arg
+            AddNewPhiArg(block, statement, phi, localNumber, ssaNumber, predecessor);
+        }
+
+        private void AddNewPhiArg(BasicBlock block, Statement statement, PhiNode phi, int localNumber, int ssaNumber, BasicBlock predecessor)
+        {
             var localVarDescriptor = _locals[localNumber];
             var localVarType = localVarDescriptor.Type;
 
             var newPhiArg = new PhiArg(localVarType, localNumber, ssaNumber, predecessor);
             phi.Arguments.Add(newPhiArg);
 
-            var phiNode = statement.Prev;
-            Debug.Assert(phiNode != null);
-
-            var existingPhiArg = phiNode.Prev;
+            var existingPhiArg = phi.Prev;
 
             if (existingPhiArg != null)
             {
                 existingPhiArg.Next = newPhiArg;
                 newPhiArg.Prev = existingPhiArg;
             }
-            else
-            {
-                block.FirstNode = newPhiArg;
-            }
 
-            newPhiArg.Next = phiNode;
-            phiNode.Prev = newPhiArg;
+            newPhiArg.Next = phi;
+            phi.Prev = newPhiArg;
+
+            statement.TreeList.Insert(statement.TreeList.Count - 2, newPhiArg);
 
             var localVarSsaDescriptor = localVarDescriptor.GetPerSsaData(ssaNumber);
             localVarSsaDescriptor.AddPhiUse(block);
@@ -89,10 +88,9 @@ namespace ILCompiler.Compiler.Ssa
         private void BlockRenameVariables(BasicBlock block)
         {
             // Walk nodes in statements
-            var tree = block.FirstNode;
-            if (tree != null)
-            { 
-                do
+            foreach (var statement in block.Statements)
+            {
+                foreach (var tree in statement.TreeList)
                 {
                     if (tree is StoreLocalVariableEntry || tree is CallEntry)
                     {
@@ -102,10 +100,8 @@ namespace ILCompiler.Compiler.Ssa
                     {
                         RenameLocalUse(localVariable, block);
                     }
-
-                    tree = tree.Next;
-                } while (tree != null);
-            }   
+                }
+            }
         }
 
         /// <summary>
@@ -121,7 +117,7 @@ namespace ILCompiler.Compiler.Ssa
                 var localVariableDescriptor = _locals[localNumber];
                 if (localVariableDescriptor.InSsa)
                 {
-                    localNode.SsaNumber = RenamePushDef(block, localNumber);
+                    localNode.SsaNumber = RenamePushDef(defNode, block, localNumber);
                 }
             }
         }
@@ -136,13 +132,14 @@ namespace ILCompiler.Compiler.Ssa
                 int ssaNumber = _renameStack.Top(localNumber);
                 var ssaDescriptor = localVariableDescriptor.GetPerSsaData(ssaNumber);
                 ssaDescriptor.AddUse(block);
+                tree.SsaNumber = ssaNumber;
             }
         }
 
-        private int RenamePushDef(BasicBlock block, int localNumber)
+        private int RenamePushDef(StackEntry defNode, BasicBlock block, int localNumber)
         {
             var localVariableDescriptor = _locals[localNumber];
-            int ssaNumber = localVariableDescriptor.PerSsaData.AllocSsaNumber(() => new LocalSsaVariableDescriptor(block));
+            int ssaNumber = localVariableDescriptor.PerSsaData.AllocSsaNumber(() => new LocalSsaVariableDescriptor(block, defNode));
 
             _renameStack.Push(block, localNumber, ssaNumber);
 

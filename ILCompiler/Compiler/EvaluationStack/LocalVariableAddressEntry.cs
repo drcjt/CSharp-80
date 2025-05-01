@@ -3,7 +3,7 @@
     public class LocalVariableAddressEntry : StackEntry, ILocalVariable
     {
         public int LocalNumber { get; }
-        public int SsaNumber { get; }
+        public int SsaNumber { get; set;  }
 
         public LocalVariableAddressEntry(int localNumber) : base(VarType.Ptr, VarType.Ptr.GetTypeSize())
         {

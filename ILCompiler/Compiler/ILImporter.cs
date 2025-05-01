@@ -151,21 +151,21 @@ namespace ILCompiler.Compiler
                 ImportSpillAppendTree(entry);
             }
             else
-            {
-                _currentBasicBlock?.Statements.Add(entry);
+            {                
+                _currentBasicBlock?.Statements.Add(new Statement(entry));
             }
         }
 
         private StackEntry? ImportExtractLastStmt()
         {
-            StackEntry? lastStmt = null;
+            Statement? lastStmt = null;
             if (_currentBasicBlock?.Statements.Count > 0)
             {
                 var lastStatementIndex = _currentBasicBlock.Statements.Count - 1;
                 lastStmt = _currentBasicBlock.Statements[lastStatementIndex];
                 _currentBasicBlock.Statements.RemoveAt(lastStatementIndex);
             }
-            return lastStmt;
+            return lastStmt?.RootNode;
         }
 
         private void ImportBasicBlock(IDictionary<int, int> offsetToIndexMap, BasicBlock block)
@@ -306,7 +306,7 @@ namespace ILCompiler.Compiler
                     var targetMethod = _nameMangler.GetMangledMethodName(staticConstructorMethod);
                     var staticInitCall = new CallEntry(targetMethod, new List<StackEntry>(), VarType.Void, 0);
 
-                    _basicBlocks[0].Statements.Add(staticInitCall);
+                    _basicBlocks[0].Statements.Add(new Statement(staticInitCall));
                 }
             }
 

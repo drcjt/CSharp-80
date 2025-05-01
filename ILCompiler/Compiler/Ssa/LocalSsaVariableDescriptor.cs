@@ -1,4 +1,6 @@
-﻿namespace ILCompiler.Compiler.Ssa
+﻿using ILCompiler.Compiler.EvaluationStack;
+
+namespace ILCompiler.Compiler.Ssa
 {
     public class LocalSsaVariableDescriptor
     {
@@ -9,9 +11,17 @@
 
         public int NumberOfUses { get; private set; } = 0;
 
+        public StackEntry? DefNode { get; private set; }
+
         public LocalSsaVariableDescriptor(BasicBlock block)
         {
             Block = block;
+        }
+
+        public LocalSsaVariableDescriptor(BasicBlock block, StackEntry defNode)
+        {
+            Block = block;
+            DefNode = defNode;
         }
 
         public void AddUse(BasicBlock block)

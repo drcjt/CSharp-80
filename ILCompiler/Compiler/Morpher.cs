@@ -20,10 +20,10 @@ namespace ILCompiler.Compiler
 
         private void MorphStatements(BasicBlock block)
         {
-            var morphedStatements = new List<StackEntry>();
+            var morphedStatements = new List<Statement>();
             foreach (var statement in block.Statements)
             {
-                morphedStatements.Add(MorphTree(statement));
+                morphedStatements.Add(MorphStatement(statement));
             }
 
             block.Statements.Clear();
@@ -32,6 +32,8 @@ namespace ILCompiler.Compiler
                 block.Statements.Add(morphedStatement);
             }
         }
+
+        private Statement MorphStatement(Statement statement) => new Statement(MorphTree(statement.RootNode));
 
         private StackEntry MorphTree(StackEntry tree)
         {

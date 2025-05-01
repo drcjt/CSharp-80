@@ -166,6 +166,11 @@ namespace ILCompiler.Compiler
             var ssaBuilder = _phaseFactory.Create<ISsaBuilder>();
             ssaBuilder.Build(basicBlocks, _locals, _configuration.DumpSsa);
 
+            // Rationalize
+            // LIR valid from here on - nodes are fully linked across statements
+            var rationalizer = _phaseFactory.Create<IRationalizer>();
+            rationalizer.Rationalize(basicBlocks);
+
             if (_configuration.DumpIRTrees)
             {
                 // Dump LIR here
@@ -173,10 +178,6 @@ namespace ILCompiler.Compiler
                 var lirDump = lirDumper.Dump(basicBlocks);
                 _logger.LogInformation("{lirDump}", lirDump);
             }
-
-            // Rationalize
-            var rationalizer = _phaseFactory.Create<IRationalizer>();
-            rationalizer.Rationalize(basicBlocks);
 
             // Lower
             var lowering = _phaseFactory.Create<ILowering>();

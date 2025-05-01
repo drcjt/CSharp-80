@@ -80,6 +80,11 @@ namespace ILCompiler.Compiler.LinearIR
             FinishInsertionBefore(insertion, range.FirstNode, range.LastNode);
         }
 
+        public void InsertAtEnd(Range range)
+        {
+            InsertAfter(LastNode, range);
+        }
+
         private void FinishInsertionBefore(StackEntry insertionPoint, StackEntry first, StackEntry last)
         {
             if (insertionPoint == null)
@@ -129,7 +134,13 @@ namespace ILCompiler.Compiler.LinearIR
             FinishInsertionAfter(insertionPoint, node1, node3);
         }
 
-        private void FinishInsertionAfter(StackEntry insertionPoint, StackEntry first, StackEntry last)
+        public void InsertAfter(StackEntry? insertion, Range range)
+        {
+            Debug.Assert(!range.IsEmpty);
+            FinishInsertionAfter(insertion, range.FirstNode!, range.LastNode!);
+        }
+
+        private void FinishInsertionAfter(StackEntry? insertionPoint, StackEntry first, StackEntry last)
         {
             if (insertionPoint == null)
             {
@@ -172,5 +183,7 @@ namespace ILCompiler.Compiler.LinearIR
         }
 
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+        public bool IsEmpty => FirstNode == null || LastNode == null;
     }
 }
