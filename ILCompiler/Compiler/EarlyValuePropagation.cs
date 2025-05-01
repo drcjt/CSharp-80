@@ -1,6 +1,7 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.LinearIR;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
 
 namespace ILCompiler.Compiler
 {
@@ -54,8 +55,6 @@ namespace ILCompiler.Compiler
 
                         if (actualValue is not null)
                         {
-                            int actualConstValue = actualValue.GetIntConstant();
-
                             var actualValueClone = actualValue.Duplicate();
 
                             // Replace tree with actualValueClone
@@ -79,7 +78,7 @@ namespace ILCompiler.Compiler
             return PropagationGetValueRecursive(localNumber, ssaNumber, 0, locals);
         }
 
-        private StackEntry? PropagationGetValueRecursive(int localNumber, int ssaNumber, int walkDepth, LocalVariableTable locals)
+        private static StackEntry? PropagationGetValueRecursive(int localNumber, int ssaNumber, int walkDepth, LocalVariableTable locals)
         {
             // Bound the recursion
             if (walkDepth > 5)
@@ -124,9 +123,9 @@ namespace ILCompiler.Compiler
         private static StackEntry? GetArrayLengthFromAllocation(StackEntry tree)
         {
             StackEntry? arrayLength = null;
-            // TODO: more precise check on method
-            if (tree is CallEntry call && call.TargetMethod == "NewArray")
+            if (tree is CallEntry call && IsMethodNewArray(call.Method))
             {
+
                 // Get the array length parameter from the call
                 arrayLength = call.Arguments[1];
             }
@@ -139,6 +138,11 @@ namespace ILCompiler.Compiler
             }
 
             return arrayLength;
+        }
+
+        private static bool IsMethodNewArray(MethodDesc? method)
+        {
+            return method?.Name == "NewArray" && method.OwningType.FullName == "System.Runtime.RuntimeImports";
         }
     }
 }

@@ -199,9 +199,9 @@ namespace ILCompiler.Compiler
         {
             foreach (var statement in block.Statements)
             {
-                if (statement.RootNode is StoreLocalVariableEntry store && store.Op1 is PhiNode phi)
+                if (statement.RootNode is StoreLocalVariableEntry store && store.Op1 is PhiNode)
                 {
-                    if (store?.LocalNumber == localNumber)
+                    if (store.LocalNumber == localNumber)
                     {
                         return true;
                     }
