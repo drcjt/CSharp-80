@@ -274,6 +274,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OptimisationTestsRunner", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleArrayLength", "Tests\Optimisation\EarlyValuePropagation\SimpleArrayLength.csproj", "{B3B5F0CF-5FDA-0F2F-1FD9-9972CAAE0656}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopWithArrayLength", "Tests\Optimisation\EarlyValuePropagation\LoopWithArrayLength.csproj", "{115247AF-1AFD-290D-4DE7-42CAC7666086}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -676,6 +678,10 @@ Global
 		{B3B5F0CF-5FDA-0F2F-1FD9-9972CAAE0656}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3B5F0CF-5FDA-0F2F-1FD9-9972CAAE0656}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3B5F0CF-5FDA-0F2F-1FD9-9972CAAE0656}.Release|Any CPU.Build.0 = Release|Any CPU
+		{115247AF-1AFD-290D-4DE7-42CAC7666086}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{115247AF-1AFD-290D-4DE7-42CAC7666086}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{115247AF-1AFD-290D-4DE7-42CAC7666086}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{115247AF-1AFD-290D-4DE7-42CAC7666086}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -793,6 +799,7 @@ Global
 		{E57473DF-FAEF-42DC-8963-F96246FF9B87} = {8ED36AC6-21AB-4336-BC68-4A14BBBFC771}
 		{CBA60732-1AAA-FC27-9CE1-9C307CB1F45F} = {8ED36AC6-21AB-4336-BC68-4A14BBBFC771}
 		{B3B5F0CF-5FDA-0F2F-1FD9-9972CAAE0656} = {E57473DF-FAEF-42DC-8963-F96246FF9B87}
+		{115247AF-1AFD-290D-4DE7-42CAC7666086} = {E57473DF-FAEF-42DC-8963-F96246FF9B87}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}
