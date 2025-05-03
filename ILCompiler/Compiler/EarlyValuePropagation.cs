@@ -1,5 +1,4 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
-using ILCompiler.Compiler.LinearIR;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
 
@@ -38,7 +37,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private StackEntry? EarlyPropagationRewriteTree(BasicBlock block, StackEntry tree, LocalVariableTable locals)
+        private static StackEntry? EarlyPropagationRewriteTree(BasicBlock block, StackEntry tree, LocalVariableTable locals)
         {
             if (tree is ArrayLengthEntry arrayLengthEntry)
             {
@@ -69,7 +68,7 @@ namespace ILCompiler.Compiler
             return null;
         }
 
-        private StackEntry? PropagationGetValue(int localNumber, int ssaNumber, LocalVariableTable locals)
+        private static StackEntry? PropagationGetValue(int localNumber, int ssaNumber, LocalVariableTable locals)
         {
             return PropagationGetValueRecursive(localNumber, ssaNumber, 0, locals);
         }
