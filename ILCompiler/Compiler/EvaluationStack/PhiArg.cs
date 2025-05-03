@@ -3,7 +3,7 @@
     public class PhiArg : StackEntry, ILocalVariable
     {
         public int LocalNumber { get; }
-        public int SsaNumber { get; }
+        public int SsaNumber { get; set; }
         public BasicBlock Block { get; }
 
         public PhiArg(VarType type, int localNumber, int ssaNumber, BasicBlock block) : base(type)

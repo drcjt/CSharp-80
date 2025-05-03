@@ -66,7 +66,6 @@ namespace ILCompiler.Compiler
             }
         }
 
-
         private static void PerBlockLocalVarLiveness(IList<BasicBlock> blocks, ILogger<SsaBuilder> logger)
         {
             foreach (var block in blocks)
@@ -75,11 +74,17 @@ namespace ILCompiler.Compiler
                 var defSet = VariableSet.Empty;
 
                 // Enumerate nodes in each statement in evaluation order
-                var currentNode = block.FirstNode;
-                while (currentNode != null)
+
+                foreach (var statement in block.Statements)
                 {
-                    PerNodeLocalVarLiveness(currentNode, useSet, defSet);
-                    currentNode = currentNode.Next;
+                    // Filter out phi definitions
+                    if (statement.IsPhiDefinition)
+                        continue;
+
+                    foreach (var node in statement.TreeList)
+                    {
+                        PerNodeLocalVarLiveness(node, useSet, defSet);
+                    }
                 }
 
                 block.VarDef = defSet;

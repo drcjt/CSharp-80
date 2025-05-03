@@ -23,7 +23,7 @@
         ByRef,
         Struct,     // Custom Value Types
 
-        Ptr,        // Unmanaged pointers, NativeInt, NativeUInt
+        Ptr,        // Unmanaged pointers, Native sized Integers
     }
 
     public static class VarTypeExtensions
@@ -56,6 +56,11 @@
         public static bool IsInt(this VarType type)
         {
             return type >= VarType.Byte && type <= VarType.UInt;
+        }
+
+        public static bool IsGC(this VarType type)
+        {
+            return type == VarType.Ref || type == VarType.ByRef;
         }
 
         public static bool GenActualTypeIsI(this VarType type)

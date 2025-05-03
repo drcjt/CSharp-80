@@ -114,7 +114,8 @@ namespace ILCompiler.Compiler
             for (int localVariableNumber = 0; localVariableNumber < locals.Count; localVariableNumber++)
             {
                 var localVariableDescriptor = locals[localVariableNumber];
-                if (localVariableDescriptor.IsParameter || localVariableDescriptor.MustInit) 
+                if (localVariableDescriptor.IsParameter || localVariableDescriptor.MustInit || 
+                    localVariableDescriptor.Type.IsGC())
                 {
                     var ssaNumber = localVariableDescriptor.PerSsaData.AllocSsaNumber(() => new LocalSsaVariableDescriptor(tree.Block));
                     ssaRenameStack.Push(tree.Block, localVariableNumber, ssaNumber);
@@ -196,18 +197,15 @@ namespace ILCompiler.Compiler
 
         private static bool HasPhiNode(BasicBlock block, int localNumber)
         {
-            var node = block.FirstNode;
-            while (node != null)
+            foreach (var statement in block.Statements)
             {
-                if (node is PhiNode phi)
+                if (statement.RootNode is StoreLocalVariableEntry store && store.Op1 is PhiNode)
                 {
-                    var store = phi.Next as StoreLocalVariableEntry;
-                    if (store?.LocalNumber == localNumber)
+                    if (store.LocalNumber == localNumber)
                     {
                         return true;
                     }
                 }
-                node = node.Next;
             }
 
             return false;
@@ -223,18 +221,15 @@ namespace ILCompiler.Compiler
             var store = new StoreLocalVariableEntry(localNumber, false, phiNode);
 
             // Create the statement and chain together in linear order e.g. PhiNode followed by StoreLocalVariableEntry
+            var statement = new Statement(store)
+            {
+                TreeList = new List<StackEntry> { phiNode, store }
+            };
             phiNode.Next = store;
             store.Prev = phiNode;
 
             // Add new store/phi statement to start of block
-            store.Next = block.FirstNode;
-            if (block.FirstNode != null)
-            {
-                block.FirstNode.Prev = store;
-            }
-
-            block.FirstNode = phiNode;
-            block.Statements.Insert(0, store);
+            block.Statements.Insert(0, statement);
 
             if (_dumpSsa)
             {

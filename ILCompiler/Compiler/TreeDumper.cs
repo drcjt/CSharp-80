@@ -31,7 +31,7 @@ namespace ILCompiler.Compiler
                     _sb.AppendLine($"STMT{stmtId}");
                     _indent++;
 
-                    statement.Accept(this);
+                    statement.RootNode.Accept(this);
                     stmtId++;
                 }
             }

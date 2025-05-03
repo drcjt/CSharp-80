@@ -28,7 +28,7 @@ namespace ILCompiler.Compiler
         public ISet<BasicBlock> Reach { get; } = new HashSet<BasicBlock>();
 
         // High level intermediate representation - main output of importation process
-        public IList<StackEntry> Statements { get; } = new List<StackEntry>();
+        public IList<Statement> Statements { get; } = new List<Statement>();
 
         public bool Marked { get; set; } = false;
 

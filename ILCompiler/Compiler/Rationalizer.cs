@@ -10,6 +10,15 @@ namespace ILCompiler.Compiler
         {
             foreach (var block in blocks)
             {
+                // Link IR in statements together
+                foreach (var statement in block.Statements)
+                {
+                    var firstNode = statement.TreeList[0];
+                    var lastNode = statement.TreeList[^1];
+
+                    block.InsertAtEnd(new LinearIR.Range(firstNode, lastNode));
+                }
+               
                 if (block.Statements.Count > 0)
                 {
                     RemovePhiNodes(block);

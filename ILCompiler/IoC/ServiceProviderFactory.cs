@@ -52,6 +52,8 @@ namespace ILCompiler.IoC
 
             services.AddTransient<IRationalizer, Rationalizer>();
 
+            services.AddTransient<IEarlyValuePropagation, EarlyValuePropagation>();
+
             services.AddTransient<IFlowgraph, Flowgraph>();
 
             services.AddTransient<ISsaBuilder, SsaBuilder>();

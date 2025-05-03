@@ -40,8 +40,9 @@ namespace ILCompiler.Compiler.Ssa
             }
             else
             {
-                var top = stack.Peek();
+                var top = stack.Pop();
                 top.SsaNumber = ssaNumber;
+                stack.Push(top);
             }
 
             DumpStack(lclNumber);

@@ -74,5 +74,13 @@ namespace ILCompiler.Compiler.EvaluationStack
         }
 
         public static void ReplaceOperand(Edge<StackEntry> useEdge, StackEntry replacement) => useEdge.Set(replacement);
+
+        public void ReplaceWith(StackEntry newTree, BasicBlock block)
+        {
+            if (block.TryGetUse(this, out Use? use))
+            {
+                use.ReplaceWith(newTree);
+            }
+        }
     }
 }
