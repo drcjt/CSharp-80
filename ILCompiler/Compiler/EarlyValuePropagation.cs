@@ -58,11 +58,7 @@ namespace ILCompiler.Compiler
                             var actualValueClone = actualValue.Duplicate();
 
                             // Replace tree with actualValueClone
-                            if (!block.TryGetUse(tree, out Use? use))
-                            {
-                                return null;
-                            }
-                            use.ReplaceWith(actualValueClone);
+                            tree.ReplaceWith(actualValueClone, block);
 
                             return tree;
                         }
