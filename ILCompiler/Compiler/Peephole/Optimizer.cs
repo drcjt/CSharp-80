@@ -19,6 +19,10 @@ namespace ILCompiler.Compiler.Peephole
             {
                 removedInstructions = EliminatePushXXPopXX(instructions);
             } while (removedInstructions > 0);
+            do
+            {
+                removedInstructions = EliminatePopXXPushXX(instructions);
+            } while (removedInstructions > 0);
             removedInstructions = RemoveJumpsToNextInstruction(instructions);
 
             _logger.LogDebug("Eliminated {eliminatedInstructions} instructions", removedInstructions);
@@ -73,6 +77,49 @@ namespace ILCompiler.Compiler.Peephole
                     removedInstructions += 2;
 
                     // Last Instruction is now one before the Push just eliminated
+                    lastInstructionIndex = lastInstructionIndex > 0 ? lastInstructionIndex-- : 0;
+                    lastInstruction = lastInstructionIndex > 0 ? instructions[lastInstructionIndex] : null;
+                }
+                else
+                {
+                    lastInstruction = currentInstruction;
+                    lastInstructionIndex = currentInstructionIndex;
+                }
+
+                currentInstructionIndex++;
+
+                // Skip instructions with no opcode
+                while (currentInstructionIndex < instructions.Count && instructions[currentInstructionIndex].Opcode == Opcode.None)
+                {
+                    currentInstructionIndex++;
+                }
+            } while (currentInstructionIndex < instructions.Count);
+
+            return removedInstructions;
+        }
+
+        private static int EliminatePopXXPushXX(IList<Instruction> instructions)
+        {
+            int removedInstructions = 0;
+            Instruction? lastInstruction = null;
+            int lastInstructionIndex = 0;
+            Instruction currentInstruction;
+            var currentInstructionIndex = 0;
+
+            do
+            {
+                currentInstruction = instructions[currentInstructionIndex];
+
+                if (lastInstruction?.Opcode == Opcode.Pop && currentInstruction.Opcode == Opcode.Push
+                    && lastInstruction?.Op0?.Register == currentInstruction.Op0?.Register &&
+                    currentInstruction.Label == null && lastInstruction?.Label == null)
+                {
+                    // Eliminate Pop followed by Push
+                    instructions[lastInstructionIndex] = Instruction.CreateComment($"\tPOP {lastInstruction?.Op0?.Register}");
+                    instructions[currentInstructionIndex] = Instruction.CreateComment($"\tPUSH {lastInstruction?.Op0?.Register}");
+                    removedInstructions += 2;
+
+                    // Last Instruction is now one before the Pop just eliminated
                     lastInstructionIndex = lastInstructionIndex > 0 ? lastInstructionIndex-- : 0;
                     lastInstruction = lastInstructionIndex > 0 ? instructions[lastInstructionIndex] : null;
                 }
