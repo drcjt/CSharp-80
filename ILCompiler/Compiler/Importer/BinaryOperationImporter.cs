@@ -40,6 +40,12 @@ namespace ILCompiler.Compiler.Importer
             if ((op2.IsIntegralConstant(0) && (binaryOp == Operation.Add || binaryOp == Operation.Sub)) ||
                 op2.IsIntegralConstant(1) && (binaryOp == Operation.Mul || binaryOp == Operation.Div))
             {
+                // If the second operand is a native int then need to still ensure op1 is cast to be a native int
+                if (op2.Type == VarType.Ptr)
+                {
+                    op1 = CodeFolder.FoldExpression(new CastEntry(op1, VarType.Ptr));
+                }
+
                 importer.PushExpression(op1);
                 return true;
             }

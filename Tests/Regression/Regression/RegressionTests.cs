@@ -1,4 +1,6 @@
-﻿namespace Regression
+﻿using Internal.Runtime.CompilerServices;
+
+namespace Regression
 {
     public static class Regression
     {
@@ -17,7 +19,15 @@
 
             Assert.AreEqual(10, Bug545Method<int>().Length);
 
+            Bug617();
+
             return 0;
+        }
+
+        public unsafe static void Bug617()
+        {
+            byte value = 42;
+            Unsafe.Add<byte>(ref value, 0);
         }
 
         public unsafe static nuint Bug206(int count)
