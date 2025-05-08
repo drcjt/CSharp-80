@@ -63,11 +63,9 @@ namespace ILCompiler.TypeSystem.Common
                 if (field.IsStatic)
                     continue;
 
-                /* TODO: Check type is by ref like if field is by ref
                 TypeDesc fieldType = field.FieldType;
-                if (fieldType.IsByRef && !type.IsByRefLike)
-                    throw new InvalidOperationException("Byref instance fields on non byref like types are not allowed");
-                */
+                if ((fieldType.IsByRef || fieldType.IsByRefLike) && !type.IsByRefLike)
+                    throw new InvalidOperationException("ByRef and ByRefLike instance fields on non ByRef like types are not allowed");
 
                 numInstanceFields++;
             }
