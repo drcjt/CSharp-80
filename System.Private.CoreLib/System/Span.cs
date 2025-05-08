@@ -1,4 +1,5 @@
-﻿using Internal.Runtime.CompilerServices;
+﻿using Internal.Runtime.CompilerHelpers;
+using Internal.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace System
@@ -41,7 +42,7 @@ namespace System
             {
                 if ((uint)index >= (uint)_length)
                 {
-                    throw new IndexOutOfRangeException();
+                    ThrowHelper.ThrowIndexOutOfRangeException();
                 }
 
                 return ref Unsafe.Add(ref _reference, index);
