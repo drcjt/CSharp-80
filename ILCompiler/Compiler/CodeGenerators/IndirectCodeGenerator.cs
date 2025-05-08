@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(IndirectEntry entry, CodeGeneratorContext context)
         {
-            if (entry.Type.IsInt() || entry.Type == VarType.Struct || entry.Type == VarType.Ptr || entry.Type == VarType.Ref)
+            if (entry.Type.IsInt() || entry.Type == VarType.Struct || entry.Type == VarType.Ptr || entry.Type == VarType.Ref || entry.Type == VarType.ByRef)
             {
                 int offset = (int)entry.Offset;
                 if (entry.Op1.Contained && entry.Op1 is LocalVariableAddressEntry lvaAddress)

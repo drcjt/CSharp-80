@@ -65,11 +65,6 @@ namespace ILCompiler.TypeSystem.Common
 
                 TypeDesc fieldType = field.FieldType;
 
-                if (fieldType.IsByRef)
-                {
-                    throw new InvalidOperationException("ByRef Instance fields are not allowed");
-                }
-
                 numInstanceFields++;
             }
 
@@ -274,7 +269,7 @@ namespace ILCompiler.TypeSystem.Common
             }
             else
             {
-                Debug.Assert(fieldType.IsPointer || fieldType.IsFunctionPointer);
+                Debug.Assert(fieldType.IsPointer || fieldType.IsFunctionPointer || fieldType.IsByRef);
 
                 result.Size = _target.LayoutPointerSize;
                 result.Alignment = _target.LayoutPointerSize;
