@@ -90,6 +90,12 @@ namespace Internal.Runtime.CompilerServices
             // ret
         }
 
+        public static ref T AsRef<T>(void* source) // where T : allows ref struct
+        {
+            return ref *(T*)source;
+        }
+
+
         [Intrinsic]
         public static void InitBlock(void* startAddress, byte value, uint byteCount)
         {
@@ -123,6 +129,17 @@ namespace Internal.Runtime.CompilerServices
             // ldarg.1
             // ldarg.2
             // cpblk
+            // ret
+        }
+
+        [Intrinsic]
+        public static bool AreSame<T>(ref readonly T left, ref readonly T right) // where T : allows ref struct
+        {
+            throw new PlatformNotSupportedException();
+
+            // ldarg.0
+            // ldarg.1
+            // ceq
             // ret
         }
     }
