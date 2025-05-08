@@ -25,6 +25,8 @@ namespace ILCompiler.Common.TypeSystem.IL
                     return EmitInitBlock();
                 case "CopyBlock":
                     return EmitCopyBlock();
+                case "AreSame":
+                    return EmitAreSame();
             }
 
             return null;
@@ -116,6 +118,19 @@ namespace ILCompiler.Common.TypeSystem.IL
             codeStream.Emit(ILOpcode.ldarg_0);
             codeStream.Emit(ILOpcode.ldarg_1);
             codeStream.Emit(ILOpcode.add);
+            codeStream.Emit(ILOpcode.ret);
+
+            return emitter.Link();
+        }
+
+        private static MethodIL? EmitAreSame()
+        {
+            var emitter = new ILEmitter();
+            var codeStream = emitter.NewCodeStream();
+
+            codeStream.Emit(ILOpcode.ldarg_0);
+            codeStream.Emit(ILOpcode.ldarg_1);
+            codeStream.Emit(ILOpcode.ceq);
             codeStream.Emit(ILOpcode.ret);
 
             return emitter.Link();

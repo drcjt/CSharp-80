@@ -276,6 +276,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleArrayLength", "Tests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopWithArrayLength", "Tests\Optimisation\EarlyValuePropagation\LoopWithArrayLength.csproj", "{115247AF-1AFD-290D-4DE7-42CAC7666086}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Memory.Tests", "Tests\CoreLib\System.Memory.Tests\System.Memory.Tests.csproj", "{38B73279-75C7-8148-2534-CE8AC4E293EB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -682,6 +684,10 @@ Global
 		{115247AF-1AFD-290D-4DE7-42CAC7666086}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{115247AF-1AFD-290D-4DE7-42CAC7666086}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{115247AF-1AFD-290D-4DE7-42CAC7666086}.Release|Any CPU.Build.0 = Release|Any CPU
+		{38B73279-75C7-8148-2534-CE8AC4E293EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{38B73279-75C7-8148-2534-CE8AC4E293EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{38B73279-75C7-8148-2534-CE8AC4E293EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{38B73279-75C7-8148-2534-CE8AC4E293EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -800,6 +806,7 @@ Global
 		{CBA60732-1AAA-FC27-9CE1-9C307CB1F45F} = {8ED36AC6-21AB-4336-BC68-4A14BBBFC771}
 		{B3B5F0CF-5FDA-0F2F-1FD9-9972CAAE0656} = {E57473DF-FAEF-42DC-8963-F96246FF9B87}
 		{115247AF-1AFD-290D-4DE7-42CAC7666086} = {E57473DF-FAEF-42DC-8963-F96246FF9B87}
+		{38B73279-75C7-8148-2534-CE8AC4E293EB} = {2076ADF1-E63E-4A71-AF00-DCD6570B5ECF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}

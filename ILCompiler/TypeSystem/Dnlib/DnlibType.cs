@@ -53,7 +53,6 @@ namespace ILCompiler.TypeSystem.Dnlib
 
         public override TypeSystemContext Context => _module.Context;
 
-
         public override bool IsSequentialLayout => _typeDef.IsSequentialLayout;
 
         public override string Name => _typeDef.Name;
@@ -65,6 +64,8 @@ namespace ILCompiler.TypeSystem.Dnlib
         public override bool IsPrimitive => _typeDef.IsPrimitive;
         public override bool IsValueType => _typeDef.IsValueType;
 
+        private const string CompilerIsByRefLikeAttribute = "System.Runtime.CompilerServices.IsByRefLikeAttribute";
+        public override bool IsByRefLike => _typeDef.HasCustomAttributes && _typeDef.CustomAttributes.IsDefined(CompilerIsByRefLikeAttribute);
 
         public override VarType VarType => GetVarType(_typeDef.ToTypeSig());
 

@@ -25,7 +25,8 @@ namespace ILCompiler.TypeSystem.Common
         public bool IsParameterizedType => this is ParameterizedType;
         public bool IsFunctionPointer => this is FunctionPointerType;
         public bool IsPointer => this is PointerType;
-        public bool IsByRef => false;
+        public bool IsByRef => this is ByRefType;
+        public virtual bool IsByRefLike => false;
         public bool IsObject => this.IsWellKnownType(WellKnownType.Object);
 
         public bool IsInstantiatedType => this is InstantiatedType;

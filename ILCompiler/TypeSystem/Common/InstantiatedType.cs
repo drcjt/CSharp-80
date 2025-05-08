@@ -139,6 +139,8 @@ namespace ILCompiler.TypeSystem.Common
 
         public override bool IsInterface => _typeDef.IsInterface;
 
+        public override bool IsByRefLike => _typeDef.IsByRefLike;
+
         public override bool HasStaticConstructor => _typeDef.HasStaticConstructor;
 
         public override MethodDesc? GetStaticConstructor()
