@@ -5,6 +5,8 @@ namespace System.Runtime.InteropServices
 {
     public static unsafe class MemoryMarshal
     {
+        public static ref T GetArrayDataReference<T>(T[] array) => ref Unsafe.As<byte, T>(ref Unsafe.As<RawArrayData>(array).Data);
+
         /// <summary>
         /// Returns a reference to the 0th element of <paramref name="array"/>
         /// </summary>
@@ -21,5 +23,9 @@ namespace System.Runtime.InteropServices
             // points at the number of components, skipping over the method table pointer-sized field.
             return ref Unsafe.AddByteOffset(ref Unsafe.As<RawData>(array).Data, (nint)array.GetMethodTable()->BaseSize - (1 * 2 /* sizeof(IntPtr) */));
         }
+
+        public static ref T GetReference<T>(Span<T> span) => ref span._reference;
+
+        public static ref T GetReference<T>(ReadOnlySpan<T> span) => ref span._reference;
     }
 }
