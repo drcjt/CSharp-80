@@ -82,5 +82,22 @@ namespace ILCompiler.Compiler.EvaluationStack
                 use.ReplaceWith(newTree);
             }
         }
+
+        public bool Contains<T>()
+        {
+            bool containsT = false;
+
+            var visitor = new StackEntryVisitor(node =>
+            {
+                if (node is T)
+                {
+                    containsT = true;
+                }
+            });
+
+            visitor.WalkTree(this);
+
+            return containsT;
+        }
     }
 }
