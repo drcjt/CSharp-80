@@ -158,14 +158,21 @@ namespace ILCompiler.Compiler
 
         private StackEntry? ImportExtractLastStmt()
         {
-            Statement? lastStmt = null;
             if (_currentBasicBlock?.Statements.Count > 0)
             {
                 var lastStatementIndex = _currentBasicBlock.Statements.Count - 1;
-                lastStmt = _currentBasicBlock.Statements[lastStatementIndex];
-                _currentBasicBlock.Statements.RemoveAt(lastStatementIndex);
+                var lastStmt = _currentBasicBlock.Statements[lastStatementIndex];
+                var lastStmtRoot = lastStmt.RootNode;
+
+                if (lastStmtRoot is JumpEntry || lastStmtRoot is JumpTrueEntry)
+                {
+                    // Remove the branch statement from the current basic block
+                    _currentBasicBlock.Statements.RemoveAt(lastStatementIndex);
+                    return lastStmtRoot;
+                }
             }
-            return lastStmt?.RootNode;
+
+            return null;
         }
 
         private void ImportBasicBlock(IDictionary<int, int> offsetToIndexMap, BasicBlock block)
