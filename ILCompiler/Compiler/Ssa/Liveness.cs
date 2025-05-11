@@ -37,12 +37,6 @@ namespace ILCompiler.Compiler
             {
                 localVariable.Tracked = true;
 
-                // Don't track structs
-                if (localVariable.Type == VarType.Struct)
-                {
-                    localVariable.Tracked = false;
-                }
-
                 // Don't track local variables which are address exposed
                 if (localVariable.AddressExposed)
                 {

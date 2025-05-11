@@ -50,13 +50,7 @@
             UInt32Tests.EqualsTests();
 
             IntPtrTests.EqualsTests();
-
             UIntPtrTests.EqualsTests();
-
-            StringTests.Ctor_CharArray_EmptyString();
-            StringTests.Ctor_CharArray_Tests();
-            StringTests.Contains_Char_Tests();
-            StringTests.EqualsTests();
 
             DateTimeTests.Ctor_Int_Int_Int_Int();
             DateTimeTests.Equals_Tests();

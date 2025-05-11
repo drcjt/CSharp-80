@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace System
 {
@@ -28,16 +29,37 @@ namespace System
             }
         }
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        [DynamicDependency("Ctor(System.Char[])")]
+        public extern String(char[] value);
+
         internal unsafe static string Ctor(char[] value)
         {
+            if (value == null || value.Length == 0)
+            {
+                return Empty;
+            }
+
             string result = RuntimeImports.NewString(EEType.Of<string>(), value.Length);
             Buffer.Memmove(ref result._firstChar, ref value[0], (uint)result.Length);
             return result;
         }
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        [DynamicDependency("Ctor(System.Char[])")]
-        public extern String(char[] value);
+        [DynamicDependency("Ctor(System.ReadOnlySpan`1<System.Char>)")]
+        public extern String(ReadOnlySpan<char> value);
+
+        internal unsafe static string Ctor(ReadOnlySpan<char> value)
+        {
+            if (value.Length == 0)
+            {
+                return Empty;
+            }
+
+            string result = RuntimeImports.NewString(EEType.Of<string>(), value.Length);
+            Buffer.Memmove(ref result._firstChar, ref MemoryMarshal.GetReference(value), (uint)result.Length);
+            return result;
+        }
 
         public bool Contains(char value)
         {
@@ -51,5 +73,12 @@ namespace System
         }
 
         public override string ToString() => this;
+
+        internal ref char GetRawStringData() => ref _firstChar;
+
+        public static implicit operator ReadOnlySpan<char>(string? value)
+        {
+            return value != null ? new ReadOnlySpan<char>(ref value.GetRawStringData(), value.Length) : default;
+        }
     }
 }

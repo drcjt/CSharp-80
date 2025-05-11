@@ -178,6 +178,9 @@ namespace ILCompiler.Compiler
                 // Loop over variables that are assigned to in the block e.g. the def's
                 foreach (var defVar in block.VarDef)
                 {
+                    if (!locals[defVar].InSsa)
+                        continue;
+
                     foreach (var blockInDominanceFront in iteratedDominanceFrontier)
                     {
                         if (!blockInDominanceFront.LiveIn.IsMember(defVar))

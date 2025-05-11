@@ -1,4 +1,4 @@
-﻿namespace System.Tests
+﻿namespace System.String.Tests
 {
     internal static class Assert
     {
