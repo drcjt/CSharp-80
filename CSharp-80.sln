@@ -280,6 +280,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.Memory.Tests", "Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bug623", "Tests\Regression\Bug623\Bug623.csproj", "{FE29F40B-0257-76A1-8BDF-8E9934FA5D1F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.String.Tests", "Tests\CoreLib\System.String.Tests\System.String.Tests.csproj", "{FF2C639D-15C2-3899-0BCC-458EF630E609}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -694,6 +696,10 @@ Global
 		{FE29F40B-0257-76A1-8BDF-8E9934FA5D1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FE29F40B-0257-76A1-8BDF-8E9934FA5D1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FE29F40B-0257-76A1-8BDF-8E9934FA5D1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF2C639D-15C2-3899-0BCC-458EF630E609}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF2C639D-15C2-3899-0BCC-458EF630E609}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF2C639D-15C2-3899-0BCC-458EF630E609}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF2C639D-15C2-3899-0BCC-458EF630E609}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -814,6 +820,7 @@ Global
 		{115247AF-1AFD-290D-4DE7-42CAC7666086} = {E57473DF-FAEF-42DC-8963-F96246FF9B87}
 		{38B73279-75C7-8148-2534-CE8AC4E293EB} = {2076ADF1-E63E-4A71-AF00-DCD6570B5ECF}
 		{FE29F40B-0257-76A1-8BDF-8E9934FA5D1F} = {190AA2D7-1957-4ED1-BC6A-5D5BB6B049C9}
+		{FF2C639D-15C2-3899-0BCC-458EF630E609} = {2076ADF1-E63E-4A71-AF00-DCD6570B5ECF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}
