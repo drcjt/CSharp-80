@@ -59,5 +59,12 @@ namespace System
         public int Length => _length;
 
         public bool IsEmpty => _length == 0;
+
+        public static ReadOnlySpan<T> Empty => default;
+
+        public static bool operator ==(ReadOnlySpan<T> left, ReadOnlySpan<T> right) =>
+            left._length == right._length && Unsafe.AreSame(ref left._reference, ref right._reference);
+
+        public static bool operator !=(ReadOnlySpan<T> left, ReadOnlySpan<T> right) => !(left == right);
     }
 }
