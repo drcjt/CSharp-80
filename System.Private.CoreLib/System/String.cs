@@ -35,6 +35,11 @@ namespace System
 
         internal unsafe static string Ctor(char[] value)
         {
+            if (value == null || value.Length == 0)
+            {
+                return Empty;
+            }
+
             string result = RuntimeImports.NewString(EEType.Of<string>(), value.Length);
             Buffer.Memmove(ref result._firstChar, ref value[0], (uint)result.Length);
             return result;
@@ -46,6 +51,11 @@ namespace System
 
         internal unsafe static string Ctor(ReadOnlySpan<char> value)
         {
+            if (value.Length == 0)
+            {
+                return Empty;
+            }
+
             string result = RuntimeImports.NewString(EEType.Of<string>(), value.Length);
             Buffer.Memmove(ref result._firstChar, ref MemoryMarshal.GetReference(value), (uint)result.Length);
             return result;
