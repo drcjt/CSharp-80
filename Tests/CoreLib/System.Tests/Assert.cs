@@ -2,6 +2,14 @@
 {
     internal static class Assert
     {
+        public static void AreSame(object expected, object actual)
+        {
+            if (!ReferenceEquals(expected, actual))
+            {
+                Environment.Exit(1);
+            }
+        }
+
         public static void AreSame<T>(T[] expected, T[] actual)
         {
             Assert.AreEqual(expected.Length, actual.Length);

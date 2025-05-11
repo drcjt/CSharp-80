@@ -53,10 +53,16 @@
 
             UIntPtrTests.EqualsTests();
 
-            StringTests.Ctor_CharArray_EmptyString();
-            StringTests.Ctor_CharArray_Tests();
+            StringTests.Ctor_CharSpan_EmptyString_Tests();
+            StringTests.Ctor_CharSpan_Empty();
+            StringTests.Ctor_CharSpan_Tests();
             StringTests.Contains_Char_Tests();
             StringTests.EqualsTests();
+            StringTests.Contains_Match_Char();
+            StringTests.Contains_ZeroLength_Char();
+            StringTests.Contains_MultipleMatches_Char();
+            StringTests.ImplicitCast_ResultingSpanMatches_Tests();
+            StringTests.ImplicitCast_NullString_ReturnsDefaultSpan();
 
             DateTimeTests.Ctor_Int_Int_Int_Int();
             DateTimeTests.Equals_Tests();
