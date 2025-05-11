@@ -60,6 +60,7 @@ namespace System
 
         // Spans can't be boxed, use operator == instead
         public override bool Equals(object? obj) => throw new NotSupportedException();
+        public override int GetHashCode() => throw new NotSupportedException();
 
         public static bool operator ==(Span<T> left, Span<T> right) =>
             left._length == right._length && Unsafe.AreSame(ref left._reference, ref right._reference);
