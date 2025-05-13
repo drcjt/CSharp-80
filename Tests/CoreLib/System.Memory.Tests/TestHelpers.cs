@@ -1,24 +1,26 @@
-﻿namespace System.Memory.Tests
+﻿using Xunit;
+
+namespace System.Memory.Tests
 {
     public static class TestHelpers
     {
         public static void Validate<T>(this Span<T> span, params T[] expected) where T : struct, IEquatable<T>
         {
-            Assert.IsTrue(span.SequenceEqual(expected));
+            Assert.True(span.SequenceEqual(expected));
         }
 
         public static void Validate<T>(this ReadOnlySpan<T> span, params T[] expected) where T : struct, IEquatable<T>
         {
-            Assert.IsTrue(span.SequenceEqual(expected));
+            Assert.True(span.SequenceEqual(expected));
         }
 
         public static void ValidateReferenceType<T>(this Span<T> span, params T[] expected) where T : class
         {
-            Assert.AreEqual(span.Length, expected.Length);
+            Assert.Equal(span.Length, expected.Length);
             for (int i = 0; i < expected.Length; i++)
             {
                 T actual = span[i];
-                Assert.AreSame(expected[i], actual);
+                Assert.Same(expected[i], actual);
             }
 
             bool exceptionThrown = false;
@@ -31,16 +33,16 @@
                 exceptionThrown = true;
             }
 
-            Assert.IsTrue(exceptionThrown);
+            Assert.True(exceptionThrown);
         }
 
         public static void ValidateReferenceType<T>(this ReadOnlySpan<T> span, params T[] expected) where T : class
         {
-            Assert.AreEqual(span.Length, expected.Length);
+            Assert.Equal(span.Length, expected.Length);
             for (int i = 0; i < expected.Length; i++)
             {
                 T actual = span[i];
-                Assert.AreSame(expected[i], actual);
+                Assert.Same(expected[i], actual);
             }
 
             bool exceptionThrown = false;
@@ -53,7 +55,7 @@
                 exceptionThrown = true;
             }
 
-            Assert.IsTrue(exceptionThrown);
+            Assert.True(exceptionThrown);
         }
     }
 }

@@ -18,7 +18,7 @@
 	  <!-- Prevent .NET Core 3+ from generating exe -->
 	  <UseAppHost>false</UseAppHost>
 
-	  <OutputType>Exe</OutputType>
+	  <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,9 +28,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
-    <ProjectReference Include="..\..\..\ILCompiler\ILCompiler.csproj" />
-    <ProjectReference Include="..\..\Common\Tests.Common.csproj" />
+	  <ProjectReference Include="..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
+	  <ProjectReference Include="..\..\ILCompiler\ILCompiler.csproj" />
   </ItemGroup>
   
 </Project>

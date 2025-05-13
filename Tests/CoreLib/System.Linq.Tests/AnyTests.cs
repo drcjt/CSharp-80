@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Xunit;
 
 namespace System.Linq.Tests
 {
@@ -13,7 +14,7 @@ namespace System.Linq.Tests
 
         private static void Any_Test(IEnumerable<int> source, bool expected)
         {
-            Assert.AreEqual(expected, source.Any());
+            Assert.Equal(expected, source.Any());
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Internal.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Xunit;
 
 namespace System.Memory.Tests
 {
@@ -14,7 +15,7 @@ namespace System.Memory.Tests
                 {
                     ReadOnlySpan<int> span = new ReadOnlySpan<int>(pa, 3);
                     span.Validate(90, 91, 92);
-                    Assert.IsTrue(Unsafe.AreSame(ref Unsafe.AsRef<int>(pa), ref Unsafe.AsRef(in MemoryMarshal.GetReference(span))));
+                    Assert.True(Unsafe.AreSame(ref Unsafe.AsRef<int>(pa), ref Unsafe.AsRef(in MemoryMarshal.GetReference(span))));
                 }
             }
         }

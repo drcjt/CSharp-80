@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Xunit;
 
 namespace System.Linq.Tests
 {
@@ -14,7 +15,7 @@ namespace System.Linq.Tests
 
         private static void CountMatchesTally<T>(int count, IEnumerable<T> enumerable)
         {
-            Assert.AreEqual(count, enumerable.Count());
+            Assert.Equal(count, enumerable.Count());
         }
     }
 }

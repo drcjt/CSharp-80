@@ -1,21 +1,23 @@
-﻿namespace System.Tests
+﻿using Xunit;
+
+namespace System.Tests
 {
     internal static class Int32Tests
     {
         public static void Ctor_Empty()
         {
             var i = new int();
-            Assert.AreEqual(0, i);
+            Assert.Equal(0, i);
         }
 
         public static void MaxValue()
         {
-            Assert.AreEqual(2147483647, int.MaxValue);
+            Assert.Equal(2147483647, int.MaxValue);
         }
 
         public static void MinValue()
         {
-            Assert.AreEqual(-2147483648, int.MinValue);
+            Assert.Equal(-2147483648, int.MinValue);
         }
 
         public static void EqualsTests()
@@ -41,30 +43,30 @@
 
         private static void ToStringTest(int i, string expected)
         {
-            Assert.AreEqual(expected, i.ToString());
+            Assert.Equal(expected, i.ToString());
         }
 
         private static void EqualsTest(int i, object? obj, bool expected)
         {
             if (obj is int j)
             {
-                Assert.AreEqual(expected, i.Equals(j));
-                Assert.AreEqual(expected, i.GetHashCode().Equals(j.GetHashCode()));
+                Assert.Equal(expected, i.Equals(j));
+                Assert.Equal(expected, i.GetHashCode().Equals(j.GetHashCode()));
             }
-            Assert.AreEqual(expected, i.Equals(obj));
+            Assert.Equal(expected, i.Equals(obj));
         }
 
         public static void Parse_Valid()
         {
-            Assert.AreEqual(0, int.Parse("0"));
-            Assert.AreEqual(0, int.Parse("0000000000000000000000000000000000000000000000000000000000"));
-            Assert.AreEqual(1, int.Parse("0000000000000000000000000000000000000000000000000000000001"));
-            Assert.AreEqual(2147483647, int.Parse("2147483647"));
-            Assert.AreEqual(2147483647, int.Parse("02147483647"));
-            Assert.AreEqual(2147483647, int.Parse("00000000000000000000000000000000000000000000000002147483647"));
-            Assert.AreEqual(123, int.Parse("123\0\0"));
+            Assert.Equal(0, int.Parse("0"));
+            Assert.Equal(0, int.Parse("0000000000000000000000000000000000000000000000000000000000"));
+            Assert.Equal(1, int.Parse("0000000000000000000000000000000000000000000000000000000001"));
+            Assert.Equal(2147483647, int.Parse("2147483647"));
+            Assert.Equal(2147483647, int.Parse("02147483647"));
+            Assert.Equal(2147483647, int.Parse("00000000000000000000000000000000000000000000000002147483647"));
+            Assert.Equal(123, int.Parse("123\0\0"));
 
-            Assert.AreEqual(123, int.Parse("123"));
+            Assert.Equal(123, int.Parse("123"));
         }
     }
 }

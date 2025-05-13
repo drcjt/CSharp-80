@@ -1,4 +1,6 @@
-﻿namespace System.Collections.Tests
+﻿using Xunit;
+
+namespace System.Collections.Tests
 {
     public abstract class ICollection_NonGeneric_Tests : IEnumerable_NonGeneric_Tests
     {
@@ -18,7 +20,7 @@
         private void Count_Validity(int count)
         {
             var collection = NonGenericICollectionFactory(count);
-            Assert.AreEqual(count, collection.Count);
+            Assert.Equal(count, collection.Count);
         }
 
         private void CopyTo_ExactlyEnoughSpaceInArray(int count)
@@ -29,7 +31,7 @@
             int i = 0;
             foreach (var item in collection)
             {
-                Assert.AreEqual(array[i++], item);
+                Assert.Equal(array[i++], item);
             }
         }
 

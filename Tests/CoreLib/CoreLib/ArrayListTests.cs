@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Xunit;
 
 namespace CoreLib
 {
@@ -8,14 +9,14 @@ namespace CoreLib
         public static void Ctor_Empty()
         {
             var arrayList = new ArrayList();
-            Assert.AreEqual(0, arrayList.Count);
-            Assert.AreEqual(0, arrayList.Capacity);
+            Assert.Equal(0, arrayList.Count);
+            Assert.Equal(0, arrayList.Capacity);
         }
 
         public static void Ctor_Int(int capacity)
         {
             var arrayList = new ArrayList(capacity);
-            Assert.AreEqual(capacity, arrayList.Capacity);
+            Assert.Equal(capacity, arrayList.Capacity);
         }
 
         public static void Add_SmallCapacity(int count)
@@ -24,19 +25,19 @@ namespace CoreLib
             for (int i = 0; i < count; i++)
             {
                 arrayList.Add(i);
-                Assert.AreEqual(i, arrayList[i]);
-                Assert.AreEqual(i + 1, arrayList.Count);
-                Assert.IsTrue(arrayList.Capacity >= arrayList.Count);
+                Assert.Equal(i, arrayList[i]);
+                Assert.Equal(i + 1, arrayList.Count);
+                Assert.True(arrayList.Capacity >= arrayList.Count);
             }
 
-            Assert.AreEqual(count, arrayList.Count);
+            Assert.Equal(count, arrayList.Count);
 
             for (int i = 0; i < count; i++)
             {
                 arrayList.RemoveAt(0);
             }
 
-            Assert.AreEqual(0, arrayList.Count);
+            Assert.Equal(0, arrayList.Count);
         }
 
         public static void IndexOf_Int()
@@ -51,7 +52,7 @@ namespace CoreLib
 
             foreach (var item in data)
             {
-                Assert.AreEqual(item, arrayList.IndexOf(item));
+                Assert.Equal(item, arrayList.IndexOf(item));
             }
         }
 
@@ -62,9 +63,9 @@ namespace CoreLib
             arrayList.Add(2);
             arrayList.Add(3);
 
-            Assert.AreEqual(-1, arrayList.IndexOf(null));
-            Assert.AreEqual(-1, arrayList.IndexOf("wibble"));
-            Assert.AreEqual(-1, arrayList.IndexOf(5));
+            Assert.Equal(-1, arrayList.IndexOf(null));
+            Assert.Equal(-1, arrayList.IndexOf("wibble"));
+            Assert.Equal(-1, arrayList.IndexOf(5));
         }
 
         public static void GetEnumerator_Int()
@@ -78,7 +79,7 @@ namespace CoreLib
             for (int i = 1; i <= 3; i++)
             {
                 enumerator.MoveNext();
-                Assert.AreEqual(i, enumerator.Current);
+                Assert.Equal(i, enumerator.Current);
             }
         }
 
@@ -93,7 +94,7 @@ namespace CoreLib
             arrayList.Remove(1);
             arrayList.Remove(2);
 
-            Assert.AreEqual(0, arrayList.Count);
+            Assert.Equal(0, arrayList.Count);
         }
 
         public static void Clear_Int()
@@ -106,7 +107,7 @@ namespace CoreLib
 
             arrayList.Clear();
 
-            Assert.AreEqual(0, arrayList.Count);
+            Assert.Equal(0, arrayList.Count);
         }
 
         public static void Contains_Int()
@@ -116,7 +117,7 @@ namespace CoreLib
             arrayList.Add(1);
             arrayList.Add(2);
 
-            Assert.IsTrue(arrayList.Contains(2));
+            Assert.True(arrayList.Contains(2));
         }
 
         public static void Indexer_Int()
@@ -128,7 +129,7 @@ namespace CoreLib
 
             arrayList[1] = arrayList[0];
 
-            Assert.AreEqual(arrayList[0], arrayList[1]);   
+            Assert.Equal(arrayList[0], arrayList[1]);   
         }
 
         public static void RunArrayListTests()

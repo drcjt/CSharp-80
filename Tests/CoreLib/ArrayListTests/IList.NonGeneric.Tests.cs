@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using Xunit;
 
 namespace System.Collections.Tests
 {
@@ -126,7 +126,7 @@ namespace System.Collections.Tests
                 var list = NonGenericIListFactory(count);
                 object value = CreateT(0);
                 list[0] = value;
-                Assert.AreEqual(value, list[0]);
+                Assert.Equal(value, list[0]);
             }
         }
 
@@ -137,7 +137,7 @@ namespace System.Collections.Tests
                 var list = NonGenericIListFactory(count);
                 object? value = null;
                 list[0] = value;
-                Assert.AreEqual(value, list[0]);
+                Assert.Equal(value, list[0]);
             }            
         }
 
@@ -149,7 +149,7 @@ namespace System.Collections.Tests
                 object value = CreateT(0);
                 var lastIndex = count - 1;
                 list[lastIndex] = value;
-                Assert.AreEqual(value, list[lastIndex]);
+                Assert.Equal(value, list[lastIndex]);
             }
         }
 
@@ -161,7 +161,7 @@ namespace System.Collections.Tests
                 object? value = null;
                 var lastIndex = count - 1;
                 list[lastIndex] = value;
-                Assert.AreEqual(value, list[lastIndex]);
+                Assert.Equal(value, list[lastIndex]);
             }
         }
 
@@ -173,8 +173,8 @@ namespace System.Collections.Tests
                 object value = CreateT(0);
                 list[0] = value;
                 list[1] = value;
-                Assert.AreEqual(value, list[0]);
-                Assert.AreEqual(value, list[1]);
+                Assert.Equal(value, list[0]);
+                Assert.Equal(value, list[1]);
             }
         }
 
@@ -182,7 +182,7 @@ namespace System.Collections.Tests
         {
             var list = NonGenericIListFactory(count);
             list.Add(null);
-            Assert.AreEqual(count + 1, list.Count);
+            Assert.Equal(count + 1, list.Count);
         }
 
         private void Add_DuplicateValues(int count)
@@ -191,7 +191,7 @@ namespace System.Collections.Tests
             object duplicateValue = CreateT(0);
             list.Add(duplicateValue);
             list.Add(duplicateValue);
-            Assert.AreEqual(count + 2, list.Count);
+            Assert.Equal(count + 2, list.Count);
         }
 
         private void Add_AfterCallingClear(int count)
@@ -199,7 +199,7 @@ namespace System.Collections.Tests
             var list = NonGenericIListFactory(count);
             list.Clear();
             AddToCollection(list, 5);
-            Assert.AreEqual(5, list.Count);
+            Assert.Equal(5, list.Count);
         }
 
         private void Add_AfterRemovingAnyValue(int count)
@@ -222,7 +222,7 @@ namespace System.Collections.Tests
             for (int i = 0; i < count; i++)
                 list.Remove(arr[i]);
             list.Add(CreateT(0));
-            Assert.AreEqual(1, list.Count);
+            Assert.Equal(1, list.Count);
         }
 
         private void Add_AfterRemoving(int count)
@@ -238,40 +238,40 @@ namespace System.Collections.Tests
         {
             var list = NonGenericIListFactory(count);
             list.Clear();
-            Assert.AreEqual(0, list.Count);
+            Assert.Equal(0, list.Count);
         }
 
         private void Contains_ValueNotInListNotContainingValue(int count)
         {
             var list = NonGenericIListFactory(count);
             var item = CreateTNotInList(0, list);
-            Assert.IsFalse(list.Contains(item));
+            Assert.False(list.Contains(item));
         }
 
         private void Contains_ValueInListContainingValue(int count)
         {
             var list = NonGenericIListFactory(count);
             foreach (var item in list)
-                Assert.IsTrue(list.Contains(item));
+                Assert.True(list.Contains(item));
         }
 
         private void Contains_NullNotInListNotContainingNull(int count)
         {
             var list = NonGenericIListFactory(count);
-            Assert.IsFalse(list.Contains(null));
+            Assert.False(list.Contains(null));
         }
 
         private void Contains_NullInListContainingNull(int count)
         {
             var list = NonGenericIListFactory(count);
             list.Add(null);
-            Assert.IsTrue(list.Contains(null));
+            Assert.True(list.Contains(null));
         }
 
         private void IndexOf_NullNotContainedInList(int count)
         {
             var list = NonGenericIListFactory(count);
-            Assert.AreEqual(-1, list.IndexOf(null));
+            Assert.Equal(-1, list.IndexOf(null));
         }
 
         private void IndexOf_NullContainedInList(int count)
@@ -280,7 +280,7 @@ namespace System.Collections.Tests
             {
                 var list = NonGenericIListFactory(count);
                 list[0] = null;
-                Assert.AreEqual(0, list.IndexOf(null));
+                Assert.Equal(0, list.IndexOf(null));
             }
         }
 
@@ -292,7 +292,7 @@ namespace System.Collections.Tests
                 var value = CreateT(0);
                 list[0] = value;
                 list[count / 2] = value;
-                Assert.AreEqual(0, list.IndexOf(value));
+                Assert.Equal(0, list.IndexOf(value));
             }
         }
 
@@ -301,7 +301,7 @@ namespace System.Collections.Tests
             var list = NonGenericIListFactory(count);
             for (int i = 0; i < count; i++)
             {
-                Assert.AreEqual(i, list.IndexOf(list[i]));
+                Assert.Equal(i, list.IndexOf(list[i]));
             }
         }
 
@@ -319,7 +319,7 @@ namespace System.Collections.Tests
 
             for (int i = 0; i < count; i++)
             {
-                Assert.AreEqual(i, list.IndexOf(originalItems[i]));
+                Assert.Equal(i, list.IndexOf(originalItems[i]));
             }
         }
 
@@ -328,8 +328,8 @@ namespace System.Collections.Tests
             var list = NonGenericIListFactory(count);
             var toInsert = CreateT(0);
             list.Insert(count, toInsert);
-            Assert.AreEqual(count + 1, list.Count);
-            Assert.AreEqual(toInsert, list[count]);
+            Assert.Equal(count + 1, list.Count);
+            Assert.Equal(toInsert, list[count]);
         }
 
         private void Insert_FirstItemToNonNull(int count)
@@ -337,16 +337,16 @@ namespace System.Collections.Tests
             var list = NonGenericIListFactory(count);
             var toInsert = CreateT(0);
             list.Insert(0, toInsert);
-            Assert.AreEqual(toInsert, list[0]);
-            Assert.AreEqual(count + 1, list.Count);
+            Assert.Equal(toInsert, list[0]);
+            Assert.Equal(count + 1, list.Count);
         }
 
         private void Insert_FirstItemToNull(int count)
         {
             var list = NonGenericIListFactory(count);
             list.Insert(0, null);
-            Assert.AreEqual(null, list[0]);
-            Assert.AreEqual(count + 1, list.Count);
+            Assert.Equal(null, list[0]);
+            Assert.Equal(count + 1, list.Count);
         }
 
         private void Insert_LastItemToNonNull(int count)
@@ -355,8 +355,8 @@ namespace System.Collections.Tests
             var toInsert = CreateT(0);
             int lastIndex = count > 0 ? count - 1 : 0;
             list.Insert(lastIndex, toInsert);
-            Assert.AreEqual(toInsert, list[lastIndex]);
-            Assert.AreEqual(count + 1, list.Count);
+            Assert.Equal(toInsert, list[lastIndex]);
+            Assert.Equal(count + 1, list.Count);
         }
 
         private void Insert_LastItemToNull(int count)
@@ -364,8 +364,8 @@ namespace System.Collections.Tests
             var list = NonGenericIListFactory(count);
             int lastIndex = count > 0 ? count - 1 : 0;
             list.Insert(lastIndex, null);
-            Assert.AreEqual(null, list[lastIndex]);
-            Assert.AreEqual(count + 1, list.Count);
+            Assert.Equal(null, list[lastIndex]);
+            Assert.Equal(count + 1, list.Count);
         }
 
         private void Insert_DuplicateValues(int count)
@@ -374,16 +374,16 @@ namespace System.Collections.Tests
             var toInsert = CreateT(0);
             list.Insert(0, toInsert);
             list.Insert(1, toInsert);
-            Assert.AreEqual(toInsert, list[0]);
-            Assert.AreEqual(toInsert, list[1]);
-            Assert.AreEqual(count + 2, list.Count);
+            Assert.Equal(toInsert, list[0]);
+            Assert.Equal(toInsert, list[1]);
+            Assert.Equal(count + 2, list.Count);
         }
 
         private void Remove_NullNotContainedInList(int count)
         {
             var list = NonGenericIListFactory(count);
             list.Remove(null);
-            Assert.AreEqual(count, list.Count);
+            Assert.Equal(count, list.Count);
         }
 
         private void Remove_NonNullNotContainedInList(int count)
@@ -391,7 +391,7 @@ namespace System.Collections.Tests
             var list = NonGenericIListFactory(count);
             var item = CreateTNotInList(0, list);
             list.Remove(item);
-            Assert.AreEqual(count, list.Count);
+            Assert.Equal(count, list.Count);
         }
 
         private void Remove_NullContainedInList(int count)
@@ -399,7 +399,7 @@ namespace System.Collections.Tests
             var list = NonGenericIListFactory(count);
             list.Add(null);
             list.Remove(null);
-            Assert.AreEqual(count, list.Count);
+            Assert.Equal(count, list.Count);
         }
 
         private void Remove_NonNullContainedInList(int count)
@@ -408,7 +408,7 @@ namespace System.Collections.Tests
             var item = CreateT(0);
             list.Add(item);
             list.Remove(item);
-            Assert.AreEqual(count, list.Count);
+            Assert.Equal(count, list.Count);
         }
 
         private void Remove_ValueThatExistsTwiceInList(int count)
@@ -418,7 +418,7 @@ namespace System.Collections.Tests
             list.Add(item);
             list.Add(item);
             list.Remove(item);
-            Assert.AreEqual(count + 1, list.Count);
+            Assert.Equal(count + 1, list.Count);
         }
 
         private void Remove_AllValues(int count)
@@ -431,7 +431,7 @@ namespace System.Collections.Tests
             {
                 list.Remove(items[i]);
             }
-            Assert.AreEqual(0, list.Count);
+            Assert.Equal(0, list.Count);
         }
 
         private void RemoveAt_AllIndices(int count)
@@ -440,7 +440,7 @@ namespace System.Collections.Tests
             for (int index = count - 1; index >= 0; index--)
             {
                 list.RemoveAt(index);
-                Assert.AreEqual(index, list.Count);
+                Assert.Equal(index, list.Count);
             }
         }
 
@@ -450,7 +450,7 @@ namespace System.Collections.Tests
             for (int index = 0; index < count; index++)
             {
                 list.RemoveAt(0);
-                Assert.AreEqual(count - index - 1, list.Count);
+                Assert.Equal(count - index - 1, list.Count);
             }
         }
 

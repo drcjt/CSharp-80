@@ -1,4 +1,6 @@
-﻿namespace CoreLib
+﻿using Xunit;
+
+namespace CoreLib
 {
     public static class ArrayTests
     {
@@ -17,7 +19,7 @@
                 sum += i;
             }
 
-            Assert.AreEqual(55, sum);
+            Assert.Equal(55, sum);
         }
     }
 }

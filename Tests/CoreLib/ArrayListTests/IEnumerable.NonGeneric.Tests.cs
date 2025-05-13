@@ -1,4 +1,6 @@
-﻿namespace System.Collections.Tests
+﻿using Xunit;
+
+namespace System.Collections.Tests
 {
     public abstract class IEnumerable_NonGeneric_Tests
     {
@@ -7,7 +9,7 @@
         private void GetEnumerator_ReturnsNotNull(int count)
         {
             var enumerable = NonGenericIEnumerableFactory(count);
-            Assert.IsNotNull(enumerable.GetEnumerator());
+            Assert.NotNull(enumerable.GetEnumerator());
         }
 
         private void GetEnumerator_ReturnsUniqueEnumerator(int count)
@@ -20,7 +22,7 @@
                     foreach (var item3 in enumerable)
                         iterations++;
 
-            Assert.AreEqual(count * count * count, iterations);
+            Assert.Equal(count * count * count, iterations);
         }
 
         private void MoveNext_FromStartToFinish(int count)
@@ -30,7 +32,7 @@
             while (enumerator.MoveNext())
                 iterations++;
 
-            Assert.AreEqual(count, iterations);
+            Assert.Equal(count, iterations);
         }
 
         private void MoveNext_AfterEndOfCollection(int count)
@@ -39,8 +41,8 @@
             for (int i = 0; i < count; i++)
                 enumerator.MoveNext();
 
-            Assert.IsFalse(enumerator.MoveNext());
-            Assert.IsFalse(enumerator.MoveNext());
+            Assert.False(enumerator.MoveNext());
+            Assert.False(enumerator.MoveNext());
         }
 
         private void Current_FromStartToFinish(int count)
@@ -56,9 +58,9 @@
             while (enumerator.MoveNext())
             {
                 var current = enumerator.Current;
-                Assert.AreEqual(current, enumerator.Current);
-                Assert.AreEqual(current, enumerator.Current);
-                Assert.AreEqual(current, enumerator.Current);
+                Assert.Equal(current, enumerator.Current);
+                Assert.Equal(current, enumerator.Current);
+                Assert.Equal(current, enumerator.Current);
             }
         }
 
@@ -77,7 +79,7 @@
                 enumerator.Reset();
                 if (enumerator.MoveNext())
                 {
-                    Assert.AreEqual(current, enumerator.Current);
+                    Assert.Equal(current, enumerator.Current);
                 }
             }
         }

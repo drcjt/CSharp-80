@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Xunit;
+using System.Collections.Generic;
 
 namespace System.Collections.Tests
 {
@@ -9,7 +10,7 @@ namespace System.Collections.Tests
         private void GetEnumerator_ReturnsNotNull(int count)
         {
             var enumerable = GenericIEnumerableFactory(count);
-            Assert.IsNotNull(enumerable.GetEnumerator());
+            Assert.NotNull(enumerable.GetEnumerator());
         }
 
         private void GetEnumerator_ReturnsUniqueEnumerator(int count)
@@ -22,7 +23,7 @@ namespace System.Collections.Tests
                     foreach (var item3 in enumerable)
                         iterations++;
 
-            Assert.AreEqual(count * count * count, iterations);
+            Assert.Equal(count * count * count, iterations);
         }
 
         private void MoveNext_FromStartToFinish(int count)
@@ -33,7 +34,7 @@ namespace System.Collections.Tests
                 while (enumerator.MoveNext())
                     iterations++;
 
-                Assert.AreEqual(count, iterations);
+                Assert.Equal(count, iterations);
             }
         }
 
@@ -44,8 +45,8 @@ namespace System.Collections.Tests
                 for (int i = 0; i < count; i++)
                     enumerator.MoveNext();
 
-                Assert.IsFalse(enumerator.MoveNext());
-                Assert.IsFalse(enumerator.MoveNext());
+                Assert.False(enumerator.MoveNext());
+                Assert.False(enumerator.MoveNext());
             }
         }
 
@@ -65,9 +66,9 @@ namespace System.Collections.Tests
                 while (enumerator.MoveNext())
                 {
                     var current = enumerator.Current!;
-                    Assert.AreEqual(current, enumerator.Current!);
-                    Assert.AreEqual(current, enumerator.Current!);
-                    Assert.AreEqual(current, enumerator.Current!);
+                    Assert.Equal(current, enumerator.Current!);
+                    Assert.Equal(current, enumerator.Current!);
+                    Assert.Equal(current, enumerator.Current!);
                 }
             }
         }
@@ -88,7 +89,7 @@ namespace System.Collections.Tests
                     enumerator.Reset();
                     if (enumerator.MoveNext())
                     {
-                        Assert.AreEqual(current, enumerator.Current!);
+                        Assert.Equal(current, enumerator.Current!);
                     }
                 }
             }

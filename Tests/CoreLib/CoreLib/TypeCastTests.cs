@@ -1,5 +1,5 @@
-﻿using dnlib.DotNet;
-using System;
+﻿using System;
+using Xunit;
 
 namespace CoreLib
 {
@@ -41,12 +41,12 @@ namespace CoreLib
             var super = new SuperClass();
             var sub = new SubClass();
 
-            Assert.IsTrue(sub is SubClass);
-            Assert.IsTrue(sub is SuperClass);
-            Assert.IsTrue(super is SuperClass);
-            Assert.IsFalse(super is SubClass);
-            Assert.IsTrue(super is Object);
-            Assert.IsTrue(sub is Object);
+            Assert.True(sub is SubClass);
+            Assert.True(sub is SuperClass);
+            Assert.True(super is SuperClass);
+            Assert.False(super is SubClass);
+            Assert.True(super is Object);
+            Assert.True(sub is Object);
         }
 
         public static void InterfaceTypeCastTests()
@@ -55,14 +55,14 @@ namespace CoreLib
             var two = new Two();
             var oneAndTwo = new OneAndTwo();
 
-            Assert.IsTrue(one is IOne);
-            Assert.IsFalse(one is ITwo);
+            Assert.True(one is IOne);
+            Assert.False(one is ITwo);
 
-            Assert.IsFalse(two is IOne);
-            Assert.IsTrue(two is ITwo);
+            Assert.False(two is IOne);
+            Assert.True(two is ITwo);
 
-            Assert.IsTrue(oneAndTwo is IOne);
-            Assert.IsTrue(oneAndTwo is ITwo);
+            Assert.True(oneAndTwo is IOne);
+            Assert.True(oneAndTwo is ITwo);
         }
     }
 }

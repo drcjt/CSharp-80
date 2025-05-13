@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using Xunit;
 
 namespace CoreLib
 {
@@ -8,8 +9,8 @@ namespace CoreLib
         {
             var handler = new DefaultInterpolatedStringHandler(0, 0);
             handler.AppendLiteral("hi");
-            Assert.IsTrue(handler.ToStringAndClear().Equals("hi"));
-            Assert.IsTrue(handler.ToStringAndClear().Equals(string.Empty));
+            Assert.True(handler.ToStringAndClear().Equals("hi"));
+            Assert.True(handler.ToStringAndClear().Equals(string.Empty));
         }
 
         public static void AppendLiteral()
@@ -23,7 +24,7 @@ namespace CoreLib
                 actual.AppendLiteral(s);
             }
 
-            Assert.IsTrue(expected.Equals(actual.ToStringAndClear()));
+            Assert.True(expected.Equals(actual.ToStringAndClear()));
         }
 
         public static void AppendFormatted()
@@ -39,7 +40,7 @@ namespace CoreLib
                 actual.AppendLiteral(",");
             }
 
-            Assert.IsTrue(expected.Equals(actual.ToStringAndClear()));
+            Assert.True(expected.Equals(actual.ToStringAndClear()));
         }
     }
 }

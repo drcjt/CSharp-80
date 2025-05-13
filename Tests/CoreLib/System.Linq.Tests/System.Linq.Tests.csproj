@@ -30,6 +30,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
     <ProjectReference Include="..\..\..\ILCompiler\ILCompiler.csproj" />
+    <ProjectReference Include="..\..\Common\Tests.Common.csproj" />
   </ItemGroup>
   
 </Project>

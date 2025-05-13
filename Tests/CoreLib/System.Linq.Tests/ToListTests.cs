@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Xunit;
 
 namespace System.Linq.Tests
 {
@@ -9,8 +10,8 @@ namespace System.Linq.Tests
             List<int> sourceList = [1, 2, 3, 4, 5];
             List<int> resultList = sourceList.ToList();
 
-            Assert.IsTrue(sourceList != resultList);
-            Assert.AreEnumerablesEqual(sourceList, resultList);
+            Assert.True(sourceList != resultList);
+            Assert.EqualEnumerable(sourceList, resultList);
         }
     }
 }

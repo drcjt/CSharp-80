@@ -1,21 +1,23 @@
-﻿namespace System.Tests
+﻿using Xunit;
+
+namespace System.Tests
 {
     internal static class SByteTests
     {
         public static void Ctor_Empty()
         {
             var i = new sbyte();
-            Assert.AreEqual(0, i);
+            Assert.Equal(0, i);
         }
 
         public static void MaxValue()
         {
-            Assert.AreEqual(0x7F, sbyte.MaxValue);
+            Assert.Equal(0x7F, sbyte.MaxValue);
         }
 
         public static void MinValue()
         {
-            Assert.AreEqual(-0x80, sbyte.MinValue);
+            Assert.Equal(-0x80, sbyte.MinValue);
         }
 
         public static void EqualsTests()
@@ -35,10 +37,10 @@
         {
             if (obj is sbyte j)
             {
-                Assert.AreEqual(expected, i.Equals(j));
-                Assert.AreEqual(expected, i.GetHashCode().Equals(j.GetHashCode()));
+                Assert.Equal(expected, i.Equals(j));
+                Assert.Equal(expected, i.GetHashCode().Equals(j.GetHashCode()));
             }
-            Assert.AreEqual(expected, i.Equals(obj));
+            Assert.Equal(expected, i.Equals(obj));
         }
     }
 }

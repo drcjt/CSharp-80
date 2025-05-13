@@ -1,21 +1,23 @@
-﻿namespace System.Tests
+﻿using Xunit;
+
+namespace System.Tests
 {
     internal static class UInt32Tests
     {
         public static void Ctor_Empty()
         {
             var i = new uint();
-            Assert.AreEqual((uint)0, i);
+            Assert.Equal((uint)0, i);
         }
 
         public static void MaxValue()
         {
-            Assert.AreEqual(4294967295, uint.MaxValue);
+            Assert.Equal(4294967295, uint.MaxValue);
         }
 
         public static void MinValue()
         {
-            Assert.AreEqual((uint)0, uint.MinValue);
+            Assert.Equal((uint)0, uint.MinValue);
         }
 
         public static void EqualsTests()
@@ -32,11 +34,11 @@
         {
             if (obj is uint j)
             {
-                Assert.AreEqual(expected, i.Equals(j));
-                Assert.AreEqual(expected, i.GetHashCode().Equals(j.GetHashCode()));
-                Assert.AreEqual((int)i, i.GetHashCode());
+                Assert.Equal(expected, i.Equals(j));
+                Assert.Equal(expected, i.GetHashCode().Equals(j.GetHashCode()));
+                Assert.Equal((int)i, i.GetHashCode());
             }
-            Assert.AreEqual(expected, i.Equals(obj));
+            Assert.Equal(expected, i.Equals(obj));
         }
     }
 }
