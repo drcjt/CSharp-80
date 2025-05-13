@@ -27,25 +27,21 @@ namespace Xunit
             }
         }
 
-        public static void Equal(byte expected, byte actual)
-        {
-            if (expected != actual)
-            {
-                Assert.HandleFail("Assert.Equal", "");
-            }
-        }
-
-        public static void Equal(RuntimeTypeHandle expected, RuntimeTypeHandle actual)
-        {
-            if (!expected.Equals(actual))
-            {
-                Assert.HandleFail("Assert.Equal", "");
-            }
-        }
-
         public static void Equal<T>(T expected, T actual)
         {
-            if (!Object.Equals(expected, actual))
+            var comparer = EqualityComparerHelpers.GetComparerForReferenceTypesOnly<T>();
+
+            bool result;
+            if (comparer != null)
+            {
+                result = comparer.Equals(expected, actual);
+            }
+            else
+            {
+                result = EqualityComparerHelpers.StructOnlyEquals<T>(expected, actual);
+            }
+
+            if (!result)
             {
                 Assert.HandleFail("Assert.Equal", "");
             }
