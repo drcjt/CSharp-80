@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Xunit;
+using System.Collections;
 
 namespace System.Tests
 {
@@ -9,17 +10,17 @@ namespace System.Tests
             var intArray = new int[] { 7, 8, 9 };
             Array array = intArray;
 
-            Assert.AreEqual(7, array.GetValue(0));
+            Assert.Equal(7, array.GetValue(0));
             array.SetValue(41, 0);
-            Assert.AreEqual(41, array.GetValue(0));
+            Assert.Equal(41, array.GetValue(0));
 
-            Assert.AreEqual(8, array.GetValue(1));
+            Assert.Equal(8, array.GetValue(1));
             array.SetValue(42, 1);
-            Assert.AreEqual(42, array.GetValue(1));
+            Assert.Equal(42, array.GetValue(1));
 
-            Assert.AreEqual(9, array.GetValue(2));
+            Assert.Equal(9, array.GetValue(2));
             array.SetValue(43, 2);
-            Assert.AreEqual(43, array.GetValue(2));
+            Assert.Equal(43, array.GetValue(2));
         }
 
         public static void IndexOf_ArrayTests()
@@ -85,7 +86,7 @@ namespace System.Tests
 
         private static void IndexOf_SZArray<T>(T[] array, T value, int expected)
         {
-            Assert.AreEqual(expected, Array.IndexOf<T>(array, value, 0, array.Length));
+            Assert.Equal(expected, Array.IndexOf<T>(array, value, 0, array.Length));
 
             IndexOf_Array(array, value, expected);
         }
@@ -94,8 +95,8 @@ namespace System.Tests
         {
             IList iList = array;
 
-            Assert.AreEqual(expected, iList.IndexOf(value));
-            Assert.AreEqual(expected >= 0, iList.Contains(value));
+            Assert.Equal(expected, iList.IndexOf(value));
+            Assert.Equal(expected >= 0, iList.Contains(value));
         }
 
         public static void GetEnumerator()
@@ -109,7 +110,7 @@ namespace System.Tests
         {
             var enumerator1 = array.GetEnumerator();
             var enumerator2 = array.GetEnumerator();
-            Assert.IsTrue(enumerator1 != enumerator2);
+            Assert.True(enumerator1 != enumerator2);
 
             IEnumerator enumerator = array.GetEnumerator();
             for (int i = 0; i < 2; i++)
@@ -117,12 +118,12 @@ namespace System.Tests
                 int counter = 0;
                 while (enumerator.MoveNext())
                 {
-                    Assert.AreEqual(array[counter], enumerator.Current);
+                    Assert.Equal(array[counter], enumerator.Current);
                     counter++;
                 }
 
-                Assert.IsFalse(enumerator.MoveNext());
-                Assert.AreEqual(array.Length, counter);
+                Assert.False(enumerator.MoveNext());
+                Assert.Equal(array.Length, counter);
 
                 enumerator.Reset();
             }
@@ -130,13 +131,13 @@ namespace System.Tests
 
         public static void EmptyTests()
         {
-            Assert.IsTrue(Array.Empty<int>() != null);
-            Assert.AreEqual(0, Array.Empty<int>().Length);
-            Assert.AreSame(Array.Empty<int>(), Array.Empty<int>());
+            Assert.True(Array.Empty<int>() != null);
+            Assert.Equal(0, Array.Empty<int>().Length);
+            Assert.Same(Array.Empty<int>(), Array.Empty<int>());
 
-            Assert.IsTrue(Array.Empty<object>() != null);
-            Assert.AreEqual(0, Array.Empty<object>().Length);
-            Assert.AreSame(Array.Empty<object>(), Array.Empty<object>());
+            Assert.True(Array.Empty<object>() != null);
+            Assert.Equal(0, Array.Empty<object>().Length);
+            Assert.Same(Array.Empty<object>(), Array.Empty<object>());
         }
     }
 }

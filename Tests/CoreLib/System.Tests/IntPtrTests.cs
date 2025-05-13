@@ -1,4 +1,6 @@
-﻿namespace System.Tests
+﻿using Xunit;
+
+namespace System.Tests
 {
     internal static class IntPtrTests
     {
@@ -14,16 +16,16 @@
         {
             if (obj is nint other)
             {
-                Assert.AreEqual(expected, value == other);
-                Assert.AreEqual(!expected, value != other);
-                Assert.AreEqual(expected, value.GetHashCode().Equals(other.GetHashCode()));
+                Assert.Equal(expected, value == other);
+                Assert.Equal(!expected, value != other);
+                Assert.Equal(expected, value.GetHashCode().Equals(other.GetHashCode()));
 
                 IEquatable<nint> iEquatable = value;
-                Assert.AreEqual(expected, iEquatable.Equals(other));
+                Assert.Equal(expected, iEquatable.Equals(other));
 
             }
-            Assert.AreEqual(expected, value.Equals(obj));
-            Assert.AreEqual(value.GetHashCode(), value.GetHashCode());
+            Assert.Equal(expected, value.Equals(obj));
+            Assert.Equal(value.GetHashCode(), value.GetHashCode());
         }
     }
 }

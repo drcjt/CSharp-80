@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Xunit;
 
 namespace System.Collections.Tests
 {
@@ -15,7 +16,7 @@ namespace System.Collections.Tests
                 _ = EqualityComparer<DefaultType>.Default;
             }
             var afterAllComparerRequests = GC.GetTotalMemory();
-            Assert.AreEqual(afterComparerCreation, afterAllComparerRequests);
+            Assert.Equal(afterComparerCreation, afterAllComparerRequests);
         }
 
         public static void EqualsTests()
@@ -50,24 +51,24 @@ namespace System.Collections.Tests
             var comparer = EqualityComparer<T>.Default;
 
             // Commutative tests
-            Assert.AreEqual(expected, comparer.Equals(left, right));
-            Assert.AreEqual(expected, comparer.Equals(right, left));
+            Assert.Equal(expected, comparer.Equals(left, right));
+            Assert.Equal(expected, comparer.Equals(right, left));
 
             // Reflexive tests
-            Assert.IsTrue(comparer.Equals(left, left));
-            Assert.IsTrue(comparer.Equals(right, right));
+            Assert.True(comparer.Equals(left, left));
+            Assert.True(comparer.Equals(right, right));
 
             if (default(T) is null)
             {
                 T? nil = default;
 
-                Assert.IsTrue(comparer.Equals(nil, nil));
+                Assert.True(comparer.Equals(nil, nil));
 
-                Assert.AreEqual(left is null, comparer.Equals(left, nil));
-                Assert.AreEqual(left is null, comparer.Equals(nil, left));
+                Assert.Equal(left is null, comparer.Equals(left, nil));
+                Assert.Equal(left is null, comparer.Equals(nil, left));
 
-                Assert.AreEqual(right is null, comparer.Equals(right, nil));
-                Assert.AreEqual(right is null, comparer.Equals(nil, right));
+                Assert.Equal(right is null, comparer.Equals(right, nil));
+                Assert.Equal(right is null, comparer.Equals(nil, right));
             }
         }
     }

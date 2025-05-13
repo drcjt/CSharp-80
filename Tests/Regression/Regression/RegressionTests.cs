@@ -1,4 +1,5 @@
 ﻿using Internal.Runtime.CompilerServices;
+using Xunit;
 
 namespace Regression
 {
@@ -9,15 +10,15 @@ namespace Regression
             Bug87();
 
             nuint testValue = 123;
-            Assert.AreEqual(testValue, MethodCall_WithNuintParameter_CompilesWithoutErrors(testValue));
+            Assert.Equal(testValue, MethodCall_WithNuintParameter_CompilesWithoutErrors(testValue));
 
-            Assert.AreEqual(1, Bug210_SpillStack());
+            Assert.Equal(1, Bug210_SpillStack());
 
-            Assert.AreEqual(0, Bug206(0));
+            Assert.Equal<nuint>(0, Bug206(0));
 
-            Assert.AreEqual(2, new SpillImportAppendTests().SpillOnStFldImport());
+            Assert.Equal(2, new SpillImportAppendTests().SpillOnStFldImport());
 
-            Assert.AreEqual(10, Bug545Method<int>().Length);
+            Assert.Equal(10, Bug545Method<int>().Length);
 
             Bug617();
 

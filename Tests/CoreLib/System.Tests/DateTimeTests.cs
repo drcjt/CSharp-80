@@ -1,4 +1,6 @@
-﻿namespace System.Tests
+﻿using Xunit;
+
+namespace System.Tests
 {
     internal static class DateTimeTests
     {
@@ -10,10 +12,10 @@
 
         private static void VerifyDateTime(DateTime dateTime, int day, int hour, int minute, int second)
         {
-            Assert.AreEqual(day, dateTime.Day);
-            Assert.AreEqual(hour, dateTime.Hour);
-            Assert.AreEqual(minute, dateTime.Minute);
-            Assert.AreEqual(second, dateTime.Second);
+            Assert.Equal(day, dateTime.Day);
+            Assert.Equal(hour, dateTime.Hour);
+            Assert.Equal(minute, dateTime.Minute);
+            Assert.Equal(second, dateTime.Second);
         }
 
         public static void Equals_Tests()
@@ -29,14 +31,14 @@
         {
             if (other is DateTime otherDate)
             {
-                Assert.AreEqual(expected, date.Equals(otherDate));
-                Assert.AreEqual(expected, date.GetHashCode().Equals(otherDate.GetHashCode()));
+                Assert.Equal(expected, date.Equals(otherDate));
+                Assert.Equal(expected, date.GetHashCode().Equals(otherDate.GetHashCode()));
 
-                Assert.AreEqual(expected, date == otherDate);
-                Assert.AreEqual(!expected, date != otherDate);
+                Assert.Equal(expected, date == otherDate);
+                Assert.Equal(!expected, date != otherDate);
             }
 
-            Assert.AreEqual(expected, date.Equals(other));
+            Assert.Equal(expected, date.Equals(other));
         }
     }
 }

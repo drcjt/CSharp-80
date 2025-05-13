@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Xunit;
 
 namespace System.Linq.Tests
 {
@@ -9,8 +10,8 @@ namespace System.Linq.Tests
             int[] sourceArray = new int[] { 1, 2, 3, 4, 5 };
             int[] resultArray = sourceArray.ToArray();
 
-            Assert.IsTrue(sourceArray != resultArray);
-            Assert.AreEnumerablesEqual(sourceArray, resultArray);
+            Assert.True(sourceArray != resultArray);
+            Assert.EqualEnumerable(sourceArray, resultArray);
         }
     }
 }

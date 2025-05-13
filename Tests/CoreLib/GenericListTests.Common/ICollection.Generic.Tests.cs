@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Xunit;
 
 namespace System.Collections.Tests
 {
@@ -36,7 +37,7 @@ namespace System.Collections.Tests
         private void Count_Validity(int count)
         {
             var collection = GenericICollectionFactory(count);
-            Assert.AreEqual(count, collection.Count);
+            Assert.Equal(count, collection.Count);
         }
 
         private void CopyTo_ExactlyEnoughSpaceInArray(int count)
@@ -47,7 +48,7 @@ namespace System.Collections.Tests
             int i = 0;
             foreach (var item in collection)
             {
-                Assert.AreEqual(array[i++], item);
+                Assert.Equal(array[i++], item);
             }
         }
 

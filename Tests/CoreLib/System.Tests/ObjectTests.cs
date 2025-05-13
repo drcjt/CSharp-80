@@ -1,4 +1,6 @@
-﻿namespace System.Tests
+﻿using Xunit;
+
+namespace System.Tests
 {
     internal static class ObjectTests
     {
@@ -19,9 +21,9 @@
         {
             if (obj1 != null)
             {
-                Assert.AreEqual(expected, obj1.Equals(obj2));
+                Assert.Equal(expected, obj1.Equals(obj2));
             }
-            Assert.AreEqual(expected, Equals(obj1, obj2));
+            Assert.Equal(expected, Equals(obj1, obj2));
         }
 
         public static void ReferenceEqualsTests()
@@ -30,20 +32,20 @@
             var equalsTester2 = new EqualsTester(8);
 
             EqualsTester.EqualsCalled = false;
-            Assert.IsFalse(ReferenceEquals(equalsTester1, equalsTester2));
-            Assert.IsFalse(EqualsTester.EqualsCalled);
+            Assert.False(ReferenceEquals(equalsTester1, equalsTester2));
+            Assert.False(EqualsTester.EqualsCalled);
 
             EqualsTester.EqualsCalled = false;
-            Assert.IsTrue(ReferenceEquals(equalsTester1, equalsTester1));
-            Assert.IsFalse(EqualsTester.EqualsCalled);
+            Assert.True(ReferenceEquals(equalsTester1, equalsTester1));
+            Assert.False(EqualsTester.EqualsCalled);
 
             EqualsTester.EqualsCalled = false;
-            Assert.IsFalse(ReferenceEquals(equalsTester1, null));
-            Assert.IsFalse(EqualsTester.EqualsCalled);
+            Assert.False(ReferenceEquals(equalsTester1, null));
+            Assert.False(EqualsTester.EqualsCalled);
 
             EqualsTester.EqualsCalled = false;
-            Assert.IsFalse(ReferenceEquals(null, equalsTester1));
-            Assert.IsFalse(EqualsTester.EqualsCalled);
+            Assert.False(ReferenceEquals(null, equalsTester1));
+            Assert.False(EqualsTester.EqualsCalled);
         }
 
         private sealed class EqualsTester(int x)
