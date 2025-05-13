@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Xunit;
 
 namespace CoreLib
 {
@@ -66,7 +67,7 @@ namespace CoreLib
             int index = 0;
             foreach (var item in enumerable)
             {
-                Assert.AreEqual(testArray[index++], item);
+                Assert.Equal(testArray[index++], item);
             }
         }
 
@@ -78,7 +79,7 @@ namespace CoreLib
             int index = 0;
             foreach (var item in enumerable)
             {
-                Assert.AreEqual(testArray[index++], item);
+                Assert.Equal(testArray[index++], item);
             }
         }
 
@@ -86,29 +87,29 @@ namespace CoreLib
         {
             var sequence = new FibonacciEnumerable().GetEnumerator();
 
-            Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEqual(0, sequence.Current);
+            Assert.True(sequence.MoveNext());
+            Assert.Equal(0, sequence.Current);
 
-            Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEqual(1, sequence.Current);
+            Assert.True(sequence.MoveNext());
+            Assert.Equal(1, sequence.Current);
 
-            Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEqual(1, sequence.Current);
+            Assert.True(sequence.MoveNext());
+            Assert.Equal(1, sequence.Current);
 
-            Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEqual(2, sequence.Current);
+            Assert.True(sequence.MoveNext());
+            Assert.Equal(2, sequence.Current);
 
-            Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEqual(3, sequence.Current);
+            Assert.True(sequence.MoveNext());
+            Assert.Equal(3, sequence.Current);
 
-            Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEqual(5, sequence.Current);
+            Assert.True(sequence.MoveNext());
+            Assert.Equal(5, sequence.Current);
 
-            Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEqual(8, sequence.Current);
+            Assert.True(sequence.MoveNext());
+            Assert.Equal(8, sequence.Current);
 
-            Assert.IsTrue(sequence.MoveNext());
-            Assert.AreEqual(13, sequence.Current);
+            Assert.True(sequence.MoveNext());
+            Assert.Equal(13, sequence.Current);
         }
     }
 }
