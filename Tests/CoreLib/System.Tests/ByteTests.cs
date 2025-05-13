@@ -7,17 +7,17 @@ namespace System.Tests
         public static void Ctor_Empty()
         {
             var i = new byte();
-            Assert.Equal(0, i);
+            Assert.Equal((byte)0, i);
         }
 
         public static void MaxValue()
         {
-            Assert.Equal(0xFF, byte.MaxValue);
+            Assert.Equal((byte)0xFF, byte.MaxValue);
         }
 
         public static void MinValue()
         {
-            Assert.Equal(0, byte.MinValue);
+            Assert.Equal((byte)0, byte.MinValue);
         }
 
         public static void EqualsTests()

@@ -27,6 +27,22 @@ namespace Xunit
             }
         }
 
+        public static void Equal(byte expected, byte actual)
+        {
+            if (expected != actual)
+            {
+                Assert.HandleFail("Assert.Equal", "");
+            }
+        }
+
+        public static void Equal(RuntimeTypeHandle expected, RuntimeTypeHandle actual)
+        {
+            if (!expected.Equals(actual))
+            {
+                Assert.HandleFail("Assert.Equal", "");
+            }
+        }
+
         public static void Equal<T>(T expected, T actual)
         {
             if (!Object.Equals(expected, actual))
