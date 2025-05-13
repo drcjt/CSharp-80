@@ -7,6 +7,17 @@ namespace System
 {
     public partial class String
     {
+        public unsafe static string Concat(string str0, string str1, string str2)
+        {
+            string result = RuntimeImports.NewString(EEType.Of<string>(), str0.Length + str1.Length + str2.Length);
+
+            FillStringChecked(result, 0, str0);
+            FillStringChecked(result, str0.Length, str1);
+            FillStringChecked(result, str0.Length + str1.Length, str2);
+
+            return result;
+        }
+
         public unsafe static string Concat(string str0, string str1)
         {
             string result = RuntimeImports.NewString(EEType.Of<string>(), str0.Length + str1.Length);
