@@ -69,9 +69,7 @@ namespace Xunit
 
         internal static void HandleFail(string assertionName, string message)
         {
-            // TODO this fails compile with CS0656
-            //throw new XunitException(assertionName + ": " + message);
-            throw new XunitException(String.Concat(String.Concat(assertionName, ": "), message));
+            throw new XunitException($"{assertionName}: {message}");
         }
     }
 
