@@ -15,10 +15,8 @@ namespace Xunit
             }
         }
 
-        public static void EqualEnumerable<T>(IEnumerable<T> expected, IEnumerable<T> actual)
+        private static void EqualEnumerable(IEnumerable expected, IEnumerable actual)
         {
-            Assert.Equal(expected.Count(), actual.Count());
-
             var expectedEnumerator = expected.GetEnumerator();
             var actualEnumerator = actual.GetEnumerator();
             while (expectedEnumerator.MoveNext() && actualEnumerator.MoveNext())
@@ -29,6 +27,12 @@ namespace Xunit
 
         public static void Equal<T>(T expected, T actual)
         {
+            if (expected is IEnumerable expectedEnumerable && actual is IEnumerable actualEnumerable)
+            {
+                EqualEnumerable(expectedEnumerable, actualEnumerable);
+                return;
+            }
+
             var comparer = EqualityComparerHelpers.GetComparerForReferenceTypesOnly<T>();
 
             bool result;
