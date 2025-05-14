@@ -15,10 +15,12 @@
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-	  <!-- Prevent .NET Core 3+ from generating exe -->
-	  <UseAppHost>false</UseAppHost>
+	<!-- Prevent .NET Core 3+ from generating exe -->
+	<UseAppHost>false</UseAppHost>
 
-	  <OutputType>Exe</OutputType>
+	<OutputType>Exe</OutputType>
+
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>

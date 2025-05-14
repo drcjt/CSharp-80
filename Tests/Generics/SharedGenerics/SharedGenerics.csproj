@@ -19,6 +19,8 @@
 	  <UseAppHost>false</UseAppHost>
 
 	  <OutputType>Exe</OutputType>
+	  
+	  <AssemblyVersion>1.0.0.0</AssemblyVersion>	  
   </PropertyGroup>
 
   <ItemGroup>
