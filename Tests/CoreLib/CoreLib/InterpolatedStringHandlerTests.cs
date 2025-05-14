@@ -5,6 +5,41 @@ namespace CoreLib
 {
     public static class InterpolatedStringHandlerTests
     {
+        public static void SingleInterpolation()
+        {
+            var one = "one";
+            var result = $"{one}";
+            Assert.Equal("one", result);
+        }
+
+        public static void DoubleInterpolation()
+        {
+            var one = "one";
+            var two = "two";
+            var result = $"{one}{two}";
+            Assert.Equal("onetwo", result);
+        }
+
+        public static void TripleInterpolation()
+        {
+            var one = "one";
+            var two = "two";
+            var three = "three";
+            var result = $"{one}{two}{three}";
+            Assert.Equal("onetwothree", result);
+        }
+
+        public static void QuadInterpolation()
+        {
+            var one = "one";
+            var two = "two";
+            var three = "three";
+            var four = "four";
+
+            var result = $"{one}{two}{three}{four}";
+            Assert.Equal("onetwothreefour", result);
+        }
+        
         public static void ToStringAndClear_Clears()
         {
             var handler = new DefaultInterpolatedStringHandler(0, 0);
