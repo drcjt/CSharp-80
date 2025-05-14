@@ -7,7 +7,6 @@
 	  
     <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         
     <!--Disable .NET Core SDK libs-->
     <NoStdLib>true</NoStdLib>

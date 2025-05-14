@@ -7,7 +7,6 @@
 
     <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
         
     <!--Disable .NET Core SDK libs-->
     <NoStdLib>true</NoStdLib>
@@ -15,10 +14,12 @@
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-	  <!-- Prevent .NET Core 3+ from generating exe -->
-	  <UseAppHost>false</UseAppHost>
+	<!-- Prevent .NET Core 3+ from generating exe -->
+	<UseAppHost>false</UseAppHost>
 
-	  <OutputType>Exe</OutputType>
+	<OutputType>Exe</OutputType>
+
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
