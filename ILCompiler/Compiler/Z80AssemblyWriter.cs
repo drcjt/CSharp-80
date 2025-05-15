@@ -134,12 +134,25 @@ namespace ILCompiler.Compiler
 
             instructionsBuilder.Label("START");
 
+            LoadMainArguments(instructionsBuilder, entryMethod);
+
             instructionsBuilder.Call(_nameMangler.GetMangledMethodName(entryMethod));
 
             instructionsBuilder.Label("EH_ENDIP");
             instructionsBuilder.Jp("EXITRETCODE");
 
             _out.Write(instructionsBuilder.ToString());
+        }
+
+        private static void LoadMainArguments(InstructionsBuilder instructionsBuilder, MethodDesc entryMethod)
+        {
+            // If Main method has string[] args then need to push reference on the stack here
+            if (entryMethod.Parameters.Count > 0)
+            {
+                // Push a null reference for the args array
+                instructionsBuilder.Ld(HL, 0);
+                instructionsBuilder.Push(HL);
+            }
         }
 
         private void RelocateStack(InstructionsBuilder instructionsBuilder)
