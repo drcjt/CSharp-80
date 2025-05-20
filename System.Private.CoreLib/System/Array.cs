@@ -311,11 +311,6 @@ namespace System
 
             return new SZGenericArrayEnumerator<T>(@this, length);
         }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
     }
 
     internal sealed class SZGenericArrayEnumerator<T> : IEnumerator<T>

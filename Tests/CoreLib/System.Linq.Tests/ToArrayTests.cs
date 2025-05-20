@@ -11,7 +11,7 @@ namespace System.Linq.Tests
             int[] resultArray = sourceArray.ToArray();
 
             Assert.True(sourceArray != resultArray);
-            Assert.EqualEnumerable(sourceArray, resultArray);
+            Assert.Equal(sourceArray, resultArray);
         }
     }
 }

@@ -151,9 +151,15 @@
                         foundOnCurrentType = FindSlotDefiningMethodForVirtualMethod(foundOnCurrentType);
                     }
 
-                    if (baseType != null && foundOnCurrentType == null)
+                    if (baseType == null)
+                        return foundOnCurrentType;
+
+                    if (foundOnCurrentType == null && ResolveInterfaceMethodToVirtualMethodOnType(interfaceMethod, baseType) == null)
                     {
-                        throw new NotImplementedException("Unable to resolve explicit interface method to virtual method on type");
+                        if (!IsInterfaceImplementedOnType(baseType, interfaceType))
+                        {
+                            throw new NotImplementedException("Unable to resolve explicit interface method to virtual method on type");
+                        }
                     }
 
                     return foundOnCurrentType;
