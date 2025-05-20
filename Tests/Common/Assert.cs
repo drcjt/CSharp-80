@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Xunit
 {
@@ -15,20 +14,14 @@ namespace Xunit
             }
         }
 
-        public static void EqualEnumerable<T>(IEnumerable<T> expected, IEnumerable<T> actual)
-        {
-            Assert.Equal(expected.Count(), actual.Count());
-
-            var expectedEnumerator = expected.GetEnumerator();
-            var actualEnumerator = actual.GetEnumerator();
-            while (expectedEnumerator.MoveNext() && actualEnumerator.MoveNext())
-            {
-                Assert.Equal(expectedEnumerator.Current, actualEnumerator.Current);
-            }
-        }
-
         public static void Equal<T>(T expected, T actual)
         {
+            if (expected is IEnumerable expectedEnumerable && actual is IEnumerable actualEnumerable)
+            {
+                SequenceEqual(expectedEnumerable, actualEnumerable);
+                return;
+            }
+
             var comparer = EqualityComparerHelpers.GetComparerForReferenceTypesOnly<T>();
 
             bool result;
@@ -45,6 +38,20 @@ namespace Xunit
             {
                 Assert.HandleFail("Assert.Equal", "");
             }
+        }
+
+        private static void SequenceEqual(IEnumerable expected, IEnumerable actual)
+        {
+            var expectedEnumerator = expected.GetEnumerator();
+            var actualEnumerator = actual.GetEnumerator();
+
+            while (expectedEnumerator.MoveNext())
+            {
+                Assert.True(actualEnumerator.MoveNext());
+                Assert.Equal(expectedEnumerator.Current, actualEnumerator.Current);
+            }
+
+            Assert.False(actualEnumerator.MoveNext());
         }
 
         public static void NotEqual<T>(T notExpected, T actual)

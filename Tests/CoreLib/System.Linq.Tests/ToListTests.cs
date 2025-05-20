@@ -11,7 +11,7 @@ namespace System.Linq.Tests
             List<int> resultList = sourceList.ToList();
 
             Assert.True(sourceList != resultList);
-            Assert.EqualEnumerable(sourceList, resultList);
+            Assert.Equal(sourceList, resultList);
         }
     }
 }
