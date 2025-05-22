@@ -251,11 +251,55 @@ namespace ILCompiler.Compiler
             }
         }
 
+        public static void FindAllCalledMethods(IList<Emit.Instruction> instructions, ISet<string> referencedMethods)
+        {
+            foreach (var instruction in instructions)
+            {
+                if (instruction.Opcode == Emit.Opcode.Call && instruction.Op0 is not null)
+                {
+                    var target = instruction.Op0.Label;
+                    if (target is not null)
+                    {
+                        referencedMethods.Add(target);
+                    }
+                }
+            }
+        }
+
+        private readonly Dictionary<IDependencyNode, IList<Instruction>> _instructionsCache = [];
+
+        public IList<Instruction> GetInstructions(IDependencyNode node, string inputFilePath, List<string> modules)
+        {
+            if (!_instructionsCache.TryGetValue(node, out var instructions))
+            {
+                instructions = node.GetInstructions(inputFilePath, modules);
+                _instructionsCache[node] = instructions;
+            }
+            return instructions;
+        }
+
+        private static bool IsMethodTrimmable(Z80MethodCodeNode node) =>
+            !node.Method.IsVirtual &&
+            node.Method.Name != "ThrowException" &&
+            !node.Method.IsIntrinsic &&
+            !node.Method.IsInternalCall &&
+            !node.Method.IsPInvoke;
+
         public void WriteCode(Z80MethodCodeNode rootNode, IReadOnlyCollection<IDependencyNode> nodes, string inputFilePath, string outputFilePath)
         {
             _inputFilePath = inputFilePath;
 
             var modules = new List<string>();
+
+            var allReferencedMethods = new HashSet<string>();
+            foreach (var node in nodes)
+            {
+                if (!node.ShouldSkipEmitting(_nodeFactory))
+                {
+                    var instructions = GetInstructions(node, inputFilePath, modules);
+                    FindAllCalledMethods(instructions, allReferencedMethods);
+                }
+            }
 
             using (_out = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, false), Encoding.ASCII))
             {
@@ -265,7 +309,17 @@ namespace ILCompiler.Compiler
                 {
                     if (!node.ShouldSkipEmitting(_nodeFactory))
                     {
-                        var instructions = node.GetInstructions(inputFilePath, modules);
+                        if (node != rootNode && node is Z80MethodCodeNode codeNode && IsMethodTrimmable(codeNode))
+                        {
+                            var mangledName = codeNode.GetMangledName(_nameMangler);
+                            if (!allReferencedMethods.Contains(mangledName))
+                            {
+                                _logger.LogInformation("Skipping method {methodName} as not referenced", codeNode.Method.FullName);
+                                continue;
+                            }
+                        }
+
+                        var instructions = GetInstructions(node, inputFilePath, modules);
                         WriteInstructions(instructions);
                     }
                 }
