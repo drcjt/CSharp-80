@@ -22,6 +22,11 @@
             TypeCastTests.ClassTypeCastTests();
             TypeCastTests.InterfaceTypeCastTests();
 
+            InterpolatedStringHandlerTests.SingleInterpolation();
+            InterpolatedStringHandlerTests.DoubleInterpolation();
+            InterpolatedStringHandlerTests.TripleInterpolation();
+            InterpolatedStringHandlerTests.QuadInterpolation();
+
             InterpolatedStringHandlerTests.ToStringAndClear_Clears();
             InterpolatedStringHandlerTests.AppendLiteral();
             InterpolatedStringHandlerTests.AppendFormatted();
