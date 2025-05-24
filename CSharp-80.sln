@@ -284,6 +284,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "System.String.Tests", "Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Common", "Tests\Common\Tests.Common.csproj", "{A79F7F2B-E6ED-153B-E09F-BAC1D810904E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inlining", "Tests\Methodical\Inlining\Inlining.csproj", "{C788D6F2-78A0-C578-C445-0E52E9CE2F6B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -706,6 +708,10 @@ Global
 		{A79F7F2B-E6ED-153B-E09F-BAC1D810904E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A79F7F2B-E6ED-153B-E09F-BAC1D810904E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A79F7F2B-E6ED-153B-E09F-BAC1D810904E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C788D6F2-78A0-C578-C445-0E52E9CE2F6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C788D6F2-78A0-C578-C445-0E52E9CE2F6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C788D6F2-78A0-C578-C445-0E52E9CE2F6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C788D6F2-78A0-C578-C445-0E52E9CE2F6B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -828,6 +834,7 @@ Global
 		{FE29F40B-0257-76A1-8BDF-8E9934FA5D1F} = {190AA2D7-1957-4ED1-BC6A-5D5BB6B049C9}
 		{FF2C639D-15C2-3899-0BCC-458EF630E609} = {2076ADF1-E63E-4A71-AF00-DCD6570B5ECF}
 		{A79F7F2B-E6ED-153B-E09F-BAC1D810904E} = {6505E749-06C0-4B7B-8F4B-17F9B36A9095}
+		{C788D6F2-78A0-C578-C445-0E52E9CE2F6B} = {4DBCD88C-3231-4CCF-8D5A-D2AA2D45750B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}
