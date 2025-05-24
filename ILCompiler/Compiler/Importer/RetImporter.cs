@@ -43,6 +43,9 @@ namespace ILCompiler.Compiler.Importer
                 returnValue = value;
             }
 
+            if (context.Inlining)
+                return true;
+
             var retNode = new ReturnEntry(returnValue, returnBufferArgIndex, returnTypeExactSize);
             importer.ImportAppendTree(retNode);
             context.StopImporting = true;

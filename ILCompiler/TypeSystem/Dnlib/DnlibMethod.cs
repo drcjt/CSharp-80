@@ -31,6 +31,8 @@ namespace ILCompiler.TypeSystem.Dnlib
         private const string CompilerIntrinsicAttribute = "System.Runtime.CompilerServices.IntrinsicAttribute";
         public override bool IsIntrinsic => _methodDef.HasCustomAttributes && _methodDef.CustomAttributes.IsDefined(CompilerIntrinsicAttribute);
 
+        public override bool IsAggressiveInlining => _methodDef.IsAggressiveInlining;
+
         public override bool IsPInvoke => _methodDef.IsPinvokeImpl;
 
         public override PInvokeMetaData? GetPInvokeMetaData()

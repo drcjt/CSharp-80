@@ -10,19 +10,22 @@ namespace ILCompiler.Compiler.EvaluationStack
         public IList<StackEntry> Arguments { get; }
         public bool IsVirtual { get; }
 
+        public bool IsInlineCandidate { get; set; }
+
         public MethodDesc? Method { get; }
 
-        public CallEntry(string targetMethod, IList<StackEntry> arguments, VarType returnType, int? returnSize, bool isVirtual = false, MethodDesc? method = null) : base(returnType, returnSize)
+        public CallEntry(string targetMethod, IList<StackEntry> arguments, VarType returnType, int? returnSize, bool isVirtual = false, MethodDesc? method = null, bool isInlineCandidate = false) : base(returnType, returnSize)
         {
             TargetMethod = targetMethod;
             Arguments = arguments;
             IsVirtual = isVirtual;
             Method = method;
-        }
+            IsInlineCandidate = isInlineCandidate;
+         }
 
         public override StackEntry Duplicate()
         {
-            return new CallEntry(TargetMethod, Arguments, Type, ExactSize, IsVirtual, Method);
+            return new CallEntry(TargetMethod, Arguments, Type, ExactSize, IsVirtual, Method, IsInlineCandidate);
         }
 
         public override void Accept(IStackEntryVisitor visitor) => visitor.Visit(this);

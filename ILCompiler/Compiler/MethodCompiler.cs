@@ -26,7 +26,7 @@ namespace ILCompiler.Compiler
 
         private int SetupLocalVariableTable(MethodDesc method)
         {
-            int paramterCount = 0;
+            int parameterCount = 0;
 
             if (method.HasThis)
             {
@@ -39,7 +39,7 @@ namespace ILCompiler.Compiler
                     Type = VarType.Ref,
                 };
                 _locals.Add(local);
-                paramterCount++;
+                parameterCount++;
             }
 
             // Setup local variable table - includes parameters as well as locals in method
@@ -55,7 +55,7 @@ namespace ILCompiler.Compiler
                     Type = parameter.Type.VarType,
                 };
                 _locals.Add(local);
-                paramterCount++;
+                parameterCount++;
             }
 
             foreach (var local in method.Locals)
@@ -74,10 +74,10 @@ namespace ILCompiler.Compiler
             if (!method.Signature.ReturnType.IsVoid)
             {
                 var returnType = method.Signature.ReturnType;
-                InitReturnBufferArg(returnType, method.HasThis, ref paramterCount);
+                InitReturnBufferArg(returnType, method.HasThis, ref parameterCount);
             }
 
-            return paramterCount;
+            return parameterCount;
         }
 
         private void InitReturnBufferArg(TypeDesc returnType, bool hasThis, ref int parameterCount)
@@ -101,11 +101,46 @@ namespace ILCompiler.Compiler
             }
         }
 
+        public IList<BasicBlock>? CompileInlineeMethod(MethodDesc method, string inputFilePath)
+        {
+            _logger.LogDebug("Compiling inlinee method {MethodName}", method.Name);
+
+            if (method.HasCustomAttribute("System.Runtime", "RuntimeImportAttribute"))
+            {
+                return null;
+            }
+            if (method.IsPInvoke || method.IsInternalCall)
+            {
+                return null;
+            }
+
+            if (method.IsIntrinsic && method.MethodIL == null)
+            {
+                // Deal with intrinsics handled by code gen so no need to import
+                return null;
+            }
+
+            var parameterCount = SetupLocalVariableTable(method);
+
+            var ilImporter = _phaseFactory.Create<IILImporter>();
+
+            // Main phases of the compiler live here
+            IList<EHClause> ehClauses = new List<EHClause>();
+            var basicBlocks = ilImporter.Import(parameterCount, _returnBufferArgIndex, method, _locals, ehClauses, true);
+
+            if (_configuration.DumpFlowGraphs)
+            {
+                Diagnostics.DumpFlowGraph(inputFilePath, method, basicBlocks);
+            }
+
+            return basicBlocks;
+        }
+
         public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode, string inputFilePath)
         {
-            _logger.LogDebug("Compiling method {method.Name}", methodCodeNodeNeedingCode.Method.Name);
-
             var method = methodCodeNodeNeedingCode.Method;
+
+            _logger.LogDebug("Compiling method {MethodName}", method.Name);
 
             if (method.HasCustomAttribute("System.Runtime", "RuntimeImportAttribute"))
             {
@@ -131,12 +166,12 @@ namespace ILCompiler.Compiler
 
             if (_configuration.DumpFlowGraphs)
             {
-                Diagnostics.DumpFlowGraph(inputFilePath, methodCodeNodeNeedingCode.Method, basicBlocks);
+                Diagnostics.DumpFlowGraph(inputFilePath, method, basicBlocks);
             }
 
             if (_configuration.DumpIRTrees)
             {
-                _logger.LogInformation("METHOD: {methodFullName}", method.FullName);
+                _logger.LogInformation("METHOD: {MethodFullName}", method.FullName);
 
                 int lclNum = 0;
                 StringBuilder sb = new();
@@ -146,12 +181,16 @@ namespace ILCompiler.Compiler
 
                     lclNum++;
                 }
-                _logger.LogInformation("{localVars}", sb.ToString());
+                _logger.LogInformation("{LocalVars}", sb.ToString());
 
                 var treeDumper = new TreeDumper();
                 var treedump = treeDumper.Dump(basicBlocks);
-                _logger.LogInformation("{treedump}", treedump);
+                _logger.LogInformation("{Treedump}", treedump);
             }
+
+            // Inlining
+            var inliner = _phaseFactory.Create<IInliner>();
+            inliner.Inline(basicBlocks, inputFilePath);
 
             var morpher = _phaseFactory.Create<IMorpher>();
             morpher.Morph(basicBlocks, _locals);
@@ -180,7 +219,7 @@ namespace ILCompiler.Compiler
                 // Dump LIR here
                 var lirDumper = new LIRDumper();
                 var lirDump = lirDumper.Dump(basicBlocks);
-                _logger.LogInformation("{lirDump}", lirDump);
+                _logger.LogInformation("{LirDump}", lirDump);
             }
 
             // Lower
