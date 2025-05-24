@@ -101,11 +101,46 @@ namespace ILCompiler.Compiler
             }
         }
 
+        public IList<BasicBlock>? CompileInlineeMethod(MethodDesc method, string inputFilePath)
+        {
+            _logger.LogDebug("Compiling inlinee method {method.Name}", method.Name);
+
+            if (method.HasCustomAttribute("System.Runtime", "RuntimeImportAttribute"))
+            {
+                return null;
+            }
+            if (method.IsPInvoke || method.IsInternalCall)
+            {
+                return null;
+            }
+
+            if (method.IsIntrinsic && method.MethodIL == null)
+            {
+                // Deal with intrinsics handled by code gen so no need to import
+                return null;
+            }
+
+            var parameterCount = SetupLocalVariableTable(method);
+
+            var ilImporter = _phaseFactory.Create<IILImporter>();
+
+            // Main phases of the compiler live here
+            IList<EHClause> ehClauses = new List<EHClause>();
+            var basicBlocks = ilImporter.Import(parameterCount, _returnBufferArgIndex, method, _locals, ehClauses, true);
+
+            if (_configuration.DumpFlowGraphs)
+            {
+                Diagnostics.DumpFlowGraph(inputFilePath, method, basicBlocks);
+            }
+
+            return basicBlocks;
+        }
+
         public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode, string inputFilePath)
         {
-            _logger.LogDebug("Compiling method {method.Name}", methodCodeNodeNeedingCode.Method.Name);
-
             var method = methodCodeNodeNeedingCode.Method;
+
+            _logger.LogDebug("Compiling method {method.Name}", method.Name);
 
             if (method.HasCustomAttribute("System.Runtime", "RuntimeImportAttribute"))
             {
@@ -131,7 +166,7 @@ namespace ILCompiler.Compiler
 
             if (_configuration.DumpFlowGraphs)
             {
-                Diagnostics.DumpFlowGraph(inputFilePath, methodCodeNodeNeedingCode.Method, basicBlocks);
+                Diagnostics.DumpFlowGraph(inputFilePath, method, basicBlocks);
             }
 
             if (_configuration.DumpIRTrees)
@@ -152,6 +187,10 @@ namespace ILCompiler.Compiler
                 var treedump = treeDumper.Dump(basicBlocks);
                 _logger.LogInformation("{treedump}", treedump);
             }
+
+            // Inlining
+            var inliner = _phaseFactory.Create<IInliner>();
+            inliner.Inline(basicBlocks, inputFilePath);
 
             var morpher = _phaseFactory.Create<IMorpher>();
             morpher.Morph(basicBlocks, _locals);

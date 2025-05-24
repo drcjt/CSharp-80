@@ -36,6 +36,8 @@ namespace ILCompiler.Compiler
         private readonly IEnumerable<IOpcodeImporter> _importers;
         private readonly ILImporterProxy _importerProxy;
 
+        private bool _inlining;
+
         private sealed class ILImporterProxy : IILImporterProxy
         {
             private readonly ILImporter _importer;
@@ -191,6 +193,7 @@ namespace ILCompiler.Compiler
                 PreinitializationManager = _preinitializationManager,
                 NodeFactory = _nodeFactory,
                 Module = _module,
+                Inlining = _inlining,
             };
 
             while (true)
@@ -279,8 +282,10 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, LocalVariableTable locals, IList<EHClause> ehClauses)
+        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, LocalVariableTable locals, IList<EHClause> ehClauses, bool inlining = false)
         {
+            _inlining = inlining;
+
             _parameterCount = parameterCount;
             _returnBufferArgIndex = returnBufferArgIndex;
 

@@ -50,6 +50,8 @@ namespace ILCompiler.TypeSystem.Common
 
         public virtual bool IsAbstract => false;
 
+        public virtual bool IsAggressiveInlining => false;
+
         public virtual bool HasGenericParameters => false; 
 
         public abstract MethodSignature Signature { get; }

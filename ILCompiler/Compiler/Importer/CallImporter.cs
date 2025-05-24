@@ -134,7 +134,7 @@ namespace ILCompiler.Compiler.Importer
             // Intrinsic calls
             if (methodToCall.IsIntrinsic)
             {
-                if (ImportIntrinsicCall(methodToCall, arguments, importer, method, context))
+                if (ImportIntrinsicCall(methodToCall, arguments, importer, context))
                 {
                     return;
                 }
@@ -177,7 +177,7 @@ namespace ILCompiler.Compiler.Importer
             int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetElementSize().AsInt : null;
 
             var returnVarType = methodToCall.HasReturnType ? returnType.VarType : VarType.Void;
-            StackEntry callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize, !directCall, methodToCall);
+            StackEntry callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize, !directCall, methodToCall, methodToCall.IsAggressiveInlining);
 
             if (methodToCall.IsStatic && !context.PreinitializationManager.IsPreinitialized(methodToCall.OwningType))
             {
@@ -256,7 +256,7 @@ namespace ILCompiler.Compiler.Importer
         /// <param name="importer">importer used when generating IR</param>
         /// <returns>true if IR generated to replace call, false otherwise</returns>
         /// <exception cref="NotImplementedException"></exception>
-        private static bool ImportIntrinsicCall(MethodDesc methodToCall, IList<StackEntry> arguments, IILImporterProxy importer, MethodDesc method, ImportContext context)
+        private static bool ImportIntrinsicCall(MethodDesc methodToCall, List<StackEntry> arguments, IILImporterProxy importer, ImportContext context)
         {
             // Map method name to string that code generator will understand
             var targetMethodName = methodToCall.Name;
@@ -372,7 +372,7 @@ namespace ILCompiler.Compiler.Importer
             return metadataType.Namespace == typeNamespace && metadataType.Name == typeName;
         }
 
-        private static StackEntry DereferenceThisPtr(StackEntry thisPtr, TypeDesc thisType)
+        private static IndirectEntry DereferenceThisPtr(StackEntry thisPtr, TypeDesc thisType)
         {
             return new IndirectEntry(thisPtr, thisType.VarType, thisType.GetElementSize().AsInt);
         }

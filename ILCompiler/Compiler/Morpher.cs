@@ -48,7 +48,7 @@ namespace ILCompiler.Compiler
                     break;
 
                 case CallEntry c:
-                    tree = new CallEntry(c.TargetMethod, MorphList(c.Arguments), c.Type, c.ExactSize, c.IsVirtual, c.Method);
+                    tree = new CallEntry(c.TargetMethod, MorphList(c.Arguments), c.Type, c.ExactSize, c.IsVirtual, c.Method, c.IsInlineCandidate);
                     break;
 
                 case BinaryOperator bo:
