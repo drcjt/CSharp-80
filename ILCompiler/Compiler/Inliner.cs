@@ -72,6 +72,13 @@ namespace ILCompiler.Compiler
             {
                 throw new InvalidOperationException("Method is null");
             }
+
+            // No support for inlining methods with return type and/or parameters yet
+            if (!method.Call.Method.HasReturnType && method.Call.Method.Parameters.Count != 0)
+            {
+                return false;
+            }
+
             var compiler = new MethodCompiler(_logger, _configuration, _phaseFactory);
             var basicBlocks = compiler.CompileInlineeMethod(method.Call.Method, _inputFilePath!);
 
