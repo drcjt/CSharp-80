@@ -13,10 +13,19 @@ namespace ILCompiler.Compiler.Importer
             {
                 case ILOpcode.starg:
                 case ILOpcode.starg_s:
-                    var value = importer.PopExpression();
                     var parameter = (ParameterDefinition)instruction.Operand;
-                    var node = new StoreLocalVariableEntry(parameter.Index, true, value);
-                    importer.ImportAppendTree(node);
+                    int localNumber = parameter.Index;
+
+                    if (context.Inlining)
+                    {
+                        var node = importer.InlineFetchArgument(parameter.Index);
+                        localNumber = ((LocalVariableEntry)node).LocalNumber;
+                    }
+
+                    var value = importer.PopExpression();
+                    var store = new StoreLocalVariableEntry(localNumber, true, value);
+                    importer.ImportAppendTree(store);
+
                     return true;
 
                 default:

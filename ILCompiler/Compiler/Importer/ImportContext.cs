@@ -22,8 +22,10 @@ namespace ILCompiler.Compiler.Importer
         public required DnlibModule Module { get; init; }
         public TypeDesc? Constrained { get; set; } = null;
 
-        public bool Inlining { get; set; } = false;
+        public InlineInfo? InlineInfo { get; set; } = null;
 
+        public bool Inlining => InlineInfo is not null;
+        
         public StackEntry GetGenericContext()
         {
             if (Method.AcquiresInstMethodTableFromThis())

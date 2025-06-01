@@ -101,7 +101,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public IList<BasicBlock>? CompileInlineeMethod(MethodDesc method, string inputFilePath)
+        public IList<BasicBlock>? CompileInlineeMethod(MethodDesc method, string inputFilePath, InlineInfo inlineInfo)
         {
             _logger.LogDebug("Compiling inlinee method {MethodName}", method.Name);
 
@@ -124,9 +124,9 @@ namespace ILCompiler.Compiler
 
             var ilImporter = _phaseFactory.Create<IILImporter>();
 
-            // Main phases of the compiler live here
+            // When inlining we only run the import phaser
             IList<EHClause> ehClauses = new List<EHClause>();
-            var basicBlocks = ilImporter.Import(parameterCount, _returnBufferArgIndex, method, _locals, ehClauses, true);
+            var basicBlocks = ilImporter.Import(parameterCount, _returnBufferArgIndex, method, _locals, ehClauses, inlineInfo);
 
             if (_configuration.DumpFlowGraphs)
             {
@@ -190,7 +190,28 @@ namespace ILCompiler.Compiler
 
             // Inlining
             var inliner = _phaseFactory.Create<IInliner>();
-            inliner.Inline(basicBlocks, inputFilePath);
+            inliner.Inline(basicBlocks, _locals, inputFilePath);
+
+            if (_configuration.DumpIRTrees)
+            {
+                _logger.LogInformation("After Inlining");
+                _logger.LogInformation("METHOD: {MethodFullName}", method.FullName);
+
+                int lclNum = 0;
+                StringBuilder sb = new();
+                foreach (var lclVar in _locals)
+                {
+                    sb.AppendLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Type} {lclVar.ExactSize}");
+
+                    lclNum++;
+                }
+                _logger.LogInformation("{LocalVars}", sb.ToString());
+
+                var treeDumper = new TreeDumper();
+                var treedump = treeDumper.Dump(basicBlocks);
+                _logger.LogInformation("{Treedump}", treedump);
+            }
+
 
             var morpher = _phaseFactory.Create<IMorpher>();
             morpher.Morph(basicBlocks, _locals);

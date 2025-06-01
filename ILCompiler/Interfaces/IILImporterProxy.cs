@@ -17,5 +17,11 @@ namespace ILCompiler.Interfaces
         BasicBlock[] BasicBlocks { get; }
 
         int? ReturnBufferArgIndex { get; }
+
+        InlineInfo? InlineInfo { get; }
+
+        public StackEntry InlineFetchArgument(int ilArgNum);
+
+        public int InlineFetchLocal(int localNumber);
     }
 }

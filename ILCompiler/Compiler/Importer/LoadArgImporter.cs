@@ -29,11 +29,20 @@ namespace ILCompiler.Compiler.Importer
                     return false;
             }
 
-            var lclNum = MapIlArgNum(index, importer.ReturnBufferArgIndex);
+            if (context.Inlining)
+            {
+                // Need to get arg from inline info.
+                var node = importer.InlineFetchArgument(index);
+                importer.PushExpression(node);
+            }
+            else
+            {
+                var lclNum = MapIlArgNum(index, importer.ReturnBufferArgIndex);
 
-            var argument = importer.LocalVariableTable[lclNum];
-            var node = new LocalVariableEntry(lclNum, argument.Type, argument.ExactSize);
-            importer.PushExpression(node);
+                var argument = importer.LocalVariableTable[lclNum];
+                var node = new LocalVariableEntry(lclNum, argument.Type, argument.ExactSize);
+                importer.PushExpression(node);
+            }
 
             return true;
         }

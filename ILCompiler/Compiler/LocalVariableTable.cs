@@ -35,5 +35,16 @@ namespace ILCompiler.Compiler
 
             return _locals.Count - 1;
         }
+
+        public void ResetCount(int count)
+        {
+            // Remove any variables added after count
+            int removeAt = count;
+
+            while (count-- > 0)
+            {
+                _locals.RemoveAt(removeAt);
+            }
+        }
     }
 }
