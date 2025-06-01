@@ -1,13 +1,12 @@
-﻿using ILCompiler.TypeSystem.Common;
-using ILCompiler.TypeSystem.Dnlib;
-using ILCompiler.Compiler.DependencyAnalysis;
+﻿using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Importer;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
+using ILCompiler.TypeSystem.Dnlib;
+using ILCompiler.TypeSystem.IL;
 using Microsoft.Extensions.Logging;
 using PreinitializationManager = ILCompiler.Compiler.PreInit.PreinitializationManager;
-using ILCompiler.TypeSystem.IL;
-
 namespace ILCompiler.Compiler
 {
     public class ILImporter : IILImporter
@@ -36,7 +35,9 @@ namespace ILCompiler.Compiler
         private readonly IEnumerable<IOpcodeImporter> _importers;
         private readonly ILImporterProxy _importerProxy;
 
-        private bool _inlining;
+        private InlineInfo? _inlineInfo;
+
+        private bool Inlining => _inlineInfo != null;
 
         private sealed class ILImporterProxy : IILImporterProxy
         {
@@ -57,8 +58,14 @@ namespace ILCompiler.Compiler
             public void ImportFallThrough(BasicBlock next) => _importer.ImportFallThrough(next);
             public StackEntry PopExpression() => _importer._stack.Pop();
             public void PushExpression(StackEntry entry) => _importer._stack.Push(entry);
-                
-            public int GrabTemp(VarType type, int? exactSize) => _importer._locals!.GrabTemp(type, exactSize);
+
+            public int GrabTemp(VarType type, int? exactSize) => _importer.GrabTemp(type, exactSize);
+
+            public InlineInfo? InlineInfo => _importer._inlineInfo;
+
+            public StackEntry InlineFetchArgument(int ilArgNum) => _importer.InlineFetchArgument(ilArgNum);
+
+            public int InlineFetchLocal(int localNumber) => _importer.InlineFetchLocal(localNumber);
         }
 
         public ILImporter(IConfiguration configuration, ILogger<ILImporter> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, CorLibModuleProvider corlibModuleProvider, PreinitializationManager preinitializationManager, NodeFactory nodeFactory, DnlibModule module)
@@ -193,7 +200,7 @@ namespace ILCompiler.Compiler
                 PreinitializationManager = _preinitializationManager,
                 NodeFactory = _nodeFactory,
                 Module = _module,
-                Inlining = _inlining,
+                InlineInfo = _inlineInfo,
             };
 
             while (true)
@@ -282,9 +289,9 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, LocalVariableTable locals, IList<EHClause> ehClauses, bool inlining = false)
+        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, LocalVariableTable locals, IList<EHClause> ehClauses, InlineInfo? inlineInfo = null)
         {
-            _inlining = inlining;
+            _inlineInfo = inlineInfo;
 
             _parameterCount = parameterCount;
             _returnBufferArgIndex = returnBufferArgIndex;
@@ -437,6 +444,62 @@ namespace ILCompiler.Compiler
             }
 
             MarkBasicBlock(next);
+        }
+
+        public StackEntry InlineFetchArgument(int ilArgNum)
+        {
+            var inlineArgumentInfo = _inlineInfo!.InlineArgumentInfos[ilArgNum];
+
+            if (inlineArgumentInfo.HasTemp)
+            {
+                var callArgument = inlineArgumentInfo.Argument;
+                var tempNumber = inlineArgumentInfo.TempNumber;
+                return new LocalVariableEntry(tempNumber, callArgument.Type, callArgument.ExactSize);
+            }
+            else
+            {
+                var callArgument = inlineArgumentInfo.Argument;
+
+                var tempNumber = GrabTemp(callArgument.Type, callArgument.ExactSize);
+
+                inlineArgumentInfo.HasTemp = true;
+                inlineArgumentInfo.TempNumber = tempNumber;
+
+                return new LocalVariableEntry(tempNumber, callArgument.Type, callArgument.ExactSize);
+            }
+        }
+
+        public int InlineFetchLocal(int localNumber)
+        {
+            var inlineLocalInfo = _inlineInfo!.LocalVariableInfos[localNumber];
+            if (inlineLocalInfo.HasTemp)
+            {
+                return inlineLocalInfo.TempNumber;
+            }
+            else
+            {
+                var localType = inlineLocalInfo.Type;
+
+                var tempNumber = GrabTemp(localType, localType.GetTypeSize());
+
+                inlineLocalInfo.HasTemp = true;
+                inlineLocalInfo.TempNumber = tempNumber;
+
+                return tempNumber;
+            }
+        }
+
+        public int GrabTemp(VarType type, int? exactSize)
+        {
+            if (Inlining)
+            {
+                // Grab temp in locals of method containing call that is being inlined
+                return _inlineInfo!.InlineLocalVariableTable.GrabTemp(type, exactSize);
+            }
+            else
+            {
+                return _locals!.GrabTemp(type, exactSize);
+            }
         }
     }
 }

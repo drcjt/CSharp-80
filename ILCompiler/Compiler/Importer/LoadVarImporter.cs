@@ -31,6 +31,12 @@ namespace ILCompiler.Compiler.Importer
 
             var localNumber = importer.ParameterCount + index;
             var localVariable = importer.LocalVariableTable[localNumber];
+
+            if (context.Inlining)
+            {
+                localNumber = importer.InlineFetchLocal(index);
+            }
+
             var node = new LocalVariableEntry(localNumber, localVariable.Type, localVariable.ExactSize);
             importer.PushExpression(node);
 

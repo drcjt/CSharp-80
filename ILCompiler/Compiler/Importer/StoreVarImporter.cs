@@ -28,10 +28,15 @@ namespace ILCompiler.Compiler.Importer
                     return false;
             }
 
+            var localNumber = importer.ParameterCount + index;
+
+            if (context.Inlining)
+            {
+                localNumber = importer.InlineFetchLocal(index);
+            }
+
             var value = importer.PopExpression();
 
-            var localNumber = importer.ParameterCount + index;
-            var localVariable = importer.LocalVariableTable[localNumber];
             var node = new StoreLocalVariableEntry(localNumber, false, value);
             importer.ImportAppendTree(node, true);
 
