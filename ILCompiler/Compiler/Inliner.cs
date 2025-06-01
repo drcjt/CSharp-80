@@ -149,7 +149,7 @@ namespace ILCompiler.Compiler
             return inlineInfo;
         }
 
-        private bool InsertInlineeBlocks(IList<BasicBlock> blocks, InlineMethod method, InlineInfo inlineInfo)
+        private static bool InsertInlineeBlocks(IList<BasicBlock> blocks, InlineMethod method, InlineInfo inlineInfo)
         {
             if (blocks.Count == 1)
             {
@@ -171,7 +171,7 @@ namespace ILCompiler.Compiler
             return false;
         }
 
-        private void PrependStatements(InlineMethod method, InlineInfo inlineInfo, ref int afterStatementIndex)
+        private static void PrependStatements(InlineMethod method, InlineInfo inlineInfo, ref int afterStatementIndex)
         {
             for (int argumentIndex = 0; argumentIndex < method.Call.Arguments.Count;  argumentIndex++)
             {
@@ -179,7 +179,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void InsertInlineeArgument(InlineMethod method, ref int afterStatementIndex, int argumentIndex, StackEntry argument, InlineInfo inlineInfo)
+        private static void InsertInlineeArgument(InlineMethod method, ref int afterStatementIndex, int argumentIndex, StackEntry argument, InlineInfo inlineInfo)
         {
             var tempNumber = inlineInfo.InlineArgumentInfos[argumentIndex].TempNumber;
 
