@@ -4,12 +4,8 @@ namespace Inlining
 {
     public static class Test
     {
-        private static int _parameter = 0;
-        
-        // This is not initialized as this causes all od the static method
-        // calls to be imported as comma nodes to call the cctor before
-        // the method. 
-        private static string _str;
+        private static int _parameter = 0;        
+        private static string _str = "Foo";
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void InlineMethodWithParameters(int i, string s)

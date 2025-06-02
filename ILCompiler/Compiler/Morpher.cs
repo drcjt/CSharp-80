@@ -1,12 +1,23 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Helpers;
 using ILCompiler.Compiler.Importer;
+using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
+using StackEntry = ILCompiler.Compiler.EvaluationStack.StackEntry;
 
 namespace ILCompiler.Compiler
 {
     public class Morpher : IMorpher
     {
+        private readonly PreinitializationManager _preinitializationManager;
+        private readonly INameMangler _nameMangler;
+        public Morpher(PreinitializationManager preinitializationManager, INameMangler nameMangler)
+        {
+            _preinitializationManager = preinitializationManager;
+            _nameMangler = nameMangler;
+        }
+
         private LocalVariableTable? _locals;
         public void Morph(IList<BasicBlock> blocks, LocalVariableTable locals)
         {
@@ -15,6 +26,38 @@ namespace ILCompiler.Compiler
             {
                 // fgMorphBlocks -> fgMorphStmts -> fgMorphTree -> fgMorphSmpOp -> fgMorphArrayIndex
                 MorphStatements(block);
+            }
+        }
+
+        public void Init(MethodDesc method, IList<BasicBlock> blocks)
+        {
+            if (method.IsStatic && !_preinitializationManager.IsPreinitialized(method.OwningType))
+            {
+                var staticConstructorMethod = method.OwningType.GetStaticConstructor();
+                if (staticConstructorMethod != null && staticConstructorMethod.FullName != method.FullName)
+                {
+                    // Generate call to static constructor
+                    var targetMethod = _nameMangler.GetMangledMethodName(staticConstructorMethod);
+                    var staticInitCall = new CallEntry(targetMethod, [], VarType.Void, 0);
+
+                    var newStatement = new Statement(staticInitCall);
+
+                    if (blocks.Count > 0)
+                    {
+                        var firstBlock = blocks[0];
+
+                        if (firstBlock.Statements.Count > 0)
+                        {
+                            // Insert at the beginning of the first block
+                            firstBlock.Statements.Insert(0, newStatement);
+                        }
+                        else
+                        {
+                            // If the first block is empty, just add the statement
+                            firstBlock.Statements.Add(newStatement);
+                        }
+                    }
+                }
             }
         }
 

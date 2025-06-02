@@ -188,6 +188,9 @@ namespace ILCompiler.Compiler
                 _logger.LogInformation("{Treedump}", treedump);
             }
 
+            var morpher = _phaseFactory.Create<IMorpher>();
+            morpher.Init(method, basicBlocks);
+
             // Inlining
             var inliner = _phaseFactory.Create<IInliner>();
             inliner.Inline(basicBlocks, _locals, inputFilePath);
@@ -212,8 +215,6 @@ namespace ILCompiler.Compiler
                 _logger.LogInformation("{Treedump}", treedump);
             }
 
-
-            var morpher = _phaseFactory.Create<IMorpher>();
             morpher.Morph(basicBlocks, _locals);
 
             // Find loops

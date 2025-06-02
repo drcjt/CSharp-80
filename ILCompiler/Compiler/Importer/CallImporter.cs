@@ -179,11 +179,6 @@ namespace ILCompiler.Compiler.Importer
             var returnVarType = methodToCall.HasReturnType ? returnType.VarType : VarType.Void;
             StackEntry callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize, !directCall, methodToCall, methodToCall.IsAggressiveInlining);
 
-            if (methodToCall.IsStatic && !context.PreinitializationManager.IsPreinitialized(methodToCall.OwningType))
-            {
-                callNode = InitClassHelper.ImportInitClass(methodToCall.OwningType, context, importer, callNode);
-            }
-
             if (!methodToCall.HasReturnType)
             {
                 importer.ImportAppendTree(callNode, true);
