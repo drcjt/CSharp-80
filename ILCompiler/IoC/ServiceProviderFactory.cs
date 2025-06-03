@@ -4,7 +4,6 @@ using ILCompiler.Compiler;
 using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
-using ILCompiler.Compiler.Importer;
 using ILCompiler.Compiler.Lowerings;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Compiler.Z80Assembler;
@@ -13,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ILCompiler.IL;
 using ILCompiler.Compiler.Peephole;
+using ILCompiler.Compiler.OpcodeImporters;
 
 namespace ILCompiler.IoC
 {
@@ -43,7 +43,7 @@ namespace ILCompiler.IoC
 
             services.AddSingleton<IPhaseFactory, PhaseFactory>();
 
-            services.AddTransient<IILImporter, ILImporter>();
+            services.AddTransient<IImporter, Importer>();
             services.AddImporters();
 
             services.AddTransient<IMorpher, Morpher>();

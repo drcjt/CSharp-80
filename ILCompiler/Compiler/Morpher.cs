@@ -1,6 +1,6 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Helpers;
-using ILCompiler.Compiler.Importer;
+using ILCompiler.Compiler.OpcodeImporters;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
