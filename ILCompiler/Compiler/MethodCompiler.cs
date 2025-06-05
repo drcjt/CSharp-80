@@ -122,7 +122,7 @@ namespace ILCompiler.Compiler
 
             var parameterCount = SetupLocalVariableTable(method);
 
-            var ilImporter = _phaseFactory.Create<IILImporter>();
+            var ilImporter = _phaseFactory.Create<IImporter>();
 
             // When inlining we only run the import phaser
             IList<EHClause> ehClauses = new List<EHClause>();
@@ -159,7 +159,7 @@ namespace ILCompiler.Compiler
 
             var parameterCount = SetupLocalVariableTable(method);
 
-            var ilImporter = _phaseFactory.Create<IILImporter>();
+            var ilImporter = _phaseFactory.Create<IImporter>();
 
             // Main phases of the compiler live here
             var basicBlocks = ilImporter.Import(parameterCount, _returnBufferArgIndex, method, _locals, methodCodeNodeNeedingCode.EhClauses);
