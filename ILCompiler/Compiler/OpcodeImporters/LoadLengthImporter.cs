@@ -6,7 +6,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     internal class LoadLengthImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.ldlen) return false;
 

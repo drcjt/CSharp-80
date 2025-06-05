@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class StoreFieldImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.stfld && instruction.Opcode != ILOpcode.stsfld) return false;
 
@@ -20,12 +20,12 @@ namespace ILCompiler.Compiler.OpcodeImporters
             StackEntry addr;
             if (isStoreStatic)
             {
-                var staticsBase = context.NameMangler.GetMangledTypeName(field.OwningType) + "_statics";
+                var staticsBase = importer.NameMangler.GetMangledTypeName(field.OwningType) + "_statics";
                 addr = new SymbolConstantEntry(staticsBase);
 
-                if (!context.PreinitializationManager.IsPreinitialized(field.OwningType))
+                if (!importer.PreinitializationManager.IsPreinitialized(field.OwningType))
                 {
-                    addr = InitClassHelper.ImportInitClass(field.OwningType, context, importer, addr);
+                    addr = InitClassHelper.ImportInitClass(field.OwningType, importer, addr);
                 }
             }
             else

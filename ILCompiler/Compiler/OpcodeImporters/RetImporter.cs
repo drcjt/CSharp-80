@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class RetImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.ret) return false;
 
@@ -15,9 +15,9 @@ namespace ILCompiler.Compiler.OpcodeImporters
             int? returnBufferArgIndex = null;
             int? returnTypeExactSize = null;
 
-            if (context.Method.HasReturnType)
+            if (importer.Method.HasReturnType)
             {
-                var returnType = context.Method.Signature.ReturnType;
+                var returnType = importer.Method.Signature.ReturnType;
                 var value = importer.Pop();
 
                 if (returnType.IsValueType && !returnType.IsPrimitive && !returnType.IsEnum) // && returnType.GetElementSize().AsInt > 4)
@@ -26,7 +26,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     // so that code gen can generate code to
                     // copy struct on top of stack to the 
                     // return buffer.
-                    returnBufferArgIndex = context.Method.HasThis ? 1 : 0;
+                    returnBufferArgIndex = importer.Method.HasThis ? 1 : 0;
                     returnTypeExactSize = returnType.GetElementSize().AsInt;
                 }
                 else
@@ -43,12 +43,12 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 returnValue = value;
             }
 
-            if (context.Inlining)
+            if (importer.Inlining)
                 return true;
 
             var retNode = new ReturnEntry(returnValue, returnBufferArgIndex, returnTypeExactSize);
             importer.ImportAppendTree(retNode);
-            context.StopImporting = true;
+            importer.StopImporting = true;
 
             return true;
         }

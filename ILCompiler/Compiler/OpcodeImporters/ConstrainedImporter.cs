@@ -6,11 +6,11 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class ConstrainedImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.constrained) return false;
 
-            context.Constrained = (TypeDesc)instruction.Operand;
+            importer.Constrained = (TypeDesc)instruction.Operand;
 
             return true;
         }

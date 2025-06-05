@@ -6,7 +6,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class LocallocImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.localloc) return false;
 
@@ -31,7 +31,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             // The frame pointer may not be back to the original value at the end of the method
             // even if the frame size is 0 as localloc may have modified it so we will have to
             // reset it.
-            context.Method.LocallocUsed = true;
+            importer.Method.LocallocUsed = true;
 
             return true;
         }

@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class LoadTokenImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.ldtoken) return false;
 
@@ -15,7 +15,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             if (obj is FieldDesc field)
             {
-                var node = context.NodeFactory.FieldRvaDataNode(field);
+                var node = importer.NodeFactory.FieldRvaDataNode(field);
                 var token = new TokenEntry(field, node.Label);
 
                 importer.Push(token);

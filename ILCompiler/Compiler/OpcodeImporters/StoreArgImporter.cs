@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class StoreArgImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             switch (instruction.Opcode)
             {
@@ -16,7 +16,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     var parameter = (ParameterDefinition)instruction.Operand;
                     int localNumber = parameter.Index;
 
-                    if (context.Inlining)
+                    if (importer.Inlining)
                     {
                         var node = importer.InlineFetchArgument(parameter.Index);
                         localNumber = ((LocalVariableEntry)node).LocalNumber;

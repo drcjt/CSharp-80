@@ -9,7 +9,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class NewobjImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.newobj) return false;
 
@@ -19,13 +19,13 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             if (owningType.IsArray)
             {
-                ImportNewObjArray(context, importer, (ArrayType)owningType);
+                ImportNewObjArray(importer, (ArrayType)owningType);
             }
             else
             {
                 if (IsSystemStringConstructor(runtimeDeterminedMethod))
                 {
-                    ImportNewObjString(instruction, context, importer, runtimeDeterminedMethod);
+                    ImportNewObjString(instruction, importer, runtimeDeterminedMethod);
                 }
                 else
                 {
@@ -35,11 +35,11 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
                     if (objType.IsValueType)
                     {
-                        ImportNewObjValueType(instruction, context, importer, objVarType, objSize);
+                        ImportNewObjValueType(instruction, importer, objVarType, objSize);
                     }
                     else
                     {
-                        ImportNewObjReferenceType(instruction, context, importer, objType, objVarType, objSize);
+                        ImportNewObjReferenceType(instruction, importer, objType, objVarType, objSize);
                     }
                 }
             }
@@ -54,20 +54,20 @@ namespace ILCompiler.Compiler.OpcodeImporters
                    methodToCall.HasCustomAttribute("System.Diagnostics.CodeAnalysis", "DynamicDependencyAttribute");
         }
 
-        private static void ImportNewObjReferenceType(Instruction instruction, ImportContext context, IImporter importer, DefType objType, VarType objVarType, int objSize)
+        private static void ImportNewObjReferenceType(Instruction instruction, IImporter importer, DefType objType, VarType objVarType, int objSize)
         {
             StackEntry eeTypeNode;
             if (objType.IsRuntimeDeterminedSubtype)
             {
                 // Only handle AcquiresInstMethodTableFromThis which will get
                 // the EETypePtr from this pointer.
-                Debug.Assert(context.Method.AcquiresInstMethodTableFromThis());
+                Debug.Assert(importer.Method.AcquiresInstMethodTableFromThis());
 
-                eeTypeNode = context.GetGenericContext();
+                eeTypeNode = importer.GetGenericContext();
             }
             else
             {
-                var mangledEETypeName = context.NameMangler.GetMangledTypeName(objType);
+                var mangledEETypeName = importer.NameMangler.GetMangledTypeName(objType);
                 eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
             }
 
@@ -81,27 +81,27 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             // Call the constructor                    
             var newObjThisPtr = new LocalVariableEntry(lclNum, objVarType, objSize);
-            CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
+            CallImporter.ImportCall(instruction, importer, newObjThisPtr);
 
             // Push a local variable entry corresponding to the object here
             var node = new LocalVariableEntry(lclNum, VarType.Ref, objSize);
             importer.Push(node);
         }
 
-        private static void ImportNewObjValueType(Instruction instruction, ImportContext context, IImporter importer, VarType objVarType, int objSize)
+        private static void ImportNewObjValueType(Instruction instruction, IImporter importer, VarType objVarType, int objSize)
         {
             // Allocate memory on the stack for the value type as a temp local variable
             var lclNum = importer.GrabTemp(objVarType, objSize);
             var newObjThisPtr = new LocalVariableAddressEntry(lclNum);
 
             // Call the valuetype constructor
-            CallImporter.ImportCall(instruction, context, importer, newObjThisPtr);
+            CallImporter.ImportCall(instruction, importer, newObjThisPtr);
 
             var node = new LocalVariableEntry(lclNum, objVarType, objSize);
             importer.Push(node);
         }
 
-        private static void ImportNewObjString(Instruction instruction, ImportContext context, IImporter importer, MethodDesc methodToCall)
+        private static void ImportNewObjString(Instruction instruction, IImporter importer, MethodDesc methodToCall)
         {
             // String constructors marked as dynamic dependencies simply
             // call the referred method which will deal with allocation and
@@ -113,7 +113,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             if (dependentMethod == null) throw new InvalidOperationException($"Cannot find dynamic dependency {dependentMethodName}");
 
             // Call the dynamic dependency method
-            CallImporter.ImportCall(dependentMethod, instruction, context, importer, null);
+            CallImporter.ImportCall(dependentMethod, instruction, importer, null);
         }
 
         /// <summary>
@@ -123,11 +123,11 @@ namespace ILCompiler.Compiler.OpcodeImporters
         /// </summary>
         /// <param name="importer"></param>
         /// <param name="arrayType"></param>
-        private static void ImportNewObjArray(ImportContext context, IImporter importer, ArrayType arrayType)
+        private static void ImportNewObjArray(IImporter importer, ArrayType arrayType)
         {
             Debug.Assert(arrayType.Rank > 0);
 
-            var mangledEETypeName = context.NameMangler.GetMangledTypeName(arrayType);
+            var mangledEETypeName = importer.NameMangler.GetMangledTypeName(arrayType);
             var eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
             var rank = new Int32ConstantEntry(arrayType.Rank);
 
@@ -147,8 +147,8 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             var args = new List<StackEntry>() { eeTypeNode, rank, node };
 
-            var runtimeHelperMethod = context.Method.Context.GetHelperEntryPoint("Internal.Runtime.CompilerHelpers", "ArrayHelpers", "NewObjArray");
-            var mangledHelperMethod = context.NameMangler.GetMangledMethodName(runtimeHelperMethod);
+            var runtimeHelperMethod = importer.Method.Context.GetHelperEntryPoint("Internal.Runtime.CompilerHelpers", "ArrayHelpers", "NewObjArray");
+            var mangledHelperMethod = importer.NameMangler.GetMangledMethodName(runtimeHelperMethod);
 
             node = new CallEntry(mangledHelperMethod, args, VarType.Ref, 2);
 

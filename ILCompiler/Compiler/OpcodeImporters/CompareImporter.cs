@@ -6,7 +6,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class CompareImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             Operation op;
             switch (instruction.Opcode)

@@ -6,7 +6,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class LeaveImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.leave && instruction.Opcode != ILOpcode.leave_s) return false;
 
@@ -19,7 +19,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             // TODO: Finally blocks
 
-            context.StopImporting = true;
+            importer.StopImporting = true;
 
             return true;
         }

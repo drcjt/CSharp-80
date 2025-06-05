@@ -6,7 +6,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     internal class ThrowImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.throw_) return false;
 

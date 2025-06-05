@@ -3,7 +3,6 @@ using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.OpcodeImporters;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
-using ILCompiler.TypeSystem.Dnlib;
 using ILCompiler.TypeSystem.IL;
 using Microsoft.Extensions.Logging;
 using PreinitializationManager = ILCompiler.Compiler.PreInit.PreinitializationManager;
@@ -11,15 +10,13 @@ namespace ILCompiler.Compiler
 {
     public class Importer : IImporter
     {
-        private readonly IConfiguration _configuration;
-        private readonly ILogger<Importer> _logger;
-        private readonly INameMangler _nameMangler;
-        private readonly CorLibModuleProvider _corLibModuleProvider;
-        private readonly PreinitializationManager _preinitializationManager;
-        private readonly NodeFactory _nodeFactory;
-        private readonly DnlibModule _module;
+        public IConfiguration Configuration { get; init; }
+        private ILogger<Importer> Logger { get; init; }
+        public INameMangler NameMangler { get; init; }
+        public PreinitializationManager PreinitializationManager { get; init; }
+        public NodeFactory NodeFactory { get; init; }
 
-        private MethodDesc _method = null!;
+        public MethodDesc Method { get; private set; } = null!;
         private MethodIL _methodIL = null!;
 
         private LocalVariableTable? _locals;
@@ -28,29 +25,32 @@ namespace ILCompiler.Compiler
         public BasicBlock[] BasicBlocks { get; set; } = [];
         private BasicBlock? _currentBasicBlock;
         private BasicBlock? _pendingBasicBlocks;
+        public BasicBlock? FallThroughBlock { get; private set; } = null;
 
         public int ParameterCount { get; private set; }
         public int? ReturnBufferArgIndex { get; private set; }
 
         private readonly EvaluationStack<StackEntry> _stack = new EvaluationStack<StackEntry>(0);
-        public StackEntry Pop() => _stack.Pop();
         public void Push(StackEntry entry) => _stack.Push(entry);
+        public StackEntry Pop() => _stack.Pop();
 
         private readonly IEnumerable<IOpcodeImporter> _opcodeImporters;
 
         public InlineInfo? InlineInfo { get; private set; }
-        private bool Inlining => InlineInfo != null;
+        public bool Inlining => InlineInfo != null;
 
-        public Importer(IConfiguration configuration, ILogger<Importer> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, CorLibModuleProvider corlibModuleProvider, PreinitializationManager preinitializationManager, NodeFactory nodeFactory, DnlibModule module)
+        public TypeDesc? Constrained { get; set; } = null;
+
+        public bool StopImporting { get; set; }
+
+        public Importer(IConfiguration configuration, ILogger<Importer> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, PreinitializationManager preinitializationManager, NodeFactory nodeFactory)
         {
-            _configuration = configuration;
-            _logger = logger;
-            _nameMangler = nameMangler;
+            Configuration = configuration;
+            NameMangler = nameMangler;
+            PreinitializationManager = preinitializationManager;
+            NodeFactory = nodeFactory;
+            Logger = logger;
             _opcodeImporters = importers;
-            _corLibModuleProvider = corlibModuleProvider;
-            _preinitializationManager = preinitializationManager;
-            _nodeFactory = nodeFactory;
-            _module = module;
         }
 
         private void ImportBasicBlocks(IDictionary<int, int> offsetToIndexMap)
@@ -160,18 +160,7 @@ namespace ILCompiler.Compiler
             var currentOffset = block.StartOffset;
             var currentIndex = offsetToIndexMap[currentOffset];
 
-            var importContext = new ImportContext
-            {
-                CurrentBlock = block,
-                Method = _method,
-                NameMangler = _nameMangler,
-                Configuration = _configuration,
-                CorLibModuleProvider = _corLibModuleProvider,
-                PreinitializationManager = _preinitializationManager,
-                NodeFactory = _nodeFactory,
-                Module = _module,
-                InlineInfo = this.InlineInfo,
-            };
+            StopImporting = false;
 
             while (true)
             {
@@ -179,13 +168,13 @@ namespace ILCompiler.Compiler
                 currentOffset += currentInstruction.GetSize();
                 currentIndex++;
 
-                importContext.FallThroughBlock = currentOffset < BasicBlocks.Length ? BasicBlocks[currentOffset] : null;
+                FallThroughBlock = currentOffset < BasicBlocks.Length ? BasicBlocks[currentOffset] : null;
 
-                bool imported = ImportInstruction(currentInstruction, importContext);
+                bool imported = ImportInstruction(currentInstruction);
 
                 if (imported)
                 {
-                    if (importContext.StopImporting)
+                    if (StopImporting)
                     {
                         return;
                     }
@@ -211,21 +200,21 @@ namespace ILCompiler.Compiler
 
         private void HandleUnknownInstruction(Instruction currentInstruction)
         {
-            if (_configuration.IgnoreUnknownCil)
+            if (Configuration.IgnoreUnknownCil)
             {
-                _logger.LogWarning("Unsupported IL opcode {Opcode} in {MethodFullName}", currentInstruction.Opcode, _method.FullName);
+                Logger.LogWarning("Unsupported IL opcode {Opcode} in {MethodFullName}", currentInstruction.Opcode, Method.FullName);
                 return;
             }
 
-            throw new UnknownCilException($"Unsupported IL opcode {currentInstruction.Opcode} in {_method.FullName}");
+            throw new UnknownCilException($"Unsupported IL opcode {currentInstruction.Opcode} in {Method.FullName}");
         }
 
-        private bool ImportInstruction(Instruction currentInstruction, ImportContext importContext)
+        private bool ImportInstruction(Instruction currentInstruction)
         {
             var imported = false;
             foreach (var opcodeImporter in _opcodeImporters)
             {
-                if (opcodeImporter.Import(currentInstruction, importContext, this))
+                if (opcodeImporter.Import(currentInstruction, this))
                 {
                     imported = true;
                     break;
@@ -262,7 +251,7 @@ namespace ILCompiler.Compiler
             ParameterCount = parameterCount;
             ReturnBufferArgIndex = returnBufferArgIndex;
 
-            _method = method;
+            Method = method;
             _locals = locals;
 
             var methodIL = method.MethodIL!;
@@ -270,7 +259,7 @@ namespace ILCompiler.Compiler
             var uninstantiatedMethodIL = methodIL.GetMethodILDefinition();
             if (methodIL != uninstantiatedMethodIL)
             {
-                var sharedMethod = _method.GetSharedRuntimeFormMethodTarget();
+                var sharedMethod = Method.GetSharedRuntimeFormMethodTarget();
                 _methodIL = new InstantiatedMethodIL(sharedMethod, uninstantiatedMethodIL);
             }
             else
@@ -278,7 +267,7 @@ namespace ILCompiler.Compiler
                 _methodIL = methodIL;
             }
 
-            var basicBlockAnalyser = new BasicBlockAnalyser(_method, _nameMangler, _methodIL);
+            var basicBlockAnalyser = new BasicBlockAnalyser(Method, NameMangler, _methodIL);
             var offsetToIndexMap = new Dictionary<int, int>();
             BasicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
@@ -288,7 +277,7 @@ namespace ILCompiler.Compiler
                 var staticConstructorMethod = method.OwningType.GetStaticConstructor();
                 if (staticConstructorMethod != null)
                 {
-                    var targetMethod = _nameMangler.GetMangledMethodName(staticConstructorMethod);
+                    var targetMethod = NameMangler.GetMangledMethodName(staticConstructorMethod);
                     var staticInitCall = new CallEntry(targetMethod, [], VarType.Void, 0);
 
                     BasicBlocks[0].Statements.Add(new Statement(staticInitCall));
@@ -465,6 +454,21 @@ namespace ILCompiler.Compiler
             else
             {
                 return _locals!.GrabTemp(type, exactSize);
+            }
+        }
+
+        public StackEntry GetGenericContext()
+        {
+            if (Method.AcquiresInstMethodTableFromThis())
+            {
+                var thisPtr = new LocalVariableEntry(0, VarType.Ref, 2);
+                var thisType = new IndirectEntry(thisPtr, VarType.Ptr, 2);
+
+                return thisType;
+            }
+            else
+            {
+                throw new NotImplementedException();
             }
         }
     }

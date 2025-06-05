@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class LoadVarImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             int index;
             switch (instruction.Opcode)
@@ -32,7 +32,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             var localNumber = importer.ParameterCount + index;
             var localVariable = importer.LocalVariableTable[localNumber];
 
-            if (context.Inlining)
+            if (importer.Inlining)
             {
                 localNumber = importer.InlineFetchLocal(index);
             }

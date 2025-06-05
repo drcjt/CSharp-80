@@ -6,7 +6,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class BranchImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             var code = instruction.Opcode;
             switch (instruction.Opcode)
@@ -49,7 +49,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             var target = (Instruction)instruction.Operand;
 
             var targetBlock = importer.BasicBlocks[(int)target.Offset];
-            var fallthroughBlock = (code != ILOpcode.br) ? context.FallThroughBlock : null;
+            var fallthroughBlock = (code != ILOpcode.br) ? importer.FallThroughBlock : null;
 
             if (code != ILOpcode.br)
             {
@@ -105,7 +105,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 importer.ImportFallThrough(fallthroughBlock);
             }
 
-            context.StopImporting = true;
+            importer.StopImporting = true;
 
             return true;
         }

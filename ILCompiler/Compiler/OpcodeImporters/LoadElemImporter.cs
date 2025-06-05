@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     internal class LoadElemImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             VarType elemType;
             int elemSize = 0;
@@ -64,7 +64,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             var op1 = importer.Pop();
             var op2 = importer.Pop();
 
-            var boundsCheck = !context.Configuration.SkipArrayBoundsCheck;
+            var boundsCheck = !importer.Configuration.SkipArrayBoundsCheck;
 
             var node = new IndexRefEntry(op1, op2, elemSize, elemType, 2, boundsCheck);
 

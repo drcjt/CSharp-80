@@ -9,7 +9,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class NewarrImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.newarr) return false;
 
@@ -23,17 +23,17 @@ namespace ILCompiler.Compiler.OpcodeImporters
             {
                 // Only handle AcquiresInstMethodTableFromThis which will get
                 // the EETypePtr from this pointer.
-                Debug.Assert(context.Method.AcquiresInstMethodTableFromThis());
+                Debug.Assert(importer.Method.AcquiresInstMethodTableFromThis());
 
-                eeTypeNode = context.GetGenericContext();
+                eeTypeNode = importer.GetGenericContext();
             }
             else
             {
-                var mangledEETypeName = context.NameMangler.GetMangledTypeName(runtimeDeterminedArrayType);
+                var mangledEETypeName = importer.NameMangler.GetMangledTypeName(runtimeDeterminedArrayType);
                 eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
             }
 
-            var runtimeHelperMethod = context.Method.Context.GetHelperEntryPoint("System.Runtime", "RuntimeImports", "NewArray");
+            var runtimeHelperMethod = importer.Method.Context.GetHelperEntryPoint("System.Runtime", "RuntimeImports", "NewArray");
 
             var args = new List<StackEntry>() { eeTypeNode, numElements };
             var node = new CallEntry("NewArray", args, VarType.Ref, 2, runtimeHelperMethod.IsVirtual, runtimeHelperMethod);

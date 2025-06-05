@@ -8,7 +8,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class IsInstImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.isinst) return false;
 
@@ -29,20 +29,20 @@ namespace ILCompiler.Compiler.OpcodeImporters
             }
 
             // Create call to helper method passing eetypeptr and object reference
-            var lookup = context.NodeFactory.NecessaryTypeSymbol(typeDesc);
+            var lookup = importer.NodeFactory.NecessaryTypeSymbol(typeDesc);
 
             var args = new List<StackEntry>() { new NativeIntConstantEntry(lookup.MangledTypeName), op1 };
-            var node = new CallEntry(GetHelperMethod(context, helperMethodName), args, VarType.Ref, 2);
+            var node = new CallEntry(GetHelperMethod(helperMethodName, importer), args, VarType.Ref, 2);
 
             importer.Push(node);
 
             return true;
         }
 
-        private static string GetHelperMethod(ImportContext context, string helperMethodName)
+        private static string GetHelperMethod(string helperMethodName, IImporter importer)
         {
-            var runtimeHelperMethod = context.Method.Context.GetHelperEntryPoint("System.Runtime", "TypeCast", helperMethodName);
-            var mangledHelperMethod = context.NameMangler.GetMangledMethodName(runtimeHelperMethod);
+            var runtimeHelperMethod = importer.Method.Context.GetHelperEntryPoint("System.Runtime", "TypeCast", helperMethodName);
+            var mangledHelperMethod = importer.NameMangler.GetMangledMethodName(runtimeHelperMethod);
 
             return mangledHelperMethod;
         }

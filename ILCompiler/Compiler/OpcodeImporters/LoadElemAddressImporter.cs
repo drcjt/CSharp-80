@@ -8,7 +8,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     internal class LoadElemAddressImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.ldelema) return false;
 
@@ -22,7 +22,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             var index = importer.Pop();
             var arrayRef = importer.Pop();
 
-            var checkBounds = !context.Configuration.SkipArrayBoundsCheck;
+            var checkBounds = !importer.Configuration.SkipArrayBoundsCheck;
 
             var arrayElementHelper = new ArrayElementHelper(importer.LocalVariableTable);
 

@@ -6,11 +6,11 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class LoadStringImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.ldstr) return false;
 
-            var node = context.NodeFactory.SerializedStringObject((string)instruction.Operand);
+            var node = importer.NodeFactory.SerializedStringObject((string)instruction.Operand);
 
             importer.Push(new SymbolConstantEntry(node.Label));
 

@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class BoxImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.box) return false;
 
@@ -16,21 +16,21 @@ namespace ILCompiler.Compiler.OpcodeImporters
             if (objType.IsValueType)
             {
                 var value = importer.Pop();
-                var boxedNode = BoxValue(value, objType, context, importer);
+                var boxedNode = BoxValue(value, objType, importer);
                 importer.Push(boxedNode);
             }
 
             return true;
         }
 
-        public static StackEntry BoxValue(StackEntry value, TypeDesc objType, ImportContext context, IImporter importer)
+        public static StackEntry BoxValue(StackEntry value, TypeDesc objType, IImporter importer)
         {
             // TODO: Consider creating a bespoke Box assembly code runtime routine to do the below
             // Note - nativeaot implements this in C# in System.Runtime.RuntimeExports.RhBox
 
             var lclNum = importer.GrabTemp(VarType.Ref, 2);
 
-            var mangledEETypeName = context.NameMangler.GetMangledTypeName(objType);
+            var mangledEETypeName = importer.NameMangler.GetMangledTypeName(objType);
             var eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
 
             int unboxedObjectSize = objType.GetElementSize().AsInt;

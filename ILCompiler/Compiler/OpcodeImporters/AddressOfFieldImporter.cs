@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class AddressOfFieldImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.ldflda && instruction.Opcode != ILOpcode.ldsflda) return false;
 
@@ -17,11 +17,11 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             if (isLoadStatic)
             {
-                var staticsBase = context.NameMangler.GetMangledTypeName(fieldDesc.OwningType) + "_statics";
+                var staticsBase = importer.NameMangler.GetMangledTypeName(fieldDesc.OwningType) + "_statics";
                 StackEntry obj = new SymbolConstantEntry(staticsBase, fieldDesc.Offset.AsInt);
-                if (!context.PreinitializationManager.IsPreinitialized(fieldDesc.OwningType))
+                if (!importer.PreinitializationManager.IsPreinitialized(fieldDesc.OwningType))
                 {
-                    obj = InitClassHelper.ImportInitClass(fieldDesc.OwningType, context, importer, obj);
+                    obj = InitClassHelper.ImportInitClass(fieldDesc.OwningType, importer, obj);
                 }
                 importer.Push(obj);
             }

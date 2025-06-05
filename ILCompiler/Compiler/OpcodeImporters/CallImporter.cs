@@ -8,13 +8,13 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class CallImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             switch (instruction.Opcode)
             {
                 case ILOpcode.call:
                 case ILOpcode.callvirt:
-                    ImportCall(instruction, context, importer);
+                    ImportCall(instruction, importer);
                     return true;
 
                 default:
@@ -22,13 +22,13 @@ namespace ILCompiler.Compiler.OpcodeImporters
             }
         }
 
-        public static void ImportCall(Instruction instruction, ImportContext context, IImporter importer, StackEntry? newObjThis = null)
+        public static void ImportCall(Instruction instruction, IImporter importer, StackEntry? newObjThis = null)
         {
             var method = (MethodDesc)instruction.Operand;
-            ImportCall(method, instruction, context, importer, newObjThis);
+            ImportCall(method, instruction, importer, newObjThis);
         }
 
-        public static void ImportCall(MethodDesc method, Instruction instruction, ImportContext context, IImporter importer, StackEntry? newObjThis = null)
+        public static void ImportCall(MethodDesc method, Instruction instruction, IImporter importer, StackEntry? newObjThis = null)
         {
             MethodDesc methodToCall = method;
             var opcode = instruction.Opcode;
@@ -63,7 +63,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             if (methodToCall.IsArrayAddressMethod())
             {
                 // Ptr to typedesc for array type
-                var arrayTypeDescPtr = new NativeIntConstantEntry(context.NameMangler.GetMangledTypeName(methodToCall.OwningType));
+                var arrayTypeDescPtr = new NativeIntConstantEntry(importer.NameMangler.GetMangledTypeName(methodToCall.OwningType));
                 arguments.Add(arrayTypeDescPtr);
             }
 
@@ -81,9 +81,9 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             if (opcode == ILOpcode.callvirt)
             {
-                if (context.Constrained != null)
+                if (importer.Constrained != null)
                 {
-                    TypeDesc constrained = context.Constrained;
+                    TypeDesc constrained = importer.Constrained;
                     if (constrained.IsRuntimeDeterminedSubtype)
                         constrained = constrained.ConvertToCanonForm(TypeSystem.Canon.CanonicalFormKind.Specific);
 
@@ -100,7 +100,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     {
                         // Dereference this ptr and box it
                         var dereferencedThisPtr = DereferenceThisPtr(arguments[0], constrainedType);
-                        var boxedNode = BoxImporter.BoxValue(dereferencedThisPtr, constrainedType, context, importer);
+                        var boxedNode = BoxImporter.BoxValue(dereferencedThisPtr, constrainedType, importer);
                         arguments[0] = boxedNode;
                     }
                     else
@@ -109,7 +109,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                         arguments[0] = DereferenceThisPtr(arguments[0], constrainedType);
                     }
 
-                    context.Constrained = null;
+                    importer.Constrained = null;
                 }
 
                 // Turn first argument into throw null ref check
@@ -134,7 +134,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             // Intrinsic calls
             if (methodToCall.IsIntrinsic)
             {
-                if (ImportIntrinsicCall(methodToCall, arguments, importer, context))
+                if (ImportIntrinsicCall(methodToCall, arguments, importer))
                 {
                     return;
                 }
@@ -155,7 +155,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             }
             else
             {
-                targetMethod = context.NameMangler.GetMangledMethodName(context.NodeFactory.MethodNode(methodToCall).Method);
+                targetMethod = importer.NameMangler.GetMangledMethodName(importer.NodeFactory.MethodNode(methodToCall).Method);
             }
 
             bool directCall = !(opcode == ILOpcode.callvirt && methodToCall.IsVirtual);
@@ -251,7 +251,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
         /// <param name="importer">importer used when generating IR</param>
         /// <returns>true if IR generated to replace call, false otherwise</returns>
         /// <exception cref="NotImplementedException"></exception>
-        private static bool ImportIntrinsicCall(MethodDesc methodToCall, List<StackEntry> arguments, IImporter importer, ImportContext context)
+        private static bool ImportIntrinsicCall(MethodDesc methodToCall, List<StackEntry> arguments, IImporter importer)
         {
             // Map method name to string that code generator will understand
             var targetMethodName = methodToCall.Name;
@@ -271,7 +271,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                         var instantiation = instantiatedType.Instantiation;
                         var objType = instantiation[0];
 
-                        var mangledEETypeName = context.NameMangler.GetMangledTypeName(objType);
+                        var mangledEETypeName = importer.NameMangler.GetMangledTypeName(objType);
 
                         importer.Push(new NativeIntConstantEntry(mangledEETypeName));
 
@@ -309,7 +309,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                         var arrayOp = arguments[0];
                         var indexOp = arguments[1];
 
-                        var boundsCheck = !context.Configuration.SkipArrayBoundsCheck;
+                        var boundsCheck = !importer.Configuration.SkipArrayBoundsCheck;
 
                         var node = new IndexRefEntry(indexOp, arrayOp, 2, VarType.UShort, StringCharsOffset, boundsCheck);
                         importer.Push(node);

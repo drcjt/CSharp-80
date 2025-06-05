@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class LoadFieldImporter : IOpcodeImporter
     {
-        public bool Import(Instruction instruction, ImportContext context, IImporter importer)
+        public bool Import(Instruction instruction, IImporter importer)
         {
             if (instruction.Opcode != ILOpcode.ldfld && instruction.Opcode != ILOpcode.ldsfld) return false;
 
@@ -20,12 +20,12 @@ namespace ILCompiler.Compiler.OpcodeImporters
             StackEntry obj;
             if (isLoadStatic)
             {
-                var staticsBase = context.NameMangler.GetMangledTypeName(runtimeDeterminedType.OwningType) + "_statics";
+                var staticsBase = importer.NameMangler.GetMangledTypeName(runtimeDeterminedType.OwningType) + "_statics";
                 obj = new SymbolConstantEntry(staticsBase);
 
-                if (!context.PreinitializationManager.IsPreinitialized(runtimeDeterminedType.OwningType))
+                if (!importer.PreinitializationManager.IsPreinitialized(runtimeDeterminedType.OwningType))
                 {
-                    obj = InitClassHelper.ImportInitClass(runtimeDeterminedType.OwningType, context, importer, obj);
+                    obj = InitClassHelper.ImportInitClass(runtimeDeterminedType.OwningType, importer, obj);
                 }
             }
             else
