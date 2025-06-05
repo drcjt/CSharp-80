@@ -13,10 +13,9 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             var typeDesc = (TypeDesc)instruction.Operand;
 
-            var elemType = typeDesc.VarType;
             int elemSize = typeDesc.GetElementSize().AsInt;
 
-            importer.Push(new Int32ConstantEntry(checked((int)elemSize)));
+            importer.Push(new Int32ConstantEntry(checked(elemSize)));
 
             return true;
         }
