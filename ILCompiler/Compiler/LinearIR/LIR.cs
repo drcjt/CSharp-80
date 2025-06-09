@@ -8,7 +8,7 @@ namespace ILCompiler.Compiler.LinearIR
         public static Range SeqTree(StackEntry tree)
         {
             var orderingVisitor = new PostOrderTraversalVisitor(tree);
-            tree.Accept(orderingVisitor);
+            orderingVisitor.WalkTree(new Edge<StackEntry>(() => tree, x => { }), null);
 
             var lastNode = tree;
             var firstNode = orderingVisitor.First;

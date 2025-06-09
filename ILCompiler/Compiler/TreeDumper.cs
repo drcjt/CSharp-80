@@ -280,5 +280,18 @@ namespace ILCompiler.Compiler
         {
             Print($"CATCH_ARGUMENT");
         }
+
+        public void Visit(ReturnExpressionEntry entry)
+        {
+            Print($"RETURN_EXPRESSION {entry.Type}");
+            _indent++;
+            entry.InlineCandidate.Accept(this);
+            _indent--;
+        }
+
+        public void Visit(NothingEntry entry)
+        {
+            Print($"NOTHING");
+        }
     }
 }

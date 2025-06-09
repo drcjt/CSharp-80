@@ -1,12 +1,11 @@
-﻿using ILCompiler.Compiler.LinearIR;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace ILCompiler.Compiler.EvaluationStack
 {
     public class BoundsCheck : StackEntry
     {
         public StackEntry Index { get; set; }
-        public StackEntry ArrayLength { get; }
+        public StackEntry ArrayLength { get; set; }
 
         public BoundsCheck(StackEntry index, StackEntry arrayLength) : base(VarType.Void)
         {

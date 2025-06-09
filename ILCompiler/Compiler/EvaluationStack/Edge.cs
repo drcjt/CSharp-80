@@ -1,4 +1,4 @@
-﻿namespace ILCompiler.Compiler.LinearIR
+﻿namespace ILCompiler.Compiler.EvaluationStack
 {
     public class Edge<T>(Func<T> getter, Action<T> setter)
     {

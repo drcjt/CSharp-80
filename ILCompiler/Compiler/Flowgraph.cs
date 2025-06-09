@@ -29,7 +29,7 @@ namespace ILCompiler.Compiler
         private static List<StackEntry> SetTreeSequence(StackEntry tree)
         {
             var orderingVisitor = new PostOrderTraversalVisitor(tree);
-            tree.Accept(orderingVisitor);
+            orderingVisitor.WalkTree(new Edge<StackEntry>(() => tree, x => { }), null);
 
             var firstNode = orderingVisitor.PostOrderNodes[0];
             var lastNode = orderingVisitor.PostOrderNodes[^1];
@@ -53,9 +53,9 @@ namespace ILCompiler.Compiler
             Current = current;
         }
 
-        public override void PostOrderVisit(StackEntry entry)
+        public override void PostOrderVisit(Edge<StackEntry> use, StackEntry? user)
         {
-            SetNext(entry);
+            SetNext(use.Get());
         }
         private void SetNext(StackEntry entry)
         {

@@ -235,5 +235,15 @@ namespace ILCompiler.Compiler
             _sb.AppendLine($"       ├──▌  t{entry.Index.TreeID}");
             _sb.AppendLine($"       bounds_check");
         }
+
+        public void Visit(ReturnExpressionEntry entry)
+        {
+            throw new Exception("ReturnExpressionEntry not valid in LIR");
+        }
+
+        public void Visit(NothingEntry entry)
+        {
+            _sb.AppendLine($"       nothing");
+        }
     }
 }
