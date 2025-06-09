@@ -135,7 +135,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private StackEntry? ImportExtractLasStatement()
+        private StackEntry? ImportExtractLastStatement()
         {
             if (_currentBasicBlock?.Statements.Count > 0)
             {
@@ -228,7 +228,7 @@ namespace ILCompiler.Compiler
         {
             tempNumber = tempNumber ?? _locals!.GrabTemp(entry.Type, entry.ExactSize);
 
-            var node = new StoreLocalVariableEntry(tempNumber.Value, false, entry.Duplicate());
+            var node = new StoreLocalVariableEntry(tempNumber.Value, false, entry);
             ImportAppendTree(node);
 
             return new LocalVariableEntry(tempNumber.Value, entry.Type, entry.ExactSize);
@@ -353,7 +353,7 @@ namespace ILCompiler.Compiler
 
             if (_stack.Length > 0)
             {
-                // If the block is not empty on exit from the basic block, additional
+                // If the stack is not empty on exit from the basic block, additional
                 // processing is needed to make sure the block successors can use the
                 // values on the predecessor’s stack.
                 // 
@@ -370,7 +370,7 @@ namespace ILCompiler.Compiler
                 }
 
                 // Remove the branch/jump statement at the end of the block if present
-                var lastStatement = ImportExtractLasStatement();
+                var lastStatement = ImportExtractLastStatement();
 
                 // Spill stuff on stack in new temps and setup new stack to contain the temps
                 for (int i = 0; i < _stack.Length; i++)
@@ -380,7 +380,13 @@ namespace ILCompiler.Compiler
                     {
                         tempNumber = (entryStack[i].As<LocalVariableEntry>()).LocalNumber;
                     }
-                    var temp = ImportSpillStackEntry(_stack[i], tempNumber);
+
+                    if (!_currentBasicBlock.SpilledStackEntries.TryGetValue(_stack[i], out LocalVariableEntry? temp))
+                    {
+                        temp = ImportSpillStackEntry(_stack[i], tempNumber);
+                        _currentBasicBlock.SpilledStackEntries[_stack[i]] = temp;
+                    }
+
                     if (setupEntryStack)
                     {
                         entryStack.Push(temp);

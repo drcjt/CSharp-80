@@ -65,5 +65,7 @@ namespace ILCompiler.Compiler
             Label = LabelGenerator.GetLabel(LabelType.BasicBlock);
             JumpKind = JumpKind.Always;
         }
+
+        public IDictionary<StackEntry, LocalVariableEntry> SpilledStackEntries { get; set; } = new Dictionary<StackEntry, LocalVariableEntry>();
     }
 }
