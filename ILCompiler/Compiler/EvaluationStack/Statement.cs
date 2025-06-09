@@ -2,7 +2,7 @@
 {
     public class Statement
     {
-        public StackEntry RootNode { get; init; }
+        public StackEntry RootNode { get; set; }
 
         public List<StackEntry> TreeList { get; set; } = [];
 
