@@ -1,5 +1,4 @@
-﻿using ILCompiler.Compiler.LinearIR;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace ILCompiler.Compiler.EvaluationStack
 {
@@ -27,6 +26,5 @@ namespace ILCompiler.Compiler.EvaluationStack
             }
             return base.TryGetUse(operand, out edge);
         }
-
     }
 }

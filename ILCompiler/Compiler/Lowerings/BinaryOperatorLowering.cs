@@ -111,11 +111,11 @@ namespace ILCompiler.Compiler.Lowerings
                     }
 
                     // Remove nodes that have been reused from the linear order
-                    // as these will be re-added when the tree is resequenced
+                    // as these will be re-added when the tree is re-sequenced
                     blockRange.Remove(divisor);
                     blockRange.Remove(dividend);
 
-                    // linearise the new div tree and insert before the orginal
+                    // linearise the new div tree and insert before the original
                     InsertTreeBefore(div, newDiv, blockRange);
                     blockRange.Remove(div);
 
