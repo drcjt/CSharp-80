@@ -33,6 +33,53 @@ namespace ILCompiler.Compiler
         public InlineArgumentInfo[] InlineArgumentInfos { get; set; } = [];
         public LocalVariableInfo[] LocalVariableInfos { get; set; } = [];
         public required LocalVariableTable InlineLocalVariableTable { get; set; }
+
+        public InlineCandidateInfo? InlineCandidateInfo { get; set; } = null;
+    }
+
+    public record InlineCandidateInfo
+    {
+        public ReturnExpressionEntry? ReturnExpressionEntry { get; set; } = null;
+    }
+
+    public class SubstitutePlaceholdersWalker : StackEntryVisitor
+    {
+        public SubstitutePlaceholdersWalker() : base() 
+        {
+        }
+
+        public Statement WalkStatement(Statement statement)
+        {
+            WalkTree(new Edge<StackEntry>(() => statement.RootNode, x => { }), null);
+
+            return statement;
+        }
+
+        public override void PreOrderVisit(Edge<StackEntry> use, StackEntry? user)
+        {
+            var node = use.Get();
+            if (node is ReturnExpressionEntry)
+            {
+                UpdateInlineReturnExpressionPlaceHolder(use, user);
+            }
+        }
+
+        private static void UpdateInlineReturnExpressionPlaceHolder(Edge<StackEntry> use, StackEntry? user)
+        {
+            while (use.Get() is ReturnExpressionEntry)
+            {
+                var tree = use.Get();
+                var inlineCandidate = tree;
+
+                do
+                {
+                    var returnExpression = inlineCandidate as ReturnExpressionEntry;
+                    inlineCandidate = returnExpression!.SubstExpr;
+                } while (inlineCandidate is ReturnExpressionEntry);
+
+                use.Set(inlineCandidate!);
+            }
+        }
     }
 
     public class Inliner(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory) : IInliner
@@ -46,9 +93,10 @@ namespace ILCompiler.Compiler
         {
             _inputFilePath = inputFilePath;
 
-            var block = blocks[0];
 
-            do
+            var walker = new SubstitutePlaceholdersWalker();
+
+            foreach (var block in blocks)
             {
                 if (block.Statements.Count > 0)
                 {
@@ -56,13 +104,17 @@ namespace ILCompiler.Compiler
                     do
                     {
                         var statement = block.Statements[statementIndex];
+
+                        // Walk Statement
+                        statement = walker.WalkStatement(statement);
+
                         var expr = statement.RootNode;
 
                         var callInlined = false;
                         if (expr is CallEntry call && call.IsInlineCandidate)
                         {
                             var inlineMethod = new InlineMethod()
-                            {                                   
+                            {
                                 Call = call,
                                 Statement = statement,
                                 StatementIndex = statementIndex,
@@ -78,9 +130,7 @@ namespace ILCompiler.Compiler
                         }
                     } while (statementIndex < block.Statements.Count);
                 }
-
-                block = block.Next;
-            } while (block is not null);
+            }
         }
 
         private bool MorphCallInline(InlineMethod method)
@@ -90,13 +140,8 @@ namespace ILCompiler.Compiler
                 throw new InvalidOperationException("Method is null");
             }
 
-            // No support for inlining methods with return types
-            if (method.Call.Method.HasReturnType)
-            {
-                return false;
-            }
-
             InlineInfo inlineInfo = InitVars(method);
+            inlineInfo.InlineCandidateInfo = method.Call.InlineCandidateInfo;
 
             var startVars = method.Locals.Count;
 
@@ -108,6 +153,14 @@ namespace ILCompiler.Compiler
                 var inlineSucceeded = InsertInlineeBlocks(basicBlocks, method, inlineInfo);
                 if (inlineSucceeded)
                     return true;
+
+                if (method.Call.Method.HasReturnType)
+                {
+                    inlineInfo.InlineCandidateInfo!.ReturnExpressionEntry!.SubstExpr = method.Call;
+
+                    // Need to blank out the original call node
+                    method.Statement!.RootNode = new NothingEntry();
+                }
 
                 // Need to undo some changes made during the inlining attempt
                 // Temps may have been allocated need to do this

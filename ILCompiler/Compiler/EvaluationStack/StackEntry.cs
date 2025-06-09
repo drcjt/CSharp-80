@@ -87,15 +87,15 @@ namespace ILCompiler.Compiler.EvaluationStack
         {
             bool containsT = false;
 
-            var visitor = new StackEntryVisitor(node =>
+            var visitor = new StackEntryVisitor((use, user) =>
             {
-                if (node is T)
+                if (use is T)
                 {
                     containsT = true;
                 }
             });
 
-            visitor.WalkTree(this);
+            visitor.WalkTree(new Edge<StackEntry>(() => this, x => { }), null);
 
             return containsT;
         }

@@ -2,7 +2,7 @@
 {
     public class JumpTrueEntry : StackEntry
     {
-        public StackEntry Condition { get; }
+        public StackEntry Condition { get; set; }
         public string TargetLabel { get; }
         public JumpTrueEntry(string targetLabel, StackEntry condition) : base(VarType.Void)
         {

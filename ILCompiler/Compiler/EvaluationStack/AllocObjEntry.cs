@@ -2,7 +2,7 @@
 {
     public class AllocObjEntry : StackEntry
     {
-        public StackEntry EETypeNode { get; }
+        public StackEntry EETypeNode { get; set; }
 
         public AllocObjEntry(StackEntry eeTypeNode, VarType objType) : base(objType)
         {

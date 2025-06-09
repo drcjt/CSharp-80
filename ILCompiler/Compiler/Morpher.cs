@@ -66,7 +66,10 @@ namespace ILCompiler.Compiler
             var morphedStatements = new List<Statement>();
             foreach (var statement in block.Statements)
             {
-                morphedStatements.Add(MorphStatement(statement));
+                if (statement.RootNode is not NothingEntry)
+                {
+                    morphedStatements.Add(MorphStatement(statement));
+                }
             }
 
             block.Statements.Clear();

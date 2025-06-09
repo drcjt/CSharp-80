@@ -19,7 +19,6 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             context.InstructionsBuilder.And(A);         // Clear carry flag
             context.InstructionsBuilder.Sbc(HL, DE);    // Calculate Array Length - Index
-
             
             // Emit conditional call to ThrowHelpers.ThrowIndexOutOfRangeException
             var throwHelperMethod = context.Method.Context.GetHelperEntryPoint("ThrowHelpers", "ThrowIndexOutOfRangeException");

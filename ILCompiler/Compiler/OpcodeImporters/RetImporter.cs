@@ -41,11 +41,21 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 }
 
                 returnValue = value;
+
+                if (importer.Inlining)
+                {
+                    var inlineCandidateInfo = importer.InlineInfo!.InlineCandidateInfo;
+                    var returnExpressionEntry = inlineCandidateInfo!.ReturnExpressionEntry;
+
+                    returnExpressionEntry!.SubstExpr = returnValue;
+                }
             }
 
             if (importer.Inlining)
+            {
                 return true;
-
+            }
+                
             var retNode = new ReturnEntry(returnValue, returnBufferArgIndex, returnTypeExactSize);
             importer.ImportAppendTree(retNode);
             importer.StopImporting = true;

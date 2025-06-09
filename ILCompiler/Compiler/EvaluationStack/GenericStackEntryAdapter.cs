@@ -38,5 +38,7 @@
         public void Visit(CatchArgumentEntry entry) => _genericStackEntryVisitor.Visit<CatchArgumentEntry>(entry);
         public void Visit(TokenEntry entry) => _genericStackEntryVisitor.Visit<TokenEntry>(entry);
         public void Visit(ArrayLengthEntry entry) => _genericStackEntryVisitor.Visit<ArrayLengthEntry>(entry);
+        public void Visit(ReturnExpressionEntry entry) => _genericStackEntryVisitor.Visit<ReturnExpressionEntry>(entry);
+        public void Visit(NothingEntry entry) => _genericStackEntryVisitor.Visit<NothingEntry>(entry);
     }
 }

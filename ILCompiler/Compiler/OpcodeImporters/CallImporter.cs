@@ -177,7 +177,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetElementSize().AsInt : null;
 
             var returnVarType = methodToCall.HasReturnType ? returnType.VarType : VarType.Void;
-            StackEntry callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize, !directCall, methodToCall, methodToCall.IsAggressiveInlining);
+            CallEntry callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize, !directCall, methodToCall, methodToCall.IsAggressiveInlining);
 
             if (!methodToCall.HasReturnType)
             {
@@ -185,17 +185,34 @@ namespace ILCompiler.Compiler.OpcodeImporters
             }
             else
             {
-                if (returnType.IsValueType && !returnType.IsPrimitive && !returnType.IsEnum)
+                if (callNode.IsInlineCandidate)
                 {
                     importer.ImportAppendTree(callNode, true);
 
-                    // Load return buffer to stack
-                    var loadTemp = new LocalVariableEntry(returnBufferArgIndex, returnType.VarType, returnType.GetElementSize().AsInt);
-                    importer.Push(loadTemp);
+                    ReturnExpressionEntry returnExpression = new ReturnExpressionEntry(callNode);
+
+                    var inlineCandidateInfo = new InlineCandidateInfo
+                    {
+                        ReturnExpressionEntry = returnExpression
+                    };
+                    callNode.InlineCandidateInfo = inlineCandidateInfo;
+
+                    importer.Push(returnExpression);
                 }
                 else
                 {
-                    importer.Push(callNode);
+                    if (returnType.IsValueType && !returnType.IsPrimitive && !returnType.IsEnum)
+                    {
+                        importer.ImportAppendTree(callNode, true);
+
+                        // Load return buffer to stack
+                        var loadTemp = new LocalVariableEntry(returnBufferArgIndex, returnType.VarType, returnType.GetElementSize().AsInt);
+                        importer.Push(loadTemp);
+                    }
+                    else
+                    {
+                        importer.Push(callNode);
+                    }
                 }
             }
         }

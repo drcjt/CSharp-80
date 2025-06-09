@@ -1,5 +1,4 @@
-﻿using ILCompiler.Compiler.LinearIR;
-using ILCompiler.TypeSystem.Common;
+﻿using ILCompiler.TypeSystem.Common;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ILCompiler.Compiler.EvaluationStack
@@ -11,7 +10,9 @@ namespace ILCompiler.Compiler.EvaluationStack
         public bool IsVirtual { get; }
 
         public bool IsInlineCandidate { get; set; }
+        public InlineInfo? InlineInfo { get; set; } = null;
 
+        public InlineCandidateInfo? InlineCandidateInfo{ get ;set; } = null;
         public MethodDesc? Method { get; }
 
         public CallEntry(string targetMethod, IList<StackEntry> arguments, VarType returnType, int? returnSize, bool isVirtual = false, MethodDesc? method = null, bool isInlineCandidate = false) : base(returnType, returnSize)
@@ -25,7 +26,10 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         public override StackEntry Duplicate()
         {
-            return new CallEntry(TargetMethod, Arguments, Type, ExactSize, IsVirtual, Method, IsInlineCandidate);
+            var duplicate = new CallEntry(TargetMethod, Arguments, Type, ExactSize, IsVirtual, Method, IsInlineCandidate);
+            duplicate.InlineInfo = InlineInfo;
+            duplicate.InlineCandidateInfo = InlineCandidateInfo;
+            return duplicate;
         }
 
         public override void Accept(IStackEntryVisitor visitor) => visitor.Visit(this);
