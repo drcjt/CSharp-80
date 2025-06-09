@@ -40,8 +40,9 @@ namespace ILCompiler.Compiler
         {
             // Remove any variables added after count
             int removeAt = count;
+            int removeCount = _locals.Count - count;
 
-            while (count-- > 0)
+            while (removeCount-- > 0)
             {
                 _locals.RemoveAt(removeAt);
             }
