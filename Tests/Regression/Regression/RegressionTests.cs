@@ -13,7 +13,6 @@ namespace Regression
             Assert.Equal(testValue, MethodCall_WithNuintParameter_CompilesWithoutErrors(testValue));
 
             Assert.Equal(1, Bug210_SpillStack());
-
             Assert.Equal<nuint>(0, Bug206(0));
 
             Assert.Equal(2, new SpillImportAppendTests().SpillOnStFldImport());
