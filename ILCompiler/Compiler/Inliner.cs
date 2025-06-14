@@ -1,6 +1,8 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
+using ILCompiler.TypeSystem.Common;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace ILCompiler.Compiler
 {
@@ -24,12 +26,12 @@ namespace ILCompiler.Compiler
     {
         public int TempNumber { get; set; }
         public bool HasTemp { get; set; }
-
-        public VarType Type { get; set; }
+        public TypeDesc? Type { get; set; }
     }
 
     public record InlineInfo
     {
+        public required CallEntry InlineCall { get; set; }
         public InlineArgumentInfo[] InlineArgumentInfos { get; set; } = [];
         public LocalVariableInfo[] LocalVariableInfos { get; set; } = [];
         public required LocalVariableTable InlineLocalVariableTable { get; set; }
@@ -152,7 +154,10 @@ namespace ILCompiler.Compiler
             {
                 var inlineSucceeded = InsertInlineeBlocks(basicBlocks, method, inlineInfo);
                 if (inlineSucceeded)
+                {
+                    _logger.LogInformation($"Inlined call to method: {method.Call.Method.FullName}");
                     return true;
+                }
 
                 if (method.Call.Method.HasReturnType)
                 {
@@ -167,6 +172,8 @@ namespace ILCompiler.Compiler
                 method.Locals.ResetCount(startVars);
             }
 
+            Debug.Assert(method.Locals.Count == startVars);
+
             return false;
         }
 
@@ -174,15 +181,21 @@ namespace ILCompiler.Compiler
         {
             var inlineInfo = new InlineInfo
             {
+                InlineCall = method.Call,
                 InlineLocalVariableTable = method.Locals,
                 InlineArgumentInfos = new InlineArgumentInfo[method.Call.Arguments.Count]
             };
 
             for (int i = 0; i < method.Call.Arguments.Count; i++)
             {
+                var argument = method.Call.Arguments[i];
+                if (argument is PutArgTypeEntry putArgType)
+                {
+                    argument = putArgType.Op1;
+                }
                 var inlineArgumentInfo = new InlineArgumentInfo()
                 {
-                    Argument = method.Call.Arguments[i],
+                    Argument = argument,
                 };
                 inlineInfo.InlineArgumentInfos[i] = inlineArgumentInfo;
             }
@@ -194,7 +207,7 @@ namespace ILCompiler.Compiler
                 var local = method.Call.Method!.Locals[i];
                 var localVariableInfo = new LocalVariableInfo()
                 {
-                    Type = local.Type.VarType,
+                    Type = local.Type,
                 };
                 inlineInfo.LocalVariableInfos[i] = localVariableInfo;
             }
@@ -234,7 +247,16 @@ namespace ILCompiler.Compiler
 
         private static void InsertInlineeArgument(InlineMethod method, ref int afterStatementIndex, int argumentIndex, StackEntry argument, InlineInfo inlineInfo)
         {
+            if (!inlineInfo.InlineArgumentInfos[argumentIndex].HasTemp)
+                return;
+
             var tempNumber = inlineInfo.InlineArgumentInfos[argumentIndex].TempNumber;
+
+            // No need for PutArgType when inlined
+            if (argument is PutArgTypeEntry putArgType)
+            {
+                argument = putArgType.Op1;
+            }
 
             var store = new StoreLocalVariableEntry(tempNumber, false, argument.Duplicate());
 
