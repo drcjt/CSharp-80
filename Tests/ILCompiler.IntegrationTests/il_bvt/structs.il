@@ -26,6 +26,7 @@
 .class public _structs {
 .method public static valuetype _struct _makestruct(int32 x, int32 y) {
 .maxstack 2
+.locals (valuetype _struct)
 	ldarg.0
 	ldarg.1
 	newobj instance void _struct::.ctor(int32, int32)
@@ -36,6 +37,7 @@
 .method public static int32 Main() {
 .entrypoint
 .maxstack 10
+.locals (valuetype _struct)
 	ldc.i4.3
 	ldc.i4.4
 	call valuetype _struct _structs::_makestruct(int32, int32)
