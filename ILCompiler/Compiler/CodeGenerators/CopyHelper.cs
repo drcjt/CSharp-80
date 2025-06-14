@@ -16,21 +16,13 @@ namespace ILCompiler.Compiler.CodeGenerators
             instructionsBuilder.Pop(DE);
 
             short changeToIX = 0;
-            if (ixOffset + bytesToCopy - 1 > 127)
+            if (ixOffset > 127 || ixOffset < -128)
             {
-                // Make IX larger so offset doesn't fall outside of bounds
-                changeToIX = 128;
-            }
-            if (ixOffset < -128)
-            {
-                changeToIX = -128;
-                // Make IX smaller so offset doesn't fall outside of bounds
-            }
-            if (changeToIX != 0)
-            {
+                // Make sure IX offset is within -128 to +127 range
+                changeToIX = (short)ixOffset;
                 instructionsBuilder.Ld(DE, changeToIX);
                 instructionsBuilder.Add(IX, DE);
-                ixOffset -= changeToIX;
+                ixOffset = 0;
             }
 
             if (bytesToCopy == 2)
@@ -126,14 +118,13 @@ namespace ILCompiler.Compiler.CodeGenerators
             Debug.Assert(bytesToCopy == 1 || bytesToCopy == 2);
             int changeToIX = 0;
 
-            if (ixOffset + bytesToCopy < -127)
+            if (ixOffset > 127 || ixOffset < -128)
             {
-                var delta = ixOffset + 1;
-                instructionsBuilder.Ld(BC, (short)delta);
+                // Make sure IX offset is within -128 to +127 range
+                changeToIX = (short)ixOffset;
+                instructionsBuilder.Ld(BC, (short)changeToIX);
                 instructionsBuilder.Add(IX, BC);
-                changeToIX += delta;
-
-                ixOffset -= delta;
+                ixOffset = 0;
             }
 
             if (!signExtend)

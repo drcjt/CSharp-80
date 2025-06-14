@@ -17,9 +17,17 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     var index = parameter.Index;
                     var localNumber = MapIlArgNum(index, importer.ReturnBufferArgIndex);
 
-                    importer.Push(new LocalVariableAddressEntry(localNumber));
-
-                    importer.LocalVariableTable[localNumber].AddressExposed = true;
+                    if (importer.Inlining)
+                    {
+                        LocalVariableEntry argument = (LocalVariableEntry)importer.InlineFetchArgument(index);
+                        importer.Push(new LocalVariableAddressEntry(argument.LocalNumber));
+                        importer.InlineInfo!.InlineLocalVariableTable[argument.LocalNumber].AddressExposed = true;
+                    }
+                    else
+                    {
+                        importer.Push(new LocalVariableAddressEntry(localNumber));
+                        importer.LocalVariableTable[localNumber].AddressExposed = true;
+                    }
 
                     return true;
 

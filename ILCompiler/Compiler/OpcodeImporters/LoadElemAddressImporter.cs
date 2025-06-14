@@ -26,7 +26,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             var arrayElementHelper = new ArrayElementHelper(importer.LocalVariableTable);
 
-            StackEntry addr = arrayElementHelper.CreateArrayAccess(index, arrayRef, elemType, elemSize, true, checkBounds, 2);
+            StackEntry addr = arrayElementHelper.CreateArrayAccess(index, arrayRef, elemType, elemSize, true, checkBounds, 2, importer);
 
             importer.Push(addr);
 

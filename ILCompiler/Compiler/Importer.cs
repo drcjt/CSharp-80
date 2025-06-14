@@ -226,7 +226,7 @@ namespace ILCompiler.Compiler
 
         private LocalVariableEntry ImportSpillStackEntry(StackEntry entry, int? tempNumber = null)
         {
-            tempNumber = tempNumber ?? _locals!.GrabTemp(entry.Type, entry.ExactSize);
+            tempNumber = tempNumber ?? GrabTemp(entry.Type, entry.ExactSize);
 
             var node = new StoreLocalVariableEntry(tempNumber.Value, false, entry);
             ImportAppendTree(node);
@@ -440,15 +440,15 @@ namespace ILCompiler.Compiler
             else
             {
                 var localType = inlineLocalInfo.Type;
-
-                var tempNumber = GrabTemp(localType, localType.GetTypeSize());
-
+                var tempNumber = GrabTemp(localType!);
                 inlineLocalInfo.HasTemp = true;
                 inlineLocalInfo.TempNumber = tempNumber;
 
                 return tempNumber;
             }
         }
+
+        public int GrabTemp(TypeDesc type) => GrabTemp(type.VarType, type.GetElementSize().AsInt);
 
         public int GrabTemp(VarType type, int? exactSize)
         {

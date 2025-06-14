@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.Helpers
 {
@@ -11,7 +12,15 @@ namespace ILCompiler.Compiler.Helpers
             _locals = locals;
         }
 
-        public StackEntry CreateArrayAccess(StackEntry index, StackEntry arrayRef, VarType elemType, int elemSize, bool address, bool checkBounds, int firstElementOffset)
+        private int GrabTemp(IImporter? importer, VarType type, int? exactSize)
+        {
+            if (importer is not null)
+                return importer.GrabTemp(type, exactSize);
+            else
+                return _locals.GrabTemp(type, exactSize);
+        }
+
+        public StackEntry CreateArrayAccess(StackEntry index, StackEntry arrayRef, VarType elemType, int elemSize, bool address, bool checkBounds, int firstElementOffset, IImporter? importer = null)
         {
             StackEntry? boundsCheck = null;
             StackEntry? indexDefinition = null;
@@ -24,12 +33,12 @@ namespace ILCompiler.Compiler.Helpers
                 // that the same values are used in the bounds check as the actual
                 // array dereference.
 
-                var arrayRefTemporaryNumber = _locals.GrabTemp(arrayRef.Type, arrayRef.ExactSize);
+                var arrayRefTemporaryNumber = GrabTemp(importer, arrayRef.Type, arrayRef.ExactSize);
                 arrayRefDefinition = new StoreLocalVariableEntry(arrayRefTemporaryNumber, false, arrayRef);
                 arrayRef = new LocalVariableEntry(arrayRefTemporaryNumber, arrayRef.Type, arrayRef.ExactSize);
                 var arrayRef2 = new LocalVariableEntry(arrayRefTemporaryNumber, arrayRef.Type, arrayRef.ExactSize);
 
-                var indexTemporaryNumber = _locals.GrabTemp(index.Type, index.ExactSize);
+                var indexTemporaryNumber = GrabTemp(importer, index.Type, index.ExactSize);
                 indexDefinition = new StoreLocalVariableEntry(indexTemporaryNumber, false, index);
                 index = new LocalVariableEntry(indexTemporaryNumber, index.Type, index.ExactSize);
                 var index2 = new LocalVariableEntry(indexTemporaryNumber, index.Type, index.ExactSize);

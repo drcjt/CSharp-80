@@ -14,9 +14,20 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 case ILOpcode.ldloca:
                 case ILOpcode.ldloca_s:
                     var localVariableDefinition = (LocalVariableDefinition)instruction.Operand;
-                    var localNumber = importer.ParameterCount + localVariableDefinition.Index;
-                    importer.Push(new LocalVariableAddressEntry(localNumber));
-                    importer.LocalVariableTable[localNumber].AddressExposed = true;
+
+                    if (importer.Inlining)
+                    {
+                        var localNumber = importer.InlineFetchLocal(localVariableDefinition.Index);
+                        importer.Push(new LocalVariableAddressEntry(localNumber));
+                        importer.InlineInfo!.InlineLocalVariableTable[localNumber].AddressExposed = true;
+                    }
+                    else
+                    {
+                        var localNumber = localVariableDefinition.Index + importer.ParameterCount;
+                        importer.Push(new LocalVariableAddressEntry(localNumber));
+                        importer.LocalVariableTable[localNumber].AddressExposed = true;
+                    }
+
                     return true;
                 default:
                     return false;
