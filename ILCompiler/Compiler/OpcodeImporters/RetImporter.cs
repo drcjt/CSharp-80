@@ -47,7 +47,22 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     var inlineCandidateInfo = importer.InlineInfo!.InlineCandidateInfo;
                     var returnExpressionEntry = inlineCandidateInfo!.ReturnExpressionEntry;
 
-                    returnExpressionEntry!.SubstExpr = returnValue;
+                    if (returnBufferArgIndex.HasValue)
+                    {
+                        // If we have a return buffer, we need to store the struct into it
+                        importer.ImportAppendTree(StoreStructPtr(importer, returnValue, returnBufferArgIndex.Value));
+
+                        var returnBufferArg = (LocalVariableAddressEntry)importer.InlineInfo!.InlineCall.Arguments[returnBufferArgIndex.Value];
+
+                        var returnBufferLocalVariable = importer.InlineInfo!.InlineLocalVariableTable[returnBufferArg.LocalNumber];
+                        var returnBuffer = new LocalVariableEntry(returnBufferArg.LocalNumber, returnBufferLocalVariable.Type, returnBufferLocalVariable.ExactSize);
+
+                        returnExpressionEntry!.SubstExpr = returnBuffer;
+                    }
+                    else
+                    {
+                        returnExpressionEntry!.SubstExpr = returnValue;
+                    }
                 }
             }
 
@@ -61,6 +76,12 @@ namespace ILCompiler.Compiler.OpcodeImporters
             importer.StopImporting = true;
 
             return true;
+        }
+
+        private static StoreIndEntry StoreStructPtr(IImporter importer, StackEntry returnValue, int returnBufferArgIndex)
+        {
+            var destination = importer.InlineInfo!.InlineCall.Arguments[returnBufferArgIndex];
+            return new StoreIndEntry(destination, returnValue, VarType.Struct, 0, returnValue.ExactSize);
         }
     }
 }
