@@ -155,7 +155,7 @@ namespace ILCompiler.Compiler
                 var inlineSucceeded = InsertInlineeBlocks(basicBlocks, method, inlineInfo);
                 if (inlineSucceeded)
                 {
-                    _logger.LogInformation($"Inlined call to method: {method.Call.Method.FullName}");
+                    _logger.LogInformation("Inlined call to method: {MethodName}", method.Call.Method.FullName);
                     return true;
                 }
 
