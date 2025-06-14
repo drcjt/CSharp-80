@@ -28,11 +28,15 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     return false;
             }
 
-            var localNumber = importer.ParameterCount + index;
+            var localNumber = index;
 
             if (importer.Inlining)
             {
-                localNumber = importer.InlineFetchLocal(index);
+                localNumber = importer.InlineFetchLocal(localNumber);
+            }
+            else
+            {
+                localNumber += importer.ParameterCount;
             }
 
             var value = importer.Pop();
