@@ -287,7 +287,7 @@ namespace ILCompiler.Compiler
 
                 var newStatement = new Statement(staticInitCall);
 
-                methodInfo.Block.Statements.Insert(0, newStatement);
+                methodInfo.Block.Statements.Insert(afterStatementIndex, newStatement);
             }
 
             // TODO: Add nullcheck for this pointer here
