@@ -29,7 +29,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     return false;
             }
 
-            var lclNum = MapIlArgNum(index, importer.ReturnBufferArgIndex);
+            var lclNum = importer.MapIlArgNum(index);
 
             if (importer.Inlining)
             {
@@ -45,24 +45,6 @@ namespace ILCompiler.Compiler.OpcodeImporters
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Map IL arg num to account for hidden parameters
-        /// </summary>
-        /// <param name="ilArgNum"></param>
-        /// <returns></returns>
-        private static int MapIlArgNum(int ilArgNum, int? returnBufferArgIndex)
-        {
-            if (returnBufferArgIndex.HasValue)
-            {
-                if (ilArgNum >= returnBufferArgIndex)
-                {
-                    ilArgNum++;
-                }
-            }
-
-            return ilArgNum;
         }
     }
 }

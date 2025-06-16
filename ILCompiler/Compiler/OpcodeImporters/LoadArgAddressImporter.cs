@@ -15,7 +15,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 case ILOpcode.ldarga_s:
                     var parameter = (ParameterDefinition)instruction.Operand;
                     var index = parameter.Index;
-                    var localNumber = MapIlArgNum(index, importer.ReturnBufferArgIndex);
+                    var localNumber = importer.MapIlArgNum(index);
 
                     if (importer.Inlining)
                     {
@@ -34,24 +34,6 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 default:
                     return false;
             }
-        }
-
-        /// <summary>
-        /// Map IL arg num to account for hidden parameters
-        /// </summary>
-        /// <param name="ilArgNum"></param>
-        /// <returns></returns>
-        private static int MapIlArgNum(int ilArgNum, int? returnBufferArgIndex)
-        {
-            if (returnBufferArgIndex.HasValue)
-            {
-                if (ilArgNum >= returnBufferArgIndex)
-                {
-                    ilArgNum++;
-                }
-            }
-
-            return ilArgNum;
         }
     }
 }

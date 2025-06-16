@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 case ILOpcode.starg:
                 case ILOpcode.starg_s:
                     var parameter = (ParameterDefinition)instruction.Operand;
-                    int localNumber = parameter.Index;
+                    var localNumber = importer.MapIlArgNum(parameter.Index);
 
                     if (importer.Inlining)
                     {

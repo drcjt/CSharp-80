@@ -31,31 +31,28 @@ namespace ILCompiler.Compiler
 
         public void Init(MethodDesc method, IList<BasicBlock> blocks)
         {
-            if (method.IsStatic && !_preinitializationManager.IsPreinitialized(method.OwningType))
+            var staticConstructorMethod = method.GetStaticConstructor();
+            if (staticConstructorMethod is not null && !_preinitializationManager.IsPreinitialized(method.OwningType))
             {
-                var staticConstructorMethod = method.OwningType.GetStaticConstructor();
-                if (staticConstructorMethod != null && staticConstructorMethod.FullName != method.FullName)
+                // Generate call to static constructor
+                var targetMethod = _nameMangler.GetMangledMethodName(staticConstructorMethod);
+                var staticInitCall = new CallEntry(targetMethod, [], VarType.Void, 0);
+
+                var newStatement = new Statement(staticInitCall);
+
+                if (blocks.Count > 0)
                 {
-                    // Generate call to static constructor
-                    var targetMethod = _nameMangler.GetMangledMethodName(staticConstructorMethod);
-                    var staticInitCall = new CallEntry(targetMethod, [], VarType.Void, 0);
+                    var firstBlock = blocks[0];
 
-                    var newStatement = new Statement(staticInitCall);
-
-                    if (blocks.Count > 0)
+                    if (firstBlock.Statements.Count > 0)
                     {
-                        var firstBlock = blocks[0];
-
-                        if (firstBlock.Statements.Count > 0)
-                        {
-                            // Insert at the beginning of the first block
-                            firstBlock.Statements.Insert(0, newStatement);
-                        }
-                        else
-                        {
-                            // If the first block is empty, just add the statement
-                            firstBlock.Statements.Add(newStatement);
-                        }
+                        // Insert at the beginning of the first block
+                        firstBlock.Statements.Insert(0, newStatement);
+                    }
+                    else
+                    {
+                        // If the first block is empty, just add the statement
+                        firstBlock.Statements.Add(newStatement);
                     }
                 }
             }
