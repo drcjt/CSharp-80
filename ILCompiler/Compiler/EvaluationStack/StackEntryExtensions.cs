@@ -2,6 +2,26 @@
 {
     public static class StackEntryExtensions
     {
+        public static bool IsInvariant(this StackEntry entry)
+        {
+            return entry is ConstantEntry || IsAddressInLocal(entry);
+        }
+
+        public static bool IsAddressInLocal(this StackEntry entry)
+        {
+            while (entry is FieldAddressEntry fieldAddressEntry)
+            {
+                entry = fieldAddressEntry.Op1;
+            }
+
+            if (entry is LocalVariableAddressEntry)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public static bool IsIntCnsOrI(this StackEntry entry)
         {
             if (entry is Int32ConstantEntry) return true;

@@ -22,6 +22,20 @@ namespace ILCompiler.TypeSystem.Common
 
         public virtual bool IsDefaultConstructor => OwningType.GetDefaultConstructor() == this;
 
+        public MethodDesc? GetStaticConstructor()
+        {
+            if (IsStatic)
+            {
+                var staticConstructorMethod = OwningType.GetStaticConstructor();
+                if (staticConstructorMethod != null && staticConstructorMethod.FullName != FullName)
+                {
+                    return staticConstructorMethod;
+                }
+            }
+
+            return null;
+        }
+
         public virtual bool IsStatic => false;
 
         public abstract IList<MethodParameter> Parameters { get; }

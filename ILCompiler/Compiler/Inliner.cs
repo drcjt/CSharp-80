@@ -1,12 +1,15 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.OpcodeImporters;
+using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using StackEntry = ILCompiler.Compiler.EvaluationStack.StackEntry;
 
 namespace ILCompiler.Compiler
 {
-    public record InlineMethod
+    public record InlineMethodInfo
     {
         public required CallEntry Call { get; set; }
         public required Statement Statement { get; set; }
@@ -20,6 +23,11 @@ namespace ILCompiler.Compiler
         public required StackEntry Argument {  get; set; }
         public int TempNumber { get; set; }
         public bool HasTemp { get; set; }
+        public bool IsInvariant { get; set; }
+        public bool IsLocalVariable { get; set; }
+        public bool IsUsed { get; set; }
+        public bool HasLdargaOp { get; set; }
+        public bool HasStargOp { get; set; }
     }
 
     public record LocalVariableInfo
@@ -37,6 +45,7 @@ namespace ILCompiler.Compiler
         public required LocalVariableTable InlineLocalVariableTable { get; set; }
 
         public InlineCandidateInfo? InlineCandidateInfo { get; set; } = null;
+        public MethodDesc? StaticConstructorMethod { get; set; } = null;
     }
 
     public record InlineCandidateInfo
@@ -79,22 +88,25 @@ namespace ILCompiler.Compiler
                     inlineCandidate = returnExpression!.SubstExpr;
                 } while (inlineCandidate is ReturnExpressionEntry);
 
+                inlineCandidate = CodeFolder.FoldExpression(inlineCandidate!);
+
                 use.Set(inlineCandidate!);
             }
         }
     }
 
-    public class Inliner(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory) : IInliner
+    public class Inliner(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory, INameMangler nameMangler, PreinitializationManager preinitializationManager) : IInliner
     {
         private readonly IConfiguration _configuration = configuration;
         private readonly ILogger<MethodCompiler> _logger = logger;
         private readonly IPhaseFactory _phaseFactory = phaseFactory;
+        private readonly INameMangler _nameMangler = nameMangler;
+        private readonly PreinitializationManager _preinitializationManager = preinitializationManager;
         private string? _inputFilePath;
 
         public void Inline(IList<BasicBlock> blocks, LocalVariableTable locals, string inputFilePath)
         {
             _inputFilePath = inputFilePath;
-
 
             var walker = new SubstitutePlaceholdersWalker();
 
@@ -115,7 +127,7 @@ namespace ILCompiler.Compiler
                         var callInlined = false;
                         if (expr is CallEntry call && call.IsInlineCandidate)
                         {
-                            var inlineMethod = new InlineMethod()
+                            var inlineMethodInfo = new InlineMethodInfo()
                             {
                                 Call = call,
                                 Statement = statement,
@@ -123,7 +135,7 @@ namespace ILCompiler.Compiler
                                 Block = block,
                                 Locals = locals,
                             };
-                            callInlined = MorphCallInline(inlineMethod);
+                            callInlined = MorphCallInline(inlineMethodInfo);
                         }
 
                         if (!callInlined)
@@ -135,60 +147,68 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private bool MorphCallInline(InlineMethod method)
+        private bool MorphCallInline(InlineMethodInfo methodInfo)
         {
-            if (method.Call.Method == null)
+            var method = methodInfo.Call.Method;
+            if (method is null)
             {
                 throw new InvalidOperationException("Method is null");
             }
 
-            InlineInfo inlineInfo = InitVars(method);
-            inlineInfo.InlineCandidateInfo = method.Call.InlineCandidateInfo;
+            InlineInfo inlineInfo = InitVars(methodInfo);
+            inlineInfo.InlineCandidateInfo = methodInfo.Call.InlineCandidateInfo;
 
-            var startVars = method.Locals.Count;
+            var staticConstructorMethod = method.GetStaticConstructor();
+            if (staticConstructorMethod is not null && !_preinitializationManager.IsPreinitialized(method.OwningType))
+            {
+                inlineInfo.StaticConstructorMethod = method.GetStaticConstructor();
+            }
+
+            var startVars = methodInfo.Locals.Count;
 
             var compiler = new MethodCompiler(_logger, _configuration, _phaseFactory);
-            var basicBlocks = compiler.CompileInlineeMethod(method.Call.Method, _inputFilePath!, inlineInfo);
+            var basicBlocks = compiler.CompileInlineeMethod(method, _inputFilePath!, inlineInfo);
 
             if (basicBlocks != null)
             {
-                var inlineSucceeded = InsertInlineeBlocks(basicBlocks, method, inlineInfo);
+                var inlineSucceeded = InsertInlineeBlocks(basicBlocks, methodInfo, inlineInfo);
                 if (inlineSucceeded)
                 {
-                    _logger.LogInformation("Inlined call to method: {MethodName}", method.Call.Method.FullName);
+                    _logger.LogInformation("Inlined call to method: {MethodName}", method.FullName);
                     return true;
                 }
 
-                if (method.Call.Method.HasReturnType)
+                if (method.HasReturnType)
                 {
-                    inlineInfo.InlineCandidateInfo!.ReturnExpressionEntry!.SubstExpr = method.Call;
+                    inlineInfo.InlineCandidateInfo!.ReturnExpressionEntry!.SubstExpr = methodInfo.Call;
 
                     // Need to blank out the original call node
-                    method.Statement!.RootNode = new NothingEntry();
+                    methodInfo.Statement!.RootNode = new NothingEntry();
                 }
 
                 // Need to undo some changes made during the inlining attempt
                 // Temps may have been allocated need to do this
-                method.Locals.ResetCount(startVars);
+                methodInfo.Locals.ResetCount(startVars);
             }
 
-            Debug.Assert(method.Locals.Count == startVars);
+            Debug.Assert(methodInfo.Locals.Count == startVars);
 
             return false;
         }
 
-        private static InlineInfo InitVars(InlineMethod method)
+        private static InlineInfo InitVars(InlineMethodInfo methodInfo)
         {
             var inlineInfo = new InlineInfo
             {
-                InlineCall = method.Call,
-                InlineLocalVariableTable = method.Locals,
-                InlineArgumentInfos = new InlineArgumentInfo[method.Call.Arguments.Count]
+                InlineCall = methodInfo.Call,
+                InlineLocalVariableTable = methodInfo.Locals,
+                InlineArgumentInfos = new InlineArgumentInfo[methodInfo.Call.Arguments.Count]
             };
 
-            for (int i = 0; i < method.Call.Arguments.Count; i++)
+            for (int i = 0; i < methodInfo.Call.Arguments.Count; i++)
             {
-                var argument = method.Call.Arguments[i];
+                var argument = methodInfo.Call.Arguments[i];
+
                 if (argument is PutArgTypeEntry putArgType)
                 {
                     argument = putArgType.Op1;
@@ -197,14 +217,18 @@ namespace ILCompiler.Compiler
                 {
                     Argument = argument,
                 };
+
+                RecordArgumentInfo(argument, inlineArgumentInfo);
+
                 inlineInfo.InlineArgumentInfos[i] = inlineArgumentInfo;
             }
 
-            inlineInfo.LocalVariableInfos = new LocalVariableInfo[method.Call.Method!.Locals.Count];
+            var method = methodInfo.Call.Method!;
+            inlineInfo.LocalVariableInfos = new LocalVariableInfo[method.Locals.Count];
 
-            for (int i = 0; i < method.Call.Method!.Locals.Count; i++)
+            for (int i = 0; i < method.Locals.Count; i++)
             {
-                var local = method.Call.Method!.Locals[i];
+                var local = method.Locals[i];
                 var localVariableInfo = new LocalVariableInfo()
                 {
                     Type = local.Type,
@@ -215,20 +239,27 @@ namespace ILCompiler.Compiler
             return inlineInfo;
         }
 
-        private static bool InsertInlineeBlocks(IList<BasicBlock> blocks, InlineMethod method, InlineInfo inlineInfo)
+        private static void RecordArgumentInfo(StackEntry? argument, InlineArgumentInfo argumentInfo)
+        {
+            argumentInfo.IsInvariant = argument!.IsInvariant();
+            argumentInfo.IsLocalVariable = argument is LocalVariableEntry;
+        }
+
+        private bool InsertInlineeBlocks(IList<BasicBlock> blocks, InlineMethodInfo methodInfo, InlineInfo inlineInfo)
         {
             if (blocks.Count == 1)
             {
-                method.Block.Statements.RemoveAt(method.StatementIndex);
+                var statements = methodInfo.Block.Statements;
+                statements.RemoveAt(methodInfo.StatementIndex);
 
                 // Prepend statements
-                int afterStatementIndex = method.StatementIndex;
-                PrependStatements(method, inlineInfo, ref afterStatementIndex);
+                int afterStatementIndex = methodInfo.StatementIndex;
+                PrependStatements(methodInfo, inlineInfo, ref afterStatementIndex);
 
                 var inlineeBlock = blocks[0];
                 foreach (var inlineeStatement in inlineeBlock.Statements)
                 {
-                    method.Block.Statements.Insert(afterStatementIndex++, inlineeStatement);
+                    statements.Insert(afterStatementIndex++, inlineeStatement);
                 }
 
                 return true;
@@ -237,15 +268,34 @@ namespace ILCompiler.Compiler
             return false;
         }
 
-        private static void PrependStatements(InlineMethod method, InlineInfo inlineInfo, ref int afterStatementIndex)
+        private void PrependStatements(InlineMethodInfo methodInfo, InlineInfo inlineInfo, ref int afterStatementIndex)
         {
-            for (int argumentIndex = 0; argumentIndex < method.Call.Arguments.Count;  argumentIndex++)
+            // TODO: check if nullcheck required for this pointer
+
+            var arguments = methodInfo.Call.Arguments;
+            for (int argumentIndex = 0; argumentIndex < arguments.Count; argumentIndex++)
             {
-                InsertInlineeArgument(method, ref afterStatementIndex, argumentIndex, method.Call.Arguments[argumentIndex], inlineInfo);
+                InsertInlineeArgument(methodInfo, ref afterStatementIndex, argumentIndex, arguments[argumentIndex], inlineInfo);
             }
+
+            // Add cctor check if necessary
+            if (inlineInfo.StaticConstructorMethod is not null)
+            {
+                // Generate call to static constructor
+                var targetMethod = _nameMangler.GetMangledMethodName(inlineInfo.StaticConstructorMethod);
+                var staticInitCall = new CallEntry(targetMethod, [], VarType.Void, 0);
+
+                var newStatement = new Statement(staticInitCall);
+
+                methodInfo.Block.Statements.Insert(afterStatementIndex, newStatement);
+            }
+
+            // TODO: Add nullcheck for this pointer here
+
+            // TODO: Zero init inlinee locals
         }
 
-        private static void InsertInlineeArgument(InlineMethod method, ref int afterStatementIndex, int argumentIndex, StackEntry argument, InlineInfo inlineInfo)
+        private static void InsertInlineeArgument(InlineMethodInfo methodInfo, ref int afterStatementIndex, int argumentIndex, StackEntry argument, InlineInfo inlineInfo)
         {
             if (!inlineInfo.InlineArgumentInfos[argumentIndex].HasTemp)
                 return;
@@ -262,7 +312,7 @@ namespace ILCompiler.Compiler
 
             var storeStatement = new Statement(store);
 
-            method.Block.Statements.Insert(afterStatementIndex++, storeStatement);
+            methodInfo.Block.Statements.Insert(afterStatementIndex++, storeStatement);
         }
     }
 }

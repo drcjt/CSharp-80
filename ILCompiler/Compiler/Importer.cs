@@ -267,7 +267,7 @@ namespace ILCompiler.Compiler
                 _methodIL = methodIL;
             }
 
-            var basicBlockAnalyser = new BasicBlockAnalyser(Method, NameMangler, _methodIL);
+            var basicBlockAnalyser = new BasicBlockAnalyser(Method, NameMangler, _methodIL, this);
             var offsetToIndexMap = new Dictionary<int, int>();
             BasicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
@@ -410,24 +410,53 @@ namespace ILCompiler.Compiler
         public StackEntry InlineFetchArgument(int ilArgNum)
         {
             var inlineArgumentInfo = InlineInfo!.InlineArgumentInfos[ilArgNum];
+            var argumentCanBeModified = inlineArgumentInfo.HasLdargaOp || inlineArgumentInfo.HasStargOp;
 
-            if (inlineArgumentInfo.HasTemp)
+            StackEntry result;
+            if (inlineArgumentInfo.IsInvariant && !argumentCanBeModified)
             {
-                var callArgument = inlineArgumentInfo.Argument;
-                var tempNumber = inlineArgumentInfo.TempNumber;
-                return new LocalVariableEntry(tempNumber, callArgument.Type, callArgument.ExactSize);
+                // Directly substitute constants or addresses of locals
+                result = inlineArgumentInfo.Argument.Duplicate();
+            }
+            else if (inlineArgumentInfo.IsLocalVariable && !argumentCanBeModified)
+            {
+                // Directly substitute unaliased caller locals for arguments that cannot be modified
+
+                // Use the caller supplied node if this is the first use
+                result = inlineArgumentInfo.Argument;
+
+                // Use an equivalent copy if this is the second or later use
+                if (inlineArgumentInfo.IsUsed)
+                {
+                    var argLocal = inlineArgumentInfo.Argument.As<LocalVariableEntry>();
+                    result = new LocalVariableEntry(argLocal.LocalNumber, argLocal.Type, argLocal.ExactSize); 
+                }
             }
             else
             {
-                var callArgument = inlineArgumentInfo.Argument;
 
-                var tempNumber = GrabTemp(callArgument.Type, callArgument.ExactSize);
+                if (inlineArgumentInfo.HasTemp)
+                {
+                    var callArgument = inlineArgumentInfo.Argument;
+                    var tempNumber = inlineArgumentInfo.TempNumber;
+                    result = new LocalVariableEntry(tempNumber, callArgument.Type, callArgument.ExactSize);
+                }
+                else
+                {
+                    var callArgument = inlineArgumentInfo.Argument;
 
-                inlineArgumentInfo.HasTemp = true;
-                inlineArgumentInfo.TempNumber = tempNumber;
+                    var tempNumber = GrabTemp(callArgument.Type, callArgument.ExactSize);
 
-                return new LocalVariableEntry(tempNumber, callArgument.Type, callArgument.ExactSize);
+                    inlineArgumentInfo.HasTemp = true;
+                    inlineArgumentInfo.TempNumber = tempNumber;
+
+                    result = new LocalVariableEntry(tempNumber, callArgument.Type, callArgument.ExactSize);
+                }
             }
+
+            inlineArgumentInfo.IsUsed = true;
+
+            return result;
         }
 
         public int InlineFetchLocal(int localNumber)
@@ -476,6 +505,16 @@ namespace ILCompiler.Compiler
             {
                 throw new NotImplementedException();
             }
+        }
+
+        public int MapIlArgNum(int ilArgNum)
+        {
+            if (ReturnBufferArgIndex.HasValue && ilArgNum >= ReturnBufferArgIndex)
+            {
+                ilArgNum++;
+            }
+
+            return ilArgNum;
         }
     }
 }
