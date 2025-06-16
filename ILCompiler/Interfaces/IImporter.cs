@@ -42,5 +42,7 @@ namespace ILCompiler.Interfaces
         public TypeDesc? Constrained { get; set; }
 
         public bool StopImporting { get; set; }
+
+        public int MapIlArgNum(int ilArgNum);
     }
 }
