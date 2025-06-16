@@ -24,7 +24,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public MethodDesc? GetStaticConstructor()
         {
-            if (IsStaticConstructor)
+            if (IsStatic)
             {
                 var staticConstructorMethod = OwningType.GetStaticConstructor();
                 if (staticConstructorMethod != null && staticConstructorMethod.FullName != FullName)
