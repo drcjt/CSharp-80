@@ -27,39 +27,14 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             if (hasReturnValue)
             {
-                if (entry.ReturnBufferArgIndex.HasValue)
+                context.InstructionsBuilder.Pop(DE);            // Copy return value into DE/DE'
+
+                if (targetType?.Type.IsInt() ?? false)
                 {
-                    // Returning a struct
-
-                    // Load address of return buffer into HL
-                    var variable = context.LocalVariableTable[entry.ReturnBufferArgIndex.Value];
-                    context.InstructionsBuilder.Ld(H, __[IX + (short)-(variable.StackOffset - 1)]);
-                    context.InstructionsBuilder.Ld(L, __[IX + (short)-(variable.StackOffset - 0)]);
-
-                    context.InstructionsBuilder.Push(IX); // save IX to BC
-                    context.InstructionsBuilder.Pop(BC);
-
-                    context.InstructionsBuilder.Push(HL); // Move HL to IX
-                    context.InstructionsBuilder.Pop(IX);
-
-                    // Copy struct to the return buffer
-                    var returnTypeExactSize = entry.ReturnTypeExactSize ?? 0;
-                    CopyHelper.CopyFromStackToIX(context.InstructionsBuilder, returnTypeExactSize);
-
-                    context.InstructionsBuilder.Push(BC); // restore IX
-                    context.InstructionsBuilder.Pop(IX);
+                    context.InstructionsBuilder.Exx();
+                    context.InstructionsBuilder.Pop(DE);
+                    context.InstructionsBuilder.Exx();
                 }
-                else
-                {
-                    context.InstructionsBuilder.Pop(DE);            // Copy return value into DE/DE'
-
-                    if (targetType?.Type.IsInt() ?? false)
-                    {
-                        context.InstructionsBuilder.Exx();
-                        context.InstructionsBuilder.Pop(DE);
-                        context.InstructionsBuilder.Exx();
-                    }
-                }                
             }
 
             // Unwind stack frame
@@ -125,7 +100,7 @@ namespace ILCompiler.Compiler.CodeGenerators
                 CodeGeneratorHelper.AddSPFromHL(context.InstructionsBuilder, (short)(totalParametersSize));
             }
 
-            if (hasReturnValue && !entry.ReturnBufferArgIndex.HasValue)
+            if (hasReturnValue)
             {
                 if (targetType?.Type.IsInt() ?? false)
                 {

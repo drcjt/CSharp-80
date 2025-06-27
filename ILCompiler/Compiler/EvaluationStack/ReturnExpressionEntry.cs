@@ -5,7 +5,11 @@ namespace ILCompiler.Compiler.EvaluationStack
     public class ReturnExpressionEntry : StackEntry
     {
         public CallEntry InlineCandidate { get; set; }
-        public StackEntry? SubstExpr { get; set; } = null;
+
+        // Represents the inline candidate's value. This is null
+        // during the import that created the ReturnExpression
+        // and is set later when the inline candidate is processed.
+        public StackEntry? SubstitionExpression { get; set; }
 
         public ReturnExpressionEntry(CallEntry inlineCandidate) : base(inlineCandidate.Type, inlineCandidate.Method!.Signature.ReturnType.GetElementSize().AsInt)
         {

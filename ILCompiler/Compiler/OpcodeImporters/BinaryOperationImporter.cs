@@ -77,10 +77,12 @@ namespace ILCompiler.Compiler.OpcodeImporters
             {
                 return VarType.Ptr;
             }
-            else
+            else if (op1.Type == VarType.ByRef && op2.Type == VarType.ByRef)
             {
-                return VarType.Int;
+                return VarType.ByRef;
             }
+
+            return VarType.Int;
         }
     }
 }

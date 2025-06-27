@@ -66,7 +66,13 @@ namespace ILCompiler.Compiler.OpcodeImporters
             addr = new BinaryOperator(Operation.Add, isComparison: false, addr, arraySizeOffset, VarType.Ptr);
             addr = new BinaryOperator(Operation.Add, isComparison: false, arrayOp, addr, VarType.Ptr);
 
-            var op = new StoreIndEntry(addr, value, elemType, 0, elemSize);
+            StackEntry op = new StoreIndEntry(addr, value, elemType, 0, elemSize);
+
+            if (elemType == VarType.Struct)
+            {
+                op = importer.StoreStruct(op);
+            }
+
             importer.ImportAppendTree(op);
 
             return true;

@@ -61,7 +61,7 @@ namespace ILCompiler.Compiler
 
         public Statement WalkStatement(Statement statement)
         {
-            WalkTree(new Edge<StackEntry>(() => statement.RootNode, x => { }), null);
+            WalkTree(new Edge<StackEntry>(() => statement.RootNode, x => { statement.RootNode = x; }), null);
 
             return statement;
         }
@@ -85,7 +85,7 @@ namespace ILCompiler.Compiler
                 do
                 {
                     var returnExpression = inlineCandidate as ReturnExpressionEntry;
-                    inlineCandidate = returnExpression!.SubstExpr;
+                    inlineCandidate = returnExpression!.SubstitionExpression;
                 } while (inlineCandidate is ReturnExpressionEntry);
 
                 inlineCandidate = CodeFolder.FoldExpression(inlineCandidate!);
@@ -180,7 +180,7 @@ namespace ILCompiler.Compiler
 
                 if (method.HasReturnType)
                 {
-                    inlineInfo.InlineCandidateInfo!.ReturnExpressionEntry!.SubstExpr = methodInfo.Call;
+                    inlineInfo.InlineCandidateInfo!.ReturnExpressionEntry!.SubstitionExpression = methodInfo.Call;
 
                     // Need to blank out the original call node
                     methodInfo.Statement!.RootNode = new NothingEntry();
@@ -189,6 +189,8 @@ namespace ILCompiler.Compiler
                 // Need to undo some changes made during the inlining attempt
                 // Temps may have been allocated need to do this
                 methodInfo.Locals.ResetCount(startVars);
+
+                inlineInfo.InlineCall.IsInlineCandidate = false;
             }
 
             Debug.Assert(methodInfo.Locals.Count == startVars);

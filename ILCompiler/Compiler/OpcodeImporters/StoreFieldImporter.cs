@@ -36,7 +36,12 @@ namespace ILCompiler.Compiler.OpcodeImporters
             var fieldSize = field.FieldType.GetElementSize().AsInt;
             var fieldOffset = field.Offset.AsInt;
 
-            var node = new StoreIndEntry(addr, value, field.FieldType.VarType, (uint)fieldOffset, fieldSize);
+            StackEntry node = new StoreIndEntry(addr, value, field.FieldType.VarType, (uint)fieldOffset, fieldSize);
+
+            if (field.FieldType.VarType == VarType.Struct)
+            {
+                node = importer.StoreStruct(node);
+            }
 
             importer.ImportAppendTree(node, true);
 

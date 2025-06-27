@@ -49,19 +49,12 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
                     if (returnBufferArgIndex.HasValue)
                     {
-                        // If we have a return buffer, we need to store the struct into it
-                        importer.ImportAppendTree(StoreStructPtr(importer, returnValue, returnBufferArgIndex.Value));
-
-                        var returnBufferArg = (LocalVariableAddressEntry)importer.InlineInfo!.InlineCall.Arguments[returnBufferArgIndex.Value];
-
-                        var returnBufferLocalVariable = importer.InlineInfo!.InlineLocalVariableTable[returnBufferArg.LocalNumber];
-                        var returnBuffer = new LocalVariableEntry(returnBufferArg.LocalNumber, returnBufferLocalVariable.Type, returnBufferLocalVariable.ExactSize);
-
-                        returnExpressionEntry!.SubstExpr = returnBuffer;
+                        var returnBufferArg = importer.InlineInfo!.InlineCall.Arguments[returnBufferArgIndex.Value].Duplicate();
+                        returnExpressionEntry!.SubstitionExpression = StoreStructPtr(returnBufferArg, returnValue, importer);
                     }
                     else
                     {
-                        returnExpressionEntry!.SubstExpr = returnValue;
+                        returnExpressionEntry!.SubstitionExpression = returnValue;
                     }
                 }
             }
@@ -70,18 +63,36 @@ namespace ILCompiler.Compiler.OpcodeImporters
             {
                 return true;
             }
+
+            if (returnBufferArgIndex is not null)
+            {
+                var destination = new LocalVariableEntry(returnBufferArgIndex.Value, VarType.Ref, 2);
+                var storeInd = StoreStructPtr(destination, returnValue!, importer);
+                importer.ImportAppendTree(storeInd);
+
+                returnValue = null;
+            }
                 
-            var retNode = new ReturnEntry(returnValue, returnBufferArgIndex, returnTypeExactSize);
+            var retNode = new ReturnEntry(returnValue);
             importer.ImportAppendTree(retNode);
             importer.StopImporting = true;
 
             return true;
         }
 
-        private static StoreIndEntry StoreStructPtr(IImporter importer, StackEntry returnValue, int returnBufferArgIndex)
+        private static StackEntry StoreStructPtr(StackEntry destinationAddress, StackEntry value, IImporter importer)
         {
-            var destination = importer.InlineInfo!.InlineCall.Arguments[returnBufferArgIndex];
-            return new StoreIndEntry(destination, returnValue, VarType.Struct, 0, returnValue.ExactSize);
+            StackEntry? store;
+            if (destinationAddress is LocalVariableAddressEntry localVariableAddress)
+            {
+                store = new StoreLocalVariableEntry(localVariableAddress.LocalNumber, true, value, VarType.Struct, value.ExactSize);
+            }
+            else
+            {
+                store = new StoreIndEntry(destinationAddress, value, value.Type, 0, value.ExactSize);
+            }
+
+            return importer.StoreStruct(store);
         }
     }
 }

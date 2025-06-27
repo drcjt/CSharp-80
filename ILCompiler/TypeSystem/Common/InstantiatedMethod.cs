@@ -55,6 +55,8 @@ namespace ILCompiler.TypeSystem.Common
         public override bool IsNewSlot => _methodDesc.IsNewSlot;
         public override bool IsAbstract => _methodDesc.IsAbstract;
 
+        public override bool IsAggressiveInlining => _methodDesc.IsAggressiveInlining;
+
         public override bool HasThis => _methodDesc.HasThis;
 
         public override TypeSystemContext Context => _methodDesc.Context;

@@ -38,7 +38,7 @@ namespace ILCompiler.Compiler.EvaluationStack
     // which will be the main output of the importer
     public abstract class StackEntry : IVisitableStackEntry
     {
-        public VarType Type { get; }
+        public VarType Type { get; protected set; }
 
         public int? ExactSize { get; }
 

@@ -1,9 +1,8 @@
-﻿using ILCompiler.Compiler.LinearIR;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace ILCompiler.Compiler.EvaluationStack
 {
-    public class StoreIndEntry : StackEntry
+    public class StoreIndEntry : StackEntry, IStoreEntry
     {
         public StackEntry Addr { get; set; }
         public StackEntry Op1 { get; set; }
