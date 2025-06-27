@@ -10,6 +10,7 @@ namespace System.Runtime.InteropServices
         /// <summary>
         /// Returns a reference to the 0th element of <paramref name="array"/>
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref byte GetArrayDataReference(Array array)
         {
             // Arrays are laid out in memory as follows:

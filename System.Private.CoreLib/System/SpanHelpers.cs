@@ -4,6 +4,24 @@ namespace System
 {
     internal static class SpanHelpers
     {
+        internal static unsafe void Memmove(ref byte dest, ref byte src, nuint len)
+        {
+            if ((nuint)Unsafe.ByteOffset(ref src, ref dest) >= len)
+            {
+                for (nuint i = 0; i < len; i++)
+                {
+                    Unsafe.Add(ref dest, (nint)i) = Unsafe.Add(ref src, (nint)i);
+                }
+            }
+            else
+            {
+                for (nuint i = len; i > 0; i--)
+                {
+                    Unsafe.Add(ref dest, (nint)(i - 1)) = Unsafe.Add(ref src, (nint)(i - 1));
+                }
+            }
+        }
+
         public static bool SequenceEqual<T>(ref T first, ref T second, int length) where T : IEquatable<T>
         {
             int index = 0;

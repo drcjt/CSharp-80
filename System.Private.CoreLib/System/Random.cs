@@ -23,5 +23,10 @@
         {
             return Next() % maxValue;
         }
-   }
+
+        public int Next(int minValue, int maxValue)
+        {
+            return Next() % (maxValue - minValue) + minValue;
+        }
+    }
 }

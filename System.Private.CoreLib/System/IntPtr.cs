@@ -4,6 +4,9 @@
     {
         private readonly nint _value;
 
+        public static nint MaxValue => 32767;
+        public static nint MinValue => -32768;
+
         public unsafe IntPtr(void* value)
         {
             _value = (nint)value;

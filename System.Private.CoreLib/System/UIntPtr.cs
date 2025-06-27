@@ -4,6 +4,8 @@
     {
         private readonly nuint _value;
 
+        public static nint MaxValue => 65535;
+        public static nint MinValue => 0;
         public unsafe UIntPtr(void* value)
         {
             _value = (nuint)value;
