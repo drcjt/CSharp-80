@@ -365,7 +365,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
         private static StackEntry NormalizeStructValue(StackEntry argument, IImporter importer)
         {
-            if (argument is CallEntry callEntry)
+            if (argument is CallEntry)
             {
                 var temp = importer.GrabTemp(argument.Type, argument.ExactSize);
 

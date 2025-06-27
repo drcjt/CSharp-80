@@ -1,6 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Interfaces;
-using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.OpcodeImporters
@@ -13,7 +12,6 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             StackEntry? returnValue = null;
             int? returnBufferArgIndex = null;
-            int? returnTypeExactSize = null;
 
             if (importer.Method.HasReturnType)
             {
@@ -27,7 +25,6 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     // copy struct on top of stack to the 
                     // return buffer.
                     returnBufferArgIndex = importer.Method.HasThis ? 1 : 0;
-                    returnTypeExactSize = returnType.GetElementSize().AsInt;
                 }
                 else
                 {
