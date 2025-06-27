@@ -67,7 +67,12 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 value = CodeFolder.FoldExpression(new CastEntry(value, type));
             }
 
-            var node = new StoreIndEntry(addr, value, value.Type, fieldOffset: 0, exactSize);
+            StackEntry node = new StoreIndEntry(addr, value, value.Type, fieldOffset: 0, exactSize);
+
+            if (value.Type == VarType.Struct)
+            {
+                node = importer.StoreStruct(node);
+            }
 
             importer.ImportAppendTree(node);
 

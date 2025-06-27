@@ -41,7 +41,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             var value = importer.Pop();
 
-            var node = new StoreLocalVariableEntry(localNumber, false, value);
+            StackEntry node = importer.NewTempStore(localNumber, value);
             importer.ImportAppendTree(node, true);
 
             return true;

@@ -31,6 +31,7 @@ namespace System.Collections.Generic
 
     public sealed class ObjectEqualityComparer<T> : EqualityComparer<T>
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(T x, T y)
         {
             if (x is not null)
@@ -44,6 +45,7 @@ namespace System.Collections.Generic
 
         public override bool Equals(object? obj) => throw new NotImplementedException();
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode(T obj)
         {
             if (obj is not null)
@@ -57,6 +59,7 @@ namespace System.Collections.Generic
 
     public sealed class GenericEqualityComparer<T> : EqualityComparer<T> where T : IEquatable<T>
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(T x, T y)
         {
             if (x is not null)
@@ -65,11 +68,14 @@ namespace System.Collections.Generic
                 return false;
             }
             if (y is not null) return false;
+
             return true;
         }
 
         public override bool Equals(object? obj) => throw new NotImplementedException();
 
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode(T obj)
         {
             if (obj is not null)

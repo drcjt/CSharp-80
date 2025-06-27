@@ -15,6 +15,10 @@ namespace ILCompiler.Compiler.EvaluationStack
         public InlineCandidateInfo? InlineCandidateInfo{ get ;set; } = null;
         public MethodDesc? Method { get; }
 
+        public bool HasReturnBuffer { get; set; }
+
+        public void SetReturnType(VarType type) => Type = type;
+
         public CallEntry(string targetMethod, IList<StackEntry> arguments, VarType returnType, int? returnSize, bool isVirtual = false, MethodDesc? method = null, bool isInlineCandidate = false) : base(returnType, returnSize)
         {
             TargetMethod = targetMethod;
@@ -27,6 +31,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         public override StackEntry Duplicate()
         {
             var duplicate = new CallEntry(TargetMethod, Arguments, Type, ExactSize, IsVirtual, Method, IsInlineCandidate);
+            duplicate.HasReturnBuffer = HasReturnBuffer;
             duplicate.InlineInfo = InlineInfo;
             duplicate.InlineCandidateInfo = InlineCandidateInfo;
             return duplicate;

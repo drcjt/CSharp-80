@@ -18,6 +18,8 @@ namespace System
 
         public int Length => Unsafe.As<RawArrayData>(this).Length;
 
+        public static int MaxLength => 65535;
+
         public unsafe ushort ElementSize => this.GetMethodTable()->ComponentSize;
 
         public static void Copy(object?[] source, object?[] destination, int length)

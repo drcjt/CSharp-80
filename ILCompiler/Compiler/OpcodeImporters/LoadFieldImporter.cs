@@ -89,7 +89,8 @@ namespace ILCompiler.Compiler.OpcodeImporters
             // Copy the struct to a new temp local variable
             // and then return the address of the new temp local variable
             var lclNum = importer.GrabTemp(structVal.Type, structVal.ExactSize);
-            var asg = new StoreLocalVariableEntry(lclNum, false, structVal);
+            StackEntry asg = importer.NewTempStore(lclNum, structVal);
+
             importer.ImportAppendTree(asg);
 
             return new LocalVariableAddressEntry(lclNum);

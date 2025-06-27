@@ -5,6 +5,7 @@ using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using PreinitializationManager = ILCompiler.Compiler.PreInit.PreinitializationManager;
 namespace ILCompiler.Compiler
 {
@@ -130,7 +131,7 @@ namespace ILCompiler.Compiler
                 ImportSpillAppendTree(entry);
             }
             else
-            {                
+            {
                 _currentBasicBlock?.Statements.Add(new Statement(entry));
             }
         }
@@ -290,7 +291,7 @@ namespace ILCompiler.Compiler
             for (int i = 0; i < BasicBlocks.Length; i++)
             {
                 if (BasicBlocks[i] != null)
-                {                    
+                {
                     importedBasicBlocks.Add(BasicBlocks[i]);
                 }
             }
@@ -429,7 +430,7 @@ namespace ILCompiler.Compiler
                 if (inlineArgumentInfo.IsUsed)
                 {
                     var argLocal = inlineArgumentInfo.Argument.As<LocalVariableEntry>();
-                    result = new LocalVariableEntry(argLocal.LocalNumber, argLocal.Type, argLocal.ExactSize); 
+                    result = new LocalVariableEntry(argLocal.LocalNumber, argLocal.Type, argLocal.ExactSize);
                 }
             }
             else
@@ -515,6 +516,89 @@ namespace ILCompiler.Compiler
             }
 
             return ilArgNum;
+        }
+
+        public StackEntry StoreStruct(StackEntry node)
+        {
+            if (node is IStoreEntry store)
+            {
+                if (store.Op1 is CallEntry call)
+                {
+                    Debug.Assert(call.Method != null);
+                    Debug.Assert(call.Method.HasReturnType);
+                    if (call.Method.Signature.ReturnType.VarType == VarType.Struct)
+                    {
+                        // If the call returns a struct, we need to store it in a local variable
+                        var destinationAddress = GetNodeAddress(node);
+
+                        // Insert the return buffer into the argument list of the call as first byref parameter after the this pointer
+                        var hasThis = call.Method!.HasThis;
+                        call.Arguments.Insert(hasThis ? 1 : 0, destinationAddress);
+                    }
+
+                    return call;
+                }
+                else if (store.Op1 is ReturnExpressionEntry returnExpression)
+                {
+                    var inlineCall = returnExpression.InlineCandidate;
+
+                    var destinationAddress = GetNodeAddress(node);
+
+                    // Insert the return buffer into the argument list of the call as first byref parameter after the this pointer
+                    var hasThis = inlineCall.Method!.HasThis;
+                    inlineCall.Arguments.Insert(hasThis ? 1 : 0, destinationAddress);
+
+                    inlineCall.SetReturnType(VarType.Void);
+
+                    return returnExpression;
+                }
+                else if (store.Op1 is CommaEntry comma)
+                {
+                    // TODO: Handle comma entry
+                    throw new NotImplementedException("StoreStruct does not support CommaEntry yet");
+                }
+            }
+
+            return node;
+        }
+
+        public StackEntry GetNodeAddress(StackEntry value)
+        {
+            if (value is IndirectEntry indirectEntry)
+            {
+                return indirectEntry.Op1;
+            }
+            if (value is StoreIndEntry storeIndirect)
+            {
+                return storeIndirect.Addr;
+            }
+            else if (value is LocalVariableEntry localVariable)
+            {
+                return new LocalVariableAddressEntry(localVariable.LocalNumber);
+            }
+            else if (value is StoreLocalVariableEntry storeLocalVariable)
+            {
+                return new LocalVariableAddressEntry(storeLocalVariable.LocalNumber);
+            }
+            else
+            {
+                var localNumber = GrabTemp(value.Type, value.ExactSize);
+                StackEntry storeToTemp = NewTempStore(localNumber, value);
+                ImportAppendTree(storeToTemp, true);
+
+                return new LocalVariableAddressEntry(localNumber);
+            }
+        }
+
+        public StackEntry NewTempStore(int tempNumber, StackEntry value)
+        {
+            StackEntry store = new StoreLocalVariableEntry(tempNumber, false, value);
+            if (value.Type == VarType.Struct)
+            {
+                store = StoreStruct(store);
+            }
+
+            return store;
         }
     }
 }

@@ -38,6 +38,11 @@ namespace ILCompiler.Compiler.OpcodeImporters
             {
                 var argument = importer.Pop();
 
+                if (argument.Type == VarType.Struct)
+                {
+                    argument = NormalizeStructValue(argument, importer);
+                }
+
                 var parameter = methodToCall.Signature[i];
                 var parameterType = parameter;
 
@@ -164,15 +169,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 throw new NotSupportedException("Non direct calls to generic methods not supported");
             }
 
-            int returnBufferArgIndex = 0;
             var returnType = methodToCall.Signature.ReturnType;
-            if (methodToCall.HasReturnType)
-            {
-                if (returnType.IsValueType && !returnType.IsPrimitive && !returnType.IsEnum)
-                {
-                    returnBufferArgIndex = FixupCallStructReturn(returnType, arguments, importer, methodToCall.HasThis);
-                }
-            }
 
             int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetElementSize().AsInt : null;
 
@@ -187,9 +184,10 @@ namespace ILCompiler.Compiler.OpcodeImporters
             {
                 if (callNode.IsInlineCandidate)
                 {
+                    // Split call into two parts: the call itself and the return expression
                     importer.ImportAppendTree(callNode, true);
 
-                    ReturnExpressionEntry returnExpression = new ReturnExpressionEntry(callNode);
+                    ReturnExpressionEntry returnExpression = new(callNode);
 
                     var inlineCandidateInfo = new InlineCandidateInfo
                     {
@@ -201,33 +199,9 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 }
                 else
                 {
-                    if (returnType.IsValueType && !returnType.IsPrimitive && !returnType.IsEnum)
-                    {
-                        importer.ImportAppendTree(callNode, true);
-
-                        // Load return buffer to stack
-                        var loadTemp = new LocalVariableEntry(returnBufferArgIndex, returnType.VarType, returnType.GetElementSize().AsInt);
-                        importer.Push(loadTemp);
-                    }
-                    else
-                    {
-                        importer.Push(callNode);
-                    }
+                    importer.Push(callNode);
                 }
             }
-        }
-
-        static private int FixupCallStructReturn(TypeDesc returnType, List<StackEntry> arguments, IImporter importer, bool hasThis)
-        {
-            // Create temp
-            var lclNum = importer.GrabTemp(returnType.VarType, returnType.GetElementSize().AsInt);
-            var returnBufferPtr = new LocalVariableAddressEntry(lclNum);
-
-            // Ensure return buffer parameter goes after the this parameter if present
-            var returnBufferArgPos = hasThis ? 1 : 0;
-            arguments.Insert(returnBufferArgPos, returnBufferPtr);
-
-            return lclNum;
         }
 
         private static string ImportInternalCall(MethodDesc methodToCall)
@@ -387,6 +361,22 @@ namespace ILCompiler.Compiler.OpcodeImporters
         private static IndirectEntry DereferenceThisPtr(StackEntry thisPtr, TypeDesc thisType)
         {
             return new IndirectEntry(thisPtr, thisType.VarType, thisType.GetElementSize().AsInt);
+        }
+
+        private static StackEntry NormalizeStructValue(StackEntry argument, IImporter importer)
+        {
+            if (argument is CallEntry)
+            {
+                var temp = importer.GrabTemp(argument.Type, argument.ExactSize);
+
+                // Import store to temp
+                StackEntry store = importer.NewTempStore(temp, argument);
+                importer.ImportAppendTree(store);
+
+                argument = new LocalVariableEntry(temp, argument.Type, argument.ExactSize);
+            }
+
+            return argument;
         }
     }
 }

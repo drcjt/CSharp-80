@@ -44,5 +44,11 @@ namespace ILCompiler.Interfaces
         public bool StopImporting { get; set; }
 
         public int MapIlArgNum(int ilArgNum);
+
+        public StackEntry StoreStruct(StackEntry node);
+
+        public StackEntry GetNodeAddress(StackEntry value);
+
+        public StackEntry NewTempStore(int tempNumber, StackEntry value);
     }
 }

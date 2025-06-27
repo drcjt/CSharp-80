@@ -29,6 +29,8 @@ namespace ILCompiler.Compiler.CodeGenerators
             { Tuple.Create(Operation.Rsh, VarType.Ptr), "i_rsh16" },
             { Tuple.Create(Operation.And, VarType.Ptr), "i_and16" },
             { Tuple.Create(Operation.Or, VarType.Ptr), "i_or16" },
+
+            { Tuple.Create(Operation.Sub, VarType.ByRef), "i_sub16" },
         };
 
         private static bool IsAddOrSub(BinaryOperator op) => op.Operation == Operation.Add || op.Operation == Operation.Sub;
