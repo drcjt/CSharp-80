@@ -1,4 +1,5 @@
-﻿using ILCompiler.Interfaces;
+﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.OpcodeImporters
@@ -13,8 +14,8 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             // Need to spill result removed from stack to a temp that will never be used
             var localNumber = importer.GrabTemp(op1.Type, op1.ExactSize);
-            var storeToTemp = importer.NewTempStore(localNumber, op1);
-            importer.ImportAppendTree(storeToTemp);
+            StackEntry store = new StoreLocalVariableEntry(localNumber, false, op1);
+            importer.ImportAppendTree(store);
 
             return true;
         }
