@@ -56,8 +56,9 @@ namespace ILCompiler.Compiler.OpcodeImporters
             {
                 return op;
             }
-            if (tree.Operation == Operation.Sub && value == 0)
+            if (tree.Operation == Operation.Sub && tree.Op1 == op && value == 0)
             {
+                // Subtracting zero from something is a no-op
                 return op;
             }
 
