@@ -35,6 +35,24 @@ namespace ILCompiler.Compiler.OpcodeImporters
             var op2 = importer.Pop();
             var op1 = importer.Pop();
 
+            // If one of the values is a native int then cast the other to be native int too
+            if (op1.Type == VarType.Ptr || op2.Type == VarType.Ptr)
+            {
+                if (op1.Type != VarType.Ptr)
+                {
+                    var cast = new CastEntry(op1, VarType.Ptr);
+                    op1 = cast;
+                }
+                if (op2.Type != VarType.Ptr)
+                {
+                    var cast = new CastEntry(op2, VarType.Ptr);
+                    op2 = cast;
+                }
+            }
+
+            op1 = CodeFolder.FoldExpression(op1);
+            op2 = CodeFolder.FoldExpression(op2);
+
             // Handle special case of int+0, int-0, int*1, int/1
             // All of these just turn into int
             if ((op2.IsIntegralConstant(0) && (binaryOp == Operation.Add || binaryOp == Operation.Sub)) ||
@@ -48,21 +66,6 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
                 importer.Push(op1);
                 return true;
-            }
-
-            // If one of the values is a native int then cast the other to be native int too
-            if (op1.Type == VarType.Ptr || op2.Type == VarType.Ptr)
-            {
-                if (op1.Type != VarType.Ptr)
-                {
-                    var cast = CodeFolder.FoldExpression(new CastEntry(op1, VarType.Ptr));
-                    op1 = cast;
-                }
-                if (op2.Type != VarType.Ptr)
-                {
-                    var cast = CodeFolder.FoldExpression(new CastEntry(op2, VarType.Ptr));
-                    op2 = cast;
-                }
             }
 
             var binaryExpr = new BinaryOperator(binaryOp, isComparison: false, op1, op2, GetResultType(op1, op2));

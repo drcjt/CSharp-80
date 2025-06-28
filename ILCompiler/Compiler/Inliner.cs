@@ -75,6 +75,11 @@ namespace ILCompiler.Compiler
             }
         }
 
+        public override void PostOrderVisit(Edge<StackEntry> use, StackEntry? user)
+        {
+            use.Set(CodeFolder.FoldExpression(use.Get()!));
+        }
+
         private static void UpdateInlineReturnExpressionPlaceHolder(Edge<StackEntry> use, StackEntry? user)
         {
             while (use.Get() is ReturnExpressionEntry)
@@ -200,15 +205,31 @@ namespace ILCompiler.Compiler
 
         private static InlineInfo InitVars(InlineMethodInfo methodInfo)
         {
+            int returnBufferArgIndex = -1;
+            if (methodInfo.Call.HasReturnBuffer)
+            {
+                var hasThis = methodInfo.Call.Method!.HasThis;
+                returnBufferArgIndex = hasThis ? 1 : 0;
+            }
+
+            var argumentCount = methodInfo.Call.Arguments.Count - (methodInfo.Call.HasReturnBuffer ? 1 : 0);
+
             var inlineInfo = new InlineInfo
             {
                 InlineCall = methodInfo.Call,
                 InlineLocalVariableTable = methodInfo.Locals,
-                InlineArgumentInfos = new InlineArgumentInfo[methodInfo.Call.Arguments.Count]
+                InlineArgumentInfos = new InlineArgumentInfo[argumentCount]
             };
 
+            int inlineArgumentIndex = 0;
             for (int i = 0; i < methodInfo.Call.Arguments.Count; i++)
             {
+                if (returnBufferArgIndex >= 0 && i == returnBufferArgIndex)
+                {
+                    // Skip the return buffer argument
+                    continue;
+                }
+
                 var argument = methodInfo.Call.Arguments[i];
 
                 if (argument is PutArgTypeEntry putArgType)
@@ -222,7 +243,7 @@ namespace ILCompiler.Compiler
 
                 RecordArgumentInfo(argument, inlineArgumentInfo);
 
-                inlineInfo.InlineArgumentInfos[i] = inlineArgumentInfo;
+                inlineInfo.InlineArgumentInfos[inlineArgumentIndex++] = inlineArgumentInfo;
             }
 
             var method = methodInfo.Call.Method!;
@@ -274,10 +295,24 @@ namespace ILCompiler.Compiler
         {
             // TODO: check if nullcheck required for this pointer
 
+            int returnBufferArgIndex = -1;
+            if (methodInfo.Call.HasReturnBuffer)
+            {
+                var hasThis = methodInfo.Call.Method!.HasThis;
+                returnBufferArgIndex = hasThis ? 1 : 0;
+            }
+
+            int inlineArgumentIndex = 0;
             var arguments = methodInfo.Call.Arguments;
             for (int argumentIndex = 0; argumentIndex < arguments.Count; argumentIndex++)
             {
-                InsertInlineeArgument(methodInfo, ref afterStatementIndex, argumentIndex, arguments[argumentIndex], inlineInfo);
+                if (returnBufferArgIndex >= 0 && argumentIndex == returnBufferArgIndex)
+                {
+                    // Skip the return buffer argument
+                    continue;
+                }
+
+                InsertInlineeArgument(methodInfo, ref afterStatementIndex, inlineArgumentIndex++, arguments[argumentIndex], inlineInfo);
             }
 
             // Add cctor check if necessary

@@ -534,6 +534,7 @@ namespace ILCompiler.Compiler
                         // Insert the return buffer into the argument list of the call as first byref parameter after the this pointer
                         var hasThis = call.Method!.HasThis;
                         call.Arguments.Insert(hasThis ? 1 : 0, destinationAddress);
+                        call.HasReturnBuffer = true;
                     }
 
                     return call;
@@ -547,6 +548,7 @@ namespace ILCompiler.Compiler
                     // Insert the return buffer into the argument list of the call as first byref parameter after the this pointer
                     var hasThis = inlineCall.Method!.HasThis;
                     inlineCall.Arguments.Insert(hasThis ? 1 : 0, destinationAddress);
+                    inlineCall.HasReturnBuffer = true;
 
                     inlineCall.SetReturnType(VarType.Void);
 
