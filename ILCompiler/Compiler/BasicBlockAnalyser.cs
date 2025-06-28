@@ -232,11 +232,10 @@ namespace ILCompiler.Compiler
                         {
                             var parameter = (ParameterDefinition)currentInstruction.Operand;
                             var index = parameter.Index;
-                            var localNumber = _importer!.MapIlArgNum(index);
 
                             if (_importer!.Inlining)
                             {
-                                _importer.InlineInfo!.InlineArgumentInfos[localNumber].HasLdargaOp = true;
+                                _importer.InlineInfo!.InlineArgumentInfos[index].HasLdargaOp = true;
                             }
                         }
                         break;
@@ -246,11 +245,10 @@ namespace ILCompiler.Compiler
                         {
                             var parameter = (ParameterDefinition)currentInstruction.Operand;
                             var index = parameter.Index;
-                            var localNumber = _importer!.MapIlArgNum(index);
 
                             if (_importer!.Inlining)
                             {
-                                _importer.InlineInfo!.InlineArgumentInfos[localNumber].HasStargOp = true;
+                                _importer.InlineInfo!.InlineArgumentInfos[index].HasStargOp = true;
                             }
                         }
                         break;

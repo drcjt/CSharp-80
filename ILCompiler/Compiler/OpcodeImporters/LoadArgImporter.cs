@@ -29,16 +29,16 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     return false;
             }
 
-            var lclNum = importer.MapIlArgNum(index);
 
             if (importer.Inlining)
             {
                 // Need to get arg from inline info.
-                var node = importer.InlineFetchArgument(lclNum);
+                var node = importer.InlineFetchArgument(index);
                 importer.Push(node);
             }
             else
             {
+                var lclNum = importer.MapIlArgNum(index);
                 var argument = importer.LocalVariableTable[lclNum];
                 var node = new LocalVariableEntry(lclNum, argument.Type, argument.ExactSize);
                 importer.Push(node);

@@ -15,7 +15,6 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 case ILOpcode.ldarga_s:
                     var parameter = (ParameterDefinition)instruction.Operand;
                     var index = parameter.Index;
-                    var localNumber = importer.MapIlArgNum(index);
 
                     if (importer.Inlining)
                     {
@@ -25,6 +24,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     }
                     else
                     {
+                        var localNumber = importer.MapIlArgNum(index);
                         importer.Push(new LocalVariableAddressEntry(localNumber));
                         importer.LocalVariableTable[localNumber].AddressExposed = true;
                     }
