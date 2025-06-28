@@ -12,6 +12,55 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 return FoldConstantExpression(tree);
             }
 
+            if (tree is BinaryOperator binaryOperator)
+            {
+                if (binaryOperator.Op1.IsIntCnsOrI() || binaryOperator.Op2.IsIntCnsOrI())
+                {
+                    return FoldBinaryOpWithOneConstantOperand(binaryOperator);
+                }
+            }
+
+            return tree;
+        }
+
+        public static StackEntry FoldBinaryOpWithOneConstantOperand(BinaryOperator tree)
+        {
+            StackEntry op;
+            StackEntry constant;
+            if (tree.Op1.IsIntCnsOrI())
+            {
+                op = tree.Op2;
+                constant = tree.Op1;
+            }
+            else if (tree.Op2.IsIntCnsOrI())
+            {
+                op = tree.Op1;
+                constant = tree.Op2;
+            }
+            else
+            {
+                return tree;
+            }
+
+            var value = constant.GetIntConstant();
+
+            if (tree.Operation == Operation.Add && value == 0)
+            {
+                return op;
+            }
+            if (tree.Operation == Operation.Mul && value == 1)
+            {
+                return op;
+            }
+            if (tree.Operation == Operation.Div && value == 1)
+            {
+                return op;
+            }
+            if (tree.Operation == Operation.Sub && value == 0)
+            {
+                return op;
+            }
+
             return tree;
         }
 
