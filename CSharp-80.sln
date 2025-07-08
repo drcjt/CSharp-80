@@ -298,6 +298,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inline_STARG", "Tests\Optim
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Inline_MethodWithCctor", "Tests\Optimisation\Inlining\Inline_MethodWithCctor.csproj", "{8789999D-210C-6C9A-5C34-43BA599DC2C4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ifelse", "Tests\Optimisation\Inlining\ifelse.csproj", "{272C7898-2E4D-D1D9-6406-0D5B38B5D31D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -744,6 +746,10 @@ Global
 		{8789999D-210C-6C9A-5C34-43BA599DC2C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8789999D-210C-6C9A-5C34-43BA599DC2C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8789999D-210C-6C9A-5C34-43BA599DC2C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{272C7898-2E4D-D1D9-6406-0D5B38B5D31D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{272C7898-2E4D-D1D9-6406-0D5B38B5D31D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{272C7898-2E4D-D1D9-6406-0D5B38B5D31D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{272C7898-2E4D-D1D9-6406-0D5B38B5D31D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -872,6 +878,7 @@ Global
 		{FEE4723E-D949-7DE8-CB8A-A7F3C88E59EF} = {8EF936C7-55DF-45A1-BBF7-E107690773CB}
 		{1A1067AA-4C82-B634-C04D-F286F3F16FBD} = {8EF936C7-55DF-45A1-BBF7-E107690773CB}
 		{8789999D-210C-6C9A-5C34-43BA599DC2C4} = {8EF936C7-55DF-45A1-BBF7-E107690773CB}
+		{272C7898-2E4D-D1D9-6406-0D5B38B5D31D} = {8EF936C7-55DF-45A1-BBF7-E107690773CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8386495B-97A2-4105-9FFF-71902F2E61B8}
