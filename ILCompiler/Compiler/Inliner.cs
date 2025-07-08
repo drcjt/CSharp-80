@@ -189,6 +189,7 @@ namespace ILCompiler.Compiler
                 if (inlineSucceeded)
                 {
                     _logger.LogInformation("Inlined call to method: {MethodName}", method.FullName);
+                    return;
                 }
 
                 if (method.HasReturnType)
