@@ -148,7 +148,7 @@ namespace ILCompiler.Compiler
                                 Block = block,
                                 Locals = locals,
                             };
-                            callInlined = MorphCallInline(inlineMethodInfo);
+                            MorphCallInline(inlineMethodInfo);
                         }
 
                         // Skip over the statement that has either not been inlined
@@ -161,7 +161,7 @@ namespace ILCompiler.Compiler
             } while (blockIndex < blocks.Count);
         }
 
-        private bool MorphCallInline(InlineMethodInfo methodInfo)
+        private void MorphCallInline(InlineMethodInfo methodInfo)
         {
             var method = methodInfo.Call.Method;
             if (method is null)
@@ -189,7 +189,6 @@ namespace ILCompiler.Compiler
                 if (inlineSucceeded)
                 {
                     _logger.LogInformation("Inlined call to method: {MethodName}", method.FullName);
-                    return true;
                 }
 
                 if (method.HasReturnType)
@@ -208,8 +207,6 @@ namespace ILCompiler.Compiler
             }
 
             Debug.Assert(methodInfo.Locals.Count == startVars);
-
-            return false;
         }
 
         private static InlineInfo InitVars(InlineMethodInfo methodInfo)
