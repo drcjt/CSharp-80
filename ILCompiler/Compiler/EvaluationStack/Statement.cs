@@ -2,6 +2,7 @@
 {
     public class Statement
     {
+        public int StartOffset { get; set; }
         public StackEntry RootNode { get; set; }
 
         public List<StackEntry> TreeList { get; set; } = [];

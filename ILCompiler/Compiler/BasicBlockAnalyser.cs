@@ -36,8 +36,11 @@ namespace ILCompiler.Compiler
     public class BasicBlockAnalyser
     {
         private readonly INameMangler _nameMangler;
+        private readonly MethodDesc _method;
         private readonly MethodIL _methodIL;
         private readonly IImporter? _importer;
+
+        public int ReturnCount { get; set; }
 
         public BasicBlockAnalyser(MethodDesc method, MethodIL? methodIL = null) : this(method, new NameMangler(), methodIL)
         {
@@ -45,6 +48,7 @@ namespace ILCompiler.Compiler
 
         public BasicBlockAnalyser(MethodDesc method, INameMangler nameMangler, MethodIL? methodIL = null, IImporter? importer = null)
         {
+            _method = method;
             _nameMangler = nameMangler;
             if (methodIL == null)
             {
@@ -65,9 +69,21 @@ namespace ILCompiler.Compiler
             var maxOffset = (int)lastInstruction.Offset + lastInstruction.GetSize();
             var basicBlocks = new BasicBlock[maxOffset];
 
-            CreateBasicBlock(basicBlocks, 0);
+            var jumpTargets = FindJumpTargets(offsetToIndexMap);
+            MakeBasicBlocks(jumpTargets, basicBlocks);
 
-            FindJumpTargets(basicBlocks, offsetToIndexMap);
+            // Use a spill temp for the return value if there are multiple return blocks
+            if (_importer is not null && _importer.Inlining)
+            {
+                if (_method.HasReturnType && ReturnCount > 1)
+                {
+                    // Create the spill temp
+                    var returnType = _method.Signature.ReturnType;
+                    var spillTempNumber = _importer.GrabTemp(returnType.VarType, returnType.GetElementSize().AsInt);
+                    _importer.InlineInfo!.InlineeReturnSpillTempNumber = spillTempNumber;
+                }
+            }
+
             FindEHTargets(basicBlocks, ehClauses);
 
             return basicBlocks;
@@ -144,23 +160,123 @@ namespace ILCompiler.Compiler
             return basicBlock;
         }
 
-        private void FindJumpTargets(BasicBlock[] basicBlocks, IDictionary<int, int> offsetToIndexMap)
+        private void MakeBasicBlocks(List<int> jumpTargets, BasicBlock[] basicBlocks)
         {
             var currentIndex = 0;
             var currentOffset = 0;
+            var startOffset = 0;
 
-            var currentBlock = basicBlocks[0];
+            JumpKind? jumpKind = null;
+
+            while (currentIndex < _methodIL.Instructions.Count)
+            {
+                var currentInstruction = _methodIL.Instructions[currentIndex];
+
+                switch (currentInstruction.Opcode)
+                {
+                    case ILOpcode.blt_un:
+                    case ILOpcode.ble_un:
+                    case ILOpcode.bgt_un:
+                    case ILOpcode.bge_un:
+                    case ILOpcode.bne_un:
+                    case ILOpcode.blt:
+                    case ILOpcode.ble:
+                    case ILOpcode.bgt:
+                    case ILOpcode.bge:
+                    case ILOpcode.beq:
+                    case ILOpcode.brfalse:
+                    case ILOpcode.brtrue:
+                    case ILOpcode.blt_un_s:
+                    case ILOpcode.ble_un_s:
+                    case ILOpcode.bgt_un_s:
+                    case ILOpcode.bge_un_s:
+                    case ILOpcode.bne_un_s:
+                    case ILOpcode.blt_s:
+                    case ILOpcode.ble_s:
+                    case ILOpcode.bgt_s:
+                    case ILOpcode.bge_s:
+                    case ILOpcode.beq_s:
+                    case ILOpcode.brfalse_s:
+                    case ILOpcode.brtrue_s:
+                        jumpKind = JumpKind.Conditional;
+                        break;
+
+                    case ILOpcode.br_s:
+                    case ILOpcode.leave_s:
+                    case ILOpcode.br:
+                    case ILOpcode.leave:
+                        jumpKind = JumpKind.Always;
+                        break;
+
+                    case ILOpcode.throw_:
+                    case ILOpcode.rethrow:
+                        jumpKind = JumpKind.Always;
+                        break;
+
+                    case ILOpcode.switch_:
+                        jumpKind = JumpKind.Switch;
+                        break;
+
+                    case ILOpcode.jmp:
+                    case ILOpcode.ret:
+                        jumpKind = JumpKind.Return;
+                        break;
+
+                    default:
+                        break;
+                }
+
+                if (jumpKind is null)
+                {
+                    var nextOffset = currentOffset + currentInstruction.GetSize();
+                    var endOfBlock = jumpTargets.Contains(nextOffset);
+
+                    if (endOfBlock)
+                    {
+                        var basicBlock = CreateBasicBlock(basicBlocks, startOffset);
+                        basicBlock.EndOffset = nextOffset;
+                        basicBlock.JumpKind = JumpKind.Always;
+
+                        startOffset = nextOffset;
+                    }
+                }
+                else
+                {
+                    var nextOffset = currentOffset + currentInstruction.GetSize();
+
+                    var basicBlock = CreateBasicBlock(basicBlocks, startOffset);
+                    basicBlock.EndOffset = nextOffset;
+                    basicBlock.JumpKind = jumpKind.Value;
+
+                    startOffset = nextOffset;
+                }
+
+                jumpKind = null;
+
+                currentOffset += currentInstruction.GetSize();
+                currentIndex++;
+            }
+
+            if (startOffset != currentOffset)
+            {
+                // Create the last block if it has not been created
+                var basicBlock = CreateBasicBlock(basicBlocks, startOffset);
+                basicBlock.EndOffset = currentOffset;
+                basicBlock.JumpKind = JumpKind.Always;
+            }
+        }
+
+        private List<int> FindJumpTargets(IDictionary<int, int> offsetToIndexMap)
+        {
+            var jumpTargets = new List<int>();
+
+            var currentIndex = 0;
+            var currentOffset = 0;
 
             while (currentIndex < _methodIL.Instructions.Count)
             {
                 offsetToIndexMap[currentOffset] = currentIndex;
                 var currentInstruction = _methodIL.Instructions[currentIndex];
-
-                if (basicBlocks[currentOffset] != null)
-                {
-                    currentBlock.EndOffset = currentOffset;
-                    currentBlock = basicBlocks[currentOffset];
-                }
                 
                 switch (currentInstruction.Opcode)
                 {
@@ -189,12 +305,11 @@ namespace ILCompiler.Compiler
                     case ILOpcode.brfalse_s:
                     case ILOpcode.brtrue_s:
                         {
-                            currentBlock.JumpKind = JumpKind.Conditional;
                             var target = (Instruction)currentInstruction.Operand;
                             var targetOffset = target.Offset;
-                            CreateBasicBlock(basicBlocks, (int)targetOffset); // target of jump                            
+                            jumpTargets.Add((int)targetOffset);
                             var nextInstructionOffset = currentOffset + currentInstruction.GetSize();
-                            CreateBasicBlock(basicBlocks, nextInstructionOffset); // instruction after jump
+                            jumpTargets.Add(nextInstructionOffset);
                         }
                         break;
 
@@ -203,28 +318,26 @@ namespace ILCompiler.Compiler
                     case ILOpcode.br:
                     case ILOpcode.leave:
                         {
-                            currentBlock.JumpKind = JumpKind.Always;
                             var target = (Instruction)currentInstruction.Operand;
-                            CreateBasicBlock(basicBlocks, (int)target.Offset); // target of jump
+                            jumpTargets.Add((int)target.Offset);
                         }
                         break;
 
                     case ILOpcode.ret:
                         {
-                            currentBlock.JumpKind = JumpKind.Return;
+                            ReturnCount++;
                         }
                         break;
 
                     case ILOpcode.switch_:
                         {
-                            currentBlock.JumpKind = JumpKind.Switch;
                             var instructions = (Instruction[])currentInstruction.Operand;
                             foreach (var target in instructions)
                             {
-                                CreateBasicBlock(basicBlocks, (int)target.Offset); // target of jump
+                                jumpTargets.Add((int)target.Offset);
                             }
                             var nextInstructionOffset = currentOffset + currentInstruction.GetSize();
-                            CreateBasicBlock(basicBlocks, nextInstructionOffset); // instruction after jump
+                            jumpTargets.Add(nextInstructionOffset);
                         }
                         break;
                     case ILOpcode.ldarga:
@@ -258,7 +371,7 @@ namespace ILCompiler.Compiler
                 currentIndex++;
             }
 
-            currentBlock.EndOffset = currentOffset;
+            return jumpTargets;
         }
     }
 }

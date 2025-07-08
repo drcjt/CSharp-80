@@ -88,6 +88,15 @@ namespace ILCompiler.Compiler
                     currentNode = currentNode.Next;
                 }
 
+                if (block.JumpKind == JumpKind.Always)
+                {
+                    var nonHandlerSuccessors = block.Successors.Where(s => !s.HandlerStart).ToList();
+                    if (nonHandlerSuccessors.Count == 1)
+                    {
+                        _context.InstructionsBuilder.Jp(nonHandlerSuccessors[0].Label);
+                    }
+                }
+
                 methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
             }
             // Emit end of method label

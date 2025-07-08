@@ -44,6 +44,8 @@ namespace ILCompiler.Compiler
         public LocalVariableInfo[] LocalVariableInfos { get; set; } = [];
         public required LocalVariableTable InlineLocalVariableTable { get; set; }
 
+        public int? InlineeReturnSpillTempNumber { get; set; } = null;
+
         public InlineCandidateInfo? InlineCandidateInfo { get; set; } = null;
         public MethodDesc? StaticConstructorMethod { get; set; } = null;
     }
@@ -90,7 +92,7 @@ namespace ILCompiler.Compiler
                 do
                 {
                     var returnExpression = inlineCandidate as ReturnExpressionEntry;
-                    inlineCandidate = returnExpression!.SubstitionExpression;
+                    inlineCandidate = returnExpression!.SubstitutionExpression;
                 } while (inlineCandidate is ReturnExpressionEntry);
 
                 inlineCandidate = CodeFolder.FoldExpression(inlineCandidate!);
@@ -109,14 +111,20 @@ namespace ILCompiler.Compiler
         private readonly PreinitializationManager _preinitializationManager = preinitializationManager;
         private string? _inputFilePath;
 
+        private IList<BasicBlock>? _blocks;
+
         public void Inline(IList<BasicBlock> blocks, LocalVariableTable locals, string inputFilePath)
         {
+            _blocks = blocks;
             _inputFilePath = inputFilePath;
 
             var walker = new SubstitutePlaceholdersWalker();
 
-            foreach (var block in blocks)
+            var blockIndex = 0;
+
+            do
             {
+                var block = blocks[blockIndex];
                 if (block.Statements.Count > 0)
                 {
                     int statementIndex = 0;
@@ -140,19 +148,20 @@ namespace ILCompiler.Compiler
                                 Block = block,
                                 Locals = locals,
                             };
-                            callInlined = MorphCallInline(inlineMethodInfo);
+                            MorphCallInline(inlineMethodInfo);
                         }
 
-                        if (!callInlined)
-                        {
-                            statementIndex++;
-                        }
+                        // Skip over the statement that has either not been inlined
+                        // or has been inlined and replaced with a NothingEntry
+                        statementIndex++;
                     } while (statementIndex < block.Statements.Count);
                 }
-            }
+
+                blockIndex++;
+            } while (blockIndex < blocks.Count);
         }
 
-        private bool MorphCallInline(InlineMethodInfo methodInfo)
+        private void MorphCallInline(InlineMethodInfo methodInfo)
         {
             var method = methodInfo.Call.Method;
             if (method is null)
@@ -180,12 +189,12 @@ namespace ILCompiler.Compiler
                 if (inlineSucceeded)
                 {
                     _logger.LogInformation("Inlined call to method: {MethodName}", method.FullName);
-                    return true;
+                    return;
                 }
 
                 if (method.HasReturnType)
                 {
-                    inlineInfo.InlineCandidateInfo!.ReturnExpressionEntry!.SubstitionExpression = methodInfo.Call;
+                    inlineInfo.InlineCandidateInfo!.ReturnExpressionEntry!.SubstitutionExpression = methodInfo.Call;
 
                     // Need to blank out the original call node
                     methodInfo.Statement!.RootNode = new NothingEntry();
@@ -199,8 +208,6 @@ namespace ILCompiler.Compiler
             }
 
             Debug.Assert(methodInfo.Locals.Count == startVars);
-
-            return false;
         }
 
         private static InlineInfo InitVars(InlineMethodInfo methodInfo)
@@ -270,25 +277,109 @@ namespace ILCompiler.Compiler
 
         private bool InsertInlineeBlocks(IList<BasicBlock> blocks, InlineMethodInfo methodInfo, InlineInfo inlineInfo)
         {
+            int afterStatementIndex = methodInfo.StatementIndex;
+            var statements = methodInfo.Block.Statements;
+
+            // Don't inline calls in blocks that have exception handlers
+            // when we have multiple blocks in the inlinee
+            if (blocks.Count > 0 && methodInfo.Block.Handlers.Count > 0)
+                return false;
+
+            if (blocks.Count > 1 && inlineInfo.InlineeReturnSpillTempNumber.HasValue)
+            {
+                // TODO: Currently can't handle inlining methods with multiple blocks and returns
+                return false;
+            }
+
+            // Prepend statements
+            PrependStatements(methodInfo, inlineInfo, ref afterStatementIndex);
+
+            bool insertInlineeBlocks = true;
             if (blocks.Count == 1)
             {
-                var statements = methodInfo.Block.Statements;
-                statements.RemoveAt(methodInfo.StatementIndex);
-
-                // Prepend statements
-                int afterStatementIndex = methodInfo.StatementIndex;
-                PrependStatements(methodInfo, inlineInfo, ref afterStatementIndex);
-
                 var inlineeBlock = blocks[0];
                 foreach (var inlineeStatement in inlineeBlock.Statements)
                 {
-                    statements.Insert(afterStatementIndex++, inlineeStatement);
+                    statements.Insert(afterStatementIndex + 1, inlineeStatement);
+                    afterStatementIndex++;
                 }
 
-                return true;
+                insertInlineeBlocks = false;
             }
 
-            return false;
+            if (insertInlineeBlocks)
+            {
+                // Split block after statement being inlined
+                var bottomBlock = SplitBlockAfterStatement(methodInfo.Block, afterStatementIndex);
+
+                var blockIndex = _blocks!.IndexOf(methodInfo.Block) + 1;
+                _blocks.Insert(blockIndex, bottomBlock);
+
+                // Insert the blocks between the current block and the bottom block
+                foreach (var block in blocks)
+                {
+                    _blocks.Insert(blockIndex++, block);
+
+                    // For the first/entry block in the blocks being inserted
+                    // link it up to the original method block
+                    if (block.Predecessors.Count == 0)
+                    {
+                        block.Predecessors.Add(methodInfo.Block);
+                        methodInfo.Block.Successors.Add(block);
+                    }
+
+                    // For exit blocks, link them to the bottom block
+                    if (block.Successors.Count == 0)
+                    {
+                        block.Successors.Add(bottomBlock);
+                        bottomBlock.Predecessors.Add(block);
+                    }
+
+                    if (block.JumpKind == JumpKind.Return)
+                    {
+                        // If the block ends with a return, we need to ensure that the
+                        // inlinee block does not have a return statement.
+                        block.JumpKind = JumpKind.Always;
+                    }
+                }
+            }
+
+            methodInfo.Statement.RootNode = new NothingEntry();
+
+            return true;
+        }
+
+        public static BasicBlock SplitBlockAfterStatement(BasicBlock block, int statementIndex)
+        {
+            // Create a new block
+            var statement = block.Statements[statementIndex + 1];
+            var newBlock = new BasicBlock(statement.StartOffset);
+            newBlock.JumpKind = block.JumpKind;
+
+            newBlock.TryStart = block.TryStart;
+            newBlock.FilterStart = block.FilterStart;
+            newBlock.HandlerStart = block.HandlerStart;
+            newBlock.TryBlocks = block.TryBlocks.ToList();
+            newBlock.Handlers = block.Handlers.ToList();
+
+            // Move statements after the specified index to the new block
+            while (block.Statements.Count > statementIndex + 1)
+            {
+                newBlock.Statements.Add(block.Statements[statementIndex + 1]);
+                block.Statements.RemoveAt(statementIndex + 1);
+            }
+
+            foreach (var successor in block.Successors)
+            {
+                newBlock.Successors.Add(successor);
+
+                successor.Predecessors.Remove(block);
+                successor.Predecessors.Add(newBlock);
+            }
+
+            block.Successors.Clear();
+
+            return newBlock;
         }
 
         private void PrependStatements(InlineMethodInfo methodInfo, InlineInfo inlineInfo, ref int afterStatementIndex)
@@ -324,7 +415,8 @@ namespace ILCompiler.Compiler
 
                 var newStatement = new Statement(staticInitCall);
 
-                methodInfo.Block.Statements.Insert(afterStatementIndex, newStatement);
+                methodInfo.Block.Statements.Insert(afterStatementIndex + 1, newStatement);
+                afterStatementIndex++;
             }
 
             // TODO: Add nullcheck for this pointer here
@@ -349,7 +441,8 @@ namespace ILCompiler.Compiler
 
             var storeStatement = new Statement(store);
 
-            methodInfo.Block.Statements.Insert(afterStatementIndex++, storeStatement);
+            methodInfo.Block.Statements.Insert(afterStatementIndex + 1, storeStatement);
+            afterStatementIndex++;
         }
     }
 }

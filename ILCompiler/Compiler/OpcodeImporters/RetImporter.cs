@@ -47,31 +47,30 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     if (returnBufferArgIndex.HasValue)
                     {
                         var returnBufferArg = importer.InlineInfo!.InlineCall.Arguments[returnBufferArgIndex.Value].Duplicate();
-                        returnExpressionEntry!.SubstitionExpression = StoreStructPtr(returnBufferArg, returnValue, importer);
+                        returnExpressionEntry!.SubstitutionExpression = StoreStructPtr(returnBufferArg, returnValue, importer);
                     }
                     else
                     {
-                        returnExpressionEntry!.SubstitionExpression = returnValue;
+                        returnExpressionEntry!.SubstitutionExpression = returnValue;
                     }
                 }
             }
 
-            if (importer.Inlining)
+            if (!importer.Inlining)
             {
-                return true;
+                if (returnBufferArgIndex is not null)
+                {
+                    var destination = new LocalVariableEntry(returnBufferArgIndex.Value, VarType.Ref, 2);
+                    var storeInd = StoreStructPtr(destination, returnValue!, importer);
+                    importer.ImportAppendTree(storeInd);
+
+                    returnValue = null;
+                }
+
+                var retNode = new ReturnEntry(returnValue);
+                importer.ImportAppendTree(retNode);
             }
 
-            if (returnBufferArgIndex is not null)
-            {
-                var destination = new LocalVariableEntry(returnBufferArgIndex.Value, VarType.Ref, 2);
-                var storeInd = StoreStructPtr(destination, returnValue!, importer);
-                importer.ImportAppendTree(storeInd);
-
-                returnValue = null;
-            }
-                
-            var retNode = new ReturnEntry(returnValue);
-            importer.ImportAppendTree(retNode);
             importer.StopImporting = true;
 
             return true;
