@@ -9,7 +9,7 @@ namespace ILCompiler.Compiler.EvaluationStack
         // Represents the inline candidate's value. This is null
         // during the import that created the ReturnExpression
         // and is set later when the inline candidate is processed.
-        public StackEntry? SubstitionExpression { get; set; }
+        public StackEntry? SubstitutionExpression { get; set; }
 
         public ReturnExpressionEntry(CallEntry inlineCandidate) : base(inlineCandidate.Type, inlineCandidate.Method!.Signature.ReturnType.GetElementSize().AsInt)
         {

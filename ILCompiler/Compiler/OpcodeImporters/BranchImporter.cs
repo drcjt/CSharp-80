@@ -94,7 +94,8 @@ namespace ILCompiler.Compiler.OpcodeImporters
             }
             else
             {
-                importer.ImportAppendTree(new JumpEntry(targetBlock.Label));
+                // Nothing to do here - code gen will generate a jump to the target block
+                //importer.ImportAppendTree(new JumpEntry(targetBlock.Label));
             }
 
             // Fall through handling

@@ -44,6 +44,8 @@ namespace ILCompiler.Compiler
 
         public bool StopImporting { get; set; }
 
+        private int _currentILOffset = 0;
+
         public Importer(IConfiguration configuration, ILogger<Importer> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, PreinitializationManager preinitializationManager, NodeFactory nodeFactory)
         {
             Configuration = configuration;
@@ -132,7 +134,11 @@ namespace ILCompiler.Compiler
             }
             else
             {
-                _currentBasicBlock?.Statements.Add(new Statement(entry));
+                var statement = new Statement(entry)
+                {
+                    StartOffset = _currentILOffset,
+                };
+                _currentBasicBlock?.Statements.Add(statement);
             }
         }
 
@@ -158,18 +164,18 @@ namespace ILCompiler.Compiler
         private void ImportBasicBlock(IDictionary<int, int> offsetToIndexMap, BasicBlock block)
         {
             _currentBasicBlock = block;
-            var currentOffset = block.StartOffset;
-            var currentIndex = offsetToIndexMap[currentOffset];
+            _currentILOffset = block.StartOffset;
+            var currentIndex = offsetToIndexMap[_currentILOffset];
 
             StopImporting = false;
 
             while (true)
             {
                 var currentInstruction = _methodIL!.Instructions[currentIndex];
-                currentOffset += currentInstruction.GetSize();
+                _currentILOffset += currentInstruction.GetSize();
                 currentIndex++;
 
-                FallThroughBlock = currentOffset < BasicBlocks.Length ? BasicBlocks[currentOffset] : null;
+                FallThroughBlock = _currentILOffset < BasicBlocks.Length ? BasicBlocks[_currentILOffset] : null;
 
                 bool imported = ImportInstruction(currentInstruction);
 
@@ -185,12 +191,12 @@ namespace ILCompiler.Compiler
                     HandleUnknownInstruction(currentInstruction);
                 }
 
-                if (currentOffset == BasicBlocks.Length)
+                if (_currentILOffset == BasicBlocks.Length)
                 {
                     return;
                 }
 
-                var nextBasicBlock = BasicBlocks[currentOffset];
+                var nextBasicBlock = BasicBlocks[_currentILOffset];
                 if (nextBasicBlock != null)
                 {
                     ImportFallThrough(nextBasicBlock);
