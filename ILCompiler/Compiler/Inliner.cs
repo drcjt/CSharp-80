@@ -282,7 +282,7 @@ namespace ILCompiler.Compiler
 
             // Don't inline calls in blocks that have exception handlers
             // when we have multiple blocks in the inlinee
-            if (blocks.Count > 0 && methodInfo.Block.Handlers.Count > 0)
+            if (blocks.Count > 1 && methodInfo.Block.Handlers.Count > 0)
                 return false;
 
             if (blocks.Count > 1 && inlineInfo.InlineeReturnSpillTempNumber.HasValue)
