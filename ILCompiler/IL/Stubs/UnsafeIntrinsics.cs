@@ -10,6 +10,8 @@ namespace ILCompiler.Common.TypeSystem.IL
         {
             switch (method.Name)
             {
+                case "Add":
+                    return EmitAdd(method);
                 case "As":
                 case "AsRef":
                     return EmitAs();
@@ -114,6 +116,35 @@ namespace ILCompiler.Common.TypeSystem.IL
 
             codeStream.Emit(ILOpcode.ldarg_0);
             codeStream.Emit(ILOpcode.ldarg_1);
+            codeStream.Emit(ILOpcode.add);
+            codeStream.Emit(ILOpcode.ret);
+
+            return emitter.Link();
+        }
+
+        private static MethodIL? EmitAdd(MethodDesc method)
+        {
+            // ldarg .0
+            // ldarg .1
+            // sizeof !!T
+            // conv.i (if necessary)
+            // mul
+            // add
+            // ret
+
+            var emitter = new ILEmitter();
+            var codeStream = emitter.NewCodeStream();
+
+            codeStream.Emit(ILOpcode.ldarg_0);
+            codeStream.Emit(ILOpcode.ldarg_1);
+            codeStream.Emit(ILOpcode.sizeof_, new SignatureMethodVariable(method.Context, 0));
+
+            if (method.Signature.Parameters[1].Type.IsWellKnownType(WellKnownType.Int32))
+            {
+                codeStream.Emit(ILOpcode.conv_i);
+            }
+
+            codeStream.Emit(ILOpcode.mul);
             codeStream.Emit(ILOpcode.add);
             codeStream.Emit(ILOpcode.ret);
 
