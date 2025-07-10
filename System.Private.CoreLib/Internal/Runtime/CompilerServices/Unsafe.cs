@@ -47,6 +47,7 @@ namespace Internal.Runtime.CompilerServices
         }
 
         [Intrinsic]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref T AddByteOffset<T>(ref T source, IntPtr byteOffset)
         {
             throw new PlatformNotSupportedException();
@@ -72,12 +73,14 @@ namespace Internal.Runtime.CompilerServices
         /// <summary>
         /// Adds an element offset to the given reference.
         /// </summary>
+        [Intrinsic]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref T Add<T>(ref T source, int elementOffset)
         {
             return ref AddByteOffset(ref source, (IntPtr)(elementOffset * (nint)SizeOf<T>()));
         }
 
+        [Intrinsic]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ref T Add<T>(ref T source, IntPtr elementOffset)
         {
