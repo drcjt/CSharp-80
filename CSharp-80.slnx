@@ -1,0 +1,178 @@
+<Solution>
+  <Folder Name="/Documentation/">
+    <File Path="Documentation/csharp-80-architecture.md" />
+    <File Path="Documentation/intro-to-csharp-80.md" />
+  </Folder>
+  <Folder Name="/Samples/">
+    <Project Path="Samples/CalcPi/CalcPi.csproj" />
+    <Project Path="Samples/Checksum/Checksum.csproj" />
+    <Project Path="Samples/Chess/Chess.csproj" />
+    <Project Path="Samples/DoomFire/DoomFire.csproj" />
+    <Project Path="Samples/Fib/Fib.csproj" />
+    <Project Path="Samples/GfxDemos/GfxDemos.csproj" />
+    <Project Path="Samples/Hanoi/Hanoi.csproj" />
+    <Project Path="Samples/Hello/Hello.csproj" />
+    <Project Path="Samples/Life/Life.csproj" />
+    <Project Path="Samples/Mandel/Mandel.csproj" />
+    <Project Path="Samples/Matrix/Matrix.csproj" />
+    <Project Path="Samples/Maze/Maze.csproj" />
+    <Project Path="Samples/Mines/Mines.csproj" />
+    <Project Path="Samples/Music/Music.csproj" />
+    <Project Path="Samples/NetBot/NetBot.csproj" />
+    <Project Path="Samples/Paint/Paint.csproj" />
+    <Project Path="Samples/Primes/Primes.csproj" />
+    <Project Path="Samples/QSort/QSort.csproj" />
+    <Project Path="Samples/Sample/Sample.csproj" />
+    <Project Path="Samples/SampleDsk/SampleDsk.csproj">
+      <BuildDependency Project="Samples/Music/Music.csproj" />
+    </Project>
+    <Project Path="Samples/Snake/Snake.csproj" />
+    <Project Path="Samples/Structs/Structs.csproj" />
+    <Project Path="Samples/Wumpus/Wumpus.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/Common/Tests.Common.csproj" />
+    <Project Path="Tests/CoreTestAssembly/CoreTestAssembly.csproj" />
+    <Project Path="Tests/ILCompiler.IntegrationTests/ILCompiler.IntegrationTests.csproj" />
+    <Project Path="Tests/ILCompiler.Tests.Common/ILCompiler.Tests.Common.csproj" />
+    <Project Path="Tests/ILCompiler.UnitTests/ILCompiler.UnitTests.csproj" />
+  </Folder>
+  <Folder Name="/Tests/CodeGen/">
+    <Project Path="Tests/CodeGen/CodeGenTestsRunner/CodeGenTests.csproj" />
+    <Project Path="Tests/CodeGen/DivConst/DivConst.csproj" />
+  </Folder>
+  <Folder Name="/Tests/CoreLib/">
+    <Project Path="Tests/CoreLib/ArrayListTests/ArrayListTests.csproj" />
+    <Project Path="Tests/CoreLib/CoreLib/CoreLib.csproj" />
+    <Project Path="Tests/CoreLib/CoreLibTestsRunner/CoreLibTests.csproj" />
+    <Project Path="Tests/CoreLib/GenericListTests.Int/GenericListTests.Int.csproj" />
+    <Project Path="Tests/CoreLib/GenericListTests.String/GenericListTests.String.csproj" />
+    <Project Path="Tests/CoreLib/System.Collections.Tests/System.Collections.Tests.csproj" />
+    <Project Path="Tests/CoreLib/System.Linq.Tests/System.Linq.Tests.csproj" />
+    <Project Path="Tests/CoreLib/System.Memory.Tests/System.Memory.Tests.csproj" />
+    <Project Path="Tests/CoreLib/System.String.Tests/System.String.Tests.csproj" />
+    <Project Path="Tests/CoreLib/System.Tests/System.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Tests/Directed/">
+    <Project Path="Tests/Directed/Ackermann/Ackermann.csproj" />
+    <Project Path="Tests/Directed/Arrays/Arrays.csproj" />
+    <Project Path="Tests/Directed/ConstantFolding/ConstantFolding.csproj" />
+    <Project Path="Tests/Directed/DirectedTestsRunner/DirectedTests.csproj">
+      <BuildDependency Project="Tests/Directed/Ackermann/Ackermann.csproj" />
+      <BuildDependency Project="Tests/Directed/Arrays/Arrays.csproj" />
+      <BuildDependency Project="Tests/Directed/ConstantFolding/ConstantFolding.csproj" />
+      <BuildDependency Project="Tests/Directed/Fibonacci/Fibonacci.csproj" />
+      <BuildDependency Project="Tests/Directed/Hanoi/Hanoi.csproj" />
+      <BuildDependency Project="Tests/Directed/MDArrays/MDArrays.csproj" />
+      <BuildDependency Project="Tests/Directed/Primes/Primes.csproj" />
+      <BuildDependency Project="Tests/Directed/Strings/Strings.csproj" />
+    </Project>
+    <Project Path="Tests/Directed/Fibonacci/Fibonacci.csproj" />
+    <Project Path="Tests/Directed/Hanoi/Hanoi.csproj" />
+    <Project Path="Tests/Directed/MDArrays/MDArrays.csproj" />
+    <Project Path="Tests/Directed/Primes/Primes.csproj" />
+    <Project Path="Tests/Directed/Strings/Strings.csproj" />
+  </Folder>
+  <Folder Name="/Tests/Generics/">
+    <Project Path="Tests/Generics/GenericConstrainedCall/GenericConstrainedCall.csproj" />
+    <Project Path="Tests/Generics/GenericFields/GenericFields.csproj" />
+    <Project Path="Tests/Generics/GenericLocals/GenericLocals.csproj" />
+    <Project Path="Tests/Generics/GenericMethods/GenericMethods.csproj" />
+    <Project Path="Tests/Generics/GenericsTestsRunner/GenericsTests.csproj" />
+    <Project Path="Tests/Generics/GenericTypeParameters/GenericTypeParameters.csproj" />
+    <Project Path="Tests/Generics/SharedGenerics/SharedGenerics.csproj" />
+  </Folder>
+  <Folder Name="/Tests/Generics/Arrays/" />
+  <Folder Name="/Tests/Generics/Arrays/ConstructedTypes/" />
+  <Folder Name="/Tests/Generics/Arrays/ConstructedTypes/MultiDim/">
+    <Project Path="Tests/Generics/Arrays/ConstructedTypes/MultiDim/ClassConstructedType.csproj" />
+    <Project Path="Tests/Generics/Arrays/ConstructedTypes/MultiDim/ClassInstance.csproj" />
+    <Project Path="Tests/Generics/Arrays/ConstructedTypes/MultiDim/ClassStatic.csproj" />
+    <Project Path="Tests/Generics/Arrays/ConstructedTypes/MultiDim/StructConstructedType.csproj" />
+    <Project Path="Tests/Generics/Arrays/ConstructedTypes/MultiDim/StructInstance.csproj" />
+    <Project Path="Tests/Generics/Arrays/ConstructedTypes/MultiDim/StructStatic.csproj" />
+  </Folder>
+  <Folder Name="/Tests/Methodical/">
+    <Project Path="Tests/Methodical/Arrays/Arrays.csproj" />
+    <Project Path="Tests/Methodical/BeforeFieldInit/BeforeFieldInit.csproj" />
+    <Project Path="Tests/Methodical/Boxing/Boxing.csproj" />
+    <Project Path="Tests/Methodical/DllImportAttribute/DllImportAttribute.csproj" />
+    <Project Path="Tests/Methodical/Exceptions/Exceptions.csproj" />
+    <Project Path="Tests/Methodical/Inlining/Inlining.csproj" />
+    <Project Path="Tests/Methodical/InterfaceDispatch/InterfaceDispatch.csproj" />
+    <Project Path="Tests/Methodical/InvokeCctorByFieldAccess/InvokeCctorByFieldAccess.csproj" />
+    <Project Path="Tests/Methodical/InvokeCctorByInstanceMethod/InvokeCctorByInstanceMethod.csproj" />
+    <Project Path="Tests/Methodical/InvokeCctorByStaticMethod/InvokeCctorByStaticMethod.csproj" />
+    <Project Path="Tests/Methodical/MethodicalTestsRunner/MethodicalTests.csproj">
+      <BuildDependency Project="Tests/Methodical/BeforeFieldInit/BeforeFieldInit.csproj" />
+      <BuildDependency Project="Tests/Methodical/Exceptions/Exceptions.csproj" />
+      <BuildDependency Project="Tests/Methodical/InterfaceDispatch/InterfaceDispatch.csproj" />
+      <BuildDependency Project="Tests/Methodical/InvokeCctorByFieldAccess/InvokeCctorByFieldAccess.csproj" />
+      <BuildDependency Project="Tests/Methodical/InvokeCctorByInstanceMethod/InvokeCctorByInstanceMethod.csproj" />
+      <BuildDependency Project="Tests/Methodical/InvokeCctorByStaticMethod/InvokeCctorByStaticMethod.csproj" />
+      <BuildDependency Project="Tests/Methodical/MDArrays/DataTypes/DataTypesBool/DataTypesBool.csproj" />
+      <BuildDependency Project="Tests/Methodical/MDArrays/DataTypes/DataTypesByte/DataTypesByte.csproj" />
+      <BuildDependency Project="Tests/Methodical/MDArrays/DataTypes/DataTypesChar/DataTypesChar.csproj" />
+      <BuildDependency Project="Tests/Methodical/MDArrays/DataTypes/DataTypesInt/DataTypesInt.csproj" />
+      <BuildDependency Project="Tests/Methodical/MDArrays/DataTypes/DataTypesSByte/DataTypesSByte.csproj" />
+      <BuildDependency Project="Tests/Methodical/MDArrays/DataTypes/DataTypesShort/DataTypesShort.csproj" />
+      <BuildDependency Project="Tests/Methodical/MDArrays/DataTypes/DataTypesUInt/DataTypesUInt.csproj" />
+      <BuildDependency Project="Tests/Methodical/MDArrays/DataTypes/DataTypesUShort/DataTypesUShort.csproj" />
+      <BuildDependency Project="Tests/Methodical/MDArrays/Simple/Simple.csproj" />
+      <BuildDependency Project="Tests/Methodical/VirtualMethods/VirtualMethods.csproj" />
+    </Project>
+    <Project Path="Tests/Methodical/Preinitialization/Preinitialization.csproj" />
+    <Project Path="Tests/Methodical/ValueTypes/ValueTypes.csproj" />
+    <Project Path="Tests/Methodical/VirtualMethods/VirtualMethods.csproj" />
+    <Project Path="Tests/Methodical/ZeroInit/ZeroInit.csproj" />
+  </Folder>
+  <Folder Name="/Tests/Methodical/MDArrays/">
+    <Project Path="Tests/Methodical/MDArrays/RangeCheck/RangeCheck.csproj" />
+    <Project Path="Tests/Methodical/MDArrays/Simple/Simple.csproj" />
+  </Folder>
+  <Folder Name="/Tests/Methodical/MDArrays/DataTypes/">
+    <Project Path="Tests/Methodical/MDArrays/DataTypes/DataTypesBool/DataTypesBool.csproj" />
+    <Project Path="Tests/Methodical/MDArrays/DataTypes/DataTypesByte/DataTypesByte.csproj" />
+    <Project Path="Tests/Methodical/MDArrays/DataTypes/DataTypesChar/DataTypesChar.csproj" />
+    <Project Path="Tests/Methodical/MDArrays/DataTypes/DataTypesInt/DataTypesInt.csproj" />
+    <Project Path="Tests/Methodical/MDArrays/DataTypes/DataTypesSByte/DataTypesSByte.csproj" />
+    <Project Path="Tests/Methodical/MDArrays/DataTypes/DataTypesShort/DataTypesShort.csproj" />
+    <Project Path="Tests/Methodical/MDArrays/DataTypes/DataTypesUInt/DataTypesUInt.csproj" />
+    <Project Path="Tests/Methodical/MDArrays/DataTypes/DataTypesUShort/DataTypesUShort.csproj" />
+  </Folder>
+  <Folder Name="/Tests/Optimisation/" />
+  <Folder Name="/Tests/Optimisation/EarlyValuePropagation/">
+    <Project Path="Tests/Optimisation/EarlyValuePropagation/LoopWithArrayLength.csproj" />
+    <Project Path="Tests/Optimisation/EarlyValuePropagation/SimpleArrayLength.csproj" />
+  </Folder>
+  <Folder Name="/Tests/Optimisation/Inlining/">
+    <Project Path="Tests/Optimisation/Inlining/ifelse.csproj" />
+    <Project Path="Tests/Optimisation/Inlining/Inline.csproj" />
+    <Project Path="Tests/Optimisation/Inlining/Inline_MethodWithCctor.csproj" />
+    <Project Path="Tests/Optimisation/Inlining/Inline_STARG.csproj" />
+    <Project Path="Tests/Optimisation/Inlining/ReturnStruct.csproj" />
+    <Project Path="Tests/Optimisation/Inlining/StructAsParam.csproj" />
+  </Folder>
+  <Folder Name="/Tests/Performance/" />
+  <Folder Name="/Tests/Performance/CodeQuality/" />
+  <Folder Name="/Tests/Performance/CodeQuality/Benchmarks/">
+    <Project Path="Tests/Performance/CodeQuality/Benchmarks/8Queens/8Queens.csproj" />
+    <Project Path="Tests/Performance/CodeQuality/Benchmarks/Ackermann/Ackermann.csproj" />
+    <Project Path="Tests/Performance/CodeQuality/Benchmarks/BenchmarkTestsRunner/BenchmarkTests.csproj" />
+    <Project Path="Tests/Performance/CodeQuality/Benchmarks/Bubblesort/Bubblesort.csproj" />
+    <Project Path="Tests/Performance/CodeQuality/Benchmarks/CSieve/CSieve.csproj" />
+    <Project Path="Tests/Performance/CodeQuality/Benchmarks/Fib/Fib.csproj" />
+    <Project Path="Tests/Performance/CodeQuality/Benchmarks/Heapsort/Heapsort.csproj" />
+    <Project Path="Tests/Performance/CodeQuality/Benchmarks/Pi/Pi.csproj" />
+    <Project Path="Tests/Performance/CodeQuality/Benchmarks/Quicksort/Quicksort.csproj" />
+  </Folder>
+  <Folder Name="/Tests/Regression/">
+    <Project Path="Tests/Regression/Bug623/Bug623.csproj" />
+    <Project Path="Tests/Regression/Regression/Regression.csproj" />
+    <Project Path="Tests/Regression/RegressionTestsRunner/RegressionTests.csproj" />
+  </Folder>
+  <Project Path="ILCompiler/ILCompiler.csproj" />
+  <Project Path="JitDiff/JitDiff.csproj" />
+  <Project Path="System.Private.CoreLib/System.Private.CoreLib.csproj" />
+  <Project Path="Tests/Optimisation/OptimisationTestRunner/OptimisationTests.csproj" />
+</Solution>
