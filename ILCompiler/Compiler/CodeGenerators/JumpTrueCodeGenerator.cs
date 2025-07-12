@@ -8,27 +8,27 @@ namespace ILCompiler.Compiler.CodeGenerators
     {
         public void GenerateCode(JumpTrueEntry entry, CodeGeneratorContext context)
         {
-            var binOp = (BinaryOperator)entry.Condition;
+            if (entry.Condition is BinaryOperator binOp)
+            {
+                if (binOp.Op1.Contained)
+                {
+                    GenerateJumpCompareCode(entry, context, binOp);
+                    return;
+                }
 
-            if (binOp.Op1.Contained)
-            {
-                GenerateJumpCompareCode(entry, context, binOp);
-                return;
+                if (binOp.ResultUsedInJump)
+                {
+                    context.InstructionsBuilder.Jp(Condition.C, entry.TargetLabel);
+                    return;
+                }
             }
 
-            if (binOp.ResultUsedInJump)
-            {
-                context.InstructionsBuilder.Jp(Condition.C, entry.TargetLabel);
-            }
-            else
-            {
-                // Pop i4 from stack and jump if non zero
-                context.InstructionsBuilder.Pop(HL);      // LSW
-                context.InstructionsBuilder.Ld(A, 0);
-                context.InstructionsBuilder.Add(A, L);
-                context.InstructionsBuilder.Pop(HL);      // MSW
-                context.InstructionsBuilder.Jp(Condition.NZ, entry.TargetLabel);
-            }
+            // Pop i4 from stack and jump if non zero
+            context.InstructionsBuilder.Pop(HL);      // LSW
+            context.InstructionsBuilder.Ld(A, 0);
+            context.InstructionsBuilder.Add(A, L);
+            context.InstructionsBuilder.Pop(HL);      // MSW
+            context.InstructionsBuilder.Jp(Condition.NZ, entry.TargetLabel);
         }
 
         private static void GenerateJumpCompareCode(JumpTrueEntry entry, CodeGeneratorContext context, BinaryOperator binOp)
