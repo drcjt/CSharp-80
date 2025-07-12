@@ -23,11 +23,16 @@ namespace ILCompiler.Compiler.CodeGenerators
                 }
             }
 
-            // Pop i4 from stack and jump if non zero
+            // Pop condition value from stack and jump if non-zero
+            // Note condition can be either int32 or native int (int 16)
             context.InstructionsBuilder.Pop(HL);      // LSW
             context.InstructionsBuilder.Ld(A, 0);
             context.InstructionsBuilder.Add(A, L);
-            context.InstructionsBuilder.Pop(HL);      // MSW
+            if (entry.Condition.Type.IsInt())
+            {
+                // If condition is int32, we need to throw away the MSW
+                context.InstructionsBuilder.Pop(HL);      // MSW
+            }
             context.InstructionsBuilder.Jp(Condition.NZ, entry.TargetLabel);
         }
 

@@ -39,20 +39,16 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 case VarType.Ptr:
                 case VarType.Int:
                     {
-                        var resultType = tree.Op2.Type;
-
                         i1 = tree.Op1.GetIntConstant();
                         i2 = tree.Op2.GetIntConstant();
                         switch (tree.Operation)
                         {
                             case Operation.Eq:
                                 i1 = i1 == i2 ? 1 : 0;
-                                resultType = VarType.Int;
                                 break;
 
                             case Operation.Ne_Un:
                                 i1 = i1 != i2 ? 1 : 0;
-                                resultType = VarType.Int;
                                 break;
 
                             case Operation.Add:
@@ -88,7 +84,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                                 return tree;
                         }
 
-                        return resultType == VarType.Ptr
+                        return tree.Type == VarType.Ptr
                             ? new NativeIntConstantEntry((short)i1)
                             : new Int32ConstantEntry(i1);
                     }
