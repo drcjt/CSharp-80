@@ -14,6 +14,11 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             if (tree is BinaryOperator binaryOperator)
             {
+                if (binaryOperator.Op1.IsIntCnsOrI() && binaryOperator.Op2.IsIntCnsOrI())
+                {
+                    return FoldBinaryOpWithBothArgumentsConstant(binaryOperator);
+                }
+
                 if (binaryOperator.Op1.IsIntCnsOrI() || binaryOperator.Op2.IsIntCnsOrI())
                 {
                     return FoldBinaryOpWithOneConstantOperand(binaryOperator);
@@ -21,6 +26,54 @@ namespace ILCompiler.Compiler.OpcodeImporters
             }
 
             return tree;
+        }
+
+
+        public static StackEntry FoldBinaryOpWithBothArgumentsConstant(BinaryOperator tree)
+        {
+            int i1;
+            int i2;
+
+            switch (tree.Op2.Type)
+            {
+                case VarType.Int:
+                    {
+                        i1 = ((Int32ConstantEntry)tree.Op1).GetIntConstant();
+                        i2 = ((Int32ConstantEntry)tree.Op2).GetIntConstant();
+                        switch (tree.Operation)
+                        {
+                            case Operation.Add:
+                                i1 = i1 + i2;
+                                break;
+
+                            case Operation.Sub:
+                                i1 = i1 - i2;
+                                break;
+
+                            case Operation.Mul:
+                                i1 = i1 * i2;
+                                break;
+
+                            case Operation.Div:
+                                if (i2 == 0)
+                                {
+                                    // Division by zero, return the original tree which will throw division by zero exception
+                                    return tree;
+                                }
+                                i1  = i1 / i2;
+                                break;
+
+                            default:
+                                return tree;
+                        }
+
+                        // TODO: should this always return an Int32? What about native ints?
+                        return new Int32ConstantEntry(i1);
+                    }
+
+                default:
+                    return tree;
+            }
         }
 
         public static StackEntry FoldBinaryOpWithOneConstantOperand(BinaryOperator tree)
