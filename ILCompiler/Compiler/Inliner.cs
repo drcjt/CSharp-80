@@ -285,12 +285,6 @@ namespace ILCompiler.Compiler
             if (blocks.Count > 1 && methodInfo.Block.Handlers.Count > 0)
                 return false;
 
-            if (blocks.Count > 1 && inlineInfo.InlineeReturnSpillTempNumber.HasValue)
-            {
-                // TODO: Currently can't handle inlining methods with multiple blocks and returns
-                return false;
-            }
-
             // Prepend statements
             PrependStatements(methodInfo, inlineInfo, ref afterStatementIndex);
 
