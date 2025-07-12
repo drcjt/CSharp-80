@@ -36,10 +36,11 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             switch (tree.Op2.Type)
             {
+                case VarType.Ptr:
                 case VarType.Int:
                     {
-                        i1 = ((Int32ConstantEntry)tree.Op1).GetIntConstant();
-                        i2 = ((Int32ConstantEntry)tree.Op2).GetIntConstant();
+                        i1 = tree.Op1.GetIntConstant();
+                        i2 = tree.Op2.GetIntConstant();
                         switch (tree.Operation)
                         {
                             case Operation.Add:
@@ -67,8 +68,9 @@ namespace ILCompiler.Compiler.OpcodeImporters
                                 return tree;
                         }
 
-                        // TODO: should this always return an Int32? What about native ints?
-                        return new Int32ConstantEntry(i1);
+                        return tree.Op2.Type == VarType.Ptr
+                            ? new NativeIntConstantEntry((short)i1)
+                            : new Int32ConstantEntry(i1);
                     }
 
                 default:
