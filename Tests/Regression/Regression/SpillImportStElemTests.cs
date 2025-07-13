@@ -4,15 +4,15 @@
     {
         public static int Test()
         {
-            object[] arr = new object[1];
+            object?[] arr = new object[1];
             arr[0] = 37;
 
             int size = 1;
 
-            object retval = arr[--size];
+            object value = arr[--size]!;
             arr[size] = null;
 
-            return (int)retval;
+            return (int)value;
         }
     }
 }
