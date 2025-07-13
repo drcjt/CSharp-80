@@ -73,7 +73,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 op = importer.StoreStruct(op);
             }
 
-            importer.ImportAppendTree(op);
+            importer.ImportAppendTree(op, true);
 
             return true;
         }
