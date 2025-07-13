@@ -16,6 +16,7 @@ namespace Regression
             Assert.Equal<nuint>(0, Bug206(0));
 
             Assert.Equal(2, new SpillImportAppendTests().SpillOnStFldImport());
+            Assert.Equal(37, SpillImportStElemTests.Test());
 
             Assert.Equal(10, Bug545Method<int>().Length);
 
