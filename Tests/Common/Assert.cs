@@ -14,6 +14,22 @@ namespace Xunit
             }
         }
 
+        public static void NotSame(object notExpected, object actual)
+        {
+            if (Object.ReferenceEquals(notExpected, actual))
+            {
+                Assert.HandleFail("Assert.NotSame", "");
+            }
+        }
+
+        public static void Null(object? value)
+        {
+            if (value is not null)
+            {
+                Assert.HandleFail("Assert.Null", "");
+            }
+        }
+
         public static void Equal<T>(T expected, T actual)
         {
             if (expected is IEnumerable expectedEnumerable && actual is IEnumerable actualEnumerable)
