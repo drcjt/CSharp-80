@@ -47,6 +47,7 @@
     <Project Path="Tests/CoreLib/CoreLibTestsRunner/CoreLibTests.csproj" />
     <Project Path="Tests/CoreLib/GenericListTests.Int/GenericListTests.Int.csproj" />
     <Project Path="Tests/CoreLib/GenericListTests.String/GenericListTests.String.csproj" />
+    <Project Path="Tests/CoreLib/StackTests/StackTests.csproj" />
     <Project Path="Tests/CoreLib/System.Collections.Tests/System.Collections.Tests.csproj" />
     <Project Path="Tests/CoreLib/System.Linq.Tests/System.Linq.Tests.csproj" />
     <Project Path="Tests/CoreLib/System.Memory.Tests/System.Memory.Tests.csproj" />
