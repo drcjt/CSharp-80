@@ -46,7 +46,15 @@ namespace ILCompiler.Tests.Common
                 Directory.SetCurrentDirectory(Path.GetDirectoryName(ilFileName)!);
             }
 
-            var compiled = Program.Main(arguments.Split(' '));
+            int compiled = 0;
+            try
+            {
+                compiled = Program.Main(arguments.Split(' '));
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"Failed to compile IL: {ex.Message}");
+            }
 
             Assert.That(compiled, Is.EqualTo(0), "IL Failed to compile");
         }

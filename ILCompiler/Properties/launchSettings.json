@@ -8,8 +8,8 @@
     },
     "Primes": {
       "commandName": "Project",
-      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net8.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile primes.asm primes.dll",
-      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\Samples\\Primes\\bin\\Trs80\\Debug\\net8.0",
+      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile primes.asm primes.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Samples\\Primes\\bin\\Trs80\\Debug\\net9.0",
       "sqlDebugging": false
     },
     "Snake": {
@@ -20,8 +20,8 @@
     },
     "il_bvt": {
       "commandName": "Project",
-      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net8.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile field_tests.asm field_tests.exe",
-      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\Tests\\ILCompiler.IntegrationTests\\bin\\Debug\\net8.0\\il_bvt",
+      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\release\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile brfalse.asm brfalse.exe",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Tests\\ILCompiler.IntegrationTests\\bin\\release\\net9.0\\il_bvt",
       "sqlDebugging": false
     },
     "Fibonacci": {
@@ -32,8 +32,8 @@
     },
     "Paint": {
       "commandName": "Project",
-      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net8.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile paint.asm paint.dll",
-      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\Samples\\Paint\\bin\\Trs80\\Debug\\net8.0",
+      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile paint.asm paint.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Samples\\Paint\\bin\\Trs80\\Debug\\net9.0",
       "sqlDebugging": false
     },
     "CoreLib": {
@@ -50,14 +50,14 @@
     },
     "Wumpus": {
       "commandName": "Project",
-      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\System.Private.CoreLib\\bin\\Trs80\\Release\\net8.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile wumpus.asm wumpus.dll",
-      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\Samples\\Wumpus\\bin\\Trs80\\Release\\net8.0",
+      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Release\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile wumpus.asm wumpus.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Samples\\Wumpus\\bin\\Trs80\\Release\\net9.0",
       "sqlDebugging": false
     },
     "GfxDemos": {
       "commandName": "Project",
-      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net8.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile gfxdemos.asm gfxdemos.dll",
-      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\Samples\\GfxDemos\\bin\\Trs80\\Debug\\net8.0",
+      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile gfxdemos.asm gfxdemos.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Samples\\GfxDemos\\bin\\Trs80\\Debug\\net9.0",
       "sqlDebugging": false
     },
     "Checksum": {
@@ -80,8 +80,8 @@
     },
     "Hanoi": {
       "commandName": "Project",
-      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net8.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile hanoi.asm hanoi.dll",
-      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\Samples\\Hanoi\\bin\\Trs80\\Debug\\net8.0",
+      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile hanoi.asm hanoi.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Samples\\Hanoi\\bin\\Trs80\\Debug\\net9.0",
       "sqlDebugging": false
     },
     "Matrix": {
@@ -104,8 +104,8 @@
     },
     "Netbot": {
       "commandName": "Project",
-      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net8.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile netbot.asm netbot.dll",
-      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\Samples\\Netbot\\bin\\Trs80\\Debug\\net8.0",
+      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Release\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile netbot.asm netbot.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Samples\\Netbot\\bin\\Trs80\\Release\\net9.0",
       "sqlDebugging": false
     },
     "Structs": {
@@ -124,6 +124,66 @@
       "commandName": "Project",
       "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\System.Private.CoreLib\\bin\\Trs80\\Release\\net8.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile doomfire.asm doomfire.dll",
       "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-clean\\Samples\\DoomFire\\bin\\Trs80\\Release\\net8.0",
+      "sqlDebugging": false
+    },
+    "Bug623": {
+      "commandName": "Project",
+      "commandLineArgs": "-ao cim -aa \"-n\" --printReturnCode --dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil --outputFile bug623.asm bug623.exe",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Tests\\Regression\\Bug623\\bin\\Debug\\net9.0",
+      "sqlDebugging": false
+    },
+    "Maze": {
+      "commandName": "Project",
+      "commandLineArgs": "-ao cim -aa \"-n\" --printReturnCode --dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil --outputFile maze.asm maze.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Samples\\maze\\bin\\Trs80\\debug\\net9.0",
+      "sqlDebugging": false
+    },
+    "Inlining": {
+      "commandName": "Project",
+      "commandLineArgs": "-ao cim -aa \"-n\" --printReturnCode --dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile inlining.asm inlining.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Tests\\Methodical\\Inlining\\bin\\Debug\\net9.0",
+      "sqlDebugging": false
+    },
+    "System.Linq.Tests": {
+      "commandName": "Project",
+      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile System.Linq.Tests.asm System.Linq.Tests.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Tests\\CoreLib\\System.Linq.Tests\\bin\\Debug\\net9.0",
+      "sqlDebugging": false
+    },
+    "DivConst": {
+      "commandName": "Project",
+      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile DivConst.asm DivConst.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Tests\\CodeGen\\DivConst\\bin\\Debug\\net9.0",
+      "sqlDebugging": false
+    },
+    "Inlining-opts": {
+      "commandName": "Project",
+      "commandLineArgs": "-ao cim -aa \"-n\" --printReturnCode --dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Release\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile inline.asm inline.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Tests\\Optimisation\\Inlining\\bin\\Release\\net9.0",
+      "sqlDebugging": false
+    },
+    "SpillImportAppendTests": {
+      "commandName": "Project",
+      "commandLineArgs": "-ao cim -aa \"-n\" --printReturnCode --dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile regression.asm regression.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Tests\\Regression\\Regression\\bin\\Release\\net9.0",
+      "sqlDebugging": false
+    },
+    "Mines": {
+      "commandName": "Project",
+      "commandLineArgs": "-ao cim -aa \"-n\" --printReturnCode --dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil --outputFile mines.asm mines.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Samples\\mines\\bin\\Trs80\\release\\net9.0",
+      "sqlDebugging": false
+    },
+    "CalcPi": {
+      "commandName": "Project",
+      "commandLineArgs": "-ao cim -aa \"-n\" --printReturnCode --dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil --outputFile calcpi.asm calcpi.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Samples\\calcpi\\bin\\Trs80\\Debug\\net9.0",
+      "sqlDebugging": false
+    },
+    "System.Tests": {
+      "commandName": "Project",
+      "commandLineArgs": "--dumpIRTrees --corelibPath C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\System.Private.CoreLib\\bin\\Trs80\\Debug\\net9.0\\System.Private.CoreLib.dll --ignoreUnknownCil true --outputFile System.Tests.asm System.Tests.dll",
+      "workingDirectory": "C:\\Users\\drcjt\\source\\repos\\CSharp-80-main\\Tests\\CoreLib\\System.Tests\\bin\\Debug\\net9.0",
       "sqlDebugging": false
     }
   }

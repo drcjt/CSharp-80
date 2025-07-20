@@ -5,7 +5,7 @@ namespace System.Runtime
 {
     internal static class RuntimeExports
     {
-        internal static unsafe object Box(EEType* pEEType, ref byte data)
+        internal static unsafe object? Box(EEType* pEEType, ref byte data)
         {
             // Allocate box
             object result = InternalCalls.NewObject(pEEType);
@@ -14,6 +14,27 @@ namespace System.Runtime
             Unsafe.CopyBlock(ref result.GetRawData(), ref data, pEEType->ValueTypeSize);
 
             return result;
+
+            /*
+            if (pEEType->IsNullable)
+            {
+                if (data == 0)
+                    return null;
+
+                // TODO: boxing of nullables
+                // Need to determine type of nullable via generic parameter
+                // Need to determine offset to actual data in nullable
+                throw new NotImplementedException();
+            }
+
+            // Allocate box
+            object result = InternalCalls.NewObject(pEEType);
+
+            // Copy data into box
+            Unsafe.CopyBlock(ref result.GetRawData(), ref data, pEEType->ValueTypeSize);
+
+            return result;
+            */
         }
 
         internal static unsafe void Unbox(object? obj, ref byte data, EEType* pUnboxToEEType)

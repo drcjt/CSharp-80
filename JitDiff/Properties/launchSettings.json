@@ -2,7 +2,7 @@
   "profiles": {
     "JitDiff": {
       "commandName": "Project",
-      "commandLineArgs": "c:\\users\\drcjt\\source\\repos\\csharp-80-base c:\\users\\drcjt\\source\\repos\\csharp-80-clean"
+      "commandLineArgs": "c:\\users\\drcjt\\source\\repos\\csharp-80-jitdiff\\samples\\calcpi c:\\users\\drcjt\\source\\repos\\csharp-80-main\\samples\\calcpi"
     }
   }
 }

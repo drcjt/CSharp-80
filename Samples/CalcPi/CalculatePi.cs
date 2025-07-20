@@ -73,6 +73,7 @@ namespace CalculatePi
                 if (i == 0)
                     Console.Write('.');
             }
+            Console.WriteLine();
         }
     }
 }

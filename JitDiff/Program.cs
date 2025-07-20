@@ -62,7 +62,7 @@ namespace JitDiff
         [GeneratedRegex(@"for method (.*)$")]
         private static partial Regex NamePattern();
 
-        [GeneratedRegex(@"code ([0-9]{1,})")]
+        [GeneratedRegex(@"code ([0-9]{1,}) for")]
         private static partial Regex CodeSizePattern();
 
         private static List<MethodInfo> ExtractMethodInfo(string filePath)

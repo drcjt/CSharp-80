@@ -1,4 +1,5 @@
 ﻿using Internal.Runtime.CompilerServices;
+using System;
 using System.Runtime.CompilerServices;
 
 namespace Internal.Runtime
@@ -43,6 +44,25 @@ namespace Internal.Runtime
 
         internal EETypeElementType ElementType => (EETypeElementType)(_usFlags);
 
+        internal bool IsNullable => ElementType == EETypeElementType.Nullable;
+
         internal uint ValueTypeSize => (uint)(BaseSize - 2);
+
+        /*
+        internal EEType* NullableType
+        {
+            get
+            {
+                return GenericArguments[0];
+            }
+        }
+        */
+
+        public nint GetFieldOffset()
+        {
+            nint dispatchMapSize = (nint)((byte*)Unsafe.AsPointer(ref this) + sizeof(EEType) + sizeof(void*) * (_numVtableSlots + _numInterfaces));
+
+            return 0;
+        }
     }
 }
