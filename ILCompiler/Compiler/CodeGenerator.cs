@@ -7,6 +7,7 @@ using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Dnlib;
 using System.Diagnostics;
 using static ILCompiler.Compiler.Emit.Registers;
+using System.Linq;
 
 namespace ILCompiler.Compiler
 {
@@ -52,7 +53,7 @@ namespace ILCompiler.Compiler
 
             if (Compilation.AnyExceptionHandlers)
             {
-                GenerateMethodUnwindInfo();
+                methodCodeNode.ParameterBytes = CalculateParameterBytes();
             }
 
             _context.InstructionsBuilder.Label(methodName);
@@ -113,23 +114,20 @@ namespace ILCompiler.Compiler
             return methodInstructions;
         }
 
-        private void GenerateMethodUnwindInfo()
+        private byte CalculateParameterBytes()
         {
             // Think of this as the unwind information
             // Could expand from single byte for number of parameters
             // For example to handle frameless methods.
 
-            // Emit byte before method as number of bytes parameters take up on stack - basically unwind info for exception handling
             var totalParametersSize = 0;
-            foreach (var local in _context.LocalVariableTable)
+            foreach (var local in _context.LocalVariableTable.Where(local => local.IsParameter))
             {
-                if (local.IsParameter)
-                {
-                    totalParametersSize += local.ExactSize;
-                }
+                totalParametersSize += local.ExactSize;
             }
+
             Debug.Assert(totalParametersSize <= Byte.MaxValue);
-            _context.InstructionsBuilder.Db((byte)totalParametersSize, "Total Parameter Size");
+            return (byte)totalParametersSize;
         }
 
         private void AssignFrameOffsets()
