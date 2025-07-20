@@ -64,7 +64,7 @@
 
         public virtual int Count => _size;
 
-        public virtual object? Peek()
+        public object? Peek()
         {
             if (_size == 0)
             {
@@ -74,7 +74,7 @@
             return _array[_size - 1];
         }
 
-        public virtual object? Pop()
+        public  object? Pop()
         {
             if (_size == 0)
             {
@@ -86,7 +86,7 @@
             return value;
         }
 
-        public virtual void Push(object? value)
+        public void Push(object? value)
         {
             if (_size == _array.Length)
             {

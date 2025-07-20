@@ -19,13 +19,11 @@ namespace Chess
 
         public void SetupPosition(string fen)
         {
-            Array.Clear(_state, 0, _state.Length);
-            /*
+            // Array.Clear(_state, 0, _state.Length);
             for (int i = 0; i < _state.Length; i++)
             {
                 _state[i] = 0;
             }
-            */
 
             for (int rank = 0; rank < 8; rank++)
             {

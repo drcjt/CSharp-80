@@ -29,7 +29,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
     <ProjectReference Include="..\..\ILCompiler\ILCompiler.csproj" />
-    <ProjectReference Include="..\..\Tests\Common\Tests.Common.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

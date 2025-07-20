@@ -1,6 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-
-namespace System.Collections.Generic
+﻿namespace System.Collections.Generic
 {
     public class List<T> : IList<T>
     {
@@ -72,28 +70,10 @@ namespace System.Collections.Generic
             }
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(T item)
         {
-            T[] array = _items;
-            int size = _size;
-            if (size < array.Length)
-            {
-                _size = size + 1;
-                array[size] = item;
-            }
-            else
-            {
-                AddWithResize(item);
-            }
-        }
-
-        private void AddWithResize(T item)
-        {
-            int size = _size;
-            Grow(size + 1);
-            _size = size + 1;
-            _items[size] = item;
+            if (_size == _items.Length) { EnsureCapacity(_size + 1); }
+            _items[_size++] = item;
         }
 
         public bool Remove(T item)
@@ -108,31 +88,14 @@ namespace System.Collections.Generic
             return false;
         }
 
-        internal void Grow(int capacity)
+        private void EnsureCapacity(int min)
         {
-            Capacity = GetNewCapacity(capacity);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private int GetNewCapacity(int capacity)
-        {
-            int newCapacity = _items.Length == 0 ? DefaultCapacity : _items.Length * 2;
-
-            if (newCapacity > Array.MaxLength) newCapacity = Array.MaxLength;
-
-            if (newCapacity < capacity) newCapacity = capacity;
-
-            return newCapacity;
-        }
-
-        private int EnsureCapacity(int capacity)
-        {
-            if (_items.Length < capacity)
+            if (_items.Length < min)
             {
-                Grow(capacity);
+                int newCapacity = _items.Length == 0 ? DefaultCapacity : _items.Length * 2;
+                if (newCapacity < min) newCapacity = min;
+                Capacity = newCapacity;
             }
-
-            return _items.Length;
         }
 
         public void Clear()
@@ -204,20 +167,6 @@ namespace System.Collections.Generic
                     _currentElement = default;
                     return false;
                 }
-
-
-/*
-                if (_index < _list._size)
-                {
-                    _currentElement = _list[_index];
-                    _index++;
-                    return true;
-                }
-
-                _index = _list._size + 1;
-                _currentElement = default;
-                return false;
-*/
             }
 
             public readonly T Current => _currentElement!;

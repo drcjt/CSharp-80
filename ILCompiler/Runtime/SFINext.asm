@@ -48,15 +48,6 @@ SFINEXT:
 	LD E, (HL)
 	INC HL
 	LD D, (HL)
-	INC HL
-
-	; Get current instruction pointer
-	LD C, (HL)
-	INC HL
-	LD B, (HL)
-
-	; Save current instuction pointer
-	LD (CURRIP), BC
 
 	LD H, D
 	LD L, E
@@ -90,72 +81,22 @@ SFINEXT:
 	PUSH BC
 	PUSH HL
 
-	LD DE, (CURRIP)
-	LD HL, UNWIND_TABLE
-
-	; Search the unwind table for entry where the current instruction pointer
-	; lies between the start/end addresses to get the number of bytes the
-	; parameters for the method occupy on the stack
-FINDMETHOD_LOOP:
-
-	LD C, (HL)	; Load IP Start into BC
-	INC HL
-	LD B, (HL)
-	INC HL
-
-	PUSH HL		; Save Table Pointer
-
-	LD H, B		; Load IP Start into HL
+	; Determine address of method being called that we are unwinding
+	LD H, B
 	LD L, C
-
-	EX DE, HL	; DE = IP start, HL = currentPC
-
-	AND A		; check if currentPC > IP Start, carry set if true
-	SBC HL, DE
-	ADD HL, DE
-
-	EX DE, HL	; DE = currentPC, HL = IP start
-	POP HL		; HL = table pointer
-
-	; Current row is not a match
-	JR C, FINDMETHOD_NOMATCH_STARTIP
-
-	LD C, (HL)	; Load IP End into BC
-	INC HL
+	DEC HL
 	LD B, (HL)
-	INC HL
-	
-	PUSH HL		; Save Table Pointer
+	DEC HL
+	LD C, (HL)
 
-	LD H, B		; Load IP End into HL
-	LD L, C
-	
-	AND A		; check if IP End (HL) >= currentPC (DE)
-	SBC HL, DE
-	ADD HL, DE
+	; Unwind information is immediately before the method
+	DEC BC
 
-	POP HL
+	; Unwind information is the number of bytes for the parameters on the stack prior to the call
+	LD A, (BC)
 
-	JR C, FINDMETHOD_NOMATCH_ENDIP	
-	
-	; Got a Match
-	JR FINDMETHOD_END
-
-FINDMETHOD_NOMATCH_STARTIP:
-	; HL = current table pointer (IP end)
-	; DE = currentPC
-		
-	INC HL	; Skip over IP end
-	INC HL	
-
-FINDMETHOD_NOMATCH_ENDIP:
-	INC HL	; Skip over parameter bytes
-
-	JR FINDMETHOD_LOOP
-
-FINDMETHOD_END:
 	LD D, 0
-	LD E, (HL)		; Parameters in bytes
+	LD E, A
 
 	; Restore stack pointer and add bytes to remove parameters on the stack
 	POP HL
@@ -219,5 +160,3 @@ SFINEXT_RETVALUE:
 
 	PUSH BC
 	RET
-
-CURRIP:	DW 0	; Holds the current instruction pointer

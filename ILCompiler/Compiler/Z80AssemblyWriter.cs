@@ -301,8 +301,6 @@ namespace ILCompiler.Compiler
                 }
             }
 
-            var methodsRequiringUnwindInfo = new List<Z80MethodCodeNode>();
-
             using (_out = new StreamWriter(new FileStream(outputFilePath, FileMode.Create, FileAccess.Write, FileShare.Read, 4096, false), Encoding.ASCII))
             {
                 WriteProlog(rootNode);
@@ -316,22 +314,15 @@ namespace ILCompiler.Compiler
                             var mangledName = codeNode.GetMangledName(_nameMangler);
                             if (!allReferencedMethods.Contains(mangledName))
                             {
-                                _logger.LogInformation("Skipping method {MethodName} as not referenced", codeNode.Method.FullName);
+                                _logger.LogInformation("Skipping method {methodName} as not referenced", codeNode.Method.FullName);
                                 continue;
                             }
                         }
 
                         var instructions = GetInstructions(node, inputFilePath, modules);
                         WriteInstructions(instructions);
-
-                        if (instructions.Count > 0 && node is Z80MethodCodeNode methodCodeNode)
-                        {
-                            methodsRequiringUnwindInfo.Add(methodCodeNode);
-                        }
                     }
                 }
-
-                WriteUnwindTable(methodsRequiringUnwindInfo);
 
                 WriteEhClauses(nodes);
 
@@ -341,38 +332,6 @@ namespace ILCompiler.Compiler
             }
 
             _logger.LogDebug("Written compiled file to {_outputFilePath}", outputFilePath);
-        }
-
-        private void WriteUnwindTable(IReadOnlyCollection<Z80MethodCodeNode> nodes)
-        {
-            if (Compilation.AnyExceptionHandlers)
-            {
-                var mostUsedNumberOfParameters = nodes.GroupBy(node => node.ParameterBytes)
-                                                      .OrderByDescending(g => g.Count())
-                                                      .Select(g => g.Key)
-                                                      .First();
-
-                InstructionsBuilder unwindBuilder = new InstructionsBuilder();
-                unwindBuilder.Label("UNWIND_TABLE");
-                foreach (var node in nodes)
-                {
-                    if (node.Method.Name != "ThrowException" && node.ParameterBytes != mostUsedNumberOfParameters)
-                    {
-                        var mangledName = node.GetMangledName(_nameMangler);
-
-                        unwindBuilder.Dw(mangledName, "Method Start");
-                        unwindBuilder.Dw($"{mangledName}_END", "Method End");
-                        unwindBuilder.Db(node.ParameterBytes, "Unwind Parameter Bytes");
-                    }
-                }
-
-                unwindBuilder.Dw(0, "Catch all entry start");
-                unwindBuilder.Dw(0xFFFF, "Catch all entry end");
-                unwindBuilder.Db(mostUsedNumberOfParameters, "Catch all unwind parameter bytes");
-
-                unwindBuilder.Label("UNWIND_TABLE_END");
-                WriteInstructions(unwindBuilder.Instructions);
-            }
         }
 
         private void WriteEhClauses(IReadOnlyCollection<IDependencyNode> nodes)

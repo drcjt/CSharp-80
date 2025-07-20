@@ -25,7 +25,7 @@
                 if (Architecture == TargetArchitecture.Z80)
                 {
                     // TODO: May need to remove this when implementing longs & doubles
-                    return 8;
+                    return 4;
                 }
 
                 // TODO: Why is this an appropriate default??
@@ -80,9 +80,6 @@
                 case TypeFlags.Int32:
                 case TypeFlags.UInt32:
                     return new LayoutInt(4);
-                case TypeFlags.Int64:
-                case TypeFlags.UInt64:
-                    return new LayoutInt(8);
                 //case ElementType.Pinned:
                     //return GetWellKnownTypeSize(type.Next);
                 case TypeFlags.IntPtr:

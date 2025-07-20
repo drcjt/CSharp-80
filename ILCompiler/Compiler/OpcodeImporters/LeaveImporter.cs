@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             var targetBlock = importer.BasicBlocks[(int)target.Offset];
 
-            //importer.ImportAppendTree(new JumpEntry(targetBlock.Label));
+            importer.ImportAppendTree(new JumpEntry(targetBlock.Label));
             importer.ImportFallThrough(targetBlock);
 
             // TODO: Finally blocks
