@@ -2,8 +2,80 @@
 
 namespace Exceptions
 {
+    internal class VirtualMethodExceptionBase
+    {
+        public virtual void Test() { }
+    }
+
+    internal class VirtualMethodExceptionDerivedThrows : VirtualMethodExceptionBase
+    {
+        public override void Test()
+        {
+            throw new Exception();
+        }
+    }
+
+    internal class VirtualMethodExceptionDerivedDoesNotThrow : VirtualMethodExceptionBase
+    {
+        public override void Test()
+        {
+        }
+    }
+
+    interface InterfaceWithManyParameters
+    {
+        int ManyParameters(int a, int b, int c, int d, int e, int f, int g, int h);
+    }
+
+    class ClassWithManyParameters : InterfaceWithManyParameters
+    {
+        public int ManyParameters(int a, int b, int c, int d, int e, int f, int g, int h)
+        {
+            if (a > 0)
+                throw new Exception();
+            else
+                return 42;
+        }
+    }
+
     internal static class SimpleExceptionTests
     {
+        private static int Try_VirtualMethodCallNoThrow()
+        {
+            var testClass = new VirtualMethodExceptionDerivedDoesNotThrow();
+
+            int result = 0;
+
+            try
+            {
+                testClass.Test();
+            }
+            catch
+            {
+                result = 1;
+            }
+
+            return result;
+        }
+
+        private static int TryCatch_VirtualMethodCallThrows_IsCaught()
+        {
+            var testClass = new VirtualMethodExceptionDerivedThrows();
+
+            int result = 1;
+
+            try
+            {
+                testClass.Test();
+            }
+            catch
+            {
+                result = 0;
+            }
+
+            return result;
+        }
+
         private static int Try_NoThrow()
         {
             int result;
@@ -44,7 +116,7 @@ namespace Exceptions
                 {
                     throw new Exception();
                 }
-                catch 
+                catch
                 {
                 }
                 throw new Exception();
@@ -201,6 +273,32 @@ namespace Exceptions
             }
         }
 
+        public static int TryCatch_WithInterfaceMethodWithManyParameters_UnwindsCorrectly()
+        {
+            int numExceptions = 0;
+
+            InterfaceWithManyParameters testInstance = new ClassWithManyParameters();
+            int a = -1;
+            for (int i = 0; i < 3; i++)
+            {
+                try
+                {
+                    Console.WriteLine(a);
+                    testInstance.ManyParameters(a, 0, 0, 0, 0, 0, 0, 0);
+                }
+                catch
+                {
+                    numExceptions++;
+                }
+                a = -a;
+            }
+
+            Console.WriteLine("Number of exceptions");
+            Console.Write(numExceptions);
+
+            return numExceptions == 1 ? 0 : 1;
+        }
+
         public static int RunTests()
         {
             int result = Try_NoThrow(); if (result != 0) return result;
@@ -212,6 +310,10 @@ namespace Exceptions
             result = TryCatchOfNRE_WhenNREThrown_IsCaught(); if (result != 0) return result;
             result = TryCatch_WithThrowingMethodHavingAParameter_StackIsRestoredCorrectly(); if (result != 0) return result;
             result = TryCatch_ThrowBeforeTry_IsNotCaughtByInnerTry(); if (result != 0) return result;
+            result = Try_VirtualMethodCallNoThrow(); if (result != 0) return result;
+            result = TryCatch_VirtualMethodCallThrows_IsCaught(); if (result != 0) return result;
+            result = TryCatch_WithInterfaceMethodWithManyParameters_UnwindsCorrectly(); if (result != 0) return result;
+
             TryCatch_WithCatchType_CatchTypeIsAddedAsDependency();
 
             return result;

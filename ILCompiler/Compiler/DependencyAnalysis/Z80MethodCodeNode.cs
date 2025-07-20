@@ -28,6 +28,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         public IList<EHClause> EhClauses { get; set; } = new List<EHClause>();
 
+        public byte ParameterBytes { get; set; } = 0;
+
         public int ParamsCount { get; set; }
         public int LocalsCount => Method.MethodIL?.LocalsCount ?? 0;
 
