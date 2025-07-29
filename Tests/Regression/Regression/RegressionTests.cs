@@ -22,6 +22,8 @@ namespace Regression
 
             Bug617();
 
+            Bug660Test();
+
             return 0;
         }
 
@@ -68,6 +70,23 @@ namespace Regression
             return t.ToArray();
         }
 
+        public static void Bug660Test()
+        {
+            int[] balls = new int[10];
+
+            bool bouncing = true;
+            while (bouncing)
+            {
+                for (int i = 0; i < balls.Length; i++)
+                {
+                    if (i == 5)
+                    {
+                        bouncing = false;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     public class Bug545Test<T>()

@@ -373,6 +373,16 @@ namespace ILCompiler.Compiler
             return dominanceFrontierMap;
         }
 
+        private static DominatorTreeNode GetOrCreate(BasicBlock block, Dictionary<BasicBlock, DominatorTreeNode> nodeMap)
+        {
+            if (!nodeMap.TryGetValue(block, out var node))
+            {
+                node = new DominatorTreeNode(block);
+                nodeMap[block] = node;
+            }
+            return node;
+        }
+
         private DominatorTreeNode BuildDominatorTree(IList<BasicBlock> blocks)
         {
             _logger.LogDebug("[SsaBuilder:BuildDominatorTree])");
@@ -386,24 +396,15 @@ namespace ILCompiler.Compiler
                 var immediateDominator = block.ImmediateDominator;
                 if (immediateDominator != null)
                 {
-                    DominatorTreeNode? node;
-                    if (!nodeMap.TryGetValue(immediateDominator, out node))
-                    {
-                        node = new DominatorTreeNode(immediateDominator);
-                        nodeMap[immediateDominator] = node;
-                    }
-
-                    var childNode = new DominatorTreeNode(block);
+                    DominatorTreeNode node = GetOrCreate(immediateDominator, nodeMap);
+                    DominatorTreeNode childNode = GetOrCreate(block, nodeMap);
                     nodeMap[block] = childNode;
                     node.Children.Add(childNode);
                 }
                 else
                 {
-                    if (!nodeMap.TryGetValue(block, out rootNode))
-                    {
-                        rootNode = new DominatorTreeNode(block);
-                        nodeMap.Add(block, rootNode);
-                    }
+                    rootNode = new DominatorTreeNode(block);
+                    nodeMap.Add(block, rootNode);
                 }
             }
 
@@ -460,16 +461,22 @@ namespace ILCompiler.Compiler
                     }
 
                     // Intersect DOM, if computed for all predecessors
-                    var basicBlockDominator = predecessorBlock;
+                    BasicBlock? basicBlockDominator = null;
                     foreach (var predecessor in BlockDominancePredecessors(block))
                     {
-                        if (predecessorBlock != predecessor)
+                        var domPred = predecessor;
+
+                        // Skip predecessors not yet visited
+                        if (domPred.PostOrderNum <= i)
+                            continue;
+
+                        if (basicBlockDominator is null)
                         {
-                            var dominatorAncestor = IntersectDominators(predecessor, basicBlockDominator);
-                            if (dominatorAncestor != null)
-                            {
-                                basicBlockDominator = dominatorAncestor;
-                            }
+                            basicBlockDominator = domPred;
+                        }
+                        else
+                        {
+                            basicBlockDominator = IntersectDominators(basicBlockDominator, domPred);
                         }
                     }
 
