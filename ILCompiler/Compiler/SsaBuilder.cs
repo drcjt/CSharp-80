@@ -373,7 +373,7 @@ namespace ILCompiler.Compiler
             return dominanceFrontierMap;
         }
 
-        private static DominatorTreeNode GetOrCreate(BasicBlock block, IDictionary<BasicBlock, DominatorTreeNode> nodeMap)
+        private static DominatorTreeNode GetOrCreate(BasicBlock block, Dictionary<BasicBlock, DominatorTreeNode> nodeMap)
         {
             if (!nodeMap.TryGetValue(block, out var node))
             {
