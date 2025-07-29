@@ -373,6 +373,16 @@ namespace ILCompiler.Compiler
             return dominanceFrontierMap;
         }
 
+        private static DominatorTreeNode GetOrCreate(BasicBlock block, IDictionary<BasicBlock, DominatorTreeNode> nodeMap)
+        {
+            if (!nodeMap.TryGetValue(block, out var node))
+            {
+                node = new DominatorTreeNode(block);
+                nodeMap[block] = node;
+            }
+            return node;
+        }
+
         private DominatorTreeNode BuildDominatorTree(IList<BasicBlock> blocks)
         {
             _logger.LogDebug("[SsaBuilder:BuildDominatorTree])");
@@ -386,30 +396,15 @@ namespace ILCompiler.Compiler
                 var immediateDominator = block.ImmediateDominator;
                 if (immediateDominator != null)
                 {
-                    DominatorTreeNode? node;
-                    if (!nodeMap.TryGetValue(immediateDominator, out node))
-                    {
-                        node = new DominatorTreeNode(immediateDominator);
-                        nodeMap[immediateDominator] = node;
-                    }
-
-                    DominatorTreeNode? childNode;
-                    if (!nodeMap.TryGetValue(block, out childNode))
-                    {
-                        childNode = new DominatorTreeNode(block);
-                        nodeMap[block] = childNode;
-                    }
-
+                    DominatorTreeNode node = GetOrCreate(immediateDominator, nodeMap);
+                    DominatorTreeNode childNode = GetOrCreate(block, nodeMap);
                     nodeMap[block] = childNode;
                     node.Children.Add(childNode);
                 }
                 else
                 {
-                    if (!nodeMap.TryGetValue(block, out rootNode))
-                    {
-                        rootNode = new DominatorTreeNode(block);
-                        nodeMap.Add(block, rootNode);
-                    }
+                    rootNode = new DominatorTreeNode(block);
+                    nodeMap.Add(block, rootNode);
                 }
             }
 
