@@ -393,7 +393,13 @@ namespace ILCompiler.Compiler
                         nodeMap[immediateDominator] = node;
                     }
 
-                    var childNode = new DominatorTreeNode(block);
+                    DominatorTreeNode? childNode;
+                    if (!nodeMap.TryGetValue(block, out childNode))
+                    {
+                        childNode = new DominatorTreeNode(block);
+                        nodeMap[block] = childNode;
+                    }
+
                     nodeMap[block] = childNode;
                     node.Children.Add(childNode);
                 }
@@ -460,16 +466,22 @@ namespace ILCompiler.Compiler
                     }
 
                     // Intersect DOM, if computed for all predecessors
-                    var basicBlockDominator = predecessorBlock;
+                    BasicBlock? basicBlockDominator = null;
                     foreach (var predecessor in BlockDominancePredecessors(block))
                     {
-                        if (predecessorBlock != predecessor)
+                        var domPred = predecessor;
+
+                        // Skip predecessors not yet visited
+                        if (domPred.PostOrderNum <= i)
+                            continue;
+
+                        if (basicBlockDominator is null)
                         {
-                            var dominatorAncestor = IntersectDominators(predecessor, basicBlockDominator);
-                            if (dominatorAncestor != null)
-                            {
-                                basicBlockDominator = dominatorAncestor;
-                            }
+                            basicBlockDominator = domPred;
+                        }
+                        else
+                        {
+                            basicBlockDominator = IntersectDominators(basicBlockDominator, domPred);
                         }
                     }
 
