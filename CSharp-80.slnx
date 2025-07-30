@@ -4,6 +4,7 @@
     <File Path="Documentation/intro-to-csharp-80.md" />
   </Folder>
   <Folder Name="/Samples/">
+    <Project Path="Samples/Balls/Balls.csproj" />
     <Project Path="Samples/CalcPi/CalcPi.csproj" />
     <Project Path="Samples/Checksum/Checksum.csproj" />
     <Project Path="Samples/Chess/Chess.csproj" />
@@ -24,6 +25,7 @@
     <Project Path="Samples/QSort/QSort.csproj" />
     <Project Path="Samples/Sample/Sample.csproj" />
     <Project Path="Samples/SampleDsk/SampleDsk.csproj">
+      <BuildDependency Project="Samples/Balls/Balls.csproj" />
       <BuildDependency Project="Samples/Music/Music.csproj" />
     </Project>
     <Project Path="Samples/Snake/Snake.csproj" />
