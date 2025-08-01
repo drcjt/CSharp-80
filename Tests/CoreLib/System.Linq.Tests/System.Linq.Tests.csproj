@@ -20,6 +20,9 @@
 	  <OutputType>Exe</OutputType>
 
 	  <AssemblyVersion>1.0.0.0</AssemblyVersion>
+
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>.\GeneratedFiles</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,6 +35,11 @@
     <ProjectReference Include="..\..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
     <ProjectReference Include="..\..\..\ILCompiler\ILCompiler.csproj" />
     <ProjectReference Include="..\..\Common\Tests.Common.csproj" />
+    <ProjectReference Include="..\..\XUnit.SourceGenerator\XUnit.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+  </ItemGroup>
+
 </Project>

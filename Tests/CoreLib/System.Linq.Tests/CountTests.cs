@@ -5,6 +5,7 @@ namespace System.Linq.Tests
 {
     static class CountTests
     {
+        [Fact]
         public static void CountMatchesTallyTests()
         {
             var range = new int[] { 1, 2, 3, 4, 5 };
