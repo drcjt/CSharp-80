@@ -86,10 +86,11 @@ namespace XUnit.SourceGenerator
 
                             mainBody.AppendLine(methodCall);
 
+#if LOG_PASSING_TEST_NAMES
                             string testPassingMessage = $"{containingType}.{method.Name} ({attributes}) passed";
                             testPassingMessage = testPassingMessage.Replace("\"", "\\\""); // Escape quotes for C# string
-
                             mainBody.AppendLine($"System.Console.WriteLine(\"{testPassingMessage}\");");
+#endif
                         }
                     }
                 }
