@@ -236,3 +236,6 @@ project.lock.json
 /Tests/ILCompiler.IntegrationTests/il_bvt/*.dll
 /Tests/ILCompiler.IntegrationTests/il_bvt/*.asm
 /benchmark-results.txt
+
+# Incremental Source Generator output
+*.g.cs
