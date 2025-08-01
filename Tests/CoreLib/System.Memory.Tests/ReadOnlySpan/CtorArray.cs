@@ -1,7 +1,10 @@
-﻿namespace System.Memory.Tests
+﻿using Xunit;
+
+namespace System.Memory.Tests
 {
     public static partial class ReadOnlySpanTests
     {
+        [Fact]
         public static void CtorArray_Integers()
         {
             int[] a = { 91, 92, -93, 94 };
@@ -14,6 +17,7 @@
             span.Validate(91, 92, -93, 94);
         }
 
+        [Fact]
         public static void CtorArray_Objects()
         {
             object o1 = new object();
