@@ -21,11 +21,15 @@ namespace System.String.Tests
             Assert.Same(string.Empty, new string(ReadOnlySpan<char>.Empty));
         }
 
-        [Theory]
-        [InlineData(new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' }, 0, 8, "abcdefgh")]
-        [InlineData(new char[] { 'a', 'b', 'c' }, 0, 1, "a")]
-        [InlineData(new char[] { 'a', 'b', 'c' }, 2, 1, "c")]
-        public static void Ctor_CharSpan(char[] data, int startIndex, int length, string expected)
+        [Fact]
+        public static void Ctor_CharSpan_Tests()
+        {
+            Ctor_CharSpan(new char[] { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' }, 0, 8, "abcdefgh");
+            Ctor_CharSpan(new char[] { 'a', 'b', 'c' }, 0, 1, "a");
+            Ctor_CharSpan(new char[] { 'a', 'b', 'c' }, 2, 1, "c");
+        }
+
+        private static void Ctor_CharSpan(char[] data, int startIndex, int length, string expected)
         {
             var span = new ReadOnlySpan<char>(data, startIndex, length);
             Assert.Equal(expected, new string(span));
