@@ -7,6 +7,7 @@ namespace System.Collections.Tests
     {
         public class DefaultType { }
 
+        [Fact]
         public static void Default_ForType_CreatesNoMoreThanOneComparerInstance()
         {
             _ = EqualityComparer<DefaultType>.Default;
@@ -19,6 +20,7 @@ namespace System.Collections.Tests
             Assert.Equal(afterComparerCreation, afterAllComparerRequests);
         }
 
+        [Fact]
         public static void EqualsTests()
         {
             EqualsTest<byte>(3, 3, true);
