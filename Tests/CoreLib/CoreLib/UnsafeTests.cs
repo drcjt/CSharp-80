@@ -5,6 +5,7 @@ namespace CoreLib
 {
     public class UnsafeTests
     {
+        [Fact]
         public static void SizeOfTests()
         {
             Assert.Equal(1, Unsafe.SizeOf<sbyte>());
@@ -17,7 +18,14 @@ namespace CoreLib
             Assert.Equal(8, Unsafe.SizeOf<Byte4Short2>());
         }
 
-        private static unsafe void InitBlockStack(int numBytes, byte value)
+        [Theory]
+        [InlineData(0, 1)]
+        [InlineData(1, 1)]
+        [InlineData(10, 0)]
+        [InlineData(10, 2)]
+        [InlineData(10, 255)]
+        [InlineData(1000, 255)]
+        public static unsafe void InitBlockStack(int numBytes, byte value)
         {
             byte* stackPtr = stackalloc byte[numBytes];
             Unsafe.InitBlock(stackPtr, value, (uint)numBytes);
@@ -27,17 +35,13 @@ namespace CoreLib
             }
         }
 
-        public unsafe static void InitBlockTests()
-        {
-            InitBlockStack(0, 1);
-            InitBlockStack(1, 1);
-            InitBlockStack(10, 0);           
-            InitBlockStack(10, 2);
-            InitBlockStack(10, 255);
-            InitBlockStack(1000, 255);
-        }
-
-        private static unsafe void CopyBlockStack(int numBytes)
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(10)]
+        [InlineData(100)]
+        [InlineData(1000)]
+        public static unsafe void CopyBlockStack(int numBytes)
         {
             byte* source = stackalloc byte[numBytes];
             byte* destination = stackalloc byte[numBytes];
@@ -58,15 +62,7 @@ namespace CoreLib
             }
         }
 
-        public unsafe static void CopyBlockTests()
-        {
-            CopyBlockStack(0);
-            CopyBlockStack(1);
-            CopyBlockStack(10);
-            CopyBlockStack(100);
-            CopyBlockStack(1000);
-        }
-
+        [Fact]
         public static void RefAs()
         {
             TestBytes testBytes = new TestBytes();

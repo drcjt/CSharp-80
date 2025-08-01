@@ -36,6 +36,7 @@ namespace CoreLib
 
     internal class TypeCastTests
     {
+        [Fact]
         public static void ClassTypeCastTests()
         {
             var super = new SuperClass();
@@ -49,6 +50,7 @@ namespace CoreLib
             Assert.True(sub is Object);
         }
 
+        [Fact]
         public static void InterfaceTypeCastTests()
         {
             var one = new One();

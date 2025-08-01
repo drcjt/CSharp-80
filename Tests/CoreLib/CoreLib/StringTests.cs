@@ -5,6 +5,7 @@ namespace CoreLib
 {
     public static class StringTests
     {
+        [Fact]
         public static unsafe void NewStringTests()
         {
             var chars = new char[25];
@@ -12,13 +13,8 @@ namespace CoreLib
             Assert.Equal(25, newString.Length);
         }
 
-        public static void SubstringTests()
-        {
-            ValidSubstringTests();
-            InvalidSubstringTests();
-        }
-
-        private static void ValidSubstringTests()
+        [Fact]
+        public static void ValidSubstringTests()
         {
             var source = "abcde";
             var middle = source.Substring(1, 3);
@@ -30,7 +26,8 @@ namespace CoreLib
             }
         }
 
-        private static void InvalidSubstringTests()
+        [Fact]
+        public static void InvalidSubstringTests()
         {
             var source = "abcde";
             var invalid1 = source.Substring(10, 2);
@@ -40,6 +37,7 @@ namespace CoreLib
             Assert.Equal(true, invalid2 == null);
         }
 
+        [Fact]
         public static void EqualsTests()
         {
             var str1 = "abc";
