@@ -5,6 +5,8 @@ namespace System.Tests
     internal static class DateTimeTests
     {
         private static readonly DateTime _testDateTime = new DateTime(10, 9, 8, 7);
+
+        [Fact]
         public static void Ctor_Int_Int_Int_Int()
         {
             VerifyDateTime(_testDateTime, 10, 9, 8, 7);
@@ -18,6 +20,7 @@ namespace System.Tests
             Assert.Equal(second, dateTime.Second);
         }
 
+        [Fact]
         public static void Equals_Tests()
         {
             EqualsTest(_testDateTime, _testDateTime, true);

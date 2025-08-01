@@ -4,6 +4,7 @@ namespace System.Tests
 {
     internal static class IntPtrTests
     {
+        [Fact]
         public static void EqualsTests()
         {
             EqualsTest((nint)42, (nint)42, true);

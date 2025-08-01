@@ -5,6 +5,7 @@ namespace System.Tests
 {
     internal static class ArrayTests
     {
+        [Fact]
         public static void GetValue_RankOneInt_SetValue()
         {
             var intArray = new int[] { 7, 8, 9 };
@@ -23,6 +24,7 @@ namespace System.Tests
             Assert.Equal(43, array.GetValue(2));
         }
 
+        [Fact]
         public static void IndexOf_ArrayTests()
         {
             var sbyteArray = new sbyte[] { 1, 2, 3, 3 };
@@ -99,6 +101,7 @@ namespace System.Tests
             Assert.Equal(expected >= 0, iList.Contains(value));
         }
 
+        [Fact]
         public static void GetEnumerator()
         {
             GetEnumerator(Array.Empty<int>());
@@ -129,6 +132,7 @@ namespace System.Tests
             }
         }
 
+        [Fact]
         public static void EmptyTests()
         {
             Assert.True(Array.Empty<int>() != null);

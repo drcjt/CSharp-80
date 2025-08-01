@@ -4,6 +4,7 @@ namespace System.Tests
 {
     internal static class ObjectTests
     {
+        [Fact]
         public static void EqualsTests()
         {
             var obj1 = new object();
@@ -26,6 +27,7 @@ namespace System.Tests
             Assert.Equal(expected, Equals(obj1, obj2));
         }
 
+        [Fact]
         public static void ReferenceEqualsTests()
         {
             var equalsTester1 = new EqualsTester(7);

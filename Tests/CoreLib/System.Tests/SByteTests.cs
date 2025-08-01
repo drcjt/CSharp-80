@@ -4,36 +4,36 @@ namespace System.Tests
 {
     internal static class SByteTests
     {
+        [Fact]
         public static void Ctor_Empty()
         {
             var i = new sbyte();
             Assert.Equal(0, i);
         }
 
+        [Fact]
         public static void MaxValue()
         {
             Assert.Equal(0x7F, sbyte.MaxValue);
         }
 
+        [Fact]
         public static void MinValue()
         {
             Assert.Equal(-0x80, sbyte.MinValue);
         }
 
-        public static void EqualsTests()
-        {
-            EqualsTest((sbyte)78, (sbyte)78, true);
-            EqualsTest((sbyte)78, (sbyte)-78, false);
-            EqualsTest((sbyte)78, (sbyte)0, false);
-            EqualsTest((sbyte)0, (sbyte)0, true);
-            EqualsTest((sbyte)-78, (sbyte)-78, true);
-            EqualsTest((sbyte)-78, (sbyte)78, false);
-            EqualsTest((sbyte)78, null, false);
-            EqualsTest((sbyte)78, "78", false);
-            EqualsTest((sbyte)78, 78, false);
-        }
-
-        private static void EqualsTest(sbyte i, object? obj, bool expected)
+        [Theory]
+        [InlineData((sbyte)78, (sbyte)78, true)]
+        [InlineData((sbyte)78, (sbyte)-78, false)]
+        [InlineData((sbyte)78, (sbyte)0, false)]
+        [InlineData((sbyte)0, (sbyte)0, true)]
+        [InlineData((sbyte)-78, (sbyte)-78, true)]
+        [InlineData((sbyte)-78, (sbyte)78, false)]
+        [InlineData((sbyte)78, null, false)]
+        [InlineData((sbyte)78, "78", false)]
+        [InlineData((sbyte)78, 78, false)]
+        public static void EqualsTest(sbyte i, object? obj, bool expected)
         {
             if (obj is sbyte j)
             {
