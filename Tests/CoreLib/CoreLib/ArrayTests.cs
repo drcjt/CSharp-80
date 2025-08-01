@@ -4,6 +4,7 @@ namespace CoreLib
 {
     public static class ArrayTests
     {
+        [Fact]
         public static void ForEachArrayEnumerationTests()
         {            
             int sum = 0;

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using Xunit;
 
 namespace CoreLib
 {
     public static class ArrayListTests
     {
+        [Fact]
         public static void Ctor_Empty()
         {
             var arrayList = new ArrayList();
@@ -13,12 +13,17 @@ namespace CoreLib
             Assert.Equal(0, arrayList.Capacity);
         }
 
+        [Theory]
+        [InlineData(2)]
+        [InlineData(16)]
         public static void Ctor_Int(int capacity)
         {
             var arrayList = new ArrayList(capacity);
             Assert.Equal(capacity, arrayList.Capacity);
         }
 
+        [Theory]
+        [InlineData(10)]
         public static void Add_SmallCapacity(int count)
         {
             var arrayList = new ArrayList(1);
@@ -40,6 +45,7 @@ namespace CoreLib
             Assert.Equal(0, arrayList.Count);
         }
 
+        [Fact]
         public static void IndexOf_Int()
         {
             var data = new int[10];
@@ -56,6 +62,7 @@ namespace CoreLib
             }
         }
 
+        [Fact]
         public static void IndexOf_NonExistentObject()
         {
             var arrayList = new ArrayList(3);
@@ -68,6 +75,7 @@ namespace CoreLib
             Assert.Equal(-1, arrayList.IndexOf(5));
         }
 
+        [Fact]
         public static void GetEnumerator_Int()
         {
             var arrayList = new ArrayList(3);
@@ -83,6 +91,7 @@ namespace CoreLib
             }
         }
 
+        [Fact]
         public static void Remove_Int()
         {
             var arrayList = new ArrayList();
@@ -97,6 +106,7 @@ namespace CoreLib
             Assert.Equal(0, arrayList.Count);
         }
 
+        [Fact]
         public static void Clear_Int()
         {
             var arrayList = new ArrayList();
@@ -110,6 +120,7 @@ namespace CoreLib
             Assert.Equal(0, arrayList.Count);
         }
 
+        [Fact]
         public static void Contains_Int()
         {
             var arrayList = new ArrayList();
@@ -120,6 +131,7 @@ namespace CoreLib
             Assert.True(arrayList.Contains(2));
         }
 
+        [Fact]
         public static void Indexer_Int()
         {
             var arrayList = new ArrayList();
@@ -130,21 +142,6 @@ namespace CoreLib
             arrayList[1] = arrayList[0];
 
             Assert.Equal(arrayList[0], arrayList[1]);   
-        }
-
-        public static void RunArrayListTests()
-        {
-            Ctor_Empty();
-            Ctor_Int(2);
-            Ctor_Int(16);
-            Add_SmallCapacity(10);
-            IndexOf_Int();
-            IndexOf_NonExistentObject();
-            Remove_Int();
-            Clear_Int();
-            Contains_Int();
-            Indexer_Int();
-            GetEnumerator_Int();
         }
     }
 }

@@ -38,6 +38,7 @@
     <Project Path="Tests/ILCompiler.IntegrationTests/ILCompiler.IntegrationTests.csproj" />
     <Project Path="Tests/ILCompiler.Tests.Common/ILCompiler.Tests.Common.csproj" />
     <Project Path="Tests/ILCompiler.UnitTests/ILCompiler.UnitTests.csproj" />
+    <Project Path="Tests/XUnit.SourceGenerator/XUnit.SourceGenerator.csproj" Id="768648ab-85f4-455f-ba19-058c21d48e90" />
   </Folder>
   <Folder Name="/Tests/CodeGen/">
     <Project Path="Tests/CodeGen/CodeGenTestsRunner/CodeGenTests.csproj" />

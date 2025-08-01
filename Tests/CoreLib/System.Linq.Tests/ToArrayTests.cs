@@ -5,6 +5,7 @@ namespace System.Linq.Tests
 {
     static class ToArrayTests
     {
+        [Fact]
         public static void ToArray_CreatesACopyWhenNotEmpty()
         {
             int[] sourceArray = new int[] { 1, 2, 3, 4, 5 };

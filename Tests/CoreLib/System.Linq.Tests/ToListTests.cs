@@ -5,6 +5,7 @@ namespace System.Linq.Tests
 {
     static class ToListTests
     {
+        [Fact]
         public static void ToList_AlwaysCreatesACopy()
         {
             List<int> sourceList = [1, 2, 3, 4, 5];

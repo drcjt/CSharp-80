@@ -12,6 +12,12 @@ namespace CoreLib
             private bool field3;
         }
 
+        [Fact]
+        public static void AllocStringSizeTests()
+        {
+            AllocStringSizeTest(new char[5]);
+        }
+
         private static void AllocStringSizeTest(char[] chars)
         {
             // This is not GC safe
@@ -28,7 +34,8 @@ namespace CoreLib
             Assert.Equal(14, GC.GetTotalMemory() - totalMemory);
         }
 
-        private static void AllocObjectSizeTest()
+        [Fact]
+        public static void AllocObjectSizeTest()
         {
             // This is not GC safe
             var totalMemory = GC.GetTotalMemory();
@@ -45,7 +52,8 @@ namespace CoreLib
             Assert.Equal(10, GC.GetTotalMemory() - totalMemory);
         }
 
-        private static void AllocArraySizeTest()
+        [Fact]
+        public static void AllocArraySizeTest()
         {
             // This is not GC safe
             var totalMemory = GC.GetTotalMemory();
@@ -61,13 +69,7 @@ namespace CoreLib
             Assert.Equal(14, GC.GetTotalMemory() - totalMemory);
         }
 
-        static public void AllocSizeTests()
-        {
-            AllocArraySizeTest();
-            AllocStringSizeTest(new char[5]);
-            AllocObjectSizeTest();
-        }
-
+        [Fact]
         static public void AllocEETypeTests()
         {
             var str1 = new String(new char[5]);

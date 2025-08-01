@@ -4,57 +4,25 @@ namespace System.Collections.Tests
 {
     public static class StackTests
     {
-        public static int Main()
-        {
-            Ctor_Empty();
-
-            Ctor_Int(0);
-            Ctor_Int(1);
-            Ctor_Int(10);
-            Ctor_Int(100);
-
-            Contains();
-
-            GetEnumerator(0);
-            GetEnumerator(1);
-            GetEnumerator(10);
-            GetEnumerator(100);
-
-            Peek();
-
-            Peek_EmptyStack_ThrowsInvalidOperationException();
-
-            Pop(1, 1);
-            Pop(10, 10);
-            Pop(100, 100);
-            Pop(10, 5);
-            Pop(100, 50);
-
-            Pop_Null();
-
-            Pop_EmptyStack_ThrowsInvalidOperationException();
-
-            Push(1);
-            Push(10);
-            Push(100);
-
-            Push_Null();
-
-            return 0;
-        }
-
+        [Fact]
         public static void Ctor_Empty()
         {
             var stack = new Stack();
             Assert.Equal(0, stack.Count);
         }
 
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(10)]
+        [InlineData(100)]
         public static void Ctor_Int(int initialCapacity)
         {
             var stack = new Stack(initialCapacity);
             Assert.Equal(0, stack.Count);
         }
 
+        [Fact]
         public static void Contains()
         {
             Stack stack = Helpers.CreateIntStack(100);
@@ -74,6 +42,12 @@ namespace System.Collections.Tests
             Assert.False(stack.Contains(-1));
         }
 
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(10)]
+        [InlineData(100)]
         public static void GetEnumerator(int count)
         {
             Stack stack = Helpers.CreateIntStack(count);
@@ -93,6 +67,7 @@ namespace System.Collections.Tests
             }
         }
 
+        [Fact]
         public static void Peek()
         {
             int count = 100;
@@ -107,6 +82,7 @@ namespace System.Collections.Tests
             }
         }
 
+        [Fact]
         public static void Peek_EmptyStack_ThrowsInvalidOperationException()
         {
             bool exceptionThrown = false;
@@ -143,6 +119,12 @@ namespace System.Collections.Tests
             Assert.True(exceptionThrown);
         }
 
+        [Theory]
+        [InlineData(1, 1)]
+        [InlineData(10, 10)]
+        [InlineData(100, 100)]
+        [InlineData(10, 5)]
+        [InlineData(100, 50)]
         public static void Pop(int pushCount, int popCount)
         {
             Stack stack = Helpers.CreateIntStack(pushCount);
@@ -154,6 +136,7 @@ namespace System.Collections.Tests
             Assert.Equal(pushCount - popCount, stack.Count);
         }
 
+        [Fact]
         public static void Pop_Null()
         {
             var stack = new Stack();
@@ -167,6 +150,7 @@ namespace System.Collections.Tests
             Assert.Null(stack.Pop());
         }
 
+        [Fact]
         public static void Pop_EmptyStack_ThrowsInvalidOperationException()
         {
             bool exceptionThrown = false;
@@ -182,6 +166,10 @@ namespace System.Collections.Tests
             Assert.True(exceptionThrown);
         }
 
+        [Theory]
+        [InlineData(1)]
+        [InlineData(10)]
+        [InlineData(100)]
         public static void Push(int count)
         {
             var stack = new Stack();
@@ -193,6 +181,8 @@ namespace System.Collections.Tests
             Assert.Equal(count, stack.Count);
         }
 
+
+        [Fact]
         public static void Push_Null()
         {
             var stack = new Stack();

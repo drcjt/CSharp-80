@@ -6,6 +6,7 @@ namespace System.Memory.Tests
 {
     public static partial class SpanTests
     {
+        [Fact]
         public static void CtorPointerInt()
         {
             unsafe

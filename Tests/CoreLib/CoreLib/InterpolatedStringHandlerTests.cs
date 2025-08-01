@@ -5,6 +5,7 @@ namespace CoreLib
 {
     public static class InterpolatedStringHandlerTests
     {
+        [Fact]
         public static void SingleInterpolation()
         {
             var one = "one";
@@ -12,6 +13,7 @@ namespace CoreLib
             Assert.Equal("one", result);
         }
 
+        [Fact]
         public static void DoubleInterpolation()
         {
             var one = "one";
@@ -20,6 +22,7 @@ namespace CoreLib
             Assert.Equal("onetwo", result);
         }
 
+        [Fact]
         public static void TripleInterpolation()
         {
             var one = "one";
@@ -29,6 +32,7 @@ namespace CoreLib
             Assert.Equal("onetwothree", result);
         }
 
+        [Fact]
         public static void QuadInterpolation()
         {
             var one = "one";
@@ -39,7 +43,8 @@ namespace CoreLib
             var result = $"{one}{two}{three}{four}";
             Assert.Equal("onetwothreefour", result);
         }
-        
+
+        [Fact]
         public static void ToStringAndClear_Clears()
         {
             var handler = new DefaultInterpolatedStringHandler(0, 0);
@@ -48,6 +53,7 @@ namespace CoreLib
             Assert.True(handler.ToStringAndClear().Equals(string.Empty));
         }
 
+        [Fact]
         public static void AppendLiteral()
         {
             var expected = "";
@@ -62,6 +68,7 @@ namespace CoreLib
             Assert.True(expected.Equals(actual.ToStringAndClear()));
         }
 
+        [Fact]
         public static void AppendFormatted()
         {
             var expected = "";

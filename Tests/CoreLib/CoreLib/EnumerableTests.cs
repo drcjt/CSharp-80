@@ -59,6 +59,7 @@ namespace CoreLib
 
     public static class EnumerableTests
     {
+        [Fact]
         public static void GenericArrayEnumerator_EnumeratesArrayElements()
         {
             var testArray = new int[] { 1, 2, 3 };
@@ -71,6 +72,7 @@ namespace CoreLib
             }
         }
 
+        [Fact]
         public static void ArrayEnumerator_EnumeratesArrayElements()
         {
             var testArray = new int[] { 1, 2, 3 };
@@ -83,6 +85,7 @@ namespace CoreLib
             }
         }
 
+        [Fact]
         public static void FibonacciEnumerable_FirstFifteenNumbers_AreCorrect()
         {
             var sequence = new FibonacciEnumerable().GetEnumerator();

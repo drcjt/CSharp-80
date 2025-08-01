@@ -4,17 +4,14 @@ namespace System.Tests
 {
     internal static class CharTests
     {
-        public static void EqualsTests()
-        {
-            EqualsTest('a', 'a', true);
-            EqualsTest('a', 'A', false);
-            EqualsTest('a', 'b', false);
-            EqualsTest('a', (int)'a', false);
-            EqualsTest('a', "a", false);
-            EqualsTest('a', null, false);
-        }
-
-        private static void EqualsTest(char c, object? obj, bool expected)
+        [Theory]
+        [InlineData('a', 'a', true)]
+        [InlineData('a', 'A', false)]
+        [InlineData('a', 'b', false)]
+        [InlineData('a', (int)'a', false)]
+        [InlineData('a', "a", false)]
+        [InlineData('a', null, false)]
+        public static void EqualsTest(char c, object? obj, bool expected)
         {
             if (obj is char v)
             {
@@ -24,24 +21,35 @@ namespace System.Tests
             Assert.Equal(expected, c.Equals(obj));
         }
 
-        public static void IsBetweenCharTests()
+        [Theory]
+        [InlineData('a', 'a', 'a', true)]
+        [InlineData((char)('a' - 1), 'a', 'a', false)]
+        [InlineData((char)('a' + 1),'a', 'a', false)]
+        [InlineData('a', 'a', 'b', true)]
+        [InlineData('b', 'a', 'b', true)]
+        [InlineData((char)('a' - 1), 'a', 'b', false)]
+        [InlineData((char)('b' + 1), 'a', 'b', false)]
+        [InlineData('a', 'a', 'z', true)]
+        [InlineData('m', 'a', 'z', true)]
+        [InlineData('z', 'a', 'z', true)]
+        [InlineData((char)('a' - 1), 'a', 'z', false)]
+        [InlineData((char)('z' + 1), 'a', 'z', false)]
+        [InlineData('\0', '\0', '\uFFFF', true)]
+        [InlineData('\u1234', '\0', '\uFFFF', true)]
+        [InlineData('\uFFFF', '\0', '\uFFFF', true)]
+        [InlineData('\u1234', '\u0123', '\u2345', true)]
+        [InlineData('\u1234', '\u2345', '\uFFFF', false)]
+        [InlineData('\u1234', '\u0123', '\u1233', false)]
+        [InlineData('\u1234', '\u0123', '\u1234', true)]
+        [InlineData('\u1234', '\u1235', '\u1231', false)]
+        [InlineData('b', 'c', 'd', false)]
+        [InlineData('b', 'd', 'c', true)]
+        public static void IsBetween_Char(char c, char minInclusive, char maxExclusive, bool expected)
         {
-            Assert.Equal(true, char.IsBetween('a', 'a', 'a'));
-            Assert.Equal(false, char.IsBetween((char)('a' - 1), 'a', 'a'));
-            Assert.Equal(false, char.IsBetween((char)('a' + 1), 'a', 'a'));
-            Assert.Equal(true, char.IsBetween('a', 'a', 'b'));
-            Assert.Equal(true, char.IsBetween('b', 'a', 'b'));
-            Assert.Equal(false, char.IsBetween((char)('a' - 1), 'a', 'b'));
-            Assert.Equal(false, char.IsBetween((char)('b' + 1), 'a', 'b'));
-            Assert.Equal(true, char.IsBetween('a', 'a', 'z'));
-            Assert.Equal(true, char.IsBetween('m', 'a', 'z'));
-            Assert.Equal(true, char.IsBetween('z', 'a', 'z'));
-            Assert.Equal(false, char.IsBetween((char)('a' - 1), 'a', 'z'));
-            Assert.Equal(false, char.IsBetween((char)('z' + 1), 'a', 'z'));
-            Assert.Equal(false, char.IsBetween('b', 'c', 'd'));
-            Assert.Equal(true, char.IsBetween('b', 'd', 'c'));
+            Assert.Equal(expected, char.IsBetween(c, minInclusive, maxExclusive));
         }
 
+        [Fact]
         public static void IsAsciiDigit_WithAsciiDigits_ReturnsTrue()
         {
             char[] validAsciiDigits = new char[] { '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039' };
@@ -53,6 +61,7 @@ namespace System.Tests
             }
         }
 
+        [Fact]
         public static void IsAsciiDigit_WithNonAsciiDigits_ReturnsFalse()
         {
             char[] invalidAsciiDigits = new char[]

@@ -5,6 +5,7 @@ namespace System.Linq.Tests
 {
     static class AnyTests
     {
+        [Fact]
         public static void Any_Tests()
         {
             Any_Test(new int[0], false);

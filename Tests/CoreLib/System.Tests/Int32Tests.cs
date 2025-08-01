@@ -4,49 +4,46 @@ namespace System.Tests
 {
     internal static class Int32Tests
     {
+        [Fact]
         public static void Ctor_Empty()
         {
             var i = new int();
             Assert.Equal(0, i);
         }
 
+        [Fact]
         public static void MaxValue()
         {
             Assert.Equal(2147483647, int.MaxValue);
         }
 
+        [Fact]
         public static void MinValue()
         {
             Assert.Equal(-2147483648, int.MinValue);
         }
 
-        public static void EqualsTests()
-        {
-            EqualsTest(789, 789, true);
-            EqualsTest(789, -789, false);
-            EqualsTest(789, 0, false);
-            EqualsTest(0, 0, true);
-            EqualsTest(-789, -789, true);
-            EqualsTest(-789, 789, false);
-            EqualsTest(789, null, false);
-            EqualsTest(789, "789", false);
-        }
-
-        public static void ToStringTests()
-        {
-            ToStringTest(int.MinValue, "-2147483648");
-            ToStringTest(-4567, "-4567");
-            ToStringTest(0, "0");
-            ToStringTest(4567, "4567");
-            ToStringTest(int.MaxValue, "2147483647");
-        }
-
-        private static void ToStringTest(int i, string expected)
+        [Theory]
+        [InlineData(int.MinValue, "-2147483648")]
+        [InlineData(-4567, "-4567")]
+        [InlineData(0, "0")]
+        [InlineData(4567, "4567")]
+        [InlineData(int.MaxValue, "2147483647")]
+        public static void ToStringTest(int i, string expected)
         {
             Assert.Equal(expected, i.ToString());
         }
 
-        private static void EqualsTest(int i, object? obj, bool expected)
+        [Theory]
+        [InlineData(789, 789, true)]
+        [InlineData(789, -789, false)]
+        [InlineData(789, 0, false)]
+        [InlineData(0, 0, true)]
+        [InlineData(-789, -789, true)]
+        [InlineData(-789, 789, false)]
+        [InlineData(789, null, false)]
+        [InlineData(789, "789", false)]
+        public static void EqualsTest(int i, object? obj, bool expected)
         {
             if (obj is int j)
             {
@@ -56,6 +53,7 @@ namespace System.Tests
             Assert.Equal(expected, i.Equals(obj));
         }
 
+        [Fact]
         public static void Parse_Valid()
         {
             Assert.Equal(0, int.Parse("0"));
