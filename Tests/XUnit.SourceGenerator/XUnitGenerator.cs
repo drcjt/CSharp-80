@@ -44,7 +44,9 @@ namespace XUnit.SourceGenerator
                             : $"new {containingType}().{method.Name}();";
 
                         mainBody.AppendLine(methodCall);
+#if LOG_PASSING_TEST_NAMES
                         mainBody.AppendLine($"System.Console.WriteLine(\"{containingType}.{method.Name} passed\");");
+#endif
                     }
                 }
 
