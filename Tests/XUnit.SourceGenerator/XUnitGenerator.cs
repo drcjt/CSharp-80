@@ -55,10 +55,43 @@ namespace XUnit.SourceGenerator
                 {
                     if (method is not null)
                     {
-                        IEnumerable<AttributeData> attributeData = method.GetAttributes().Where(attr => attr.AttributeClass?.Name == "InlineDataAttribute");
-                        foreach (AttributeData dataAttribute in attributeData)
+                        IEnumerable<AttributeData> memberDataAttributes = method.GetAttributes().Where(attr => attr.AttributeClass?.Name == "MemberDataAttribute");
+                        foreach (AttributeData memberDataAttribute in memberDataAttributes)
                         {
-                            var constructorArguments = dataAttribute.ConstructorArguments.FirstOrDefault().Values;
+                            var memberName = memberDataAttribute.ConstructorArguments.FirstOrDefault().Value as string;
+                            if (memberName is null)
+                            {
+                                continue; // Skip if no member name is provided
+                            }
+                            // Assuming the member data is a method returning an IEnumerable<object[]>
+                            string containingType = method.ContainingType.ToDisplayString();
+                            string methodCall = method.IsStatic
+                                ? $"{containingType}.{method.Name}"
+                                : $"new {containingType}().{method.Name}";
+
+                            mainBody.AppendLine($"foreach (var data in {containingType}.{memberName}())");
+                            mainBody.AppendLine("{");
+
+                            var testArguments = "";
+                            for (int i = 0; i < method.Parameters.Length; i++)
+                            {
+                                var parameter = method.Parameters[i];
+
+                                if (i > 0)
+                                {
+                                    testArguments += ", ";
+                                }
+                                testArguments += $"({parameter.Type})data[{i}]";
+                            }
+
+                            mainBody.AppendLine($"    {methodCall}({testArguments});");
+                            mainBody.AppendLine("}");
+                        }
+
+                        IEnumerable<AttributeData> inlineAttributeData = method.GetAttributes().Where(attr => attr.AttributeClass?.Name == "InlineDataAttribute");
+                        foreach (AttributeData inlineDataAttribute in inlineAttributeData)
+                        {
+                            var constructorArguments = inlineDataAttribute.ConstructorArguments.FirstOrDefault().Values;
 
                             var attributes = new StringBuilder();
                             bool addComma = false;
