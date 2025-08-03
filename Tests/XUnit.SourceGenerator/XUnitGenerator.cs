@@ -36,18 +36,7 @@ namespace XUnit.SourceGenerator
                 // Generate calls for Fact methods
                 foreach (IMethodSymbol? method in methods.Left.OrderBy(m => m.Name))
                 {
-                    if (method is not null)
-                    {
-                        string containingType = method.ContainingType.ToDisplayString();
-                        string methodCall = method.IsStatic
-                            ? $"{containingType}.{method.Name}();"
-                            : $"new {containingType}().{method.Name}();";
-
-                        mainBody.AppendLine(methodCall);
-#if LOG_PASSING_TEST_NAMES
-                        mainBody.AppendLine($"System.Console.WriteLine(\"{containingType}.{method.Name} passed\");");
-#endif
-                    }
+                    GenerateSimpleTestMethodCalls(mainBody, method);
                 }
 
                 // Add theory methods
@@ -55,45 +44,8 @@ namespace XUnit.SourceGenerator
                 {
                     if (method is not null)
                     {
-                        IEnumerable<AttributeData> attributeData = method.GetAttributes().Where(attr => attr.AttributeClass?.Name == "InlineDataAttribute");
-                        foreach (AttributeData dataAttribute in attributeData)
-                        {
-                            var constructorArguments = dataAttribute.ConstructorArguments.FirstOrDefault().Values;
-
-                            var attributes = new StringBuilder();
-                            bool addComma = false;
-                            for (int parameterIndex = 0; parameterIndex < method.Parameters.Length; parameterIndex++)
-                            {
-                                if (addComma)
-                                {
-                                    attributes.Append(", ");
-                                }
-
-                                addComma = true;
-
-                                var parameter = method.Parameters[parameterIndex];
-                                var constructorArgument = constructorArguments[parameterIndex];
-                                if (!SymbolEqualityComparer.Default.Equals(constructorArgument.Type, parameter.Type))
-                                {
-                                    attributes.Append($"({constructorArgument.Type})");
-                                }
-
-                                attributes.Append(constructorArgument.ToCSharpString());
-                            }
-
-                            string containingType = method.ContainingType.ToDisplayString();
-                            string methodCall = method.IsStatic
-                                ? $"{containingType}.{method.Name}({attributes});"
-                                : $"new {containingType}().{method.Name}({attributes});";
-
-                            mainBody.AppendLine(methodCall);
-
-#if LOG_PASSING_TEST_NAMES
-                            string testPassingMessage = $"{containingType}.{method.Name} ({attributes}) passed";
-                            testPassingMessage = testPassingMessage.Replace("\"", "\\\""); // Escape quotes for C# string
-                            mainBody.AppendLine($"System.Console.WriteLine(\"{testPassingMessage}\");");
-#endif
-                        }
+                        GenerateTestMethodCallsUsingMemberData(mainBody, method);
+                        GenerateTestMethodCallsUsingInlineData(mainBody, method);
                     }
                 }
 
@@ -112,6 +64,101 @@ public static class __GeneratedMain
 
                 spc.AddSource("SimpleRunner.g.cs", SourceText.From(source, Encoding.UTF8));
             });
+        }
+
+        private static void GenerateSimpleTestMethodCalls(StringBuilder mainBody, IMethodSymbol? method)
+        {
+            if (method is not null)
+            {
+                string containingType = method.ContainingType.ToDisplayString();
+                string methodCall = method.IsStatic
+                    ? $"{containingType}.{method.Name}();"
+                    : $"new {containingType}().{method.Name}();";
+
+                mainBody.AppendLine(methodCall);
+#if LOG_PASSING_TEST_NAMES
+                        mainBody.AppendLine($"System.Console.WriteLine(\"{containingType}.{method.Name} passed\");");
+#endif
+            }
+        }
+
+        private static void GenerateTestMethodCallsUsingInlineData(StringBuilder mainBody, IMethodSymbol method)
+        {
+            IEnumerable<AttributeData> inlineAttributeData = method.GetAttributes().Where(attr => attr.AttributeClass?.Name == "InlineDataAttribute");
+            foreach (AttributeData inlineDataAttribute in inlineAttributeData)
+            {
+                var constructorArguments = inlineDataAttribute.ConstructorArguments.FirstOrDefault().Values;
+
+                var attributes = new StringBuilder();
+                bool addComma = false;
+                for (int parameterIndex = 0; parameterIndex < method.Parameters.Length; parameterIndex++)
+                {
+                    if (addComma)
+                    {
+                        attributes.Append(", ");
+                    }
+
+                    addComma = true;
+
+                    var parameter = method.Parameters[parameterIndex];
+                    var constructorArgument = constructorArguments[parameterIndex];
+                    if (!SymbolEqualityComparer.Default.Equals(constructorArgument.Type, parameter.Type))
+                    {
+                        attributes.Append($"({constructorArgument.Type})");
+                    }
+
+                    attributes.Append(constructorArgument.ToCSharpString());
+                }
+
+                string containingType = method.ContainingType.ToDisplayString();
+                string methodCall = method.IsStatic
+                    ? $"{containingType}.{method.Name}({attributes});"
+                    : $"new {containingType}().{method.Name}({attributes});";
+
+                mainBody.AppendLine(methodCall);
+
+#if LOG_PASSING_TEST_NAMES
+                            string testPassingMessage = $"{containingType}.{method.Name} ({attributes}) passed";
+                            testPassingMessage = testPassingMessage.Replace("\"", "\\\""); // Escape quotes for C# string
+                            mainBody.AppendLine($"System.Console.WriteLine(\"{testPassingMessage}\");");
+#endif
+            }
+        }
+
+        private static void GenerateTestMethodCallsUsingMemberData(StringBuilder mainBody, IMethodSymbol method)
+        {
+            IEnumerable<AttributeData> memberDataAttributes = method.GetAttributes().Where(attr => attr.AttributeClass?.Name == "MemberDataAttribute");
+            foreach (AttributeData memberDataAttribute in memberDataAttributes)
+            {
+                var memberName = memberDataAttribute.ConstructorArguments.FirstOrDefault().Value as string;
+                if (memberName is null)
+                {
+                    continue; // Skip if no member name is provided
+                }
+                // Assuming the member data is a method returning an IEnumerable<object[]>
+                string containingType = method.ContainingType.ToDisplayString();
+                string methodCall = method.IsStatic
+                    ? $"{containingType}.{method.Name}"
+                    : $"new {containingType}().{method.Name}";
+
+                mainBody.AppendLine($"foreach (var data in {containingType}.{memberName}())");
+                mainBody.AppendLine("{");
+
+                var testArguments = new string[method.Parameters.Length];
+                for (int i = 0; i < method.Parameters.Length; i++)
+                {
+                    testArguments[i] = $"({method.Parameters[i].Type})data[{i}]";
+                }
+
+                mainBody.AppendLine($"    {methodCall}({string.Join(", ", testArguments)});");
+
+#if LOG_PASSING_TEST_NAMES
+                string testPassingMessage = $"{containingType}.{method.Name} ({string.Join(", ", testArguments.Select(x => $"{{{x}}}"))}) passed";
+                testPassingMessage = testPassingMessage.Replace("\"", "\\\""); // Escape quotes for C# string
+                mainBody.AppendLine($"    System.Console.WriteLine($\"{testPassingMessage}\");");
+#endif
+                mainBody.AppendLine("}");
+            }
         }
     }
 }
