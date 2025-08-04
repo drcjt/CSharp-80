@@ -109,6 +109,8 @@
     <EmbeddedResource Include="Runtime\i_ge_un.asm" />
     <EmbeddedResource Include="Runtime\i_ge16_un.asm" />
     <EmbeddedResource Include="Runtime\i_gt16_un.asm" />
+    <EmbeddedResource Include="Runtime\i_neg16.asm" />
+    <EmbeddedResource Include="Runtime\i_not16.asm" />
     <EmbeddedResource Include="Runtime\SFINext.asm" />
     <EmbeddedResource Include="Runtime\EHEnumNext.asm" />
     <EmbeddedResource Include="Runtime\EHEnumInit.asm" />
