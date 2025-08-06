@@ -48,7 +48,39 @@ namespace ILCompiler.Compiler.OpcodeImporters
                                 break;
 
                             case Operation.Ne_Un:
-                                i1 = i1 != i2 ? 1 : 0;
+                                i1 = (uint)i1 != (uint)i2 ? 1 : 0;
+                                break;
+
+                            case Operation.Gt:
+                                i1 = i1 > i2 ? 1 : 0;
+                                break;
+
+                            case Operation.Gt_Un:
+                                i1 = (uint)i1 > (uint)i2 ? 1 : 0;
+                                break;
+
+                            case Operation.Ge:
+                                i1 = i1 >= i2 ? 1 : 0;
+                                break;
+
+                            case Operation.Ge_Un:
+                                i1 = (uint)i1 >= (uint)i2 ? 1 : 0;
+                                break;
+
+                            case Operation.Lt:
+                                i1 = i1 < i2 ? 1 : 0;
+                                break;
+
+                            case Operation.Lt_Un:
+                                i1 = (uint)i1 < (uint)i2 ? 1 : 0;
+                                break;
+
+                            case Operation.Le:
+                                i1 = i1 <= i2 ? 1 : 0;
+                                break;
+
+                            case Operation.Le_Un:
+                                i1 = (uint)i1 <= (uint)i2 ? 1 : 0;
                                 break;
 
                             case Operation.Add:
@@ -72,6 +104,33 @@ namespace ILCompiler.Compiler.OpcodeImporters
                                 i1  = i1 / i2;
                                 break;
 
+                            case Operation.Div_Un:
+                                if (i2 == 0)
+                                {
+                                    // Division by zero, return the original tree which will throw division by zero exception
+                                    return tree;
+                                }
+                                i1 = (int)((uint)i1 / (uint)i2);
+                                break;
+
+                            case Operation.Rem:
+                                if (i2 == 0)
+                                {
+                                    // Division by zero, return the original tree which will throw division by zero exception
+                                    return tree;
+                                }
+                                i1 = i1 % i2;
+                                break;
+
+                            case Operation.Rem_Un:
+                                if (i2 == 0)
+                                {
+                                    // Division by zero, return the original tree which will throw division by zero exception
+                                    return tree;
+                                }
+                                i1 = (int)((uint)i1 % (uint)i2);
+                                break;
+
                             case Operation.Lsh:
                                 i1 <<= (i2 & 0x1F);
                                 break;
@@ -80,7 +139,19 @@ namespace ILCompiler.Compiler.OpcodeImporters
                                 i1 >>= (i2 & 0x1F);
                                 break;
 
-                            default:
+                            case Operation.Or:
+                                i1 |= i2;
+                                break;
+
+                            case Operation.And:
+                                i1 &= i2;
+                                break;
+
+                            case Operation.Xor:
+                                i1 ^= i2;
+                                break;
+
+                        default:
                                 return tree;
                         }
 
