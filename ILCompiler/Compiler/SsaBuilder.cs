@@ -20,14 +20,12 @@ namespace ILCompiler.Compiler
             _logger = logger;
         }
 
-        public void Build(IList<BasicBlock> blocks, LocalVariableTable locals, bool dumpSsa)
+        public void Build(IList<BasicBlock> blocks, LocalVariableTable locals, bool dumpSsa, FlowgraphDfsTree dfs)
         {
             _dumpSsa = dumpSsa;
 
-            blocks = SetupBasicBlockRoot(blocks);
-
             // Topologically sort the graph
-            var postOrder = FlowgraphDfsTree.Build(blocks[0]).PostOrder;
+            var postOrder = dfs.PostOrder;
 
             // Compute the immediate dominators of all basic blocks
             ComputeImmediateDominators(postOrder);

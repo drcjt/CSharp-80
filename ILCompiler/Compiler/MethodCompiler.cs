@@ -1,8 +1,9 @@
-﻿using ILCompiler.Compiler.DependencyAnalysis;
+﻿using System.Text;
+using ILCompiler.Compiler.DependencyAnalysis;
+using ILCompiler.Compiler.FlowgraphHelpers;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
 using Microsoft.Extensions.Logging;
-using System.Text;
 
 namespace ILCompiler.Compiler
 {
@@ -168,25 +169,7 @@ namespace ILCompiler.Compiler
             {
                 Diagnostics.DumpFlowGraph(inputFilePath, method, basicBlocks);
             }
-
-            if (_configuration.DumpIRTrees)
-            {
-                _logger.LogInformation("METHOD: {MethodFullName}", method.FullName);
-
-                int lclNum = 0;
-                StringBuilder sb = new();
-                foreach (var lclVar in _locals)
-                {
-                    sb.AppendLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Type} {lclVar.ExactSize}");
-
-                    lclNum++;
-                }
-                _logger.LogInformation("{LocalVars}", sb.ToString());
-
-                var treeDumper = new TreeDumper();
-                var treedump = treeDumper.Dump(basicBlocks);
-                _logger.LogInformation("{Treedump}", treedump);
-            }
+            DumpIRTrees(method, basicBlocks, "After Import");
 
             var morpher = _phaseFactory.Create<IMorpher>();
             morpher.Init(method, basicBlocks);
@@ -194,38 +177,23 @@ namespace ILCompiler.Compiler
             // Inlining
             var inliner = _phaseFactory.Create<IInliner>();
             inliner.Inline(basicBlocks, _locals, inputFilePath);
-
-            if (_configuration.DumpIRTrees)
-            {
-                _logger.LogInformation("After Inlining");
-                _logger.LogInformation("METHOD: {MethodFullName}", method.FullName);
-
-                int lclNum = 0;
-                StringBuilder sb = new();
-                foreach (var lclVar in _locals)
-                {
-                    sb.AppendLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Type} {lclVar.ExactSize}");
-
-                    lclNum++;
-                }
-                _logger.LogInformation("{LocalVars}", sb.ToString());
-
-                var treeDumper = new TreeDumper();
-                var treedump = treeDumper.Dump(basicBlocks);
-                _logger.LogInformation("{Treedump}", treedump);
-            }
+            DumpIRTrees(method, basicBlocks, "After Inlining");
 
             morpher.Morph(basicBlocks, _locals);
+            DumpIRTrees(method, basicBlocks, "After Morph");
+
+            // Build the dfs tree and remove unreachable blocks
+            var dfsTree = FlowgraphDfsTree.BuildAndRemove(basicBlocks);
 
             // Find loops
             var loopFinder = _phaseFactory.Create<ILoopFinder>();
-            loopFinder.FindLoops(basicBlocks);
+            loopFinder.FindLoops(basicBlocks, dfsTree);
 
             var flowgraph = _phaseFactory.Create<IFlowgraph>();
             flowgraph.SetBlockOrder(basicBlocks);
 
             var ssaBuilder = _phaseFactory.Create<ISsaBuilder>();
-            ssaBuilder.Build(basicBlocks, _locals, _configuration.DumpSsa);
+            ssaBuilder.Build(basicBlocks, _locals, _configuration.DumpSsa, dfsTree);
 
             // Early Value Propagation
             var earlyValuePropagation = _phaseFactory.Create<IEarlyValuePropagation>();
@@ -251,6 +219,29 @@ namespace ILCompiler.Compiler
             var codeGenerator = _phaseFactory.Create<ICodeGenerator>();
             var instructions = codeGenerator.Generate(basicBlocks, _locals, methodCodeNodeNeedingCode);
             methodCodeNodeNeedingCode.MethodCode = instructions;
+        }
+
+        private void DumpIRTrees(MethodDesc method, IList<BasicBlock> basicBlocks, string message)
+        {
+            if (_configuration.DumpIRTrees)
+            {
+                _logger.LogInformation(message);
+                _logger.LogInformation("METHOD: {MethodFullName}", method.FullName);
+
+                int lclNum = 0;
+                StringBuilder sb = new();
+                foreach (var lclVar in _locals)
+                {
+                    sb.AppendLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Type} {lclVar.ExactSize}");
+
+                    lclNum++;
+                }
+                _logger.LogInformation("{LocalVars}", sb.ToString());
+
+                var treeDumper = new TreeDumper();
+                var treedump = treeDumper.Dump(basicBlocks);
+                _logger.LogInformation("{Treedump}", treedump);
+            }
         }
     }
 }
