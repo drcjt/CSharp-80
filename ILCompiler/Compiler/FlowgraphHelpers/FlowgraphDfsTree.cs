@@ -37,6 +37,9 @@
             {
                 // Need to create a new basic block to act as the loop as the real first block is a loop
                 var basicBlockRoot = new BasicBlock(0);
+                basicBlockRoot.Successors.Add(blocks[0]);
+                blocks[0].Predecessors.Add(basicBlockRoot);
+
                 blocks.Insert(0, basicBlockRoot);
             }
 
