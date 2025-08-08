@@ -55,18 +55,6 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private static IList<BasicBlock> SetupBasicBlockRoot(IList<BasicBlock> blocks) 
-        {
-            if (blocks[0].Predecessors.Count != 0)
-            {
-                // Need to create a new basic block to act as the loop as the real first block is a loop
-                var basicBlockRoot = new BasicBlock(0);
-                blocks.Insert(0, basicBlockRoot);
-            }
-
-            return blocks;
-        }
-
         private void LogSsaSummary(LocalVariableTable locals)
         {
             for (var localNumber = 0; localNumber < locals.Count; localNumber++)
