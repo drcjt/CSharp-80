@@ -349,6 +349,7 @@ namespace ILCompiler.Compiler
             var statement = block.Statements[statementIndex + 1];
             var newBlock = new BasicBlock(statement.StartOffset);
             newBlock.JumpKind = block.JumpKind;
+            block.JumpKind = JumpKind.Always; // Set the original block to always jump to the new block
 
             newBlock.TryStart = block.TryStart;
             newBlock.FilterStart = block.FilterStart;
