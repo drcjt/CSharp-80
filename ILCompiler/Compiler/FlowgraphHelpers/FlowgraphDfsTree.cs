@@ -19,6 +19,42 @@
                 descendant.PostOrderNum <= ancestor.PostOrderNum;
         }
 
+        public static FlowgraphDfsTree BuildAndRemove(IList<BasicBlock> blocks)
+        {
+            blocks = SetupBasicBlockRoot(blocks);
+
+            var firstBlock = blocks[0];
+            var dfsTree = Build(firstBlock);
+
+            dfsTree.RemoveBlocksOutsideOfDfsTree(blocks);
+
+            return dfsTree;
+        }
+
+        private static IList<BasicBlock> SetupBasicBlockRoot(IList<BasicBlock> blocks)
+        {
+            if (blocks[0].Predecessors.Count != 0)
+            {
+                // Need to create a new basic block to act as the loop as the real first block is a loop
+                var basicBlockRoot = new BasicBlock(0);
+                basicBlockRoot.Successors.Add(blocks[0]);
+                blocks[0].Predecessors.Add(basicBlockRoot);
+
+                blocks.Insert(0, basicBlockRoot);
+            }
+
+            return blocks;
+        }
+
+        private void RemoveBlocksOutsideOfDfsTree(IList<BasicBlock> blocks)
+        {
+            var blocksToRemove = blocks.Where(block => !PostOrder.Contains(block) && !block.HandlerStart).ToList();
+            foreach (var block in blocksToRemove)
+            {
+                blocks.Remove(block);
+            }
+        }
+
         public static FlowgraphDfsTree Build(BasicBlock firstBlock)
         {
             var postOrder = new List<BasicBlock>();

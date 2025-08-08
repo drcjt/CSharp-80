@@ -94,8 +94,24 @@ namespace ILCompiler.Compiler
             foreach (var exceptionHandler in _methodIL.GetExceptionRegions())
             {
                 var tryBeginBlock = CreateBasicBlock(basicBlocks, exceptionHandler.TryOffset);
-                BasicBlock? filterBlock = null;
 
+                // Find previous block and set jump kind to always
+
+                // If previous block when imported covered code prior to start of try
+                // and code in the try upto a conditional then block will have jumpkind
+                // of conditional but by splitting this into a new block starting at
+                // the try offset then the original block needs to have the jump kind
+                // set to Always as it now doesn't end with a conditional
+                for (int i = exceptionHandler.TryOffset - 1; i >= 0; i--)
+                {
+                    if (basicBlocks[i] != null)
+                    {
+                        basicBlocks[i].JumpKind = JumpKind.Always;
+                        break;
+                    }
+                }
+
+                BasicBlock? filterBlock = null;
                 if (exceptionHandler.Kind != ILExceptionRegionKind.Catch)
                 {
                     // TODO: Implement finally blocks - just ignore them for now

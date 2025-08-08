@@ -1,4 +1,5 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
+﻿using System.Diagnostics;
+using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Helpers;
 using ILCompiler.Compiler.OpcodeImporters;
 using ILCompiler.Compiler.PreInit;
@@ -73,6 +74,51 @@ namespace ILCompiler.Compiler
             foreach (var morphedStatement in morphedStatements)
             {
                 block.Statements.Add(morphedStatement);
+            }
+
+            FoldConditional(block);
+        }
+
+        private static void FoldConditional(BasicBlock block)
+        {
+            if (block.Statements.Count == 0)
+            {
+                // Nothing to fold
+                return;
+            }
+
+            if (block.JumpKind == JumpKind.Conditional)
+            {
+                var lastStatement = block.Statements[^1];
+
+                Debug.Assert(lastStatement.RootNode is JumpTrueEntry);
+
+                var jumpTrueEntry = (JumpTrueEntry)lastStatement.RootNode;
+                if (jumpTrueEntry.Condition is Int32ConstantEntry constantEntry)
+                {
+                    // The conditional can be folded away if the condition is a constant
+
+                    // Remove the last statement from the block
+                    block.Statements.RemoveAt(block.Statements.Count - 1);
+
+                    var targetBlock = block.Successors.First(b => b.Label == jumpTrueEntry.TargetLabel);
+                    var fallthroughBlock = block.Successors.First(b => b != targetBlock && !b.HandlerStart);
+                    if (constantEntry.Value == 0)
+                    {
+                        // Remove the target block
+                        block.Successors.Remove(targetBlock);
+                        targetBlock.Predecessors.Remove(block);
+                    }
+                    else
+                    {
+                        // Remove the fallthrough block
+                        block.Successors.Remove(fallthroughBlock);
+                        fallthroughBlock.Predecessors.Remove(block);
+                    }
+
+                    // The block is now unconditional
+                    block.JumpKind = JumpKind.Always;
+                }
             }
         }
 

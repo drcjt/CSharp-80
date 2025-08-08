@@ -20,14 +20,12 @@ namespace ILCompiler.Compiler
             _logger = logger;
         }
 
-        public void Build(IList<BasicBlock> blocks, LocalVariableTable locals, bool dumpSsa)
+        public void Build(IList<BasicBlock> blocks, LocalVariableTable locals, bool dumpSsa, FlowgraphDfsTree dfs)
         {
             _dumpSsa = dumpSsa;
 
-            blocks = SetupBasicBlockRoot(blocks);
-
             // Topologically sort the graph
-            var postOrder = FlowgraphDfsTree.Build(blocks[0]).PostOrder;
+            var postOrder = dfs.PostOrder;
 
             // Compute the immediate dominators of all basic blocks
             ComputeImmediateDominators(postOrder);
@@ -55,18 +53,6 @@ namespace ILCompiler.Compiler
             {
                 LogSsaSummary(locals);
             }
-        }
-
-        private static IList<BasicBlock> SetupBasicBlockRoot(IList<BasicBlock> blocks) 
-        {
-            if (blocks[0].Predecessors.Count != 0)
-            {
-                // Need to create a new basic block to act as the loop as the real first block is a loop
-                var basicBlockRoot = new BasicBlock(0);
-                blocks.Insert(0, basicBlockRoot);
-            }
-
-            return blocks;
         }
 
         private void LogSsaSummary(LocalVariableTable locals)

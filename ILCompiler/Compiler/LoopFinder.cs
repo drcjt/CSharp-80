@@ -12,10 +12,8 @@ namespace ILCompiler.Compiler
             _logger = logger;
         }
 
-        public void FindLoops(IList<BasicBlock> blocks)
+        public void FindLoops(IList<BasicBlock> blocks, FlowgraphDfsTree dfs)
         {
-            var dfs = FlowgraphDfsTree.Build(blocks[0]);
-
             var loops = FlowGraphNaturalLoops.Find(dfs, _logger);
 
             // Consider moving out of here
