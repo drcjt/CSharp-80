@@ -59,5 +59,44 @@ namespace System.Runtime
             }
             while (true);
         }
+
+        public static unsafe object? IsInstanceOfAny(EEType* pTargetType, object? obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static unsafe object? CheckCastAny(EEType* pTargetType, object? obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public static unsafe object? CheckCastInterface(EEType* pTargetType, object? obj)
+        {
+            var result = IsInstanceOfInterface(pTargetType, obj);
+            if (result != null)
+                return obj;
+
+            throw new InvalidCastException();
+        }
+
+        public static unsafe object? CheckCastClass(EEType* pTargetType, object? obj)
+        {
+            // Handle simple case where the object is null or already of the target type
+            if (obj == null || obj.m_pEEType == pTargetType)
+            {
+                return obj;
+            }
+
+            return CheckCastClassSpecial(pTargetType, obj);
+        }
+
+        private static unsafe object? CheckCastClassSpecial(EEType* pTargetType, object? obj)
+        {
+            var result = IsInstanceOfClass(pTargetType, obj);
+            if (result != null)
+                return obj;
+
+            throw new InvalidCastException();
+        }
     }
 }

@@ -70,6 +70,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                             ImportStoreField(currentInstruction, true);
                             break;
 
+                        case ILOpcode.castclass:
                         case ILOpcode.isinst:
                             ImportCasting(currentInstruction);
                             break;
@@ -167,18 +168,18 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             var typeDesc = (TypeDesc)instruction.Operand;
 
-            string helperMethodName = "IsInstanceOfClass";
-            if (typeDesc.IsArray)
+            string helperMethodName = instruction.Opcode == ILOpcode.castclass ? "CheckCast" : "IsInstanceOf";
+            if (typeDesc.IsParameterizedType || typeDesc.IsFunctionPointer /* || typeDesc.HasGenericVariance */ )
             {
                 throw new NotImplementedException();
             }
             else if (typeDesc.IsInterface)
             {
-                helperMethodName = "IsInstanceOfInterface";
+                helperMethodName += "Interface";
             }
-            else if (typeDesc.IsParameterizedType)
+            else
             {
-                throw new NotImplementedException();
+                helperMethodName += "Class";
             }
 
             var systemRuntimeTypeCast = _context.CorLibModuleProvider.FindThrow("System.Runtime.TypeCast");
