@@ -6,11 +6,11 @@ using ILCompiler.TypeSystem.IL;
 
 namespace ILCompiler.Compiler.OpcodeImporters
 {
-    public class IsInstImporter : IOpcodeImporter
+    public class CastClassImporter : IOpcodeImporter
     {
         public bool Import(Instruction instruction, IImporter importer)
         {
-            if (instruction.Opcode != ILOpcode.isinst) return false;
+            if (instruction.Opcode != ILOpcode.castclass) return false;
 
             // Reference type to test
             var op1 = importer.Pop();
@@ -21,15 +21,15 @@ namespace ILCompiler.Compiler.OpcodeImporters
             string helperMethodName;
             if (typeDesc.IsParameterizedType || typeDesc.IsFunctionPointer /* || typeDesc.HasGenericVariance */ )
             {
-                helperMethodName = "IsInstanceOfAny";
+                helperMethodName = "CheckCastAny";
             }
             else if (typeDesc.IsInterface)
             {
-                helperMethodName = "IsInstanceOfInterface";
+                helperMethodName = "CheckCastInterface";
             }
             else
             {
-                helperMethodName = "IsInstanceOfClass";
+                helperMethodName = "CheckCastClass";
             }
 
             // Create call to helper method passing eetypeptr and object reference

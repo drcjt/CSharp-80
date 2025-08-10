@@ -48,6 +48,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             services.AddSingleton<IOpcodeImporter, SizeOfImporter>();
             services.AddSingleton<IOpcodeImporter, LoadElemAddressImporter>();
             services.AddSingleton<IOpcodeImporter, IsInstImporter>();
+            services.AddSingleton<IOpcodeImporter, CastClassImporter>();
             services.AddSingleton<IOpcodeImporter, ThrowImporter>();
             services.AddSingleton<IOpcodeImporter, LeaveImporter>();
             services.AddSingleton<IOpcodeImporter, LoadTokenImporter>();
