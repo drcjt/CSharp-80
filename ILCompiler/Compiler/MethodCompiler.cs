@@ -125,7 +125,7 @@ namespace ILCompiler.Compiler
 
             var ilImporter = _phaseFactory.Create<IImporter>();
 
-            // When inlining we only run the import phaser
+            // When inlining we only run the import phase
             IList<EHClause> ehClauses = new List<EHClause>();
             var basicBlocks = ilImporter.Import(parameterCount, _returnBufferArgIndex, method, _locals, ehClauses, inlineInfo);
 
