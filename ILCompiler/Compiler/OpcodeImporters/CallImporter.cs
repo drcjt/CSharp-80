@@ -182,7 +182,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             }
             else
             {
-                if (callNode.IsInlineCandidate)
+                if (callNode.IsInlineCandidate && importer.Configuration.Optimize)
                 {
                     // Split call into two parts: the call itself and the return expression
                     importer.ImportAppendTree(callNode, true);

@@ -115,6 +115,9 @@ namespace ILCompiler.Compiler
 
         public void Inline(IList<BasicBlock> blocks, LocalVariableTable locals, string inputFilePath)
         {
+            if (!_configuration.Optimize)
+                return;
+
             _blocks = blocks;
             _inputFilePath = inputFilePath;
 

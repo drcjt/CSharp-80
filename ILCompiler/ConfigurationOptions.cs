@@ -20,6 +20,7 @@ namespace ILCompiler
         public readonly Option<bool> NoListFile = new(new[] { "-nl", "--noListFile" }, "No list file");
         public readonly Option<bool> SkipArrayBoundsCheck = new(new[] { "-nb", "--noBoundsCheck" }, "No Array Bounds Check");
         public readonly Option<bool> SkipNullReferenceCheck = new(new[] { "-nn", "--noNullCheck" }, "No Null Reference Check");
+        public readonly Option<bool> Optimize = new(new[] { "-O", "--optimize" }, "Enable Optimizations");
 
         public void AddToCommand(Command command)
         {
@@ -35,6 +36,7 @@ namespace ILCompiler
             command.AddOption(NoListFile);
             command.AddOption(SkipArrayBoundsCheck);
             command.AddOption(SkipNullReferenceCheck);
+            command.AddOption(Optimize);
         }
     }
 }
