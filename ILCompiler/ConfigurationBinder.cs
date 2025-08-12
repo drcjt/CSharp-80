@@ -30,6 +30,7 @@ namespace ILCompiler
                 NoListFile = bindingContext.ParseResult.GetValueForOption(_configurationOptions.NoListFile),
                 SkipArrayBoundsCheck = bindingContext.ParseResult.GetValueForOption(_configurationOptions.SkipArrayBoundsCheck),
                 SkipNullReferenceCheck = bindingContext.ParseResult.GetValueForOption(_configurationOptions.SkipNullReferenceCheck),
+                Optimize = bindingContext.ParseResult.GetValueForOption(_configurationOptions.Optimize),
             };
         }
     }

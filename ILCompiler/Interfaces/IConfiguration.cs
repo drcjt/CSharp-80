@@ -18,5 +18,6 @@ namespace ILCompiler.Interfaces
         public bool NoListFile { get; set; }
         public bool SkipArrayBoundsCheck { get; set; }
         public bool SkipNullReferenceCheck { get; set; }
+        public bool Optimize { get; set; }
     }
 }

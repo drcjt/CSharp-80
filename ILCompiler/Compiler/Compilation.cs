@@ -3,6 +3,8 @@ using ILCompiler.TypeSystem.Dnlib;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Interfaces;
+using System.Diagnostics;
+using ILCompiler.Compiler.Ssa;
 
 namespace ILCompiler.Compiler
 {
@@ -49,6 +51,12 @@ namespace ILCompiler.Compiler
 
             _corLibModuleProvider.CorLibModule = corlibModule;
 
+            var debuggingAttribute = GetDebuggingAttribute(module);
+            if (debuggingAttribute != null && debuggingAttribute.IsJITOptimizerDisabled)
+            {
+                _configuration.Optimize = false;
+            }
+
             var rootNode = (Z80MethodCodeNode)_dependencyAnalyzer.AddRoot(_module.Create(module.EntryPoint));
 
             // Core Dependency Analysis and code output routine
@@ -68,6 +76,20 @@ namespace ILCompiler.Compiler
                 DgmlWriter.WriteDependencyGraphToStream(dgmlOutput, root);
                 dgmlOutput.Flush();
             }
+        }
+
+        private static DebuggableAttribute? GetDebuggingAttribute(ModuleDef module)
+        {
+            var assembly = module.Assembly;
+            var debuggableAttribute = assembly.CustomAttributes.FirstOrDefault(x => x.TypeFullName == typeof(DebuggableAttribute).FullName);
+
+            if (debuggableAttribute is not null)
+            {
+                var debuggingModes = (DebuggableAttribute.DebuggingModes)debuggableAttribute.ConstructorArguments[0].Value;
+                return new DebuggableAttribute(debuggingModes);
+            }
+
+            return null;
         }
     }
 }
