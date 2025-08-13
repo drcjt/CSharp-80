@@ -39,7 +39,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
         }
 
 
-        private StackEntry FoldBinaryOpWithBothArgumentsConstant(BinaryOperator tree)
+        private static StackEntry FoldBinaryOpWithBothArgumentsConstant(BinaryOperator tree)
         {
             int i1;
             int i2;
@@ -175,7 +175,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             }
         }
 
-        private StackEntry FoldBinaryOpWithOneConstantOperand(BinaryOperator tree)
+        private static StackEntry FoldBinaryOpWithOneConstantOperand(BinaryOperator tree)
         {
             StackEntry op;
             StackEntry constant;
