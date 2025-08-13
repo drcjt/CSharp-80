@@ -72,12 +72,12 @@ namespace ILCompiler.Compiler.OpcodeImporters
                         // If one of the values is a native int then cast the other to be native int too
                         if (op1.Type == VarType.Ptr && op2.Type != VarType.Ptr)
                         {
-                            var cast = CodeFolder.FoldExpression(new CastEntry(op2, VarType.Ptr));
+                            var cast = importer.CodeFolder.FoldExpression(new CastEntry(op2, VarType.Ptr));
                             op2 = cast;
                         }
                         else if (op1.Type != VarType.Ptr && op2.Type == VarType.Ptr)
                         {
-                            var cast = CodeFolder.FoldExpression(new CastEntry(op1, VarType.Ptr));
+                            var cast = importer.CodeFolder.FoldExpression(new CastEntry(op1, VarType.Ptr));
                             op1 = cast;
                         }
                     }

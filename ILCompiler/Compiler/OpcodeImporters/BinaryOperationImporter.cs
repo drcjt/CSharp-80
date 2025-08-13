@@ -50,8 +50,8 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 }
             }
 
-            op1 = CodeFolder.FoldExpression(op1);
-            op2 = CodeFolder.FoldExpression(op2);
+            op1 = importer.CodeFolder.FoldExpression(op1);
+            op2 = importer.CodeFolder.FoldExpression(op2);
 
             // Handle special case of int+0, int-0, int*1, int/1
             // All of these just turn into int
@@ -61,7 +61,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 // If the second operand is a native int then need to still ensure op1 is cast to be a native int
                 if (op2.Type == VarType.Ptr)
                 {
-                    op1 = CodeFolder.FoldExpression(new CastEntry(op1, VarType.Ptr));
+                    op1 = importer.CodeFolder.FoldExpression(new CastEntry(op1, VarType.Ptr));
                 }
 
                 importer.Push(op1);

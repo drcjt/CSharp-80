@@ -55,7 +55,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             if (addr.Type == VarType.Int)
             {
-                var cast = CodeFolder.FoldExpression(new CastEntry(addr, VarType.Ptr));
+                var cast = importer.CodeFolder.FoldExpression(new CastEntry(addr, VarType.Ptr));
                 addr = cast;
             }
 

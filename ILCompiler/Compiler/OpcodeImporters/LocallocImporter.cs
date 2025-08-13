@@ -16,7 +16,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 // Insert cast from int32 to nativeint as cannot localloc more
                 // space than the processor can address :)
                 var cast = new CastEntry(op2, VarType.Ptr);
-                op2 = CodeFolder.FoldExpression(cast);
+                op2 = importer.CodeFolder.FoldExpression(cast);
             }
 
             if (op2.Type != VarType.Ptr)
