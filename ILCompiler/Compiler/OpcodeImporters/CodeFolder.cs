@@ -1,12 +1,22 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Interfaces;
 using System.Diagnostics;
 
 namespace ILCompiler.Compiler.OpcodeImporters
 {
-    internal static class CodeFolder
+    public class CodeFolder
     {
-        public static StackEntry FoldExpression(StackEntry tree)
+        private readonly IConfiguration _configuration;
+        public CodeFolder(IConfiguration configuration)
         {
+            _configuration = configuration;
+        }
+
+        public StackEntry FoldExpression(StackEntry tree)
+        {
+            if (!_configuration.Optimize)
+                return tree;
+
             if (tree is CastEntry castOperator && castOperator.Op1.IsIntCnsOrI())
             {
                 return FoldConstantExpression(tree);
@@ -29,7 +39,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
         }
 
 
-        public static StackEntry FoldBinaryOpWithBothArgumentsConstant(BinaryOperator tree)
+        private StackEntry FoldBinaryOpWithBothArgumentsConstant(BinaryOperator tree)
         {
             int i1;
             int i2;
@@ -165,7 +175,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             }
         }
 
-        public static StackEntry FoldBinaryOpWithOneConstantOperand(BinaryOperator tree)
+        private StackEntry FoldBinaryOpWithOneConstantOperand(BinaryOperator tree)
         {
             StackEntry op;
             StackEntry constant;
@@ -207,8 +217,11 @@ namespace ILCompiler.Compiler.OpcodeImporters
             return tree;
         }
 
-        public static StackEntry FoldConstantExpression(StackEntry tree)
+        public StackEntry FoldConstantExpression(StackEntry tree)
         {
+            if (!_configuration.Optimize)
+                return tree;
+
             if (tree is CastEntry castOperator)
             {
                 var op1 = castOperator.Op1;
