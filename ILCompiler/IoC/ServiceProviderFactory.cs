@@ -90,7 +90,7 @@ namespace ILCompiler.IoC
 
         private static void ConfigureServices(ServiceCollection services)
         {
-            services.AddLogging(configure => configure.AddConsole()).AddTransient<Program>();
+            services.AddLogging(configure => configure.AddConsole() /*.SetMinimumLevel(LogLevel.Debug) */).AddTransient<Program>();
             services.AddSingleton<ICompilation, Compilation>();
             services.AddSingleton<IZ80Assembler, Z80Assembler>();
             services.AddSingleton<IConfiguration, Configuration>();
@@ -99,6 +99,8 @@ namespace ILCompiler.IoC
 
             services.AddSingleton<ICodeGeneratorFactory, CodeGeneratorFactory>();
             services.AddSingleton<ILoweringFactory, LoweringFactory>();
+
+            services.AddSingleton<CodeFolder>();
         }
     }
 }

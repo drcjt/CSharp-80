@@ -58,13 +58,13 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             if (addr.Type == VarType.Int)
             {
-                var cast = CodeFolder.FoldExpression(new CastEntry(addr, VarType.Ptr));
+                var cast = importer.CodeFolder.FoldExpression(new CastEntry(addr, VarType.Ptr));
                 addr = cast;
             }
 
             if (type.IsSmall() && !value.Type.IsSmall())
             {
-                value = CodeFolder.FoldExpression(new CastEntry(value, type));
+                value = importer.CodeFolder.FoldExpression(new CastEntry(value, type));
             }
 
             StackEntry node = new StoreIndEntry(addr, value, value.Type, fieldOffset: 0, exactSize);

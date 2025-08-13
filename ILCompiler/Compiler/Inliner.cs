@@ -57,8 +57,10 @@ namespace ILCompiler.Compiler
 
     public class SubstitutePlaceholdersWalker : StackEntryVisitor
     {
-        public SubstitutePlaceholdersWalker() : base() 
+        private readonly CodeFolder _codeFolder;
+        public SubstitutePlaceholdersWalker(CodeFolder codeFolder) : base() 
         {
+            _codeFolder = codeFolder;
         }
 
         public Statement WalkStatement(Statement statement)
@@ -73,16 +75,16 @@ namespace ILCompiler.Compiler
             var node = use.Get();
             if (node is ReturnExpressionEntry)
             {
-                UpdateInlineReturnExpressionPlaceHolder(use, user);
+                UpdateInlineReturnExpressionPlaceHolder(use, user, _codeFolder);
             }
         }
 
         public override void PostOrderVisit(Edge<StackEntry> use, StackEntry? user)
         {
-            use.Set(CodeFolder.FoldExpression(use.Get()!));
+            use.Set(_codeFolder.FoldExpression(use.Get()!));
         }
 
-        private static void UpdateInlineReturnExpressionPlaceHolder(Edge<StackEntry> use, StackEntry? user)
+        private static void UpdateInlineReturnExpressionPlaceHolder(Edge<StackEntry> use, StackEntry? user, CodeFolder codeFolder)
         {
             while (use.Get() is ReturnExpressionEntry)
             {
@@ -95,20 +97,21 @@ namespace ILCompiler.Compiler
                     inlineCandidate = returnExpression!.SubstitutionExpression;
                 } while (inlineCandidate is ReturnExpressionEntry);
 
-                inlineCandidate = CodeFolder.FoldExpression(inlineCandidate!);
+                inlineCandidate = codeFolder.FoldExpression(inlineCandidate!);
 
                 use.Set(inlineCandidate!);
             }
         }
     }
 
-    public class Inliner(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory, INameMangler nameMangler, PreinitializationManager preinitializationManager) : IInliner
+    public class Inliner(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory, INameMangler nameMangler, PreinitializationManager preinitializationManager, CodeFolder codeFolder) : IInliner
     {
         private readonly IConfiguration _configuration = configuration;
         private readonly ILogger<MethodCompiler> _logger = logger;
         private readonly IPhaseFactory _phaseFactory = phaseFactory;
         private readonly INameMangler _nameMangler = nameMangler;
         private readonly PreinitializationManager _preinitializationManager = preinitializationManager;
+        private readonly CodeFolder _codeFolder = codeFolder;
         private string? _inputFilePath;
 
         private IList<BasicBlock>? _blocks;
@@ -121,7 +124,7 @@ namespace ILCompiler.Compiler
             _blocks = blocks;
             _inputFilePath = inputFilePath;
 
-            var walker = new SubstitutePlaceholdersWalker();
+            var walker = new SubstitutePlaceholdersWalker(_codeFolder);
 
             var blockIndex = 0;
 

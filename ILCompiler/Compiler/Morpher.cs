@@ -13,10 +13,12 @@ namespace ILCompiler.Compiler
     {
         private readonly PreinitializationManager _preinitializationManager;
         private readonly INameMangler _nameMangler;
-        public Morpher(PreinitializationManager preinitializationManager, INameMangler nameMangler)
+        private readonly CodeFolder _codeFolder;
+        public Morpher(PreinitializationManager preinitializationManager, INameMangler nameMangler, CodeFolder codeFolder)
         {
             _preinitializationManager = preinitializationManager;
             _nameMangler = nameMangler;
+            _codeFolder = codeFolder;
         }
 
         private LocalVariableTable? _locals;
@@ -364,7 +366,7 @@ namespace ILCompiler.Compiler
                 boLeftChild.Operation == bo.Operation)
             {
                 var newOperNode = new BinaryOperator(bo.Operation, bo.IsComparison, boLeftChild.Op2, bo.Op2, bo.Type);
-                var foldedNewOperNode = CodeFolder.FoldConstantExpression(newOperNode);
+                var foldedNewOperNode = _codeFolder.FoldConstantExpression(newOperNode);
 
                 return new BinaryOperator(bo.Operation, bo.IsComparison, MorphTree(boLeftChild.Op1), foldedNewOperNode, bo.Type);
             }

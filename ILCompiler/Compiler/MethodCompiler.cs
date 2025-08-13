@@ -182,22 +182,30 @@ namespace ILCompiler.Compiler
             morpher.Morph(basicBlocks, _locals);
             DumpIRTrees(method, basicBlocks, "After Morph");
 
-            // Build the dfs tree and remove unreachable blocks
-            var dfsTree = FlowgraphDfsTree.BuildAndRemove(basicBlocks);
+            FlowgraphDfsTree? dfsTree = null;
+            if (_configuration.Optimize)
+            {
+                // Build the dfs tree and remove unreachable blocks
+                dfsTree = FlowgraphDfsTree.BuildAndRemove(basicBlocks);
 
-            // Find loops
-            var loopFinder = _phaseFactory.Create<ILoopFinder>();
-            loopFinder.FindLoops(basicBlocks, dfsTree);
+                // Find loops
+                var loopFinder = _phaseFactory.Create<ILoopFinder>();
+                loopFinder.FindLoops(basicBlocks, dfsTree);
+            }
 
             var flowgraph = _phaseFactory.Create<IFlowgraph>();
             flowgraph.SetBlockOrder(basicBlocks);
 
-            var ssaBuilder = _phaseFactory.Create<ISsaBuilder>();
-            ssaBuilder.Build(basicBlocks, _locals, _configuration.DumpSsa, dfsTree);
 
-            // Early Value Propagation
-            var earlyValuePropagation = _phaseFactory.Create<IEarlyValuePropagation>();
-            earlyValuePropagation.Run(basicBlocks, _locals);
+            if (_configuration.Optimize)
+            {
+                var ssaBuilder = _phaseFactory.Create<ISsaBuilder>();
+                ssaBuilder.Build(basicBlocks, _locals, _configuration.DumpSsa, dfsTree!);
+
+                // Early Value Propagation
+                var earlyValuePropagation = _phaseFactory.Create<IEarlyValuePropagation>();
+                earlyValuePropagation.Run(basicBlocks, _locals);
+            }
 
             // Rationalize
             // LIR valid from here on - nodes are fully linked across statements
