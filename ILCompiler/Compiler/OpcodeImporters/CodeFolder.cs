@@ -26,7 +26,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             {
                 if (binaryOperator.Op1.IsIntCnsOrI() && binaryOperator.Op2.IsIntCnsOrI())
                 {
-                    return FoldBinaryOpWithBothArgumentsConstant(binaryOperator);
+                    return FoldConstantExpression(tree);
                 }
 
                 if (binaryOperator.Op1.IsIntCnsOrI() || binaryOperator.Op2.IsIntCnsOrI())
@@ -36,143 +36,6 @@ namespace ILCompiler.Compiler.OpcodeImporters
             }
 
             return tree;
-        }
-
-
-        private static StackEntry FoldBinaryOpWithBothArgumentsConstant(BinaryOperator tree)
-        {
-            int i1;
-            int i2;
-
-            switch (tree.Op2.Type)
-            {
-                case VarType.Ptr:
-                case VarType.Int:
-                    {
-                        i1 = tree.Op1.GetIntConstant();
-                        i2 = tree.Op2.GetIntConstant();
-                        switch (tree.Operation)
-                        {
-                            case Operation.Eq:
-                                i1 = i1 == i2 ? 1 : 0;
-                                break;
-
-                            case Operation.Ne_Un:
-                                i1 = (uint)i1 != (uint)i2 ? 1 : 0;
-                                break;
-
-                            case Operation.Gt:
-                                i1 = i1 > i2 ? 1 : 0;
-                                break;
-
-                            case Operation.Gt_Un:
-                                i1 = (uint)i1 > (uint)i2 ? 1 : 0;
-                                break;
-
-                            case Operation.Ge:
-                                i1 = i1 >= i2 ? 1 : 0;
-                                break;
-
-                            case Operation.Ge_Un:
-                                i1 = (uint)i1 >= (uint)i2 ? 1 : 0;
-                                break;
-
-                            case Operation.Lt:
-                                i1 = i1 < i2 ? 1 : 0;
-                                break;
-
-                            case Operation.Lt_Un:
-                                i1 = (uint)i1 < (uint)i2 ? 1 : 0;
-                                break;
-
-                            case Operation.Le:
-                                i1 = i1 <= i2 ? 1 : 0;
-                                break;
-
-                            case Operation.Le_Un:
-                                i1 = (uint)i1 <= (uint)i2 ? 1 : 0;
-                                break;
-
-                            case Operation.Add:
-                                i1 = i1 + i2;
-                                break;
-
-                            case Operation.Sub:
-                                i1 = i1 - i2;
-                                break;
-
-                            case Operation.Mul:
-                                i1 = i1 * i2;
-                                break;
-
-                            case Operation.Div:
-                                if (i2 == 0)
-                                {
-                                    // Division by zero, return the original tree which will throw division by zero exception
-                                    return tree;
-                                }
-                                i1  = i1 / i2;
-                                break;
-
-                            case Operation.Div_Un:
-                                if (i2 == 0)
-                                {
-                                    // Division by zero, return the original tree which will throw division by zero exception
-                                    return tree;
-                                }
-                                i1 = (int)((uint)i1 / (uint)i2);
-                                break;
-
-                            case Operation.Rem:
-                                if (i2 == 0)
-                                {
-                                    // Division by zero, return the original tree which will throw division by zero exception
-                                    return tree;
-                                }
-                                i1 = i1 % i2;
-                                break;
-
-                            case Operation.Rem_Un:
-                                if (i2 == 0)
-                                {
-                                    // Division by zero, return the original tree which will throw division by zero exception
-                                    return tree;
-                                }
-                                i1 = (int)((uint)i1 % (uint)i2);
-                                break;
-
-                            case Operation.Lsh:
-                                i1 <<= (i2 & 0x1F);
-                                break;
-
-                            case Operation.Rsh:
-                                i1 >>= (i2 & 0x1F);
-                                break;
-
-                            case Operation.Or:
-                                i1 |= i2;
-                                break;
-
-                            case Operation.And:
-                                i1 &= i2;
-                                break;
-
-                            case Operation.Xor:
-                                i1 ^= i2;
-                                break;
-
-                        default:
-                                return tree;
-                        }
-
-                        return tree.Type == VarType.Ptr
-                            ? new NativeIntConstantEntry((short)i1)
-                            : new Int32ConstantEntry(i1);
-                    }
-
-                default:
-                    return tree;
-            }
         }
 
         private static StackEntry FoldBinaryOpWithOneConstantOperand(BinaryOperator tree)
@@ -217,70 +80,201 @@ namespace ILCompiler.Compiler.OpcodeImporters
             return tree;
         }
 
+        private static StackEntry FoldBinaryOperatorWithConstantIntOperands(BinaryOperator tree)
+        {
+            int i1 = tree.Op1.GetIntConstant();
+            int i2 = tree.Op2.GetIntConstant();
+            switch (tree.Operation)
+            {
+                case Operation.Eq:
+                    i1 = i1 == i2 ? 1 : 0;
+                    break;
+
+                case Operation.Ne_Un:
+                    i1 = (uint)i1 != (uint)i2 ? 1 : 0;
+                    break;
+
+                case Operation.Gt:
+                    i1 = i1 > i2 ? 1 : 0;
+                    break;
+
+                case Operation.Gt_Un:
+                    i1 = (uint)i1 > (uint)i2 ? 1 : 0;
+                    break;
+
+                case Operation.Ge:
+                    i1 = i1 >= i2 ? 1 : 0;
+                    break;
+
+                case Operation.Ge_Un:
+                    i1 = (uint)i1 >= (uint)i2 ? 1 : 0;
+                    break;
+
+                case Operation.Lt:
+                    i1 = i1 < i2 ? 1 : 0;
+                    break;
+
+                case Operation.Lt_Un:
+                    i1 = (uint)i1 < (uint)i2 ? 1 : 0;
+                    break;
+
+                case Operation.Le:
+                    i1 = i1 <= i2 ? 1 : 0;
+                    break;
+
+                case Operation.Le_Un:
+                    i1 = (uint)i1 <= (uint)i2 ? 1 : 0;
+                    break;
+
+                case Operation.Add:
+                    i1 = i1 + i2;
+                    break;
+
+                case Operation.Sub:
+                    i1 = i1 - i2;
+                    break;
+
+                case Operation.Mul:
+                    i1 = i1 * i2;
+                    break;
+
+                case Operation.Div:
+                    if (i2 == 0)
+                    {
+                        // Division by zero, return the original tree which will throw division by zero exception
+                        return tree;
+                    }
+                    i1 = i1 / i2;
+                    break;
+
+                case Operation.Div_Un:
+                    if (i2 == 0)
+                    {
+                        // Division by zero, return the original tree which will throw division by zero exception
+                        return tree;
+                    }
+                    i1 = (int)((uint)i1 / (uint)i2);
+                    break;
+
+                case Operation.Rem:
+                    if (i2 == 0)
+                    {
+                        // Division by zero, return the original tree which will throw division by zero exception
+                        return tree;
+                    }
+                    i1 = i1 % i2;
+                    break;
+
+                case Operation.Rem_Un:
+                    if (i2 == 0)
+                    {
+                        // Division by zero, return the original tree which will throw division by zero exception
+                        return tree;
+                    }
+                    i1 = (int)((uint)i1 % (uint)i2);
+                    break;
+
+                case Operation.Lsh:
+                    i1 <<= (i2 & 0x1F);
+                    break;
+
+                case Operation.Rsh:
+                    i1 >>= (i2 & 0x1F);
+                    break;
+
+                case Operation.Or:
+                    i1 |= i2;
+                    break;
+
+                case Operation.And:
+                    i1 &= i2;
+                    break;
+
+                case Operation.Xor:
+                    i1 ^= i2;
+                    break;
+
+                default:
+                    return tree;
+            }
+
+            return new Int32ConstantEntry(i1);
+        }
+
+        private static StackEntry FoldBinaryOperatorWithConstantPtrOperands(BinaryOperator tree)
+        {
+            short i1 = (short)tree.Op1.GetIntConstant();
+            short i2 = (short)tree.Op2.GetIntConstant();
+            switch (tree.Operation)
+            {
+                case Operation.Eq:
+                    i1 = i1 == i2 ? (short)1 : (short)0;
+                    break;
+
+                case Operation.Add:
+                    i1 = (short)(i1 + i2);
+                    break;
+
+                case Operation.Sub:
+                    i1 = (short)(i1 - i2);
+                    break;
+
+                case Operation.Mul:
+                    i1 = (short)(i1 * i2);
+                    break;
+
+                case Operation.Div:
+                    if (i2 == 0)
+                    {
+                        // Division by zero, return the original tree which will throw division by zero exception
+                        return tree;
+                    }
+                    i1 = (short)(i1 / i2);
+                    break;
+
+                default:
+                    return tree;
+            }
+
+            return new NativeIntConstantEntry(i1);
+
+        }
+
+        private static StackEntry FoldCastOperatorWithConstantOperands(CastEntry tree)
+        {
+            var op1 = tree.Op1;
+
+            Debug.Assert(op1.IsIntCnsOrI());
+            int i1 = op1.GetIntConstant();
+
+            switch (tree.Type)
+            {
+                case VarType.Ptr:
+                    return new NativeIntConstantEntry((short)i1);
+            }
+
+            return tree;
+        }
+
         public StackEntry FoldConstantExpression(StackEntry tree)
         {
             if (!_configuration.Optimize)
                 return tree;
 
-            if (tree is CastEntry castOperator)
+            if (tree is CastEntry castTree)
             {
-                var op1 = castOperator.Op1;
-
-                Debug.Assert(op1.IsIntCnsOrI());
-                int i1 = op1.GetIntConstant();
-
-                switch (castOperator.Type)
-                {
-                    case VarType.Ptr:
-                        return new NativeIntConstantEntry((short)i1);
-
-                    default:
-                        return tree;
-                }
+                return FoldCastOperatorWithConstantOperands(castTree);
             }
 
-            if (tree is BinaryOperator binaryOperator)
+            if (tree is BinaryOperator binaryTree)
             {
-                if (binaryOperator.Type == VarType.Ptr)
+                switch (binaryTree.Op2.Type)
                 {
-                    var i1 = (NativeIntConstantEntry)binaryOperator.Op1;
-                    var i2 = (NativeIntConstantEntry)binaryOperator.Op2;
+                    case VarType.Ptr:
+                        return FoldBinaryOperatorWithConstantPtrOperands(binaryTree);
 
-                    switch (binaryOperator.Operation)
-                    {
-                        case Operation.Add:
-                            return new NativeIntConstantEntry((short)(i1.Value + i2.Value));
-                        case Operation.Sub:
-                            return new NativeIntConstantEntry((short)(i1.Value - i2.Value));
-                        case Operation.Mul:
-                            return new NativeIntConstantEntry((short)(i1.Value * i2.Value));
-                        case Operation.Div:
-                            return new NativeIntConstantEntry((short)(i1.Value / i2.Value));
-
-                        default:
-                            throw new NotImplementedException($"Cannot fold constant expression with operation {binaryOperator.Operation}");
-                    }
-                }
-
-                if (binaryOperator.Type.IsInt())
-                {
-                    var i1 = (Int32ConstantEntry)binaryOperator.Op1;
-                    var i2 = (Int32ConstantEntry)binaryOperator.Op2;
-
-                    switch (binaryOperator.Operation)
-                    {
-                        case Operation.Add:
-                            return new Int32ConstantEntry(i1.Value + i2.Value);
-                        case Operation.Sub:
-                            return new Int32ConstantEntry(i1.Value - i2.Value);
-                        case Operation.Mul:
-                            return new Int32ConstantEntry(i1.Value * i2.Value);
-                        case Operation.Div:
-                            return new Int32ConstantEntry(i1.Value / i2.Value);
-
-                        default:
-                            throw new NotImplementedException($"Cannot fold constant expression with operation {binaryOperator.Operation}");
-                    }
+                    case VarType.Int:
+                        return FoldBinaryOperatorWithConstantIntOperands(binaryTree);
                 }
             }
 
