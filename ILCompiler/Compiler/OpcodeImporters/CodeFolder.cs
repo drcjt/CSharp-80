@@ -201,7 +201,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             return new Int32ConstantEntry(i1);
         }
 
-        private static StackEntry FoldBinaryOperatorWithConstantPtrOperands(BinaryOperator tree)
+        private static StackEntry FoldRelationalOperatorWithConstantPtrOperands(BinaryOperator tree)
         {
             short i1 = (short)tree.Op1.GetIntConstant();
             short i2 = (short)tree.Op2.GetIntConstant();
@@ -242,7 +242,23 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 case Operation.Le_Un:
                     i1 = (ushort)i1 <= (ushort)i2 ? (short)1 : (short)0;
                     break;
+            }
 
+            return new Int32ConstantEntry(i1);
+        }
+
+        private static StackEntry FoldBinaryOperatorWithConstantPtrOperands(BinaryOperator tree)
+        {
+            short i1 = (short)tree.Op1.GetIntConstant();
+            short i2 = (short)tree.Op2.GetIntConstant();
+
+            if (tree.Operation >= Operation.Eq && tree.Operation <= Operation.Lt_Un)
+            {
+                return FoldRelationalOperatorWithConstantPtrOperands(tree);
+            }
+
+            switch (tree.Operation)
+            {
                 case Operation.Add:
                     i1 = (short)(i1 + i2);
                     break;
@@ -268,14 +284,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     return tree;
             }
 
-            if (tree.Operation >= Operation.Eq && tree.Operation <= Operation.Lt_Un)
-            {
-                return new Int32ConstantEntry(i1);
-            }
-            else
-            {
-                return new NativeIntConstantEntry(i1);
-            }
+            return new NativeIntConstantEntry(i1);
         }
 
         private static StackEntry FoldCastOperatorWithConstantOperands(CastEntry tree)
