@@ -207,40 +207,44 @@ namespace ILCompiler.Compiler.OpcodeImporters
             short i2 = (short)tree.Op2.GetIntConstant();
             switch (tree.Operation)
             {
-                case Operation.Ne_Un:
-                    i1 = i1 != i2 ? (short)1 : (short)0;
-                    break;
-
-                case Operation.Gt:
-                    i1 = i1 > i2 ? (short)1 : (short)0;
-                    break;
-
-                case Operation.Gt_Un:
-                    i1 = (ushort)i1 > (ushort)i2 ? (short)1 : (short)0;
+                case Operation.Eq:
+                    i1 = i1 == i2 ? (short)1 : (short)0;
                     break;
 
                 case Operation.Ge:
                     i1 = i1 >= i2 ? (short)1 : (short)0;
                     break;
 
-                case Operation.Ge_Un:
-                    i1 = (ushort)i1 >= (ushort)i2 ? (short)1 : (short)0;
-                    break;
-
-                case Operation.Lt:
-                    i1 = i1 < i2 ? (short)1 : (short)0;
-                    break;
-
-                case Operation.Lt_Un:
-                    i1 = (ushort)i1 < (ushort)i2 ? (short)1 : (short)0;
+                case Operation.Gt:
+                    i1 = i1 > i2 ? (short)1 : (short)0;
                     break;
 
                 case Operation.Le:
                     i1 = i1 <= i2 ? (short)1 : (short)0;
                     break;
 
+                case Operation.Lt:
+                    i1 = i1 < i2 ? (short)1 : (short)0;
+                    break;
+
+                case Operation.Ne_Un:
+                    i1 = i1 != i2 ? (short)1 : (short)0;
+                    break;
+
+                case Operation.Ge_Un:
+                    i1 = (ushort)i1 >= (ushort)i2 ? (short)1 : (short)0;
+                    break;
+
+                case Operation.Gt_Un:
+                    i1 = (ushort)i1 > (ushort)i2 ? (short)1 : (short)0;
+                    break;
+
                 case Operation.Le_Un:
                     i1 = (ushort)i1 <= (ushort)i2 ? (short)1 : (short)0;
+                    break;
+
+                case Operation.Lt_Un:
+                    i1 = (ushort)i1 < (ushort)i2 ? (short)1 : (short)0;
                     break;
             }
 
