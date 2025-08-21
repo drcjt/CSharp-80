@@ -20,16 +20,9 @@ NewObjectNoSize:
 
 NewObject:	
 
-	; Allocate and check if hit stack
-
-	LD HL, (HEAPNEXT)
-	ADD HL, DE
-	OR A
-	SBC HL, SP
-	JR NC, AllocFailed
-	ADD HL, SP
-
-	LD (HEAPNEXT), HL
+    ; Try to allocate memory from the heap
+    CALL GCAlloc
+    JR NC, NewOutOfMemory
 
 	; Calculate new object pointer
 	OR A
@@ -64,7 +57,7 @@ NewObject_ZeroLoopEnd:
 
 	JP (HL)
 
-AllocFailed:
+NewOutOfMemory:
 
 	LD HL, OOM_MSG - 2
 	CALL PRINT
