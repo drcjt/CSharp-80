@@ -268,8 +268,14 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     return tree;
             }
 
-            return new NativeIntConstantEntry(i1);
-
+            if (tree.Operation >= Operation.Eq && tree.Operation <= Operation.Lt_Un)
+            {
+                return new Int32ConstantEntry(i1);
+            }
+            else
+            {
+                return new NativeIntConstantEntry(i1);
+            }
         }
 
         private static StackEntry FoldCastOperatorWithConstantOperands(CastEntry tree)
