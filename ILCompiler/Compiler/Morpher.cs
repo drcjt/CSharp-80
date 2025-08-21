@@ -96,7 +96,7 @@ namespace ILCompiler.Compiler
                 Debug.Assert(lastStatement.RootNode is JumpTrueEntry);
 
                 var jumpTrueEntry = (JumpTrueEntry)lastStatement.RootNode;
-                if (jumpTrueEntry.Condition is Int32ConstantEntry constantEntry)
+                if (jumpTrueEntry.Condition.IsIntCnsOrI())
                 {
                     // The conditional can be folded away if the condition is a constant
 
@@ -105,7 +105,9 @@ namespace ILCompiler.Compiler
 
                     var targetBlock = block.Successors.First(b => b.Label == jumpTrueEntry.TargetLabel);
                     var fallthroughBlock = block.Successors.First(b => b != targetBlock && !b.HandlerStart);
-                    if (constantEntry.Value == 0)
+
+                    var constantValue = jumpTrueEntry.Condition.GetIntConstant();
+                    if (constantValue == 0)
                     {
                         // Remove the target block
                         block.Successors.Remove(targetBlock);
@@ -169,9 +171,9 @@ namespace ILCompiler.Compiler
                         {
                             var morphedConditionTree = MorphBinaryOperator(binOp);
                             morphedConditionTree.ResultUsedInJump = true;
-                            tree = new JumpTrueEntry(jte.TargetLabel, morphedConditionTree);
-                        }
-                        else
+                            tree = new JumpTrueEntry(jte.TargetLabel, _codeFolder.FoldExpression(morphedConditionTree));
+                    }
+                    else
                         {
                             tree = new JumpTrueEntry(jte.TargetLabel, MorphTree(jte.Condition));
                         }
