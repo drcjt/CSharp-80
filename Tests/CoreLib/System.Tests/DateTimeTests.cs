@@ -55,7 +55,7 @@ namespace System.Tests
             CompareTo_Invoke_ReturnsExpected(_testDateTime10, null, 1);
         }
 
-        public static void CompareTo_Invoke_ReturnsExpected(DateTime date, object other, int expected)
+        public static void CompareTo_Invoke_ReturnsExpected(DateTime date, object? other, int expected)
         {
             if (other is DateTime otherDate)
             {

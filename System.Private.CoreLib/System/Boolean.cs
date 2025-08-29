@@ -18,14 +18,7 @@
 
         public override int GetHashCode() => m_value ? True : False;
 
-        public override string ToString()
-        {
-            if (false == m_value)
-            {
-                return FalseLiteral;
-            }
-            return TrueLiteral;
-        }
+        public override string ToString() => m_value ? TrueLiteral : FalseLiteral;
 
         public override bool Equals(object? obj)
         {

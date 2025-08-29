@@ -27,13 +27,13 @@
         public override unsafe int GetHashCode() => (int)_value;
         public override string ToString() => ((int)_value).ToString();
 
-        public int CompareTo(object? value)
+        public int CompareTo(object? obj)
         {
-            if (value is nint other)
+            if (obj is nint other)
             {
                 return CompareTo(other);
             }
-            else if (value is null)
+            else if (obj is null)
             {
                 return 1;
             }

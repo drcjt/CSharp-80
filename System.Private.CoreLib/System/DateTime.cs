@@ -34,11 +34,11 @@
         public static bool operator !=(DateTime d1, DateTime d2) => !(d1 == d2);
 
 
-        public int CompareTo(object? value)
+        public int CompareTo(object? obj)
         {
-            if (value == null) return 1;
+            if (obj == null) return 1;
 
-            if (value is DateTime dt)
+            if (obj is DateTime dt)
             {
                 return Compare(this, dt);
             }

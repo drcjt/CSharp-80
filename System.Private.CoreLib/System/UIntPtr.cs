@@ -25,13 +25,13 @@
 
         public override unsafe int GetHashCode() => (int)_value;
 
-        public int CompareTo(object? value)
+        public int CompareTo(object? obj)
         {
-            if (value is nuint other)
+            if (obj is nuint other)
             {
                 return CompareTo(other);
             }
-            else if (value is null)
+            else if (obj is null)
             {
                 return 1;
             }
