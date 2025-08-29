@@ -40,5 +40,38 @@ namespace System.Tests
             }
             Assert.Equal(expected, i.Equals(obj));
         }
+
+        [Theory]
+        [InlineData((byte)234, (byte)234, 0)]
+        [InlineData((byte)234, byte.MinValue, 1)]
+        [InlineData((byte)234, (byte)123, 1)]
+        [InlineData((byte)234, (byte)235, -1)]
+        [InlineData((byte)234, byte.MaxValue, -1)]
+        [InlineData((byte)234, null, 1)]
+        public static void CompareTo_Other_ReturnsExpected(byte i, object? value, int expected)
+        {
+            if (value is byte byteValue)
+            {
+                Assert.Equal(expected, Math.Sign(i.CompareTo(byteValue)));
+            }
+
+            Assert.Equal(expected, Math.Sign(i.CompareTo(value)));
+        }
+
+        [Theory]
+        [InlineData("a")]
+        [InlineData(234)]
+        public static void CompareTo_ObjectNotByte_ThrowsArgumentException(object value)
+        {
+            try
+            {
+                _ = ((byte)123).CompareTo(value);
+            }
+            catch (ArgumentException)
+            {
+                return;
+            }
+            Assert.Fail("");
+        }
     }
 }

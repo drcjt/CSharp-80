@@ -40,5 +40,39 @@ namespace System.Tests
             }
             Assert.Equal(expected, i.Equals(obj));
         }
+
+        [Theory]
+        [InlineData((ushort)234, (ushort)234, 0)]
+        [InlineData((ushort)234, (ushort)0, 1)]
+        [InlineData((ushort)234, (ushort)123, 1)]
+        [InlineData((ushort)234, (ushort)456, -1)]
+        [InlineData((ushort)234, (ushort)0xFFFF, -1)]
+        [InlineData((ushort)234, null, 1)]
+        public static void CompareTo_Other_ReturnsExpected(ushort i, object? value, int expected)
+        {
+            if (value is ushort ushortValue)
+            {
+                Assert.Equal(expected, Math.Sign(i.CompareTo(ushortValue)));
+            }
+
+            Assert.Equal(expected, Math.Sign(i.CompareTo(value)));
+        }
+
+        [Theory]
+        [InlineData("a")]
+        [InlineData(234)]
+        public static void CompareTo_ObjectNotUshort_ThrowsArgumentException(object value)
+        {
+            try
+            {
+                ((ushort)123).CompareTo(value);
+            }
+            catch (ArgumentException)
+            {
+                return;
+            }
+
+            Assert.Fail("");
+        }
     }
 }

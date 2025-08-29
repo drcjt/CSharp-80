@@ -40,5 +40,39 @@ namespace System.Tests
             }
             Assert.Equal(expected, i.Equals(obj));
         }
+
+        [Theory]
+        [InlineData((uint)234, (uint)234, 0)]
+        [InlineData((uint)234, uint.MinValue, 1)]
+        [InlineData((uint)234, (uint)123, 1)]
+        [InlineData((uint)234, (uint)456, -1)]
+        [InlineData((uint)234, uint.MaxValue, -1)]
+        [InlineData((uint)234, null, 1)]
+        public static void CompareTo_Other_ReturnsExpected(uint i, object? value, int expected)
+        {
+            if (value is uint uintValue)
+            {
+                Assert.Equal(expected, Math.Sign(i.CompareTo(uintValue)));
+            }
+
+            Assert.Equal(expected, Math.Sign(i.CompareTo(value)));
+        }
+
+        [Theory]
+        [InlineData("a")]
+        [InlineData(234)]
+        public static void CompareTo_ObjectNotUint_ThrowsArgumentException(object value)
+        {
+            try
+            {
+                ((uint)123).CompareTo(value);
+            }
+            catch (ArgumentException)
+            {
+                return;
+            }
+
+            Assert.Fail("");
+        }
     }
 }
