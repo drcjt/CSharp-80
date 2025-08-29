@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using System.Collections.Generic;
+using Xunit;
 
 namespace System.Tests
 {
@@ -65,6 +66,48 @@ namespace System.Tests
             Assert.Equal(123, int.Parse("123\0\0"));
 
             Assert.Equal(123, int.Parse("123"));
+        }
+
+        [Theory]
+        [InlineData(234, 234, 0)]
+        [InlineData(234, int.MinValue, 1)]
+        [InlineData(-234, int.MinValue, 1)]
+        [InlineData(int.MinValue, int.MinValue, 0)]
+        [InlineData(234, -123, 1)]
+        [InlineData(234, 0, 1)]
+        [InlineData(234, 123, 1)]
+        [InlineData(234, 456, -1)]
+        [InlineData(234, int.MaxValue, -1)]
+        [InlineData(-234, int.MaxValue, -1)]
+        [InlineData(int.MaxValue, int.MaxValue, 0)]
+        [InlineData(-234, -234, 0)]
+        [InlineData(-234, 234, -1)]
+        [InlineData(-234, -432, 1)]
+        [InlineData(234, null, 1)]
+        public static void CompareTo_Other_ReturnsExpected(int i, object? value, int expected)
+        {
+            if (value is int intValue)
+            {
+                Assert.Equal(expected, Math.Sign(i.CompareTo(intValue)));
+                Assert.Equal(-expected, Math.Sign(intValue.CompareTo(i)));
+            }
+
+            Assert.Equal(expected, Math.Sign(i.CompareTo(value)));
+        }
+
+        [Theory]
+        [InlineData("a")]
+        public static void CompareTo_ObjectNotInt_ThrowsArgumentException(object value)
+        {
+            try
+            {
+                _ = 123.CompareTo(value);
+            }
+            catch (ArgumentException)
+            {
+                return;
+            }
+            Assert.Fail("");
         }
     }
 }

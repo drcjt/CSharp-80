@@ -6,6 +6,11 @@ namespace Xunit
 {
     public static class Assert
     {
+        public static void Fail(string message)
+        {
+            Assert.HandleFail("Assert.Fail", message);
+        }
+
         public static void Same(object expected, object actual)
         {
             if (!Object.ReferenceEquals(expected, actual))
@@ -27,6 +32,14 @@ namespace Xunit
             if (value is not null)
             {
                 Assert.HandleFail("Assert.Null", "");
+            }
+        }
+
+        public static void InRange<T>(T actual, T low, T high) where T : IComparable<T>
+        {
+            if (actual.CompareTo(low) < 0 || actual.CompareTo(high) > 0)
+            {
+                Assert.HandleFail("Assert.InRange", "");
             }
         }
 

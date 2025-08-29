@@ -56,6 +56,8 @@
     <Project Path="Tests/CoreLib/System.Memory.Tests/System.Memory.Tests.csproj" />
     <Project Path="Tests/CoreLib/System.Runtime.Extensions.Tests/System.Runtime.Extensions.Tests.csproj" />
     <Project Path="Tests/CoreLib/System.String.Tests/System.String.Tests.csproj" />
+    <Project Path="Tests/CoreLib/System.Tests.Int/System.Tests.Int.csproj" />
+    <Project Path="Tests/CoreLib/System.Tests.UInt/System.Tests.UInt.csproj" />
     <Project Path="Tests/CoreLib/System.Tests/System.Tests.csproj" />
   </Folder>
   <Folder Name="/Tests/Directed/">

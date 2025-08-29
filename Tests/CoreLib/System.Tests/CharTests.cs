@@ -92,5 +92,37 @@ namespace System.Tests
                 Assert.Equal(false, char.IsAsciiDigit(ch));
             }
         }
+
+        [Theory]
+        [InlineData('h', 'h', 0)]
+        [InlineData('h', 'a', 1)]
+        [InlineData('h', 'z', -1)]
+        [InlineData('h', null, 1)]
+        public static void CompareTo_Other_ReturnsExpected(char c, object? value, int expected)
+        {
+            if (value is char charValue)
+            {
+                Assert.Equal(expected, Math.Sign(c.CompareTo(charValue)));
+            }
+
+            Assert.Equal(expected, Math.Sign(c.CompareTo(value)));
+        }
+
+        [Theory]
+        [InlineData("a")]
+        [InlineData(234)]
+        public static void CompareTo_ObjectNotDouble_ThrowsArgumentException(object value)
+        {
+            try
+            {
+                _ = ((char)123).CompareTo(value);
+            }
+            catch (ArgumentException)
+            {
+                return;
+            }
+
+            Assert.Fail("");
+        }
     }
 }
