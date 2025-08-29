@@ -1,6 +1,9 @@
 ﻿namespace System
 {
-    public readonly struct SByte : IEquatable<sbyte>
+    public readonly struct SByte
+        : IComparable,
+          IEquatable<sbyte>,
+          IComparable<sbyte>
     {
         private readonly sbyte m_value;
         
@@ -17,5 +20,20 @@
         }
 
         public bool Equals(sbyte obj) => m_value == obj;
+
+        public int CompareTo(object? obj)
+        {
+            if (obj is null)
+            {
+                return 1;
+            }
+            if (obj is sbyte b)
+            {
+                return m_value - b.m_value;
+            }
+            throw new ArgumentException();
+        }
+
+        public int CompareTo(sbyte value) => m_value - value;
     }
 }

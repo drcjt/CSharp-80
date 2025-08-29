@@ -1,6 +1,9 @@
 ﻿namespace System
 {
-    public readonly struct Char : IEquatable<char>
+    public readonly struct Char
+        : IComparable,
+          IEquatable<char>,
+          IComparable<char>
     {
         private readonly char m_value;
 
@@ -28,5 +31,20 @@
         {
             return m_value == obj;
         }
+
+        public int CompareTo(object? obj)
+        {
+            if (obj is null)
+            {
+                return 1;
+            }
+            if (obj is char c)
+            {
+                return m_value - c.m_value;
+            }
+            throw new ArgumentException();
+        }
+
+        public int CompareTo(char value) => m_value - value;
     }
 }

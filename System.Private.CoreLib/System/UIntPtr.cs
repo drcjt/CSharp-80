@@ -1,6 +1,9 @@
 ﻿namespace System
 {
-    public readonly struct UIntPtr : IEquatable<nuint>
+    public readonly struct UIntPtr
+        : IComparable,
+          IEquatable<nuint>,
+          IComparable<nuint>
     {
         private readonly nuint _value;
 
@@ -21,5 +24,26 @@
         public bool Equals(nuint other) => _value == other;
 
         public override unsafe int GetHashCode() => (int)_value;
+
+        public int CompareTo(object? value)
+        {
+            if (value is nuint other)
+            {
+                return CompareTo(other);
+            }
+            else if (value is null)
+            {
+                return 1;
+            }
+
+            throw new ArgumentException("");
+        }
+
+        public int CompareTo(nuint value)
+        {
+            if (_value < value) return -1;
+            if (_value > value) return 1;
+            return 0;
+        }
     }
 }

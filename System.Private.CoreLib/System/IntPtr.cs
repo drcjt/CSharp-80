@@ -1,6 +1,9 @@
 ﻿namespace System
 {
-    public readonly struct IntPtr : IEquatable<nint>
+    public readonly struct IntPtr
+        : IComparable,
+          IEquatable<nint>,
+          IComparable<nint>
     {
         private readonly nint _value;
 
@@ -23,5 +26,26 @@
 
         public override unsafe int GetHashCode() => (int)_value;
         public override string ToString() => ((int)_value).ToString();
+
+        public int CompareTo(object? value)
+        {
+            if (value is nint other)
+            {
+                return CompareTo(other);
+            }
+            else if (value is null)
+            {
+                return 1;
+            }
+
+            throw new ArgumentException();
+        }
+
+        public int CompareTo(nint value)
+        {
+            if (_value < value) return -1;
+            if (_value > value) return 1;
+            return 0;
+        }
     }
 }
