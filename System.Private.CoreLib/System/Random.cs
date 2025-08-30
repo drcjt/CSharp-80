@@ -33,7 +33,7 @@
             var exclusiveRange = maxValue - minValue;
             if (exclusiveRange > 1)
             {
-                return (Next() % (maxValue - minValue)) + minValue;
+                return (Next() % exclusiveRange) + minValue;
             }
 
             return minValue;
