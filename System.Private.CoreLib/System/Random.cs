@@ -21,12 +21,22 @@
 
         public int Next(int maxValue)
         {
-            return Next() % maxValue;
+            if (maxValue > 1)
+            {
+                return Next() % maxValue;
+            }
+            return 0;
         }
 
         public int Next(int minValue, int maxValue)
         {
-            return Next() % (maxValue - minValue) + minValue;
+            var exclusiveRange = maxValue - minValue;
+            if (exclusiveRange > 1)
+            {
+                return (Next() % (maxValue - minValue)) + minValue;
+            }
+
+            return minValue;
         }
     }
 }
