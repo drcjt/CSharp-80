@@ -90,13 +90,6 @@ namespace ILCompiler.Compiler
                 }
             }
 
-            // Add exception object for catch
-            if (basicBlock.HandlerStart)
-            {
-                // Use a node type that won't generate any code
-                _stack.Push(new CatchArgumentEntry());
-            }
-
             foreach (var handlerBlock in basicBlock.Handlers)
             {
                 MarkBasicBlock(handlerBlock);
@@ -171,6 +164,17 @@ namespace ILCompiler.Compiler
             _currentBasicBlock = block;
             _currentILOffset = block.StartOffset;
             var currentIndex = offsetToIndexMap[_currentILOffset];
+
+            // Add exception object for catch
+            if (block.HandlerStart)
+            {
+                // Use a node type that won't generate any code
+                var catchArgument = new CatchArgumentEntry();
+
+                // Spill to a temp to ensure correct evaluation order
+                var temp = ImportSpillStackEntry(catchArgument);
+                _stack.Push(temp);
+            }
 
             StopImporting = false;
 

@@ -27,6 +27,12 @@ namespace System.Runtime
             DispatchException(ref exceptionInfo);
         }
 
+        [RuntimeExport("ThrowDivideByZeroException")]
+        public static void ThrowDivideByZeroException()
+        {
+            throw new DivideByZeroException();
+        }
+
         private static void DispatchException(ref ExInfo exceptionInfo)
         {
             object exceptionObj = exceptionInfo._exception;

@@ -111,6 +111,14 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                         case ILOpcode.constrained:
                             ImportConstrainedPrefix(currentInstruction);
                             break;
+
+                        case ILOpcode.div:
+                        case ILOpcode.div_un:
+                        case ILOpcode.rem:
+                        case ILOpcode.rem_un:
+                            ImportBinaryOperation(currentInstruction);
+                            break;
+
                     }
                     currentOffset += currentInstruction.GetSize();
                     currentIndex++;
@@ -120,6 +128,22 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
 
             return _dependencies;
+        }
+
+        private void ImportBinaryOperation(Instruction instruction)
+        {
+            switch (instruction.Opcode)
+            {
+                case ILOpcode.div:
+                case ILOpcode.div_un:
+                case ILOpcode.rem:
+                case ILOpcode.rem_un:
+                    var systemRuntimeExceptionHandling = _context.CorLibModuleProvider.FindThrow("System.Runtime.ExceptionHandling");
+                    var runtimeHelperMethod = systemRuntimeExceptionHandling.FindMethod("ThrowDivideByZeroException");
+                    var methodNode = _context.NodeFactory.MethodNode(_module.Create(runtimeHelperMethod));
+                    _dependencies.Add(methodNode);
+                    break;
+            }
         }
 
         private void ImportConstrainedPrefix(Instruction instruction)

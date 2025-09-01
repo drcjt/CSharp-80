@@ -485,7 +485,7 @@ namespace ILCompiler.Compiler
         /// <summary>
         /// Calculates the predecessor blocks that have fully executed before block was reached.
         /// Only differs for handler blocks as the try blocks may not have fully executed 
-        /// so we use the predecessors of the first block in the try
+        /// so we use the first block in the try as the predecessor 
         /// 
         /// </summary>
         /// <param name="block"></param>
@@ -498,7 +498,7 @@ namespace ILCompiler.Compiler
             }
             else
             {
-                return block.TryBlocks[0].Predecessors;
+                return new List<BasicBlock> { block.TryBlocks[0] };
             }
         }
 

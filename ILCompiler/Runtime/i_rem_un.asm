@@ -49,7 +49,4 @@ i_rem_un:
    ret
 
 i_rem_un_divide_zero:
-
-    dec de
-    scf
-    ret
+    jp ThrowDivideByZeroException
