@@ -55,7 +55,7 @@ SFINEXT:
 	INC HL
 	LD B, (HL)
 
-	; Save current instuction pointer
+	; Save current instruction pointer
 	LD (CURRIP), BC
 
 	LD H, D
