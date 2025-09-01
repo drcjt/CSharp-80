@@ -123,8 +123,4 @@ loop_1:
    ret
 
 divide_zero:
-
-; TODO: this should be putting some values back on the stack too!
-    dec de
-    scf
-    ret
+    jp ThrowDivideByZeroException

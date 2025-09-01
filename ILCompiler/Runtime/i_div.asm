@@ -89,9 +89,4 @@ i_div_end:
     ret
 
 divide_zero_s:
-
-; TODO: this should be putting some values back on the stack too!
-    dec de
-    scf
-
-    ret
+    jp ThrowDivideByZeroException

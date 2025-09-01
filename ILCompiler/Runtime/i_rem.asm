@@ -48,7 +48,4 @@ i_rem:
    ret
 
 i_rem_divide_zero:
-
-    dec de
-    scf
-    ret
+    jp ThrowDivideByZeroException
