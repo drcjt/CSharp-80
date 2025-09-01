@@ -280,7 +280,7 @@ namespace ILCompiler.Compiler
 
         private static bool IsMethodTrimmable(Z80MethodCodeNode node) =>
             !node.Method.IsVirtual &&
-            node.Method.Name != "ThrowException" &&
+            !node.Method.HasCustomAttribute("System.Runtime", "RuntimeExportAttribute") &&
             !node.Method.IsIntrinsic &&
             !node.Method.IsInternalCall &&
             !node.Method.IsPInvoke;
@@ -356,12 +356,13 @@ namespace ILCompiler.Compiler
                 unwindBuilder.Label("UNWIND_TABLE");
                 foreach (var node in nodes)
                 {
-                    if (node.Method.Name != "ThrowException" && node.ParameterBytes != mostUsedNumberOfParameters)
+                    if (node.ParameterBytes != mostUsedNumberOfParameters)
                     {
-                        var mangledName = node.GetMangledName(_nameMangler);
+                        var isRuntimeExport = node.Method.HasCustomAttribute("System.Runtime", "RuntimeExportAttribute");
+                        var name = isRuntimeExport ? node.Method.Name : node.GetMangledName(_nameMangler);
 
-                        unwindBuilder.Dw(mangledName, "Method Start");
-                        unwindBuilder.Dw($"{mangledName}_END", "Method End");
+                        unwindBuilder.Dw(name, "Method Start");
+                        unwindBuilder.Dw($"{name}_END", "Method End");
                         unwindBuilder.Db(node.ParameterBytes, "Unwind Parameter Bytes");
                     }
                 }
