@@ -174,8 +174,15 @@
     <Project Path="Tests/Performance/CodeQuality/Benchmarks/Quicksort/Quicksort.csproj" />
   </Folder>
   <Folder Name="/Tests/Regression/">
-    <Project Path="Tests/Regression/Bug623/Bug623.csproj" />
-    <Project Path="Tests/Regression/Regression/Regression.csproj" />
+    <Project Path="Tests/Regression/Bug_206/Bug_206.csproj" />
+    <Project Path="Tests/Regression/Bug_210/Bug_210.csproj" />
+    <Project Path="Tests/Regression/Bug_468/Bug_468.csproj" />
+    <Project Path="Tests/Regression/Bug_545/Bug_545.csproj" />
+    <Project Path="Tests/Regression/Bug_617/Bug_617.csproj" />
+    <Project Path="Tests/Regression/Bug_623/Bug_623.csproj" />
+    <Project Path="Tests/Regression/Bug_655/Bug_655.csproj" />
+    <Project Path="Tests/Regression/Bug_660/Bug_660.csproj" />
+    <Project Path="Tests/Regression/Bug_87/Bug_87.csproj" />
     <Project Path="Tests/Regression/RegressionTestsRunner/RegressionTests.csproj" />
   </Folder>
   <Project Path="ILCompiler/ILCompiler.csproj" />
