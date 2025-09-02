@@ -1,6 +1,8 @@
-﻿using Internal.Runtime.CompilerServices;
+﻿using System.Reflection;
+using Internal.Runtime.CompilerServices;
 using Xunit;
 
+[assembly: AssemblyVersion("1.0.0.0")]
 namespace Regression
 {
     public static class BinaryOperatorOptimizationTests

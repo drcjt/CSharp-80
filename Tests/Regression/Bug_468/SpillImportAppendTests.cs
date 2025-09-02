@@ -1,8 +1,10 @@
-﻿using Xunit;
+﻿using System.Reflection;
+using Xunit;
 
+[assembly: AssemblyVersion("1.0.0.0")]
 namespace Regression
 {
-    internal class SpillImportAppendTests
+    public class SpillImportAppendTests
     {
         [Fact]
         public static void Test()

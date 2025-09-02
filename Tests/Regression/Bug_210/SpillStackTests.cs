@@ -1,5 +1,7 @@
-﻿using Xunit;
+﻿using System.Reflection;
+using Xunit;
 
+[assembly: AssemblyVersion("1.0.0.0")]
 namespace Regression
 {
     public static class SpillStackTests
