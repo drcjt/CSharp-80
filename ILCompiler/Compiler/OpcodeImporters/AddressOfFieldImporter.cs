@@ -17,8 +17,17 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             if (isLoadStatic)
             {
-                var staticsBase = importer.NameMangler.GetMangledTypeName(fieldDesc.OwningType) + "_statics";
-                StackEntry obj = new SymbolConstantEntry(staticsBase, fieldDesc.Offset.AsInt);
+                StackEntry obj;
+                if (fieldDesc.HasRva)
+                {
+                    var fieldRvaDataNode = importer.NodeFactory.FieldRvaDataNode(fieldDesc);
+                    obj =  new SymbolConstantEntry(fieldRvaDataNode.Label);
+                }
+                else
+                {
+                    var staticsBase = importer.NameMangler.GetMangledTypeName(fieldDesc.OwningType) + "_statics";
+                    obj = new SymbolConstantEntry(staticsBase, fieldDesc.Offset.AsInt);
+                }
                 if (!importer.PreinitializationManager.IsPreinitialized(fieldDesc.OwningType))
                 {
                     obj = InitClassHelper.ImportInitClass(fieldDesc.OwningType, importer, obj);

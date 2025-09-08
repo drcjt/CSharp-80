@@ -22,6 +22,8 @@
 
         public override bool IsLiteral => _fieldDef.IsLiteral;
 
+        public override bool HasRva => _fieldDef.HasRva;
+
         public override TypeSystemContext Context => _fieldDef.Context;
 
         public override FieldDesc GetTypicalFieldDefinition() => _fieldDef;

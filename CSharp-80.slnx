@@ -78,6 +78,7 @@
     <Project Path="Tests/Directed/Hanoi/Hanoi.csproj" />
     <Project Path="Tests/Directed/MDArrays/MDArrays.csproj" />
     <Project Path="Tests/Directed/Primes/Primes.csproj" />
+    <Project Path="Tests/Directed/RvaStatics/RvaStatic.csproj" />
     <Project Path="Tests/Directed/Strings/Strings.csproj" />
   </Folder>
   <Folder Name="/Tests/Generics/">

@@ -17,26 +17,35 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             var value = importer.Pop();
 
-            StackEntry addr;
+            var fieldSize = field.FieldType.GetElementSize().AsInt;
+            var fieldOffset = field.Offset.AsInt;
+
+            StackEntry fieldAddress;
             if (isStoreStatic)
             {
-                var staticsBase = importer.NameMangler.GetMangledTypeName(field.OwningType) + "_statics";
-                addr = new SymbolConstantEntry(staticsBase);
+                if (field.HasRva)
+                {
+                    var fieldRvaDataNode = importer.NodeFactory.FieldRvaDataNode(field);
+                    fieldAddress = new SymbolConstantEntry(fieldRvaDataNode.Label);
+                    fieldOffset = 0;
+                }
+                else
+                {
+                    var staticsBase = importer.NameMangler.GetMangledTypeName(field.OwningType) + "_statics";
+                    fieldAddress = new SymbolConstantEntry(staticsBase);
+                }
 
                 if (!importer.PreinitializationManager.IsPreinitialized(field.OwningType))
                 {
-                    addr = InitClassHelper.ImportInitClass(field.OwningType, importer, addr);
+                    fieldAddress = InitClassHelper.ImportInitClass(field.OwningType, importer, fieldAddress);
                 }
             }
             else
             {
-                addr = importer.Pop();
+                fieldAddress = importer.Pop();
             }
 
-            var fieldSize = field.FieldType.GetElementSize().AsInt;
-            var fieldOffset = field.Offset.AsInt;
-
-            StackEntry node = new StoreIndEntry(addr, value, field.FieldType.VarType, (uint)fieldOffset, fieldSize);
+            StackEntry node = new StoreIndEntry(fieldAddress, value, field.FieldType.VarType, (uint)fieldOffset, fieldSize);
 
             if (field.FieldType.VarType == VarType.Struct)
             {

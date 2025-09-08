@@ -20,8 +20,17 @@ namespace ILCompiler.Compiler.OpcodeImporters
             StackEntry obj;
             if (isLoadStatic)
             {
-                var staticsBase = importer.NameMangler.GetMangledTypeName(runtimeDeterminedType.OwningType) + "_statics";
-                obj = new SymbolConstantEntry(staticsBase);
+                if (runtimeDeterminedType.HasRva)
+                {
+                    var fieldRvaDataNode = importer.NodeFactory.FieldRvaDataNode(runtimeDeterminedType);
+                    obj = new SymbolConstantEntry(fieldRvaDataNode.Label);
+                    fieldOffset = 0;
+                }
+                else
+                {
+                    var staticsBase = importer.NameMangler.GetMangledTypeName(runtimeDeterminedType.OwningType) + "_statics";
+                    obj = new SymbolConstantEntry(staticsBase);
+                }
 
                 if (!importer.PreinitializationManager.IsPreinitialized(runtimeDeterminedType.OwningType))
                 {
