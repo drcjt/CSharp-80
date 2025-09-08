@@ -267,6 +267,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     throw new InvalidProgramException();
                 }
 
+                if (fieldDesc.HasRva)
+                {
+                    _dependencies.Add(_context.NodeFactory.FieldRvaDataNode(fieldDesc));
+                    return;
+                }
+
                 var metadataType = fieldDesc.OwningType as MetadataType;
                 _dependencies.Add(_context.NodeFactory.StaticsNode(metadataType!));
 

@@ -17,7 +17,8 @@ namespace ILCompiler.TypeSystem.Common
 
             foreach (var field in type.GetFields())
             {
-                if (!field.IsStatic || field.IsLiteral)
+                // Non static, literal fields and fields with RVA don't take up space in the static field layout
+                if (!field.IsStatic || field.IsLiteral || field.HasRva)
                     continue;
 
                 numStaticFields++;
@@ -37,7 +38,7 @@ namespace ILCompiler.TypeSystem.Common
             int index = 0;
             foreach (var field in type.GetFields())
             {
-                if (!field.IsStatic || field.IsLiteral)
+                if (!field.IsStatic || field.IsLiteral || field.HasRva)
                     continue;
 
                 var fieldType = field.FieldType;

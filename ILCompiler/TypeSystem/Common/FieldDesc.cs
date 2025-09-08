@@ -52,6 +52,8 @@
 
         public abstract bool IsLiteral { get; }
 
+        public abstract bool HasRva { get; }
+
         public virtual FieldDesc InstantiateSignature(Instantiation? typeInstantiation, Instantiation? methodInstantiation)
         {
             var field = this;

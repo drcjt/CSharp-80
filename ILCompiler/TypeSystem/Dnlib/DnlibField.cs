@@ -32,6 +32,8 @@ namespace ILCompiler.TypeSystem.Dnlib
 
         public override bool IsLiteral => _fieldDef.IsLiteral;
 
+        public override bool HasRva => _fieldDef.HasFieldRVA;
+
         public override EffectiveVisibility EffectiveVisibility => _fieldDef.Access switch
         {
             FieldAttributes.Private => EffectiveVisibility.Private,
