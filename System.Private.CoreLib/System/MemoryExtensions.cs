@@ -5,6 +5,13 @@ namespace System
 {
     public static class MemoryExtensions
     {
+        public static ReadOnlySpan<char> AsSpan(this string? text)
+        {
+            if (text == null)
+                return ReadOnlySpan<char>.Empty;
+            return new ReadOnlySpan<char>(ref text.GetRawStringData(), text.Length);
+        }
+
         public static bool SequenceEqual<T>(this Span<T> span, ReadOnlySpan<T> other) where T : IEquatable<T>
         {
             return SequenceEqual((ReadOnlySpan<T>)span, other);
