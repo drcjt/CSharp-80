@@ -34,19 +34,16 @@ namespace XUnit.SourceGenerator
                 var mainBody = new StringBuilder();
 
                 // Generate calls for Fact methods
-                foreach (IMethodSymbol? method in methods.Left.OrderBy(m => m.Name))
+                foreach (IMethodSymbol? method in methods.Left.OfType<IMethodSymbol>().OrderBy(m => m.Name))
                 {
                     GenerateSimpleTestMethodCalls(mainBody, method);
                 }
 
                 // Add theory methods
-                foreach (IMethodSymbol? method in methods.Right.OrderBy(m => m.Name))
+                foreach (IMethodSymbol method in methods.Right.OfType<IMethodSymbol>().OrderBy(m => m.Name))
                 {
-                    if (method is not null)
-                    {
-                        GenerateTestMethodCallsUsingMemberData(mainBody, method);
-                        GenerateTestMethodCallsUsingInlineData(mainBody, method);
-                    }
+                    GenerateTestMethodCallsUsingMemberData(mainBody, method);
+                    GenerateTestMethodCallsUsingInlineData(mainBody, method);
                 }
 
                 var source = $@"
