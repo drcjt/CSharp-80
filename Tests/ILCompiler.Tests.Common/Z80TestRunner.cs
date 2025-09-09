@@ -6,7 +6,7 @@ namespace ILCompiler.Tests.Common
 {
     public class Z80TestRunner
     {
-        private string _solutionPath = "";
+        private readonly string _solutionPath;
         private string _tracePath = "";
         public Z80TestRunner(string solutionPath)
         {
@@ -38,7 +38,7 @@ namespace ILCompiler.Tests.Common
         // Set to true to enable PC tracing to help debug failing tests
         private const bool TracePC = false;
 
-        private Z80Processor z80 = new Z80Processor();
+        private readonly Z80Processor z80 = new Z80Processor();
         private void RunTest(byte[]? z80Bytes, string testName, bool ilBvt, bool benchmark)
         {
             File.Delete(_tracePath);
@@ -109,7 +109,7 @@ namespace ILCompiler.Tests.Common
             }
         }
 
-        private StringBuilder _consoleStringBuilder = new StringBuilder();
+        private readonly StringBuilder _consoleStringBuilder = new StringBuilder();
 
         private void BeforeInstructionFetch(object? sender, BeforeInstructionFetchEventArgs e)
         {

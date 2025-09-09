@@ -25,6 +25,14 @@
     <CompilerGeneratedFilesOutputPath>.\GeneratedFiles</CompilerGeneratedFilesOutputPath>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;0435</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;0435</NoWarn>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="System\**" />
     <EmbeddedResource Remove="System\**" />
