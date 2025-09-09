@@ -17,14 +17,18 @@ namespace System
                 return;
             }   
 
-            // TODO: type mismatch check
-
             _reference = ref MemoryMarshal.GetArrayDataReference(array);
             _length = array.Length;
         }
 
         public ReadOnlySpan(T[]? array, int start, int length)
         {
+            if (array == null)
+            {
+                this = default;
+                return;
+            }
+
             _reference = ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(array), start);
             _length = length;
         }

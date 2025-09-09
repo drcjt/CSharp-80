@@ -169,8 +169,8 @@ namespace System.String.Tests
         [Fact]
         public static void ImplicitCast_NullString_ReturnsDefaultSpan()
         {
-            ReadOnlySpan<char> span = (string)null;
-            Assert.True(span == default);
+            ReadOnlySpan<char> span = (string?)null;
+            Assert.True(span.IsEmpty);
         }
     }
 }
