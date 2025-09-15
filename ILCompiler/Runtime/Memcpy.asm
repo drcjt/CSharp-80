@@ -2,19 +2,14 @@
 ;
 ; Uses: HL, DE, BC, AF, BC'
 
-Memcpy:	
-	EXX
-	POP BC		; Save return address
-	EXX
+Memcpy:
+    POP AF      ; Save return address
 
 	POP DE		; Destination address
 	POP HL		; Source address
 	POP BC		; Count
-	POP AF
 
-	EXX
-	PUSH BC		; put return address back
-	EXX
+    PUSH AF     ; put return address back
 
 	LD A, B
 	OR C
