@@ -10,7 +10,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
         {
             if (instruction.Opcode != ILOpcode.cpblk) return false;
 
-            var size = importer.Pop(); // Size (unsigned int 32)
+            var size = new CastEntry(importer.Pop(), VarType.Ptr); // Size (unsigned int 32)
             var sourceAddress = importer.Pop(); // Source address (native int or &)
             var destinationAddress = importer.Pop(); // Destination address (native int or &)
 

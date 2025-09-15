@@ -248,6 +248,18 @@ namespace ILCompiler.Compiler.OpcodeImporters
             var targetMethodName = methodToCall.Name;
             switch (targetMethodName)
             {
+                case "Memmove":
+                    if (IsTypeName(methodToCall, "System", "SpanHelpers"))
+                    {
+                        var size = arguments[0];
+                        var sourceAddress = arguments[1];
+                        var destinationAddress = arguments[2];
+                        var node = new CallEntry("Memcpy", new List<StackEntry> { destinationAddress, sourceAddress, size }, VarType.Void, null);
+                        importer.ImportAppendTree(node);
+                        return true;
+                    }
+                    break;
+
                 case "InitializeArray":
                     if (IsTypeName(methodToCall, "System.Runtime.CompilerServices", "RuntimeHelpers"))
                     {
@@ -338,7 +350,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             StackEntry destinationAddress = new BinaryOperator(Operation.Add, isComparison: false, arrayRef2, baseSize, VarType.Ptr);
 
             var arrayData = ((DnlibField)fieldSlot.Field).GetFieldRvaData();
-            var size = new Int32ConstantEntry((short)arrayData.Length);
+            var size = new NativeIntConstantEntry((short)arrayData.Length);
 
             var args = new List<StackEntry>() { size, sourceAddress, destinationAddress };
 

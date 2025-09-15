@@ -1,9 +1,12 @@
-﻿using Internal.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
+using Internal.Runtime.CompilerServices;
 
 namespace System
 {
     internal static class SpanHelpers
     {
+
+        [Intrinsic]
         internal static unsafe void Memmove(ref byte dest, ref byte src, nuint len)
         {
             if ((nuint)Unsafe.ByteOffset(ref src, ref dest) >= len)
