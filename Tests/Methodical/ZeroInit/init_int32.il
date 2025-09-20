@@ -213,7 +213,7 @@
 .method public static int32 Main() {
 .entrypoint
 .maxstack  5
-.locals (int32)
+.locals init (int32)
 
 	call int32 Test_Init_Int32::Test1()
 	brfalse t2
