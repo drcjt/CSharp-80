@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace Mines
@@ -96,6 +97,8 @@ namespace Mines
             _revealMines = false;
         }
 
+        // TODO: Why does inlining this cause an issue where no keypress is recognised?
+        [MethodImpl(MethodImplOptions.NoInlining)]
         private static void WaitForKeyPress()
         {
             while (!Console.KeyAvailable)
