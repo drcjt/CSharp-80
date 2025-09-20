@@ -11,10 +11,14 @@ namespace ILCompiler.TypeSystem.Dnlib
         private readonly ILExceptionRegion[] _exceptionRegions;
 
         private readonly int _localsCount;
-        private readonly bool _isInitLocals;
+        private readonly bool _isInitLocals;        
+
+        private readonly int _ilCodeSize;
 
         public DnlibMethodIL(DnlibModule module, CilBody body)
         {
+            _ilCodeSize = (int)(body.Instructions[^1].GetOffset() + body.Instructions[^1].GetSize());
+
             foreach (var instruction in body.Instructions)
             {
                 _instructions.Add(new DnlibInstruction(module, instruction));
@@ -39,6 +43,7 @@ namespace ILCompiler.TypeSystem.Dnlib
 
         }
 
+        public override int ILCodeSize => _ilCodeSize;
         public override int LocalsCount => _localsCount;
 
         public override IList<IL.Instruction> Instructions => _instructions;
