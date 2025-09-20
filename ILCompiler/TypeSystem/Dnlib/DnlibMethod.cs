@@ -33,6 +33,8 @@ namespace ILCompiler.TypeSystem.Dnlib
 
         public override bool IsAggressiveInlining => _methodDef.IsAggressiveInlining;
 
+        public override bool IsNoInlining => _methodDef.IsNoInlining;
+
         public override bool IsPInvoke => _methodDef.IsPinvokeImpl;
 
         public override PInvokeMetaData? GetPInvokeMetaData()

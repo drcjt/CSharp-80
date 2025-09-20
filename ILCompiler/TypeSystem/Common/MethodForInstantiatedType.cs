@@ -76,6 +76,8 @@ namespace ILCompiler.TypeSystem.Common
         public override string FullName => ToString();
         public override bool HasReturnType => _typicalMethodDef.HasReturnType;
 
+        public override bool IsInternalCall => _typicalMethodDef.IsInternalCall;
+        public override bool IsNoInlining => _typicalMethodDef.IsNoInlining;
         public override bool IsVirtual => _typicalMethodDef.IsVirtual;
         public override bool IsAbstract => _typicalMethodDef.IsAbstract;
 

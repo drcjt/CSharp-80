@@ -17,6 +17,7 @@ namespace ILCompiler.TypeSystem.Common
         public virtual PInvokeMetaData? GetPInvokeMetaData() => default;
 
         public virtual bool IsInternalCall => false;
+        public virtual bool IsNoInlining => false;
 
         public virtual bool IsStaticConstructor => OwningType.GetStaticConstructor() == this;
 
