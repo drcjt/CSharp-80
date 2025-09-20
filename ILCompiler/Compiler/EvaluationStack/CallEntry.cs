@@ -1,4 +1,5 @@
-﻿using ILCompiler.TypeSystem.Common;
+﻿using ILCompiler.Compiler.Inlining;
+using ILCompiler.TypeSystem.Common;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ILCompiler.Compiler.EvaluationStack

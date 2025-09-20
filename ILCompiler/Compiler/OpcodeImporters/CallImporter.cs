@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.Inlining;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.Dnlib;
@@ -174,7 +175,9 @@ namespace ILCompiler.Compiler.OpcodeImporters
             int? returnTypeSize = methodToCall.HasReturnType ? returnType.GetElementSize().AsInt : null;
 
             var returnVarType = methodToCall.HasReturnType ? returnType.VarType : VarType.Void;
-            CallEntry callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize, !directCall, methodToCall, methodToCall.IsAggressiveInlining);
+            CallEntry callNode = new CallEntry(targetMethod, arguments, returnVarType, returnTypeSize, !directCall, methodToCall);
+
+            MarkInlineCandidate(callNode, importer);
 
             if (!methodToCall.HasReturnType)
             {
@@ -182,18 +185,16 @@ namespace ILCompiler.Compiler.OpcodeImporters
             }
             else
             {
-                if (callNode.IsInlineCandidate && importer.Configuration.Optimize)
+                if (callNode.IsInlineCandidate)
                 {
+                    // TODO: if struct return then need to spill to a local temp
+
                     // Split call into two parts: the call itself and the return expression
                     importer.ImportAppendTree(callNode, true);
 
+                    // Link the return expression to the call
                     ReturnExpressionEntry returnExpression = new(callNode);
-
-                    var inlineCandidateInfo = new InlineCandidateInfo
-                    {
-                        ReturnExpressionEntry = returnExpression
-                    };
-                    callNode.InlineCandidateInfo = inlineCandidateInfo;
+                    callNode.InlineCandidateInfo!.ReturnExpressionEntry = returnExpression;
 
                     importer.Push(returnExpression);
                 }
@@ -390,5 +391,109 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             return argument;
         }
+
+        private static void MarkInlineCandidate(CallEntry call, IImporter importer)
+        {
+            InlineContext inlinersContext;
+            if (importer.InlineInfo is not null)
+            {
+                inlinersContext = importer.InlineInfo.InlineContext!;
+            }
+            else
+            {
+                // Use root context
+                inlinersContext = RootContext;
+            }
+
+            var inlineResult = new InlineResult() { InlineCall = call };
+
+            if (!importer.Configuration.Optimize)
+            {
+                inlineResult.NoteFatal(InlineObservation.DebugCodeGen);
+                return;
+            }
+
+            if (call.Method!.IsPInvoke)
+            {
+                inlineResult.NoteFatal(InlineObservation.IsPInvoke);
+                return;
+            }
+
+            if (call.Method!.IsInternalCall)
+            {
+                inlineResult.NoteFatal(InlineObservation.IsInternal);
+                return;
+            }
+
+            if (call.Method!.IsVirtual)
+            {
+                inlineResult.NoteFatal(InlineObservation.IsVirtual);
+                return;
+            }
+
+            if (call.Method.IsNoInlining)
+            {
+                inlineResult.NoteFatal(InlineObservation.IsNoInline);
+                return;
+            }
+
+            if (call.Method.Signature.ReturnType.VarType == VarType.Struct)
+            {
+                inlineResult.NoteFatal(InlineObservation.IsStructReturn);
+                return;
+            }
+
+            var inlineCandidateInfo = CheckCanInline(call, inlinersContext, inlineResult);
+
+            if (inlineResult.IsFailure)
+            {
+                return;
+            }
+
+            if (call.Method!.MethodIL!.GetExceptionRegions().Length > 0)
+            {
+                // TODO: check that inline location is within a filter
+                // See -> https://github.com/dotnet/runtime/commit/dc88476f102123edebd6b2d2efe5a56146f60094#diff-266282d463447c6984d3223b87f05a0cc94197441c10c204a8f89af0d3d8a372
+                // if (bbInFilterBBRange(compCurBB) {
+                inlineResult.NoteFatal(InlineObservation.IsWithinFilter);
+                // }
+                return;
+            }
+
+            call.InlineCandidateInfo = inlineCandidateInfo;
+
+            // Method is a candidate for inlining
+            call.IsInlineCandidate = true;
+        }
+
+        private static InlineCandidateInfo? CheckCanInline(CallEntry call, InlineContext inlinersContext, InlineResult inlineResult)
+        {
+            if (call.Method?.MethodIL is null)
+            {
+                inlineResult.NoteFatal(InlineObservation.NoMethodInfo);
+                return null;
+            }
+
+            CanInlineIL(call.Method, inlineResult);
+
+            var inlineCandidateInfo = new InlineCandidateInfo();
+            inlineCandidateInfo.InlinersContext = inlinersContext;
+            return inlineCandidateInfo;
+        }
+
+        private static void CanInlineIL(MethodDesc methodInfo, InlineResult inlineResult)
+        {
+            if (methodInfo.MethodIL?.Instructions == null || methodInfo.MethodIL.Instructions.Count == 0)
+            {
+                inlineResult.NoteFatal(InlineObservation.HasNoBody);
+                return;
+            }
+
+            inlineResult.NoteBool(InlineObservation.IsForceInline, methodInfo.IsAggressiveInlining);
+
+            inlineResult.NoteInt(InlineObservation.ILCodeSize, methodInfo.MethodIL.ILCodeSize);
+        }
+
+        private static InlineContext RootContext { get; } = new InlineContext();
     }
 }
