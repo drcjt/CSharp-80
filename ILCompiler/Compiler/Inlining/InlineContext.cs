@@ -1,8 +1,12 @@
-﻿namespace ILCompiler.Compiler.Inlining
+﻿using ILCompiler.Compiler.EvaluationStack;
+
+namespace ILCompiler.Compiler.Inlining
 {
     public class InlineContext
     {
         public InlineContext? Parent { get; set; } = null;
+
+        public CallEntry? Callee { get; set; } = null;
 
         public InlineObservation? Observation { get; set; }
         public bool Success { get; set; } = false;

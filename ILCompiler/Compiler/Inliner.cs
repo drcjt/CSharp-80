@@ -106,7 +106,10 @@ namespace ILCompiler.Compiler
 
         private static bool IsDisallowedRecursiveInline(InlineContext ancestor, InlineInfo inlineInfo)
         {
-            // TODO: verify if inline is recursive
+            if (ancestor.Callee?.Method == inlineInfo.InlineCall.Method)
+            {
+                return true;
+            }
 
             return false;
         }
@@ -169,7 +172,7 @@ namespace ILCompiler.Compiler
                 inlineInfo.StaticConstructorMethod = method.GetStaticConstructor();
             }
 
-            inlineInfo.InlineContext = NewContext(inlineInfo.InlineCandidateInfo.InlinersContext);
+            inlineInfo.InlineContext = NewContext(inlineInfo.InlineCandidateInfo.InlinersContext, methodInfo.Call);
 
             var compiler = new MethodCompiler(_logger, _configuration, _phaseFactory);
             var basicBlocks = compiler.CompileInlineeMethod(method, _inputFilePath!, inlineInfo);
@@ -208,7 +211,7 @@ namespace ILCompiler.Compiler
                     else
                     {
                         // Put all inline attempts into the inline tree
-                        var context = NewContext(inlineCandidateInfo!.InlinersContext);
+                        var context = NewContext(inlineCandidateInfo!.InlinersContext, methodInfo.Call);
                         context.SetFailed(inlineResult);
                     }
 
@@ -233,10 +236,11 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private static InlineContext NewContext(InlineContext? parentContext)
+        private static InlineContext NewContext(InlineContext? parentContext, CallEntry call)
         {
             var context = new InlineContext();
             context.Parent = parentContext;
+            context.Callee = call;
 
             return context;
         }
