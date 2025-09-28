@@ -125,8 +125,6 @@ namespace ILCompiler.TypeSystem.Common
 
         public override TypeDesc OwningType => _owningType;
 
-        public override bool IsNoInlining => Kind == ArrayMethodKind.Address;
-
         public override bool HasReturnType 
             => Kind switch
             {
