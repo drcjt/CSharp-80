@@ -19,6 +19,7 @@
         IsStructReturn,
         IsPInvoke,
         IsInternal,
+        NotMarkedForAggressiveInlining,
 
         TooMuchIL,
 
@@ -47,6 +48,7 @@
         public static InlineObservation IsStructReturn { get; } = new(InlineObservationName.IsStructReturn, InlineTarget.Callee);
         public static InlineObservation IsPInvoke { get; } = new(InlineObservationName.IsPInvoke, InlineTarget.Callee);
         public static InlineObservation IsInternal { get; } = new(InlineObservationName.IsInternal, InlineTarget.Callee);
+        public static InlineObservation NotMarkedForAggressiveInlining { get; } = new(InlineObservationName.NotMarkedForAggressiveInlining, InlineTarget.Callee);
 
         // Callee Performance
         public static InlineObservation TooMuchIL { get; } = new(InlineObservationName.TooMuchIL, InlineTarget.Callee);
