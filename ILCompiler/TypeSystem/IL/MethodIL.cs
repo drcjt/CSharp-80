@@ -11,6 +11,8 @@ namespace ILCompiler.TypeSystem.IL
 
         public virtual int LocalsCount { get; set; }
 
+        public virtual int ILCodeSize => 0;
+
         public List<LocalVariableDefinition> Locals { get; set; } = new List<LocalVariableDefinition>();
 
         public virtual MethodIL GetMethodILDefinition()

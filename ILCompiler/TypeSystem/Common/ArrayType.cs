@@ -125,7 +125,6 @@ namespace ILCompiler.TypeSystem.Common
 
         public override TypeDesc OwningType => _owningType;
 
-
         public override bool HasReturnType 
             => Kind switch
             {

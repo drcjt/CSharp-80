@@ -27,6 +27,24 @@ namespace Inlining
             InlineMethod2();
         }
 
+        private static int _unused = 0;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void InlineMethodWithMoreThanOneBasicBlock(int n)
+        {
+            if (n < 0)
+            {
+                _unused = 1;
+            }
+        }
+
+        public static void InlineMethodAtEndOfBasicBlock()
+        {
+            if (_result != 1)
+            {
+                InlineMethodWithMoreThanOneBasicBlock(42);
+            }
+        }
+
         private static int _result = 1;
 
         public static int Main()
@@ -38,6 +56,8 @@ namespace Inlining
 
             if (_parameter != 2) return 2;
             if (!ReferenceEquals(_str, strParameter)) return 3;
+
+            InlineMethodAtEndOfBasicBlock();
 
             return _result;
         }

@@ -10,76 +10,100 @@ namespace ILCompiler.Compiler.OpcodeImporters
         {
             if (instruction.Opcode != ILOpcode.ret) return false;
 
-            StackEntry? returnValue = null;
-            int? returnBufferArgIndex = null;
+            importer.StopImporting = true;
 
-            if (importer.Method.HasReturnType)
+            if (!importer.Method.HasReturnType)
             {
+                // Handle simple case of void return type
+                ImportVoidReturn(importer);
+            }
+            else
+            {
+                // We have a non void return type, get the actual return type and value
                 var returnType = importer.Method.Signature.ReturnType;
                 var value = importer.Pop();
 
-                if (returnType.IsValueType && !returnType.IsPrimitive && !returnType.IsEnum) // && returnType.GetElementSize().AsInt > 4)
+                if (returnType.VarType == VarType.Struct)
                 {
-                    // Record return buffer argument index
-                    // so that code gen can generate code to
-                    // copy struct on top of stack to the 
-                    // return buffer.
-                    returnBufferArgIndex = importer.Method.HasThis ? 1 : 0;
+                    ImportStructReturn(value, importer);
                 }
                 else
                 {
-                    if (!value.Type.IsInt()
-                        && value.Type != VarType.Ptr
-                        && value.Type != VarType.ByRef
-                        && value.Type != VarType.Ref)
-                    {
-                        throw new NotSupportedException($"Unsupported Return type {value.Type}");
-                    }
+                    ImportNonStructReturn(value, importer);
                 }
+            }
 
-                returnValue = value;
+            return true;
+        }
 
-                if (importer.Inlining)
-                {
-                    var inlineCandidateInfo = importer.InlineInfo!.InlineCandidateInfo;
-                    var returnExpressionEntry = inlineCandidateInfo!.ReturnExpressionEntry;
+        private static void ImportVoidReturn(IImporter importer)
+        {
+            if (!importer.Inlining)
+            {
+                // Void return type, just import a return
+                var retNode = new ReturnEntry(null);
+                importer.ImportAppendTree(retNode);
+            }
+        }
 
-                    if (returnBufferArgIndex.HasValue)
-                    {
-                        var returnBufferArg = importer.InlineInfo!.InlineCall.Arguments[returnBufferArgIndex.Value].Duplicate();
-                        returnValue = StoreStructPtr(returnBufferArg, returnValue, importer);
-                    }
+        private static void ImportStructReturn(StackEntry value, IImporter importer)
+        {
+            // We must be using a return buffer so work out the argument index for the return buffer pointer
+            var returnBufferArgIndex = importer.Method.HasThis ? 1 : 0;
 
-                    if (importer.InlineInfo.InlineeReturnSpillTempNumber.HasValue)
-                    {
-                        var store = importer.NewTempStore(importer.InlineInfo.InlineeReturnSpillTempNumber.Value, returnValue!);
-                        importer.ImportAppendTree(store, true);
+            if (!importer.Inlining)
+            {
+                // Store the return value into the return buffer
+                var destination = new LocalVariableEntry(returnBufferArgIndex, VarType.Ref, 2);
+                var storeInd = StoreStructPtr(destination, value, importer);
+                importer.ImportAppendTree(storeInd);
 
-                        returnValue = new LocalVariableEntry(importer.InlineInfo.InlineeReturnSpillTempNumber.Value, returnValue!.Type, returnValue.ExactSize);
-                    }
+                // Dummy return as return buffer will hold real return value
+                var retNode = new ReturnEntry(null);
+                importer.ImportAppendTree(retNode);
+            }
+            else
+            {
+                // If inlining then get the return buffer argument and set the return
+                // substitution expression to be the store to the return buffer argument
+                var inlineCandidateInfo = importer.InlineInfo!.InlineCandidateInfo;
+                var returnExpressionEntry = inlineCandidateInfo!.ReturnExpressionEntry;
 
-                    returnExpressionEntry!.SubstitutionExpression = returnValue;
-                }
+                var returnBufferArg = importer.InlineInfo!.InlineCall.Arguments[returnBufferArgIndex].Duplicate();
+                value = StoreStructPtr(returnBufferArg, value, importer);
+
+                returnExpressionEntry!.SubstitutionExpression = value;
+            }
+        }
+
+        private static void ImportNonStructReturn(StackEntry value, IImporter importer)
+        {
+            if (!value.Type.IsInt() && value.Type != VarType.Ptr &&
+                 value.Type != VarType.ByRef && value.Type != VarType.Ref)
+            {
+                throw new NotSupportedException($"Unsupported Return type {value.Type}");
             }
 
             if (!importer.Inlining)
             {
-                if (returnBufferArgIndex is not null)
-                {
-                    var destination = new LocalVariableEntry(returnBufferArgIndex.Value, VarType.Ref, 2);
-                    var storeInd = StoreStructPtr(destination, returnValue!, importer);
-                    importer.ImportAppendTree(storeInd);
-
-                    returnValue = null;
-                }
-
-                var retNode = new ReturnEntry(returnValue);
+                var retNode = new ReturnEntry(value);
                 importer.ImportAppendTree(retNode);
             }
+            else
+            {
+                var inlineCandidateInfo = importer.InlineInfo!.InlineCandidateInfo;
+                var returnExpressionEntry = inlineCandidateInfo!.ReturnExpressionEntry;
 
-            importer.StopImporting = true;
+                if (importer.InlineInfo.InlineeReturnSpillTempNumber.HasValue)
+                {
+                    var store = importer.NewTempStore(importer.InlineInfo.InlineeReturnSpillTempNumber.Value, value);
+                    importer.ImportAppendTree(store, true);
 
-            return true;
+                    value = new LocalVariableEntry(importer.InlineInfo.InlineeReturnSpillTempNumber.Value, value.Type, value.ExactSize);
+                }
+
+                returnExpressionEntry!.SubstitutionExpression = value;
+            }
         }
 
         private static StackEntry StoreStructPtr(StackEntry destinationAddress, StackEntry value, IImporter importer)

@@ -1,5 +1,6 @@
 ﻿using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.Inlining;
 using ILCompiler.Compiler.OpcodeImporters;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
@@ -45,6 +46,7 @@ namespace ILCompiler.Compiler
         public bool StopImporting { get; set; }
 
         private int _currentILOffset = 0;
+        private int _currentInstructionSize = 0;
 
 
         private readonly CodeFolder _codeFolder;
@@ -135,6 +137,7 @@ namespace ILCompiler.Compiler
                 var statement = new Statement(entry)
                 {
                     StartOffset = _currentILOffset,
+                    EndOffset = _currentILOffset + _currentInstructionSize - 1
                 };
                 _currentBasicBlock?.Statements.Add(statement);
             }
@@ -181,7 +184,8 @@ namespace ILCompiler.Compiler
             while (true)
             {
                 var currentInstruction = _methodIL!.Instructions[currentIndex];
-                _currentILOffset += currentInstruction.GetSize();
+                _currentInstructionSize = currentInstruction.GetSize();
+                _currentILOffset += _currentInstructionSize;
                 currentIndex++;
 
                 FallThroughBlock = _currentILOffset < BasicBlocks.Length ? BasicBlocks[_currentILOffset] : null;

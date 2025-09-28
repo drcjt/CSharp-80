@@ -1,109 +1,14 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
+﻿using System.Diagnostics;
+using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.Inlining;
 using ILCompiler.Compiler.OpcodeImporters;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
-using ILCompiler.TypeSystem.Common;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 using StackEntry = ILCompiler.Compiler.EvaluationStack.StackEntry;
 
 namespace ILCompiler.Compiler
 {
-    public record InlineMethodInfo
-    {
-        public required CallEntry Call { get; set; }
-        public required Statement Statement { get; set; }
-        public required int StatementIndex { get; set; }
-        public required BasicBlock Block { get; set; }
-        public required LocalVariableTable Locals { get; set; }
-    }
-
-    public record InlineArgumentInfo
-    {
-        public required StackEntry Argument {  get; set; }
-        public int TempNumber { get; set; }
-        public bool HasTemp { get; set; }
-        public bool IsInvariant { get; set; }
-        public bool IsLocalVariable { get; set; }
-        public bool IsUsed { get; set; }
-        public bool HasLdargaOp { get; set; }
-        public bool HasStargOp { get; set; }
-    }
-
-    public record LocalVariableInfo
-    {
-        public int TempNumber { get; set; }
-        public bool HasTemp { get; set; }
-        public TypeDesc? Type { get; set; }
-    }
-
-    public record InlineInfo
-    {
-        public required CallEntry InlineCall { get; set; }
-        public InlineArgumentInfo[] InlineArgumentInfos { get; set; } = [];
-        public LocalVariableInfo[] LocalVariableInfos { get; set; } = [];
-        public required LocalVariableTable InlineLocalVariableTable { get; set; }
-
-        public int? InlineeReturnSpillTempNumber { get; set; } = null;
-
-        public InlineCandidateInfo? InlineCandidateInfo { get; set; } = null;
-        public MethodDesc? StaticConstructorMethod { get; set; } = null;
-    }
-
-    public record InlineCandidateInfo
-    {
-        public ReturnExpressionEntry? ReturnExpressionEntry { get; set; } = null;
-    }
-
-    public class SubstitutePlaceholdersWalker : StackEntryVisitor
-    {
-        private readonly CodeFolder _codeFolder;
-        public SubstitutePlaceholdersWalker(CodeFolder codeFolder) : base() 
-        {
-            _codeFolder = codeFolder;
-        }
-
-        public Statement WalkStatement(Statement statement)
-        {
-            WalkTree(new Edge<StackEntry>(() => statement.RootNode, x => { statement.RootNode = x; }), null);
-
-            return statement;
-        }
-
-        public override void PreOrderVisit(Edge<StackEntry> use, StackEntry? user)
-        {
-            var node = use.Get();
-            if (node is ReturnExpressionEntry)
-            {
-                UpdateInlineReturnExpressionPlaceHolder(use, user, _codeFolder);
-            }
-        }
-
-        public override void PostOrderVisit(Edge<StackEntry> use, StackEntry? user)
-        {
-            use.Set(_codeFolder.FoldExpression(use.Get()!));
-        }
-
-        private static void UpdateInlineReturnExpressionPlaceHolder(Edge<StackEntry> use, StackEntry? user, CodeFolder codeFolder)
-        {
-            while (use.Get() is ReturnExpressionEntry)
-            {
-                var tree = use.Get();
-                var inlineCandidate = tree;
-
-                do
-                {
-                    var returnExpression = inlineCandidate as ReturnExpressionEntry;
-                    inlineCandidate = returnExpression!.SubstitutionExpression;
-                } while (inlineCandidate is ReturnExpressionEntry);
-
-                inlineCandidate = codeFolder.FoldExpression(inlineCandidate!);
-
-                use.Set(inlineCandidate!);
-            }
-        }
-    }
-
     public class Inliner(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory, INameMangler nameMangler, PreinitializationManager preinitializationManager, CodeFolder codeFolder) : IInliner
     {
         private readonly IConfiguration _configuration = configuration;
@@ -146,6 +51,8 @@ namespace ILCompiler.Compiler
                         var callInlined = false;
                         if (expr is CallEntry call && call.IsInlineCandidate)
                         {
+                            var inlineResult = new InlineResult() { InlineCall = call };
+
                             var inlineMethodInfo = new InlineMethodInfo()
                             {
                                 Call = call,
@@ -154,7 +61,7 @@ namespace ILCompiler.Compiler
                                 Block = block,
                                 Locals = locals,
                             };
-                            MorphCallInline(inlineMethodInfo);
+                            MorphCallInline(inlineMethodInfo, inlineResult);
                         }
 
                         // Skip over the statement that has either not been inlined
@@ -167,7 +74,72 @@ namespace ILCompiler.Compiler
             } while (blockIndex < blocks.Count);
         }
 
-        private void MorphCallInline(InlineMethodInfo methodInfo)
+        private static int CheckInlineDepthAndRecursion(InlineInfo inlineInfo)
+        {
+            const int MaxInlineDepth = 2;
+
+            int depth = 0;
+
+            var inlineContext = inlineInfo.InlineCandidateInfo!.InlinersContext;
+            var inlineResult = inlineInfo.InlineResult!;
+
+            for (; inlineContext is not null; inlineContext = inlineContext.Parent)
+            {
+                depth++;
+
+                if (IsDisallowedRecursiveInline(inlineContext, inlineInfo))
+                {
+                    inlineResult.NoteFatal(InlineObservation.IsRecursive);
+                    return depth;
+                }
+
+                if (depth > MaxInlineDepth)
+                {
+                    break;
+                }
+            }
+
+            inlineResult.NoteInt(InlineObservation.Depth, depth);
+
+            return depth;
+        }
+
+        private static bool IsDisallowedRecursiveInline(InlineContext ancestor, InlineInfo inlineInfo)
+        {
+            if (ancestor.Callee?.Method == inlineInfo.InlineCall.Method)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private InlineContext? MorphCallInlineHelper(InlineMethodInfo methodInfo, InlineResult result)
+        {
+            var call = methodInfo.Call;
+
+            if (call.IsVirtual)
+            {
+                result.NoteFatal(InlineObservation.IsVirtual);
+                return null;
+            }
+
+            var startVars = methodInfo.Locals.Count;
+
+            var createdConext = InvokeInlineeCompiler(methodInfo, result);
+
+            if (result.IsFailure)
+            {
+                // Need to undo some changes made during the inlining attempt
+                // Temps may have been allocated need to do this
+                methodInfo.Locals.ResetCount(startVars);
+                Debug.Assert(methodInfo.Locals.Count == startVars);
+            }
+
+            return createdConext;
+        }
+
+        private InlineContext? InvokeInlineeCompiler(InlineMethodInfo methodInfo, InlineResult inlineResult)
         {
             var method = methodInfo.Call.Method;
             if (method is null)
@@ -175,8 +147,24 @@ namespace ILCompiler.Compiler
                 throw new InvalidOperationException("Method is null");
             }
 
-            InlineInfo inlineInfo = InitVars(methodInfo);
+            var inlineInfo = new InlineInfo
+            {
+                InlineCall = methodInfo.Call,
+                InlineLocalVariableTable = methodInfo.Locals,
+                InlineResult = inlineResult,
+            };
+
             inlineInfo.InlineCandidateInfo = methodInfo.Call.InlineCandidateInfo;
+            Debug.Assert(inlineInfo.InlineCandidateInfo is not null);
+
+            var inlineDepth = CheckInlineDepthAndRecursion(inlineInfo);
+
+            if (inlineResult.IsFailure)
+            {
+                return null;
+            }
+
+            InitVars(methodInfo, inlineInfo);
 
             var staticConstructorMethod = method.GetStaticConstructor();
             if (staticConstructorMethod is not null && !_preinitializationManager.IsPreinitialized(method.OwningType))
@@ -184,7 +172,7 @@ namespace ILCompiler.Compiler
                 inlineInfo.StaticConstructorMethod = method.GetStaticConstructor();
             }
 
-            var startVars = methodInfo.Locals.Count;
+            inlineInfo.InlineContext = NewContext(inlineInfo.InlineCandidateInfo.InlinersContext, methodInfo.Call);
 
             var compiler = new MethodCompiler(_logger, _configuration, _phaseFactory);
             var basicBlocks = compiler.CompileInlineeMethod(method, _inputFilePath!, inlineInfo);
@@ -194,29 +182,70 @@ namespace ILCompiler.Compiler
                 var inlineSucceeded = InsertInlineeBlocks(basicBlocks, methodInfo, inlineInfo);
                 if (inlineSucceeded)
                 {
-                    _logger.LogInformation("Inlined call to method: {MethodName}", method.FullName);
-                    return;
+                    inlineResult.NoteSuccess();
+                    _logger.LogInformation("Inlined call to method: {MethodName} (depth {Depth})", method.FullName, inlineDepth);
+                    return inlineInfo.InlineContext;
                 }
+            }
 
+            return null;
+        }
+
+        private void MorphCallInline(InlineMethodInfo methodInfo, InlineResult inlineResult)
+        {
+            var inlineCandidateInfo = methodInfo.Call.InlineCandidateInfo;
+
+            bool inliningFailed = false;
+            if (methodInfo.Call.IsInlineCandidate)
+            {
+                var createdContext = MorphCallInlineHelper(methodInfo, inlineResult);
+
+                Debug.Assert(inlineResult.IsDecided);
+
+                if (inlineResult.IsFailure)
+                {
+                    if (createdContext is not null)
+                    {
+                        createdContext.SetFailed(inlineResult);
+                    }
+                    else
+                    {
+                        // Put all inline attempts into the inline tree
+                        var context = NewContext(inlineCandidateInfo!.InlinersContext, methodInfo.Call);
+                        context.SetFailed(inlineResult);
+                    }
+
+                    inliningFailed = true;
+                }
+            }
+            else
+            {
+                inliningFailed = true;
+            }
+
+            if (inliningFailed)
+            {
+                var method = methodInfo.Call.Method!;
                 if (method.HasReturnType)
                 {
-                    inlineInfo.InlineCandidateInfo!.ReturnExpressionEntry!.SubstitutionExpression = methodInfo.Call;
+                    inlineCandidateInfo!.ReturnExpressionEntry!.SubstitutionExpression = methodInfo.Call;
 
                     // Need to blank out the original call node
                     methodInfo.Statement!.RootNode = new NothingEntry();
                 }
-
-                // Need to undo some changes made during the inlining attempt
-                // Temps may have been allocated need to do this
-                methodInfo.Locals.ResetCount(startVars);
-
-                inlineInfo.InlineCall.IsInlineCandidate = false;
             }
-
-            Debug.Assert(methodInfo.Locals.Count == startVars);
         }
 
-        private static InlineInfo InitVars(InlineMethodInfo methodInfo)
+        private static InlineContext NewContext(InlineContext? parentContext, CallEntry call)
+        {
+            var context = new InlineContext();
+            context.Parent = parentContext;
+            context.Callee = call;
+
+            return context;
+        }
+
+        private static void InitVars(InlineMethodInfo methodInfo, InlineInfo inlineInfo)
         {
             int returnBufferArgIndex = -1;
             if (methodInfo.Call.HasReturnBuffer)
@@ -226,13 +255,8 @@ namespace ILCompiler.Compiler
             }
 
             var argumentCount = methodInfo.Call.Arguments.Count - (methodInfo.Call.HasReturnBuffer ? 1 : 0);
-
-            var inlineInfo = new InlineInfo
-            {
-                InlineCall = methodInfo.Call,
-                InlineLocalVariableTable = methodInfo.Locals,
-                InlineArgumentInfos = new InlineArgumentInfo[argumentCount]
-            };
+            
+            inlineInfo.InlineArgumentInfos = new InlineArgumentInfo[argumentCount];
 
             int inlineArgumentIndex = 0;
             for (int i = 0; i < methodInfo.Call.Arguments.Count; i++)
@@ -260,19 +284,17 @@ namespace ILCompiler.Compiler
             }
 
             var method = methodInfo.Call.Method!;
-            inlineInfo.LocalVariableInfos = new LocalVariableInfo[method.Locals.Count];
+            inlineInfo.LocalVariableInfos = new InlineLocalVariableInfo[method.Locals.Count];
 
             for (int i = 0; i < method.Locals.Count; i++)
             {
                 var local = method.Locals[i];
-                var localVariableInfo = new LocalVariableInfo()
+                var localVariableInfo = new InlineLocalVariableInfo()
                 {
                     Type = local.Type,
                 };
                 inlineInfo.LocalVariableInfos[i] = localVariableInfo;
             }
-
-            return inlineInfo;
         }
 
         private static void RecordArgumentInfo(StackEntry? argument, InlineArgumentInfo argumentInfo)
@@ -290,6 +312,8 @@ namespace ILCompiler.Compiler
             // when we have multiple blocks in the inlinee
             if (blocks.Count > 1 && methodInfo.Block.Handlers.Count > 0)
                 return false;
+
+            inlineInfo.InlineContext!.SetSucceeded(inlineInfo);
 
             // Prepend statements
             PrependStatements(methodInfo, inlineInfo, ref afterStatementIndex);
@@ -352,8 +376,9 @@ namespace ILCompiler.Compiler
         public static BasicBlock SplitBlockAfterStatement(BasicBlock block, int statementIndex)
         {
             // Create a new block
-            var statement = block.Statements[statementIndex + 1];
-            var newBlock = new BasicBlock(statement.StartOffset);
+            var statementToSplitAfter = block.Statements[statementIndex];
+            var newBlock = new BasicBlock(statementToSplitAfter.EndOffset + 1);
+
             newBlock.JumpKind = block.JumpKind;
             block.JumpKind = JumpKind.Always; // Set the original block to always jump to the new block
 
@@ -423,6 +448,10 @@ namespace ILCompiler.Compiler
             // TODO: Add nullcheck for this pointer here
 
             // TODO: Zero init inlinee locals
+            // Zero init inlinee locals
+            // If the callee contains zero-init locals then explicitly initialize them if
+            // the caller does not have init set. Otherwise we can rely on the normal logic
+            // in the caller to insert zero-init
         }
 
         private static void InsertInlineeArgument(InlineMethodInfo methodInfo, ref int afterStatementIndex, int argumentIndex, StackEntry argument, InlineInfo inlineInfo)

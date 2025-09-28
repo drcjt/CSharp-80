@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.FlowgraphHelpers;
+using ILCompiler.Compiler.Inlining;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
 using Microsoft.Extensions.Logging;

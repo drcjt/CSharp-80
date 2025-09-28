@@ -237,9 +237,9 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
         }
 
-        private void ImportStoreField(Instruction instuction, bool isStatic)
+        private void ImportStoreField(Instruction instruction, bool isStatic)
         {
-            ImportFieldAccess(instuction, isStatic);
+            ImportFieldAccess(instruction, isStatic);
         }
 
         private void ImportLoadField(Instruction instruction, bool isStatic)

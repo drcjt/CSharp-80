@@ -57,6 +57,7 @@ namespace ILCompiler.TypeSystem.IL
 
         public override IList<Instruction> Instructions => _instantiatedInstructions;
         public override ILExceptionRegion[] GetExceptionRegions() => _methodIL.GetExceptionRegions();
+        public override int ILCodeSize => _methodIL.ILCodeSize;
         public override int LocalsCount => _methodIL.LocalsCount;
 
         public override bool IsInitLocals => _methodIL.IsInitLocals;
