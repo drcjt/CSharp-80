@@ -443,6 +443,15 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 return;
             }
 
+            // Temporarily only inline methods marked with AggressiveInlining
+            // TODO: need to investigate more aggressive inlining as currently
+            // results in too much code bloat
+            if (!call.Method.IsAggressiveInlining)
+            {
+                inlineResult.NoteFatal(InlineObservation.NotMarkedForAggressiveInlining);
+                return;
+            }
+
             var inlineCandidateInfo = CheckCanInline(call, inlinersContext, inlineResult);
 
             if (inlineResult.IsFailure)
