@@ -74,7 +74,7 @@ namespace ILCompiler.Compiler
             } while (blockIndex < blocks.Count);
         }
 
-        private int CheckInlineDepthAndRecursion(InlineInfo inlineInfo)
+        private static int CheckInlineDepthAndRecursion(InlineInfo inlineInfo)
         {
             const int MaxInlineDepth = 2;
 
