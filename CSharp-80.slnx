@@ -5,6 +5,7 @@
   </Folder>
   <Folder Name="/Samples/">
     <Project Path="Samples/Balls/Balls.csproj" />
+    <Project Path="Samples/Calc/Calc.csproj" />
     <Project Path="Samples/CalcPi/CalcPi.csproj" />
     <Project Path="Samples/Checksum/Checksum.csproj" />
     <Project Path="Samples/Chess/Chess.csproj" />
