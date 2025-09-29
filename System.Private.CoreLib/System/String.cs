@@ -61,6 +61,13 @@ namespace System
             return result;
         }
 
+        internal unsafe static string CreateFromChar(char c)
+        {
+            string result = RuntimeImports.NewString(EEType.Of<string>(), 1);
+            result._firstChar = c;
+            return result;
+        }
+
         public bool Contains(char value)
         {
             for (int i = 0; i < _length; i++)
