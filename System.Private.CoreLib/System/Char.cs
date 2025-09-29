@@ -46,5 +46,9 @@
         }
 
         public int CompareTo(char value) => m_value - value;
+
+        public override string ToString() => ToString(m_value);
+
+        public static string ToString(char c) => String.CreateFromChar(c);
     }
 }

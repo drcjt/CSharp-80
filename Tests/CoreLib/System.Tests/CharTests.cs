@@ -124,5 +124,13 @@ namespace System.Tests
 
             Assert.Fail("");
         }
+
+        [Theory]
+        [InlineData('a', "a")]
+        public static void ToStringTest(char c, string expected)
+        {
+            Assert.Equal(expected, c.ToString());
+            Assert.Equal(expected, char.ToString(c));
+        }
     }
 }
