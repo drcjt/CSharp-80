@@ -11,14 +11,14 @@ namespace ILCompiler.Compiler.Ssa
 
         public int NumberOfUses { get; private set; } = 0;
 
-        public StackEntry? DefNode { get; private set; }
+        public LocalVariableCommon? DefNode { get; private set; }
 
         public LocalSsaVariableDescriptor(BasicBlock block)
         {
             Block = block;
         }
 
-        public LocalSsaVariableDescriptor(BasicBlock block, StackEntry defNode)
+        public LocalSsaVariableDescriptor(BasicBlock block, LocalVariableCommon defNode)
         {
             Block = block;
             DefNode = defNode;

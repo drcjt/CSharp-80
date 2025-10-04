@@ -1,9 +1,7 @@
 ﻿namespace ILCompiler.Compiler.EvaluationStack
 {
-    public class PhiArg : StackEntry, ILocalVariable
+    public class PhiArg : LocalVariableCommon
     {
-        public int LocalNumber { get; }
-        public int SsaNumber { get; set; }
         public BasicBlock Block { get; }
 
         public PhiArg(VarType type, int localNumber, int ssaNumber, BasicBlock block) : base(type)
