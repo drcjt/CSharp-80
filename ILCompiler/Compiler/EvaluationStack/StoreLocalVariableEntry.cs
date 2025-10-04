@@ -2,12 +2,9 @@
 
 namespace ILCompiler.Compiler.EvaluationStack
 {
-    public class StoreLocalVariableEntry : StackEntry, ILocalVariable, IStoreEntry
+    public class StoreLocalVariableEntry : LocalVariableCommon, IStoreEntry
     {
         public StackEntry Op1 { get; set; }
-
-        public int LocalNumber { get; }
-        public int SsaNumber { get; set; }
 
         public bool IsParameter { get; }
 

@@ -99,13 +99,13 @@ namespace ILCompiler.Compiler
         private static void PerNodeLocalVarLiveness(StackEntry node, VariableSet useSet, VariableSet defSet)
         {
             // For LocalVariableEntry, LocalVariableAddressEntry, StoreLocalVariableEntry, StoreIndEntry??, FieldAddressEntry?
-            if (node is ILocalVariable localVarNode)
+            if (node is LocalVariableCommon localVarNode)
             {
                 MarkUseDef(localVarNode, useSet, defSet);
             }
         }
 
-        private static void MarkUseDef(ILocalVariable tree, VariableSet useSet, VariableSet defSet)
+        private static void MarkUseDef(LocalVariableCommon tree, VariableSet useSet, VariableSet defSet)
         {
             // Assignment is a definition, everything else is a use.
 
