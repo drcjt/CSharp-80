@@ -20,6 +20,30 @@ namespace ILCompiler.Compiler.Helpers
                 return _locals.GrabTemp(type, exactSize);
         }
 
+        private static bool UseTemporary(StackEntry tree)
+        {
+            bool hasCalls = false;
+            bool hasStores = false;
+            var effectsVisitor = new StackEntryVisitor(null, (use, user) =>
+            {
+                var tree = use.Get();
+                if (tree is CallEntry)
+                {
+                    hasCalls = true;
+                }
+                if (tree is StoreLocalVariableEntry || tree is StoreIndEntry)
+                {
+                    hasStores = true;
+                }
+            });
+
+            effectsVisitor.WalkTree(new Edge<StackEntry>(() => tree, x => { }), null);
+
+            // TODO: assess complexity of tree and use temporary.
+
+            return hasCalls || hasStores;
+        }
+
         public StackEntry CreateArrayAccess(StackEntry index, StackEntry arrayRef, VarType elemType, int elemSize, bool address, bool checkBounds, int firstElementOffset, IImporter? importer = null)
         {
             StackEntry? boundsCheck = null;
@@ -33,15 +57,31 @@ namespace ILCompiler.Compiler.Helpers
                 // that the same values are used in the bounds check as the actual
                 // array dereference.
 
-                var arrayRefTemporaryNumber = GrabTemp(importer, arrayRef.Type, arrayRef.ExactSize);
-                arrayRefDefinition = new StoreLocalVariableEntry(arrayRefTemporaryNumber, false, arrayRef);
-                arrayRef = new LocalVariableEntry(arrayRefTemporaryNumber, arrayRef.Type, arrayRef.ExactSize);
-                var arrayRef2 = new LocalVariableEntry(arrayRefTemporaryNumber, arrayRef.Type, arrayRef.ExactSize);
+                StackEntry arrayRef2;
+                if (UseTemporary(arrayRef))
+                {
+                    var arrayRefTemporaryNumber = GrabTemp(importer, arrayRef.Type, arrayRef.ExactSize);
+                    arrayRefDefinition = new StoreLocalVariableEntry(arrayRefTemporaryNumber, false, arrayRef);
+                    arrayRef = new LocalVariableEntry(arrayRefTemporaryNumber, arrayRef.Type, arrayRef.ExactSize);
+                    arrayRef2 = new LocalVariableEntry(arrayRefTemporaryNumber, arrayRef.Type, arrayRef.ExactSize);
+                }
+                else
+                {
+                    arrayRef2 = arrayRef.Duplicate();
+                }
 
-                var indexTemporaryNumber = GrabTemp(importer, index.Type, index.ExactSize);
-                indexDefinition = new StoreLocalVariableEntry(indexTemporaryNumber, false, index);
-                index = new LocalVariableEntry(indexTemporaryNumber, index.Type, index.ExactSize);
-                var index2 = new LocalVariableEntry(indexTemporaryNumber, index.Type, index.ExactSize);
+                StackEntry index2;
+                if (UseTemporary(index))
+                {
+                    var indexTemporaryNumber = GrabTemp(importer, index.Type, index.ExactSize);
+                    indexDefinition = new StoreLocalVariableEntry(indexTemporaryNumber, false, index);
+                    index = new LocalVariableEntry(indexTemporaryNumber, index.Type, index.ExactSize);
+                    index2 = new LocalVariableEntry(indexTemporaryNumber, index.Type, index.ExactSize);
+                }
+                else
+                {
+                    index2 = index.Duplicate();
+                }
 
                 // Create IR node to work out the array length
                 var arraySizeOffset = new NativeIntConstantEntry(2);
