@@ -99,5 +99,35 @@ namespace ILCompiler.Compiler.EvaluationStack
 
             return containsT;
         }
+
+        /// <summary>
+        /// Get the parent of this node
+        /// </summary>
+        /// <returns>The parent of this node</returns>
+        public StackEntry? GetParent()
+        {
+            StackEntry? user;
+            for (user = Next; user is not null; user = user.Next)
+            {
+                if (user.TryGetUse(this, out _))
+                {
+                    break;
+                }
+            }
+
+            return user;
+        }
+
+        public bool ComplexityExceeds(int limit, Func<StackEntry, int> GetComplexity)
+        {
+            int complexity = 0;
+            var visitor = new StackEntryVisitor((use, user) =>
+            {
+                complexity += GetComplexity(use.Get());
+            });
+
+            visitor.WalkTree(new Edge<StackEntry>(() => this, x => { }), null);
+            return complexity > limit;
+        }
     }
 }

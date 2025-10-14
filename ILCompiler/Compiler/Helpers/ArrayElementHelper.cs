@@ -24,9 +24,10 @@ namespace ILCompiler.Compiler.Helpers
         {
             bool hasCalls = false;
             bool hasStores = false;
+
             var effectsVisitor = new StackEntryVisitor(null, (use, user) =>
             {
-                var tree = use.Get();
+                StackEntry tree = use.Get();
                 if (tree is CallEntry)
                 {
                     hasCalls = true;
@@ -39,9 +40,11 @@ namespace ILCompiler.Compiler.Helpers
 
             effectsVisitor.WalkTree(new Edge<StackEntry>(() => tree, x => { }), null);
 
-            // TODO: assess complexity of tree and use temporary.
+            int CountNode(StackEntry tree) => 1;
 
-            return hasCalls || hasStores;
+            const int MaxArrayComplexity = 4;
+
+            return hasCalls || hasStores || tree.ComplexityExceeds(MaxArrayComplexity, CountNode);
         }
 
         public StackEntry CreateArrayAccess(StackEntry index, StackEntry arrayRef, VarType elemType, int elemSize, bool address, bool checkBounds, int firstElementOffset, IImporter? importer = null)
