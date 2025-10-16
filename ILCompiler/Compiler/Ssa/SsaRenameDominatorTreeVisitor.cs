@@ -45,7 +45,7 @@ namespace ILCompiler.Compiler.Ssa
             // First check if there is already a phi arg for this predecessor, if so it should have the same ssaNumber, is so then nothing to do
             foreach (var phiArg in phi.Arguments)
             {
-                if (phiArg.Block == predecessor)
+                if (phiArg.PredecessorBlock == predecessor)
                 {
                     if (phiArg.SsaNumber == ssaNumber)
                     {
