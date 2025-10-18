@@ -188,20 +188,23 @@ namespace ILCompiler.Compiler
             {
                 // Build the dfs tree and remove unreachable blocks
                 dfsTree = FlowgraphDfsTree.BuildAndRemove(basicBlocks);
-
-                // Find loops
-                var loopFinder = _phaseFactory.Create<ILoopFinder>();
-                loopFinder.FindLoops(basicBlocks, dfsTree);
             }
 
             var flowgraph = _phaseFactory.Create<IFlowgraph>();
             flowgraph.SetBlockOrder(basicBlocks);
 
-
             if (_configuration.Optimize)
             {
                 var ssaBuilder = _phaseFactory.Create<ISsaBuilder>();
                 ssaBuilder.Build(basicBlocks, _locals, _configuration.DumpSsa, dfsTree!);
+
+                // Find loops
+                var loopFinder = _phaseFactory.Create<ILoopFinder>();
+                var loops = loopFinder.FindLoops(basicBlocks, dfsTree!);
+
+                // Optimize induction variables
+                var inductionVarOptimizer = _phaseFactory.Create<IInductionVariableOptimizer>();
+                inductionVarOptimizer.Run(basicBlocks, loops, _locals);
 
                 // Early Value Propagation
                 var earlyValuePropagation = _phaseFactory.Create<IEarlyValuePropagation>();

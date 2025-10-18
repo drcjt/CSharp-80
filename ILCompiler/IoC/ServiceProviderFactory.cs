@@ -52,6 +52,8 @@ namespace ILCompiler.IoC
 
             services.AddTransient<ILoopFinder, LoopFinder>();
 
+            services.AddTransient<IInductionVariableOptimizer, InductionVariableOptimizer>();
+
             services.AddTransient<IRationalizer, Rationalizer>();
 
             services.AddTransient<IEarlyValuePropagation, EarlyValuePropagation>();
