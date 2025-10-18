@@ -12,12 +12,14 @@ namespace ILCompiler.Compiler
             _logger = logger;
         }
 
-        public void FindLoops(IList<BasicBlock> blocks, FlowgraphDfsTree dfs)
+        public FlowGraphNaturalLoops FindLoops(IList<BasicBlock> blocks, FlowgraphDfsTree dfs)
         {
             var loops = FlowGraphNaturalLoops.Find(dfs, _logger);
 
             // Consider moving out of here
             ComputeReachabilitySets(dfs);
+
+            return loops;
         }
 
         private static void ComputeReachabilitySets(FlowgraphDfsTree dfs)
@@ -46,9 +48,14 @@ namespace ILCompiler.Compiler
         public FlowgraphDfsTree DfsTree { get; init; } = dfsTree;
         public BasicBlock Header { get; } = header;
         public IList<FlowEdge> BackEdges { get; } = [];
-        public IList<FlowEdge> ExitEdges { get; } = [];
         public IList<FlowEdge> EntryEdges { get; } = [];
+        public IList<FlowEdge> ExitEdges { get; } = [];
+
+        public int Index { get; set; }
+
         public FlowGraphNaturalLoop? Parent { get; set; }
+        public FlowGraphNaturalLoop? Child { get; set; }
+        public FlowGraphNaturalLoop? Sibling { get; set; }
 
         public IList<BasicBlock> Blocks { get; } = [];
 
@@ -75,6 +82,7 @@ namespace ILCompiler.Compiler
     {
         private readonly IList<FlowGraphNaturalLoop> _loops = [];
 
+        public IList<FlowGraphNaturalLoop> Loops => _loops;
         public IEnumerable<FlowGraphNaturalLoop> InPostOrder => _loops.Reverse();
 
         public void Add(FlowGraphNaturalLoop loop)
@@ -137,9 +145,21 @@ namespace ILCompiler.Compiler
                 // Search for parent loop
                 FindParentLoop(logger, loops, header, loop);
 
+                loop.Index = loops.Loops.Count;
                 loops.Add(loop);
 
                 logger.LogDebug($"Added loop with header {loop.Header.Label}");
+            }
+
+            // Setup the sibling & child links by iterating the loops in post order.
+            // This ends up with the sibling links in reverse post order
+            foreach (var loop in loops.InPostOrder)
+            {
+                if (loop.Parent is not null)
+                {
+                    loop.Sibling = loop.Parent.Child;
+                    loop.Parent.Child = loop;
+                }
             }
 
             return loops;

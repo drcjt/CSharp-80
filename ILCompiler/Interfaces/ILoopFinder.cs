@@ -5,6 +5,6 @@ namespace ILCompiler.Interfaces
 {
     public interface ILoopFinder : IPhase
     {
-        void FindLoops(IList<BasicBlock> blocks, FlowgraphDfsTree dfs);
+        FlowGraphNaturalLoops FindLoops(IList<BasicBlock> blocks, FlowgraphDfsTree dfs);
     }
 }
