@@ -40,9 +40,8 @@ namespace ILCompiler.Compiler.ScalarEvolution
 
                 loop.VisitLoopBlocksReversePostOrder(block =>
                 {
-                    if (!_visitedBlocks.Contains(block))
+                    if (_visitedBlocks.Add(block))
                     {
-                        _visitedBlocks.Add(block);
                         SetLocalOccurrencesInfoForBlock(block, info.LocalToOccurrences);
                     }
 

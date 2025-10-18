@@ -101,31 +101,7 @@ namespace ILCompiler.Compiler
                 }
 
                 Stack<CursorInfo> cursors = Cursors1;
-                Stack<CursorInfo> nextCursors = Cursors2;
-
-                int derivedLevel = 0;
-                ScevAddRec? currentIV = primaryIV;
-
-                while(true)
-                {
-                    _logger.LogInformation("   Advancing cursors to be {DerivedLevel}", derivedLevel + 1);
-
-                    AdvanceCursors(cursors, nextCursors);
-
-                    if (!CheckAdvancedCursors(nextCursors, out ScevAddRec? nextIV))
-                    {
-                        break;
-                    }
-
-                    _logger.LogInformation("   Next IV is: {NextIV}", nextIV);
-
-                    ExpandStoredCursors(nextCursors, cursors);
-
-                    derivedLevel++;
-                    (cursors, nextCursors) = (nextCursors, cursors);
-                    currentIV = nextIV;
-                }
-
+                (int derivedLevel, ScevAddRec? currentIV) = WalkCursors(primaryIV, cursors);
                 if (derivedLevel == 0)
                 {
                     continue;
@@ -145,6 +121,36 @@ namespace ILCompiler.Compiler
             return strengthReducedAny;
         }
 
+        private (int derivedLevel, ScevAddRec? currentIV) WalkCursors(ScevAddRec primaryIV, Stack<CursorInfo> cursors)
+        {
+            ScevAddRec? currentIV = primaryIV;
+            Stack<CursorInfo> nextCursors = Cursors2;
+
+            int derivedLevel = 0;
+
+            while (true)
+            {
+                _logger.LogInformation("   Advancing cursors to be {DerivedLevel}", derivedLevel + 1);
+
+                AdvanceCursors(cursors, nextCursors);
+
+                if (!CheckAdvancedCursors(nextCursors, out ScevAddRec? nextIV))
+                {
+                    break;
+                }
+
+                _logger.LogInformation("   Next IV is: {NextIV}", nextIV);
+
+                ExpandStoredCursors(nextCursors, cursors);
+
+                derivedLevel++;
+                (cursors, nextCursors) = (nextCursors, cursors);
+                currentIV = nextIV;
+            }
+
+            return (derivedLevel, currentIV);
+        }
+
         private void ExpandStoredCursors(Stack<CursorInfo> cursors, Stack<CursorInfo> otherCursors)
         {
             for (int i = 0; i < cursors.Count; i++)
@@ -162,62 +168,7 @@ namespace ILCompiler.Compiler
 
                     if (parent is StoreLocalVariableEntry)
                     {
-                        LocalVariableCommon storedLcl = (LocalVariableCommon)parent;
-                        // TODO: side effects and LocalHasNonLoopUses
-                        if (storedLcl.Data == cur)
-                        {
-                            int numCreated = 0;
-                            ScevAddRec? cursorIV = cursor.IV;
-                            BasicBlock cursorBlock = cursor.Block;
-                            Statement cursorStmt = cursor.Stmt;
-
-                            bool CreateExtraCursor(BasicBlock block, Statement stmt, LocalVariableCommon use)
-                            {
-                                if (use == parent)
-                                {
-                                    return true;
-                                }
-
-                                if (use is not LocalVariableEntry || use.SsaNumber != storedLcl.SsaNumber)
-                                {
-                                    return false;
-                                }
-
-                                Scev? iv = ScalarEvolutionContext.Analyze(block, use);
-                                if (iv is null)
-                                {
-                                    return false;
-                                }
-
-                                iv = iv.Simplify(ScalarEvolutionContext);
-                                if (iv != cursorIV)
-                                {
-                                    return false;
-                                }
-
-                                cursors.Push(new CursorInfo(block, stmt, use, cursorIV));
-                                otherCursors.Push(new CursorInfo(block, stmt, use, cursorIV));
-                                numCreated++;
-                                return true;
-                            }
-
-                            if (LoopInfo.VisitOccurrences(Loop, storedLcl.LocalNumber, CreateExtraCursor))
-                            {
-                                _logger.LogInformation("   [{CurrentTreeID}] was the data of store [{ParentTreeID}]; expanded to {NumCreated} new cursors and will replace with a store of 0", cur.TreeID, parent.TreeID, numCreated + 1);
-
-                                IntermediateIVStores.Push(new CursorInfo(cursorBlock, cursorStmt, parent, null));
-                                cursors.SwapTopWithBottom(i);
-                                otherCursors.SwapTopWithBottom(i);
-                                cursors.Pop();
-                                otherCursors.Pop();
-                                i--;
-                                break;
-                            }
-
-                            cursors.Pop(numCreated);
-                            otherCursors.Pop(numCreated);
-                        }
-
+                        ExpandStoreLocalVariableEntry(cursors, otherCursors, ref i, cursor, cur, parent);
                         break;
                     }
 
@@ -236,6 +187,65 @@ namespace ILCompiler.Compiler
 
                     cursor.Tree = parent;
                 }
+            }
+        }
+
+        private void ExpandStoreLocalVariableEntry(Stack<CursorInfo> cursors, Stack<CursorInfo> otherCursors, ref int i, CursorInfo cursor, StackEntry cur, StackEntry parent)
+        {
+            LocalVariableCommon storedLcl = (LocalVariableCommon)parent;
+            // TODO: side effects and LocalHasNonLoopUses
+            if (storedLcl.Data == cur)
+            {
+                int numCreated = 0;
+                ScevAddRec? cursorIV = cursor.IV;
+                BasicBlock cursorBlock = cursor.Block;
+                Statement cursorStmt = cursor.Stmt;
+
+                bool CreateExtraCursor(BasicBlock block, Statement stmt, LocalVariableCommon use)
+                {
+                    if (use == parent)
+                    {
+                        return true;
+                    }
+
+                    if (use is not LocalVariableEntry || use.SsaNumber != storedLcl.SsaNumber)
+                    {
+                        return false;
+                    }
+
+                    Scev? iv = ScalarEvolutionContext.Analyze(block, use);
+                    if (iv is null)
+                    {
+                        return false;
+                    }
+
+                    iv = iv.Simplify(ScalarEvolutionContext);
+                    if (iv != cursorIV)
+                    {
+                        return false;
+                    }
+
+                    cursors.Push(new CursorInfo(block, stmt, use, cursorIV));
+                    otherCursors.Push(new CursorInfo(block, stmt, use, cursorIV));
+                    numCreated++;
+                    return true;
+                }
+
+                if (LoopInfo.VisitOccurrences(Loop, storedLcl.LocalNumber, CreateExtraCursor))
+                {
+                    _logger.LogInformation("   [{CurrentTreeID}] was the data of store [{ParentTreeID}]; expanded to {NumCreated} new cursors and will replace with a store of 0", cur.TreeID, parent.TreeID, numCreated + 1);
+
+                    IntermediateIVStores.Push(new CursorInfo(cursorBlock, cursorStmt, parent, null));
+                    cursors.SwapTopWithBottom(i);
+                    otherCursors.SwapTopWithBottom(i);
+                    cursors.Pop();
+                    otherCursors.Pop();
+                    i--;
+                    return;
+                }
+
+                cursors.Pop(numCreated);
+                otherCursors.Pop(numCreated);
             }
         }
 
@@ -388,7 +398,7 @@ namespace ILCompiler.Compiler
                 return true;
             }
 
-            if (!LoopInfo.VisitOccurrences(Loop, primaryIVLcl.LocalNumber, Visitor) || Cursors1.Count == 0)
+            if (!LoopInfo.VisitOccurrences(Loop, primaryIVLcl.LocalNumber, Visitor))
             {
                 _logger.LogInformation("   Could not create cursors for all loop uses of primary IV");
                 return false;
@@ -453,35 +463,7 @@ namespace ILCompiler.Compiler
                 Debug.Assert(nextCursor.Block == cursor.Block && nextCursor.Stmt == cursor.Stmt);
 
                 nextCursor.Tree = cursor.Tree;
-                do
-                {
-                    StackEntry? current = nextCursor.Tree;
-                    nextCursor.Tree = current!.GetParent();
-
-                    if (nextCursor.Tree is null || nextCursor.Tree is CommaEntry commaEntry && commaEntry.Op1 == current)
-                    {
-                        nextCursor.IV = null;
-                        break;
-                    }
-
-                    Scev? parentIV = ScalarEvolutionContext.Analyze(nextCursor.Block, nextCursor.Tree);
-                    if (parentIV is null)
-                    {
-                        nextCursor.IV = null;
-                        break;
-                    }
-
-                    parentIV = parentIV.Simplify(ScalarEvolutionContext);
-                    Debug.Assert(parentIV is not null);
-                    if (parentIV is not ScevAddRec)
-                    {
-                        nextCursor.IV = null;
-                        break;
-                    }
-
-                    nextCursor.IV = (ScevAddRec)parentIV;
-                }
-                while (nextCursor.IV == cursor.IV);
+                AdvanceCursor(cursor, nextCursor);
             }
 
             for (int i = 0; i < nextCursors.Count; i++)
@@ -491,6 +473,39 @@ namespace ILCompiler.Compiler
                 string ivDump = nextCursor.IV is null ? "<null IV>" : nextCursor.IV.ToString();
                 _logger.LogInformation("   [{I}] [{TreeId}]: {IVDump}", i, treeId, ivDump);
             }
+        }
+
+        private void AdvanceCursor(CursorInfo cursor, CursorInfo nextCursor)
+        {
+            do
+            {
+                StackEntry? current = nextCursor.Tree;
+                nextCursor.Tree = current!.GetParent();
+
+                if (nextCursor.Tree is null || nextCursor.Tree is CommaEntry commaEntry && commaEntry.Op1 == current)
+                {
+                    nextCursor.IV = null;
+                    break;
+                }
+
+                Scev? parentIV = ScalarEvolutionContext.Analyze(nextCursor.Block, nextCursor.Tree);
+                if (parentIV is null)
+                {
+                    nextCursor.IV = null;
+                    break;
+                }
+
+                parentIV = parentIV.Simplify(ScalarEvolutionContext);
+                Debug.Assert(parentIV is not null);
+                if (parentIV is not ScevAddRec)
+                {
+                    nextCursor.IV = null;
+                    break;
+                }
+
+                nextCursor.IV = (ScevAddRec)parentIV;
+            }
+            while (nextCursor.IV == cursor.IV);
         }
     }
 

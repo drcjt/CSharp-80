@@ -203,25 +203,8 @@ namespace ILCompiler.Compiler.ScalarEvolution
             Stack<Scev> addOperands = new();
             ((ScevBinop)scev).ExtractAddOperands(addOperands);
 
-            int numberOfApperances = 0;
-            for (int i = 0; i < addOperands.Count; i++)
-            {
-                Scev addOperand = addOperands.Bottom(i);
-                if (addOperand == recursiveScev)
-                {
-                    numberOfApperances++;
-                }
-                else
-                {
-                    ScevVisit result = addOperand.Visit(node => node == recursiveScev ? ScevVisit.Abort : ScevVisit.Continue);
-                    if (result == ScevVisit.Abort)
-                    {
-                        return null;
-                    }
-                }
-            }
-
-            if (numberOfApperances == 0 || numberOfApperances > 1)
+            int numberOfAppearances = FindNumberOfAppearances(recursiveScev, addOperands);
+            if (numberOfAppearances == 0 || numberOfAppearances > 1)
             {
                 return null;
             }
@@ -246,6 +229,30 @@ namespace ILCompiler.Compiler.ScalarEvolution
             }
 
             return NewAddRec(startScev, step!);
+        }
+
+        private static int FindNumberOfAppearances(Scev recursiveScev, Stack<Scev> addOperands)
+        {
+            int numberOfApperances = 0;
+            for (int i = 0; i < addOperands.Count; i++)
+            {
+                Scev addOperand = addOperands.Bottom(i);
+                if (addOperand == recursiveScev)
+                {
+                    numberOfApperances++;
+                }
+                else
+                {
+                    ScevVisit result = addOperand.Visit(node => node == recursiveScev ? ScevVisit.Abort : ScevVisit.Continue);
+                    if (result == ScevVisit.Abort)
+                    {
+                        numberOfApperances = 0;
+                        break;
+                    }
+                }
+            }
+
+            return numberOfApperances;
         }
 
         private ScevAddRec? CreateSimpleAddRec(PhiNode phi, ScevLocal enterScev, StackEntry stepDef)
