@@ -1,6 +1,6 @@
-﻿namespace ILCompiler.Compiler.Ssa
+﻿namespace ILCompiler.Compiler.Dominators
 {
-    internal sealed class DominatorTreeNode
+    public sealed class DominatorTreeNode
     {
         public BasicBlock Block { get; private set; }
         public IList<DominatorTreeNode> Children { get; set; } = new List<DominatorTreeNode>();

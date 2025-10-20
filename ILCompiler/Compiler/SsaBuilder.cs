@@ -1,6 +1,7 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.FlowgraphHelpers;
 using ILCompiler.Compiler.Ssa;
+using ILCompiler.Compiler.Dominators;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 using System.Text;
@@ -20,18 +21,12 @@ namespace ILCompiler.Compiler
             _logger = logger;
         }
 
-        public void Build(IList<BasicBlock> blocks, LocalVariableTable locals, bool dumpSsa, FlowgraphDfsTree dfs)
+        public void Build(FlowgraphDominatorTree dominatorTree, IList<BasicBlock> blocks, LocalVariableTable locals, bool dumpSsa, FlowgraphDfsTree dfs)
         {
             _dumpSsa = dumpSsa;
 
             // Topologically sort the graph
             var postOrder = dfs.PostOrder;
-
-            // Compute the immediate dominators of all basic blocks
-            ComputeImmediateDominators(postOrder);
-
-            // Create the dominator tree
-            var dominatorTree = BuildDominatorTree(blocks);
 
             // Calculate liveness
             Liveness.LocalVarLiveness(blocks, locals, _logger);
@@ -46,7 +41,7 @@ namespace ILCompiler.Compiler
             InsertPhiFunctions(postOrder, locals);
 
             // Rename local variables
-            RenameVariables(dominatorTree, locals);
+            RenameVariables(dominatorTree.Root, locals);
 
             // Log SSA form
             if (_dumpSsa)

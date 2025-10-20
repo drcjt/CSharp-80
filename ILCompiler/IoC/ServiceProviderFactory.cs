@@ -13,6 +13,7 @@ using Microsoft.Extensions.Logging;
 using ILCompiler.IL;
 using ILCompiler.Compiler.Peephole;
 using ILCompiler.Compiler.OpcodeImporters;
+using ILCompiler.Compiler.Dominators;
 
 namespace ILCompiler.IoC
 {
@@ -61,6 +62,8 @@ namespace ILCompiler.IoC
             services.AddTransient<IFlowgraph, Flowgraph>();
 
             services.AddTransient<ISsaBuilder, SsaBuilder>();
+
+            services.AddTransient<IComputeDominators, FlowgraphDominatorTreeBuilder>();
 
             services.AddTransient<ILowering, Lowering>();
             services.AddLowerings();

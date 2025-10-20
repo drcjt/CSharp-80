@@ -195,8 +195,11 @@ namespace ILCompiler.Compiler
 
             if (_configuration.Optimize)
             {
+                var flowgraphDominatorTreeBuilder = _phaseFactory.Create<IComputeDominators>();
+                var flowgraphDominatorTree = flowgraphDominatorTreeBuilder.Build(dfsTree!, basicBlocks);
+
                 var ssaBuilder = _phaseFactory.Create<ISsaBuilder>();
-                ssaBuilder.Build(basicBlocks, _locals, _configuration.DumpSsa, dfsTree!);
+                ssaBuilder.Build(flowgraphDominatorTree, basicBlocks, _locals, _configuration.DumpSsa, dfsTree!);
 
                 // Find loops
                 var loopFinder = _phaseFactory.Create<ILoopFinder>();
