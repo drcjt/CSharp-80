@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.Dominators;
 
 namespace ILCompiler.Compiler.Ssa
 {

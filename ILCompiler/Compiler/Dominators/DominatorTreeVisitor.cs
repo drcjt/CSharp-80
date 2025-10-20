@@ -1,4 +1,4 @@
-﻿namespace ILCompiler.Compiler.Ssa
+﻿namespace ILCompiler.Compiler.Dominators
 {
     internal class DominatorTreeVisitor
     {
