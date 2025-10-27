@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.Helpers;
 using ILCompiler.Compiler.LinearIR;
 
 namespace ILCompiler.Compiler.Lowerings
@@ -42,10 +43,10 @@ namespace ILCompiler.Compiler.Lowerings
             // Convert multiplication by power of 2 into a left shift
             if (mul.Op2 is Int32ConstantEntry multiplier)
             {
-                if (IsPow2(multiplier.Value))
+                if (MathHelpers.IsPow2(multiplier.Value))
                 {
                     mul.Operation = Operation.Lsh;
-                    multiplier.Value = GetLog2(multiplier.Value);
+                    multiplier.Value = MathHelpers.GetLog2(multiplier.Value);
 
                     return mul;
                 }
@@ -58,10 +59,10 @@ namespace ILCompiler.Compiler.Lowerings
         {
             if (div.Op2 is Int32ConstantEntry divisor)
             {
-                if (IsPow2(divisor.Value))
+                if (MathHelpers.IsPow2(divisor.Value))
                 {
                     div.Operation = Operation.Rsh;
-                    divisor.Value = GetLog2(divisor.Value);
+                    divisor.Value = MathHelpers.GetLog2(divisor.Value);
 
                     return div;
                 }
@@ -82,7 +83,7 @@ namespace ILCompiler.Compiler.Lowerings
                 }
 
                 var absDivisor = Math.Abs(divisor.Value);
-                if (IsPow2(absDivisor))
+                if (MathHelpers.IsPow2(absDivisor))
                 {
                     var blockRange = block;
                     if (!blockRange.TryGetUse(div, out Use? use))
@@ -100,7 +101,7 @@ namespace ILCompiler.Compiler.Lowerings
 
                     // Implement the division by right shifting the adjusted dividend
                     var divisorValue = divisor.Value;
-                    divisor.Value = GetLog2(absDivisor);
+                    divisor.Value = MathHelpers.GetLog2(absDivisor);
 
                     StackEntry newDiv = new BinaryOperator(Operation.Rsh, false, adjustedDividend, divisor, VarType.Int);
 
@@ -156,18 +157,6 @@ namespace ILCompiler.Compiler.Lowerings
                     ContainCheckBinary(lsh);
                 }
             }
-        }
-
-        private static bool IsPow2(int i) => (i > 0 && ((i - 1) & i) == 0);
-
-        private static int GetLog2(int i)
-        {
-            int r = 0;
-            while ((i >>= 1) != 0)
-            {
-                ++r;
-            }
-            return r;
         }
 
         private static void ContainCheckBinary(BinaryOperator node)
