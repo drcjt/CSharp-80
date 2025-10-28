@@ -23,7 +23,7 @@ namespace ILCompiler.Compiler.ScalarEvolution
 
         public Scev? Analyze(BasicBlock block, StackEntry tree) => Analyze(block, tree, 0);
 
-        public StackEntry? Materialize(Scev scev) => scev.Materialize();
+        public static StackEntry? Materialize(Scev scev) => scev.Materialize();
 
         private const int MaxAnalysisDepth = 5;
 
