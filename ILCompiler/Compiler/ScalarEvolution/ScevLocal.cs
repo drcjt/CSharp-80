@@ -27,6 +27,8 @@ namespace ILCompiler.Compiler.ScalarEvolution
             return this;
         }
 
+        public override StackEntry? Materialize() => new LocalVariableEntry(LocalNumber, Type, Type.GetTypeSize());
+
         public override ScevVisit Visit(Func<Scev, ScevVisit> visitor) => visitor(this);
 
         public override string ToString() => $"V{LocalNumber}.{SsaNumber}";

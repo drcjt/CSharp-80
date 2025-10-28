@@ -1,4 +1,6 @@
-﻿namespace ILCompiler.Compiler.ScalarEvolution
+﻿using ILCompiler.Compiler.EvaluationStack;
+
+namespace ILCompiler.Compiler.ScalarEvolution
 {
     internal enum ScevVisit
     {
@@ -10,6 +12,7 @@
     {
         public virtual int? GetConstantValue() => null;
         public virtual Scev Simplify(ScevContext context) => this;
+        public virtual StackEntry? Materialize() => null;
 
         public virtual ScevVisit Visit(Func<Scev, ScevVisit> visitor) => ScevVisit.Continue;
 

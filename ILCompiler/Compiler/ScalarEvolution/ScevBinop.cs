@@ -1,4 +1,6 @@
-﻿namespace ILCompiler.Compiler.ScalarEvolution
+﻿using ILCompiler.Compiler.EvaluationStack;
+
+namespace ILCompiler.Compiler.ScalarEvolution
 {
     internal record ScevBinop(ScevOperator Operator, VarType Type, Scev Op1, Scev Op2) : ScevUnop(Operator, Type, Op1)
     {
@@ -146,6 +148,36 @@
             {
                 operands.Push(Op2);
             }
+        }
+
+        public override StackEntry? Materialize()
+        {
+            StackEntry? op1 = Op1.Materialize();
+            StackEntry? op2 = Op2.Materialize();
+            if (op1 == null || op2 == null)
+            {
+                return null;
+            }
+
+            if (Operator == ScevOperator.Multiply)
+            {
+                if (op1.IsIntegralConstant(-1))
+                {
+                    return new UnaryOperator(Operation.Neg, op2);
+                }
+                if (op2.IsIntegralConstant(-1))
+                {
+                    return new UnaryOperator(Operation.Neg, op1);
+                }
+            }
+
+            return Operator switch
+            {
+                ScevOperator.Add => new BinaryOperator(Operation.Add, false, op1, op2, Type),
+                ScevOperator.Multiply => new BinaryOperator(Operation.Mul, false, op1, op2, Type),
+                ScevOperator.LeftShift => new BinaryOperator(Operation.Lsh, false, op1, op2, Type),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         public override string ToString() => $"({Op1}{OpToString()}{Op2})";
