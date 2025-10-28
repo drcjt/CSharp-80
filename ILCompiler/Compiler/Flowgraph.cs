@@ -39,6 +39,52 @@ namespace ILCompiler.Compiler
 
             return orderingVisitor.PostOrderNodes;
         }
+
+        public void InsertStatementAfter(BasicBlock block, Statement insertionPoint, Statement statement)
+        {
+            var index = block.Statements.IndexOf(insertionPoint);
+            if (index == -1)
+            {
+                throw new ArgumentException("Insertion point not found in block.");
+            }
+            if (index == block.Statements.Count - 1)
+            {
+                // Insertion point is the last statement
+                InsertStatementAtEnd(block, statement);
+            }
+            else
+            {
+                // Insert the statement after the insertion point
+                block.Statements.Insert(index + 1, statement);
+                // Update the evaluation order
+                SetStatementSequence(statement);
+            }
+        }
+
+        public void InsertStatementNearEnd(BasicBlock block, Statement statement)
+        {
+            if (block.HasTerminator)
+            {
+                throw new NotImplementedException("Inserting before terminator not implemented.");
+            }
+            else
+            {
+                InsertStatementAtEnd(block, statement);
+            }              
+        }
+
+        public void InsertStatementAtEnd(BasicBlock block, Statement statement)
+        {
+            // Insert the statement at the end of the block
+            block.Statements.Add(statement);
+            // Update the evaluation order
+            SetStatementSequence(statement);
+        }
+
+        public void RemoveStatement(BasicBlock block, Statement statement)
+        {
+            block.Statements.Remove(statement);
+        }
     }
 
     public class PostOrderTraversalVisitor : StackEntryVisitor
@@ -53,9 +99,10 @@ namespace ILCompiler.Compiler
             Current = current;
         }
 
-        public override void PostOrderVisit(Edge<StackEntry> use, StackEntry? user)
+        public override WalkResult PostOrderVisit(Edge<StackEntry> use, StackEntry? user)
         {
             SetNext(use.Get());
+            return WalkResult.Continue;
         }
         private void SetNext(StackEntry entry)
         {

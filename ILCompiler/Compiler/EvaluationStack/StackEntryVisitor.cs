@@ -1,5 +1,12 @@
 ﻿namespace ILCompiler.Compiler.EvaluationStack
 {
+    public enum WalkResult
+    {
+        Continue,
+        SkipSubtrees,
+        Abort,
+    }
+
     public class StackEntryVisitor : IStackEntryVisitor
     {
         private readonly Action<Edge<StackEntry>, StackEntry?>? _preOrderVisit;
@@ -10,27 +17,40 @@
             _postOrderVisit = postOrderVisit;
         }
 
-        public void WalkTree(Edge<StackEntry> use, StackEntry? user)
+        public WalkResult WalkTree(Edge<StackEntry> use, StackEntry? user)
         {
-            PreOrderVisit(use, user);
-            use.Get().Accept(this);
-            PostOrderVisit(use, user);
+            WalkResult result = PreOrderVisit(use, user);
+            if (result == WalkResult.Abort)
+            {
+                return result;
+            }
+
+            if (result != WalkResult.SkipSubtrees)
+            {
+                use.Get().Accept(this);
+            }
+            result = PostOrderVisit(use, user);
+            return result;
         }
 
-        public virtual void PreOrderVisit(Edge<StackEntry> use, StackEntry? user)
+        public virtual WalkResult PreOrderVisit(Edge<StackEntry> use, StackEntry? user)
         {
             if (_preOrderVisit is not null)
             {
                 _preOrderVisit(use, user);
             }
+
+            return WalkResult.Continue;
         }
 
-        public virtual void PostOrderVisit(Edge<StackEntry> use, StackEntry? user)
+        public virtual WalkResult PostOrderVisit(Edge<StackEntry> use, StackEntry? user)
         {
             if (_postOrderVisit is not null)
             {
                 _postOrderVisit(use, user);
             }
+
+            return WalkResult.Continue;
         }
 
         // Leaf nodes

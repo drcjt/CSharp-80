@@ -27,6 +27,8 @@ namespace ILCompiler.Compiler
         public IList<BasicBlock> Predecessors { get; } = new List<BasicBlock>();
         public ISet<BasicBlock> Reach { get; } = new HashSet<BasicBlock>();
 
+        public bool HasTerminator => JumpKind == JumpKind.Return || JumpKind == JumpKind.Conditional || JumpKind == JumpKind.Switch;
+
         // High level intermediate representation - main output of importation process
         public IList<Statement> Statements { get; } = new List<Statement>();
 

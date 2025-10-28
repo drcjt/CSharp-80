@@ -18,18 +18,20 @@ namespace ILCompiler.Compiler.Inlining
             return statement;
         }
 
-        public override void PreOrderVisit(Edge<StackEntry> use, StackEntry? user)
+        public override WalkResult PreOrderVisit(Edge<StackEntry> use, StackEntry? user)
         {
             var node = use.Get();
             if (node is ReturnExpressionEntry)
             {
                 UpdateInlineReturnExpressionPlaceHolder(use, user, _codeFolder);
             }
+            return WalkResult.Continue;
         }
 
-        public override void PostOrderVisit(Edge<StackEntry> use, StackEntry? user)
+        public override WalkResult PostOrderVisit(Edge<StackEntry> use, StackEntry? user)
         {
             use.Set(_codeFolder.FoldExpression(use.Get()!));
+            return WalkResult.Continue;
         }
 
         private static void UpdateInlineReturnExpressionPlaceHolder(Edge<StackEntry> use, StackEntry? user, CodeFolder codeFolder)
