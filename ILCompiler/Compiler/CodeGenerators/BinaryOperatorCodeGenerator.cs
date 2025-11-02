@@ -53,7 +53,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             if (IsAddOrSub(entry))
             {
-                if (operatorType == VarType.Ptr)
+                if (operatorType == VarType.Ptr || operatorType == VarType.Ref)
                 {
                     context.InstructionsBuilder.Pop(HL);
 
@@ -199,7 +199,7 @@ namespace ILCompiler.Compiler.CodeGenerators
 
         private static void GenerateContainedIntAddOrSub(BinaryOperator entry, CodeGeneratorContext context)
         {
-            int value = entry.Op2.As<Int32ConstantEntry>().Value;
+            int value = entry.Op2.GetIntConstant();
 
             if (entry.Operation == Operation.Sub)
             {

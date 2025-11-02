@@ -150,11 +150,14 @@ namespace ILCompiler.Compiler.Lowerings
         {
             if (lsh.Op2.IsIntCnsOrI())
             {
-                var shiftBy = lsh.Op2.As<Int32ConstantEntry>().Value;
-
-                if (shiftBy == 1 || shiftBy == 8 || shiftBy == 16 || shiftBy > 31)
+                if (lsh.Op2 is Int32ConstantEntry)
                 {
-                    ContainCheckBinary(lsh);
+                    var shiftBy = lsh.Op2.As<Int32ConstantEntry>().Value;
+
+                    if (shiftBy == 1 || shiftBy == 8 || shiftBy == 16 || shiftBy > 31)
+                    {
+                        ContainCheckBinary(lsh);
+                    }
                 }
             }
         }

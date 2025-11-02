@@ -9,6 +9,14 @@ namespace ILCompiler.Compiler
 
         private readonly StringBuilder _sb = new StringBuilder();
 
+        public string Dump(Statement statement)
+        {
+            _sb.Clear();
+            _indent = 0;
+            statement.RootNode.Accept(this);
+            return _sb.ToString();
+        }
+
         public string Dump(IList<BasicBlock> blocks)
         {
             var stmtId = 0;
