@@ -49,12 +49,20 @@ namespace ILCompiler.Compiler.ScalarEvolution
         {
             switch (tree)
             {
+                case NativeIntConstantEntry entry:
+                    return CreateScevForConstant(entry);
                 case Int32ConstantEntry entry:
                     return CreateScevForConstant(entry);
 
                 case LocalVariableCommon entry:
                 {
                     LocalVariableDescriptor dsc = _locals[entry.LocalNumber];
+
+                    if (!dsc.InSsa)
+                    {
+                        return null;
+                    }
+
                     LocalSsaVariableDescriptor ssaDsc = dsc.GetPerSsaData(entry.SsaNumber);
 
                     if (tree.Type != dsc.Type)
@@ -180,6 +188,23 @@ namespace ILCompiler.Compiler.ScalarEvolution
                     return NewBinop(oper, op1, op2);
                 }
 
+                case CastEntry castEntry:
+                {
+                    Scev? operandScev = Analyze(block, castEntry.Op1, depth + 1);
+                    if (operandScev is null)
+                    {
+                        return null;
+                    }
+
+                    if (castEntry.Type == VarType.Ptr)
+                    {
+                        return new ScevUnop(ScevOperator.Narrow, castEntry.Type, operandScev);
+                    }
+
+                    // For now, ignore the cast and just return the operand SCEV.
+                    return operandScev;
+                }
+
                 default:
                     return null;
             }
@@ -270,11 +295,15 @@ namespace ILCompiler.Compiler.ScalarEvolution
                     {
                         LocalVariableCommon lcl = localVariable as LocalVariableCommon;
                         LocalVariableDescriptor lclDsc = _locals[lcl.LocalNumber];
-                        LocalSsaVariableDescriptor ssaDsc = lclDsc.GetPerSsaData(lcl.SsaNumber);
 
-                        if (ssaDsc.DefNode is not null)
+                        if (lclDsc.InSsa)
                         {
-                            return ssaDsc.DefNode.Data;
+                            LocalSsaVariableDescriptor ssaDsc = lclDsc.GetPerSsaData(lcl.SsaNumber);
+
+                            if (ssaDsc.DefNode is not null)
+                            {
+                                return ssaDsc.DefNode.Data;
+                            }
                         }
                     }
 
@@ -316,11 +345,14 @@ namespace ILCompiler.Compiler.ScalarEvolution
             if (tree is LocalVariableEntry localVariableEntry)
             {
                 LocalVariableDescriptor dsc = _locals[localVariableEntry.LocalNumber];
-                LocalSsaVariableDescriptor ssaDsc = dsc.GetPerSsaData(localVariableEntry.SsaNumber);
-
-                if (ssaDsc.Block is null || !_loop!.ContainsBlock(ssaDsc.Block))
+                if (dsc.InSsa)
                 {
-                    return NewLocal(localVariableEntry.LocalNumber, localVariableEntry.SsaNumber);
+                    LocalSsaVariableDescriptor ssaDsc = dsc.GetPerSsaData(localVariableEntry.SsaNumber);
+
+                    if (ssaDsc.Block is null || !_loop!.ContainsBlock(ssaDsc.Block))
+                    {
+                        return NewLocal(localVariableEntry.LocalNumber, localVariableEntry.SsaNumber);
+                    }
                 }
             }
 
@@ -333,7 +365,8 @@ namespace ILCompiler.Compiler.ScalarEvolution
         public ScevConstant NewConstant(VarType type, int value) => new(type, value);
         public ScevLocal NewLocal(int localNumber, int ssaNumber) => new(_locals[localNumber].Type, localNumber, ssaNumber, _locals);
         public ScevBinop NewBinop(ScevOperator op, Scev op1, Scev op2) => new(op, op1.Type, op1, op2);
-        
+        public ScevUnop NewUnop(ScevOperator op, Scev operand, VarType type) => new(op, type, operand);
+
         private (PhiArg? enterSsa, PhiArg? backEdgeSsa) FindEnterAndBackedgeSsa(PhiNode phiNode)
         {
             PhiArg? enterSsa = null;
