@@ -209,6 +209,8 @@ namespace ILCompiler.Compiler
                 var inductionVarOptimizer = _phaseFactory.Create<IInductionVariableOptimizer>();
                 inductionVarOptimizer.Run(basicBlocks, loops, _locals);
 
+                DumpIRTrees(method, basicBlocks, "After Strength Reduction");
+
                 // Early Value Propagation
                 var earlyValuePropagation = _phaseFactory.Create<IEarlyValuePropagation>();
                 earlyValuePropagation.Run(basicBlocks, _locals);
