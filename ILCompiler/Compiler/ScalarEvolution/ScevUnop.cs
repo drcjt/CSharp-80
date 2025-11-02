@@ -21,9 +21,8 @@
                 return op1;
             }
 
-            if (op1 is ScevConstant)
+            if (op1 is ScevConstant cns1)
             {
-                ScevConstant cns1 = (ScevConstant)op1;
                 return context.NewConstant(Type, (short)cns1.Value);
             }
 
@@ -42,7 +41,7 @@
             ScevOperator.Narrow => $"narrow<{Type.GetTypeSize()}>({Op1})",
             ScevOperator.ZeroExtend => $"zext{Type.GetTypeSize()}>({Op1})",
             ScevOperator.SignExtend => $"sext<{Type.GetTypeSize()}>({Op1})",
-            _ => throw new ArgumentException(),
+            _ => throw new ArgumentException("Unknown SCEV unary operator"),
         };
     }
 }

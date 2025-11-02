@@ -63,23 +63,6 @@ namespace ILCompiler.Compiler
             return block.LiveIn.IsMember(lclNum);
         }
 
-        private static bool IsUpdateOfIVWithoutSideEffects(StackEntry tree, int localNumber)
-        {
-            if (tree is not StoreLocalVariableEntry)
-            {
-                return false;
-            }
-            var store = (LocalVariableCommon)tree;
-            if (store.LocalNumber != localNumber)
-            {
-                return false;
-            }
-
-            // TODO: Check for side effects
-
-            return true;
-        }
-
         internal class StrengthReductionContext
         {
             ScevContext ScalarEvolutionContext { get; }
@@ -450,7 +433,7 @@ namespace ILCompiler.Compiler
                 return new Statement(tree);
             }
 
-            private BasicBlock? FindUpdateInsertionPoint(Stack<CursorInfo> cursors, Statement? afterStmt = null)
+            private BasicBlock? FindUpdateInsertionPoint(Stack<CursorInfo> cursors)
             {
                 BasicBlock? insertionPoint = null;
                 foreach (FlowEdge backEdge in Loop.BackEdges)
