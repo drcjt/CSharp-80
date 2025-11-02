@@ -5,6 +5,10 @@
         public int LocalNumber { get; init; }
         public int SsaNumber { get; set; }
 
-        public StackEntry Data => ((StoreLocalVariableEntry)this).Op1;
+        public StackEntry Data
+        {
+            get => ((StoreLocalVariableEntry)this).Op1;
+            set => ((StoreLocalVariableEntry)this).Op1 = value;
+        }
     }
 }
