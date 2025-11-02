@@ -4,6 +4,7 @@
     {
         ZeroExtend,
         SignExtend,
+        Narrow,
         Add,
         Multiply,
         LeftShift,
