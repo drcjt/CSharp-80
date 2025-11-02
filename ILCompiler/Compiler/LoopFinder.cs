@@ -139,6 +139,22 @@ namespace ILCompiler.Compiler
 
             return result;
         }
+
+        public bool VisitRegularExitBlocks(Func<BasicBlock, bool> func)
+        {
+            HashSet<BasicBlock> visited = [];
+
+            foreach (FlowEdge edge in ExitEdges)
+            {
+                BasicBlock exit = edge.Target;
+                if (visited.Add(exit) && !func(exit))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
     }
 
     public class FlowGraphNaturalLoops()
