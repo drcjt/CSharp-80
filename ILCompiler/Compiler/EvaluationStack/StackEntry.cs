@@ -104,13 +104,16 @@ namespace ILCompiler.Compiler.EvaluationStack
         /// Get the parent of this node
         /// </summary>
         /// <returns>The parent of this node</returns>
-        public StackEntry? GetParent()
+        public StackEntry? GetParent(out Edge<StackEntry>? use)
         {
+            use = null;
+
             StackEntry? user;
             for (user = Next; user is not null; user = user.Next)
             {
-                if (user.TryGetUse(this, out _))
+                if (user.TryGetUse(this, out Edge<StackEntry>? edge))
                 {
+                    use = edge;
                     break;
                 }
             }
