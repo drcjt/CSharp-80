@@ -78,10 +78,10 @@ namespace ILCompiler.TypeSystem.Common
                     return this;
                 }
 
-                foreach (var field in this.GetFields())
+                foreach (var @field in this.GetFields())
                 {
-                    if (!field.IsStatic)
-                        return field.FieldType;
+                    if (!@field.IsStatic)
+                        return @field.FieldType;
                 }
 
                 throw new InvalidOperationException();

@@ -37,7 +37,7 @@ namespace ILCompiler.TypeSystem.Dnlib
                 return _instruction.Operand switch
                 {
                     MemberRef memberRef => memberRef.IsFieldRef ? _module.Create((IField)memberRef) : _module.Create((IMethod)memberRef),
-                    IField field => _module.Create(field),
+                    IField field => _module.Create(@field),
                     IMethod method => _module.Create(method),
                     ITypeDefOrRef typeDefOrRef => _module.Create(typeDefOrRef),
                     dnlib.DotNet.Emit.Instruction[] instructions => instructions.Select(x => new DnlibInstruction(_module, x)).ToArray(),
