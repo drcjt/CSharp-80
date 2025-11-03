@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
 	 <Nullable>enable</Nullable>
 
@@ -26,7 +26,7 @@
     <Compile Remove="System\**" />
     <EmbeddedResource Remove="System\**" />
     <None Remove="System\**" />
-	<Compile Include="..\GenericListTests.Common\**"/>
+	<Compile Include="..\GenericListTests.Common\**" />
   </ItemGroup>
 
   <ItemGroup>
