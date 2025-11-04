@@ -43,7 +43,7 @@ namespace ILCompiler.IL
             return helperType.GetMethods().First(x => x.Name == methodName);
         }
 
-        public static MethodDesc GetHelperEntryPoint(this TypeSystemContext context, string typeNamespace, string typeName, string methodName)
+        public static MethodDesc GetCoreLibEntryPoint(this TypeSystemContext context, string typeNamespace, string typeName, string methodName)
         {
             TypeDesc helperType = (TypeDesc)context.SystemModule!.GetType(typeNamespace, typeName);
             return helperType.GetMethods().First(x => x.Name == methodName);

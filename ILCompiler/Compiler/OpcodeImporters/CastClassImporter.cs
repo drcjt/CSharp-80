@@ -45,7 +45,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
         private static string GetHelperMethod(string helperMethodName, IImporter importer)
         {
-            var runtimeHelperMethod = importer.Method.Context.GetHelperEntryPoint("System.Runtime", "TypeCast", helperMethodName);
+            var runtimeHelperMethod = importer.Method.Context.GetCoreLibEntryPoint("System.Runtime", "TypeCast", helperMethodName);
             var mangledHelperMethod = importer.NameMangler.GetMangledMethodName(runtimeHelperMethod);
 
             return mangledHelperMethod;

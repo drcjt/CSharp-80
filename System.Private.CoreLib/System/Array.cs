@@ -1,10 +1,10 @@
-﻿using Internal.Runtime;
-using Internal.Runtime.CompilerServices;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Internal.Runtime;
+using Internal.Runtime.CompilerServices;
 
 namespace System
 {
@@ -261,7 +261,7 @@ namespace System
             public object? Current => _array.InternalGetValue(_index);
         }
 
-        private ref nint GetRawMultiDimArrayBounds()
+        private ref nint GetMultiDimensionalArrayBounds()
         {
             return ref Unsafe.As<byte, nint>(ref Unsafe.As<RawArrayData>(this).Data);
         }
@@ -281,7 +281,7 @@ namespace System
             Array result = RuntimeImports.NewArray(pEEType, (int)totalLength);
 
             // Setup upper bounds of dimensions as nints
-            ref nint bounds = ref result.GetRawMultiDimArrayBounds();
+            ref nint bounds = ref result.GetMultiDimensionalArrayBounds();
             for (int i = 0; i < rank; i++)
             {
                 Unsafe.Add(ref bounds, i) = (nint)pLengths[i];
@@ -290,13 +290,18 @@ namespace System
             return result;
         }
 
+        internal static unsafe Array Ctor(EEType* pEEType, int nDimensions, int* pDimensions)
+        {
+            return NewMultiDimArray(pEEType, pDimensions, nDimensions);
+        }
+
         public int GetLength(int dimension) => GetUpperBound(dimension) + 1;
 
         public int GetUpperBound(int dimension)
         {
             //if (!IsSzArray)
             {
-                ref nint bounds = ref GetRawMultiDimArrayBounds();
+                ref nint bounds = ref GetMultiDimensionalArrayBounds();
                 return (int)(Unsafe.Add(ref bounds, dimension) - 1);
             }
 
