@@ -33,7 +33,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
             }
 
-            var runtimeHelperMethod = importer.Method.Context.GetHelperEntryPoint("System.Runtime", "RuntimeImports", "NewArray");
+            var runtimeHelperMethod = importer.Method.Context.GetCoreLibEntryPoint("System.Runtime", "RuntimeImports", "NewArray");
 
             var args = new List<StackEntry>() { eeTypeNode, numElements };
             var node = new CallEntry("NewArray", args, VarType.Ref, 2, runtimeHelperMethod.IsVirtual, runtimeHelperMethod);

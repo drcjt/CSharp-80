@@ -147,7 +147,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             var args = new List<StackEntry>() { eeTypeNode, rank, node };
 
-            var runtimeHelperMethod = importer.Method.Context.GetHelperEntryPoint("Internal.Runtime.CompilerHelpers", "ArrayHelpers", "NewObjArray");
+            var runtimeHelperMethod = importer.Method.Context.GetCoreLibEntryPoint("System", "Array", "Ctor");
             var mangledHelperMethod = importer.NameMangler.GetMangledMethodName(runtimeHelperMethod);
 
             node = new CallEntry(mangledHelperMethod, args, VarType.Ref, 2);

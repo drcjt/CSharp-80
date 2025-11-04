@@ -547,7 +547,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
                 if (owningType.IsMdArray)
                 {
-                    _dependencies.Add(GetHelperEntryPoint("ArrayHelpers", "NewObjArray"));
+                    var ctorMethod = _module.Context.GetCoreLibEntryPoint("System", "Array", "Ctor");
+                    _dependencies.Add(_context.NodeFactory.MethodNode(ctorMethod));
                     return true;
                 }
                 else
