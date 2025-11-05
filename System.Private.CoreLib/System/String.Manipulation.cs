@@ -9,7 +9,7 @@ namespace System
     {
         public unsafe static string Concat(string str0, string str1, string str2, string str3)
         {
-            string result = RuntimeImports.NewString(EEType.Of<string>(), str0.Length + str1.Length + str2.Length + str3.Length);
+            string result = RuntimeImports.NewString(EEType.Of<string>(), (nuint)(str0.Length + str1.Length + str2.Length + str3.Length));
 
             FillStringChecked(result, 0, str0);
             FillStringChecked(result, str0.Length, str1);
@@ -21,7 +21,7 @@ namespace System
 
         public unsafe static string Concat(string str0, string str1, string str2)
         {
-            string result = RuntimeImports.NewString(EEType.Of<string>(), str0.Length + str1.Length + str2.Length);
+            string result = RuntimeImports.NewString(EEType.Of<string>(), (nuint)(str0.Length + str1.Length + str2.Length));
 
             FillStringChecked(result, 0, str0);
             FillStringChecked(result, str0.Length, str1);
@@ -32,7 +32,7 @@ namespace System
 
         public unsafe static string Concat(string str0, string str1)
         {
-            string result = RuntimeImports.NewString(EEType.Of<string>(), str0.Length + str1.Length);
+            string result = RuntimeImports.NewString(EEType.Of<string>(), (nuint)(str0.Length + str1.Length));
 
             FillStringChecked(result, 0, str0);
             FillStringChecked(result, str0.Length, str1);
@@ -67,10 +67,10 @@ namespace System
                 return null;
             }
 
-            return InternalSubstring(startIndex, length);
+            return InternalSubstring(startIndex, (nuint)length);
         }
 
-        private unsafe string InternalSubstring(int startIndex, int length)
+        private unsafe string InternalSubstring(int startIndex, nuint length)
         {
             string result = RuntimeImports.NewString(EEType.Of<string>(), length);
 

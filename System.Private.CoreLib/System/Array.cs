@@ -269,16 +269,16 @@ namespace System
         internal unsafe static Array NewMultiDimArray(EEType* pEEType, int* pLengths, int rank)
         {
             // Calculate required size for array elements
-            uint totalLength = 1;
+            nuint totalLength = 1;
             for (int i = 0; i < rank; i++)
             {
-                totalLength *= (uint)pLengths[i];
+                totalLength *= (nuint)pLengths[i];
             }
 
             // Allocate array - note size allocated is totalLength + array base size
             // The base size incorporates the bounds for all dimensions plus the
             // eetype pointer and the number of components
-            Array result = RuntimeImports.NewArray(pEEType, (int)totalLength);
+            Array result = RuntimeImports.NewArray(pEEType, totalLength);
 
             // Setup upper bounds of dimensions as nints
             ref nint bounds = ref result.GetMultiDimensionalArrayBounds();

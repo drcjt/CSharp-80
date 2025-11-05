@@ -7,10 +7,10 @@ namespace System.Runtime
     {
         [MethodImpl(MethodImplOptions.InternalCall)]
         [RuntimeImport("NewString")]
-        internal static unsafe extern string NewString(EEType* pEEType, int length);
+        internal static unsafe extern string NewString(EEType* pEEType, nuint length);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         [RuntimeImport("NewArray")]
-        internal static unsafe extern Array NewArray(EEType* pEEType, int length);
+        internal static unsafe extern Array NewArray(EEType* pEEType, nuint length);
     }
 }
