@@ -40,7 +40,7 @@ namespace System
                 return Empty;
             }
 
-            string result = RuntimeImports.NewString(EEType.Of<string>(), value.Length);
+            string result = RuntimeImports.NewString(EEType.Of<string>(), (nuint)value.Length);
             Buffer.Memmove(ref result._firstChar, ref value[0], (uint)result.Length);
             return result;
         }
@@ -56,7 +56,7 @@ namespace System
                 return Empty;
             }
 
-            string result = RuntimeImports.NewString(EEType.Of<string>(), value.Length);
+            string result = RuntimeImports.NewString(EEType.Of<string>(), (nuint)value.Length);
             Buffer.Memmove(ref result._firstChar, ref MemoryMarshal.GetReference(value), (uint)result.Length);
             return result;
         }

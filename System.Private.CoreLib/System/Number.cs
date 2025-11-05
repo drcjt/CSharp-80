@@ -15,12 +15,12 @@ namespace System
             if (value == 0)
                 return "0";
 
-            int bufferLength = CountDigits(value);
+            nuint bufferLength = CountDigits(value);
 
             string result = RuntimeImports.NewString(EEType.Of<string>(), bufferLength);
             fixed (char* buffer = result)
             {
-                char* p = buffer + bufferLength;
+                char* p = buffer + (int)(nint)bufferLength;
                 UInt32ToDecStr(p, value);
             }
             return result;
@@ -38,12 +38,12 @@ namespace System
         }
         private static unsafe string NegativeInt32ToDecStr(int value)
         {
-            int bufferLength = CountDigits((uint)-value) + 1;
+            nuint bufferLength = CountDigits((uint)-value) + 1;
             string result = RuntimeImports.NewString(EEType.Of<string>(), bufferLength);
 
             fixed (char* buffer = result)
             {
-                char* p = buffer + bufferLength;
+                char* p = buffer + (int)(nint)bufferLength;
                 p = UInt32ToDecStr(p, (uint)-value);
 
                 *(p-1) = '-';
@@ -52,9 +52,9 @@ namespace System
             return result;
         }
 
-        private static int CountDigits(uint value)
+        private static nuint CountDigits(uint value)
         {
-            int count = 0;
+            nuint count = 0;
 
             while (value > 0)
             {
