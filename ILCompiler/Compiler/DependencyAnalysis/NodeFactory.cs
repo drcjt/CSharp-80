@@ -8,7 +8,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 {
     public class NodeFactory
     {
-        private readonly Dictionary<TypeDesc, StaticsNode> _staticNodes = [];
+        private readonly Dictionary<TypeDesc, GcStaticsNode> _gcStaticNodes = [];
+        private readonly Dictionary<TypeDesc, NonGcStaticsNode> _nonGcStaticNodes = [];
         private readonly Dictionary<MethodDesc, Z80MethodCodeNode> _methodNodesByFullName = [];
         private readonly Dictionary<string, UnboxingStubNode> _unboxingStubsByFullName = [];
 
@@ -56,15 +57,26 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return necessaryTypeSymbolNode;
         }
 
-        public StaticsNode StaticsNode(MetadataType type)
+        public GcStaticsNode GcStaticsNode(MetadataType type)
         {
-            if (!_staticNodes.TryGetValue(type, out var staticNode))
+            if (!_gcStaticNodes.TryGetValue(type, out var gcStaticNode))
             {
-                staticNode = new StaticsNode(type, _preinitializationManager, _nameMangler);
-                _staticNodes[type] = staticNode;
+                gcStaticNode = new GcStaticsNode(type, _preinitializationManager, _nameMangler);
+                _gcStaticNodes[type] = gcStaticNode;
             }
 
-            return staticNode;
+            return gcStaticNode;
+        }
+
+        public NonGcStaticsNode NonGcStaticsNode(MetadataType type)
+        {
+            if (!_nonGcStaticNodes.TryGetValue(type, out var nonGcStaticNode))
+            {
+                nonGcStaticNode = new NonGcStaticsNode(type, _preinitializationManager, _nameMangler);
+                _nonGcStaticNodes[type] = nonGcStaticNode;
+            }
+
+            return nonGcStaticNode;
         }
 
         public FrozenStringNode SerializedStringObject(string data)

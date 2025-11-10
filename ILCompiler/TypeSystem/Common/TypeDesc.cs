@@ -22,6 +22,9 @@ namespace ILCompiler.TypeSystem.Common
         public virtual string Name => String.Empty;
         public virtual string Namespace => String.Empty;
         public bool IsDefType => this is DefType;
+
+        public bool IsGcPointer => Category == TypeFlags.Class || Category == TypeFlags.SzArray || Category == TypeFlags.Array;
+
         public bool IsParameterizedType => this is ParameterizedType;
         public bool IsFunctionPointer => this is FunctionPointerType;
         public bool IsPointer => this is PointerType;

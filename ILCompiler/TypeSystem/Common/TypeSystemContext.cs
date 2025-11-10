@@ -30,6 +30,18 @@ namespace ILCompiler.TypeSystem.Common
 
         public SharedGenericsMode GenericsMode { get; set; } = SharedGenericsMode.Disabled;
 
+        public bool ComputeHasGcStaticBase(FieldDesc field)
+        {
+            TypeDesc fieldType = field.FieldType;
+            if (fieldType.IsValueType)
+                return ((DefType)fieldType).ContainsGcPointers;
+            else
+            {
+                return fieldType.IsGcPointer;
+
+            }
+        }
+
         public InstantiatedType GetInstantiatedType(MetadataType typeDef, Instantiation instantiation)
         {
             var newInstantiatedType = new InstantiatedType(typeDef, instantiation);

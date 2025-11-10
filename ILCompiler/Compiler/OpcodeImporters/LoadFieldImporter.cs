@@ -28,7 +28,8 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 }
                 else
                 {
-                    var staticsBase = importer.NameMangler.GetMangledTypeName(runtimeDeterminedType.OwningType) + "_statics";
+                    var staticName = runtimeDeterminedType.HasGcStaticBase ? "_gcstatics" : "_nongcstatics";
+                    var staticsBase = importer.NameMangler.GetMangledTypeName(runtimeDeterminedType.OwningType) + staticName;
                     obj = new SymbolConstantEntry(staticsBase);
                 }
 

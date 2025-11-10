@@ -12,7 +12,13 @@ namespace ILCompiler.TypeSystem.Common
         private LayoutInt? _instanceByteCountUnaligned;
         private LayoutInt? _instanceByteAlignment;
 
-        private LayoutInt? _staticFieldSize;
+        private sealed class StaticBlockInfo
+        {
+            public StaticsBlock NonGcStatics;
+            public StaticsBlock GcStatics;
+        }
+
+        private StaticBlockInfo? _staticBlockInfo;
 
         public void ComputeInstanceLayout()
         {
@@ -42,8 +48,17 @@ namespace ILCompiler.TypeSystem.Common
             var fieldLayoutAlgorithm = new MetadataFieldLayoutAlgorithm(target);
 
             var computedStaticLayout = fieldLayoutAlgorithm.ComputeStaticFieldLayout(this);
-            _staticFieldSize = computedStaticLayout.Size;
 
+            if (computedStaticLayout.NonGcStatics.Size != LayoutInt.Zero ||
+                computedStaticLayout.GcStatics.Size != LayoutInt.Zero)
+            {
+                _staticBlockInfo = new StaticBlockInfo
+                {
+                    NonGcStatics = computedStaticLayout.NonGcStatics,
+                    GcStatics = computedStaticLayout.GcStatics,
+                };
+            }
+            
             if (computedStaticLayout.Offsets != null)
             {
                 foreach (var fieldAndOffset in computedStaticLayout.Offsets)
@@ -55,7 +70,7 @@ namespace ILCompiler.TypeSystem.Common
             _computedStaticLayout = true;
         }
 
-        public LayoutInt StaticFieldSize
+        public LayoutInt GCStaticFieldSize
         {
             get
             {
@@ -63,7 +78,19 @@ namespace ILCompiler.TypeSystem.Common
                 {
                     ComputeStaticFieldLayout();
                 }
-                return _staticFieldSize!;
+                return _staticBlockInfo is null ? LayoutInt.Zero : _staticBlockInfo.GcStatics.Size;
+            }
+        }
+
+        public LayoutInt NonGCStaticFieldSize
+        {
+            get
+            {
+                if (!_computedStaticLayout)
+                {
+                    ComputeStaticFieldLayout();
+                }
+                return _staticBlockInfo is null ? LayoutInt.Zero : _staticBlockInfo.NonGcStatics.Size;
             }
         }
 
@@ -158,5 +185,23 @@ namespace ILCompiler.TypeSystem.Common
         }
 
         public virtual DefType? ContainingType => null;
+
+        public bool ContainsGcPointers
+        {
+            get
+            {
+                if (!IsValueType && HasBaseType && BaseType!.ContainsGcPointers)
+                {
+                    return true;
+                }
+
+                if (MetadataFieldLayoutAlgorithm.ComputeContainsGcPointers(this))
+                {
+                    return true;
+                }
+
+                return false;
+            }
+        }
     }
 }

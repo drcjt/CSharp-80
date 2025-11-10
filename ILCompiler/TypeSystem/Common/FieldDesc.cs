@@ -37,6 +37,8 @@
             }
         }
 
+        public bool HasGcStaticBase => Context.ComputeHasGcStaticBase(this);
+
         internal void InitializeOffset(LayoutInt offset)
         {
             _offset = offset;
