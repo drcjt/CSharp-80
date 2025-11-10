@@ -273,8 +273,15 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                     return;
                 }
 
-                var metadataType = fieldDesc.OwningType as MetadataType;
-                _dependencies.Add(_context.NodeFactory.StaticsNode(metadataType!));
+                MetadataType metadataType = (MetadataType)fieldDesc.OwningType;
+                if (fieldDesc.HasGcStaticBase)
+                {
+                    _dependencies.Add(_context.NodeFactory.GcStaticsNode(metadataType));
+                }
+                else
+                {
+                    _dependencies.Add(_context.NodeFactory.NonGcStaticsNode(metadataType));
+                }
 
                 if (!_context.PreinitializationManager.IsPreinitialized(fieldDesc.OwningType))
                 {

@@ -6,16 +6,16 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler.DependencyAnalysis
 {
-    public class StaticsNode : DependencyNode
+    public class GcStaticsNode : DependencyNode
     {
         private readonly MetadataType _type;
 
-        public override string Name => $"StaticsNode_{_type.ToString()}";
+        public override string Name => $"GcStaticsNode_{_type.ToString()}";
 
         private readonly PreinitializationManager _preinitializationManager;
         private readonly INameMangler _nameMangler;
 
-        public StaticsNode(MetadataType type, PreinitializationManager preinitializationManager, INameMangler nameMangler)
+        public GcStaticsNode(MetadataType type, PreinitializationManager preinitializationManager, INameMangler nameMangler)
         {
             _type = type;
             _preinitializationManager = preinitializationManager;
@@ -26,8 +26,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             var instructionsBuilder = new InstructionsBuilder();
 
-            instructionsBuilder.Comment($"Bytes for static fields for type {_type.ToString()}");
-            instructionsBuilder.Label(_nameMangler.GetMangledTypeName(_type) + "_" + "statics");
+            instructionsBuilder.Comment($"Bytes for gc static fields for type {_type.ToString()}");
+            instructionsBuilder.Label(_nameMangler.GetMangledTypeName(_type) + "_" + "gcstatics");
 
             if (_preinitializationManager.IsPreinitialized(_type))
             {
@@ -35,11 +35,11 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
             else
             {
-                var staticsSize = _type.StaticFieldSize.AsInt;
+                var staticsSize = _type.GCStaticFieldSize.AsInt;
 
                 foreach (var field in _type.GetFields())
                 {
-                    if (!field.IsStatic || field.IsLiteral)
+                    if (!IsGcStaticField(field))
                         continue;
 
                     instructionsBuilder.Comment($"Field {field.Name} offset: {field.Offset.AsInt}");
@@ -51,6 +51,8 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             return instructionsBuilder.Instructions;
         }
 
+        private static bool IsGcStaticField(FieldDesc field) => field.IsStatic && !field.IsLiteral && field.HasGcStaticBase;
+
         private void BuildInstructionsForPreinitializedStatics(InstructionsBuilder instructionsBuilder)
         {
             var preinitializationInfo = _preinitializationManager.GetPreinitializationInfo(_type);
@@ -58,7 +60,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             int byteCount = 0;
             foreach (var field in _type.GetFields())
             {
-                if (!field.IsStatic || field.IsLiteral)
+                if (!field.IsStatic || field.IsLiteral || !field.HasGcStaticBase)
                     continue;
 
                 instructionsBuilder.Comment($"Field {field.Name} offset: {field.Offset.AsInt}");

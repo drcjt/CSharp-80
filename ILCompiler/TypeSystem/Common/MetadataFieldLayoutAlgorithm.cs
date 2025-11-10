@@ -25,7 +25,8 @@ namespace ILCompiler.TypeSystem.Common
             }
 
             ComputedStaticFieldLayout result = new ComputedStaticFieldLayout();
-            result.Size = new LayoutInt(0);
+            result.GcStatics = new StaticsBlock { Size = LayoutInt.Zero, LargestAlignment = LayoutInt.Zero };
+            result.NonGcStatics = new StaticsBlock { Size = LayoutInt.Zero, LargestAlignment = LayoutInt.Zero };
 
             if (numStaticFields == 0)
             {
@@ -42,15 +43,61 @@ namespace ILCompiler.TypeSystem.Common
                     continue;
 
                 var fieldType = field.FieldType;
-                SizeAndAlignment sizeAndAlignment = ComputeFieldSizeAndAlignment(fieldType, 1);
 
-                result.Size = LayoutInt.AlignUp(result.Size, sizeAndAlignment.Alignment, _target);
-                result.Offsets[index] = new FieldAndOffset(field, result.Size);
-                result.Size += sizeAndAlignment.Size;
+                ref StaticsBlock block = ref GetStaticsBlockForField(ref result, field);
+
+                SizeAndAlignment sizeAndAlignment = ComputeFieldSizeAndAlignment(fieldType, _target.DefaultPackingSize);
+
+                block.Size = LayoutInt.AlignUp(block.Size, sizeAndAlignment.Alignment, _target);
+                result.Offsets[index] = new FieldAndOffset(field, block.Size);
+                block.Size += sizeAndAlignment.Size;
+
+                block.LargestAlignment = LayoutInt.Max(block.LargestAlignment, sizeAndAlignment.Alignment);
 
                 index++;
             }
             return result;
+        }
+
+        private static ref StaticsBlock GetStaticsBlockForField(ref ComputedStaticFieldLayout layout, FieldDesc field)
+        {
+            if (field.HasGcStaticBase)
+            {
+                return ref layout.GcStatics;
+            }
+            else
+            {
+                return ref layout.NonGcStatics;
+            }
+        }
+
+        public static bool ComputeContainsGcPointers(DefType type)
+        {
+            foreach (var field in type.GetFields())
+            {
+                if (field.IsStatic)
+                    continue;
+
+                TypeDesc fieldType = field.FieldType;
+                if (fieldType.IsValueType)
+                {
+                    if (fieldType.IsPrimitive)
+                    {
+                        continue;
+                    }
+
+                    if (((DefType)fieldType).ContainsGcPointers)
+                    {
+                        return true;
+                    }
+                }
+                else if (fieldType.IsGcPointer)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public ComputedInstanceFieldLayout ComputeInstanceLayout(DefType defType)

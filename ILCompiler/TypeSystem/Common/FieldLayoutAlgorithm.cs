@@ -10,8 +10,18 @@
         public FieldAndOffset[] Offsets { get; set; }
     }
 
+    public struct StaticsBlock
+    {
+        public LayoutInt Size { get; set; }
+        public LayoutInt LargestAlignment { get; set; }
+
+    }
+
     public struct ComputedStaticFieldLayout
     {
+        public StaticsBlock NonGcStatics;
+        public StaticsBlock GcStatics;
+
         public LayoutInt Size { get; set; }
 
         public FieldAndOffset[] Offsets { get; set; }

@@ -31,7 +31,8 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 }
                 else
                 {
-                    var staticsBase = importer.NameMangler.GetMangledTypeName(field.OwningType) + "_statics";
+                    var staticName = field.HasGcStaticBase ? "_gcstatics" : "_nongcstatics";
+                    var staticsBase = importer.NameMangler.GetMangledTypeName(field.OwningType) + staticName;
                     fieldAddress = new SymbolConstantEntry(staticsBase);
                 }
 
