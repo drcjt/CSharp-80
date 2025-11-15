@@ -1,10 +1,9 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
-using ILCompiler.Compiler.FlowgraphHelpers;
-using ILCompiler.Compiler.Ssa;
+﻿using System.Text;
 using ILCompiler.Compiler.Dominators;
+using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.Ssa;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
-using System.Text;
 
 namespace ILCompiler.Compiler
 {
@@ -13,40 +12,43 @@ namespace ILCompiler.Compiler
 
     public class SsaBuilder : ISsaBuilder
     {
-        private readonly ILogger<SsaBuilder> _logger;
+        private readonly ILogger _logger;
+        private readonly IConfiguration _configuration;
+
         private bool _dumpSsa;
 
-        public SsaBuilder(ILogger<SsaBuilder> logger)
+        public SsaBuilder(ILogger<SsaBuilder> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
         }
 
-        public void Build(FlowgraphDominatorTree dominatorTree, IList<BasicBlock> blocks, LocalVariableTable locals, bool dumpSsa, FlowgraphDfsTree dfs)
+        public void Build(MethodCompiler compiler)
         {
-            _dumpSsa = dumpSsa;
+            _dumpSsa = _configuration.DumpSsa;
 
             // Topologically sort the graph
-            var postOrder = dfs.PostOrder;
+            var postOrder = compiler.DfsTree!.PostOrder;
 
             // Calculate liveness
-            Liveness.LocalVarLiveness(blocks, locals, _logger);
+            Liveness.LocalVarLiveness(compiler, _logger);
 
             // Calculate Ssa only for Tracked local variables
-            foreach (var localVariable in locals) 
+            foreach (var localVariable in compiler.Locals) 
             {
                 localVariable.InSsa = localVariable.Tracked;
             }
 
             // Insert Phi functions
-            InsertPhiFunctions(postOrder, locals);
+            InsertPhiFunctions(postOrder, compiler.Locals);
 
             // Rename local variables
-            RenameVariables(dominatorTree.Root, locals);
+            RenameVariables(compiler.DominatorTree!.Root, compiler.Locals);
 
             // Log SSA form
             if (_dumpSsa)
             {
-                LogSsaSummary(locals);
+                LogSsaSummary(compiler.Locals);
             }
         }
 

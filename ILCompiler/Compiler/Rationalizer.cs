@@ -6,9 +6,9 @@ namespace ILCompiler.Compiler
 {
     public class Rationalizer : IRationalizer
     {
-        public void Rationalize(IList<BasicBlock> blocks)
+        public void Rationalize(MethodCompiler compiler)
         {
-            foreach (var block in blocks)
+            foreach (var block in compiler.Blocks)
             {
                 // Link IR in statements together
                 foreach (var statement in block.Statements)

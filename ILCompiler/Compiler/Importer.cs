@@ -264,17 +264,17 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, LocalVariableTable locals, IList<EHClause> ehClauses, InlineInfo? inlineInfo = null)
+        public void Import(MethodCompiler compiler, IList<EHClause> ehClauses, InlineInfo? inlineInfo = null)
         {
             InlineInfo = inlineInfo;
 
-            ParameterCount = parameterCount;
-            ReturnBufferArgIndex = returnBufferArgIndex;
+            ParameterCount = compiler.Locals.ParameterCount;
+            ReturnBufferArgIndex = compiler.Locals.ReturnBufferArgIndex;
 
-            Method = method;
-            _locals = locals;
+            Method = compiler.Method!;
+            _locals = compiler.Locals;
 
-            var methodIL = method.MethodIL!;
+            var methodIL = Method.MethodIL!;
 
             var uninstantiatedMethodIL = methodIL.GetMethodILDefinition();
             if (methodIL != uninstantiatedMethodIL)
@@ -292,9 +292,9 @@ namespace ILCompiler.Compiler
             BasicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
 
             // Trigger static constructor if required
-            if (method.IsDefaultConstructor)
+            if (Method.IsDefaultConstructor)
             {
-                var staticConstructorMethod = method.OwningType.GetStaticConstructor();
+                var staticConstructorMethod = Method.OwningType.GetStaticConstructor();
                 if (staticConstructorMethod != null)
                 {
                     var targetMethod = NameMangler.GetMangledMethodName(staticConstructorMethod);
@@ -306,19 +306,17 @@ namespace ILCompiler.Compiler
 
             ImportBasicBlocks(offsetToIndexMap);
 
-            var importedBasicBlocks = new List<BasicBlock>();
+            compiler.Blocks.Clear();
             for (int i = 0; i < BasicBlocks.Length; i++)
             {
                 if (BasicBlocks[i] != null)
                 {
-                    importedBasicBlocks.Add(BasicBlocks[i]);
+                    compiler.Blocks.Add(BasicBlocks[i]);
                 }
             }
 
             // Add EH begin block as successor to all blocks in trys
-            SetTryBlockSuccessors(importedBasicBlocks);
-
-            return importedBasicBlocks;
+            SetTryBlockSuccessors(compiler.Blocks);
         }
 
         private static void SetTryBlockSuccessors(IList<BasicBlock> basicBlocks)

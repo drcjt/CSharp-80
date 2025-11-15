@@ -1,13 +1,12 @@
-﻿using ILCompiler.Compiler.CodeGenerators;
+﻿using System.Diagnostics;
+using ILCompiler.Compiler.CodeGenerators;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.Emit;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Peephole;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Dnlib;
-using System.Diagnostics;
 using static ILCompiler.Compiler.Emit.Registers;
-using System.Linq;
 
 namespace ILCompiler.Compiler
 {
@@ -22,7 +21,7 @@ namespace ILCompiler.Compiler
 
         private CodeGeneratorContext _context = null!;
 
-        public CodeGenerator(INameMangler nameMangler, ICodeGeneratorFactory codeGeneratorFactory, IConfiguration configuration, 
+        public CodeGenerator(INameMangler nameMangler, ICodeGeneratorFactory codeGeneratorFactory, IConfiguration configuration,
             CorLibModuleProvider corLibModuleProvider, NodeFactory nodeFactory, Optimizer optimizer)
         {
             _nameMangler = nameMangler;
@@ -33,8 +32,11 @@ namespace ILCompiler.Compiler
             _optimizer = optimizer;
         }
 
-        public IList<Instruction> Generate(IList<BasicBlock> blocks, LocalVariableTable locals, Z80MethodCodeNode methodCodeNode)
+        public IList<Instruction> Generate(MethodCompiler compiler, Z80MethodCodeNode methodCodeNode)
         {
+            LocalVariableTable locals = compiler.Locals;
+            IList<BasicBlock> blocks = compiler.Blocks;
+
             _context = new CodeGeneratorContext(locals, methodCodeNode, _configuration, _nameMangler, _nodeFactory, _corLibModuleProvider);
 
             AssignFrameOffsets();

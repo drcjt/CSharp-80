@@ -16,7 +16,7 @@ namespace ILCompiler.Interfaces
         public PreinitializationManager PreinitializationManager { get; }
         public NodeFactory NodeFactory { get; }
 
-        public IList<BasicBlock> Import(int parameterCount, int? returnBufferArgIndex, MethodDesc method, LocalVariableTable locals, IList<EHClause> ehClauses, InlineInfo? inlineInfo = null);
+        public void Import(MethodCompiler compiler, IList<EHClause> ehClauses, InlineInfo? inlineInfo = null);
 
         void Push(StackEntry entry);
         StackEntry Pop();
