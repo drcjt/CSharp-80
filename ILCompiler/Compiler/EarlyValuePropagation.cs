@@ -6,22 +6,16 @@ namespace ILCompiler.Compiler
 {
     internal class EarlyValuePropagation : IEarlyValuePropagation
     {
-        private readonly IFlowgraph _flowgraph;
-        public EarlyValuePropagation(IFlowgraph flowgraph)
+        public void Run(MethodCompiler compiler)
         {
-            _flowgraph = flowgraph;
-        }
-
-        public void Run(IList<BasicBlock> blocks, LocalVariableTable locals)
-        {
-            foreach (var block in blocks)
+            foreach (var block in compiler.Blocks)
             {
                 foreach (var statement in block.Statements)
                 {
                     bool isRewritten = false;
                     foreach (var tree in statement.TreeList)
                     {
-                        var rewrittenTree = EarlyPropagationRewriteTree(block, tree, locals);
+                        var rewrittenTree = EarlyPropagationRewriteTree(block, tree, compiler.Locals);
                         if (rewrittenTree != null)
                         {
                             isRewritten = true;
@@ -31,7 +25,7 @@ namespace ILCompiler.Compiler
                     if (isRewritten)
                     {
                         // Update the evaluation order
-                        _flowgraph.SetStatementSequence(statement);
+                        compiler.Flowgraph!.SetStatementSequence(statement);
                     }
                 }
             }

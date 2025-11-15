@@ -6,13 +6,13 @@ namespace ILCompiler.Compiler
 {
     internal static class Liveness
     {
-        public static void LocalVarLiveness(IList<BasicBlock> blocks, LocalVariableTable locals, ILogger<SsaBuilder> logger)
+        public static void LocalVarLiveness(MethodCompiler compiler, ILogger logger)
         {
-            LocalVarLivenessInit(locals);
+            LocalVarLivenessInit(compiler.Locals);
 
             // Figure out use/def info for all basic blocks
-            PerBlockLocalVarLiveness(blocks, logger);
-            InterBlockLocalVarLiveness(blocks, locals);
+            PerBlockLocalVarLiveness(compiler.Blocks, logger);
+            InterBlockLocalVarLiveness(compiler);
         }
 
         private static void LocalVarLivenessInit(LocalVariableTable locals)
@@ -45,22 +45,24 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private static void InterBlockLocalVarLiveness(IList<BasicBlock> blocks, LocalVariableTable locals)
+        private static void InterBlockLocalVarLiveness(MethodCompiler compiler)
         {
             // Compute the IN and OUT sets using classic liveness algorithm
-            LiveVarAnalyzer.AnalyzeLiveVars(blocks);
+            LiveVarAnalyzer.AnalyzeLiveVars(compiler.Blocks);
+
+            LocalVariableTable locals = compiler.Locals;
 
             // Set which local variable must be initialized
             for (var lclNum = 0; lclNum < locals.Count; lclNum++)
             {
-                if (!locals[lclNum].IsParameter && blocks[0].LiveIn.IsMember(lclNum))
+                if (!locals[lclNum].IsParameter && compiler.Blocks[0].LiveIn.IsMember(lclNum))
                 {
                     locals[lclNum].MustInit = true;
                 }
             }
         }
 
-        private static void PerBlockLocalVarLiveness(IList<BasicBlock> blocks, ILogger<SsaBuilder> logger)
+        private static void PerBlockLocalVarLiveness(IList<BasicBlock> blocks, ILogger logger)
         {
             foreach (var block in blocks)
             {

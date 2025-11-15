@@ -8,17 +8,18 @@ namespace ILCompiler.Compiler
     public class LoopFinder : ILoopFinder
     {
         private readonly ILogger<LoopFinder> _logger;
-        public LoopFinder(ILogger<LoopFinder> logger) 
+
+        public LoopFinder(ILogger<LoopFinder> logger)
         {
             _logger = logger;
         }
 
-        public FlowGraphNaturalLoops FindLoops(IList<BasicBlock> blocks, FlowgraphDfsTree dfs)
+        public FlowGraphNaturalLoops FindLoops(MethodCompiler compiler)
         {
-            var loops = FlowGraphNaturalLoops.Find(dfs, _logger);
+            var loops = FlowGraphNaturalLoops.Find(compiler.DfsTree!, _logger);
 
             // Consider moving out of here
-            ComputeReachabilitySets(dfs);
+            ComputeReachabilitySets(compiler.DfsTree!);
 
             return loops;
         }
@@ -169,7 +170,7 @@ namespace ILCompiler.Compiler
             _loops.Add(loop);
         }
 
-        public static FlowGraphNaturalLoops Find(FlowgraphDfsTree dfsTree, ILogger<LoopFinder> logger)
+        public static FlowGraphNaturalLoops Find(FlowgraphDfsTree dfsTree, ILogger logger)
         {
             logger.LogDebug("Finding loops in DFS tree");
             logger.LogDebug("Reverse Post Order -> Block [pre, post]");
@@ -252,7 +253,7 @@ namespace ILCompiler.Compiler
             return loops;
         }
 
-        private static FlowGraphNaturalLoop? FindBackEdges(FlowgraphDfsTree dfsTree, ILogger<LoopFinder> logger, BasicBlock header, FlowGraphNaturalLoop? loop)
+        private static FlowGraphNaturalLoop? FindBackEdges(FlowgraphDfsTree dfsTree, ILogger logger, BasicBlock header, FlowGraphNaturalLoop? loop)
         {
             foreach (BasicBlock predecessorBlock in header.Predecessors)
             {
@@ -268,7 +269,7 @@ namespace ILCompiler.Compiler
             return loop;
         }
 
-        private static void FindParentLoop(ILogger<LoopFinder> logger, FlowGraphNaturalLoops loops, BasicBlock header, FlowGraphNaturalLoop loop)
+        private static void FindParentLoop(ILogger logger, FlowGraphNaturalLoops loops, BasicBlock header, FlowGraphNaturalLoop loop)
         {
             foreach (FlowGraphNaturalLoop otherLoop in loops.InPostOrder)
             {
@@ -283,7 +284,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private static void FindEntryEdges(FlowgraphDfsTree dfsTree, ILogger<LoopFinder> logger, BasicBlock header, FlowGraphNaturalLoop loop)
+        private static void FindEntryEdges(FlowgraphDfsTree dfsTree, ILogger logger, BasicBlock header, FlowGraphNaturalLoop loop)
         {
             foreach (BasicBlock predecessor in header.Predecessors)
             {
@@ -296,7 +297,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private static void FindExitEdges(ILogger<LoopFinder> logger, FlowGraphNaturalLoop loop)
+        private static void FindExitEdges(ILogger logger, FlowGraphNaturalLoop loop)
         {
             loop.VisitLoopBlocksReversePostOrder(loopBlock =>
             {
@@ -314,7 +315,7 @@ namespace ILCompiler.Compiler
             });
         }
 
-        private static bool FindNaturalLoopBlocks(FlowGraphNaturalLoop loop, Stack<BasicBlock> worklist, ILogger<LoopFinder> logger)
+        private static bool FindNaturalLoopBlocks(FlowGraphNaturalLoop loop, Stack<BasicBlock> worklist, ILogger logger)
         {
             var dfsTree = loop.DfsTree;
             loop.Blocks.Add(loop.Header);

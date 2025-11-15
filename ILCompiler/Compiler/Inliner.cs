@@ -19,14 +19,11 @@ namespace ILCompiler.Compiler
         private readonly CodeFolder _codeFolder = codeFolder;
         private string? _inputFilePath;
 
-        private IList<BasicBlock>? _blocks;
-
-        public void Inline(IList<BasicBlock> blocks, LocalVariableTable locals, string inputFilePath)
+        public void Inline(MethodCompiler compiler, string inputFilePath)
         {
             if (!_configuration.Optimize)
                 return;
 
-            _blocks = blocks;
             _inputFilePath = inputFilePath;
 
             var walker = new SubstitutePlaceholdersWalker(_codeFolder);
@@ -35,7 +32,7 @@ namespace ILCompiler.Compiler
 
             do
             {
-                var block = blocks[blockIndex];
+                var block = compiler.Blocks[blockIndex];
                 if (block.Statements.Count > 0)
                 {
                     int statementIndex = 0;
@@ -59,9 +56,9 @@ namespace ILCompiler.Compiler
                                 Statement = statement,
                                 StatementIndex = statementIndex,
                                 Block = block,
-                                Locals = locals,
+                                Locals = compiler.Locals,
                             };
-                            MorphCallInline(inlineMethodInfo, inlineResult);
+                            MorphCallInline(compiler, inlineMethodInfo, inlineResult);
                         }
 
                         // Skip over the statement that has either not been inlined
@@ -71,7 +68,7 @@ namespace ILCompiler.Compiler
                 }
 
                 blockIndex++;
-            } while (blockIndex < blocks.Count);
+            } while (blockIndex < compiler.Blocks.Count);
         }
 
         private static int CheckInlineDepthAndRecursion(InlineInfo inlineInfo)
@@ -114,7 +111,7 @@ namespace ILCompiler.Compiler
             return false;
         }
 
-        private InlineContext? MorphCallInlineHelper(InlineMethodInfo methodInfo, InlineResult result)
+        private InlineContext? MorphCallInlineHelper(MethodCompiler compiler, InlineMethodInfo methodInfo, InlineResult result)
         {
             var call = methodInfo.Call;
 
@@ -126,7 +123,7 @@ namespace ILCompiler.Compiler
 
             var startVars = methodInfo.Locals.Count;
 
-            var createdConext = InvokeInlineeCompiler(methodInfo, result);
+            var createdConext = InvokeInlineeCompiler(compiler, methodInfo, result);
 
             if (result.IsFailure)
             {
@@ -139,7 +136,7 @@ namespace ILCompiler.Compiler
             return createdConext;
         }
 
-        private InlineContext? InvokeInlineeCompiler(InlineMethodInfo methodInfo, InlineResult inlineResult)
+        private InlineContext? InvokeInlineeCompiler(MethodCompiler compiler, InlineMethodInfo methodInfo, InlineResult inlineResult)
         {
             var method = methodInfo.Call.Method;
             if (method is null)
@@ -174,12 +171,12 @@ namespace ILCompiler.Compiler
 
             inlineInfo.InlineContext = NewContext(inlineInfo.InlineCandidateInfo.InlinersContext, methodInfo.Call);
 
-            var compiler = new MethodCompiler(_logger, _configuration, _phaseFactory);
-            var basicBlocks = compiler.CompileInlineeMethod(method, _inputFilePath!, inlineInfo);
+            var inlinerCompiler = new MethodCompiler(_logger, _configuration, _phaseFactory);
+            var basicBlocks = inlinerCompiler.CompileInlineeMethod(method, _inputFilePath!, inlineInfo);
 
             if (basicBlocks != null)
             {
-                var inlineSucceeded = InsertInlineeBlocks(basicBlocks, methodInfo, inlineInfo);
+                var inlineSucceeded = InsertInlineeBlocks(compiler, basicBlocks, methodInfo, inlineInfo);
                 if (inlineSucceeded)
                 {
                     inlineResult.NoteSuccess();
@@ -191,14 +188,14 @@ namespace ILCompiler.Compiler
             return null;
         }
 
-        private void MorphCallInline(InlineMethodInfo methodInfo, InlineResult inlineResult)
+        private void MorphCallInline(MethodCompiler compiler, InlineMethodInfo methodInfo, InlineResult inlineResult)
         {
             var inlineCandidateInfo = methodInfo.Call.InlineCandidateInfo;
 
             bool inliningFailed = false;
             if (methodInfo.Call.IsInlineCandidate)
             {
-                var createdContext = MorphCallInlineHelper(methodInfo, inlineResult);
+                var createdContext = MorphCallInlineHelper(compiler, methodInfo, inlineResult);
 
                 Debug.Assert(inlineResult.IsDecided);
 
@@ -303,7 +300,7 @@ namespace ILCompiler.Compiler
             argumentInfo.IsLocalVariable = argument is LocalVariableEntry;
         }
 
-        private bool InsertInlineeBlocks(IList<BasicBlock> blocks, InlineMethodInfo methodInfo, InlineInfo inlineInfo)
+        private bool InsertInlineeBlocks(MethodCompiler compiler, IList<BasicBlock> blocks, InlineMethodInfo methodInfo, InlineInfo inlineInfo)
         {
             int afterStatementIndex = methodInfo.StatementIndex;
             var statements = methodInfo.Block.Statements;
@@ -336,13 +333,13 @@ namespace ILCompiler.Compiler
                 // Split block after statement being inlined
                 var bottomBlock = SplitBlockAfterStatement(methodInfo.Block, afterStatementIndex);
 
-                var blockIndex = _blocks!.IndexOf(methodInfo.Block) + 1;
-                _blocks.Insert(blockIndex, bottomBlock);
+                var blockIndex = compiler.Blocks!.IndexOf(methodInfo.Block) + 1;
+                compiler.Blocks.Insert(blockIndex, bottomBlock);
 
                 // Insert the blocks between the current block and the bottom block
                 foreach (var block in blocks)
                 {
-                    _blocks.Insert(blockIndex++, block);
+                    compiler.Blocks.Insert(blockIndex++, block);
 
                     // For the first/entry block in the blocks being inserted
                     // link it up to the original method block

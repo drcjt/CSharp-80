@@ -4,6 +4,6 @@ namespace ILCompiler.Interfaces
 {
     internal interface IRationalizer : IPhase
     {
-        void Rationalize(IList<BasicBlock> blocks);
+        void Rationalize(MethodCompiler compiler);
     }
 }

@@ -16,10 +16,10 @@ namespace ILCompiler.Compiler
         private BasicBlock _currentBlock = null!;
         private LocalVariableTable _locals = null!;
 
-        public void Run(IList<BasicBlock> blocks, LocalVariableTable locals)
+        public void Run(MethodCompiler compiler)
         {
-            _locals = locals;
-            foreach (var block in blocks)
+            _locals = compiler.Locals;
+            foreach (var block in compiler.Blocks)
             {
                 _currentBlock = block;
                 LowerBlock(block);

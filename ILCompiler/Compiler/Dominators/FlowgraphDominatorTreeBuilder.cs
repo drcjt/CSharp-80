@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using ILCompiler.Compiler.FlowgraphHelpers;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -14,9 +13,10 @@ namespace ILCompiler.Compiler.Dominators
             _logger = logger;
         }
 
-
-        public FlowgraphDominatorTree Build(FlowgraphDfsTree dfs, IList<BasicBlock> blocks)
+        public FlowgraphDominatorTree Build(MethodCompiler compiler)
         {
+            var dfs = compiler.DfsTree!;
+
             // Topologically sort the graph
             var postOrder = dfs.PostOrder;
 
@@ -24,7 +24,7 @@ namespace ILCompiler.Compiler.Dominators
             ComputeImmediateDominators(postOrder);
 
             // Create the dominator tree
-            var root = BuildDominatorTree(blocks);
+            var root = BuildDominatorTree(compiler.Blocks);
 
             // Assign preorder and postorder numbers for quick dominance checks
             NumberDomTreeVisitor numberDomTreeVisitor = new NumberDomTreeVisitor(root, postOrder.Count);

@@ -20,15 +20,17 @@ namespace ILCompiler.Compiler
             _flowgraph = flowgraph;
         }
 
-        public void Run(IList<BasicBlock> blocks, FlowGraphNaturalLoops loops, LocalVariableTable locals)
+        public void Run(MethodCompiler compiler)
         {
+            FlowGraphNaturalLoops loops = compiler.Loops!;
+
             if (loops.Loops.Count > 0)
             {
                 PerLoopInfo loopInfo = new PerLoopInfo(loops);
 
                 _logger.LogInformation("Optimizing induction variables");
 
-                ScevContext scalarEvolutionContext = new(locals);
+                ScevContext scalarEvolutionContext = new(compiler.Locals);
                 foreach (FlowGraphNaturalLoop? loop in loops.InPostOrder.Reverse())
                 {
                     scalarEvolutionContext.ResetForLoop(loop);
@@ -36,7 +38,7 @@ namespace ILCompiler.Compiler
                     // Consider doing something useful here
                     _logger.LogInformation("Processing loop with header {LoopLabel}", loop.Header.Label);
 
-                    var strengthReductionContext = new StrengthReductionContext(scalarEvolutionContext, loop, loopInfo, locals, _flowgraph, _logger);
+                    var strengthReductionContext = new StrengthReductionContext(scalarEvolutionContext, loop, loopInfo, compiler.Locals, _flowgraph, _logger);
                     strengthReductionContext.TryStrengthReduce();
 
                     // TODO: Remove unused IVs
@@ -76,10 +78,10 @@ namespace ILCompiler.Compiler
             private readonly LocalVariableTable _locals;
             private readonly IFlowgraph _flowgraph;
 
-            private readonly ILogger<InductionVariableOptimizer> _logger;
+            private readonly ILogger _logger;
 
             public StrengthReductionContext(ScevContext scalarEvolutionContext, FlowGraphNaturalLoop loop, PerLoopInfo loopInfo, LocalVariableTable locals,
-                IFlowgraph flowgraph, ILogger<InductionVariableOptimizer> logger)
+                IFlowgraph flowgraph, ILogger logger)
             {
                 ScalarEvolutionContext = scalarEvolutionContext;
                 Loop = loop;

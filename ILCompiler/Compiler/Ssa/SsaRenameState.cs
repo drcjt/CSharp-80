@@ -11,10 +11,10 @@ namespace ILCompiler.Compiler.Ssa
             public int SsaNumber;
         }
 
-        private readonly ILogger<SsaBuilder> _logger;
+        private readonly ILogger _logger;
         private readonly Stack<StackNode>[] _stacks;
 
-        public SsaRenameState(ILogger<SsaBuilder> logger, int lclCount)
+        public SsaRenameState(ILogger logger, int lclCount)
         {
             _logger = logger;
             _stacks = new Stack<StackNode>[lclCount];

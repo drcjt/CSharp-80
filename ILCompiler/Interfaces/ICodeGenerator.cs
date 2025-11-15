@@ -6,6 +6,6 @@ namespace ILCompiler.Interfaces
 {
     public interface ICodeGenerator : IPhase
     {
-        public IList<Instruction> Generate(IList<BasicBlock> blocks, LocalVariableTable locals, Z80MethodCodeNode methodCodeNode);
+        public IList<Instruction> Generate(MethodCompiler compiler, Z80MethodCodeNode methodCodeNode);
     }
 }

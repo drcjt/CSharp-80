@@ -14,6 +14,9 @@ namespace ILCompiler.Compiler
         private readonly PreinitializationManager _preinitializationManager;
         private readonly INameMangler _nameMangler;
         private readonly CodeFolder _codeFolder;
+
+        private MethodCompiler _compiler = default!;
+
         public Morpher(PreinitializationManager preinitializationManager, INameMangler nameMangler, CodeFolder codeFolder)
         {
             _preinitializationManager = preinitializationManager;
@@ -22,18 +25,22 @@ namespace ILCompiler.Compiler
         }
 
         private LocalVariableTable? _locals;
-        public void Morph(IList<BasicBlock> blocks, LocalVariableTable locals)
+        public void Morph()
         {
-            _locals = locals;
-            foreach (var block in blocks)
+            _locals = _compiler.Locals;
+            foreach (var block in _compiler.Blocks)
             {
                 // fgMorphBlocks -> fgMorphStmts -> fgMorphTree -> fgMorphSmpOp -> fgMorphArrayIndex
                 MorphStatements(block);
             }
         }
 
-        public void Init(MethodDesc method, IList<BasicBlock> blocks)
+        public void Init(MethodCompiler compiler)
         {
+            _compiler = compiler;
+
+            MethodDesc method = _compiler.Method!;
+
             var staticConstructorMethod = method.GetStaticConstructor();
             if (staticConstructorMethod is not null && !_preinitializationManager.IsPreinitialized(method.OwningType))
             {
@@ -43,9 +50,9 @@ namespace ILCompiler.Compiler
 
                 var newStatement = new Statement(staticInitCall);
 
-                if (blocks.Count > 0)
+                if (_compiler.Blocks.Count > 0)
                 {
-                    var firstBlock = blocks[0];
+                    var firstBlock = _compiler.Blocks[0];
 
                     if (firstBlock.Statements.Count > 0)
                     {
