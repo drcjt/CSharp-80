@@ -38,6 +38,9 @@
         Push,
         Pop,
         Sbc,
-        Srl,       
+        Srl,
+
+        Scf,
+        Xor,
     }
 }
