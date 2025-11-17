@@ -42,15 +42,56 @@ namespace ILCompiler.Compiler
                     strengthReductionContext.TryStrengthReduce();
 
                     // TODO: Remove unused IVs
+                    RemoveUnusedIVs(loop, loopInfo, compiler.Flowgraph!, compiler.Locals);
                 }
             }
         }
 
-        public static bool LocalHasNonLoopUses(int lclNum, FlowGraphNaturalLoop loop, PerLoopInfo loopInfo)
+        private void RemoveUnusedIVs(FlowGraphNaturalLoop loop, PerLoopInfo loopInfo, IFlowgraph flowgraph, LocalVariableTable locals)
+        {
+            for (int i = 0; i < loop.Header.Statements.Count; i++)
+            {
+                Statement statement = loop.Header.Statements[i];
+                if (!statement.IsPhiDefinition)
+                {
+                    break;
+                }
+                int lclNum = ((LocalVariableCommon)statement.RootNode).LocalNumber;
+                _logger.LogInformation("  V{LocalNumber}", lclNum);
+
+                // Check for non-loop uses
+                if (LocalHasNonLoopUses(lclNum, loop, loopInfo, locals))
+                {
+                    _logger.LogInformation(" has non-loop uses, cannot remove");
+                    continue;
+                }
+
+                bool Visitor(BasicBlock block, Statement stmt) => StrengthReductionContext.IsUpdateOfIVWithoutSideEffects(stmt.RootNode, lclNum);
+
+                if (!loopInfo.VisitStatementsWithOccurrences(loop, lclNum, Visitor))
+                {
+                    _logger.LogInformation(" has essential uses, cannot remove");
+                    continue;
+                }
+
+                _logger.LogInformation(" has no essential uses, removing");
+
+                bool Remove(BasicBlock block, Statement stmt)
+                {
+                    flowgraph.RemoveStatement(block, stmt);
+                    return true;
+                }
+
+                loopInfo.VisitStatementsWithOccurrences(loop, lclNum, Remove);
+                loopInfo.Invalidate(loop);
+            }
+        }
+
+        public static bool LocalHasNonLoopUses(int lclNum, FlowGraphNaturalLoop loop, PerLoopInfo loopInfo, LocalVariableTable locals)
         {
             bool visitResult = loop.VisitRegularExitBlocks(block =>
             {
-                return !LocalIsLiveIntoBlock(lclNum, block);
+                return !LocalIsLiveIntoBlock(lclNum, block, locals);
             });
 
             if (!visitResult)
@@ -60,9 +101,18 @@ namespace ILCompiler.Compiler
             return false;
         }
 
-        private static bool LocalIsLiveIntoBlock(int lclNum, BasicBlock block)
+        private static bool LocalIsLiveIntoBlock(int lclNum, BasicBlock block, LocalVariableTable locals)
         {
-            return block.LiveIn.IsMember(lclNum);
+            LocalVariableDescriptor dsc = locals[lclNum];
+            if (dsc.Tracked)
+            {
+                return block.LiveIn.IsMember(lclNum);
+            }
+
+            Debug.Assert(dsc.InSsa);
+
+            // TODO: Handle SSA inserted locals
+            throw new NotImplementedException();
         }
 
         internal class StrengthReductionContext
@@ -125,7 +175,12 @@ namespace ILCompiler.Compiler
                         continue;
                     }
 
-                    // TODO: check for non-loop uses
+                    // Check for non-loop uses
+                    if (LocalHasNonLoopUses(primaryIVLcl.LocalNumber, Loop, LoopInfo, _locals))
+                    {
+                        _logger.LogInformation("   Has non-loop uses");
+                        continue;
+                    }
 
                     ScevAddRec primaryIV = (ScevAddRec)candidate;
 
@@ -658,7 +713,7 @@ namespace ILCompiler.Compiler
                 return false;
             }
 
-            private static bool IsUpdateOfIVWithoutSideEffects(StackEntry tree, int localNumber)
+            public static bool IsUpdateOfIVWithoutSideEffects(StackEntry tree, int localNumber)
             {
                 if (tree is not StoreLocalVariableEntry)
                 {
