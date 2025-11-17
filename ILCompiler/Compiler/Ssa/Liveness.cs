@@ -48,7 +48,7 @@ namespace ILCompiler.Compiler
         private static void InterBlockLocalVarLiveness(MethodCompiler compiler)
         {
             // Compute the IN and OUT sets using classic liveness algorithm
-            LiveVarAnalyzer.AnalyzeLiveVars(compiler.Blocks);
+            LiveVarAnalyzer.AnalyzeLiveVars(compiler.Blocks, compiler.DfsTree!);
 
             LocalVariableTable locals = compiler.Locals;
 

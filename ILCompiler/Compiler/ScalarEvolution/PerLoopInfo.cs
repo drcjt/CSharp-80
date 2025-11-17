@@ -112,6 +112,41 @@ namespace ILCompiler.Compiler.ScalarEvolution
             return VisitLoopNestInfo(loop, Visitor);
         }
 
+        public bool VisitStatementsWithOccurrences(FlowGraphNaturalLoop loop, int lclNum, Func<BasicBlock, Statement, bool> func)
+        {
+            bool Visitor(LoopInfo info)
+            {
+                if (info.LocalToOccurrences!.TryGetValue(lclNum, out Occurrence? occurrence))
+                {
+                    while (true)
+                    {
+                        if (!func(occurrence.Block, occurrence.Stmt))
+                        {
+                            return false;
+                        }
+
+                        Statement curStmt = occurrence.Stmt;
+                        while (true)
+                        {
+                            occurrence = occurrence.Next;
+                            if (occurrence is null)
+                            {
+                                return true;
+                            }
+                            if (occurrence.Stmt != curStmt)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                return true;
+            }
+
+            return VisitLoopNestInfo(loop, Visitor);
+        }
+
         public void Invalidate(FlowGraphNaturalLoop loop)
         {
             for (FlowGraphNaturalLoop? child = loop.Child; child is not null; child = child.Sibling)
