@@ -1,14 +1,16 @@
-﻿namespace ILCompiler.Compiler.Ssa
+﻿using ILCompiler.Compiler.FlowgraphHelpers;
+
+namespace ILCompiler.Compiler.Ssa
 {
     internal sealed class LiveVarAnalyzer
     {
         readonly VariableSet _liveIn;
         readonly VariableSet _liveOut;
 
-        public static void AnalyzeLiveVars(IList<BasicBlock> blocks)
+        public static void AnalyzeLiveVars(IList<BasicBlock> blocks, FlowgraphDfsTree dfsTree)
         {
             var analyzer = new LiveVarAnalyzer();
-            analyzer.Run(blocks);
+            analyzer.Run(blocks, dfsTree);
         }
 
         public LiveVarAnalyzer()
@@ -20,6 +22,7 @@
         private bool PerBlockAnalysis(BasicBlock block)
         {
             // Compute the liveOut set
+            _liveOut.Clear();
 
             // When block ends with a Jmp need to mark all parameters as live at the Jmp
             // Note importer does not currently handle jmp cil and the JumpEntry node is
@@ -54,6 +57,7 @@
         // in = use | (out & ~def)
         public static void Liveness(VariableSet liveIn, VariableSet def, VariableSet use, VariableSet liveOut)
         {
+            liveIn.Clear();
             foreach (var variable in use)
             {
                 liveIn.AddElem(variable);
@@ -68,7 +72,7 @@
             }
         }
 
-        public void Run(IList<BasicBlock> blocks)
+        public void Run(IList<BasicBlock> blocks, FlowgraphDfsTree dfsTree)
         {
             bool changed;
             do
@@ -78,14 +82,14 @@
                 _liveIn.Clear();
                 _liveOut.Clear();
 
-                foreach (var block in blocks)
+                foreach (BasicBlock block in dfsTree.PostOrder)
                 {
                     if (PerBlockAnalysis(block))
                     {
                         changed = true;
                     }
                 }
-            } while (changed);
+            } while (changed && dfsTree.HasCycle);
         }
     }
 }
