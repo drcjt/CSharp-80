@@ -33,6 +33,10 @@ namespace ILCompiler.Compiler.Lowerings
                 case Operation.Rsh:
                     LowerShift(entry);
                     break;
+
+                case Operation.Eq:
+                    LowerEq(entry);
+                    break;
             }
 
             return null;
@@ -144,6 +148,17 @@ namespace ILCompiler.Compiler.Lowerings
         private static void LowerSub(BinaryOperator sub)
         {
             ContainCheckBinary(sub);
+        }
+
+        private static void LowerEq(BinaryOperator eq)
+        {
+            if (eq.Op2.IsIntCnsOrI())
+            {
+                if (eq.Op2.IsIntegralConstant(0) && eq.IsComparison)
+                {                    
+                    ContainCheckBinary(eq);
+                }
+            }
         }
 
         private static void LowerShift(BinaryOperator lsh)

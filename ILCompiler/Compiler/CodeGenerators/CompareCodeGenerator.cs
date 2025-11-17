@@ -1,5 +1,5 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using ILCompiler.Compiler.EvaluationStack;
 using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler.CodeGenerators
@@ -43,7 +43,14 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             if (ComparisonOperatorMappings.TryGetValue(Tuple.Create(entry.Operation, op1Type), out string? routine))
             {
-                context.InstructionsBuilder.Call(routine);
+                if (entry.Operation == Operation.Eq && entry.Op2.IsContainedIntOrI() && entry.Op2.IsIntegralConstant(0))
+                {
+                    GenerateEqualsZero(context, op1Type);
+                }
+                else
+                {
+                    context.InstructionsBuilder.Call(routine);
+                }
 
                 if (!entry.ResultUsedInJump)
                 {
@@ -60,6 +67,42 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 throw new NotImplementedException($"Binary operator {entry.Operation} for type {op1Type} not yet implemented");
             }
+        }
+
+        private static void GenerateEqualsZero(CodeGeneratorContext context, VarType op1Type)
+        {
+            if (op1Type == VarType.Ptr || op1Type == VarType.Ref)
+            {
+                context.InstructionsBuilder.Pop(HL);
+                context.InstructionsBuilder.Ld(A, H);
+                context.InstructionsBuilder.Or(L);
+
+                SetCarryFlagBasedOnZeroFlag(context);
+            }
+            else
+            {
+                context.InstructionsBuilder.Pop(HL);
+                context.InstructionsBuilder.Pop(DE);
+                context.InstructionsBuilder.Ld(A, D);
+                context.InstructionsBuilder.Or(E);
+                context.InstructionsBuilder.Or(H);
+                context.InstructionsBuilder.Or(L);
+
+                SetCarryFlagBasedOnZeroFlag(context);
+            }
+        }
+
+        private static void SetCarryFlagBasedOnZeroFlag(CodeGeneratorContext context)
+        {
+            var notZeroLabel = context.NameMangler.GetUniqueName();
+            var endLabel = context.NameMangler.GetUniqueName();
+
+            context.InstructionsBuilder.Jr(Emit.Condition.NZ, notZeroLabel);
+            context.InstructionsBuilder.Scf();
+            context.InstructionsBuilder.Jr(endLabel);
+            context.InstructionsBuilder.Label(notZeroLabel);
+            context.InstructionsBuilder.Xor(A); // Clear carry flag
+            context.InstructionsBuilder.Label(endLabel);
         }
     }
 }
