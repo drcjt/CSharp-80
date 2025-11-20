@@ -88,11 +88,18 @@ SearchDispatchMap:
 	LD (INTFSLOTS), A
 	INC HL
 
-	LD (VTABLE), HL
+    PUSH HL
 
-	; Skip over the vtable
+StoreVTable:
+    LD (VTABLE), HL
 
-	EX DE, HL
+    ; Overwrite StoreVTable to be a JP $+7
+    LD HL, 0x0718
+    LD (StoreVTable), HL
+
+    ; Skip over the vtable
+    POP DE
+
 	LD H, 0
 	LD L, B
 	ADD HL, HL		; 2 * vtable slots
@@ -157,9 +164,15 @@ NoMatch:
 	INC HL	; Skip implementation slot
 	DJNZ NextMapEntry
 
-	JR CheckType
+	JP CheckType
 
-Match:	
+Match:
+    ; Replace StoreTgtVTable with original instructions, 22 XX XX
+    LD A, 0x22
+    LD (StoreVTable), A
+    LD HL, VTable
+    LD (StoreVTable + 1), HL
+
 	POP HL
 
 	; Got right dispatch map entry - get the implementation slot
@@ -182,4 +195,4 @@ BASETYPE:		DW 0
 INTFSLOTS:		DB 0
 INTFMAP			DW 0
 INTFINDEX:		DB 0
-VTABLE:			DW 0 
+VTABLE:         DW 0
