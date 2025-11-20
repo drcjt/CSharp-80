@@ -6,5 +6,10 @@
         {
             throw new IndexOutOfRangeException();
         }
+
+        internal static void ThrowNotSupportedException()
+        {
+            throw new NotSupportedException();
+        }
     }
 }
