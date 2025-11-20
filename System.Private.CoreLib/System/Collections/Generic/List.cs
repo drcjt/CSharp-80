@@ -1,4 +1,6 @@
-﻿namespace System.Collections.Generic
+﻿using System.Runtime.CompilerServices;
+
+namespace System.Collections.Generic
 {
     public class List<T> : IList<T>
     {
@@ -6,6 +8,8 @@
 
         internal T[] _items;
         internal int _size;
+
+        private static readonly T[] s_emptyArray = new T[0];
 
         public List()
         {
@@ -70,10 +74,28 @@
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(T item)
         {
-            if (_size == _items.Length) { EnsureCapacity(_size + 1); }
-            _items[_size++] = item;
+            T[] array = _items;
+            int size = _size;
+            if (size < array.Length)
+            {
+                _size = size + 1;
+                array[size] = item;
+            }
+            else
+            {
+                AddWithResize(item);
+            }
+        }
+
+        private void AddWithResize(T item)
+        {
+            int size = _size;
+            Grow(size + 1);
+            _size = size + 1;
+            _items[size] = item;
         }
 
         public bool Remove(T item)
@@ -88,14 +110,31 @@
             return false;
         }
 
-        private void EnsureCapacity(int min)
+        internal void Grow(int capacity)
         {
-            if (_items.Length < min)
+            Capacity = GetNewCapacity(capacity);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int GetNewCapacity(int capacity)
+        {
+            int newCapacity = _items.Length == 0 ? DefaultCapacity : _items.Length * 2;
+
+            if (newCapacity > Array.MaxLength) newCapacity = Array.MaxLength;
+
+            if (newCapacity < capacity) newCapacity = capacity;
+
+            return newCapacity;
+        }
+
+        private int EnsureCapacity(int capacity)
+        {
+            if (_items.Length < capacity)
             {
-                int newCapacity = _items.Length == 0 ? DefaultCapacity : _items.Length * 2;
-                if (newCapacity < min) newCapacity = min;
-                Capacity = newCapacity;
+                Grow(capacity);
             }
+
+            return _items.Length;
         }
 
         public void Clear()
@@ -141,6 +180,19 @@
             throw new NotImplementedException();
         }
 
+        public T[] ToArray()
+        {
+            if (_size == 0)
+            {
+                return s_emptyArray;
+            }
+
+            T[] array = new T[_size];
+            Array.Copy(_items, array, _size);
+            return array;
+        }
+
+
         private struct ListEnumeratorSimple : IEnumerator<T>
         {
             private readonly List<T> _list;
@@ -179,8 +231,8 @@
                 _index = -1;
             }
 
-            public void Dispose() 
-            { 
+            public void Dispose()
+            {
             }
         }
     }
