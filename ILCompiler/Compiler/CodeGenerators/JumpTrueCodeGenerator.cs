@@ -108,8 +108,11 @@ namespace ILCompiler.Compiler.CodeGenerators
             {
                 context.InstructionsBuilder.Pop(HL);
                 context.InstructionsBuilder.Pop(BC);
-                context.InstructionsBuilder.And(A);
-                context.InstructionsBuilder.Sbc(HL, BC);
+
+                context.InstructionsBuilder.Ld(A, H); 
+                context.InstructionsBuilder.Or(L);
+                context.InstructionsBuilder.Or(B);
+                context.InstructionsBuilder.Or(C);
             }
             context.InstructionsBuilder.Jp(condition, entry.TargetLabel);
         }
