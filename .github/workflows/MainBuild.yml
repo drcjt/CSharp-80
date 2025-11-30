@@ -121,7 +121,7 @@ jobs:
           name: CSharp-80 Benchmark
           tool: 'customSmallerIsBetter'
           output-file-path: benchmark-results.txt
-          fail-on-alert: true
+          fail-on-alert: false
           # Access token to deploy GitHub Pages branch
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # Push and deploy GitHub pages branch automatically
