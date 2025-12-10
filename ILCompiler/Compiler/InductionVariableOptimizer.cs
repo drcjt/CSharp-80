@@ -383,7 +383,7 @@ namespace ILCompiler.Compiler
                 _flowgraph.InsertStatementNearEnd(preHeader, initStmt);
 
                 _logger.LogInformation("   Inserting init statement in preheader {PreHeaderLabel}", preHeader.Label);
-                _logger.LogInformation(dumper.Dump(initStmt));
+                _logger.LogInformation(dumper.Dump(initStmt, _locals));
 
                 StackEntry nextValue = new BinaryOperator(Operation.Add, false, new LocalVariableEntry(newPrimaryIV, iv.Type, iv.Type.GetTypeSize()), stepValue, iv.Type);
                 StackEntry stepStore = NewTempStore(newPrimaryIV, nextValue);
@@ -392,7 +392,7 @@ namespace ILCompiler.Compiler
                 _flowgraph.InsertStatementNearEnd(insertionPoint, stepStmt);
 
                 _logger.LogInformation("   Inserting step statement in {InsertionPointLabel}", insertionPoint.Label);
-                _logger.LogInformation(dumper.Dump(stepStmt));
+                _logger.LogInformation(dumper.Dump(stepStmt, _locals));
 
                 // replace uses
                 for (int i = 0; i < cursors.Count; i++)
@@ -402,7 +402,7 @@ namespace ILCompiler.Compiler
                     newUse = RephraseIV(cursor.IV!, iv, newUse);
 
                     _logger.LogInformation("   Replacing use {OriginalTreeID} with {NewTreeID}. Before:", cursor.Tree!.TreeID, newUse.TreeID);
-                    _logger.LogInformation(dumper.Dump(cursor.Stmt));
+                    _logger.LogInformation(dumper.Dump(cursor.Stmt, _locals));
 
                     Edge<StackEntry>? use;
                     if (cursor.Stmt.RootNode == cursor.Tree)
@@ -421,7 +421,7 @@ namespace ILCompiler.Compiler
                     use!.Set(newUse);
 
                     _logger.LogInformation("   After:");
-                    _logger.LogInformation(dumper.Dump(cursor.Stmt));
+                    _logger.LogInformation(dumper.Dump(cursor.Stmt, _locals));
 
                     _flowgraph.SetStatementSequence(cursor.Stmt);
                 }
