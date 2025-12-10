@@ -11,9 +11,9 @@
     {
         private static readonly Dictionary<LabelType, string> _labelFormatByType = new Dictionary<LabelType, string>()
         {
-            { LabelType.BasicBlock, "bb{0}" },
-            { LabelType.String, "s{0}" },
-            { LabelType.FieldRVAData, "frva{0}" }
+            { LabelType.BasicBlock, "BB{0:00}" },
+            { LabelType.String, "S{0}" },
+            { LabelType.FieldRVAData, "FRVA{0}" }
         };
 
 

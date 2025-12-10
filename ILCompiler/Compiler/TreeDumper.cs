@@ -1,80 +1,136 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
-using System.Text;
+﻿using System.Text;
+using ILCompiler.Compiler.EvaluationStack;
 
 namespace ILCompiler.Compiler
 {
     public class TreeDumper : IStackEntryVisitor
     {
         private int _indent;
+        private LocalVariableTable _locals = default!;
+        private readonly StringBuilder _sb = new();
 
-        private readonly StringBuilder _sb = new StringBuilder();
-
-        public string Dump(Statement statement)
+        public string Dump(Statement statement, LocalVariableTable locals)
         {
+            _locals = locals;
+
             _sb.Clear();
             _indent = 0;
             statement.RootNode.Accept(this);
             return _sb.ToString();
         }
 
-        public string Dump(IList<BasicBlock> blocks)
+        public string Dump(IList<BasicBlock> blocks, LocalVariableTable locals)
         {
-            var stmtId = 0;
+            _locals = locals;
+            int statementId = 0;
 
             _sb.Clear();
-            foreach (var block in blocks)
+            foreach (BasicBlock block in blocks)
             {
-                _sb.AppendLine($"BLOCK {block.Label}");
+                string blockKind = GetBlockKind(block);
+                string blockPreds = GetBlocks(block.Predecessors);
+                string blockSuccs = GetBlocks(block.Successors);
+                _sb.AppendLine($"{block.Label} [{block.StartOffset:0000}] ({blockKind}) preds={{{blockPreds}}} succs={{{blockSuccs}}}");
 
-                _sb.Append($"BLOCK SUCCESSORS: ");
-                foreach (var successor in block.Successors)
-                {
-                    _sb.Append($"${successor.Label}, ");
-                }
-                _sb.AppendLine();
-
-                foreach (var statement in block.Statements)
+                foreach (Statement statement in block.Statements)
                 {
                     _indent = 0;
-                    _sb.AppendLine($"STMT{stmtId}");
+                    _sb.AppendLine($"STMT{statementId:00000} [0x{statement.StartOffset:X3} ... 0x{statement.EndOffset:X3})");
                     _indent++;
 
                     statement.RootNode.Accept(this);
-                    stmtId++;
+                    statementId++;
                 }
+
+                _sb.AppendLine();
             }
             return _sb.ToString();
         }
 
-        private void Print(string text)
+        private static string GetBlocks(IList<BasicBlock> blocks)
         {
-            _sb.AppendLine(new String(' ', _indent * 3) + "▌ " + text);
+            bool first = true;
+            StringBuilder sb = new();
+            foreach (BasicBlock block in blocks)
+            {
+                if (!first)
+                {
+                    sb.Append(',');
+                }
+                sb.Append(block.Label);
+                first = false;
+            }
+            return sb.ToString();
+        }
+
+        private static string GetBlockKind(BasicBlock block) => 
+            block.JumpKind switch
+            {
+                JumpKind.Return => "return",
+                JumpKind.Always => "always",
+                JumpKind.Conditional => "cond",
+                JumpKind.Switch => "switch",
+                _ => "unknown",
+            };
+
+        private static string GetLocalName(LocalVariableDescriptor local)
+        {
+            string result = "";
+            if (string.IsNullOrEmpty(local.Name))
+            {
+                if (local.IsTemp)
+                {
+                    result = "(tmp)";
+                }
+            }
+            else
+            {
+                result = $"({local.Name})";
+            }
+
+            return result;
+        }
+
+        private void PrintNodeText(StackEntry tree, string text)
+        {
+            string nodeText = new String(' ', _indent * 2) + text;
+            _sb.AppendLine($"  [{tree.TreeID:000000}] ------------              *{nodeText}");
+        }
+
+        private void Print(StackEntry tree, string nodeName, VarType? type = null, string postText = "")
+        {
+            PrintNodeText(tree, $"{nodeName.ToUpper()} {(type ?? tree.Type).ToString().ToLower()} {postText}");
+        }
+
+        private void Print(StackEntry tree, string nodeName, VarType? type, int localNumber)
+        {
+            LocalVariableDescriptor local = _locals[localNumber];
+            string localName = GetLocalName(local);
+            Print(tree, nodeName, type, $"V{localNumber} {localName}");
         }
 
         public void Visit(NativeIntConstantEntry entry)
         {
-            Print($"nativeintconst {entry.Value}");
+            Print(entry, "CNS_INT", VarType.Ptr, entry.Value.ToString());
         }
 
         public void Visit(Int32ConstantEntry entry)
         {
-            Print($"CNS_INT {entry.Value}");
+            Print(entry, "CNS_INT", entry.Type, entry.Value.ToString());
         }
 
         public void Visit(StoreIndEntry entry)
         {
+            Print(entry, $"STORE_IND offset={entry.FieldOffset} size={entry.ExactSize} vartype={entry.Type}");
             _indent++;
             entry.Addr.Accept(this);
-            _indent--;
-            Print($"STORE_IND offset={entry.FieldOffset} size={entry.ExactSize} vartype={entry.Type}");
-            _indent++;
             entry.Op1.Accept(this);
             _indent--;
         }
 
         public void Visit(JumpTrueEntry entry)
         {
-            Print($"JCMP {entry.TargetLabel}");
+            Print(entry, "JTRUE");
             _indent++;
             entry.Condition.Accept(this);
             _indent--;
@@ -82,25 +138,25 @@ namespace ILCompiler.Compiler
 
         public void Visit(JumpEntry entry)
         {
-            Print($"JMP {entry.TargetLabel}");
+            Print(entry, "JMP");
         }
 
         public void Visit(TokenEntry entry)
         {
-            Print($"TOKEN {entry.Field.Name}");
+            Print(entry, $"TOKEN {entry.Field.Name}");
         }
 
         public void Visit(SwitchEntry entry)
         {
+            Print(entry, $"SWITCH {entry.JumpTable}");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
-            Print($"SWITCH {entry.JumpTable}");
         }
 
         public void Visit(ReturnEntry entry)
         {
-            Print("RETURN");
+            Print(entry, "RETURN");
             if (entry.Return != null)
             {
                 _indent++;
@@ -111,39 +167,35 @@ namespace ILCompiler.Compiler
 
         public void Visit(BinaryOperator entry)
         {
+            Print(entry, entry.Operation.ToString());
             _indent++;
             entry.Op1.Accept(this);
-            _indent--;
-            Print($"{entry.Operation}");
-            _indent++;
             entry.Op2.Accept(this);
             _indent--;
         }
 
         public void Visit(CommaEntry entry)
         {
+            Print(entry, "COMMA");
             _indent++;
             entry.Op1.Accept(this);
-            _indent--;
-            Print("COMMA");
-            _indent++;
             entry.Op2.Accept(this);
             _indent--;
         }
 
         public void Visit(LocalVariableEntry entry)
         {
-            Print($"LCL_VAR {entry.Type} V{entry.LocalNumber}");
+            Print(entry, "LCL_VAR", entry.Type, entry.LocalNumber);
         }
 
         public void Visit(LocalVariableAddressEntry entry)
         {
-            Print($"LCL_VAR_ADDR V{entry.LocalNumber}");
+            Print(entry, $"LCL_VAR_ADDR", entry.Type, entry.LocalNumber);
         }
 
         public void Visit(StoreLocalVariableEntry entry)
         {
-            Print($"STORE_LCL_VAR {entry.LocalNumber}");
+            Print(entry, "STORE_LCL_VAR", entry.Op1.Type, entry.LocalNumber);
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
@@ -151,9 +203,9 @@ namespace ILCompiler.Compiler
 
         public void Visit(CallEntry entry)
         {
-            Print($"CALL {entry.TargetMethod}");
+            Print(entry, "CALL", entry.Type, entry.Method!.Name);
             _indent++;
-            foreach (var argument in entry.Arguments)
+            foreach (StackEntry argument in entry.Arguments)
             {
                 argument.Accept(this);
             }
@@ -162,9 +214,9 @@ namespace ILCompiler.Compiler
 
         public void Visit(IntrinsicEntry entry)
         {
-            Print($"{entry.TargetMethod}");
+            Print(entry, "CALL", entry.Type, $"intrinsic {entry.TargetMethod}");
             _indent++;
-            foreach (var argument in entry.Arguments)
+            foreach (StackEntry argument in entry.Arguments)
             {
                 argument.Accept(this);
             }
@@ -173,7 +225,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(CastEntry entry)
         {
-            Print($"CAST {entry.Type}");
+            Print(entry, "CAST");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
@@ -181,7 +233,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(ArrayLengthEntry entry)
         {
-            Print($"ARRAYLENGTH {entry.Type}");
+            Print(entry, "ARRAYLENGTH");
             _indent++;
             entry.ArrayReference.Accept(this);
             _indent--;
@@ -189,7 +241,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(NullCheckEntry entry)
         {
-            Print($"NULLCHECK");
+            Print(entry, "NULLCHECK");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
@@ -197,7 +249,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(PutArgTypeEntry entry)
         {
-            Print($"PUTARG_TYPE {entry.ArgType}");
+            Print(entry, "PUTARG_TYPE", entry.ArgType);
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
@@ -205,7 +257,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(UnaryOperator entry)
         {
-            Print($"{entry.Operation}");
+            Print(entry, entry.Operation.ToString());
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
@@ -213,7 +265,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(IndirectEntry entry)
         {
-            Print($"IND {entry.Offset}");
+            Print(entry, $"IND {entry.Offset}");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
@@ -221,7 +273,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(FieldAddressEntry entry)
         {
-            Print($"FLD_ADDR {entry.Name}");
+            Print(entry, $"FLD_ADDR {entry.Name}");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
@@ -229,12 +281,12 @@ namespace ILCompiler.Compiler
 
         public void Visit(SymbolConstantEntry entry)
         {
-            Print($"SYMBOL {entry.Value}");
+            Print(entry, $"SYMBOL {entry.Value}");
         }
 
         public void Visit(AllocObjEntry entry)
         {
-            Print($"ALLOCOBJ");
+            Print(entry, "ALLOCOBJ");
             _indent++;
             entry.EETypeNode.Accept(this);
             _indent--;
@@ -242,7 +294,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(LocalHeapEntry entry)
         {
-            Print($"LCLHEAP");
+            Print(entry, "LCLHEAP");
             _indent++;
             entry.Op1.Accept(this);
             _indent--;
@@ -250,9 +302,9 @@ namespace ILCompiler.Compiler
 
         public void Visit(PhiNode entry)
         {
-            Print($"PHI ");
+            Print(entry, "PHI ");
             _indent++;
-            foreach (var argument in entry.Arguments)
+            foreach (PhiArg argument in entry.Arguments)
             {
                 argument.Accept(this);
             }
@@ -261,23 +313,21 @@ namespace ILCompiler.Compiler
 
         public void Visit(PhiArg entry)
         {
-            Print($"PHIARG V{entry.LocalNumber:00} ssa{entry.SsaNumber} {entry.Type}");
+            Print(entry, "PHIARG");
         }
 
         public void Visit(IndexRefEntry entry)
         {
-            _indent++;
-            entry.IndexOp.Accept(this);
-            _indent--;
-            Print($"[]");
+            Print(entry, "[]");
             _indent++;
             entry.ArrayOp.Accept(this);
+            entry.IndexOp.Accept(this);
             _indent--;
         }
 
         public void Visit(BoundsCheck entry)
         {
-            Print($"BOUNDS_CHECK");
+            Print(entry, "BOUNDS_CHECK");
             _indent++;
             entry.Index.Accept(this);
             entry.ArrayLength.Accept(this);
@@ -286,12 +336,12 @@ namespace ILCompiler.Compiler
 
         public void Visit(CatchArgumentEntry entry)
         {
-            Print($"CATCH_ARGUMENT");
+            Print(entry, "CATCH_ARGUMENT");
         }
 
         public void Visit(ReturnExpressionEntry entry)
         {
-            Print($"RETURN_EXPRESSION {entry.Type}");
+            Print(entry, "RETURN_EXPRESSION");
             _indent++;
             entry.InlineCandidate.Accept(this);
             _indent--;
@@ -299,7 +349,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(NothingEntry entry)
         {
-            Print($"NOTHING");
+            Print(entry, "NOTHING");
         }
     }
 }

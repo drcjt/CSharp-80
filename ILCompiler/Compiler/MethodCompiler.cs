@@ -183,16 +183,23 @@ namespace ILCompiler.Compiler
 
                 int lclNum = 0;
                 StringBuilder sb = new();
+                sb.AppendLine("Local var info:");
                 foreach (var lclVar in Locals)
                 {
-                    sb.AppendLine($"LCLVAR {lclNum} {lclVar.Name} {lclVar.IsParameter} {lclVar.Type} {lclVar.ExactSize}");
+                    var name = lclVar.Name;
+                    if (lclVar.IsTemp)
+                    {
+                        name = "tmp";
+                    }
+
+                    sb.AppendLine($"  V{lclNum:00} {name} {lclVar.IsParameter} {lclVar.Type.ToString().ToLower()} {lclVar.ExactSize}");
 
                     lclNum++;
                 }
                 _logger.LogInformation("{LocalVars}", sb.ToString());
 
                 var treeDumper = new TreeDumper();
-                var treedump = treeDumper.Dump(Blocks);
+                var treedump = treeDumper.Dump(Blocks, Locals);
                 _logger.LogInformation("{Treedump}", treedump);
             }
         }
