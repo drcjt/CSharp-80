@@ -5,6 +5,16 @@ namespace System
 {
     internal static class SpanHelpers
     {
+        public static unsafe void Fill<T>(ref T refData, nuint length, T value)
+        {
+            if (length == 0)
+                return;
+
+            for (nuint i = 0; i < length; i++)
+            {
+                Unsafe.Add(ref refData, (nint)i) = value;
+            }
+        }
 
         [Intrinsic]
         internal static unsafe void Memmove(ref byte dest, ref byte src, nuint len)

@@ -68,6 +68,18 @@ namespace System
             return result;
         }
 
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        [DynamicDependency("Ctor(System.Char,System.Int32)")]
+        public extern String(char c, int count);
+
+        internal unsafe static string Ctor(char c, int count)
+        {
+            string result = RuntimeImports.NewString(EEType.Of<string>(), (nuint)count);
+            SpanHelpers.Fill(ref result._firstChar, (uint)count, c);
+            return result;
+        }
+
+
         public bool Contains(char value)
         {
             for (int i = 0; i < _length; i++)
