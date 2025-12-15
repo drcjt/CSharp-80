@@ -35,6 +35,13 @@ namespace System.String.Tests
             Assert.Equal(expected, new string(span));
         }
 
+        [Fact]
+        public static void Ctor_Char_Int()
+        {
+            Assert.Equal("aaa", new string('a', 3));
+            Assert.Equal(string.Empty, new string('a', 0));
+        }
+
         [Theory]
         [InlineData("Hello", 'H', true)]
         [InlineData("Hello", 'Z', false)]
