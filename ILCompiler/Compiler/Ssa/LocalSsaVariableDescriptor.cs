@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.ValueNumbering;
 
 namespace ILCompiler.Compiler.Ssa
 {
@@ -8,6 +9,8 @@ namespace ILCompiler.Compiler.Ssa
 
         public bool HasGlobalUse { get; private set; } = false;
         public bool HasPhiUse { get; private set; } = false;
+
+        public ValueNumber ValueNumber { get; set; }
 
         public int NumberOfUses { get; private set; } = 0;
 
