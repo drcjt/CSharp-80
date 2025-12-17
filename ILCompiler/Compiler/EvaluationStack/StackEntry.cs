@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler.LinearIR;
+using ILCompiler.Compiler.ValueNumbering;
 using System.Diagnostics.CodeAnalysis;
 
 namespace ILCompiler.Compiler.EvaluationStack
@@ -49,6 +50,7 @@ namespace ILCompiler.Compiler.EvaluationStack
 
         private static int _treeID = 0;
 
+        public ValueNumber? ValueNumber { get; set; }
         public bool Contained { get; set; }
 
         protected StackEntry(VarType type, int? exactSize = null)
