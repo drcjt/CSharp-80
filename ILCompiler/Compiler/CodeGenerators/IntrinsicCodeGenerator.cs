@@ -47,6 +47,17 @@ namespace ILCompiler.Compiler.CodeGenerators
                 case "Exit":
                     context.InstructionsBuilder.Jp("EXITRETCODE");
                     break;
+
+                case "DebugBreak":
+                    if (context.Configuration.TargetArchitecture == TargetArchitecture.TRS80)
+                    {
+                        context.InstructionsBuilder.Call(0x440d);
+                    }
+                    else
+                    {
+                        // TODO: Implement for other architectures
+                    }
+                    break;
             }
         }
     }

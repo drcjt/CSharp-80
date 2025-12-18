@@ -1,4 +1,6 @@
-﻿namespace System.Diagnostics
+﻿using System.Runtime.CompilerServices;
+
+namespace System.Diagnostics
 {
     public static class Debug
     {
@@ -25,6 +27,12 @@
         public static void WriteLine(string message)
         {
             Console.WriteLine(message);
+        }
+
+        [Intrinsic]
+        internal static void DebugBreak()
+        {
+            throw new PlatformNotSupportedException();
         }
     }
 }
