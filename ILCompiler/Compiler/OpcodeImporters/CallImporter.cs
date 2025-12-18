@@ -249,6 +249,13 @@ namespace ILCompiler.Compiler.OpcodeImporters
             var targetMethodName = methodToCall.Name;
             switch (targetMethodName)
             {
+                case "DebugBreak":
+                    {
+                        var callNode = new IntrinsicEntry(targetMethodName, arguments, VarType.Void);
+                        importer.ImportAppendTree(callNode);
+                        return true;
+                    }
+
                 case "Memmove":
                     if (IsTypeName(methodToCall, "System", "SpanHelpers"))
                     {
