@@ -30,6 +30,7 @@
         IsWithinFilter,
         IsRecursive,
         IsTooDeep,
+        IsWithinEHAndHasMultipleBlocks,
 
         Depth,
     }
@@ -63,6 +64,7 @@
         public static InlineObservation IsWithinFilter { get; } = new(InlineObservationName.IsWithinFilter, InlineTarget.CallSite);
         public static InlineObservation IsRecursive { get; } = new(InlineObservationName.IsRecursive, InlineTarget.CallSite);
         public static InlineObservation IsTooDeep { get; } = new(InlineObservationName.IsTooDeep, InlineTarget.CallSite);
+        public static InlineObservation IsWithinEHAndHasMultipleBlocks { get; } = new(InlineObservationName.IsWithinEHAndHasMultipleBlocks, InlineTarget.CallSite);
 
         // Callsite Information
         public static InlineObservation Depth { get; } = new(InlineObservationName.Depth, InlineTarget.CallSite);

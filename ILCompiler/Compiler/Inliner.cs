@@ -308,7 +308,10 @@ namespace ILCompiler.Compiler
             // Don't inline calls in blocks that have exception handlers
             // when we have multiple blocks in the inlinee
             if (blocks.Count > 1 && methodInfo.Block.Handlers.Count > 0)
+            {
+                inlineInfo.InlineResult!.NoteFatal(InlineObservation.IsWithinEHAndHasMultipleBlocks);
                 return false;
+            }
 
             inlineInfo.InlineContext!.SetSucceeded(inlineInfo);
 
