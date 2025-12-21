@@ -437,7 +437,7 @@ namespace ILCompiler.Compiler
             {
                 // Generate call to static constructor
                 var targetMethod = _nameMangler.GetMangledMethodName(inlineInfo.StaticConstructorMethod);
-                var staticInitCall = new CallEntry(targetMethod, [], VarType.Void, 0);
+                var staticInitCall = new CallEntry(targetMethod, [], VarType.Void, 0, method: inlineInfo.StaticConstructorMethod);
 
                 var newStatement = new Statement(staticInitCall);
 

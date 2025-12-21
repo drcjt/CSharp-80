@@ -298,7 +298,7 @@ namespace ILCompiler.Compiler
                 if (staticConstructorMethod != null)
                 {
                     var targetMethod = NameMangler.GetMangledMethodName(staticConstructorMethod);
-                    var staticInitCall = new CallEntry(targetMethod, [], VarType.Void, 0);
+                    var staticInitCall = new CallEntry(targetMethod, [], VarType.Void, 0, method: staticConstructorMethod);
 
                     BasicBlocks[0].Statements.Add(new Statement(staticInitCall));
                 }
