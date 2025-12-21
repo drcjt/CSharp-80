@@ -14,7 +14,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             {
                 // Generate call to static constructor
                 var targetMethod = importer.NameMangler.GetMangledMethodName(staticConstructorMethod);
-                var staticInitCall = new CallEntry(targetMethod, new List<StackEntry>(), VarType.Void, 0);
+                var staticInitCall = new CallEntry(targetMethod, new List<StackEntry>(), VarType.Void, 0, method: staticConstructorMethod);
                 obj = new CommaEntry(staticInitCall, obj);
             }
 
