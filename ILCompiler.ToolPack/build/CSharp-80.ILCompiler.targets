@@ -1,0 +1,7 @@
+<Project>
+  <Target Name="RunILCompiler" AfterTargets="Build">
+    <Exec Command="&quot;$(MSBuildThisFileDirectory)..\tools\ILCompiler.exe&quot; -o $(TargetDir)$(TargetName).dasm $(TargetPath)"
+          StandardOutputImportance="High"
+          StandardErrorImportance="High" />
+  </Target>
+</Project>

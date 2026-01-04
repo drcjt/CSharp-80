@@ -187,6 +187,7 @@
     <Project Path="Tests/Regression/Bug_87/Bug_87.csproj" />
     <Project Path="Tests/Regression/RegressionTestsRunner/RegressionTests.csproj" />
   </Folder>
+  <Project Path="ILCompiler.ToolPack/ILCompiler.ToolPack.csproj" />
   <Project Path="ILCompiler/ILCompiler.csproj" />
   <Project Path="JitDiff/JitDiff.csproj" />
   <Project Path="System.Private.CoreLib/System.Private.CoreLib.csproj" />

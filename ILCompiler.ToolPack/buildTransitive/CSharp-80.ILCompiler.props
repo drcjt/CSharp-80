@@ -1,0 +1,3 @@
+<Project>
+  <Import Project="$(MSBuildThisPackageDirectory)build\CSharp-80.ILCompiler.targets" />
+</Project>
