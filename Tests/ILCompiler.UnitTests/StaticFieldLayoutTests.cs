@@ -24,7 +24,11 @@ namespace ILCompiler.UnitTests
             var directoryInfo = new DirectoryInfo(Assembly.GetExecutingAssembly().Location);
             var configAndTargetFramework = $"{directoryInfo.Parent.Parent.Name}{Path.DirectorySeparatorChar}{directoryInfo.Parent.Name}";
 
-            var corelibPath = Path.Combine(SolutionPath, $@".\System.Private.CoreLib\bin\Trs80\{configAndTargetFramework}\System.Private.CoreLib.dll");
+            var currentType = MethodBase.GetCurrentMethod().DeclaringType;
+            var assemblyConfigurationAttribute = currentType.Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
+            var buildConfigurationName = assemblyConfigurationAttribute?.Configuration;
+
+            var corelibPath = Path.Combine(SolutionPath, $@".\System.Private.CoreLib\bin\{buildConfigurationName}\System.Private.CoreLib.dll");
             ModuleDefMD corlibModule = ModuleDefMD.Load(corelibPath, modCtx);
             ((AssemblyResolver)modCtx.AssemblyResolver).AddToCache(corlibModule);
 

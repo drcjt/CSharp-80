@@ -6,7 +6,6 @@ namespace ILCompiler.Tests.Common
     public class ILCompilerRunner
     {
         public const int StackStart = UInt16.MaxValue;
-        private const string ZmacExe = "zmac.exe";
 
         private readonly string _corelibPath;
 
@@ -16,7 +15,7 @@ namespace ILCompiler.Tests.Common
             var assemblyConfigurationAttribute = currentType?.Assembly.GetCustomAttribute<AssemblyConfigurationAttribute>();
             var buildConfigurationName = assemblyConfigurationAttribute?.Configuration;
 
-            _corelibPath = Path.Combine(solutionPath, $@".\System.Private.CoreLib\bin\Trs80\{buildConfigurationName}\net10.0\System.Private.CoreLib.dll");
+            _corelibPath = Path.Combine(solutionPath, $@".\System.Private.CoreLib\bin\{buildConfigurationName}\System.Private.CoreLib.dll");
         }
 
         public static ILCompilerRunner Create(string solutionPath)
@@ -46,7 +45,15 @@ namespace ILCompiler.Tests.Common
                 Directory.SetCurrentDirectory(Path.GetDirectoryName(ilFileName)!);
             }
 
-            var compiled = Program.Main(arguments.Split(' '));
+            int compiled = 0;
+            try
+            {
+                compiled = Program.Main(arguments.Split(' '));
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail($"Failed to compile IL: {ex.Message}");
+            }
 
             Assert.That(compiled, Is.EqualTo(0), "IL Failed to compile");
         }
