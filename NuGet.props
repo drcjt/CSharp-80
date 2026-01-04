@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <Description>.NET for Z80 retro computers including the TRS80, ZX Spectrum and CPM</Description>
+    <Authors>Colin Taylor</Authors>
+    <PackageProjectUrl>https://github.com/drcjt/CSharp-80</PackageProjectUrl>
+    <PackageTags>.NET C# Z80 TRS80</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageIcon>CSharp80Logo.png</PackageIcon>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)README.md" Pack="true" PackagePath="" />
+    <None Include="$(MSBuildThisFileDirectory)Documentation/Images/CSharp80Logo.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+</Project>

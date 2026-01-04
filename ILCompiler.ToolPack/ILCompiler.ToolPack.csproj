@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="../NuGet.Props"/>
+  
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+
+    <!-- This project produces the NuGet package -->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>CSharp-80.ILCompiler</PackageId>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    
+    <Description>CSharp-80 ILCompiler tool</Description>
+    <PackageOutputPath>../nupkg</PackageOutputPath>
+
+    <!-- We don't want a DLL from this project -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+  </PropertyGroup>
+
+  <!-- Publish ILCompiler before packing -->
+  <Target Name="PublishILCompiler" BeforeTargets="Pack">
+    <Exec Command="dotnet publish ../ILCompiler/ILCompiler.csproj -c Release -r win-x64 --output $(MSBuildThisFileDirectory)tools" />
+  </Target>
+  
+  <ItemGroup>
+    <None Include="../LICENSE" Pack="true" PackagePath="" />
+    <None Include="build/CSharp-80.ILCompiler.targets" Pack="true" PackagePath="build/" />
+    <None Include="build/CSharp-80.ILCompiler.props" Pack="true" PackagePath="build/" />
+    <None Include="tools/**" Pack="true" PackagePath="tools/" />
+  </ItemGroup>
+
+</Project>
