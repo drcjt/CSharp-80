@@ -1,70 +1,187 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net10.0</TargetFramework>
-		<LangVersion>latest</LangVersion>
+  <Import Project="../NuGet.Props" />
 
-		<RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
-		<GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  <!-- Core settings -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
 
-		<!--Disable .NET Core SDK libs-->
-		<NoStdLib>true</NoStdLib>
-		<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+    <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Disable .NET Core SDK libs -->
+    <NoStdLib>true</NoStdLib>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
 
-		<!-- Prevent .NET Core 3+ from generating exe -->
-		<UseAppHost>false</UseAppHost>
-		<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
-		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
-		<TargetPlatform>Trs80</TargetPlatform>
-		<!--<TargetPlatform>ZXSpectrum</TargetPlatform>-->
-		<!--<TargetPlatform>CPM</TargetPlatform>-->
+    <!-- Prevent .NET Core 3+ from generating exe -->
+    <UseAppHost>false</UseAppHost>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
 
-		<BaseOutputPath>bin\$(TargetPlatform)</BaseOutputPath>
+    <!-- Default platform (can be overridden from CLI: /p:TargetPlatform=ZXSpectrum etc.) -->
+    <TargetPlatform Condition="'$(TargetPlatform)' == ''">Trs80</TargetPlatform>
 
-		<Nullable>enable</Nullable>
-	</PropertyGroup>
+    <Nullable>enable</Nullable>
 
-	<ItemGroup Condition="'$(TargetPlatform)' == 'ZXSpectrum'">
-		<Compile Remove="Pal\*" />
-		<Compile Include="Pal/Console.cs" />
-		<Compile Include="Pal/Console.ZXSpectrum.cs" />		
-		<Compile Include="Pal/Environment.ZXSpectrum.cs" />
-		<Compile Include="Pal/Graphics.ZXSpectrum.cs" />
-		<Compile Include="Pal/Interop.Libraries.cs" />
-		<Compile Include="Pal/Thread.ZXSpectrum.cs" />
-		<Compile Include="Pal\DateTime.ZXSpectrum.cs" />
-	</ItemGroup>
-	
-	<ItemGroup Condition="'$(TargetPlatform)' == 'Trs80'">
-		<Compile Remove="Pal\*" />	
-		<Compile Include="Pal/Console.cs" />
-		<Compile Include="Pal/Console.Trs80.cs" />
-		<Compile Include="Pal/Environment.Trs80.cs" />
-		<Compile Include="Pal/Graphics.Trs80.cs" />		
-		<Compile Include="Pal/Interop.Libraries.cs" />
-		<Compile Include="Pal/Thread.Trs80.cs" />
-		<Compile Include="Pal\DateTime.Trs80.cs" />
-	</ItemGroup>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>CSharp-80.CoreLib</PackageId>
+    <PackageOutputPath>../nupkg</PackageOutputPath>
 
-	<ItemGroup Condition="'$(TargetPlatform)' == 'CPM'">
-		<Compile Remove="Pal\*" />
-		<Compile Include="Pal/Console.cs" />
-		<Compile Include="Pal/Console.CPM.cs" />
-		<Compile Include="Pal/Graphics.CPM.cs" />
-		<Compile Include="Pal/Environment.CPM.cs" />
-		<Compile Include="Pal/Interop.Libraries.cs" />
-		<Compile Include="Pal/Thread.CPM.cs" />
-		<Compile Include="Pal\DateTime.CPM.cs" />
-	</ItemGroup>
+    <RuntimeIdentifiers>z80-trs80;z80-zxspectrum;z80-cpm</RuntimeIdentifiers>
+  </PropertyGroup>
 
-	<ItemGroup>
-		<Compile Include="..\Common\Internal\Runtime\EEType.cs" Link="Internal\Runtime\EEType.cs" />
-		<Compile Include="..\Common\Internal\Runtime\EETypeElementType.cs" Link="Internal\Runtime\EETypeElementType.cs" />
-		<Compile Include="..\Common\Internal\Runtime\EETypeFlags.cs" Link="Internal\Runtime\EETypeFlags.cs" />
-	</ItemGroup>
+  <!-- Take full control over which .cs files are compiled and in what order -->
+  <PropertyGroup>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+
+  <!-- Separate outputs by RID when specified -->
+  <PropertyGroup>
+    <BaseOutputPath Condition="'$(RuntimeIdentifier)' != ''">bin\$(RuntimeIdentifier)\</BaseOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != ''">
+    <BaseOutputPath>bin\$(RuntimeIdentifier)\</BaseOutputPath>
+    <OutputPath>bin\$(RuntimeIdentifier)\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+
+  <!-- Map custom RIDs to TargetPlatform values -->
+  <ItemGroup>
+    <CoreLibRid Include="z80-trs80">
+      <TargetPlatform>Trs80</TargetPlatform>
+    </CoreLibRid>
+    <CoreLibRid Include="z80-zxspectrum">
+      <TargetPlatform>ZXSpectrum</TargetPlatform>
+    </CoreLibRid>
+    <CoreLibRid Include="z80-cpm">
+      <TargetPlatform>CPM</TargetPlatform>
+    </CoreLibRid>
+  </ItemGroup>
+
+  <!-- Outer vs inner build switch -->
+  <PropertyGroup>
+    <!-- Outer build: true (default). Inner per-RID builds: set this to false. -->
+    <BuildAllRids Condition="'$(BuildAllRids)' == ''">true</BuildAllRids>
+    <IsInnerBuild Condition="'$(IsInnerBuild)' == ''">false</IsInnerBuild>
+  </PropertyGroup>
+
+  <!-- Outer build: loop over all RIDs and invoke inner builds -->
+  <Target Name="BuildAllRids"
+          AfterTargets="Build"
+          Condition="'$(BuildAllRids)' == 'true' AND '$(IsInnerBuild)' != 'true'">
+    <Message Text="Building CoreLib for RID %(CoreLibRid.Identity) / TargetPlatform %(CoreLibRid.TargetPlatform)"
+             Importance="High" />
+    <MSBuild
+      Projects="$(MSBuildProjectFullPath)"
+      Targets="Build"
+      Properties="
+        TargetPlatform=%(CoreLibRid.TargetPlatform);
+        RuntimeIdentifier=%(CoreLibRid.Identity);
+        BuildAllRids=false;
+        IsInnerBuild=true;
+        GeneratePackageOnBuild=false;
+        BaseOutputPath=bin\%(CoreLibRid.Identity)\;
+        OutputPath=bin\%(CoreLibRid.Identity)\$(Configuration)\
+      " />
+  </Target>
+
+  <!-- Add RID-specific CoreLib assemblies into the NuGet package -->
+  <Target Name="IncludeRidAssetsInPackage"
+          AfterTargets="Pack"
+          Condition="'$(BuildAllRids)' == 'true'">
+    <ItemGroup>
+      <!-- z80-trs80 -->
+      <_RidAsset Include="bin\z80-trs80\$(Configuration)\System.Private.CoreLib.dll">
+        <PackagePath>runtimes/z80-trs80/lib/$(TargetFramework)/</PackagePath>
+        <Pack>true</Pack>
+      </_RidAsset>
+      <!-- z80-zxspectrum -->
+      <_RidAsset Include="bin\z80-zxspectrum\$(Configuration)\System.Private.CoreLib.dll">
+        <PackagePath>runtimes/z80-zxspectrum/lib/$(TargetFramework)/</PackagePath>
+        <Pack>true</Pack>
+      </_RidAsset>
+      <!-- z80-cpm -->
+      <_RidAsset Include="bin\z80-cpm\$(Configuration)\System.Private.CoreLib.dll">
+        <PackagePath>runtimes/z80-cpm/lib/$(TargetFramework)/</PackagePath>
+        <Pack>true</Pack>
+      </_RidAsset>
+    </ItemGroup>
+    <Message Text="Including RID-specific CoreLib assets in NuGet package" Importance="High" />
+  </Target>
+
+  <!-- Pack RID-specific binaries as Content when building outer package -->
+  <ItemGroup Condition="'$(BuildAllRids)' == 'true'">
+    <!-- z80-trs80 -->
+    <Content Include="bin\z80-trs80\$(Configuration)\System.Private.CoreLib.dll">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/z80-trs80/lib/$(TargetFramework)/</PackagePath>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <!-- z80-zxspectrum -->
+    <Content Include="bin\z80-zxspectrum\$(Configuration)\System.Private.CoreLib.dll">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/z80-zxspectrum/lib/$(TargetFramework)/</PackagePath>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+    <!-- z80-cpm -->
+    <Content Include="bin\z80-cpm\$(Configuration)\System.Private.CoreLib.dll">
+      <Pack>true</Pack>
+      <PackagePath>runtimes/z80-cpm/lib/$(TargetFramework)/</PackagePath>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- PAL selection: pick platform-specific files based on TargetPlatform -->
+  <ItemGroup>
+    <!-- Remove all PAL files unconditionally -->
+    <Compile Remove="Pal\*" />
+
+    <!-- Common PAL file -->
+    <Compile Include="Pal/Console.cs" />
+    <Compile Include="Pal/Interop.Libraries.cs" />
+
+    <!-- ZX Spectrum -->
+    <Compile Include="Pal/Console.ZXSpectrum.cs"   Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
+    <Compile Include="Pal/Environment.ZXSpectrum.cs" Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
+    <Compile Include="Pal/Graphics.ZXSpectrum.cs"  Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
+    <Compile Include="Pal/Thread.ZXSpectrum.cs"    Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
+    <Compile Include="Pal/DateTime.ZXSpectrum.cs"  Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
+
+    <!-- TRS‑80 -->
+    <Compile Include="Pal/Console.Trs80.cs"        Condition="'$(TargetPlatform)' == 'Trs80'" />
+    <Compile Include="Pal/Environment.Trs80.cs"    Condition="'$(TargetPlatform)' == 'Trs80'" />
+    <Compile Include="Pal/Graphics.Trs80.cs"       Condition="'$(TargetPlatform)' == 'Trs80'" />
+    <Compile Include="Pal/Thread.Trs80.cs"         Condition="'$(TargetPlatform)' == 'Trs80'" />
+    <Compile Include="Pal/DateTime.Trs80.cs"       Condition="'$(TargetPlatform)' == 'Trs80'" />
+
+    <!-- CP/M -->
+    <Compile Include="Pal/Console.CPM.cs"          Condition="'$(TargetPlatform)' == 'CPM'" />
+    <Compile Include="Pal/Environment.CPM.cs"      Condition="'$(TargetPlatform)' == 'CPM'" />
+    <Compile Include="Pal/Graphics.CPM.cs"         Condition="'$(TargetPlatform)' == 'CPM'" />
+    <Compile Include="Pal/Thread.CPM.cs"           Condition="'$(TargetPlatform)' == 'CPM'" />
+    <Compile Include="Pal/DateTime.CPM.cs"         Condition="'$(TargetPlatform)' == 'CPM'" />
+  </ItemGroup>
+
+  <!-- Explicitly include the rest of the code in a deterministic order -->
+  <ItemGroup>
+    <!-- PAL first (already added above), then System, Internal, Common, etc. -->
+    <Compile Include="System/**/*.cs" />
+    <Compile Include="Internal/**/*.cs" />
+    <Compile Include="Common/**/*.cs" />
+  </ItemGroup>
+
+  <!-- Linked runtime files -->
+  <ItemGroup>
+    <Compile Include="..\Common\Internal\Runtime\EEType.cs"
+             Link="Internal\Runtime\EEType.cs" />
+    <Compile Include="..\Common\Internal\Runtime\EETypeElementType.cs"
+             Link="Internal\Runtime\EETypeElementType.cs" />
+    <Compile Include="..\Common\Internal\Runtime\EETypeFlags.cs"
+             Link="Internal\Runtime\EETypeFlags.cs" />
+  </ItemGroup>
 
 </Project>
