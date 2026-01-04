@@ -151,3 +151,10 @@ jobs:
         with:
           name: samples-${{ matrix.platform }}
           path: Samples/**/*.hex
+
+      - name: Upload nuget packages if they exist
+        if: matrix.platform == 'Trs80' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkgs
+          path: nupkg/**/*.nupkg
