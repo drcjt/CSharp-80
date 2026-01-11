@@ -191,5 +191,6 @@
   <Project Path="ILCompiler/ILCompiler.csproj" />
   <Project Path="JitDiff/JitDiff.csproj" />
   <Project Path="System.Private.CoreLib/System.Private.CoreLib.csproj" />
+  <Project Path="Templates/Templates.csproj" />
   <Project Path="Tests/Optimisation/OptimisationTestRunner/OptimisationTests.csproj" />
 </Solution>

@@ -1,0 +1,15 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Colin Taylor",
+    "classifications": [ "CSharp-80" ],
+    "identity": "CSharp80.Templates",
+    "name": "CSharp-80 application",
+    "description": "A project for creating a Z80 application in C#",
+    "shortName": "CSharp-80",
+    "tags": {
+        "language": "C#",
+        "type": "project"
+    },
+    "sourceName": "hello",
+    "preferNameDirectory": true,
+}

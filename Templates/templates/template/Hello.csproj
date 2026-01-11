@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk" >
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+
+    <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+
+    <NoStdLib>true</NoStdLib>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+
+    <UseAppHost>false</UseAppHost>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CSharp-80.ILCompiler" Version="0.1.0-alpha" />
+    <PackageReference Include="CSharp-80.CoreLib" Version="0.1.0-alpha" />
+  </ItemGroup>
+
+</Project>
