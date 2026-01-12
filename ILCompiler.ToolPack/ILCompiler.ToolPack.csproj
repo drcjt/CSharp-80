@@ -18,7 +18,7 @@
   </PropertyGroup>
 
   <!-- Publish ILCompiler before packing -->
-  <Target Name="PublishILCompiler" BeforeTargets="Pack">
+  <Target Name="PublishILCompiler" BeforeTargets="Build">
     <Exec Command="dotnet publish ../ILCompiler/ILCompiler.csproj -c Release -r win-x64 --output $(MSBuildThisFileDirectory)tools" />
   </Target>
   
