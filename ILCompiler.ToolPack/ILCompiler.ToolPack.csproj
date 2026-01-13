@@ -16,14 +16,10 @@
     <!-- We don't want a DLL from this project -->
     <IncludeBuildOutput>false</IncludeBuildOutput>
   </PropertyGroup>
-
-  <!-- Publish ILCompiler before packing -->
-  <Target Name="PublishILCompiler" BeforeTargets="Build">
-    <Message Importance="high" Text="Publishing ILCompiler to $(MSBuildThisFileDirectory)tools" />
-    <Exec Command="dotnet publish ../ILCompiler/ILCompiler.csproj -c Release -r win-x64 --output $(MSBuildThisFileDirectory)tools" />
-  </Target>
   
   <ItemGroup>
+    <ProjectReference Include="..\ILCompiler\ILCompiler.csproj" />
+    <Content Include="$(SolutionDir)/ILCompiler/bin/ILCompiler/$(Configuration)/net10.0/**/*" PackagePath="tools/" />
     <None Include="../LICENSE" Pack="true" PackagePath="" />
     <None Include="build/CSharp-80.ILCompiler.targets" Pack="true" PackagePath="build/" />
     <None Include="build/CSharp-80.ILCompiler.props" Pack="true" PackagePath="build/" />
