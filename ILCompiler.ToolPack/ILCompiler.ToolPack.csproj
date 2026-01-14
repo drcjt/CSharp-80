@@ -2,6 +2,10 @@
 
   <Import Project="../NuGet.Props"/>
   
+  <PropertyGroup Condition="'$(TargetPlatform)' != 'Trs80'">
+    <BuildProject>false</BuildProject>
+  </PropertyGroup>
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
 
