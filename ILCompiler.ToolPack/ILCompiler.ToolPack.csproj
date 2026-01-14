@@ -23,7 +23,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\ILCompiler\ILCompiler.csproj" />
-    <Content Include="$(SolutionDir)/ILCompiler/bin/$(Configuration)/net10.0/**/*" PackagePath="tools/" />
+    <Content Include="$(MSBuildThisFileDirectory)../ILCompiler/bin/$(Configuration)/net10.0/**/*" PackagePath="tools/" />
     <None Include="../LICENSE" Pack="true" PackagePath="" />
     <None Include="build/CSharp-80.ILCompiler.targets" Pack="true" PackagePath="build/" />
     <None Include="build/CSharp-80.ILCompiler.props" Pack="true" PackagePath="build/" />
