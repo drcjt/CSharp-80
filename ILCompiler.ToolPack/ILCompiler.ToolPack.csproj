@@ -28,7 +28,7 @@
 	</Target>
 	
   <ItemGroup>
-    <ProjectReference Include="..\ILCompiler\ILCompiler.csproj" />
+    <ProjectReference Include="..\ILCompiler\ILCompiler.csproj" PrivateAssets="all"/>
     <None Include="../LICENSE" Pack="true" PackagePath="" />
     <None Include="build/CSharp-80.ILCompiler.targets" Pack="true" PackagePath="build/" />
     <None Include="build/CSharp-80.ILCompiler.props" Pack="true" PackagePath="build/" />
