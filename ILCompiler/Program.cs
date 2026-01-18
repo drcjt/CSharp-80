@@ -1,4 +1,5 @@
-﻿using ILCompiler.Interfaces;
+﻿using ILCompiler.Compiler;
+using ILCompiler.Interfaces;
 using ILCompiler.IoC;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -82,7 +83,7 @@ namespace ILCompiler
                     configuration.IgnoreUnknownCil = parsedConfiguration.IgnoreUnknownCil;
                     configuration.PrintReturnCode = parsedConfiguration.PrintReturnCode;
                     configuration.IntegrationTests = parsedConfiguration.IntegrationTests;
-                    configuration.TargetArchitecture = parsedConfiguration.TargetArchitecture;
+                    configuration.TargetArchitecture = MapRuntimeIdentifierToTargetArchitecture(parsedConfiguration.RuntimeIdentifier, parsedConfiguration.TargetArchitecture);
                     configuration.StackStart = parsedConfiguration.StackStart;
                     configuration.AssemblerArguments = parsedConfiguration.AssemblerArguments;
                     configuration.AssemblerOutput = parsedConfiguration.AssemblerOutput;
@@ -92,6 +93,30 @@ namespace ILCompiler
             );
 
             return rootCommand.InvokeAsync(args).Result;
+        }
+
+        private TargetArchitecture MapRuntimeIdentifierToTargetArchitecture(string? runtimeIdentifer, TargetArchitecture defaultArchitecture)
+        {
+            if (string.IsNullOrEmpty(runtimeIdentifer))
+            {
+                return defaultArchitecture;
+            }
+            else if (runtimeIdentifer == "z80-trs80")
+            {
+                return TargetArchitecture.TRS80;
+            }
+            else if (runtimeIdentifer == "z80-zxspectrum")
+            {
+                return TargetArchitecture.ZXSpectrum;
+            }
+            else if (runtimeIdentifer == "z80-cpm")
+            {
+                return TargetArchitecture.CPM;
+            }
+            else
+            {
+                throw new ArgumentException("Unknown runtime identifier");
+            }
         }
     }
 }

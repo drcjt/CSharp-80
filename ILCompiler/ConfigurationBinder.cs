@@ -23,6 +23,7 @@ namespace ILCompiler
                 DumpIRTrees = bindingContext.ParseResult.GetValueForOption(_configurationOptions.DumpIRTreesOption),
                 DumpSsa = bindingContext.ParseResult.GetValueForOption(_configurationOptions.DumpSsaOption),
                 DumpFlowGraphs = bindingContext.ParseResult.GetValueForOption(_configurationOptions.DumpFlowGraphs),
+                RuntimeIdentifier = bindingContext.ParseResult.GetValueForOption(_configurationOptions.RuntimeIdentifier) ?? "",
                 TargetArchitecture = bindingContext.ParseResult.GetValueForOption(_configurationOptions.TargetArchitectureOption),
                 StackStart = bindingContext.ParseResult.GetValueForOption(_configurationOptions.StackStartOption),
                 AssemblerArguments = bindingContext.ParseResult.GetValueForOption(_configurationOptions.AssemblerArguments) ?? "",
