@@ -12,6 +12,7 @@ namespace ILCompiler
         public bool PrintReturnCode { get; set; } = true;
         public string CorelibPath { get; set; } = string.Empty;
         public bool IntegrationTests { get; set; }
+        public string? RuntimeIdentifier { get; set; } = string.Empty;
         public TargetArchitecture TargetArchitecture { get; set; }
         public int? StackStart { get; set; }
         public string AssemblerArguments { get; set; } = string.Empty;

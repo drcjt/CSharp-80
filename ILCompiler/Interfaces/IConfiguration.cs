@@ -11,6 +11,7 @@ namespace ILCompiler.Interfaces
         public bool PrintReturnCode { get; set; }
         public string CorelibPath { get; set; }
         public bool IntegrationTests { get; set; }
+        public string? RuntimeIdentifier { get; set; }
         public TargetArchitecture TargetArchitecture { get; set; }
         public int? StackStart { get; set; }
         public string AssemblerArguments { get; set; }

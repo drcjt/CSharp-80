@@ -13,6 +13,7 @@ namespace ILCompiler
         public readonly Option<bool> DumpSsaOption = new(new[] { "-dssa", "--dumpSsa" }, "Dump Ssa information");
         public readonly Option<bool> DumpFlowGraphs = new(new[] { "-dfg", "--dumpFlowGraphs" }, "Dump Flow Graphs");
 
+        public readonly Option<string?> RuntimeIdentifier = new(new[] { "-rid", "--runtimeIdentifier" }, "Runtime Identifier");
         public readonly Option<TargetArchitecture> TargetArchitectureOption = new(new[] { "-a", "--targetArchitecture" }, getDefaultValue : () => TargetArchitecture.TRS80, "Target Architecture");
         public readonly Option<int?> StackStartOption = new(new[] { "-ss", "--stackStart" }, "Stack Start Address");
         public readonly Option<string> AssemblerArguments = new(new[] { "-aa", "--assemblerArguments" }, "Assembler arguments");
@@ -29,6 +30,7 @@ namespace ILCompiler
             command.AddOption(CoreLibPathOption);
             command.AddOption(IntegrationTestsOption);
             command.AddOption(DumpIRTreesOption);
+            command.AddOption(RuntimeIdentifier);
             command.AddOption(TargetArchitectureOption);
             command.AddOption(StackStartOption);
             command.AddOption(AssemblerArguments);
