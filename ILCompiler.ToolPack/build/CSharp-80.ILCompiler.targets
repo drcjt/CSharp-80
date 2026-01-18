@@ -1,6 +1,11 @@
 <Project>
+    <PropertyGroup>
+    <RuntimeArg Condition="'$(RuntimeIdentifier)' != ''">-rid $(RuntimeIdentifier)</RuntimeArg>
+    <RuntimeArg Condition="'$(RuntimeIdentifier)' == ''"></RuntimeArg>
+  </PropertyGroup>
+  
   <Target Name="RunILCompiler" AfterTargets="Build">
-    <Exec Command="&quot;$(MSBuildThisFileDirectory)..\tools\ILCompiler.exe&quot; -o $(TargetDir)$(TargetName).dasm $(TargetPath)"
+    <Exec Command="&quot;$(MSBuildThisFileDirectory)..\tools\ILCompiler.exe&quot; $(RuntimeArg) -o $(TargetDir)$(TargetName).dasm $(TargetPath)"
           StandardOutputImportance="High"
           StandardErrorImportance="High" />
   </Target>
