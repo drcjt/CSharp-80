@@ -12,8 +12,7 @@
     <!-- This project produces the NuGet package -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>CSharp-80.ILCompiler</PackageId>
-    <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    
+
     <Description>CSharp-80 ILCompiler tool</Description>
     <PackageOutputPath>../nupkg</PackageOutputPath>
 
@@ -29,7 +28,6 @@
 	
   <ItemGroup>
     <ProjectReference Include="..\ILCompiler\ILCompiler.csproj" PrivateAssets="all"/>
-    <None Include="../LICENSE" Pack="true" PackagePath="" />
     <None Include="build/CSharp-80.ILCompiler.targets" Pack="true" PackagePath="build/" />
     <None Include="build/CSharp-80.ILCompiler.props" Pack="true" PackagePath="build/" />
     <None Include="tools/**" Pack="true" PackagePath="tools/" />
