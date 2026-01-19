@@ -22,7 +22,7 @@ dotnet new csharp-80
 
 Or use the project template in Visual Studio:
 
-![Screenshot of the CSharp-80 project template in Visual Studio](Documentation/vs-template.png)
+![Screenshot of the CSharp-80 project template in Visual Studio](Documentation/Images/vs-template.png)
 
 
 Build it, if necessary specifying the runtime identifier, if no runtime identifier is specfied it will build for Trs80. 
