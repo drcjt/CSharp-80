@@ -8,16 +8,45 @@ which is subsequently assembled using the [zmac](http://48k.ca/zmac.html) assemb
 
 ## How to use
 
-Try out the sample applications here:
+Install the template:
+
+```sh
+dotnet new install csharp-80.templates
+```
+
+Create a project:
+
+```sh
+dotnet new csharp-80 
+```
+
+Or use the project template in Visual Studio:
+
+![Screenshot of the CSharp-80 project template in Visual Studio](Documentation/vs-template.png)
+
+
+Build it, if necessary specifying the runtime identifier, if no runtime identifier is specfied it will build for Trs80. 
+Valid runtime identifiers are z80-trs80, z80-zxspectrum and z80-cpm.
+
+```sh
+dotnet build -r z80-trs80
+```
+
+At this point you will be able to see the z80 assembly in the Hello.lst file. The binary file format depends on the target platform, for Trs80 it's a cmd file,
+for the ZX Spectrum it's a tap file, and for CPM it's a hex file.
+You will need to use either real hardware or an appropriate emulator to run the binary file.
+For Trs80 I recommend using [trs80gp](http://48k.ca/trs80gp.html) which you can simply pass the cmd file to as a parameter:
+
+```sh
+trs80gp.exe hello.cmd
+```
+
+## Samples
+
+You can try the sample applications out online directly here:
+
 * For [Trs-80](https://drcjt.github.io/CSharp-80/trs80/index.html)
 * For [ZX Spectrum](https://drcjt.github.io/CSharp-80/zxspectrum/index.html)
-
-Currently the easiest way to use the compiler is to clone the repo, load the solution in Visual Studio, build, and then alter the code in one of the samples like Hello World.
-Rebuild and then you can see the z80 assembly in the Hello.lst file, look in Samples/Hello/bin/Trs80/Debug/net7.0. Note that by default the solution targets the TRS-80 platform 
-and so you'll also get a Hello.cmd file which is the binary file you can then use with either a real TRS-80 or an emulator.
-
-Note that the csproj files for the samples contain some specific configuration settings to disable the normal .NET SDK libs. The samples reference the System.Private.CoreLib 
-project which is a cut down version of the normal .NET SDK libs.
 
 ## Credits
 * [SeeSharpSnake](https://github.com/MichalStrehovsky/SeeSharpSnake) written by Michal Strehovský
