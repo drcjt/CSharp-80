@@ -161,6 +161,11 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
             else
             {
+                var systemRuntimeExports = _context.CorLibModuleProvider.FindThrow("System.Runtime.RuntimeExports");
+                var boxHelperMethod = systemRuntimeExports.FindMethod("Box");
+                var methodNode = _context.NodeFactory.MethodNode(_module.Create(boxHelperMethod));
+                _dependencies.Add(methodNode);
+
                 _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(runtimeDeterminedType));
             }
         }
