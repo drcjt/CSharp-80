@@ -12,7 +12,7 @@ NewObjectNoSize:
 
 	LD B, H
 	LD C, L
-	LD DE, 4	; Offset to BaseSize
+	LD DE, 6	; Offset to BaseSize
 	ADD HL, DE
 	LD E, (HL)
 	INC HL

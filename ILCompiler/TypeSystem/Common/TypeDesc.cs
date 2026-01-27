@@ -216,5 +216,13 @@ namespace ILCompiler.TypeSystem.Common
             }
             return null;
         }
+
+        public bool IsNullable
+        {
+            get
+            {
+                return GetTypeDefinition().IsWellKnownType(WellKnownType.Nullable);
+            }
+        }
     }
 }
