@@ -225,6 +225,8 @@ namespace ILCompiler.TypeSystem.Common
                     return (DefType)SystemModule!.GetType(SystemNameSpace, "IntPtr");
                 case WellKnownType.Void:
                     return (DefType)SystemModule!.GetType(SystemNameSpace, "Void");
+                case WellKnownType.Nullable:
+                    return (DefType)SystemModule!.GetType(SystemNameSpace, "Nullable`1");
                 default:
                     throw new TypeLoadException();
             }

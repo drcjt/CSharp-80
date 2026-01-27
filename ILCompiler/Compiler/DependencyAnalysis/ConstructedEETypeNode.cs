@@ -16,6 +16,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
     /// ---------------------------------------------------
     /// UInt16            | Component Size
     /// UInt16            | Flags
+    /// UInt16            | FlagsEx
     /// UInt16            | Base size
     /// [Pointer Size]    | Related type, this is the base type for regular types, and the element type for arrays / pointer types.
     /// UInt8             | Number of VTable slots (X)
@@ -168,6 +169,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
             // Emit data for EEType flags here
             ushort flags = ComputeFlags(Type);
+            ushort flagsEx = ComputeFlagsEx(Type);
             /*
             if (_preinitializationManager.HasLazyStaticConstructor(Type))
             {
@@ -175,6 +177,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
             */
             instructionsBuilder.Dw(flags, "EEType flags");
+            instructionsBuilder.Dw(flagsEx, "EEType flagsEx");
 
             // Emit data for EEType here
             var baseSize = BaseSize;
@@ -199,7 +202,20 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             // Emit dispatch map
             OutputDispatchMap(instructionsBuilder, defType);
 
+            // Emit the instantiation data - used for Nullable<T> and generic types
+            OutputInstantiationData(instructionsBuilder, defType);
+
             return instructionsBuilder.Instructions;
+        }
+
+        private void OutputInstantiationData(InstructionsBuilder instructionsBuilder, DefType defType)
+        {
+            if (defType.IsNullable)
+            {
+                var nullableType = defType.Instantiation![0];
+                var nullableTypeNode = _nodeFactory.NecessaryTypeSymbol(nullableType);
+                instructionsBuilder.Dw(nullableTypeNode.MangledTypeName, "Nullable<T> type argument");
+            }
         }
 
         private void OutputRelatedType(InstructionsBuilder instructionsBuilder)
@@ -339,10 +355,10 @@ namespace ILCompiler.Compiler.DependencyAnalysis
                 var implementation = VirtualMethodAlgorithm.FindVirtualFunctionTargetMethodOnObjectType(implType, method);
 
                 // Only generate slot entries for non abstract methods
-                if (implementation != null && !implementation.IsAbstract)
+                if (implementation is not null && !implementation.IsAbstract)
                 {
                     var node = _nodeFactory.MethodNode(implementation, implementation.OwningType.IsValueType);
-                    instructionsBuilder.Dw(node.GetMangledName(_nameMangler));
+                    instructionsBuilder.Dw(node.GetMangledName(_nameMangler), $"{method.FullName}");
                     _virtualSlotCount++;
                 }
             }
@@ -352,6 +368,12 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         {
             EETypeElementType elementType = ComputeEETypeElementType(type);
             return (ushort)elementType;
+        }
+
+        private static ushort ComputeFlagsEx(TypeDesc type)
+        {
+            // TODO: Handle nullable types
+            return 0;
         }
 
         private static EETypeElementType ComputeEETypeElementType(TypeDesc type)

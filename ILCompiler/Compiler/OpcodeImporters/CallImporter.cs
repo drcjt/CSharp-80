@@ -353,7 +353,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             // Get the base size
             var eeTypePtr = new IndirectEntry(arrayRef, VarType.Ptr, pointerSize);
-            var baseSize = new IndirectEntry(eeTypePtr, VarType.Ptr, pointerSize, 4);   // Base size is at offset 4
+            var baseSize = new IndirectEntry(eeTypePtr, VarType.Ptr, pointerSize, 6);   // Base size is at offset 6
 
             StackEntry destinationAddress = new BinaryOperator(Operation.Add, isComparison: false, arrayRef2, baseSize, VarType.Ptr);
 

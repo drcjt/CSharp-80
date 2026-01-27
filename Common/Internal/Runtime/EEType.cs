@@ -1,5 +1,5 @@
-﻿using Internal.Runtime.CompilerServices;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
+using Internal.Runtime.CompilerServices;
 
 namespace Internal.Runtime
 {
@@ -9,6 +9,7 @@ namespace Internal.Runtime
 #pragma warning disable 649
         private ushort _usComponentSize;
         private ushort _usFlags;
+        private ushort _usFlagsEx;
         private ushort _usBaseSize;
         private EEType* _relatedType;
         private byte _numVtableSlots;
@@ -41,7 +42,14 @@ namespace Internal.Runtime
 
         internal bool IsValueType => ElementType < EETypeElementType.Class;
 
+        internal bool IsInterface => ElementType == EETypeElementType.Interface;
+
+        internal bool IsArray => ElementType == EETypeElementType.Array;
+
         internal EETypeElementType ElementType => (EETypeElementType)(_usFlags);
+
+        // TODO: this should check FlagsEx
+        internal bool IsNullable => ElementType == EETypeElementType.Nullable;
 
         internal uint ValueTypeSize => (uint)(BaseSize - 2);
     }

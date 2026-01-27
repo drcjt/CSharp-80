@@ -2,7 +2,7 @@
 ;
 ; Uses: HL, DE, BC, AF, HL'
 
-; On entry on stack: EETypePtr, ElementCount in DEHL
+; On entry on stack: EETypePtr, ElementCount in HL
 
 NewArray:
 	; Save return address
@@ -50,7 +50,7 @@ NEWARR_NOMUL16:
 	PUSH HL
 
 	; Add base size to bytes to allocate
-	LD HL, 4
+	LD HL, 6
 	ADD HL, BC
 	LD E, (HL)
 	INC HL
