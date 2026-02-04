@@ -51,6 +51,8 @@ namespace ILCompiler.Compiler
 
             _corLibModuleProvider.CorLibModule = corlibModule;
 
+            _module.Context.SetSystemModule(_module);
+
             var debuggingAttribute = GetDebuggingAttribute(module);
             if (debuggingAttribute != null && debuggingAttribute.IsJITOptimizerDisabled)
             {

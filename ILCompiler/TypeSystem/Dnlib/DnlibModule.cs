@@ -19,7 +19,6 @@ namespace ILCompiler.TypeSystem.Dnlib
         public DnlibModule(TypeSystemContext context, CorLibModuleProvider corLibModuleProvider, RTILProvider ilProvider) : base(context)
         {
             _corLibModuleProvider = corLibModuleProvider;
-            context.SystemModule = this;
             _ilProvider = ilProvider;
         }
 
@@ -322,9 +321,9 @@ namespace ILCompiler.TypeSystem.Dnlib
             }
         }
 
-        public override object GetType(string nameSpace, string name)
+        public override MetadataType GetType(string nameSpace, string name)
         {
-            return Create(_corLibModuleProvider.FindThrow($"{nameSpace}.{name}"));
+            return (MetadataType)Create(_corLibModuleProvider.FindThrow($"{nameSpace}.{name}"));
         }
 
         private InstantiatedType ResolveGenericInstanceType(TypeSig typeSig)

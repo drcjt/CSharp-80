@@ -5,13 +5,24 @@ namespace System.Runtime
 {
     internal static class RuntimeExports
     {
-        internal static unsafe object Box(EEType* pEEType, ref byte data)
+        internal static unsafe object? Box(EEType* pEEType, ref byte data)
         {
+            ref byte dataAdjustedForNullable = ref data;
+
+            if (pEEType->IsNullable)
+            {
+                if (data == 0)
+                    return null;
+
+                dataAdjustedForNullable = ref Unsafe.Add(ref data, pEEType->NullableValueOffset);
+                pEEType = pEEType->NullableType;
+            }
+
             // Allocate box
             object result = InternalCalls.NewObject(pEEType);
 
             // Copy data into box
-            Unsafe.CopyBlock(ref result.GetRawData(), ref data, pEEType->ValueTypeSize);
+            Unsafe.CopyBlock(ref result.GetRawData(), ref dataAdjustedForNullable, pEEType->ValueTypeSize);
 
             return result;
         }

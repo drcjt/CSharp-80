@@ -48,7 +48,7 @@ namespace ILCompiler.TypeSystem.Common
             return this;
         }
 
-        public override TypeFlags Category => _rank == -1 ? TypeFlags.SzArray : TypeFlags.Array;
+        protected override TypeFlags ComputeTypeFlags() => _rank == -1 ? TypeFlags.SzArray : TypeFlags.Array;
 
         private MethodDesc[]? _methods;
         public override IEnumerable<MethodDesc> GetMethods()

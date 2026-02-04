@@ -9,6 +9,6 @@
             Context = context;
         }
 
-        public abstract object GetType(string nameSpace, string name);
+        public abstract MetadataType GetType(string nameSpace, string name);
     }
 }

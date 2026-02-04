@@ -100,6 +100,8 @@
   <ItemGroup>
     <Compile Include="..\Common\Internal\Runtime\EETypeElementType.cs" Link="Common\EETypeElementType.cs" />
     <Compile Include="..\Common\Internal\Runtime\EETypeFlags.cs" Link="Common\EETypeFlags.cs" />
+    <Compile Include="..\Common\Internal\Runtime\EETypeFlagsEx.cs" Link="Common\EETypeFlagsEx.cs" />
+    <Compile Include="..\Common\Internal\Runtime\NullableValueOffsetConsts.cs" Link="Common\NullableValueOffsetConsts.cs" />
   </ItemGroup>
 
   <ItemGroup>
