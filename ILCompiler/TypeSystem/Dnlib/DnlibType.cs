@@ -152,33 +152,30 @@ namespace ILCompiler.TypeSystem.Dnlib
             }
         }
 
-        public override TypeFlags Category
+        protected override TypeFlags ComputeTypeFlags()
         {
-            get
+            return _typeDef.ToTypeSig().ElementType switch
             {
-                return _typeDef.ToTypeSig().ElementType switch
-                {
-                    ElementType.Void => TypeFlags.Void,
-                    ElementType.Boolean => TypeFlags.Boolean,
-                    ElementType.Char => TypeFlags.Char,
-                    ElementType.I1 => TypeFlags.SByte,
-                    ElementType.I2 => TypeFlags.Int16,
-                    ElementType.I4 => TypeFlags.Int32,
-                    ElementType.U1 => TypeFlags.Byte,
-                    ElementType.U2 => TypeFlags.UInt16,
-                    ElementType.U4 => TypeFlags.UInt32,
-                    ElementType.I => TypeFlags.IntPtr,
-                    ElementType.U => TypeFlags.UIntPtr,
-                    ElementType.Ptr => TypeFlags.IntPtr,
-                    ElementType.ByRef => TypeFlags.ByRef,
-                    ElementType.Array => TypeFlags.Array,
-                    ElementType.SZArray => TypeFlags.SzArray,
-                    ElementType.Object => TypeFlags.Class,
-                    ElementType.String => TypeFlags.Class,
-                    ElementType.Class => TypeFlags.Class,
-                    _ => TypeFlags.Unknown
-                };
-            }
+                ElementType.Void => TypeFlags.Void,
+                ElementType.Boolean => TypeFlags.Boolean,
+                ElementType.Char => TypeFlags.Char,
+                ElementType.I1 => TypeFlags.SByte,
+                ElementType.I2 => TypeFlags.Int16,
+                ElementType.I4 => TypeFlags.Int32,
+                ElementType.U1 => TypeFlags.Byte,
+                ElementType.U2 => TypeFlags.UInt16,
+                ElementType.U4 => TypeFlags.UInt32,
+                ElementType.I => TypeFlags.IntPtr,
+                ElementType.U => TypeFlags.UIntPtr,
+                ElementType.Ptr => TypeFlags.IntPtr,
+                ElementType.ByRef => TypeFlags.ByRef,
+                ElementType.Array => TypeFlags.Array,
+                ElementType.SZArray => TypeFlags.SzArray,
+                ElementType.Object => TypeFlags.Class,
+                ElementType.String => TypeFlags.Class,
+                ElementType.Class => TypeFlags.Class,
+                _ => TypeFlags.Unknown
+            };
         }
 
         public override MethodImplRecord[] FindMethodsImplWithMatchingDeclName(string name)

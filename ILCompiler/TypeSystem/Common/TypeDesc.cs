@@ -91,7 +91,22 @@ namespace ILCompiler.TypeSystem.Common
             }
         }
 
-        public virtual TypeFlags Category { get; }
+        private TypeFlags _typeFlags;
+
+        public TypeFlags Category
+        {
+            get
+            {
+                if (_typeFlags == 0)
+                {
+                    _typeFlags = ComputeTypeFlags();
+                }
+
+                return _typeFlags;
+            }
+        }
+
+        protected virtual TypeFlags ComputeTypeFlags() => TypeFlags.Unknown;
 
         public virtual MethodDesc? GetStaticConstructor() => null;
         public virtual MethodDesc? GetDefaultConstructor() => null;
@@ -222,6 +237,14 @@ namespace ILCompiler.TypeSystem.Common
             get
             {
                 return GetTypeDefinition().IsWellKnownType(WellKnownType.Nullable);
+            }
+        }
+
+        internal void SetWellKnownType(WellKnownType wellKnownType)
+        {
+            if (wellKnownType == WellKnownType.Nullable)
+            {
+                _typeFlags |= TypeFlags.Nullable;
             }
         }
     }

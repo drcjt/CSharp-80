@@ -30,6 +30,15 @@ namespace ILCompiler.TypeSystem.Common
 
         public SharedGenericsMode GenericsMode { get; set; } = SharedGenericsMode.Disabled;
 
+        public void SetSystemModule(ModuleDesc moduleDesc)
+        {
+            SystemModule = moduleDesc;
+
+            // Preload well known types
+            MetadataType type = SystemModule.GetType("System", "Nullable`1");
+            type.SetWellKnownType(WellKnownType.Nullable);
+        }
+
         public bool ComputeHasGcStaticBase(FieldDesc field)
         {
             TypeDesc fieldType = field.FieldType;

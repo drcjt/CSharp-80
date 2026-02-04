@@ -41,6 +41,7 @@ namespace ILCompiler.TypeSystem.Common
             return InstantiateMethodImpls(uninstMethodImpls);
         }
 
+        protected override TypeFlags ComputeTypeFlags() => _typeDef.Category;
         public override Instantiation? Instantiation => _instantiation;
 
         public override bool IsSequentialLayout => _typeDef.IsSequentialLayout;
