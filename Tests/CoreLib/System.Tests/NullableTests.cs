@@ -18,16 +18,14 @@ namespace System.Tests
             Assert.Equal(999, n.GetValueOrDefault(999));
 
             n = new int?(42);
-            // TODO: This needs RuntimeExports.Box to work with Nullable<T> properly
-            //Assert.Equal(true, n.HasValue);
+            Assert.Equal(true, n.HasValue);
             Assert.Equal(42, n.Value);
             Assert.Equal(42, (int)n);
 
             Assert.Equal(true, n is not null);
             Assert.Equal(true, 7 != n);
 
-            // TODO: This needs RuntimeExports.Box to work with Nullable<T> properly
-            //Assert.Equal(42, n);
+            Assert.Equal(42, n);
             Assert.Equal(true, n.Equals(42));
 
             Assert.Equal(true, 42.GetHashCode() == n.GetHashCode());
