@@ -372,8 +372,20 @@ namespace ILCompiler.Compiler.DependencyAnalysis
 
         private static ushort ComputeFlagsEx(TypeDesc type)
         {
-            // TODO: Handle nullable types
-            return 0;
+            ushort flagsEx = 0;
+
+            if (type.IsNullable)
+            {
+                FieldDesc? field = type.GetField("value");
+                if (field is not null)
+                {
+                    int nullableValueOffset = field.Offset.AsInt;
+
+                    flagsEx |= (ushort)(nullableValueOffset << NullableValueOffsetConsts.Shift);
+                }
+            }
+
+            return flagsEx;
         }
 
         private static EETypeElementType ComputeEETypeElementType(TypeDesc type)
