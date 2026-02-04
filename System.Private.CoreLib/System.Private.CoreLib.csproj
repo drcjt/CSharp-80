@@ -70,29 +70,13 @@
   </PropertyGroup>
 
   <!-- Outer build: loop over all RIDs and invoke inner builds -->
-  <Target Name="BuildAllRids"
-          AfterTargets="Build"
-          Condition="'$(BuildAllRids)' == 'true' AND '$(IsInnerBuild)' != 'true'">
-    <Message Text="Building CoreLib for RID %(CoreLibRid.Identity) / TargetPlatform %(CoreLibRid.TargetPlatform)"
-             Importance="High" />
-    <MSBuild
-      Projects="$(MSBuildProjectFullPath)"
-      Targets="Build"
-      Properties="
-        TargetPlatform=%(CoreLibRid.TargetPlatform);
-        RuntimeIdentifier=%(CoreLibRid.Identity);
-        BuildAllRids=false;
-        IsInnerBuild=true;
-        GeneratePackageOnBuild=false;
-        BaseOutputPath=bin\%(CoreLibRid.Identity)\;
-        OutputPath=bin\%(CoreLibRid.Identity)\$(Configuration)\
-      " />
+  <Target Name="BuildAllRids" AfterTargets="Build" Condition="'$(BuildAllRids)' == 'true' AND '$(IsInnerBuild)' != 'true'">
+    <Message Text="Building CoreLib for RID %(CoreLibRid.Identity) / TargetPlatform %(CoreLibRid.TargetPlatform)" Importance="High" />
+    <MSBuild Projects="$(MSBuildProjectFullPath)" Targets="Build" Properties="&#xD;&#xA;        TargetPlatform=%(CoreLibRid.TargetPlatform);&#xD;&#xA;        RuntimeIdentifier=%(CoreLibRid.Identity);&#xD;&#xA;        BuildAllRids=false;&#xD;&#xA;        IsInnerBuild=true;&#xD;&#xA;        GeneratePackageOnBuild=false;&#xD;&#xA;        BaseOutputPath=bin\%(CoreLibRid.Identity)\;&#xD;&#xA;        OutputPath=bin\%(CoreLibRid.Identity)\$(Configuration)\&#xD;&#xA;      " />
   </Target>
 
   <!-- Add RID-specific CoreLib assemblies into the NuGet package -->
-  <Target Name="IncludeRidAssetsInPackage"
-          AfterTargets="Pack"
-          Condition="'$(BuildAllRids)' == 'true'">
+  <Target Name="IncludeRidAssetsInPackage" AfterTargets="Pack" Condition="'$(BuildAllRids)' == 'true'">
     <ItemGroup>
       <!-- z80-trs80 -->
       <_RidAsset Include="bin\z80-trs80\$(Configuration)\System.Private.CoreLib.dll">
@@ -145,25 +129,25 @@
     <Compile Include="Pal/Interop.Libraries.cs" />
 
     <!-- ZX Spectrum -->
-    <Compile Include="Pal/Console.ZXSpectrum.cs"   Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
+    <Compile Include="Pal/Console.ZXSpectrum.cs" Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
     <Compile Include="Pal/Environment.ZXSpectrum.cs" Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
-    <Compile Include="Pal/Graphics.ZXSpectrum.cs"  Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
-    <Compile Include="Pal/Thread.ZXSpectrum.cs"    Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
-    <Compile Include="Pal/DateTime.ZXSpectrum.cs"  Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
+    <Compile Include="Pal/Graphics.ZXSpectrum.cs" Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
+    <Compile Include="Pal/Thread.ZXSpectrum.cs" Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
+    <Compile Include="Pal/DateTime.ZXSpectrum.cs" Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
 
     <!-- TRS‑80 -->
-    <Compile Include="Pal/Console.Trs80.cs"        Condition="'$(TargetPlatform)' == 'Trs80'" />
-    <Compile Include="Pal/Environment.Trs80.cs"    Condition="'$(TargetPlatform)' == 'Trs80'" />
-    <Compile Include="Pal/Graphics.Trs80.cs"       Condition="'$(TargetPlatform)' == 'Trs80'" />
-    <Compile Include="Pal/Thread.Trs80.cs"         Condition="'$(TargetPlatform)' == 'Trs80'" />
-    <Compile Include="Pal/DateTime.Trs80.cs"       Condition="'$(TargetPlatform)' == 'Trs80'" />
+    <Compile Include="Pal/Console.Trs80.cs" Condition="'$(TargetPlatform)' == 'Trs80'" />
+    <Compile Include="Pal/Environment.Trs80.cs" Condition="'$(TargetPlatform)' == 'Trs80'" />
+    <Compile Include="Pal/Graphics.Trs80.cs" Condition="'$(TargetPlatform)' == 'Trs80'" />
+    <Compile Include="Pal/Thread.Trs80.cs" Condition="'$(TargetPlatform)' == 'Trs80'" />
+    <Compile Include="Pal/DateTime.Trs80.cs" Condition="'$(TargetPlatform)' == 'Trs80'" />
 
     <!-- CP/M -->
-    <Compile Include="Pal/Console.CPM.cs"          Condition="'$(TargetPlatform)' == 'CPM'" />
-    <Compile Include="Pal/Environment.CPM.cs"      Condition="'$(TargetPlatform)' == 'CPM'" />
-    <Compile Include="Pal/Graphics.CPM.cs"         Condition="'$(TargetPlatform)' == 'CPM'" />
-    <Compile Include="Pal/Thread.CPM.cs"           Condition="'$(TargetPlatform)' == 'CPM'" />
-    <Compile Include="Pal/DateTime.CPM.cs"         Condition="'$(TargetPlatform)' == 'CPM'" />
+    <Compile Include="Pal/Console.CPM.cs" Condition="'$(TargetPlatform)' == 'CPM'" />
+    <Compile Include="Pal/Environment.CPM.cs" Condition="'$(TargetPlatform)' == 'CPM'" />
+    <Compile Include="Pal/Graphics.CPM.cs" Condition="'$(TargetPlatform)' == 'CPM'" />
+    <Compile Include="Pal/Thread.CPM.cs" Condition="'$(TargetPlatform)' == 'CPM'" />
+    <Compile Include="Pal/DateTime.CPM.cs" Condition="'$(TargetPlatform)' == 'CPM'" />
   </ItemGroup>
 
   <!-- Explicitly include the rest of the code in a deterministic order -->
@@ -176,12 +160,11 @@
 
   <!-- Linked runtime files -->
   <ItemGroup>
-    <Compile Include="..\Common\Internal\Runtime\EEType.cs"
-             Link="Internal\Runtime\EEType.cs" />
-    <Compile Include="..\Common\Internal\Runtime\EETypeElementType.cs"
-             Link="Internal\Runtime\EETypeElementType.cs" />
-    <Compile Include="..\Common\Internal\Runtime\EETypeFlags.cs"
-             Link="Internal\Runtime\EETypeFlags.cs" />
+    <Compile Include="..\Common\Internal\Runtime\EEType.cs" Link="Internal\Runtime\EEType.cs" />
+    <Compile Include="..\Common\Internal\Runtime\EETypeElementType.cs" Link="Internal\Runtime\EETypeElementType.cs" />
+    <Compile Include="..\Common\Internal\Runtime\EETypeFlags.cs" Link="Internal\Runtime\EETypeFlags.cs" />
+    <Compile Include="..\Common\Internal\Runtime\EETypeFlagsEx.cs" Link="Internal\Runtime\EETypeFlagsEx.cs" />
+    <Compile Include="..\Common\Internal\Runtime\NullableValueOffsetConsts.cs" Link="Internal\Runtime\NullableValueOffsetConsts.cs" />
   </ItemGroup>
 
 </Project>

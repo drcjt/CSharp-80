@@ -3,13 +3,15 @@
     public struct Nullable<T> where T : struct
     {
         public readonly bool HasValue { get; }
-        public readonly T Value { get; }
+        internal T value;
 
         public Nullable(T value)
         {
-            Value = value;
+            this.value = value;
             HasValue = true;
         }
+
+        public readonly T Value => value;
 
         public override bool Equals(object? obj)
         {
@@ -18,13 +20,13 @@
             return Value.Equals(obj);
         }
 
-        public readonly T GetValueOrDefault() => Value;
-        public readonly T GetValueOrDefault(T defaultValue) => HasValue ? Value : defaultValue;
+        public readonly T GetValueOrDefault() => value;
+        public readonly T GetValueOrDefault(T defaultValue) => HasValue ? value : defaultValue;
         public override int GetHashCode()
         {
             if (HasValue)
             {
-                return Value.GetHashCode();
+                return value.GetHashCode();
             }
             return 0;
 
@@ -36,7 +38,7 @@
         { 
             if (HasValue)
             {
-                return Value.ToString();
+                return value.ToString();
             }
             return "";
         }
