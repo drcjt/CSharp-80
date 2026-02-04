@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using Internal.Runtime.CompilerServices;
 
 namespace Internal.Runtime
@@ -48,9 +49,37 @@ namespace Internal.Runtime
 
         internal EETypeElementType ElementType => (EETypeElementType)(_usFlags);
 
-        // TODO: this should check FlagsEx
         internal bool IsNullable => ElementType == EETypeElementType.Nullable;
 
         internal uint ValueTypeSize => (uint)(BaseSize - 2);
+
+        internal EEType** GenericArguments
+        {
+            get
+            {
+                byte* pDispatchMapSize = (byte*)Unsafe.AsPointer(ref this) + sizeof(EEType) + sizeof(void*) * (_numVtableSlots + _numInterfaces);
+                return (EEType**)(pDispatchMapSize + 1 + *pDispatchMapSize);
+            }
+        }
+
+        internal int NullableValueOffset
+        {
+            get
+            {
+                Debug.Assert(IsNullable);
+
+                return (_usFlagsEx & (ushort)EETypeFlagsEx.NullableValueOffsetMask) >> NullableValueOffsetConsts.Shift;
+            }
+        }
+
+        internal EEType* NullableType
+        {
+            get
+            {
+                Debug.Assert(IsNullable);
+
+                return GenericArguments[0];
+            }
+        }
     }
 }
