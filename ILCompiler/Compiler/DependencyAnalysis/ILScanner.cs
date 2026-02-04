@@ -161,10 +161,18 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             }
             else
             {
-                var systemRuntimeExports = _context.CorLibModuleProvider.FindThrow("System.Runtime.RuntimeExports");
-                var boxHelperMethod = systemRuntimeExports.FindMethod("Box");
-                var methodNode = _context.NodeFactory.MethodNode(_module.Create(boxHelperMethod));
-                _dependencies.Add(methodNode);
+                if (runtimeDeterminedType.IsNullable)
+                {
+                    // Add dependency on Box - this can handle nullable types properly e.g. in RhBox
+                    var systemRuntimeExports = _context.CorLibModuleProvider.FindThrow("System.Runtime.RuntimeExports");
+                    var boxHelperMethod = systemRuntimeExports.FindMethod("Box");
+                    var methodNode = _context.NodeFactory.MethodNode(_module.Create(boxHelperMethod));
+                    _dependencies.Add(methodNode);
+                }
+                else
+                {
+                    // Add dependency on Box_Nullable - this is the fast path boxing helper
+                }
 
                 _dependencies.Add(_context.NodeFactory.ConstructedEETypeNode(runtimeDeterminedType));
             }
