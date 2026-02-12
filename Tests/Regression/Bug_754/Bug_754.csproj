@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+	 <Nullable>enable</Nullable>
+
+    <RuntimeMetadataVersion>v4.0.30319</RuntimeMetadataVersion>
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        
+    <!--Disable .NET Core SDK libs-->
+    <NoStdLib>true</NoStdLib>
+    <DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+	  <!-- Prevent .NET Core 3+ from generating exe -->
+	  <UseAppHost>false</UseAppHost>
+
+	  <OutputType>Exe</OutputType>
+
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <CompilerGeneratedFilesOutputPath>.\GeneratedFiles</CompilerGeneratedFilesOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\System.Private.CoreLib\System.Private.CoreLib.csproj" />
+    <ProjectReference Include="..\..\..\ILCompiler\ILCompiler.csproj" />
+    <ProjectReference Include="..\..\Common\Tests.Common.csproj" />
+    <ProjectReference Include="..\..\XUnit.SourceGenerator\XUnit.SourceGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/*.cs" />
+  </ItemGroup>
+
+</Project>
