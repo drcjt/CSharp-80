@@ -182,8 +182,8 @@
     <Project Path="Tests/Regression/Bug_545/Bug_545.csproj" />
     <Project Path="Tests/Regression/Bug_617/Bug_617.csproj" />
     <Project Path="Tests/Regression/Bug_623/Bug_623.csproj" />
-    <Project Path="Tests/Regression/Bug_655/Bug_655.csproj" />
     <Project Path="Tests/Regression/Bug_660/Bug_660.csproj" />
+    <Project Path="Tests/Regression/Bug_754/Bug_754.csproj" />
     <Project Path="Tests/Regression/Bug_87/Bug_87.csproj" />
     <Project Path="Tests/Regression/RegressionTestsRunner/RegressionTests.csproj" />
   </Folder>

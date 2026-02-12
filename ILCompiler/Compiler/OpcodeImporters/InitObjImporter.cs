@@ -23,7 +23,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             var args = new List<StackEntry>() { size, initValue, address };
 
             var node = new CallEntry("Memset", args, VarType.Void, null);
-            importer.ImportAppendTree(node);
+            importer.ImportAppendTree(node, spill: true);
 
             return true;
         }
