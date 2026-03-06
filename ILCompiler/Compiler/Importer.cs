@@ -627,22 +627,19 @@ namespace ILCompiler.Compiler
 
         public StackEntry FixupCallStructReturn(StackEntry node)
         {
-            if (node is CallEntry call)
+            if (node is CallEntry call && call.Type == VarType.Struct)
             {
-                if (call.Type == VarType.Struct)
-                {
-                    // Need to use return buffer
-                    var returnbuffer = GrabTemp(call.Type, call.ExactSize);
+                // Need to use return buffer
+                int returnbuffer = GrabTemp(call.Type, call.ExactSize);
 
-                    var hasThis = call.Method!.HasThis;
-                    call.SetReturnType(VarType.Void);
-                    call.Arguments.Insert(hasThis ? 1 : 0, new LocalVariableAddressEntry(returnbuffer));
-                    call.HasReturnBuffer = true;
+                bool hasThis = call.Method!.HasThis;
+                call.SetReturnType(VarType.Void);
+                call.Arguments.Insert(hasThis ? 1 : 0, new LocalVariableAddressEntry(returnbuffer));
+                call.HasReturnBuffer = true;
 
-                    ImportAppendTree(call);
+                ImportAppendTree(call);
 
-                    node = new LocalVariableEntry(returnbuffer, call.Type, call.ExactSize);
-                }
+                node = new LocalVariableEntry(returnbuffer, call.Type, call.ExactSize);
             }
 
             return node;
