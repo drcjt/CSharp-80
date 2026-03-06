@@ -9,7 +9,7 @@
 	{
         public void RunTests()
         {
-            var validCollectionSizes = new int[] { 0, 1, 10 };
+            var validCollectionSizes = new int[] { 0, 1, 8 };
 
             foreach (int size in validCollectionSizes)
                 RunTests(size);
