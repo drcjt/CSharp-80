@@ -29,18 +29,14 @@ namespace ILCompiler.Compiler.OpcodeImporters
             string mangledEETypeName = importer.NameMangler.GetMangledTypeName(objType);
             var eeTypeNode = new NativeIntConstantEntry(mangledEETypeName);
 
+            value = importer.FixupCallStructReturn(value);
+
             if (objType.IsNullable)
             {
-                // Spill value into a local so we can take its address to pass to the runtime helper
-                // TODO: Optimize this to avoid the local if possible
-                var lclNum = importer.GrabTemp(value.Type, value.ExactSize);
-                var asg = new StoreLocalVariableEntry(lclNum, false, value);
-                importer.ImportAppendTree(asg);
-
-                var arguments = new List<StackEntry> { eeTypeNode, new LocalVariableAddressEntry(lclNum) };
+                var arguments = new List<StackEntry> { eeTypeNode, importer.GetNodeAddress(value) };
                 MethodDesc runtimeHelperMethod = importer.Method.Context.GetCoreLibEntryPoint("System.Runtime", "RuntimeExports", "Box");
                 string mangledHelperMethod = importer.NameMangler.GetMangledMethodName(runtimeHelperMethod);
-                var node = new CallEntry(mangledHelperMethod, arguments, VarType.Ref, null);
+                var node = new CallEntry(mangledHelperMethod, arguments, VarType.Ref, 2);
 
                 return node;
             }
