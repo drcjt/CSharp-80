@@ -25,7 +25,7 @@ namespace System.Tests
             Assert.Equal(true, n is not null);
             Assert.Equal(true, 7 != n);
 
-            Assert.Equal(42, n);
+            Assert.Equal(42, n);  // This is failing
             Assert.Equal(true, n.Equals(42));
 
             Assert.Equal(true, 42.GetHashCode() == n.GetHashCode());
@@ -36,6 +36,38 @@ namespace System.Tests
             n = 88;
             Assert.Equal(true, n.HasValue);
             Assert.Equal(true, n.Equals(88));
+        }
+
+        [Fact]
+        public static void ImplicitCast_T()
+        {
+            int? nullable = 5;
+            Assert.True(nullable.HasValue);
+            Assert.Equal(5, nullable.GetValueOrDefault());
+
+            nullable = null;
+            Assert.False(nullable.HasValue);
+            Assert.Equal(0, nullable.GetValueOrDefault());
+        }
+
+        [Fact]
+        public static void ExplicitCast_T()
+        {
+            int? nullable = 5;
+            int value = (int)nullable;
+            Assert.Equal(5, value);
+
+            nullable = null;
+            bool exceptionThrown = false;
+            try
+            {
+                Console.Write((int)nullable);
+            }
+            catch (InvalidOperationException)
+            {
+                exceptionThrown = true;
+            }
+            Assert.True(exceptionThrown);
         }
     }
 }

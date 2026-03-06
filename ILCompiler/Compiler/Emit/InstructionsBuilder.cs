@@ -91,6 +91,7 @@ namespace ILCompiler.Compiler.Emit
         public void Ld(Register16 target, string source) => AddInstruction(Instruction.Create(Opcode.Ld, target, source, target.IsIndexRegister() ? 4 : 3));
         public void Ld(Register16 target, ushort immediate) => AddInstruction(Instruction.Create(Opcode.Ld, target, immediate, target.IsIndexRegister() ? 4 : 3));
         public void Ld(Register16 target, short immediate) => Ld(target, (ushort)immediate);
+        public void Ldir() => AddInstruction(Instruction.Create(Opcode.Ldir));
         public void Or(Register8 target) => AddInstruction(Instruction.Create(Opcode.Or, target));
         public void Pop(Register16 register) => AddInstruction(Instruction.Create(Opcode.Pop, register, register.IsIndexRegister() ? 2 : 1));
         public void Push(Register16 register) => AddInstruction(Instruction.Create(Opcode.Push, register, register.IsIndexRegister() ? 2 : 1));

@@ -11,7 +11,17 @@
             HasValue = true;
         }
 
-        public readonly T Value => value;
+        public readonly T Value
+        {
+            get
+            {
+                if (!HasValue)
+                {
+                    ThrowHelper.ThrowInvalidOperationException_InvalidOperation_NoValue();
+                }
+                return value;
+            }
+        }
 
         public override bool Equals(object? obj)
         {
@@ -43,7 +53,7 @@
             return "";
         }
 
-        public static explicit operator T(Nullable<T> value) => value!.Value;
         public static explicit operator T?(T value) => new T?(value);
+        public static explicit operator T(T? value) => value!.Value;
     }
 }

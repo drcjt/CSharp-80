@@ -258,7 +258,7 @@ namespace ILCompiler.Compiler
             {
                 foreach (var variable in _context.LocalVariableTable)
                 {
-                    if (variable.MustInit)
+                    if (variable.MustInit || !_configuration.Optimize && !variable.IsParameter)
                     {
                         // Emit code to init the local here
                         var offset = variable.StackOffset;
@@ -269,10 +269,22 @@ namespace ILCompiler.Compiler
 
                         CodeGeneratorHelper.AddHLFromDE(instructionsBuilder, (short)-offset);
 
-                        for (var count = 0; count < exactSize; count++)
+                        if (exactSize < 4)
                         {
+                            for (var count = 0; count < exactSize; count++)
+                            {
+                                instructionsBuilder.Ld(__[HL], 0);
+                                instructionsBuilder.Inc(HL);
+                            }
+                        }
+                        else
+                        {
+                            instructionsBuilder.Ld(D, H);
+                            instructionsBuilder.Ld(E, L);
+                            instructionsBuilder.Inc(DE);
                             instructionsBuilder.Ld(__[HL], 0);
-                            instructionsBuilder.Inc(HL);
+                            instructionsBuilder.Ld(BC, (short)(exactSize - 1));
+                            instructionsBuilder.Ldir();
                         }
                     }
                 }
