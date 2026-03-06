@@ -111,7 +111,7 @@ namespace ILCompiler.Compiler
 
         public void Visit(NativeIntConstantEntry entry)
         {
-            Print(entry, "CNS_INT", VarType.Ptr, entry.Value.ToString());
+            Print(entry, "CNS_INT", VarType.Ptr, entry.SymbolName ?? entry.Value.ToString());
         }
 
         public void Visit(Int32ConstantEntry entry)
@@ -203,7 +203,8 @@ namespace ILCompiler.Compiler
 
         public void Visit(CallEntry entry)
         {
-            Print(entry, "CALL", entry.Type, entry.Method!.Name);
+            var methodName = entry.Method is not null ? entry.Method.Name : "";
+            Print(entry, "CALL", entry.Type, methodName);
             _indent++;
             foreach (StackEntry argument in entry.Arguments)
             {

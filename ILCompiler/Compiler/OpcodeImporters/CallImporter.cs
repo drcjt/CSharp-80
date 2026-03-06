@@ -38,32 +38,25 @@ namespace ILCompiler.Compiler.OpcodeImporters
             for (var i = methodToCall.Signature.Length - 1; i >= 0; i--)
             {
                 var argument = importer.Pop();
+                arguments.Add(argument);
+            }
 
-                if (argument.Type == VarType.Struct)
-                {
-                    argument = NormalizeStructValue(argument, importer);
-                }
+            for (int i = 0; i < arguments.Count; i++)
+            {
+                var argument = arguments[i];
 
-                var parameter = methodToCall.Signature[i];
+                argument = importer.FixupCallStructReturn(argument);
+
+                var parameter = methodToCall.Signature[methodToCall.Signature.Length - i - 1];
                 var parameterType = parameter;
 
                 var parameterVarType = parameterType.Type.VarType;
                 if (parameterVarType.IsSmall())
-                {
-                    /*
-                    if (argument is LocalVariableEntry localVariableEntry)
-                    {
-                        // Not need for PutArgTypeEntry here but need to override sign extend on local variable entry
-                        localVariableEntry.OverrideSignExtend = true;
-                    }
-                    else
-                    {
-                    */
-                        argument = new PutArgTypeEntry(parameterVarType, argument);
-                    //}
+                {                    
+                    argument = new PutArgTypeEntry(parameterVarType, argument);
                 }
 
-                arguments.Add(argument);
+                arguments[i] = argument;
             }
 
             if (methodToCall.IsArrayAddressMethod())
@@ -381,22 +374,6 @@ namespace ILCompiler.Compiler.OpcodeImporters
         private static IndirectEntry DereferenceThisPtr(StackEntry thisPtr, TypeDesc thisType)
         {
             return new IndirectEntry(thisPtr, thisType.VarType, thisType.GetElementSize().AsInt);
-        }
-
-        private static StackEntry NormalizeStructValue(StackEntry argument, IImporter importer)
-        {
-            if (argument is CallEntry)
-            {
-                var temp = importer.GrabTemp(argument.Type, argument.ExactSize);
-
-                // Import store to temp
-                StackEntry store = importer.NewTempStore(temp, argument);
-                importer.ImportAppendTree(store);
-
-                argument = new LocalVariableEntry(temp, argument.Type, argument.ExactSize);
-            }
-
-            return argument;
         }
 
         private static void MarkInlineCandidate(CallEntry call, IImporter importer)

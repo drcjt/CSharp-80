@@ -53,5 +53,6 @@ namespace ILCompiler.Interfaces
         public StackEntry GetNodeAddress(StackEntry value);
 
         public StackEntry NewTempStore(int tempNumber, StackEntry value);
+        public StackEntry FixupCallStructReturn(StackEntry node);
     }
 }

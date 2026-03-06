@@ -1,4 +1,5 @@
-﻿using ILCompiler.Compiler.DependencyAnalysis;
+﻿using System.Diagnostics;
+using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Inlining;
 using ILCompiler.Compiler.OpcodeImporters;
@@ -6,7 +7,6 @@ using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 using PreinitializationManager = ILCompiler.Compiler.PreInit.PreinitializationManager;
 namespace ILCompiler.Compiler
 {
@@ -545,10 +545,14 @@ namespace ILCompiler.Compiler
                     Debug.Assert(call.Method.HasReturnType);
                     if (call.Method.Signature.ReturnType.VarType == VarType.Struct)
                     {
-                        // If the call returns a struct, we need to store it in a local variable
+                        // If the call returns a struct then it can use the destination of the store as its return buffer
+                        // eliminating the need for the store completely.
+
+                        // Just use the address of the destination of the store as the return buffer
                         var destinationAddress = GetNodeAddress(node);
 
                         // Insert the return buffer into the argument list of the call as first byref parameter after the this pointer
+
                         var hasThis = call.Method!.HasThis;
                         call.Arguments.Insert(hasThis ? 1 : 0, destinationAddress);
                         call.HasReturnBuffer = true;
@@ -585,7 +589,8 @@ namespace ILCompiler.Compiler
         {
             if (value is IndirectEntry indirectEntry)
             {
-                return indirectEntry.Op1;
+                var offset = new NativeIntConstantEntry((short)indirectEntry.Offset);
+                return new BinaryOperator(Operation.Add, isComparison: false, indirectEntry.Op1, offset, VarType.Ptr);
             }
             if (value is StoreIndEntry storeIndirect)
             {
@@ -618,6 +623,29 @@ namespace ILCompiler.Compiler
             }
 
             return store;
+        }
+
+        public StackEntry FixupCallStructReturn(StackEntry node)
+        {
+            if (node is CallEntry call)
+            {
+                if (call.Type == VarType.Struct)
+                {
+                    // Need to use return buffer
+                    var returnbuffer = GrabTemp(call.Type, call.ExactSize);
+
+                    var hasThis = call.Method!.HasThis;
+                    call.SetReturnType(VarType.Void);
+                    call.Arguments.Insert(hasThis ? 1 : 0, new LocalVariableAddressEntry(returnbuffer));
+                    call.HasReturnBuffer = true;
+
+                    ImportAppendTree(call);
+
+                    node = new LocalVariableEntry(returnbuffer, call.Type, call.ExactSize);
+                }
+            }
+
+            return node;
         }
     }
 }
