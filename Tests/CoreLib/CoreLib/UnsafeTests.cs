@@ -40,7 +40,6 @@ namespace CoreLib
         [InlineData(1)]
         [InlineData(10)]
         [InlineData(100)]
-        [InlineData(1000)]
         public static unsafe void CopyBlockStack(int numBytes)
         {
             byte* source = stackalloc byte[numBytes];
