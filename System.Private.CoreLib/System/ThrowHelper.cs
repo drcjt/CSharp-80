@@ -11,5 +11,10 @@
         {
             throw new NotSupportedException();
         }
+
+        internal static void ThrowInvalidOperationException_InvalidOperation_NoValue()
+        {
+            throw new InvalidOperationException();
+        }
     }
 }

@@ -58,6 +58,7 @@
     <Project Path="Tests/CoreLib/System.Runtime.Extensions.Tests/System.Runtime.Extensions.Tests.csproj" />
     <Project Path="Tests/CoreLib/System.String.Tests/System.String.Tests.csproj" />
     <Project Path="Tests/CoreLib/System.Tests.Int/System.Tests.Int.csproj" />
+    <Project Path="Tests/CoreLib/System.Tests.Nullable/System.Tests.Nullable.csproj" />
     <Project Path="Tests/CoreLib/System.Tests.UInt/System.Tests.UInt.csproj" />
     <Project Path="Tests/CoreLib/System.Tests/System.Tests.csproj" />
   </Folder>
@@ -78,6 +79,7 @@
     <Project Path="Tests/Directed/Fibonacci/Fibonacci.csproj" />
     <Project Path="Tests/Directed/Hanoi/Hanoi.csproj" />
     <Project Path="Tests/Directed/MDArrays/MDArrays.csproj" />
+    <Project Path="Tests/Directed/NullableTypes/NullableTypes.csproj" />
     <Project Path="Tests/Directed/Primes/Primes.csproj" />
     <Project Path="Tests/Directed/RvaStatics/RvaStatic.csproj" />
     <Project Path="Tests/Directed/Strings/Strings.csproj" />
@@ -185,6 +187,7 @@
     <Project Path="Tests/Regression/Bug_655/Bug_655.csproj" />
     <Project Path="Tests/Regression/Bug_660/Bug_660.csproj" />
     <Project Path="Tests/Regression/Bug_754/Bug_754.csproj" />
+	
     <Project Path="Tests/Regression/Bug_87/Bug_87.csproj" />
     <Project Path="Tests/Regression/RegressionTestsRunner/RegressionTests.csproj" />
   </Folder>
