@@ -324,8 +324,8 @@ namespace ILCompiler.Compiler.CodeGenerators
 
             bool pushImmediately = size > 4;
             int originalSize = size;
-            var destHigh = size == 2 ? H : D;
-            var destLow = size == 2 ? L : E;
+            var destHigh = size <= 2 ? H : D;
+            var destLow = size <= 2 ? L : E;
 
             int originalIxOffset = ixOffset;
             ixOffset += size - 2;
