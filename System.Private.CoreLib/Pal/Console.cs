@@ -88,33 +88,51 @@ namespace System
         [DllImport(Libraries.Runtime, EntryPoint = "CLS")]
         public static unsafe extern void Clear();
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteLine()
         {
             Write(Environment.NewLine);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteLine(char value)
         {
             Write(value);
             WriteLine();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteLine(Int32 value)
         {
             Write(value);
             WriteLine();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteLine(UInt32 value)
         {
             Write(value);
             WriteLine();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WriteLine(string str)
         {
             Write(str);
             WriteLine();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void WriteLine(object? value)
+        {
+            if (value is null)
+            {
+                WriteLine();
+            }
+            else
+            {
+                WriteLine(value.ToString());
+            }
         }
     }
 }

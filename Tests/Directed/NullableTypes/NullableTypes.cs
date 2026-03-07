@@ -32,7 +32,6 @@ namespace NullableTypes
             }
             catch (System.InvalidOperationException e) { }
 
-            /*
             try
             {
                 Console.WriteLine(s.Value);
@@ -40,9 +39,7 @@ namespace NullableTypes
                 exceptionCounter++;
             }
             catch (System.InvalidOperationException e) { }
-            */
 
-            /*
             try
             {
                 Console.WriteLine(imps.Value);
@@ -66,7 +63,6 @@ namespace NullableTypes
                 exceptionCounter++;
             }
             catch (System.InvalidOperationException e) { }
-            */
         }
     }
 
