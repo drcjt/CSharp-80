@@ -114,6 +114,12 @@ public static class __GeneratedMain
                         attributes.Append($"({constructorArgument.Type})");
                     }
 
+                    if (constructorArgument.Kind == TypedConstantKind.Array)
+                    {
+                        // Handle array arguments by converting them to a C# array initializer
+                        attributes.Append("new [] ");
+                    }
+
                     attributes.Append(constructorArgument.ToCSharpString());
                 }
 
