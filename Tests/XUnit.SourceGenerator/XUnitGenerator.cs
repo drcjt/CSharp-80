@@ -36,12 +36,22 @@ namespace XUnit.SourceGenerator
                 // Generate calls for Fact methods
                 foreach (IMethodSymbol? method in methods.Left.OfType<IMethodSymbol>().OrderBy(m => m.Name))
                 {
+                    if (HasActiveIssues(method, out IList<string> issues))
+                    {
+                        mainBody.AppendLine($"// Active Issues {string.Join(",", issues)} skipping {method.ContainingType}.{method.Name}");
+                        continue;
+                    }
                     GenerateSimpleTestMethodCalls(mainBody, method);
                 }
 
                 // Add theory methods
                 foreach (IMethodSymbol method in methods.Right.OfType<IMethodSymbol>().OrderBy(m => m.Name))
                 {
+                    if (HasActiveIssues(method, out IList<string> issues))
+                    {
+                        mainBody.AppendLine($"// Active Issues {string.Join(",", issues)} skipping {method.ContainingType}.{method.Name}");
+                        continue;
+                    }
                     GenerateTestMethodCallsUsingMemberData(mainBody, method);
                     GenerateTestMethodCallsUsingInlineData(mainBody, method);
                 }
@@ -156,6 +166,29 @@ public static class __GeneratedMain
 #endif
                 mainBody.AppendLine("}");
             }
+        }
+
+        private static bool HasActiveIssues(ISymbol symbol, out IList<string> issues)
+        {
+            issues = [];
+            while (symbol.ContainingSymbol is not null)
+            {
+                AttributeData? activeIssueAttribute = symbol
+                    .GetAttributes()
+                    .FirstOrDefault(a => a.AttributeClass?.Name == "ActiveIssueAttribute");
+
+                if (activeIssueAttribute is not null)
+                {
+                    string issue = "";
+                    if (activeIssueAttribute.ConstructorArguments.Length > 0)
+                    {
+                        issue = activeIssueAttribute.ConstructorArguments[0].Value?.ToString() ?? string.Empty;
+                    }
+                    issues.Add(issue);
+                }
+                symbol = symbol.ContainingSymbol;
+            }
+            return issues.Count > 0;
         }
     }
 }
