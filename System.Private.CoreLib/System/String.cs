@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Internal.Runtime.CompilerServices;
 
 namespace System
 {
@@ -103,6 +104,19 @@ namespace System
         public static bool IsNullOrEmpty([NotNullWhen(false)] string? value)
         {
             return value == null || value.Length == 0;
+        }
+
+        public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
+        {
+            Buffer.Memmove(
+                destination: ref Unsafe.Add(ref MemoryMarshal.GetArrayDataReference(destination), destinationIndex),
+                source: ref Unsafe.Add(ref _firstChar, sourceIndex),
+                elementCount: (uint)count);
+        }
+
+        public void CopyTo(Span<char> destination)
+        {
+            Buffer.Memmove(ref destination._reference, ref _firstChar, (uint)Length);
         }
     }
 }
