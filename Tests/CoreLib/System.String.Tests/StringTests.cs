@@ -191,5 +191,41 @@ namespace System.String.Tests
 
             Assert.Equal(expected, value.AsSpan().IsEmpty);
         }
+
+        [Theory]
+        [InlineData("Hello", 0, 0, 5, new char[] { 'H', 'e', 'l', 'l', 'o' } )]
+        [InlineData("Hello", 1, 5, 3, new char[] { '\0', '\0', '\0', '\0', '\0', 'e', 'l', 'l', '\0', '\0' })]
+        [InlineData("Hello", 2, 0, 3, new char[] { 'l', 'l', 'o', '\0', '\0', '\0', '\0', '\0', '\0', '\0' })]
+        [InlineData("Hello", 0, 7, 3, new char[] { '\0', '\0', '\0', '\0', '\0', '\0', '\0', 'H', 'e', 'l' })]
+        [InlineData("Hello", 5, 10, 0, new char[] { '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0', '\0' })]
+        public static void CopyTo(string s, int sourceIndex, int destinationIndex, int count, char[] expected)
+        {
+            char[] dst = new char[expected.Length];
+
+            s.CopyTo(sourceIndex, dst, destinationIndex, count);
+
+            Assert.Equal(expected, dst);
+        }
+
+        [Theory]
+        [InlineData("", 0)]
+        [InlineData("", 1)]
+        [InlineData("a", 1)]
+        [InlineData("a", 2)]
+        [InlineData("abc", 3)]
+        [InlineData("abc", 4)]
+        [InlineData("Hello world", 20)]
+        public static void CopyTo_Span(string s, int destinationLength)
+        {
+            char[] destination = new char[destinationLength];
+
+            s.CopyTo(destination);
+
+            Assert.True(s.Equals(new string(new ReadOnlySpan<char>(destination, 0, s.Length))));
+            for (int i = s.Length; i < destinationLength; i++)
+            {
+                Assert.Equal('\0', destination[i]);
+            }
+        }
     }
 }
