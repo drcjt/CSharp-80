@@ -179,5 +179,17 @@ namespace System.String.Tests
             ReadOnlySpan<char> span = (string?)null;
             Assert.True(span.IsEmpty);
         }
+
+        [Theory]
+        [InlineData(null, true)]
+        [InlineData("", true)]
+        [InlineData("foo", false)]
+        [InlineData("   ", false)]
+        public static void IsNullOrEmpty(string? value, bool expected)
+        {
+            Assert.Equal(expected, string.IsNullOrEmpty(value));
+
+            Assert.Equal(expected, value.AsSpan().IsEmpty);
+        }
     }
 }
