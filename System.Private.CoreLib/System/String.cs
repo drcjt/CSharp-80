@@ -99,5 +99,10 @@ namespace System
         {
             return value != null ? new ReadOnlySpan<char>(ref value.GetRawStringData(), value.Length) : default;
         }
+
+        public static bool IsNullOrEmpty([NotNullWhen(false)] string? value)
+        {
+            return value == null || value.Length == 0;
+        }
     }
 }

@@ -109,7 +109,7 @@ public static class __GeneratedMain
 
                     var parameter = method.Parameters[parameterIndex];
                     var constructorArgument = constructorArguments[parameterIndex];
-                    if (!SymbolEqualityComparer.Default.Equals(constructorArgument.Type, parameter.Type))
+                    if (!SymbolEqualityComparer.Default.Equals(constructorArgument.Type, parameter.Type) && !constructorArgument.IsNull)
                     {
                         attributes.Append($"({constructorArgument.Type})");
                     }
