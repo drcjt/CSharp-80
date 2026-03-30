@@ -14,6 +14,9 @@
 
         public static bool IsAsciiDigit(char c) => IsBetween(c, '0', '9');
 
+        public static bool IsUpper(char c) => c >= 'A' && c <= 'Z';
+        public static bool IsLower(char c) => c >= 'a' && c <= 'z';
+
         public static char ToLower(char c) => (char)(c | 32);
         public static char ToUpper(char c) => (char)(c & ~32);
 
