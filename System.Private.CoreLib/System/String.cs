@@ -4,6 +4,7 @@ using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Internal.Runtime.CompilerServices;
+using System.Diagnostics;
 
 namespace System
 {
@@ -41,7 +42,7 @@ namespace System
                 return Empty;
             }
 
-            string result = RuntimeImports.NewString(EEType.Of<string>(), (nuint)value.Length);
+            string result = FastAllocateString(value.Length);
             Buffer.Memmove(ref result._firstChar, ref value[0], (uint)result.Length);
             return result;
         }
@@ -57,14 +58,14 @@ namespace System
                 return Empty;
             }
 
-            string result = RuntimeImports.NewString(EEType.Of<string>(), (nuint)value.Length);
+            string result = FastAllocateString(value.Length);
             Buffer.Memmove(ref result._firstChar, ref MemoryMarshal.GetReference(value), (uint)result.Length);
             return result;
         }
 
         internal unsafe static string CreateFromChar(char c)
         {
-            string result = RuntimeImports.NewString(EEType.Of<string>(), 1);
+            string result = FastAllocateString(1);
             result._firstChar = c;
             return result;
         }
@@ -75,11 +76,21 @@ namespace System
 
         internal unsafe static string Ctor(char c, int count)
         {
-            string result = RuntimeImports.NewString(EEType.Of<string>(), (nuint)count);
+            string result = FastAllocateString(count);
             SpanHelpers.Fill(ref result._firstChar, (uint)count, c);
             return result;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static unsafe string FastAllocateString(nint length)
+        {
+            // We allocate one extra char as an interop convenience so that our strings are null-
+            // terminated, however, we don't pass the extra +1 to the string allocation because the base
+            // size of this object includes the _firstChar field.
+            string newStr = RuntimeImports.NewString(EEType.Of<string>(), (nuint)length);
+            Debug.Assert(newStr._length == length);
+            return newStr;
+        }
 
         public bool Contains(char value)
         {
