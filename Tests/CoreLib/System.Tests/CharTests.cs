@@ -132,5 +132,59 @@ namespace System.Tests
             Assert.Equal(expected, c.ToString());
             Assert.Equal(expected, char.ToString(c));
         }
+
+        [Fact]
+        public static void ToLower()
+        {
+            Assert.Equal('a', char.ToLower('A'));
+            Assert.Equal('a', char.ToLower('a'));
+
+            for (char c = 'A'; c <= 'Z'; c++)
+            {
+                char lc = char.ToLower(c);
+                Assert.NotEqual(c, lc);
+                Assert.True(char.IsLower(lc));
+            }
+        }
+
+        [Fact]
+        public static void ToUpper()
+        {
+            Assert.Equal('A', char.ToUpper('A'));
+            Assert.Equal('A', char.ToUpper('a'));
+
+            for (char c = 'a'; c <= 'z'; c++)
+            {
+                char uc = char.ToUpper(c);
+                Assert.NotEqual(c, uc);
+                Assert.True(char.IsUpper(uc));
+            }
+        }
+
+        [Fact]
+        public static void IsLower_Char()
+        {
+            for (char c = 'a'; c <= 'z'; c++)
+            {
+                Assert.True(char.IsLower(c));
+            }
+            for (char c = 'A'; c <= 'Z'; c++)
+            {
+                Assert.False(char.IsLower(c));
+            }
+        }
+
+        [Fact]
+        public static void IsUpper_Char()
+        {
+            for (char c = 'A'; c <= 'Z'; c++)
+            {
+                Assert.True(char.IsUpper(c));
+            }
+            for (char c = 'a'; c <= 'z'; c++)
+            {
+                Assert.False(char.IsUpper(c));
+            }
+        }
     }
 }
