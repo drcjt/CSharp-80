@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
+using ILCompiler.Compiler.FlowgraphHelpers;
 using ILCompiler.Compiler.Ssa;
 
 namespace ILCompiler.Compiler
@@ -16,8 +17,30 @@ namespace ILCompiler.Compiler
         public BasicBlock? Next { get; set; }
         public int StartOffset { get; set; }
         public int EndOffset { get; set; }
+        public int? TargetOffset { get; set; }
 
         public JumpKind JumpKind { get; set; }
+
+        public FlowEdge? TrueEdge { get; set; }
+
+        private FlowEdge? _falseEdge = null;
+        public FlowEdge? FalseEdge
+        {
+            get
+            {
+                if (JumpKind == JumpKind.Conditional)
+                {
+                    if (_falseEdge is null)
+                    {
+                        _falseEdge = new FlowEdge(this, Next!);
+                    }
+                }
+                return _falseEdge;
+            }
+        }
+
+        public BasicBlock? TrueTarget => TrueEdge?.Target;
+        public BasicBlock? FalseTarget => FalseEdge?.Target;
 
         public uint PreOrderNum { get; set; }
         public uint PostOrderNum { get; set; }

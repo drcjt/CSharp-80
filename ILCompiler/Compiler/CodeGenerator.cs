@@ -100,6 +100,12 @@ namespace ILCompiler.Compiler
                     }
                 }
 
+                // If block is last block in a try handler then emit a label which will be used in the EH_CLAUSES
+                if (methodCodeNode.EhClauses.Any(x => x.TryEnd == block))
+                {
+                    _context.InstructionsBuilder.Label($"{block.Label}_END");
+                }
+
                 methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
             }
             // Emit end of method label

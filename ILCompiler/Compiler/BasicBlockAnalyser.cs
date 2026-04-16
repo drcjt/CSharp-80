@@ -1,4 +1,6 @@
-﻿using ILCompiler.Interfaces;
+﻿using System.Diagnostics;
+using ILCompiler.Compiler.FlowgraphHelpers;
+using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
 using ILCompiler.TypeSystem.IL;
 
@@ -6,9 +8,10 @@ namespace ILCompiler.Compiler
 {
     public enum EHClauseKind
     {
-        Typed,
-        Fault,
-        Filter
+        Typed,  // Catch handler with a specific type
+        Fault,  // Fault handler
+        Finally, // Finally handler
+        Filter  // Filter handler
     }
 
     public class EHClause
@@ -19,9 +22,9 @@ namespace ILCompiler.Compiler
         public BasicBlock? HandlerEnd { get; init; }
         public BasicBlock? Filter { get; init; }
         public EHClauseKind Kind { get; init; }
-        public string CatchTypeMangledName { get; init; }
+        public string? CatchTypeMangledName { get; init; }
 
-        public EHClause(BasicBlock tryBegin, BasicBlock? tryEnd, BasicBlock handlerBegin, BasicBlock? handlerEnd, BasicBlock? filter, EHClauseKind kind, string catchTypeMangledName)
+        public EHClause(BasicBlock tryBegin, BasicBlock? tryEnd, BasicBlock handlerBegin, BasicBlock? handlerEnd, BasicBlock? filter, EHClauseKind kind, string? catchTypeMangledName)
         {
             TryBegin = tryBegin;
             TryEnd = tryEnd;
@@ -125,27 +128,55 @@ namespace ILCompiler.Compiler
                 }
 
                 var handlerBeginBlock = CreateBasicBlock(basicBlocks, exceptionHandler.HandlerOffset);
-                var handlerEndBlock = exceptionHandler.HandlerEndOffset != null ? basicBlocks[(int)exceptionHandler.HandlerEndOffset] : null;
+                var handlerEndBlock = GetHandlerLastBlock(exceptionHandler.HandlerEndOffset, basicBlocks);
 
                 handlerBeginBlock.TryBlocks = GetTryBlocks(exceptionHandler, basicBlocks);
 
-                var tryEndBlock = exceptionHandler.TryEndOffset != null ? basicBlocks[(int)exceptionHandler.TryEndOffset] : null;
+                var tryEndBlock = GetHandlerLastBlock(exceptionHandler.TryEndOffset, basicBlocks);
 
                 handlerBeginBlock.HandlerStart = true;
                 tryBeginBlock.TryStart = true;
 
-                var catchTypeDesc = exceptionHandler.CatchType!;
-                var catchTypeMangledName = _nameMangler.GetMangledTypeName(catchTypeDesc);
+                string? catchTypeMangledName = null;
+                if (exceptionHandler.Kind == ILExceptionRegionKind.Catch)
+                {
+                    var catchTypeDesc = exceptionHandler.CatchType!;
+                    catchTypeMangledName = _nameMangler.GetMangledTypeName(catchTypeDesc);
+                }
 
                 tryBeginBlock.Handlers.Add(handlerBeginBlock);
 
-                EHClauseKind kind = EHClauseKind.Typed;
-                if (exceptionHandler.Kind == ILExceptionRegionKind.Fault || exceptionHandler.Kind == ILExceptionRegionKind.Finally) kind = EHClauseKind.Fault;
-                else if (exceptionHandler.Kind == ILExceptionRegionKind.Filter) kind = EHClauseKind.Filter;
+                EHClauseKind kind = exceptionHandler.Kind switch
+                {
+                    ILExceptionRegionKind.Fault => EHClauseKind.Fault,
+                    ILExceptionRegionKind.Finally => EHClauseKind.Finally,
+                    ILExceptionRegionKind.Filter => EHClauseKind.Filter,
+                    ILExceptionRegionKind => EHClauseKind.Typed
+                };
 
                 var ehClause = new EHClause(tryBeginBlock, tryEndBlock, handlerBeginBlock, handlerEndBlock, filterBlock, kind, catchTypeMangledName);
                 ehClauses.Add(ehClause);
             }
+        }
+
+        private static BasicBlock GetHandlerLastBlock(int? handlerEndOffset, BasicBlock[] basicBlocks)
+        {
+            if (!handlerEndOffset.HasValue)
+            {
+                return basicBlocks[^1];
+            }
+
+            int blockIndex = handlerEndOffset.Value - 1;
+            BasicBlock? handlerLastBlock;
+            do
+            {
+                handlerLastBlock = basicBlocks[blockIndex--];
+
+            } while (handlerLastBlock is null && blockIndex >= 0);
+
+            Debug.Assert(handlerLastBlock != null, "Could not find a basic block for the end of the handler");
+
+            return handlerLastBlock;
         }
 
         private static List<BasicBlock> GetTryBlocks(ILExceptionRegion exceptionHandler, BasicBlock[] basicBlocks)
@@ -169,7 +200,7 @@ namespace ILCompiler.Compiler
             var basicBlock = basicBlocks[offset];
             if (basicBlock == null)
             {
-                basicBlock = new BasicBlock(offset);
+                basicBlock = new BasicBlock(offset);                
                 basicBlocks[offset] = basicBlock;
             }
 
@@ -186,6 +217,7 @@ namespace ILCompiler.Compiler
 
             while (currentIndex < _methodIL.Instructions.Count)
             {
+                int? jumpAddress = null;
                 var currentInstruction = _methodIL.Instructions[currentIndex];
 
                 switch (currentInstruction.Opcode)
@@ -215,6 +247,7 @@ namespace ILCompiler.Compiler
                     case ILOpcode.brfalse_s:
                     case ILOpcode.brtrue_s:
                         jumpKind = JumpKind.Conditional;
+                        jumpAddress = (int)((Instruction)currentInstruction.Operand).Offset;
                         break;
 
                     case ILOpcode.br_s:
@@ -222,6 +255,7 @@ namespace ILCompiler.Compiler
                     case ILOpcode.br:
                     case ILOpcode.leave:
                         jumpKind = JumpKind.Always;
+                        jumpAddress = (int)((Instruction)currentInstruction.Operand).Offset;
                         break;
 
                     case ILOpcode.throw_:
@@ -242,6 +276,7 @@ namespace ILCompiler.Compiler
                         break;
                 }
 
+                BasicBlock? currentBasicBlock = null;
                 if (jumpKind is null)
                 {
                     var nextOffset = currentOffset + currentInstruction.GetSize();
@@ -249,9 +284,9 @@ namespace ILCompiler.Compiler
 
                     if (endOfBlock)
                     {
-                        var basicBlock = CreateBasicBlock(basicBlocks, startOffset);
-                        basicBlock.EndOffset = nextOffset;
-                        basicBlock.JumpKind = JumpKind.Always;
+                        currentBasicBlock = CreateBasicBlock(basicBlocks, startOffset);
+                        currentBasicBlock.EndOffset = nextOffset;
+                        currentBasicBlock.JumpKind = JumpKind.Always;
 
                         startOffset = nextOffset;
                     }
@@ -260,9 +295,10 @@ namespace ILCompiler.Compiler
                 {
                     var nextOffset = currentOffset + currentInstruction.GetSize();
 
-                    var basicBlock = CreateBasicBlock(basicBlocks, startOffset);
-                    basicBlock.EndOffset = nextOffset;
-                    basicBlock.JumpKind = jumpKind.Value;
+                    currentBasicBlock = CreateBasicBlock(basicBlocks, startOffset);
+                    currentBasicBlock.TargetOffset = jumpAddress;
+                    currentBasicBlock.EndOffset = nextOffset;
+                    currentBasicBlock.JumpKind = jumpKind.Value;
 
                     startOffset = nextOffset;
                 }
@@ -279,6 +315,28 @@ namespace ILCompiler.Compiler
                 var basicBlock = CreateBasicBlock(basicBlocks, startOffset);
                 basicBlock.EndOffset = currentOffset;
                 basicBlock.JumpKind = JumpKind.Always;
+            }
+
+            LinkBasicBlocks(basicBlocks);
+        }
+
+        private static void LinkBasicBlocks(BasicBlock[] blocks)
+        {
+            foreach (BasicBlock block in blocks)
+            {
+                if (block is not null)
+                {
+                    switch (block.JumpKind)
+                    {
+                        case JumpKind.Conditional:
+                            Debug.Assert(block.TargetOffset is not null);
+                            BasicBlock trueTarget = blocks[block.TargetOffset.Value];
+                            FlowEdge trueEdge = new FlowEdge(block, trueTarget);
+                            block.TrueEdge = trueEdge;
+
+                            break;
+                    }
+                }
             }
         }
 
