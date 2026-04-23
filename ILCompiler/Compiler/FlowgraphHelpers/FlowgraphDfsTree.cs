@@ -5,7 +5,7 @@
         public IList<BasicBlock> PostOrder { get; init; } = postOrder;
         public bool HasCycle { get; init; } = hasCycle;
 
-        public class AllSuccessorEnumerator(BasicBlock block, ControlFlowGraph controlFlowGraph)
+        public class AllSuccessorEnumerator(BasicBlock block, FlowGraph controlFlowGraph)
         {
             public BasicBlock Block { get; init; } = block;
 
@@ -19,7 +19,7 @@
                 descendant.PostOrderNum <= ancestor.PostOrderNum;
         }
 
-        public static FlowgraphDfsTree BuildAndRemove(ControlFlowGraph controlFlowGraph)
+        public static FlowgraphDfsTree BuildAndRemove(FlowGraph controlFlowGraph)
         {
             var blocks = SetupBasicBlockRoot(controlFlowGraph.Blocks);
 
@@ -54,7 +54,7 @@
             }
         }
 
-        public static FlowgraphDfsTree Build(ControlFlowGraph controlFlowGraph)
+        public static FlowgraphDfsTree Build(FlowGraph controlFlowGraph)
         {
             var firstBlock = controlFlowGraph.Blocks[0];
             var postOrder = new List<BasicBlock>();
