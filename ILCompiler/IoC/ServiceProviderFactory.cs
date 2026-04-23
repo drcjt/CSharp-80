@@ -59,8 +59,6 @@ namespace ILCompiler.IoC
 
             services.AddTransient<IEarlyValuePropagation, EarlyValuePropagation>();
 
-            services.AddTransient<IFlowgraph, Flowgraph>();
-
             services.AddTransient<ISsaBuilder, SsaBuilder>();
 
             services.AddTransient<IComputeDominators, FlowgraphDominatorTreeBuilder>();

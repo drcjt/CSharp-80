@@ -4,6 +4,6 @@ namespace ILCompiler.Interfaces
 {
     public interface IInductionVariableOptimizer : IPhase
     {
-        void Run(MethodCompiler compiler);
+        void Run(MethodCompiler compiler, FlowGraph controlFlowGraph);
     }
 }

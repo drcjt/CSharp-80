@@ -5,7 +5,7 @@ namespace ILCompiler.Interfaces
 {
     public interface IFlowgraph : IPhase
     {
-        void SetBlockOrder(IList<BasicBlock> blocks);
+        void SetBlockOrder();
         void SetStatementSequence(Statement statement);
 
         void InsertStatementAfter(BasicBlock block, Statement insertionPoint, Statement statement);
