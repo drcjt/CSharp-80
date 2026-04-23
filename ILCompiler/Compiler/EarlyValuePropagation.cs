@@ -8,7 +8,7 @@ namespace ILCompiler.Compiler
     {
         public void Run(MethodCompiler compiler)
         {
-            foreach (var block in compiler.Blocks)
+            foreach (var block in compiler.ControlFlowGraph.Blocks)
             {
                 foreach (var statement in block.Statements)
                 {
@@ -25,7 +25,7 @@ namespace ILCompiler.Compiler
                     if (isRewritten)
                     {
                         // Update the evaluation order
-                        compiler.Flowgraph!.SetStatementSequence(statement);
+                        compiler.ControlFlowGraph.SetStatementSequence(statement);
                     }
                 }
             }

@@ -28,7 +28,7 @@ namespace ILCompiler.Compiler
         public void Morph()
         {
             _locals = _compiler.Locals;
-            foreach (var block in _compiler.Blocks)
+            foreach (var block in _compiler.ControlFlowGraph.Blocks)
             {
                 // fgMorphBlocks -> fgMorphStmts -> fgMorphTree -> fgMorphSmpOp -> fgMorphArrayIndex
                 MorphStatements(block);
@@ -50,9 +50,9 @@ namespace ILCompiler.Compiler
 
                 var newStatement = new Statement(staticInitCall);
 
-                if (_compiler.Blocks.Count > 0)
+                if (_compiler.ControlFlowGraph.Blocks.Count > 0)
                 {
-                    var firstBlock = _compiler.Blocks[0];
+                    var firstBlock = _compiler.ControlFlowGraph.Blocks[0];
 
                     if (firstBlock.Statements.Count > 0)
                     {

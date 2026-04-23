@@ -39,7 +39,7 @@ namespace ILCompiler.Compiler
             return sb.ToString();
         }
 
-        public static void DumpFlowGraph(string inputFilePath, MethodDesc method, IList<BasicBlock> blocks)
+        public static void DumpFlowGraph(string inputFilePath, MethodDesc method, FlowGraph cfg)
         {
             var inputFolder = Path.GetDirectoryName(inputFilePath) ?? throw new ArgumentException("inputFilePath is null");
             var flowGraphFolder = Path.Combine(inputFolder, "FlowGraph");
@@ -54,14 +54,14 @@ namespace ILCompiler.Compiler
                 dotOutput.WriteLine($"    graph [label=\"{method.FullName}\"];");
                 dotOutput.WriteLine( "    node [shape=\"Box\"];");
 
-                foreach (var block in blocks)
+                foreach (var block in cfg.Blocks)
                 {
                     dotOutput.WriteLine($"    {block.Label}");
                 }
 
-                foreach (var block in blocks)
+                foreach (var block in cfg.Blocks)
                 {
-                    foreach (var successor in block.Successors)
+                    foreach (var successor in cfg.VisitAllSuccs(block))
                     {
                         dotOutput.WriteLine($"    {block.Label} -> {successor.Label}");
                     }

@@ -15,14 +15,12 @@ namespace ILCompiler.Compiler
         private readonly ILogger<MethodCompiler> _logger;
         private readonly IPhaseFactory _phaseFactory;
 
-
         public MethodDesc? Method { get; private set; }
         public LocalVariableTable Locals { get; } = [];
         public FlowgraphDfsTree? DfsTree { get; private set; }
         public FlowgraphDominatorTree? DominatorTree { get; private set; }
         public FlowGraphNaturalLoops? Loops { get; private set; }
-        public IFlowgraph? Flowgraph { get; private set; }
-        public IList<BasicBlock> Blocks { get; } = [];
+        public FlowGraph ControlFlowGraph { get; } = new();
 
         public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory)
         {
@@ -62,10 +60,10 @@ namespace ILCompiler.Compiler
 
             if (_configuration.DumpFlowGraphs)
             {
-                Diagnostics.DumpFlowGraph(inputFilePath, method, Blocks);
+                Diagnostics.DumpFlowGraph(inputFilePath, method, ControlFlowGraph);
             }
 
-            return Blocks;
+            return ControlFlowGraph.Blocks;
         }
 
         public void CompileMethod(Z80MethodCodeNode methodCodeNodeNeedingCode, string inputFilePath)
@@ -96,11 +94,12 @@ namespace ILCompiler.Compiler
             var ilImporter = _phaseFactory.Create<IImporter>();
 
             // Main phases of the compiler live here
-            ilImporter.Import(this, methodCodeNodeNeedingCode.EhClauses);
+            ilImporter.Import(this, ControlFlowGraph.EhClauses);
+            methodCodeNodeNeedingCode.EhClauses = ControlFlowGraph.EhClauses;
 
             if (_configuration.DumpFlowGraphs)
             {
-                Diagnostics.DumpFlowGraph(inputFilePath, method, Blocks);
+                Diagnostics.DumpFlowGraph(inputFilePath, method, ControlFlowGraph);
             }
             DumpIRTrees("After Import");
 
@@ -118,11 +117,10 @@ namespace ILCompiler.Compiler
             if (_configuration.Optimize)
             {
                 // Build the dfs tree and remove unreachable blocks
-                DfsTree = FlowgraphDfsTree.BuildAndRemove(Blocks);
+                DfsTree = FlowgraphDfsTree.BuildAndRemove(ControlFlowGraph);
             }
 
-            Flowgraph = _phaseFactory.Create<IFlowgraph>();
-            Flowgraph.SetBlockOrder(Blocks);
+            ControlFlowGraph.SetBlockOrder();
 
             if (_configuration.Optimize)
             {
@@ -138,7 +136,7 @@ namespace ILCompiler.Compiler
 
                 // Optimize induction variables
                 var inductionVarOptimizer = _phaseFactory.Create<IInductionVariableOptimizer>();
-                inductionVarOptimizer.Run(this);
+                inductionVarOptimizer.Run(this, ControlFlowGraph);
 
                 DumpIRTrees("After Strength Reduction");
 
@@ -169,7 +167,7 @@ namespace ILCompiler.Compiler
             {
                 // Dump LIR here
                 var lirDumper = new LIRDumper();
-                var lirDump = lirDumper.Dump(Blocks);
+                var lirDump = lirDumper.Dump(ControlFlowGraph.Blocks);
                 _logger.LogInformation("{LirDump}", lirDump);
             }
         }
@@ -199,7 +197,7 @@ namespace ILCompiler.Compiler
                 _logger.LogInformation("{LocalVars}", sb.ToString());
 
                 var treeDumper = new TreeDumper();
-                var treedump = treeDumper.Dump(Blocks, Locals);
+                var treedump = treeDumper.Dump(ControlFlowGraph, Locals);
                 _logger.LogInformation("{Treedump}", treedump);
             }
         }

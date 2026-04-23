@@ -19,7 +19,7 @@ namespace ILCompiler.Compiler
         public void Run(MethodCompiler compiler)
         {
             _locals = compiler.Locals;
-            foreach (var block in compiler.Blocks)
+            foreach (var block in compiler.ControlFlowGraph.Blocks)
             {
                 _currentBlock = block;
                 LowerBlock(block);

@@ -16,7 +16,7 @@ namespace ILCompiler.Compiler
 
         public FlowGraphNaturalLoops FindLoops(MethodCompiler compiler)
         {
-            var loops = FlowGraphNaturalLoops.Find(compiler.DfsTree!, _logger);
+            var loops = FlowGraphNaturalLoops.Find(compiler.DfsTree!, _logger, compiler.ControlFlowGraph);
 
             // Consider moving out of here
             ComputeReachabilitySets(compiler.DfsTree!);
@@ -45,7 +45,7 @@ namespace ILCompiler.Compiler
         }
     }
 
-    public class FlowGraphNaturalLoop(FlowgraphDfsTree dfsTree, BasicBlock header)
+    public class FlowGraphNaturalLoop(FlowgraphDfsTree dfsTree, BasicBlock header, FlowGraph controlFlowGraph)
     {
         public FlowgraphDfsTree DfsTree { get; init; } = dfsTree;
         public BasicBlock Header { get; } = header;
@@ -117,7 +117,7 @@ namespace ILCompiler.Compiler
                     continue;
                 }
 
-                foreach (BasicBlock succ in topBlock.Successors)
+                foreach (BasicBlock succ in controlFlowGraph.VisitAllSuccs(topBlock))
                 {
                     if (succ == Header)
                     {
@@ -170,7 +170,7 @@ namespace ILCompiler.Compiler
             _loops.Add(loop);
         }
 
-        public static FlowGraphNaturalLoops Find(FlowgraphDfsTree dfsTree, ILogger logger)
+        public static FlowGraphNaturalLoops Find(FlowgraphDfsTree dfsTree, ILogger logger, FlowGraph controlFlowGraph)
         {
             logger.LogDebug("Finding loops in DFS tree");
             logger.LogDebug("Reverse Post Order -> Block [pre, post]");
@@ -197,7 +197,7 @@ namespace ILCompiler.Compiler
                 FlowGraphNaturalLoop? loop = null;
 
                 // If a block is a ancestor of one of its predecessors then the block is a loop header
-                loop = FindBackEdges(dfsTree, logger, header, loop);
+                loop = FindBackEdges(dfsTree, logger, header, loop, controlFlowGraph);
 
                 if (loop == null)
                     continue;
@@ -253,13 +253,13 @@ namespace ILCompiler.Compiler
             return loops;
         }
 
-        private static FlowGraphNaturalLoop? FindBackEdges(FlowgraphDfsTree dfsTree, ILogger logger, BasicBlock header, FlowGraphNaturalLoop? loop)
+        private static FlowGraphNaturalLoop? FindBackEdges(FlowgraphDfsTree dfsTree, ILogger logger, BasicBlock header, FlowGraphNaturalLoop? loop, FlowGraph controlFlowGraph)
         {
             foreach (BasicBlock predecessorBlock in header.Predecessors)
             {
                 if (dfsTree.PostOrder.Contains(predecessorBlock) && FlowgraphDfsTree.IsAncestor(header, predecessorBlock))
                 {
-                    loop = loop ?? new FlowGraphNaturalLoop(dfsTree, header);
+                    loop = loop ?? new FlowGraphNaturalLoop(dfsTree, header, controlFlowGraph);
                     loop.BackEdges.Add(new FlowEdge(predecessorBlock, header));
 
                     logger.LogDebug("{PredecssorLabel} -> {HeaderLabel} is a backedge", predecessorBlock.Label, header.Label);

@@ -32,7 +32,7 @@ namespace ILCompiler.Compiler
 
             do
             {
-                var block = compiler.Blocks[blockIndex];
+                var block = compiler.ControlFlowGraph.Blocks[blockIndex];
                 if (block.Statements.Count > 0)
                 {
                     int statementIndex = 0;
@@ -68,7 +68,7 @@ namespace ILCompiler.Compiler
                 }
 
                 blockIndex++;
-            } while (blockIndex < compiler.Blocks.Count);
+            } while (blockIndex < compiler.ControlFlowGraph.Blocks.Count);
         }
 
         private static int CheckInlineDepthAndRecursion(InlineInfo inlineInfo)
@@ -336,13 +336,13 @@ namespace ILCompiler.Compiler
                 // Split block after statement being inlined
                 var bottomBlock = SplitBlockAfterStatement(methodInfo.Block, afterStatementIndex);
 
-                var blockIndex = compiler.Blocks!.IndexOf(methodInfo.Block) + 1;
-                compiler.Blocks.Insert(blockIndex, bottomBlock);
+                var blockIndex = compiler.ControlFlowGraph.Blocks!.IndexOf(methodInfo.Block) + 1;
+                compiler.ControlFlowGraph.Blocks.Insert(blockIndex, bottomBlock);
 
                 // Insert the blocks between the current block and the bottom block
                 foreach (var block in blocks)
                 {
-                    compiler.Blocks.Insert(blockIndex++, block);
+                    compiler.ControlFlowGraph.Blocks.Insert(blockIndex++, block);
 
                     // For the first/entry block in the blocks being inserted
                     // link it up to the original method block

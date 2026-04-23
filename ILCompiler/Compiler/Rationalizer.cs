@@ -8,7 +8,7 @@ namespace ILCompiler.Compiler
     {
         public void Rationalize(MethodCompiler compiler)
         {
-            foreach (var block in compiler.Blocks)
+            foreach (var block in compiler.ControlFlowGraph.Blocks)
             {
                 // Link IR in statements together
                 foreach (var statement in block.Statements)

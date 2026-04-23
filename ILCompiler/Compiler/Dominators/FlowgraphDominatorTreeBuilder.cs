@@ -24,7 +24,7 @@ namespace ILCompiler.Compiler.Dominators
             ComputeImmediateDominators(postOrder);
 
             // Create the dominator tree
-            var root = BuildDominatorTree(compiler.Blocks);
+            var root = BuildDominatorTree(compiler.ControlFlowGraph.Blocks);
 
             // Assign preorder and postorder numbers for quick dominance checks
             NumberDomTreeVisitor numberDomTreeVisitor = new NumberDomTreeVisitor(root, postOrder.Count);

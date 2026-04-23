@@ -5,12 +5,12 @@
         public IList<BasicBlock> PostOrder { get; init; } = postOrder;
         public bool HasCycle { get; init; } = hasCycle;
 
-        public class AllSuccessorEnumerator(BasicBlock block)
+        public class AllSuccessorEnumerator(BasicBlock block, ControlFlowGraph controlFlowGraph)
         {
-            private int _position = 0;
             public BasicBlock Block { get; init; } = block;
 
-            public BasicBlock? NextSuccessor => _position < Block.Successors.Count ? Block.Successors[_position++] : null;
+            private readonly IEnumerator<BasicBlock> _successorEnumerator = controlFlowGraph.VisitAllSuccs(block).GetEnumerator();
+            public BasicBlock? NextSuccessor => _successorEnumerator.MoveNext() ? _successorEnumerator.Current : null;
         }
 
         public static bool IsAncestor(BasicBlock ancestor, BasicBlock descendant)
@@ -19,12 +19,11 @@
                 descendant.PostOrderNum <= ancestor.PostOrderNum;
         }
 
-        public static FlowgraphDfsTree BuildAndRemove(IList<BasicBlock> blocks)
+        public static FlowgraphDfsTree BuildAndRemove(ControlFlowGraph controlFlowGraph)
         {
-            blocks = SetupBasicBlockRoot(blocks);
+            var blocks = SetupBasicBlockRoot(controlFlowGraph.Blocks);
 
-            var firstBlock = blocks[0];
-            var dfsTree = Build(firstBlock);
+            var dfsTree = Build(controlFlowGraph);
 
             dfsTree.RemoveBlocksOutsideOfDfsTree(blocks);
 
@@ -55,8 +54,9 @@
             }
         }
 
-        public static FlowgraphDfsTree Build(BasicBlock firstBlock)
+        public static FlowgraphDfsTree Build(ControlFlowGraph controlFlowGraph)
         {
+            var firstBlock = controlFlowGraph.Blocks[0];
             var postOrder = new List<BasicBlock>();
             bool hasCycle = false;
 
@@ -66,7 +66,7 @@
             uint preOrderIndex = 0;
 
             var blocks = new Stack<AllSuccessorEnumerator>();
-            blocks.Push(new AllSuccessorEnumerator(firstBlock));
+            blocks.Push(new AllSuccessorEnumerator(firstBlock, controlFlowGraph));
             VisitPreOrder(firstBlock, preOrderIndex++);
 
             while (blocks.Count != 0)
@@ -78,7 +78,7 @@
                 {
                     if (!visitedBlocks.Contains(successor))
                     {
-                        blocks.Push(new AllSuccessorEnumerator(successor));
+                        blocks.Push(new AllSuccessorEnumerator(successor, controlFlowGraph));
                         visitedBlocks.Add(successor);
 
                         VisitPreOrder(successor, preOrderIndex++);

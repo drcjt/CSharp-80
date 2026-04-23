@@ -6,17 +6,19 @@ namespace ILCompiler.Compiler.Ssa
     {
         readonly VariableSet _liveIn;
         readonly VariableSet _liveOut;
+        readonly FlowGraph _controlFlowGraph;
 
-        public static void AnalyzeLiveVars(IList<BasicBlock> blocks, FlowgraphDfsTree dfsTree)
+        public static void AnalyzeLiveVars(FlowGraph controlFlowGraph, FlowgraphDfsTree dfsTree)
         {
-            var analyzer = new LiveVarAnalyzer();
-            analyzer.Run(blocks, dfsTree);
+            var analyzer = new LiveVarAnalyzer(controlFlowGraph);
+            analyzer.Run(dfsTree);
         }
 
-        public LiveVarAnalyzer()
+        public LiveVarAnalyzer(FlowGraph controlFlowGraph)
         {
             _liveIn = new VariableSet();
             _liveOut = new VariableSet();
+            _controlFlowGraph = controlFlowGraph;
         }
 
         private bool PerBlockAnalysis(BasicBlock block)
@@ -32,7 +34,7 @@ namespace ILCompiler.Compiler.Ssa
             // TODO: Revisit when importer handles jmp cil
 
             // Union in all the live in vars of blocks successors
-            foreach (var succ in block.Successors)
+            foreach (var succ in _controlFlowGraph.VisitAllSuccs(block))
             {
                 _liveOut.Union(succ.LiveIn);
             }
@@ -72,7 +74,7 @@ namespace ILCompiler.Compiler.Ssa
             }
         }
 
-        public void Run(IList<BasicBlock> blocks, FlowgraphDfsTree dfsTree)
+        public void Run(FlowgraphDfsTree dfsTree)
         {
             bool changed;
             do

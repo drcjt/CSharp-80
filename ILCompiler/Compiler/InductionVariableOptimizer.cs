@@ -12,15 +12,13 @@ namespace ILCompiler.Compiler
     internal class InductionVariableOptimizer : IInductionVariableOptimizer
     {
         private readonly ILogger<InductionVariableOptimizer> _logger;
-        private readonly IFlowgraph _flowgraph;
 
-        public InductionVariableOptimizer(ILogger<InductionVariableOptimizer> logger, IFlowgraph flowgraph)
+        public InductionVariableOptimizer(ILogger<InductionVariableOptimizer> logger)
         {
             _logger = logger;
-            _flowgraph = flowgraph;
         }
 
-        public void Run(MethodCompiler compiler)
+        public void Run(MethodCompiler compiler, FlowGraph controlFlowGraph)
         {
             FlowGraphNaturalLoops loops = compiler.Loops!;
 
@@ -38,11 +36,11 @@ namespace ILCompiler.Compiler
                     // Consider doing something useful here
                     _logger.LogInformation("Processing loop with header {LoopLabel}", loop.Header.Label);
 
-                    var strengthReductionContext = new StrengthReductionContext(scalarEvolutionContext, loop, loopInfo, compiler.Locals, _flowgraph, _logger);
+                    var strengthReductionContext = new StrengthReductionContext(scalarEvolutionContext, loop, loopInfo, compiler.Locals, controlFlowGraph, _logger);
                     strengthReductionContext.TryStrengthReduce();
 
                     // TODO: Remove unused IVs
-                    RemoveUnusedIVs(loop, loopInfo, compiler.Flowgraph!, compiler.Locals);
+                    RemoveUnusedIVs(loop, loopInfo, controlFlowGraph, compiler.Locals);
                 }
             }
         }
