@@ -128,11 +128,11 @@ namespace ILCompiler.Compiler
                 }
 
                 var handlerBeginBlock = CreateBasicBlock(basicBlocks, exceptionHandler.HandlerOffset);
-                var handlerEndBlock = GetHandlerLastBlock(exceptionHandler.HandlerEndOffset, basicBlocks);
+                var handlerEndBlock = exceptionHandler.HandlerEndOffset != null ? basicBlocks[(int)exceptionHandler.HandlerEndOffset] : null;
 
                 handlerBeginBlock.TryBlocks = GetTryBlocks(exceptionHandler, basicBlocks);
 
-                var tryEndBlock = GetHandlerLastBlock(exceptionHandler.TryEndOffset, basicBlocks);
+                var tryEndBlock = exceptionHandler.TryEndOffset != null ? basicBlocks[(int)exceptionHandler.TryEndOffset] : null;
 
                 handlerBeginBlock.HandlerStart = true;
                 tryBeginBlock.TryStart = true;
@@ -157,26 +157,6 @@ namespace ILCompiler.Compiler
                 var ehClause = new EHClause(tryBeginBlock, tryEndBlock, handlerBeginBlock, handlerEndBlock, filterBlock, kind, catchTypeMangledName);
                 ehClauses.Add(ehClause);
             }
-        }
-
-        private static BasicBlock GetHandlerLastBlock(int? handlerEndOffset, BasicBlock[] basicBlocks)
-        {
-            if (!handlerEndOffset.HasValue)
-            {
-                return basicBlocks[^1];
-            }
-
-            int blockIndex = handlerEndOffset.Value - 1;
-            BasicBlock? handlerLastBlock;
-            do
-            {
-                handlerLastBlock = basicBlocks[blockIndex--];
-
-            } while (handlerLastBlock is null && blockIndex >= 0);
-
-            Debug.Assert(handlerLastBlock != null, "Could not find a basic block for the end of the handler");
-
-            return handlerLastBlock;
         }
 
         private static List<BasicBlock> GetTryBlocks(ILExceptionRegion exceptionHandler, BasicBlock[] basicBlocks)
