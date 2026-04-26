@@ -157,7 +157,7 @@ namespace ILCompiler.Compiler
             ILExceptionRegionKind.Fault => EHClauseKind.Fault,
             ILExceptionRegionKind.Finally => EHClauseKind.Finally,
             ILExceptionRegionKind.Filter => EHClauseKind.Filter,
-            ILExceptionRegionKind => EHClauseKind.Typed
+            ILExceptionRegionKind.Catch => EHClauseKind.Typed,
         };
 
         private static List<BasicBlock> GetTryBlocks(ILExceptionRegion exceptionHandler, BasicBlock[] basicBlocks)
