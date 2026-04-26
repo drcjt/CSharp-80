@@ -35,7 +35,7 @@ namespace ILCompiler.Compiler
         public IList<Instruction> Generate(MethodCompiler compiler, Z80MethodCodeNode methodCodeNode)
         {
             LocalVariableTable locals = compiler.Locals;
-            IList<BasicBlock> blocks = compiler.Blocks;
+            IList<BasicBlock> blocks = compiler.ControlFlowGraph.Blocks;
 
             _context = new CodeGeneratorContext(locals, methodCodeNode, _configuration, _nameMangler, _nodeFactory, _corLibModuleProvider);
 
@@ -91,19 +91,9 @@ namespace ILCompiler.Compiler
                     currentNode = currentNode.Next;
                 }
 
-                if (block.JumpKind == JumpKind.Always)
+                if (block.JumpKind == JumpKind.Always && block.Successors.Count == 1)
                 {
-                    var nonHandlerSuccessors = block.Successors.Where(s => !s.HandlerStart).ToList();
-                    if (nonHandlerSuccessors.Count == 1)
-                    {
-                        _context.InstructionsBuilder.Jp(nonHandlerSuccessors[0].Label);
-                    }
-                }
-
-                // If block is last block in a try handler then emit a label which will be used in the EH_CLAUSES
-                if (methodCodeNode.EhClauses.Any(x => x.TryEnd == block))
-                {
-                    _context.InstructionsBuilder.Label($"{block.Label}_END");
+                    _context.InstructionsBuilder.Jp(block.Successors[0].Label);
                 }
 
                 methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);

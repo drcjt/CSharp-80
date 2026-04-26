@@ -7,10 +7,12 @@ namespace ILCompiler.Compiler.Ssa
     {
         private readonly SsaRenameState _renameStack;
         private readonly LocalVariableTable _locals;
-        public SsaRenameDominatorTreeVisitor(DominatorTreeNode root, SsaRenameState renameStack, LocalVariableTable locals) : base(root)
+        private readonly FlowGraph _controlFlowGraph;
+        public SsaRenameDominatorTreeVisitor(DominatorTreeNode root, SsaRenameState renameStack, LocalVariableTable locals, FlowGraph controlFlowGraph) : base(root)
         {
             _renameStack = renameStack;
             _locals = locals;
+            _controlFlowGraph = controlFlowGraph;
         }
 
         public override void PostOrderVisit(BasicBlock block)
@@ -26,7 +28,7 @@ namespace ILCompiler.Compiler.Ssa
 
         private void AddPhiArgsToSuccessors(BasicBlock block)
         {
-            foreach (var successor in block.Successors)
+            foreach (var successor in _controlFlowGraph.VisitAllSuccs(block))
             {
                 foreach (var statement in successor.Statements)
                 {

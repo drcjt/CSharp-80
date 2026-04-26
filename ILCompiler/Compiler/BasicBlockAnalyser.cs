@@ -8,10 +8,10 @@ namespace ILCompiler.Compiler
 {
     public enum EHClauseKind
     {
-        Typed,  // Catch handler with a specific type
-        Fault,  // Fault handler
-        Finally, // Finally handler
-        Filter  // Filter handler
+        Typed = 0,  // Catch handler with a specific type
+        Filter = 1,  // Filter handler
+        Finally = 2, // Finally handler
+        Fault = 4,  // Fault handler
     }
 
     public class EHClause
@@ -120,19 +120,18 @@ namespace ILCompiler.Compiler
                     // TODO: Implement finally blocks - just ignore them for now
                     continue;
                 }
-
-                if (exceptionHandler.Kind == ILExceptionRegionKind.Filter)
+                else if (exceptionHandler.Kind == ILExceptionRegionKind.Filter)
                 {
                     filterBlock = CreateBasicBlock(basicBlocks, exceptionHandler.FilterOffset);
                     filterBlock.FilterStart = true;
                 }
 
                 var handlerBeginBlock = CreateBasicBlock(basicBlocks, exceptionHandler.HandlerOffset);
-                var handlerEndBlock = GetHandlerLastBlock(exceptionHandler.HandlerEndOffset, basicBlocks);
+                var handlerEndBlock = exceptionHandler.HandlerEndOffset != null ? basicBlocks[(int)exceptionHandler.HandlerEndOffset] : null;
 
                 handlerBeginBlock.TryBlocks = GetTryBlocks(exceptionHandler, basicBlocks);
 
-                var tryEndBlock = GetHandlerLastBlock(exceptionHandler.TryEndOffset, basicBlocks);
+                var tryEndBlock = exceptionHandler.TryEndOffset != null ? basicBlocks[(int)exceptionHandler.TryEndOffset] : null;
 
                 handlerBeginBlock.HandlerStart = true;
                 tryBeginBlock.TryStart = true;
@@ -146,37 +145,9 @@ namespace ILCompiler.Compiler
 
                 tryBeginBlock.Handlers.Add(handlerBeginBlock);
 
-                EHClauseKind kind = exceptionHandler.Kind switch
-                {
-                    ILExceptionRegionKind.Fault => EHClauseKind.Fault,
-                    ILExceptionRegionKind.Finally => EHClauseKind.Finally,
-                    ILExceptionRegionKind.Filter => EHClauseKind.Filter,
-                    ILExceptionRegionKind => EHClauseKind.Typed
-                };
-
-                var ehClause = new EHClause(tryBeginBlock, tryEndBlock, handlerBeginBlock, handlerEndBlock, filterBlock, kind, catchTypeMangledName);
+                var ehClause = new EHClause(tryBeginBlock, tryEndBlock, handlerBeginBlock, handlerEndBlock, filterBlock, (EHClauseKind)exceptionHandler.Kind, catchTypeMangledName);
                 ehClauses.Add(ehClause);
             }
-        }
-
-        private static BasicBlock GetHandlerLastBlock(int? handlerEndOffset, BasicBlock[] basicBlocks)
-        {
-            if (!handlerEndOffset.HasValue)
-            {
-                return basicBlocks[^1];
-            }
-
-            int blockIndex = handlerEndOffset.Value - 1;
-            BasicBlock? handlerLastBlock;
-            do
-            {
-                handlerLastBlock = basicBlocks[blockIndex--];
-
-            } while (handlerLastBlock is null && blockIndex >= 0);
-
-            Debug.Assert(handlerLastBlock != null, "Could not find a basic block for the end of the handler");
-
-            return handlerLastBlock;
         }
 
         private static List<BasicBlock> GetTryBlocks(ILExceptionRegion exceptionHandler, BasicBlock[] basicBlocks)

@@ -289,7 +289,7 @@ namespace ILCompiler.Compiler
 
             var basicBlockAnalyser = new BasicBlockAnalyser(Method, NameMangler, _methodIL, this);
             var offsetToIndexMap = new Dictionary<int, int>();
-            BasicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
+            BasicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);            
 
             // Trigger static constructor if required
             if (Method.IsDefaultConstructor)
@@ -306,29 +306,12 @@ namespace ILCompiler.Compiler
 
             ImportBasicBlocks(offsetToIndexMap);
 
-            compiler.Blocks.Clear();
+            compiler.ControlFlowGraph.Blocks.Clear();
             for (int i = 0; i < BasicBlocks.Length; i++)
             {
                 if (BasicBlocks[i] != null)
                 {
-                    compiler.Blocks.Add(BasicBlocks[i]);
-                }
-            }
-
-            // Add EH begin block as successor to all blocks in trys
-            SetTryBlockSuccessors(compiler.Blocks);
-        }
-
-        private static void SetTryBlockSuccessors(IList<BasicBlock> basicBlocks)
-        {
-            foreach (var block in basicBlocks)
-            {
-                if (block.HandlerStart)
-                {
-                    foreach (var tryBlock in block.TryBlocks)
-                    {
-                        tryBlock.Successors.Add(block);
-                    }
+                    compiler.ControlFlowGraph.Blocks.Add(BasicBlocks[i]);
                 }
             }
         }

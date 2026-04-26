@@ -3,11 +3,54 @@ using ILCompiler.Interfaces;
 
 namespace ILCompiler.Compiler
 {
-    public class Flowgraph : IFlowgraph
+    public class FlowGraph : IFlowgraph
     {
-        public void SetBlockOrder(IList<BasicBlock> blocks)
+        public IList<BasicBlock> Blocks { get; } = [];
+
+        public IList<EHClause> EhClauses { get; } = [];
+
+        public IEnumerable<BasicBlock> VisitAllSuccs(BasicBlock b)
         {
-            foreach (var block in blocks)
+            foreach (BasicBlock succ in b.Successors)
+                yield return succ;
+
+            foreach (BasicBlock ehSucc in GetEhSuccs(b))
+                yield return ehSucc;
+        }
+
+        private IEnumerable<BasicBlock> GetEhSuccs(BasicBlock b)
+        {
+            foreach (EHClause clause in EhClauses)
+            {
+                if (IsInTryRegion(b, clause))
+                {
+                    yield return clause.HandlerBegin;
+                }
+            }
+        }
+
+        bool IsInTryRegion(BasicBlock b, EHClause c)
+        {
+            bool inRegion = false;
+
+            foreach (BasicBlock block in Blocks)
+            {
+                if (block == c.TryBegin)
+                    inRegion = true;
+
+                if (block == c.TryEnd)
+                    break;
+
+                if (block == b && inRegion)
+                    return true;
+            }
+
+            return false;
+        }
+
+        public void SetBlockOrder()
+        {
+            foreach (var block in Blocks)
             {
                 SetBlockOrder(block);
             }
@@ -70,7 +113,7 @@ namespace ILCompiler.Compiler
             else
             {
                 InsertStatementAtEnd(block, statement);
-            }              
+            }
         }
 
         public void InsertStatementAtEnd(BasicBlock block, Statement statement)
@@ -84,39 +127,6 @@ namespace ILCompiler.Compiler
         public void RemoveStatement(BasicBlock block, Statement statement)
         {
             block.Statements.Remove(statement);
-        }
-    }
-
-    public class PostOrderTraversalVisitor : StackEntryVisitor
-    {
-        public StackEntry? Current { get; private set; }
-        public StackEntry? First { get; set; }
-
-        public List<StackEntry> PostOrderNodes { get; set; } = new List<StackEntry>();
-
-        public PostOrderTraversalVisitor(StackEntry? current)
-        {
-            Current = current;
-        }
-
-        public override WalkResult PostOrderVisit(Edge<StackEntry> use, StackEntry? user)
-        {
-            SetNext(use.Get());
-            return WalkResult.Continue;
-        }
-        private void SetNext(StackEntry entry)
-        {
-            PostOrderNodes.Add(entry);
-            if (Current != null)
-            {
-                Current.Next = entry;
-                entry.Prev = Current;
-            }
-            Current = entry;
-            if (First == null)
-            {
-                First = Current;
-            }
         }
     }
 }

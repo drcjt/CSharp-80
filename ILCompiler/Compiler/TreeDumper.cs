@@ -19,17 +19,17 @@ namespace ILCompiler.Compiler
             return _sb.ToString();
         }
 
-        public string Dump(IList<BasicBlock> blocks, LocalVariableTable locals)
+        public string Dump(FlowGraph controlFlowGraph, LocalVariableTable locals)
         {
             _locals = locals;
             int statementId = 0;
 
             _sb.Clear();
-            foreach (BasicBlock block in blocks)
+            foreach (BasicBlock block in controlFlowGraph.Blocks)
             {
                 string blockKind = GetBlockKind(block);
                 string blockPreds = GetBlocks(block.Predecessors);
-                string blockSuccs = GetBlocks(block.Successors);
+                string blockSuccs = GetBlocks(controlFlowGraph.VisitAllSuccs(block));
                 _sb.AppendLine($"{block.Label} [{block.StartOffset:0000}] ({blockKind}) preds={{{blockPreds}}} succs={{{blockSuccs}}}");
 
                 foreach (Statement statement in block.Statements)
@@ -47,7 +47,7 @@ namespace ILCompiler.Compiler
             return _sb.ToString();
         }
 
-        private static string GetBlocks(IList<BasicBlock> blocks)
+        private static string GetBlocks(IEnumerable<BasicBlock> blocks)
         {
             bool first = true;
             StringBuilder sb = new();

@@ -398,7 +398,7 @@ namespace ILCompiler.Compiler
                                     ehClausesBuilder.Dw(ehClause.TryBegin.Label, "Protected Region Start");
                                     if (ehClause.TryEnd != null)
                                     {
-                                        ehClausesBuilder.Dw($"{ehClause.TryEnd.Label}_END", "Protected Region End");
+                                        ehClausesBuilder.Dw(ehClause.TryEnd.Label, "Protected Region End");
                                     }
                                     else
                                     {

@@ -43,7 +43,7 @@ namespace ILCompiler.Compiler
             InsertPhiFunctions(postOrder, compiler.Locals);
 
             // Rename local variables
-            RenameVariables(compiler.DominatorTree!.Root, compiler.Locals);
+            RenameVariables(compiler.DominatorTree!.Root, compiler.Locals, compiler.ControlFlowGraph);
 
             // Log SSA form
             if (_dumpSsa)
@@ -87,7 +87,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void RenameVariables(DominatorTreeNode tree, LocalVariableTable locals)
+        private void RenameVariables(DominatorTreeNode tree, LocalVariableTable locals, FlowGraph controlFlowGraph)
         {
             var ssaRenameStack = new SsaRenameState(_logger, locals.Count);
 
@@ -128,7 +128,7 @@ namespace ILCompiler.Compiler
              * rename(entry)
              */
 
-            var visitor = new SsaRenameDominatorTreeVisitor(tree, ssaRenameStack, locals);
+            var visitor = new SsaRenameDominatorTreeVisitor(tree, ssaRenameStack, locals, controlFlowGraph);
             visitor.WalkTree();
         }
 

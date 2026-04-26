@@ -11,7 +11,7 @@ namespace ILCompiler.Compiler
             LocalVarLivenessInit(compiler.Locals);
 
             // Figure out use/def info for all basic blocks
-            PerBlockLocalVarLiveness(compiler.Blocks, logger);
+            PerBlockLocalVarLiveness(compiler.ControlFlowGraph.Blocks, logger);
             InterBlockLocalVarLiveness(compiler);
         }
 
@@ -48,14 +48,14 @@ namespace ILCompiler.Compiler
         private static void InterBlockLocalVarLiveness(MethodCompiler compiler)
         {
             // Compute the IN and OUT sets using classic liveness algorithm
-            LiveVarAnalyzer.AnalyzeLiveVars(compiler.Blocks, compiler.DfsTree!);
+            LiveVarAnalyzer.AnalyzeLiveVars(compiler.ControlFlowGraph, compiler.DfsTree!);
 
             LocalVariableTable locals = compiler.Locals;
 
             // Set which local variable must be initialized
             for (var lclNum = 0; lclNum < locals.Count; lclNum++)
             {
-                if (!locals[lclNum].IsParameter && compiler.Blocks[0].LiveIn.IsMember(lclNum))
+                if (!locals[lclNum].IsParameter && compiler.ControlFlowGraph.Blocks[0].LiveIn.IsMember(lclNum))
                 {
                     locals[lclNum].MustInit = true;
                 }
