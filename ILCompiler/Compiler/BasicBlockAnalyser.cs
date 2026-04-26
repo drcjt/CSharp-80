@@ -8,10 +8,10 @@ namespace ILCompiler.Compiler
 {
     public enum EHClauseKind
     {
-        Typed,  // Catch handler with a specific type
-        Fault,  // Fault handler
-        Finally, // Finally handler
-        Filter  // Filter handler
+        Typed = 0,  // Catch handler with a specific type
+        Filter = 1,  // Filter handler
+        Finally = 2, // Finally handler
+        Fault = 4,  // Fault handler
     }
 
     public class EHClause
@@ -145,20 +145,10 @@ namespace ILCompiler.Compiler
 
                 tryBeginBlock.Handlers.Add(handlerBeginBlock);
 
-                EHClauseKind kind = ToEHClauseKind(exceptionHandler.Kind);
-
-                var ehClause = new EHClause(tryBeginBlock, tryEndBlock, handlerBeginBlock, handlerEndBlock, filterBlock, kind, catchTypeMangledName);
+                var ehClause = new EHClause(tryBeginBlock, tryEndBlock, handlerBeginBlock, handlerEndBlock, filterBlock, (EHClauseKind)exceptionHandler.Kind, catchTypeMangledName);
                 ehClauses.Add(ehClause);
             }
         }
-
-        private static EHClauseKind ToEHClauseKind(ILExceptionRegionKind exceptionRegionKind) => exceptionRegionKind switch
-        {
-            ILExceptionRegionKind.Fault => EHClauseKind.Fault,
-            ILExceptionRegionKind.Finally => EHClauseKind.Finally,
-            ILExceptionRegionKind.Filter => EHClauseKind.Filter,
-            ILExceptionRegionKind.Catch => EHClauseKind.Typed,
-        };
 
         private static List<BasicBlock> GetTryBlocks(ILExceptionRegion exceptionHandler, BasicBlock[] basicBlocks)
         {
