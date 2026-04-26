@@ -120,8 +120,7 @@ namespace ILCompiler.Compiler
                     // TODO: Implement finally blocks - just ignore them for now
                     continue;
                 }
-
-                if (exceptionHandler.Kind == ILExceptionRegionKind.Filter)
+                else if (exceptionHandler.Kind == ILExceptionRegionKind.Filter)
                 {
                     filterBlock = CreateBasicBlock(basicBlocks, exceptionHandler.FilterOffset);
                     filterBlock.FilterStart = true;
@@ -146,18 +145,20 @@ namespace ILCompiler.Compiler
 
                 tryBeginBlock.Handlers.Add(handlerBeginBlock);
 
-                EHClauseKind kind = exceptionHandler.Kind switch
-                {
-                    ILExceptionRegionKind.Fault => EHClauseKind.Fault,
-                    ILExceptionRegionKind.Finally => EHClauseKind.Finally,
-                    ILExceptionRegionKind.Filter => EHClauseKind.Filter,
-                    ILExceptionRegionKind => EHClauseKind.Typed
-                };
+                EHClauseKind kind = ToEHClauseKind(exceptionHandler.Kind);
 
                 var ehClause = new EHClause(tryBeginBlock, tryEndBlock, handlerBeginBlock, handlerEndBlock, filterBlock, kind, catchTypeMangledName);
                 ehClauses.Add(ehClause);
             }
         }
+
+        private static EHClauseKind ToEHClauseKind(ILExceptionRegionKind exceptionRegionKind) => exceptionRegionKind switch
+        {
+            ILExceptionRegionKind.Fault => EHClauseKind.Fault,
+            ILExceptionRegionKind.Finally => EHClauseKind.Finally,
+            ILExceptionRegionKind.Filter => EHClauseKind.Filter,
+            ILExceptionRegionKind => EHClauseKind.Typed
+        };
 
         private static List<BasicBlock> GetTryBlocks(ILExceptionRegion exceptionHandler, BasicBlock[] basicBlocks)
         {

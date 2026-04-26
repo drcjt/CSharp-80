@@ -91,12 +91,9 @@ namespace ILCompiler.Compiler
                     currentNode = currentNode.Next;
                 }
 
-                if (block.JumpKind == JumpKind.Always)
+                if (block.JumpKind == JumpKind.Always && block.Successors.Count == 1)
                 {
-                    if (block.Successors.Count == 1)
-                    {
-                        _context.InstructionsBuilder.Jp(block.Successors[0].Label);
-                    }
+                    _context.InstructionsBuilder.Jp(block.Successors[0].Label);
                 }
 
                 methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
