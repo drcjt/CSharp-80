@@ -396,15 +396,7 @@ namespace ILCompiler.Compiler
                                 if (ehClause.Kind == EHClauseKind.Typed)
                                 {
                                     ehClausesBuilder.Dw(ehClause.TryBegin.Label, "Protected Region Start");
-                                    if (ehClause.TryEnd != null)
-                                    {
-                                        ehClausesBuilder.Dw(ehClause.TryEnd.Label, "Protected Region End");
-                                    }
-                                    else
-                                    {
-                                        var methodName = codeNode.GetMangledName(_nameMangler);
-                                        ehClausesBuilder.Dw($"{methodName}_END", "Protected Region End");
-                                    }
+                                    ehClausesBuilder.Dw($"{ehClause.TryLast.Label}_END", "Protected Region End");
                                     ehClausesBuilder.Dw(ehClause.HandlerBegin.Label, "Handler Start");
                                     ehClausesBuilder.Dw(ehClause.CatchTypeMangledName!, "Catch Type");
                                 }

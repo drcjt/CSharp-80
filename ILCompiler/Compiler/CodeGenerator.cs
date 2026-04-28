@@ -6,6 +6,7 @@ using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Peephole;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Dnlib;
+using Microsoft.Extensions.Logging;
 using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler
@@ -18,11 +19,12 @@ namespace ILCompiler.Compiler
         private readonly CorLibModuleProvider _corLibModuleProvider;
         private readonly NodeFactory _nodeFactory;
         private readonly Optimizer _optimizer;
+        private readonly ILogger<CodeGenerator> _logger;
 
         private CodeGeneratorContext _context = null!;
 
         public CodeGenerator(INameMangler nameMangler, ICodeGeneratorFactory codeGeneratorFactory, IConfiguration configuration,
-            CorLibModuleProvider corLibModuleProvider, NodeFactory nodeFactory, Optimizer optimizer)
+            CorLibModuleProvider corLibModuleProvider, NodeFactory nodeFactory, Optimizer optimizer, ILogger<CodeGenerator> logger)
         {
             _nameMangler = nameMangler;
             _codeGeneratorFactory = codeGeneratorFactory;
@@ -30,6 +32,7 @@ namespace ILCompiler.Compiler
             _corLibModuleProvider = corLibModuleProvider;
             _nodeFactory = nodeFactory;
             _optimizer = optimizer;
+            _logger = logger;
         }
 
         public IList<Instruction> Generate(MethodCompiler compiler, Z80MethodCodeNode methodCodeNode)
@@ -71,33 +74,25 @@ namespace ILCompiler.Compiler
             GenerateProlog(_context.InstructionsBuilder);
             methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
 
-            foreach (var block in blocks)
+            foreach (var funclet in compiler.Funclets)
             {
-                _context.InstructionsBuilder.Reset();
-
-                _context.InstructionsBuilder.Label(block.Label);
-
-                var visitorAdapter = new GenericStackEntryAdapter(this);
-
-                var currentNode = block.FirstNode;
-                while (currentNode != null)
+                if (funclet.Kind == FuncletKind.Root)
                 {
-                    // Only need to generate code for nodes that are not contained
-                    // Contained nodes are part of their parents for code generation purposes
-                    if (!currentNode.Contained)
-                    {
-                        currentNode.Accept(visitorAdapter);
-                    }
-                    currentNode = currentNode.Next;
+                    _logger.LogInformation("Generating code for main function");
+                }
+                else
+                {
+                    _logger.LogInformation("Generating code for funclet");
                 }
 
-                if (block.JumpKind == JumpKind.Always && block.Successors.Count == 1)
+                foreach (BasicBlock block in funclet.Blocks)
                 {
-                    _context.InstructionsBuilder.Jp(block.Successors[0].Label);
+                    GenerateCodeForBlock(block, methodCodeNode.EhClauses);
+                    methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
                 }
-
-                methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
             }
+
+
             // Emit end of method label
             _context.InstructionsBuilder.Reset();
             _context.InstructionsBuilder.Label($"{methodName}_END");
@@ -110,6 +105,37 @@ namespace ILCompiler.Compiler
             methodInstructions.Add(Instruction.CreateComment($"Total bytes of code {totalBytes} for method {methodCodeNode.Method.FullName}"));
 
             return methodInstructions;
+        }
+
+        private void GenerateCodeForBlock(BasicBlock block, IList<EHClause> ehClauses)
+        {
+            _context.InstructionsBuilder.Reset();
+
+            _context.InstructionsBuilder.Label(block.Label);
+
+            var visitorAdapter = new GenericStackEntryAdapter(this);
+
+            var currentNode = block.FirstNode;
+            while (currentNode != null)
+            {
+                // Only need to generate code for nodes that are not contained
+                // Contained nodes are part of their parents for code generation purposes
+                if (!currentNode.Contained)
+                {
+                    currentNode.Accept(visitorAdapter);
+                }
+                currentNode = currentNode.Next;
+            }
+
+            if (block.JumpKind == JumpKind.Always && block.Successors.Count == 1)
+            {
+                _context.InstructionsBuilder.Jp(block.Successors[0].Label);
+            }
+
+            if (ehClauses.Any(x => x.TryLast == block))
+            {
+                _context.InstructionsBuilder.Label($"{block.Label}_END");
+            }
         }
 
         private byte CalculateParameterBytes()

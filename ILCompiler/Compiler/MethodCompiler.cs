@@ -21,6 +21,7 @@ namespace ILCompiler.Compiler
         public FlowgraphDominatorTree? DominatorTree { get; private set; }
         public FlowGraphNaturalLoops? Loops { get; private set; }
         public FlowGraph ControlFlowGraph { get; } = new();
+        public IList<FuncletInfoDescriptor> Funclets { get; private set; } = [];
 
         public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory)
         {
@@ -144,6 +145,10 @@ namespace ILCompiler.Compiler
                 var earlyValuePropagation = _phaseFactory.Create<IEarlyValuePropagation>();
                 earlyValuePropagation.Run(this);
             }
+
+            // Create funclets from the EH handlers.
+            IFuncletCreator funcletCreator = _phaseFactory.Create<IFuncletCreator>();
+            Funclets = funcletCreator.CreateFunclets(this, methodCodeNodeNeedingCode);
 
             // Rationalize
             // LIR valid from here on - nodes are fully linked across statements
