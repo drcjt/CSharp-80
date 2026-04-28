@@ -38,7 +38,6 @@ namespace ILCompiler.Compiler
         public IList<Instruction> Generate(MethodCompiler compiler, Z80MethodCodeNode methodCodeNode)
         {
             LocalVariableTable locals = compiler.Locals;
-            IList<BasicBlock> blocks = compiler.ControlFlowGraph.Blocks;
 
             _context = new CodeGeneratorContext(locals, methodCodeNode, _configuration, _nameMangler, _nodeFactory, _corLibModuleProvider);
 
