@@ -66,6 +66,8 @@ namespace ILCompiler.IoC
             services.AddTransient<ILowering, Lowering>();
             services.AddLowerings();
 
+            services.AddTransient<IFuncletCreator, FuncletCreator>();
+
             services.AddTransient<ICodeGenerator, CodeGenerator>();
             services.AddCodeGenerators();
 

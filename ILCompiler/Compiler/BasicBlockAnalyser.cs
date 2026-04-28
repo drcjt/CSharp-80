@@ -17,17 +17,17 @@ namespace ILCompiler.Compiler
     public class EHClause
     {
         public BasicBlock TryBegin { get; init; }
-        public BasicBlock? TryEnd { get; init; }
+        public BasicBlock TryLast { get; init; }
         public BasicBlock HandlerBegin { get; init; }
         public BasicBlock? HandlerEnd { get; init; }
         public BasicBlock? Filter { get; init; }
         public EHClauseKind Kind { get; init; }
         public string? CatchTypeMangledName { get; init; }
 
-        public EHClause(BasicBlock tryBegin, BasicBlock? tryEnd, BasicBlock handlerBegin, BasicBlock? handlerEnd, BasicBlock? filter, EHClauseKind kind, string? catchTypeMangledName)
+        public EHClause(BasicBlock tryBegin, BasicBlock tryLast, BasicBlock handlerBegin, BasicBlock? handlerEnd, BasicBlock? filter, EHClauseKind kind, string? catchTypeMangledName)
         {
             TryBegin = tryBegin;
-            TryEnd = tryEnd;
+            TryLast = tryLast;
             HandlerBegin = handlerBegin;
             HandlerEnd = handlerEnd;
             Filter = filter;
@@ -131,7 +131,7 @@ namespace ILCompiler.Compiler
 
                 handlerBeginBlock.TryBlocks = GetTryBlocks(exceptionHandler, basicBlocks);
 
-                var tryEndBlock = exceptionHandler.TryEndOffset != null ? basicBlocks[(int)exceptionHandler.TryEndOffset] : null;
+                var tryLastBlock = GetHandlerLastBlock(exceptionHandler.TryEndOffset, basicBlocks);
 
                 handlerBeginBlock.HandlerStart = true;
                 tryBeginBlock.TryStart = true;
@@ -145,9 +145,29 @@ namespace ILCompiler.Compiler
 
                 tryBeginBlock.Handlers.Add(handlerBeginBlock);
 
-                var ehClause = new EHClause(tryBeginBlock, tryEndBlock, handlerBeginBlock, handlerEndBlock, filterBlock, (EHClauseKind)exceptionHandler.Kind, catchTypeMangledName);
+                var ehClause = new EHClause(tryBeginBlock, tryLastBlock, handlerBeginBlock, handlerEndBlock, filterBlock, (EHClauseKind)exceptionHandler.Kind, catchTypeMangledName);
                 ehClauses.Add(ehClause);
             }
+        }
+
+        private static BasicBlock GetHandlerLastBlock(int? handlerEndOffset, BasicBlock[] basicBlocks)
+        {
+            if (!handlerEndOffset.HasValue)
+            {
+                return basicBlocks[^1];
+            }
+
+            int blockIndex = handlerEndOffset.Value - 1;
+            BasicBlock? handlerLastBlock;
+            do
+            {
+                handlerLastBlock = basicBlocks[blockIndex--];
+
+            } while (handlerLastBlock is null && blockIndex >= 0);
+
+            Debug.Assert(handlerLastBlock != null, "Could not find a basic block for the end of the handler");
+
+            return handlerLastBlock;
         }
 
         private static List<BasicBlock> GetTryBlocks(ILExceptionRegion exceptionHandler, BasicBlock[] basicBlocks)
