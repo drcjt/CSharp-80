@@ -19,12 +19,11 @@ namespace ILCompiler.Compiler
         private readonly CorLibModuleProvider _corLibModuleProvider;
         private readonly NodeFactory _nodeFactory;
         private readonly Optimizer _optimizer;
-        private readonly ILogger<CodeGenerator> _logger;
 
         private CodeGeneratorContext _context = null!;
 
         public CodeGenerator(INameMangler nameMangler, ICodeGeneratorFactory codeGeneratorFactory, IConfiguration configuration,
-            CorLibModuleProvider corLibModuleProvider, NodeFactory nodeFactory, Optimizer optimizer, ILogger<CodeGenerator> logger)
+            CorLibModuleProvider corLibModuleProvider, NodeFactory nodeFactory, Optimizer optimizer)
         {
             _nameMangler = nameMangler;
             _codeGeneratorFactory = codeGeneratorFactory;
@@ -32,7 +31,6 @@ namespace ILCompiler.Compiler
             _corLibModuleProvider = corLibModuleProvider;
             _nodeFactory = nodeFactory;
             _optimizer = optimizer;
-            _logger = logger;
         }
 
         public IList<Instruction> Generate(MethodCompiler compiler, Z80MethodCodeNode methodCodeNode)
