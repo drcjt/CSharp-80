@@ -166,7 +166,7 @@ namespace ILCompiler.Compiler.Dominators
         /// <returns>list of dominance predecessors</returns>
         private static IList<BasicBlock> BlockDominancePredecessors(BasicBlock block)
         {
-            if (!block.HandlerStart)
+            if (!block.EHFlags.HasFlag(EHBoundaryFlags.HandlerStart))
             {
                 return block.Predecessors;
             }

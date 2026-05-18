@@ -29,39 +29,7 @@ namespace ILCompiler.Compiler
             }
         }
 
-        public bool IsInHandlerRegion(BasicBlock b, EHClause c)
-        {
-            bool inRegion = false;
-            foreach (BasicBlock block in Blocks)
-            {
-                if (block == c.HandlerBegin)
-                    inRegion = true;
-                if (block == c.HandlerEnd)
-                    break;
-                if (block == b && inRegion)
-                    return true;
-            }
-            return false;
-        }
-
-        bool IsInTryRegion(BasicBlock b, EHClause c)
-        {
-            bool inRegion = false;
-
-            foreach (BasicBlock block in Blocks)
-            {
-                if (block == c.TryBegin)
-                    inRegion = true;
-
-                if (block == b && inRegion)
-                    return true;
-
-                if (block == c.TryLast)
-                    break;
-            }
-
-            return false;
-        }
+        private static bool IsInTryRegion(BasicBlock b, EHClause c) => c.InTry(b.StartOffset);
 
         public void SetBlockOrder()
         {

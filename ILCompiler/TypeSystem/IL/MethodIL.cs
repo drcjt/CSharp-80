@@ -37,10 +37,10 @@ namespace ILCompiler.TypeSystem.IL
         public int HandlerOffset { get; }
         public int? HandlerEndOffset { get; }
 
-        public int FilterOffset { get; }
+        public int? FilterOffset { get; }
         public TypeDesc? CatchType { get; }
 
-        public ILExceptionRegion(ILExceptionRegionKind kind, int tryOffset, int? tryEndOffset, int handlerOffset, int? handlerEndOffset, int filterOffset, TypeDesc? catchType)
+        public ILExceptionRegion(ILExceptionRegionKind kind, int tryOffset, int? tryEndOffset, int handlerOffset, int? handlerEndOffset, int? filterOffset, TypeDesc? catchType)
         {
             Kind = kind;
             TryOffset = tryOffset;

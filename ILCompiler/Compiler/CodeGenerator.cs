@@ -19,12 +19,11 @@ namespace ILCompiler.Compiler
         private readonly CorLibModuleProvider _corLibModuleProvider;
         private readonly NodeFactory _nodeFactory;
         private readonly Optimizer _optimizer;
-        private readonly ILogger<CodeGenerator> _logger;
 
         private CodeGeneratorContext _context = null!;
 
         public CodeGenerator(INameMangler nameMangler, ICodeGeneratorFactory codeGeneratorFactory, IConfiguration configuration,
-            CorLibModuleProvider corLibModuleProvider, NodeFactory nodeFactory, Optimizer optimizer, ILogger<CodeGenerator> logger)
+            CorLibModuleProvider corLibModuleProvider, NodeFactory nodeFactory, Optimizer optimizer)
         {
             _nameMangler = nameMangler;
             _codeGeneratorFactory = codeGeneratorFactory;
@@ -32,7 +31,6 @@ namespace ILCompiler.Compiler
             _corLibModuleProvider = corLibModuleProvider;
             _nodeFactory = nodeFactory;
             _optimizer = optimizer;
-            _logger = logger;
         }
 
         public IList<Instruction> Generate(MethodCompiler compiler, Z80MethodCodeNode methodCodeNode)
@@ -72,25 +70,14 @@ namespace ILCompiler.Compiler
 
             GenerateProlog(_context.InstructionsBuilder);
             methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
+            _context.InstructionsBuilder.Reset();
 
-            foreach (var funclet in compiler.Funclets)
+            foreach (BasicBlock block in compiler.ControlFlowGraph.Blocks)
             {
-                if (funclet.Kind == FuncletKind.Root)
-                {
-                    _logger.LogInformation("Generating code for main function");
-                }
-                else
-                {
-                    _logger.LogInformation("Generating code for funclet");
-                }
-
-                foreach (BasicBlock block in funclet.Blocks)
-                {
-                    GenerateCodeForBlock(block, methodCodeNode.EhClauses);
-                    methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
-                }
+                GenerateCodeForBlock(block, compiler.ControlFlowGraph.EhClauses);
             }
 
+            methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
 
             // Emit end of method label
             _context.InstructionsBuilder.Reset();
@@ -108,8 +95,6 @@ namespace ILCompiler.Compiler
 
         private void GenerateCodeForBlock(BasicBlock block, IList<EHClause> ehClauses)
         {
-            _context.InstructionsBuilder.Reset();
-
             _context.InstructionsBuilder.Label(block.Label);
 
             var visitorAdapter = new GenericStackEntryAdapter(this);
@@ -126,11 +111,15 @@ namespace ILCompiler.Compiler
                 currentNode = currentNode.Next;
             }
 
-            if (block.JumpKind == JumpKind.Always && block.Successors.Count == 1)
+            if (!ehClauses.Any(x => x.HandlerLast == block && x.Kind == EHClauseKind.Finally))
             {
-                _context.InstructionsBuilder.Jp(block.Successors[0].Label);
+                if (block.JumpKind == JumpKind.Always && block.Successors.Count == 1)
+                {
+                    _context.InstructionsBuilder.Jp(block.Successors[0].Label);
+                }
             }
 
+            // If block is last block in a try handler then emit a label which will be used in the EH_CLAUSES
             if (ehClauses.Any(x => x.TryLast == block))
             {
                 _context.InstructionsBuilder.Label($"{block.Label}_END");

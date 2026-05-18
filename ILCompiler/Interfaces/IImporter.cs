@@ -39,7 +39,8 @@ namespace ILCompiler.Interfaces
         public int InlineFetchLocal(int localNumber);
 
         public MethodDesc Method { get; }
-
+        public IList<EHClause> EHClauses { get; }
+        public BasicBlock? CurrentBlock { get; }
         public StackEntry GetGenericContext();
 
         public TypeDesc? Constrained { get; set; }

@@ -52,6 +52,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
             services.AddSingleton<IOpcodeImporter, ThrowImporter>();
             services.AddSingleton<IOpcodeImporter, LeaveImporter>();
             services.AddSingleton<IOpcodeImporter, LoadTokenImporter>();
+            services.AddSingleton<IOpcodeImporter, EndFinallyImporter>();
 
             return services;
         }

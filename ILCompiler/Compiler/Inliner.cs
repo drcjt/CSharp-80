@@ -382,9 +382,8 @@ namespace ILCompiler.Compiler
             newBlock.JumpKind = block.JumpKind;
             block.JumpKind = JumpKind.Always; // Set the original block to always jump to the new block
 
-            newBlock.TryStart = block.TryStart;
-            newBlock.FilterStart = block.FilterStart;
-            newBlock.HandlerStart = block.HandlerStart;
+            newBlock.EHFlags = block.EHFlags;
+
             newBlock.TryBlocks = block.TryBlocks.ToList();
             newBlock.Handlers = block.Handlers.ToList();
 
