@@ -10,6 +10,12 @@ namespace ILCompiler.Compiler.CodeGenerators
 
         public void GenerateCode(ReturnEntry entry, CodeGeneratorContext context)
         {
+            if (entry.IsFinallyReturn)
+            {
+                context.InstructionsBuilder.Ret();
+                return;
+            }
+
             var epilogLabel = GetEpilogLabel(context);
             if (context.GeneratedEpilog)
             {

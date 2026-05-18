@@ -24,7 +24,11 @@ namespace ILCompiler.Compiler
         private LocalVariableTable? _locals;
         public LocalVariableTable LocalVariableTable => _locals!;
 
+        public IList<EHClause> EHClauses { get; private set; } = [];
+
         public BasicBlock[] BasicBlocks { get; set; } = [];
+
+        public BasicBlock? CurrentBlock => _currentBasicBlock;
         private BasicBlock? _currentBasicBlock;
         private BasicBlock? _pendingBasicBlocks;
         public BasicBlock? FallThroughBlock { get; private set; } = null;
@@ -169,7 +173,7 @@ namespace ILCompiler.Compiler
             var currentIndex = offsetToIndexMap[_currentILOffset];
 
             // Add exception object for catch
-            if (block.HandlerStart)
+            if (block.EHFlags.HasFlag(EHBoundaryFlags.HandlerStart) && block.CatchType is not null)
             {
                 // Use a node type that won't generate any code
                 var catchArgument = new CatchArgumentEntry();
@@ -273,6 +277,7 @@ namespace ILCompiler.Compiler
 
             Method = compiler.Method!;
             _locals = compiler.Locals;
+            EHClauses = ehClauses;
 
             var methodIL = Method.MethodIL!;
 
@@ -287,7 +292,7 @@ namespace ILCompiler.Compiler
                 _methodIL = methodIL;
             }
 
-            var basicBlockAnalyser = new BasicBlockAnalyser(Method, NameMangler, _methodIL, this);
+            var basicBlockAnalyser = new BasicBlockAnalyser(Method, _methodIL, this);
             var offsetToIndexMap = new Dictionary<int, int>();
             BasicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);            
 

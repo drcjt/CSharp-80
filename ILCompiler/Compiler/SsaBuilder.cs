@@ -299,7 +299,7 @@ namespace ILCompiler.Compiler
                 // block is obviously an immediate successor of its immediate predecessors
 
                 // If block is first block in exception handler then use all blocks handled by the handler
-                IList<BasicBlock> predecessors = !block.HandlerStart ? block.Predecessors : block.TryBlocks;
+                IList<BasicBlock> predecessors = !block.EHFlags.HasFlag(EHBoundaryFlags.HandlerStart) ? block.Predecessors : block.TryBlocks;
 
                 // If there is zero or one predecessors then there is no predecessor,
                 // or else the single predecessor dominates block, so no B2 exists

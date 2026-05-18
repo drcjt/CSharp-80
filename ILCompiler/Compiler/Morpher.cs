@@ -111,7 +111,7 @@ namespace ILCompiler.Compiler
                     block.Statements.RemoveAt(block.Statements.Count - 1);
 
                     var targetBlock = block.Successors.First(b => b.Label == jumpTrueEntry.TargetLabel);
-                    var fallthroughBlock = block.Successors.First(b => b != targetBlock && !b.HandlerStart);
+                    var fallthroughBlock = block.Successors.First(b => b != targetBlock && !b.EHFlags.HasFlag(EHBoundaryFlags.HandlerStart));
 
                     var constantValue = jumpTrueEntry.Condition.GetIntConstant();
                     if (constantValue == 0)
@@ -197,7 +197,7 @@ namespace ILCompiler.Compiler
                     {
                         returnValue = MorphTree(returnValue);
                     }
-                    tree = new ReturnEntry(returnValue);
+                    tree = new ReturnEntry(returnValue, re.IsFinallyReturn);
                     break;
 
                 case StoreIndEntry sie:

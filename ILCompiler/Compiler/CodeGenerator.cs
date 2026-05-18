@@ -72,25 +72,14 @@ namespace ILCompiler.Compiler
 
             GenerateProlog(_context.InstructionsBuilder);
             methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
+            _context.InstructionsBuilder.Reset();
 
-            foreach (var funclet in compiler.Funclets)
+            foreach (BasicBlock block in compiler.ControlFlowGraph.Blocks)
             {
-                if (funclet.Kind == FuncletKind.Root)
-                {
-                    _logger.LogInformation("Generating code for main function");
-                }
-                else
-                {
-                    _logger.LogInformation("Generating code for funclet");
-                }
-
-                foreach (BasicBlock block in funclet.Blocks)
-                {
-                    GenerateCodeForBlock(block, methodCodeNode.EhClauses);
-                    methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
-                }
+                GenerateCodeForBlock(block, compiler.ControlFlowGraph.EhClauses);
             }
 
+            methodInstructions.AddRange(_context.InstructionsBuilder.Instructions);
 
             // Emit end of method label
             _context.InstructionsBuilder.Reset();
@@ -108,8 +97,6 @@ namespace ILCompiler.Compiler
 
         private void GenerateCodeForBlock(BasicBlock block, IList<EHClause> ehClauses)
         {
-            _context.InstructionsBuilder.Reset();
-
             _context.InstructionsBuilder.Label(block.Label);
 
             var visitorAdapter = new GenericStackEntryAdapter(this);
@@ -126,11 +113,15 @@ namespace ILCompiler.Compiler
                 currentNode = currentNode.Next;
             }
 
-            if (block.JumpKind == JumpKind.Always && block.Successors.Count == 1)
+            if (!ehClauses.Any(x => x.HandlerLast == block && x.Kind == EHClauseKind.Finally))
             {
-                _context.InstructionsBuilder.Jp(block.Successors[0].Label);
+                if (block.JumpKind == JumpKind.Always && block.Successors.Count == 1)
+                {
+                    _context.InstructionsBuilder.Jp(block.Successors[0].Label);
+                }
             }
 
+            // If block is last block in a try handler then emit a label which will be used in the EH_CLAUSES
             if (ehClauses.Any(x => x.TryLast == block))
             {
                 _context.InstructionsBuilder.Label($"{block.Label}_END");

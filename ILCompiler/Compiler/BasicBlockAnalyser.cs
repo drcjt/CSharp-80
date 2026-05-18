@@ -14,45 +14,34 @@ namespace ILCompiler.Compiler
         Fault = 4,  // Fault handler
     }
 
-    public class EHClause
+    public class EHClause(BasicBlock tryBegin, BasicBlock tryLast, BasicBlock handlerBegin, BasicBlock handlerLast,
+        EHClauseKind kind, TypeDesc? exceptionType, int tryBeginILOffset, int tryEndILOffset)
     {
-        public BasicBlock TryBegin { get; init; }
-        public BasicBlock TryLast { get; init; }
-        public BasicBlock HandlerBegin { get; init; }
-        public BasicBlock? HandlerEnd { get; init; }
-        public BasicBlock? Filter { get; init; }
-        public EHClauseKind Kind { get; init; }
-        public string? CatchTypeMangledName { get; init; }
+        public BasicBlock TryBegin { get; init; } = tryBegin;
+        public BasicBlock TryLast { get; init; } = tryLast;
+        public BasicBlock HandlerBegin { get; init; } = handlerBegin;
+        public BasicBlock HandlerLast { get; init; } = handlerLast;
+        public EHClauseKind Kind { get; init; } = kind;
+        public TypeDesc? ExceptionType { get; init;  } = exceptionType;
 
-        public EHClause(BasicBlock tryBegin, BasicBlock tryLast, BasicBlock handlerBegin, BasicBlock? handlerEnd, BasicBlock? filter, EHClauseKind kind, string? catchTypeMangledName)
-        {
-            TryBegin = tryBegin;
-            TryLast = tryLast;
-            HandlerBegin = handlerBegin;
-            HandlerEnd = handlerEnd;
-            Filter = filter;
-            Kind = kind;
-            CatchTypeMangledName = catchTypeMangledName;
-        }   
+        public int TryBeginILOffset { get; init; } = tryBeginILOffset;
+        public int TryEndILOffset { get; init; } = tryEndILOffset;
+        public int TrySize => TryEndILOffset - TryBeginILOffset;
+
+        public bool InTry(int il) => TryBeginILOffset <= il && il < TryEndILOffset;
     }
 
     public class BasicBlockAnalyser
     {
-        private readonly INameMangler _nameMangler;
         private readonly MethodDesc _method;
         private readonly MethodIL _methodIL;
         private readonly IImporter? _importer;
 
         public int ReturnCount { get; set; }
 
-        public BasicBlockAnalyser(MethodDesc method, MethodIL? methodIL = null) : this(method, new NameMangler(), methodIL)
-        {
-        }
-
-        public BasicBlockAnalyser(MethodDesc method, INameMangler nameMangler, MethodIL? methodIL = null, IImporter? importer = null)
+        public BasicBlockAnalyser(MethodDesc method, MethodIL? methodIL = null, IImporter? importer = null)
         {
             _method = method;
-            _nameMangler = nameMangler;
             if (methodIL == null)
             {
                 _methodIL = method.MethodIL!;
@@ -94,9 +83,16 @@ namespace ILCompiler.Compiler
 
         private void FindEHTargets(BasicBlock[] basicBlocks, IList<EHClause> ehClauses)
         {
-            foreach (var exceptionHandler in _methodIL.GetExceptionRegions())
+            CreateEHBlocks(basicBlocks);
+            CreateEHClauses(basicBlocks, ehClauses);
+        }
+
+        private void CreateEHBlocks(BasicBlock[] basicBlocks)
+        {
+            foreach (ILExceptionRegion exceptionHandler in _methodIL.GetExceptionRegions())
             {
-                var tryBeginBlock = CreateBasicBlock(basicBlocks, exceptionHandler.TryOffset);
+                BasicBlock tryBeginBlock = CreateBasicBlock(basicBlocks, exceptionHandler.TryOffset);
+                tryBeginBlock.EHFlags |= EHBoundaryFlags.TryStart;
 
                 // Find previous block and set jump kind to always
 
@@ -114,38 +110,43 @@ namespace ILCompiler.Compiler
                     }
                 }
 
-                BasicBlock? filterBlock = null;
-                if (exceptionHandler.Kind != ILExceptionRegionKind.Catch)
+                BasicBlock? filterBlock;
+                if (exceptionHandler.Kind == ILExceptionRegionKind.Filter)
                 {
-                    // TODO: Implement finally blocks - just ignore them for now
-                    continue;
-                }
-                else if (exceptionHandler.Kind == ILExceptionRegionKind.Filter)
-                {
-                    filterBlock = CreateBasicBlock(basicBlocks, exceptionHandler.FilterOffset);
-                    filterBlock.FilterStart = true;
+                    filterBlock = CreateBasicBlock(basicBlocks, (int)exceptionHandler.FilterOffset!);
+                    filterBlock.EHFlags |= EHBoundaryFlags.FilterStart;
                 }
 
-                var handlerBeginBlock = CreateBasicBlock(basicBlocks, exceptionHandler.HandlerOffset);
-                var handlerEndBlock = exceptionHandler.HandlerEndOffset != null ? basicBlocks[(int)exceptionHandler.HandlerEndOffset] : null;
+                BasicBlock handlerBeginBlock = CreateBasicBlock(basicBlocks, exceptionHandler.HandlerOffset);
+                handlerBeginBlock.EHFlags |= EHBoundaryFlags.HandlerStart;
+                handlerBeginBlock.CatchType = exceptionHandler.CatchType;
+
+                tryBeginBlock.Handlers.Add(handlerBeginBlock);
+            }
+        }
+
+        private void CreateEHClauses(BasicBlock[] basicBlocks, IList<EHClause> ehClauses)
+        {
+            foreach (ILExceptionRegion exceptionHandler in _methodIL.GetExceptionRegions())
+            {
+                BasicBlock tryBeginBlock = basicBlocks[exceptionHandler.TryOffset];
+                BasicBlock tryLastBlock = GetHandlerLastBlock(exceptionHandler.TryEndOffset, basicBlocks);
+
+                BasicBlock handlerBeginBlock = basicBlocks[exceptionHandler.HandlerOffset];
+                BasicBlock handlerLastBlock = GetHandlerLastBlock(exceptionHandler.HandlerEndOffset, basicBlocks);
 
                 handlerBeginBlock.TryBlocks = GetTryBlocks(exceptionHandler, basicBlocks);
 
-                var tryLastBlock = GetHandlerLastBlock(exceptionHandler.TryEndOffset, basicBlocks);
+                TypeDesc? exceptionType = exceptionHandler.CatchType;
 
-                handlerBeginBlock.HandlerStart = true;
-                tryBeginBlock.TryStart = true;
+                int methodEndILOffset = (int)_methodIL.Instructions[^1].Offset;
 
-                string? catchTypeMangledName = null;
-                if (exceptionHandler.Kind == ILExceptionRegionKind.Catch)
-                {
-                    var catchTypeDesc = exceptionHandler.CatchType!;
-                    catchTypeMangledName = _nameMangler.GetMangledTypeName(catchTypeDesc);
-                }
+                int tryBeginILOffset = exceptionHandler.TryOffset;
+                int tryEndILOffset = exceptionHandler.TryEndOffset ?? methodEndILOffset;
 
-                tryBeginBlock.Handlers.Add(handlerBeginBlock);
+                var ehClause = new EHClause(tryBeginBlock, tryLastBlock, handlerBeginBlock, handlerLastBlock,
+                    (EHClauseKind)exceptionHandler.Kind, exceptionType, tryBeginILOffset, tryEndILOffset);
 
-                var ehClause = new EHClause(tryBeginBlock, tryLastBlock, handlerBeginBlock, handlerEndBlock, filterBlock, (EHClauseKind)exceptionHandler.Kind, catchTypeMangledName);
                 ehClauses.Add(ehClause);
             }
         }
@@ -186,6 +187,7 @@ namespace ILCompiler.Compiler
 
             return tryBlocks;
         }
+
         private static BasicBlock CreateBasicBlock(BasicBlock[] basicBlocks, int offset)
         {
             var basicBlock = basicBlocks[offset];

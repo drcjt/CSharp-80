@@ -1,6 +1,7 @@
 ﻿using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.FlowgraphHelpers;
 using ILCompiler.Compiler.Ssa;
+using ILCompiler.TypeSystem.Common;
 
 namespace ILCompiler.Compiler
 {
@@ -10,6 +11,15 @@ namespace ILCompiler.Compiler
         Always,         // block always jumps to the target
         Conditional,    // block conditionally jumps to target
         Switch,         // block ends with a switch statement
+    }
+
+    [Flags]
+    public enum EHBoundaryFlags
+    {
+        None = 0,
+        TryStart = 1,
+        HandlerStart = 2,
+        FilterStart = 4,
     }
 
     public class BasicBlock : LinearIR.Range
@@ -76,9 +86,10 @@ namespace ILCompiler.Compiler
         // Variables in scope over the block
         public VariableSet Scope { get; set; } = VariableSet.Empty;
 
-        public bool TryStart { get; set; }
-        public bool FilterStart { get; set; }
-        public bool HandlerStart { get; set; }
+        public EHBoundaryFlags EHFlags { get; set; }
+
+        // If this block is a catch handler, the type of exception it catches. Only set on first block of catch handler
+        public TypeDesc? CatchType { get; set; }
 
         public IList<BasicBlock> TryBlocks { get; set; } = new List<BasicBlock>();
 

@@ -47,7 +47,7 @@
 
         private void RemoveBlocksOutsideOfDfsTree(IList<BasicBlock> blocks)
         {
-            var blocksToRemove = blocks.Where(block => !PostOrder.Contains(block) && !block.HandlerStart).ToList();
+            var blocksToRemove = blocks.Where(block => !PostOrder.Contains(block) && !block.EHFlags.HasFlag(EHBoundaryFlags.HandlerStart)).ToList();
             foreach (var block in blocksToRemove)
             {
                 blocks.Remove(block);

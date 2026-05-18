@@ -29,11 +29,11 @@ namespace ILCompiler.TypeSystem.Dnlib
             {
                 var handler = body.ExceptionHandlers[handlerIndex];
                 TypeDesc? catchType = handler.IsCatch ? module.Create(handler.CatchType) : null;
-                int tryOffset = (int)(handler.TryStart?.Offset ?? 0);
-                int? tryEndOffset = (int?)handler.TryEnd?.Offset;
-                int handlerOffset = (int)(handler.HandlerStart?.Offset ?? 0);
-                int? handlerEndOffset = (int)(handler.HandlerEnd?.Offset ?? 0);
-                int filterOffset = (int)(handler.FilterStart?.Offset ?? 0);
+                int tryOffset = (int)handler.TryStart.Offset;
+                int? tryEndOffset = handler.TryEnd != null ? (int?)handler.TryEnd.Offset : null;
+                int handlerOffset = (int)(handler.HandlerStart.Offset);
+                int? handlerEndOffset = (handler.HandlerEnd != null ? (int?)handler.HandlerEnd.Offset : null);
+                int? filterOffset = handler.FilterStart != null ? (int?)handler.FilterStart.Offset : null;
 
                 _exceptionRegions[handlerIndex] = new ILExceptionRegion(GetExceptionRegionKind(handler), tryOffset, tryEndOffset, handlerOffset, handlerEndOffset, filterOffset, catchType);
             }
