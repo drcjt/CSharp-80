@@ -137,6 +137,11 @@
     <Project Path="Tests/Methodical/VirtualMethods/VirtualMethods.csproj" />
     <Project Path="Tests/Methodical/ZeroInit/ZeroInit.csproj" />
   </Folder>
+  <Folder Name="/Tests/Methodical/EH/" />
+  <Folder Name="/Tests/Methodical/EH/Nested/">
+    <Project Path="Tests/Methodical/EH/Nested/NestedTryCatch/NestedTryCatch.csproj" />
+    <Project Path="Tests/Methodical/EH/Nested/NestedTryFinally/NestedTryFinally.csproj" />
+  </Folder>
   <Folder Name="/Tests/Methodical/MDArrays/">
     <Project Path="Tests/Methodical/MDArrays/RangeCheck/RangeCheck.csproj" />
     <Project Path="Tests/Methodical/MDArrays/Simple/Simple.csproj" />
@@ -187,7 +192,6 @@
     <Project Path="Tests/Regression/Bug_655/Bug_655.csproj" />
     <Project Path="Tests/Regression/Bug_660/Bug_660.csproj" />
     <Project Path="Tests/Regression/Bug_754/Bug_754.csproj" />
-	
     <Project Path="Tests/Regression/Bug_87/Bug_87.csproj" />
     <Project Path="Tests/Regression/RegressionTestsRunner/RegressionTests.csproj" />
   </Folder>
