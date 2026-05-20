@@ -138,6 +138,22 @@
     <Project Path="Tests/Methodical/ZeroInit/ZeroInit.csproj" />
   </Folder>
   <Folder Name="/Tests/Methodical/EH/" />
+  <Folder Name="/Tests/Methodical/EH/Basics/">
+    <Project Path="Tests/Methodical/EH/Basics/MultiHandler/MultiHandler.csproj" />
+    <Project Path="Tests/Methodical/EH/Basics/ThrowInCatch/ThrowInCatch.csproj" />
+    <Project Path="Tests/Methodical/EH/Basics/ThrowInClassConstructor/ThrowInClassConstructor.csproj" />
+    <Project Path="Tests/Methodical/EH/Basics/ThrowInFinally/ThrowInFinally.csproj" />
+    <Project Path="Tests/Methodical/EH/Basics/ThrowInFinallyErrPath/ThrowInFinallyErrPath.csproj" />
+    <Project Path="Tests/Methodical/EH/Basics/ThrowInFinallyErrPathFn/ThrowInFinallyErrPathFn.csproj" />
+    <Project Path="Tests/Methodical/EH/Basics/ThrowOutside/ThrowOutside.csproj" />
+    <Project Path="Tests/Methodical/EH/Basics/TryCatch/TryCatch.csproj" />
+    <Project Path="Tests/Methodical/EH/Basics/TryCatchTryCatch/TryCatchTryCatch.csproj" />
+    <Project Path="Tests/Methodical/EH/Basics/TryFinally/TryFinally.csproj" />
+    <Project Path="Tests/Methodical/EH/Basics/TryFinallyTryCatch/TryFinallyTryCatch.csproj" />
+    <Project Path="Tests/Methodical/EH/Basics/TryFinallyTryFinally/TryFinallyTryFinally.csproj" />
+    <Project Path="Tests/Methodical/EH/Basics/TryThrowCatch/TryThrowCatch.csproj" />
+    <Project Path="Tests/Methodical/EH/Basics/TryThrowCatchFinally/TryThrowCatchFinally.csproj" />
+  </Folder>
   <Folder Name="/Tests/Methodical/EH/Nested/">
     <Project Path="Tests/Methodical/EH/Nested/NestedTryCatch/NestedTryCatch.csproj" />
     <Project Path="Tests/Methodical/EH/Nested/NestedTryFinally/NestedTryFinally.csproj" />
