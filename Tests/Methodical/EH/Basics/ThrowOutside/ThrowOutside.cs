@@ -42,8 +42,8 @@ namespace ThrowOutside
 
     public static class Log
     {
-        public static int[] Events = new int[5];
-        public static int Index;
+        public static int[] Events { get; } = new int[10];
+        public static int Index { get; set; }
 
         public static void Mark(int id) => Events[Index++] = id;
     }
