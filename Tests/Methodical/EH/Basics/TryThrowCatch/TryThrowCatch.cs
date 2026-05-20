@@ -1,0 +1,55 @@
+﻿using System;
+
+namespace TryThrowCatch
+{
+    internal static class Test
+    {
+        public static int Main()
+        {
+            try
+            {
+                InTry();
+            }
+            catch (Exception e)
+            {
+                InCatch();
+            }
+
+
+            return AssertSequence(new[] { 1, 2 });
+        }
+
+        public static void InTry()
+        {
+            Log.Mark(1); // In try
+            throw new Exception();
+        }
+
+        public static void InCatch()
+        {
+            Log.Mark(2); // In catch
+        }
+
+        public static int AssertSequence(int[] expected)
+        {
+            if (Log.Index != expected.Length)
+                return 1;
+
+            for (int i = 0; i < expected.Length; i++)
+            {
+                if (Log.Events[i] != expected[i])
+                    return 1;
+            }
+
+            return 0;
+        }
+    }
+
+    public static class Log
+    {
+        public static int[] Events { get; } = new int[10];
+        public static int Index { get; set; }
+
+        public static void Mark(int id) => Events[Index++] = id;
+    }
+}

@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace ILCompiler.Tests.Common
 {
@@ -83,7 +84,14 @@ namespace ILCompiler.Tests.Common
                         // Visual Studio doesn't like .'s in test names so replace with a character that looks like a dot but isn't
                         testName = testName.Replace('.', '\u2024');
 
-                        yield return new TestCaseData(testAssemblyPath).SetName(testName);
+                        var testCaseData = new TestCaseData(testAssemblyPath).SetName(testName);
+
+                        if (TestHasActiveIssueAttribute(testAssemblyPath))
+                        {
+                            testCaseData = testCaseData.Ignore("Test is marked with ActiveIssue");
+                        }
+
+                        yield return testCaseData;
                     }
                     else
                     {
@@ -115,6 +123,23 @@ namespace ILCompiler.Tests.Common
                     }
                 }
             }
+        }
+
+        private static bool TestHasActiveIssueAttribute(string testAssemblyPath)
+        {
+            var exeFileName = Path.ChangeExtension(testAssemblyPath, "dll");
+            Assembly assembly = Assembly.LoadFrom(exeFileName);
+
+            MethodInfo? mainMethod = assembly.EntryPoint;
+
+            bool hasActiveIssueAttribute = false;
+            if (mainMethod is not null)
+            {
+                object[] allAttributes = mainMethod.GetCustomAttributes(inherit: false);
+                hasActiveIssueAttribute = allAttributes.Any(attr => attr.GetType().Name.Equals("ActiveIssueAttribute", StringComparison.OrdinalIgnoreCase));
+            }
+
+            return hasActiveIssueAttribute;
         }
     }
 }
