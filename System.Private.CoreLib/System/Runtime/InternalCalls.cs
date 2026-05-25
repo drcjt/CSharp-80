@@ -13,6 +13,9 @@ namespace System.Runtime
         [DllImport(Libraries.Runtime, EntryPoint = "CALLCATCHHANDLER")]
         internal static extern unsafe void CallCatchHandler(object exception, byte* pCatchHandler, ref StackFrameIterator frameIter);
 
+        [DllImport(Libraries.Runtime, EntryPoint = "CALLFINALLYFUNCLET")]
+        internal static extern unsafe void CallFinallyFunclet(byte* pHandler, ushort parentFramePointer);
+
         [DllImport(Libraries.Runtime, EntryPoint = "EHENUMINIT")]
         internal static extern unsafe void EHEnumInit(void* pEHEnum);
 
