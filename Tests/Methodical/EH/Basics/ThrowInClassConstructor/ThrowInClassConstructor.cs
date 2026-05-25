@@ -1,5 +1,4 @@
 ﻿using System;
-using Xunit;
 
 namespace ThrowInClassConstructor
 {
@@ -16,7 +15,6 @@ namespace ThrowInClassConstructor
 
     internal static class Test
     {
-        [ActiveIssue("Exception handling doesn't call Finally handlers when exception thrown")]
         public static int Main()
         {
             int i = 0;

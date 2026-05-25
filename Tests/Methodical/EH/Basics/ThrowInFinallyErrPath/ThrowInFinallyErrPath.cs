@@ -1,11 +1,9 @@
 ﻿using System;
-using Xunit;
 
 namespace ThrowInFinallyErrPath
 {
     internal static class Test
     {
-        [ActiveIssue("Exception handling doesn't call Finally handlers when exception thrown")]
         public static int Main()
         {
             try
