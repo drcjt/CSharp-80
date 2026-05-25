@@ -28,7 +28,7 @@ namespace ILCompiler.TypeSystem.Dnlib
             return ((ILOpcode)code);
         }
 
-        public override int GetSize() => _instruction.GetSize();
+        public override uint GetSize() => (uint)_instruction.GetSize();
 
         public override object Operand
         {

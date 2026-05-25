@@ -29,11 +29,11 @@ namespace ILCompiler.TypeSystem.Dnlib
             {
                 var handler = body.ExceptionHandlers[handlerIndex];
                 TypeDesc? catchType = handler.IsCatch ? module.Create(handler.CatchType) : null;
-                int tryOffset = (int)handler.TryStart.Offset;
-                int? tryEndOffset = handler.TryEnd != null ? (int?)handler.TryEnd.Offset : null;
-                int handlerOffset = (int)(handler.HandlerStart.Offset);
-                int? handlerEndOffset = (handler.HandlerEnd != null ? (int?)handler.HandlerEnd.Offset : null);
-                int? filterOffset = handler.FilterStart != null ? (int?)handler.FilterStart.Offset : null;
+                uint tryOffset = handler.TryStart.Offset;
+                uint? tryEndOffset = handler.TryEnd?.Offset;
+                uint handlerOffset = handler.HandlerStart.Offset;
+                uint? handlerEndOffset = handler.HandlerEnd?.Offset;
+                uint? filterOffset = handler.FilterStart?.Offset;
 
                 _exceptionRegions[handlerIndex] = new ILExceptionRegion(GetExceptionRegionKind(handler), tryOffset, tryEndOffset, handlerOffset, handlerEndOffset, filterOffset, catchType);
             }
@@ -62,7 +62,7 @@ namespace ILCompiler.TypeSystem.Dnlib
             if (eh.IsFault)
                 return ILExceptionRegionKind.Fault;
             if (eh.IsFinally)
-                return ILExceptionRegionKind.Finally;
+                return ILExceptionRegionKind.Fault;
 
             throw new ArgumentException("Invalid exception handler kind");
         }
