@@ -15,7 +15,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             // Find all EH clauses that require finally funclets to run when leaving the current instruction
             List<EHClause> candidates = importer.EHClauses
-                .Where(eh => FinallyMustRun(eh, (int)instruction.Offset, (int)target.Offset))
+                .Where(eh => FinallyMustRun(eh, instruction.Offset, target.Offset))
                 .ToList();
 
             // Sort candidates by the size of their try block, so that we run innermost finally funclets first
@@ -37,8 +37,8 @@ namespace ILCompiler.Compiler.OpcodeImporters
             return true;
         }
 
-        private static bool FinallyMustRun(EHClause eh, int leaveIL, int targetIL) =>
-            eh.Kind == EHClauseKind.Finally &&
+        private static bool FinallyMustRun(EHClause eh, uint leaveIL, uint targetIL) =>
+            eh.Kind == EHClauseKind.Fault &&
             eh.InTry(leaveIL) &&
             !eh.InTry(targetIL);
     }

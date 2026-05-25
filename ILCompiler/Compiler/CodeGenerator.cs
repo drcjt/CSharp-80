@@ -6,7 +6,6 @@ using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Peephole;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Dnlib;
-using Microsoft.Extensions.Logging;
 using static ILCompiler.Compiler.Emit.Registers;
 
 namespace ILCompiler.Compiler
@@ -111,7 +110,7 @@ namespace ILCompiler.Compiler
                 currentNode = currentNode.Next;
             }
 
-            if (!ehClauses.Any(x => x.HandlerLast == block && x.Kind == EHClauseKind.Finally))
+            if (!ehClauses.Any(x => x.HandlerLast == block && x.Kind == EHClauseKind.Fault))
             {
                 if (block.JumpKind == JumpKind.Always && block.Successors.Count == 1)
                 {
