@@ -268,16 +268,6 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     }
                     break;
 
-                case "get_HasFinallyHandlers":
-                    if (IsTypeName(methodToCall, "System.Runtime.CompilerServices", "RuntimeHelpers"))
-                    {
-                        var hasFinallyHandlers = importer.EHClauses.Any(x => x.Kind == EHClauseKind.Fault);
-                        var result = new Int32ConstantEntry(hasFinallyHandlers ? 1 : 0);
-                        importer.Push(result);
-                        return true;
-                    }
-                    break;
-
                 case "Of":
                     if (IsTypeName(methodToCall, "Internal.Runtime", "EEType"))
                     {

@@ -90,19 +90,16 @@ namespace System.Runtime
 
             // Second pass
             //
-            if (CompilerServices.RuntimeHelpers.HasFinallyHandlers)
+            isValid = true;
+            for (; isValid; isValid = InternalCalls.SFINext(ref stackFrameIterator))
             {
-                isValid = true;
-                for (; isValid; isValid = InternalCalls.SFINext(ref stackFrameIterator))
+                if (stackFrameIterator.StackPointer == handlingFrameSp)
                 {
-                    if (stackFrameIterator.StackPointer == handlingFrameSp)
-                    {
-                        // Invoke a partial second pass here
-                        InvokeSecondPass(ref stackFrameIterator, catchingTryRegionIdx);
-                        break;
-                    }
-                    InvokeSecondPass(ref stackFrameIterator);
+                    // Invoke a partial second pass here
+                    InvokeSecondPass(ref stackFrameIterator, catchingTryRegionIdx);
+                    break;
                 }
+                InvokeSecondPass(ref stackFrameIterator);
             }
 
             s_originalThrowSP = 0;
