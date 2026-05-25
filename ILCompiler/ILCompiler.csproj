@@ -105,6 +105,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Runtime\JumpToHL.asm" />
+    <EmbeddedResource Include="Runtime\CallFinallyFunclet.asm" />
     <EmbeddedResource Include="Runtime\CPM\cls.asm" />
     <EmbeddedResource Include="Runtime\CPM\printchr.asm" />
     <EmbeddedResource Include="Runtime\CallCatchHandler.asm" />
