@@ -1,5 +1,4 @@
-﻿using ILCompiler.Compiler.Lowerings;
-using ILCompiler.Compiler.Ssa;
+﻿using ILCompiler.Compiler.Ssa;
 
 namespace ILCompiler.Compiler
 {

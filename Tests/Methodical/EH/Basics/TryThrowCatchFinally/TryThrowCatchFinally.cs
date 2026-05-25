@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TryThrowCatch
+namespace TryThrowCatchFinally
 {
     internal static class Test
     {

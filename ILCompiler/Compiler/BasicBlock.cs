@@ -25,9 +25,9 @@ namespace ILCompiler.Compiler
     public class BasicBlock : LinearIR.Range
     {
         public BasicBlock? Next { get; set; }
-        public int StartOffset { get; set; }
-        public int EndOffset { get; set; }
-        public int? TargetOffset { get; set; }
+        public uint StartOffset { get; set; }
+        public uint EndOffset { get; set; }
+        public uint? TargetOffset { get; set; }
 
         public JumpKind JumpKind { get; set; }
 
@@ -95,7 +95,7 @@ namespace ILCompiler.Compiler
 
         public IList<BasicBlock> Handlers { get; set; } = new List<BasicBlock>();
 
-        public BasicBlock(int offset)
+        public BasicBlock(uint offset)
         {
             StartOffset = offset;
             Label = LabelGenerator.GetLabel(LabelType.BasicBlock);

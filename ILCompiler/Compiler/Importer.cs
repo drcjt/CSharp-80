@@ -49,8 +49,8 @@ namespace ILCompiler.Compiler
 
         public bool StopImporting { get; set; }
 
-        private int _currentILOffset = 0;
-        private int _currentInstructionSize = 0;
+        private uint _currentILOffset = 0;
+        private uint _currentInstructionSize = 0;
 
 
         private readonly CodeFolder _codeFolder;
@@ -67,7 +67,7 @@ namespace ILCompiler.Compiler
             _codeFolder = codeFolder;
         }
 
-        private void ImportBasicBlocks(IDictionary<int, int> offsetToIndexMap)
+        private void ImportBasicBlocks(IDictionary<uint, int> offsetToIndexMap)
         {
             _pendingBasicBlocks = BasicBlocks[0];
             _pendingBasicBlocks.Marked = true;
@@ -166,7 +166,7 @@ namespace ILCompiler.Compiler
             return null;
         }
 
-        private void ImportBasicBlock(IDictionary<int, int> offsetToIndexMap, BasicBlock block)
+        private void ImportBasicBlock(IDictionary<uint, int> offsetToIndexMap, BasicBlock block)
         {
             _currentBasicBlock = block;
             _currentILOffset = block.StartOffset;
@@ -293,7 +293,7 @@ namespace ILCompiler.Compiler
             }
 
             var basicBlockAnalyser = new BasicBlockAnalyser(Method, _methodIL, this);
-            var offsetToIndexMap = new Dictionary<int, int>();
+            var offsetToIndexMap = new Dictionary<uint, int>();
             BasicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);            
 
             // Trigger static constructor if required

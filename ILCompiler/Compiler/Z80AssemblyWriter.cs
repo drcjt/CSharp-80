@@ -335,8 +335,6 @@ namespace ILCompiler.Compiler
 
                 WriteEhClauses(nodes);
 
-                WriteFinallyEhClauses(nodes);
-
                 WritePInvokeModules(modules);
 
                 WriteEpilog();
@@ -378,38 +376,6 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private void WriteFinallyEhClauses(IReadOnlyCollection<IDependencyNode> nodes)
-        {
-            if (Compilation.AnyExceptionHandlers)
-            {
-                InstructionsBuilder ehClausesBuilder = new InstructionsBuilder();
-                ehClausesBuilder.Label("FINALLY_CLAUSES");
-                foreach (var node in nodes)
-                {
-                    if (node is Z80MethodCodeNode codeNode)
-                    {
-                        var ehClauses = codeNode.EhClauses;
-
-                        if (ehClauses.Count > 0)
-                        {
-                            ehClausesBuilder.Comment($"{codeNode.Method.FullName} Finally Clauses");
-                            foreach (var ehClause in ehClauses)
-                            {
-                                if (ehClause.Kind == EHClauseKind.Finally)
-                                {
-                                    ehClausesBuilder.Dw(ehClause.TryBegin.Label, "Protected Region Start");
-                                    ehClausesBuilder.Dw($"{ehClause.TryLast.Label}_END", "Protected Region End");
-                                    ehClausesBuilder.Dw(ehClause.HandlerBegin.Label, "Handler Start");
-                                }
-                            }
-                        }
-                    }
-                }
-                ehClausesBuilder.Label("FINALLY_CLAUSES_END");
-                WriteInstructions(ehClausesBuilder.Instructions);
-            }
-        }
-
         private void WriteEhClauses(IReadOnlyCollection<IDependencyNode> nodes)
         {
             if (Compilation.AnyExceptionHandlers)
@@ -425,15 +391,24 @@ namespace ILCompiler.Compiler
                         if (ehClauses.Count > 0)
                         {
                             ehClausesBuilder.Comment($"{codeNode.Method.FullName} EH Clauses");
-                            foreach (var ehClause in ehClauses)
+
+                            // Ensure clauses are ordered by size so that the most nested handlers are emitted first.
+                            // This is important as the unwind logic will need to check the most nested handlers first
+                            // to ensure the correct handler is executed.
+                            foreach (var ehClause in ehClauses.OrderBy(c => c.TrySize))
                             {
+                                ehClausesBuilder.Dw(ehClause.TryBegin.Label, "Protected Region Start");
+                                ehClausesBuilder.Dw($"{ehClause.TryLast.Label}_END", "Protected Region End");
+                                ehClausesBuilder.Dw(ehClause.HandlerBegin.Label, "Handler Start");
                                 if (ehClause.Kind == EHClauseKind.Typed)
                                 {
-                                    ehClausesBuilder.Dw(ehClause.TryBegin.Label, "Protected Region Start");
-                                    ehClausesBuilder.Dw($"{ehClause.TryLast.Label}_END", "Protected Region End");
-                                    ehClausesBuilder.Dw(ehClause.HandlerBegin.Label, "Handler Start");
                                     ehClausesBuilder.Dw(_nameMangler.GetMangledTypeName(ehClause.ExceptionType!), "Catch Type");
                                 }
+                                else
+                                {
+                                    ehClausesBuilder.Dw(0, "Catch Type");
+                                }
+                                ehClausesBuilder.Db((byte)ehClause.Kind, "Clause Kind");
                             }
                         }
                     }

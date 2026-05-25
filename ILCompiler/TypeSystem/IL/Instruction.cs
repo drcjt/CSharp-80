@@ -4,7 +4,7 @@
     {
         public virtual ILOpcode Opcode { get; }
         public virtual uint Offset { get; set; }
-        public virtual int GetSize() => 1;
+        public virtual uint GetSize() => 1;
 
         private object? _operand = null;
         public virtual object Operand

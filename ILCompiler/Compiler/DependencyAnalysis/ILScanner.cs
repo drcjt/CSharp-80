@@ -28,7 +28,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         public IList<IDependencyNode> FindDependencies()
         {
             var currentIndex = 0;
-            var currentOffset = 0;
+            uint currentOffset = 0;
 
             if (_methodIL != null)
             {

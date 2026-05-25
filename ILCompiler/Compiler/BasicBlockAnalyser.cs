@@ -9,13 +9,12 @@ namespace ILCompiler.Compiler
     public enum EHClauseKind
     {
         Typed = 0,  // Catch handler with a specific type
-        Filter = 1,  // Filter handler
-        Finally = 2, // Finally handler
-        Fault = 4,  // Fault handler
+        Fault = 1,  // Fault handler
+        Filter = 2,  // Filter handler
     }
 
     public class EHClause(BasicBlock tryBegin, BasicBlock tryLast, BasicBlock handlerBegin, BasicBlock handlerLast,
-        EHClauseKind kind, TypeDesc? exceptionType, int tryBeginILOffset, int tryEndILOffset)
+        EHClauseKind kind, TypeDesc? exceptionType, uint tryBeginILOffset, uint tryEndILOffset)
     {
         public BasicBlock TryBegin { get; init; } = tryBegin;
         public BasicBlock TryLast { get; init; } = tryLast;
@@ -24,11 +23,11 @@ namespace ILCompiler.Compiler
         public EHClauseKind Kind { get; init; } = kind;
         public TypeDesc? ExceptionType { get; init;  } = exceptionType;
 
-        public int TryBeginILOffset { get; init; } = tryBeginILOffset;
-        public int TryEndILOffset { get; init; } = tryEndILOffset;
-        public int TrySize => TryEndILOffset - TryBeginILOffset;
+        public uint TryBeginILOffset { get; init; } = tryBeginILOffset;
+        public uint TryEndILOffset { get; init; } = tryEndILOffset;
+        public uint TrySize => TryEndILOffset - TryBeginILOffset;
 
-        public bool InTry(int il) => TryBeginILOffset <= il && il < TryEndILOffset;
+        public bool InTry(uint il) => TryBeginILOffset <= il && il < TryEndILOffset;
     }
 
     public class BasicBlockAnalyser
@@ -54,7 +53,7 @@ namespace ILCompiler.Compiler
             _importer = importer;
         }
 
-        public BasicBlock[] FindBasicBlocks(IDictionary<int, int> offsetToIndexMap, IList<EHClause> ehClauses)
+        public BasicBlock[] FindBasicBlocks(IDictionary<uint, int> offsetToIndexMap, IList<EHClause> ehClauses)
         {
             var instructions = _methodIL.Instructions;
             var lastInstruction = instructions[instructions.Count - 1];
@@ -101,7 +100,7 @@ namespace ILCompiler.Compiler
                 // of conditional but by splitting this into a new block starting at
                 // the try offset then the original block needs to have the jump kind
                 // set to Always as it now doesn't end with a conditional
-                for (int i = exceptionHandler.TryOffset - 1; i >= 0; i--)
+                for (int i = (int)exceptionHandler.TryOffset - 1; i >= 0; i--)
                 {
                     if (basicBlocks[i] != null)
                     {
@@ -113,7 +112,7 @@ namespace ILCompiler.Compiler
                 BasicBlock? filterBlock;
                 if (exceptionHandler.Kind == ILExceptionRegionKind.Filter)
                 {
-                    filterBlock = CreateBasicBlock(basicBlocks, (int)exceptionHandler.FilterOffset!);
+                    filterBlock = CreateBasicBlock(basicBlocks, (uint)exceptionHandler.FilterOffset!);
                     filterBlock.EHFlags |= EHBoundaryFlags.FilterStart;
                 }
 
@@ -139,10 +138,10 @@ namespace ILCompiler.Compiler
 
                 TypeDesc? exceptionType = exceptionHandler.CatchType;
 
-                int methodEndILOffset = (int)_methodIL.Instructions[^1].Offset;
+                uint methodEndILOffset = _methodIL.Instructions[^1].Offset;
 
-                int tryBeginILOffset = exceptionHandler.TryOffset;
-                int tryEndILOffset = exceptionHandler.TryEndOffset ?? methodEndILOffset;
+                uint tryBeginILOffset = exceptionHandler.TryOffset;
+                uint tryEndILOffset = exceptionHandler.TryEndOffset ?? methodEndILOffset;
 
                 var ehClause = new EHClause(tryBeginBlock, tryLastBlock, handlerBeginBlock, handlerLastBlock,
                     (EHClauseKind)exceptionHandler.Kind, exceptionType, tryBeginILOffset, tryEndILOffset);
@@ -151,14 +150,14 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private static BasicBlock GetHandlerLastBlock(int? handlerEndOffset, BasicBlock[] basicBlocks)
+        private static BasicBlock GetHandlerLastBlock(uint? handlerEndOffset, BasicBlock[] basicBlocks)
         {
             if (!handlerEndOffset.HasValue)
             {
                 return basicBlocks[^1];
             }
 
-            int blockIndex = handlerEndOffset.Value - 1;
+            uint blockIndex = handlerEndOffset.Value - 1;
             BasicBlock? handlerLastBlock;
             do
             {
@@ -174,10 +173,10 @@ namespace ILCompiler.Compiler
         private static List<BasicBlock> GetTryBlocks(ILExceptionRegion exceptionHandler, BasicBlock[] basicBlocks)
         {
             var tryStartOffset = exceptionHandler.TryOffset;
-            var tryEndOffset = exceptionHandler.TryEndOffset ?? basicBlocks.Length;
+            var tryEndOffset = exceptionHandler.TryEndOffset ?? (uint)basicBlocks.Length;
 
             var tryBlocks = new List<BasicBlock>();
-            for (int offset = tryStartOffset; offset < tryEndOffset; offset++)
+            for (uint offset = tryStartOffset; offset < tryEndOffset; offset++)
             {
                 if (basicBlocks[offset] != null)
                 {
@@ -188,7 +187,7 @@ namespace ILCompiler.Compiler
             return tryBlocks;
         }
 
-        private static BasicBlock CreateBasicBlock(BasicBlock[] basicBlocks, int offset)
+        private static BasicBlock CreateBasicBlock(BasicBlock[] basicBlocks, uint offset)
         {
             var basicBlock = basicBlocks[offset];
             if (basicBlock == null)
@@ -200,17 +199,17 @@ namespace ILCompiler.Compiler
             return basicBlock;
         }
 
-        private void MakeBasicBlocks(List<int> jumpTargets, BasicBlock[] basicBlocks)
+        private void MakeBasicBlocks(List<uint> jumpTargets, BasicBlock[] basicBlocks)
         {
             var currentIndex = 0;
-            var currentOffset = 0;
-            var startOffset = 0;
+            uint currentOffset = 0;
+            uint startOffset = 0;
 
             JumpKind? jumpKind = null;
 
             while (currentIndex < _methodIL.Instructions.Count)
             {
-                int? jumpAddress = null;
+                uint? jumpAddress = null;
                 var currentInstruction = _methodIL.Instructions[currentIndex];
 
                 switch (currentInstruction.Opcode)
@@ -240,7 +239,7 @@ namespace ILCompiler.Compiler
                     case ILOpcode.brfalse_s:
                     case ILOpcode.brtrue_s:
                         jumpKind = JumpKind.Conditional;
-                        jumpAddress = (int)((Instruction)currentInstruction.Operand).Offset;
+                        jumpAddress = ((Instruction)currentInstruction.Operand).Offset;
                         break;
 
                     case ILOpcode.br_s:
@@ -248,7 +247,7 @@ namespace ILCompiler.Compiler
                     case ILOpcode.br:
                     case ILOpcode.leave:
                         jumpKind = JumpKind.Always;
-                        jumpAddress = (int)((Instruction)currentInstruction.Operand).Offset;
+                        jumpAddress = ((Instruction)currentInstruction.Operand).Offset;
                         break;
 
                     case ILOpcode.throw_:
@@ -272,7 +271,7 @@ namespace ILCompiler.Compiler
                 BasicBlock? currentBasicBlock = null;
                 if (jumpKind is null)
                 {
-                    var nextOffset = currentOffset + currentInstruction.GetSize();
+                    uint nextOffset = currentOffset + currentInstruction.GetSize();
                     var endOfBlock = jumpTargets.Contains(nextOffset);
 
                     if (endOfBlock)
@@ -333,12 +332,12 @@ namespace ILCompiler.Compiler
             }
         }
 
-        private List<int> FindJumpTargets(IDictionary<int, int> offsetToIndexMap)
+        private List<uint> FindJumpTargets(IDictionary<uint, int> offsetToIndexMap)
         {
-            var jumpTargets = new List<int>();
+            var jumpTargets = new List<uint>();
 
             var currentIndex = 0;
-            var currentOffset = 0;
+            uint currentOffset = 0;
 
             while (currentIndex < _methodIL.Instructions.Count)
             {
@@ -374,8 +373,8 @@ namespace ILCompiler.Compiler
                         {
                             var target = (Instruction)currentInstruction.Operand;
                             var targetOffset = target.Offset;
-                            jumpTargets.Add((int)targetOffset);
-                            var nextInstructionOffset = currentOffset + currentInstruction.GetSize();
+                            jumpTargets.Add(targetOffset);
+                            uint nextInstructionOffset = currentOffset + currentInstruction.GetSize();
                             jumpTargets.Add(nextInstructionOffset);
                         }
                         break;
@@ -386,7 +385,7 @@ namespace ILCompiler.Compiler
                     case ILOpcode.leave:
                         {
                             var target = (Instruction)currentInstruction.Operand;
-                            jumpTargets.Add((int)target.Offset);
+                            jumpTargets.Add(target.Offset);
                         }
                         break;
 
@@ -401,7 +400,7 @@ namespace ILCompiler.Compiler
                             var instructions = (Instruction[])currentInstruction.Operand;
                             foreach (var target in instructions)
                             {
-                                jumpTargets.Add((int)target.Offset);
+                                jumpTargets.Add(target.Offset);
                             }
                             var nextInstructionOffset = currentOffset + currentInstruction.GetSize();
                             jumpTargets.Add(nextInstructionOffset);

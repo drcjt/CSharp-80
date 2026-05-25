@@ -16,7 +16,7 @@ namespace ILCompiler.TypeSystem.IL
             _typeInstantiation = typeInstantiation;
             _methodInstantiation = methodInstantiation;
         }
-        public override int GetSize() => _instruction.GetSize();
+        public override uint GetSize() => _instruction.GetSize();
 
         public override object Operand
         {

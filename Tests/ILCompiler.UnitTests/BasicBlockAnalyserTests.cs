@@ -42,7 +42,7 @@ namespace ILCompiler.Tests
                 new Instruction(OpCodes.Ldc_I4_S, 1234),
             }, module);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
-            var offsetToIndexMap = new Dictionary<int, int>();
+            var offsetToIndexMap = new Dictionary<uint, int>();
             var ehClauses = new List<EHClause>();
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
@@ -59,7 +59,7 @@ namespace ILCompiler.Tests
                 new Instruction(OpCodes.Ret),
             }, module);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
-            var offsetToIndexMap = new Dictionary<int, int>();
+            var offsetToIndexMap = new Dictionary<uint, int>();
             var ehClauses = new List<EHClause>();
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
@@ -77,7 +77,7 @@ namespace ILCompiler.Tests
                 new Instruction(OpCodes.Ret),
             }, module);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
-            var offsetToIndexMap = new Dictionary<int, int>();
+            var offsetToIndexMap = new Dictionary<uint, int>();
             var ehClauses = new List<EHClause>();
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
@@ -97,7 +97,7 @@ namespace ILCompiler.Tests
             var module = CreateModule();
             var method = BuildMethod(code, module);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
-            var offsetToIndexMap = new Dictionary<int, int>();
+            var offsetToIndexMap = new Dictionary<uint, int>();
             var ehClauses = new List<EHClause>();
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
@@ -115,7 +115,7 @@ namespace ILCompiler.Tests
                 new Instruction(OpCodes.Ldc_I4_S, 1234),
             }, module);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
-            var offsetToIndexMap = new Dictionary<int, int>();
+            var offsetToIndexMap = new Dictionary<uint, int>();
             var ehClauses = new List<EHClause>();
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
@@ -136,7 +136,7 @@ namespace ILCompiler.Tests
             var module = CreateModule();
             var method = BuildMethod(code, module);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
-            var offsetToIndexMap = new Dictionary<int, int>();
+            var offsetToIndexMap = new Dictionary<uint, int>();
             var ehClauses = new List<EHClause>();
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
@@ -158,7 +158,7 @@ namespace ILCompiler.Tests
             var module = CreateModule();
             var method = BuildMethod(code, module);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
-            var offsetToIndexMap = new Dictionary<int, int>();
+            var offsetToIndexMap = new Dictionary<uint, int>();
             var ehClauses = new List<EHClause>();
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);
@@ -178,7 +178,7 @@ namespace ILCompiler.Tests
             var module = CreateModule();
             var method = BuildMethod(code, module);
             var basicBlockAnalyser = new BasicBlockAnalyser(method);
-            var offsetToIndexMap = new Dictionary<int, int>();
+            var offsetToIndexMap = new Dictionary<uint, int>();
             var ehClauses = new List<EHClause>();
 
             var basicBlocks = basicBlockAnalyser.FindBasicBlocks(offsetToIndexMap, ehClauses);

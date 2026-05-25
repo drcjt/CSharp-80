@@ -24,23 +24,22 @@ namespace ILCompiler.TypeSystem.IL
     public enum ILExceptionRegionKind
     {
         Catch = 0,
-        Filter = 1,
-        Finally = 2,
-        Fault = 4,
+        Fault = 1,
+        Filter = 2,
     }
 
     public class ILExceptionRegion
     {
         public ILExceptionRegionKind Kind { get; }
-        public int TryOffset { get; }
-        public int? TryEndOffset { get; }
-        public int HandlerOffset { get; }
-        public int? HandlerEndOffset { get; }
+        public uint TryOffset { get; }
+        public uint? TryEndOffset { get; }
+        public uint HandlerOffset { get; }
+        public uint? HandlerEndOffset { get; }
 
-        public int? FilterOffset { get; }
+        public uint? FilterOffset { get; }
         public TypeDesc? CatchType { get; }
 
-        public ILExceptionRegion(ILExceptionRegionKind kind, int tryOffset, int? tryEndOffset, int handlerOffset, int? handlerEndOffset, int? filterOffset, TypeDesc? catchType)
+        public ILExceptionRegion(ILExceptionRegionKind kind, uint tryOffset, uint? tryEndOffset, uint handlerOffset, uint? handlerEndOffset, uint? filterOffset, TypeDesc? catchType)
         {
             Kind = kind;
             TryOffset = tryOffset;
