@@ -24,6 +24,7 @@ namespace ILCompiler.Compiler.DependencyAnalysis
         }
 
         public bool HasExceptionHandlers => Method?.MethodIL?.GetExceptionRegions().Length > 0;
+        public bool HasFinallyHandlers => Method?.MethodIL?.GetExceptionRegions().Any(x => x.Kind == TypeSystem.IL.ILExceptionRegionKind.Fault) ?? false;
         public IList<Instruction> MethodCode { get; set; } = new List<Instruction>();
 
         public IList<EHClause> EhClauses { get; set; } = new List<EHClause>();

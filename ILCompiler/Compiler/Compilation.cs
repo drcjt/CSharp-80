@@ -17,6 +17,7 @@ namespace ILCompiler.Compiler
         private readonly DnlibModule _module;
 
         public static bool AnyExceptionHandlers { get; set; } = false;
+        public static bool AnyFinallyHandlers { get; set; } = false;
 
         public Compilation(IConfiguration configuration, Z80AssemblyWriter z80Writer, CorLibModuleProvider corLibModuleProvider, DependencyAnalyzer dependencyAnalyzer, /*TypeSystemContext typeSystemContext, */ DnlibModule module)
         {
@@ -64,6 +65,7 @@ namespace ILCompiler.Compiler
             // Core Dependency Analysis and code output routine
             var nodes = _dependencyAnalyzer.ComputeMarkedNodes();
             AnyExceptionHandlers = nodes.OfType<Z80MethodCodeNode>().Any(n => n.HasExceptionHandlers);
+            AnyFinallyHandlers = nodes.OfType<Z80MethodCodeNode>().Any(n => n.HasFinallyHandlers);
 
             _z80AssemblyWriter.WriteCode(rootNode, nodes, inputFilePath, outputFilePath);
 
