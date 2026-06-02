@@ -1,4 +1,4 @@
-; Call a finaally funclet
+; Call a finally funclet
 ;
 ; Uses: HL, DE, BC, IX
 ;

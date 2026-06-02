@@ -13,13 +13,14 @@ namespace ILCompiler.Compiler
         Filter = 2,  // Filter handler
     }
 
-    public class EHClause(BasicBlock tryBegin, BasicBlock tryLast, BasicBlock handlerBegin, BasicBlock handlerLast,
+    public class EHClause(BasicBlock tryBegin, BasicBlock tryLast, BasicBlock handlerBegin, BasicBlock handlerLast, BasicBlock? filterBegin,
         EHClauseKind kind, TypeDesc? exceptionType, uint tryBeginILOffset, uint tryEndILOffset)
     {
         public BasicBlock TryBegin { get; init; } = tryBegin;
         public BasicBlock TryLast { get; init; } = tryLast;
         public BasicBlock HandlerBegin { get; init; } = handlerBegin;
         public BasicBlock HandlerLast { get; init; } = handlerLast;
+        public BasicBlock? FilterBegin { get; init; } = filterBegin;
         public EHClauseKind Kind { get; init; } = kind;
         public TypeDesc? ExceptionType { get; init;  } = exceptionType;
 
@@ -114,11 +115,19 @@ namespace ILCompiler.Compiler
                 {
                     filterBlock = CreateBasicBlock(basicBlocks, (uint)exceptionHandler.FilterOffset!);
                     filterBlock.EHFlags |= EHBoundaryFlags.FilterStart;
+                    tryBeginBlock.Handlers.Add(filterBlock);
                 }
 
                 BasicBlock handlerBeginBlock = CreateBasicBlock(basicBlocks, exceptionHandler.HandlerOffset);
                 handlerBeginBlock.EHFlags |= EHBoundaryFlags.HandlerStart;
-                handlerBeginBlock.CatchType = exceptionHandler.CatchType;
+                if (exceptionHandler.Kind == ILExceptionRegionKind.Filter)
+                {
+                    handlerBeginBlock.CatchType = _method.Context.GetWellKnownType(WellKnownType.Object);
+                }
+                else
+                {
+                    handlerBeginBlock.CatchType = exceptionHandler.CatchType;
+                }
 
                 tryBeginBlock.Handlers.Add(handlerBeginBlock);
             }
@@ -134,6 +143,8 @@ namespace ILCompiler.Compiler
                 BasicBlock handlerBeginBlock = basicBlocks[exceptionHandler.HandlerOffset];
                 BasicBlock handlerLastBlock = GetHandlerLastBlock(exceptionHandler.HandlerEndOffset, basicBlocks);
 
+                BasicBlock? filterBeginBlock = exceptionHandler.FilterOffset is not null ? basicBlocks[(uint)exceptionHandler.FilterOffset] : null;
+
                 handlerBeginBlock.TryBlocks = GetTryBlocks(exceptionHandler, basicBlocks);
 
                 TypeDesc? exceptionType = exceptionHandler.CatchType;
@@ -143,7 +154,7 @@ namespace ILCompiler.Compiler
                 uint tryBeginILOffset = exceptionHandler.TryOffset;
                 uint tryEndILOffset = exceptionHandler.TryEndOffset ?? methodEndILOffset;
 
-                var ehClause = new EHClause(tryBeginBlock, tryLastBlock, handlerBeginBlock, handlerLastBlock,
+                var ehClause = new EHClause(tryBeginBlock, tryLastBlock, handlerBeginBlock, handlerLastBlock, filterBeginBlock,
                     (EHClauseKind)exceptionHandler.Kind, exceptionType, tryBeginILOffset, tryEndILOffset);
 
                 ehClauses.Add(ehClause);

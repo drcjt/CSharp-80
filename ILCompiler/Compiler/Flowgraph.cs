@@ -24,6 +24,10 @@ namespace ILCompiler.Compiler
             {
                 if (IsInTryRegion(b, clause))
                 {
+                    if (clause.FilterBegin is not null)
+                    {
+                        yield return clause.FilterBegin;
+                    }
                     yield return clause.HandlerBegin;
                 }
             }

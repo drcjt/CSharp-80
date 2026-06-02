@@ -400,6 +400,14 @@ namespace ILCompiler.Compiler
                                 ehClausesBuilder.Dw(ehClause.TryBegin.Label, "Protected Region Start");
                                 ehClausesBuilder.Dw($"{ehClause.TryLast.Label}_END", "Protected Region End");
                                 ehClausesBuilder.Dw(ehClause.HandlerBegin.Label, "Handler Start");
+                                if (ehClause.FilterBegin is not null)
+                                {
+                                    ehClausesBuilder.Dw(ehClause.FilterBegin.Label, "Filter Start");
+                                }
+                                else
+                                {
+                                    ehClausesBuilder.Dw(0, "Filter Start");
+                                }
                                 if (ehClause.Kind == EHClauseKind.Typed)
                                 {
                                     ehClausesBuilder.Dw(_nameMangler.GetMangledTypeName(ehClause.ExceptionType!), "Catch Type");

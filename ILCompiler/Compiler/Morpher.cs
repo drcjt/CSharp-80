@@ -197,7 +197,7 @@ namespace ILCompiler.Compiler
                     {
                         returnValue = MorphTree(returnValue);
                     }
-                    tree = new ReturnEntry(returnValue, re.IsFinallyReturn);
+                    tree = new ReturnEntry(returnValue, re.IsFinallyReturn, re.IsFilterReturn);
                     break;
 
                 case StoreIndEntry sie:
