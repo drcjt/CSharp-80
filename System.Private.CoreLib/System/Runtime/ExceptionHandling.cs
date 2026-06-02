@@ -24,6 +24,7 @@ namespace System.Runtime
             internal ushort _tryStartOffset;
             internal ushort _tryEndOffset;
             internal byte* _handlerAddress;
+            internal byte* _filterAddress;
             internal void* _pTargetType;
             internal byte _kind;
 
@@ -123,11 +124,37 @@ namespace System.Runtime
 
             for (nuint idx = 0; InternalCalls.EHEnumNext(&ehEnum, &nextClause); idx++)
             {
+                if ((nextClause._kind != (byte)EHClauseKind.Typed && nextClause._kind != (byte)EHClauseKind.Filter)
+                    || !nextClause.ContainsCodeOffset(frameIter.InstructionPointer))
+                {
+                    continue;
+                }
+
                 // Only handle Typed clauses in the first pass. Filter by type and IP range.
                 if (nextClause._kind == (byte)EHClauseKind.Typed)
                 {
                     var catchEETypePtr = (EEType*)(nextClause._pTargetType);
-                    if (nextClause.ContainsCodeOffset(frameIter.InstructionPointer) && TypeCast.IsInstanceOfClass(catchEETypePtr, exception) != null)
+                    if (TypeCast.IsInstanceOfClass(catchEETypePtr, exception) != null)
+                    {
+                        pHandler = nextClause._handlerAddress;
+                        tryRegionIdx = idx;
+                        return true;
+                    }
+                }
+                else
+                {
+                    bool shouldInvokeHandler = false;
+
+                    try
+                    {
+                        shouldInvokeHandler = InternalCalls.CallFilterFunclet(exception, nextClause._filterAddress, frameIter.FramePointer);
+                    }
+                    catch
+                    {
+                        // Make sure no exceptions leak out of the filter funclet
+                    }
+
+                    if (shouldInvokeHandler)
                     {
                         pHandler = nextClause._handlerAddress;
                         tryRegionIdx = idx;
