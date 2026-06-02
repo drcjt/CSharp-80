@@ -15,6 +15,16 @@ namespace ILCompiler.Compiler.CodeGenerators
                 context.InstructionsBuilder.Ret();
                 return;
             }
+            else if (entry.IsFilterReturn)
+            {
+                context.InstructionsBuilder.Pop(BC);    // bool result from filter
+                context.InstructionsBuilder.Pop(DE);
+                context.InstructionsBuilder.Pop(HL);    // return address
+
+                context.InstructionsBuilder.Push(DE);
+                context.InstructionsBuilder.Push(BC);
+                context.InstructionsBuilder.Jp(__[HL]);
+            }
 
             var epilogLabel = GetEpilogLabel(context);
             if (context.GeneratedEpilog)

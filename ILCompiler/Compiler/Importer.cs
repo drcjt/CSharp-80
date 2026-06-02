@@ -173,7 +173,8 @@ namespace ILCompiler.Compiler
             var currentIndex = offsetToIndexMap[_currentILOffset];
 
             // Add exception object for catch
-            if (block.EHFlags.HasFlag(EHBoundaryFlags.HandlerStart) && block.CatchType is not null)
+            if ((block.EHFlags.HasFlag(EHBoundaryFlags.HandlerStart) && block.CatchType is not null)
+                || block.EHFlags.HasFlag(EHBoundaryFlags.FilterStart))
             {
                 // Use a node type that won't generate any code
                 var catchArgument = new CatchArgumentEntry();
