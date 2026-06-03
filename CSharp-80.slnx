@@ -145,6 +145,7 @@
     <Project Path="Tests/Methodical/EH/Basics/ThrowInCatch/ThrowInCatch.csproj" />
     <Project Path="Tests/Methodical/EH/Basics/ThrowInClassConstructor/ThrowInClassConstructor.csproj" />
     <Project Path="Tests/Methodical/EH/Basics/ThrowInExcept/ThrowInExcept.csproj" />
+    <Project Path="Tests/Methodical/EH/Basics/ThrowInFilter/ThrowInFilter.csproj" />
     <Project Path="Tests/Methodical/EH/Basics/ThrowInFinally/ThrowInFinally.csproj" />
     <Project Path="Tests/Methodical/EH/Basics/ThrowInFinallyErrPath/ThrowInFinallyErrPath.csproj" />
     <Project Path="Tests/Methodical/EH/Basics/ThrowInFinallyErrPathFn/ThrowInFinallyErrPathFn.csproj" />
