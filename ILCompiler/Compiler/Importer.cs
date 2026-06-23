@@ -12,6 +12,7 @@ namespace ILCompiler.Compiler
 {
     public class Importer : IImporter
     {
+        public MethodCompiler Compiler { get; private set; } = null!;
         public IConfiguration Configuration { get; init; }
         private ILogger<Importer> Logger { get; init; }
         public INameMangler NameMangler { get; init; }
@@ -52,11 +53,7 @@ namespace ILCompiler.Compiler
         private uint _currentILOffset = 0;
         private uint _currentInstructionSize = 0;
 
-
-        private readonly CodeFolder _codeFolder;
-        public CodeFolder CodeFolder => _codeFolder;
-
-        public Importer(IConfiguration configuration, ILogger<Importer> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, PreinitializationManager preinitializationManager, NodeFactory nodeFactory, CodeFolder codeFolder)
+        public Importer(IConfiguration configuration, ILogger<Importer> logger, INameMangler nameMangler, IEnumerable<IOpcodeImporter> importers, PreinitializationManager preinitializationManager, NodeFactory nodeFactory)
         {
             Configuration = configuration;
             NameMangler = nameMangler;
@@ -64,7 +61,6 @@ namespace ILCompiler.Compiler
             NodeFactory = nodeFactory;
             Logger = logger;
             _opcodeImporters = importers;
-            _codeFolder = codeFolder;
         }
 
         private void ImportBasicBlocks(IDictionary<uint, int> offsetToIndexMap)
@@ -271,6 +267,7 @@ namespace ILCompiler.Compiler
 
         public void Import(MethodCompiler compiler, IList<EHClause> ehClauses, InlineInfo? inlineInfo = null)
         {
+            Compiler = compiler;
             InlineInfo = inlineInfo;
 
             ParameterCount = compiler.Locals.ParameterCount;

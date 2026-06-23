@@ -18,6 +18,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public virtual bool IsInternalCall => false;
         public virtual bool IsNoInlining => false;
+        public virtual bool IsNoOptimization => false;
 
         public virtual bool IsStaticConstructor => OwningType.GetStaticConstructor() == this;
 

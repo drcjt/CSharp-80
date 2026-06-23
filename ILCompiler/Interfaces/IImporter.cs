@@ -1,7 +1,6 @@
 ﻿using ILCompiler.Compiler;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.Inlining;
-using ILCompiler.Compiler.OpcodeImporters;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.TypeSystem.Common;
 using StackEntry = ILCompiler.Compiler.EvaluationStack.StackEntry;
@@ -10,7 +9,7 @@ namespace ILCompiler.Interfaces
 {
     public interface IImporter : IPhase
     {
-        public CodeFolder CodeFolder { get; }
+        public MethodCompiler Compiler { get; }
         public INameMangler NameMangler { get; }
         public IConfiguration Configuration { get; }
         public PreinitializationManager PreinitializationManager { get; }

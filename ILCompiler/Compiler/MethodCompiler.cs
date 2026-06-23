@@ -3,6 +3,7 @@ using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.Dominators;
 using ILCompiler.Compiler.FlowgraphHelpers;
 using ILCompiler.Compiler.Inlining;
+using ILCompiler.Compiler.OpcodeImporters;
 using ILCompiler.Interfaces;
 using ILCompiler.TypeSystem.Common;
 using Microsoft.Extensions.Logging;
@@ -14,6 +15,7 @@ namespace ILCompiler.Compiler
         private readonly IConfiguration _configuration;
         private readonly ILogger<MethodCompiler> _logger;
         private readonly IPhaseFactory _phaseFactory;
+        public CodeFolder CodeFolder { get; }
 
         public MethodDesc? Method { get; private set; }
         public LocalVariableTable Locals { get; } = [];
@@ -21,12 +23,14 @@ namespace ILCompiler.Compiler
         public FlowgraphDominatorTree? DominatorTree { get; private set; }
         public FlowGraphNaturalLoops? Loops { get; private set; }
         public FlowGraph ControlFlowGraph { get; } = new();
+        public bool Optimize => _configuration.Optimize && !Method!.IsNoOptimization;
 
-        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory)
+        public MethodCompiler(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory, CodeFolder codeFolder)
         {
             _configuration = configuration;
             _logger = logger;
             _phaseFactory = phaseFactory;
+            CodeFolder = codeFolder;
         }
 
         public IList<BasicBlock>? CompileInlineeMethod(MethodDesc method, string inputFilePath, InlineInfo inlineInfo)
@@ -88,6 +92,7 @@ namespace ILCompiler.Compiler
             }
 
             Method = method;
+            CodeFolder.Optimize = Optimize;
 
             Locals.SetupLocalVariableTable(Method);
 
@@ -114,7 +119,7 @@ namespace ILCompiler.Compiler
             morpher.Morph();
             DumpIRTrees("After Morph");
 
-            if (_configuration.Optimize)
+            if (Optimize)
             {
                 // Build the dfs tree and remove unreachable blocks
                 DfsTree = FlowgraphDfsTree.BuildAndRemove(ControlFlowGraph);
@@ -122,7 +127,7 @@ namespace ILCompiler.Compiler
 
             ControlFlowGraph.SetBlockOrder();
 
-            if (_configuration.Optimize)
+            if (Optimize)
             {
                 var flowgraphDominatorTreeBuilder = _phaseFactory.Create<IComputeDominators>();
                 DominatorTree = flowgraphDominatorTreeBuilder.Build(this);
