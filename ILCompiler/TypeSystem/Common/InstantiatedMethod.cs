@@ -49,6 +49,7 @@ namespace ILCompiler.TypeSystem.Common
         public override PInvokeMetaData? GetPInvokeMetaData() => _methodDesc.GetPInvokeMetaData();
         public override bool IsInternalCall => _methodDesc.IsInternalCall;
         public override bool IsNoInlining => _methodDesc.IsNoInlining;
+        public override bool IsNoOptimization => _methodDesc.IsNoOptimization;
 
         public override bool IsStatic => _methodDesc.IsStatic;
 

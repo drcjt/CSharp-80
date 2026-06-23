@@ -400,7 +400,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
             var inlineResult = new InlineResult() { InlineCall = call };
 
-            if (!importer.Configuration.Optimize)
+            if (!importer.Compiler.Optimize)
             {
                 inlineResult.NoteFatal(InlineObservation.DebugCodeGen);
                 return;

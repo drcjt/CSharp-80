@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using ILCompiler.Compiler.EvaluationStack;
 using ILCompiler.Compiler.Inlining;
-using ILCompiler.Compiler.OpcodeImporters;
 using ILCompiler.Compiler.PreInit;
 using ILCompiler.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -9,14 +8,13 @@ using StackEntry = ILCompiler.Compiler.EvaluationStack.StackEntry;
 
 namespace ILCompiler.Compiler
 {
-    public class Inliner(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory, INameMangler nameMangler, PreinitializationManager preinitializationManager, CodeFolder codeFolder) : IInliner
+    public class Inliner(ILogger<MethodCompiler> logger, IConfiguration configuration, IPhaseFactory phaseFactory, INameMangler nameMangler, PreinitializationManager preinitializationManager) : IInliner
     {
         private readonly IConfiguration _configuration = configuration;
         private readonly ILogger<MethodCompiler> _logger = logger;
         private readonly IPhaseFactory _phaseFactory = phaseFactory;
         private readonly INameMangler _nameMangler = nameMangler;
         private readonly PreinitializationManager _preinitializationManager = preinitializationManager;
-        private readonly CodeFolder _codeFolder = codeFolder;
         private string? _inputFilePath;
 
         public void Inline(MethodCompiler compiler, string inputFilePath)
@@ -26,7 +24,7 @@ namespace ILCompiler.Compiler
 
             _inputFilePath = inputFilePath;
 
-            var walker = new SubstitutePlaceholdersWalker(_codeFolder);
+            var walker = new SubstitutePlaceholdersWalker(compiler.CodeFolder);
 
             var blockIndex = 0;
 
@@ -171,7 +169,7 @@ namespace ILCompiler.Compiler
 
             inlineInfo.InlineContext = NewContext(inlineInfo.InlineCandidateInfo.InlinersContext, methodInfo.Call);
 
-            var inlinerCompiler = new MethodCompiler(_logger, _configuration, _phaseFactory);
+            var inlinerCompiler = new MethodCompiler(_logger, _configuration, _phaseFactory, compiler.CodeFolder);
             var basicBlocks = inlinerCompiler.CompileInlineeMethod(method, _inputFilePath!, inlineInfo);
 
             if (basicBlocks != null)

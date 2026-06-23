@@ -78,6 +78,7 @@ namespace ILCompiler.TypeSystem.Common
 
         public override bool IsInternalCall => _typicalMethodDef.IsInternalCall;
         public override bool IsNoInlining => _typicalMethodDef.IsNoInlining;
+        public override bool IsNoOptimization => _typicalMethodDef.IsNoOptimization;
         public override bool IsVirtual => _typicalMethodDef.IsVirtual;
         public override bool IsAbstract => _typicalMethodDef.IsAbstract;
 

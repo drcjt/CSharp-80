@@ -1,20 +1,15 @@
-﻿using ILCompiler.Compiler.EvaluationStack;
-using ILCompiler.Interfaces;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using ILCompiler.Compiler.EvaluationStack;
 
 namespace ILCompiler.Compiler.OpcodeImporters
 {
     public class CodeFolder
     {
-        private readonly IConfiguration _configuration;
-        public CodeFolder(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        public bool Optimize { get; set; }
 
         public StackEntry FoldExpression(StackEntry tree)
         {
-            if (!_configuration.Optimize)
+            if (!Optimize)
                 return tree;
 
             if (tree is CastEntry castOperator && castOperator.Op1.IsIntCnsOrI())
@@ -309,7 +304,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
 
         public StackEntry FoldConstantExpression(StackEntry tree)
         {
-            if (!_configuration.Optimize)
+            if (!Optimize)
                 return tree;
 
             if (tree is CastEntry castTree)
