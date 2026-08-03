@@ -150,6 +150,10 @@ namespace ILCompiler.Compiler
                 earlyValuePropagation.Run(this);
             }
 
+            // Remove unreachable try regions
+            var removeUnreachableTryRegions = _phaseFactory.Create<IRemoveUnreachableTryRegions>();
+            removeUnreachableTryRegions.Run(this);
+
             // Rationalize
             // LIR valid from here on - nodes are fully linked across statements
             var rationalizer = _phaseFactory.Create<IRationalizer>();

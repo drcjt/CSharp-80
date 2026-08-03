@@ -17,9 +17,9 @@ namespace ILCompiler.Compiler
         EHClauseKind kind, TypeDesc? exceptionType, uint tryBeginILOffset, uint tryEndILOffset)
     {
         public BasicBlock TryBegin { get; init; } = tryBegin;
-        public BasicBlock TryLast { get; init; } = tryLast;
+        public BasicBlock TryLast { get; set; } = tryLast;
         public BasicBlock HandlerBegin { get; init; } = handlerBegin;
-        public BasicBlock HandlerLast { get; init; } = handlerLast;
+        public BasicBlock HandlerLast { get; set; } = handlerLast;
         public BasicBlock? FilterBegin { get; init; } = filterBegin;
         public EHClauseKind Kind { get; init; } = kind;
         public TypeDesc? ExceptionType { get; init;  } = exceptionType;

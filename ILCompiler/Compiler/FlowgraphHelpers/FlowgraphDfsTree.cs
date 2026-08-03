@@ -21,11 +21,11 @@
 
         public static FlowgraphDfsTree BuildAndRemove(FlowGraph controlFlowGraph)
         {
-            var blocks = SetupBasicBlockRoot(controlFlowGraph.Blocks);
+            SetupBasicBlockRoot(controlFlowGraph.Blocks);
 
-            var dfsTree = Build(controlFlowGraph);
+            FlowgraphDfsTree? dfsTree = Build(controlFlowGraph);
 
-            dfsTree.RemoveBlocksOutsideOfDfsTree(blocks);
+            controlFlowGraph.RemoveUnreachableBlocks(block => !dfsTree.PostOrder.Contains(block) && !block.EHFlags.HasFlag(EHBoundaryFlags.HandlerStart));
 
             return dfsTree;
         }
@@ -43,15 +43,6 @@
             }
 
             return blocks;
-        }
-
-        private void RemoveBlocksOutsideOfDfsTree(IList<BasicBlock> blocks)
-        {
-            var blocksToRemove = blocks.Where(block => !PostOrder.Contains(block) && !block.EHFlags.HasFlag(EHBoundaryFlags.HandlerStart)).ToList();
-            foreach (var block in blocksToRemove)
-            {
-                blocks.Remove(block);
-            }
         }
 
         public static FlowgraphDfsTree Build(FlowGraph controlFlowGraph)
