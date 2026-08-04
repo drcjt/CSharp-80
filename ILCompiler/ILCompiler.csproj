@@ -192,6 +192,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Compiler\RemoveUnreachableTryRegions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="dnlib" Version="4.4.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />

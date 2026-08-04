@@ -9,6 +9,34 @@ namespace ILCompiler.Compiler
 
         public IList<EHClause> EhClauses { get; } = [];
 
+
+        public BasicBlock Previous(BasicBlock block) =>
+            Blocks.Where(b => b.EndOffset < block.StartOffset)
+                  .OrderBy(b => b.EndOffset)
+                  .Last();
+
+        public void Remove(BasicBlock block)
+        {
+            BasicBlock previousBlock = Previous(block);
+            Blocks.Remove(block);
+            UpdateLastBlocks(block, previousBlock);
+        }
+
+        private void UpdateLastBlocks(BasicBlock removedBlock, BasicBlock previousBlock)
+        {
+            foreach (EHClause ehClause in EhClauses)
+            {
+                if (ehClause.TryLast == removedBlock)
+                {
+                    ehClause.TryLast = previousBlock;
+                }
+                if (ehClause.HandlerLast == removedBlock)
+                {
+                    ehClause.HandlerLast = previousBlock;
+                }
+            }
+        }
+
         public IEnumerable<BasicBlock> VisitAllSuccs(BasicBlock b)
         {
             foreach (BasicBlock succ in b.Successors)
@@ -114,6 +142,22 @@ namespace ILCompiler.Compiler
         public void RemoveStatement(BasicBlock block, Statement statement)
         {
             block.Statements.Remove(statement);
+        }
+
+        public void RemoveUnreachableBlocks(Func<BasicBlock, bool> canRemoveBlock)
+        {
+            IList<BasicBlock> blocksToRemove = [];
+            foreach (BasicBlock block in Blocks)
+            {
+                if (canRemoveBlock(block))
+                {
+                    blocksToRemove.Add(block);
+                }
+            }
+            foreach (BasicBlock block in blocksToRemove)
+            {
+                Blocks.Remove(block);
+            }
         }
     }
 }

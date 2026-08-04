@@ -58,6 +58,7 @@ namespace ILCompiler.IoC
             services.AddTransient<IRationalizer, Rationalizer>();
 
             services.AddTransient<IEarlyValuePropagation, EarlyValuePropagation>();
+            services.AddTransient<IRemoveUnreachableTryRegions, RemoveUnreachableTryRegoins>();
 
             services.AddTransient<ISsaBuilder, SsaBuilder>();
 

@@ -160,6 +160,13 @@
     <Project Path="Tests/Methodical/EH/Basics/TryThrowCatchFinally/TryThrowCatchFinally.csproj" />
     <Project Path="Tests/Methodical/EH/Basics/TryThrowExcept/TryThrowExcept.csproj" />
   </Folder>
+  <Folder Name="/Tests/Methodical/EH/DeadCode/">
+    <Project Path="Tests/Methodical/EH/DeadCode/DeadTryCatch/DeadTryCatch.csproj" />
+    <Project Path="Tests/Methodical/EH/DeadCode/DeadTryFinally/DeadTryFinally.csproj" />
+    <Project Path="Tests/Methodical/EH/DeadCode/DeadTryFinallyThrow/DeadTryFinallyThrow.csproj" />
+    <Project Path="Tests/Methodical/EH/DeadCode/SeveralDeadEHRegions/SeveralDeadEHRegion.csproj" />
+    <Project Path="Tests/Methodical/EH/DeadCode/SimpleDeadEHRegion/SimpleDeadEHRegion.csproj" />
+  </Folder>
   <Folder Name="/Tests/Methodical/EH/FinallyExec/">
     <Project Path="Tests/Methodical/EH/FinallyExec/CatchRetToInnerTry/CatchRetToInnerTry.csproj" />
     <Project Path="Tests/Methodical/EH/FinallyExec/LocalGotoInAHandler/LocalGotoInAHandler.csproj" />
