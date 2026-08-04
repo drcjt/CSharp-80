@@ -8,7 +8,7 @@
 	.ver 0:0:0:0
 }
 
-.class public Test_deadtryfinally
+.class public Test_deadtryfinallythrow
 {
 
 .method public static int32 Main() {
@@ -20,7 +20,8 @@
         ldc.i4.1
         call void Log::Mark(int32)  // In try
 
-        leave.s done
+        newobj instance void [mscorlib]System.Exception::.ctor()
+        throw
 
         dead:
 
@@ -48,11 +49,15 @@
     }
 
 done:
-    ldc.i4.1
+    ldc.i4.2
     newarr     [mscorlib]System.Int32
     dup
     ldc.i4.0
     ldc.i4.1    // In try
+    stelem.i4
+    dup
+    ldc.i4.1
+    ldc.i4.5    // In catch
     stelem.i4
 
     call int32 Log::AssertSequence(int32[])
