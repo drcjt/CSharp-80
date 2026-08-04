@@ -400,6 +400,14 @@ namespace ILCompiler.Compiler
                         }
                         break;
 
+                    case ILOpcode.endfinally:
+                    case ILOpcode.endfilter:
+                        {
+                            uint nextInstructionOffset = currentOffset + currentInstruction.GetSize();
+                            jumpTargets.Add(nextInstructionOffset);
+                        }
+                        break;
+
                     case ILOpcode.ret:
                         {
                             ReturnCount++;
