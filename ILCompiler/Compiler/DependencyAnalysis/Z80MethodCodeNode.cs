@@ -23,8 +23,21 @@ namespace ILCompiler.Compiler.DependencyAnalysis
             _module = module;
         }
 
+        public EHFeatures EHFeatures
+        {
+            get
+            {
+                EHFeatures features = EHFeatures.None;
+                if (Method?.MethodIL?.GetExceptionRegions().Length > 0) features |= EHFeatures.Any;
+                if (Method?.MethodIL?.GetExceptionRegions().Any(x => x.Kind == TypeSystem.IL.ILExceptionRegionKind.Fault) ?? false) features |= EHFeatures.Finallys;
+                if (Method?.MethodIL?.GetExceptionRegions().Any(x => x.Kind == TypeSystem.IL.ILExceptionRegionKind.Filter) ?? false) features |= EHFeatures.Filters;
+                return features;
+            }
+        }
+
         public bool HasExceptionHandlers => Method?.MethodIL?.GetExceptionRegions().Length > 0;
         public bool HasFinallyHandlers => Method?.MethodIL?.GetExceptionRegions().Any(x => x.Kind == TypeSystem.IL.ILExceptionRegionKind.Fault) ?? false;
+        public bool HasExceptionFilters => Method?.MethodIL?.GetExceptionRegions().Any(x => x.Kind == TypeSystem.IL.ILExceptionRegionKind.Filter) ?? false;
         public IList<Instruction> MethodCode { get; set; } = new List<Instruction>();
 
         public IList<EHClause> EhClauses { get; set; } = new List<EHClause>();

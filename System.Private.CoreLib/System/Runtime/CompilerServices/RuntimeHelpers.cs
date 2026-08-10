@@ -20,11 +20,6 @@ namespace System.Runtime.CompilerServices
         {
             throw new PlatformNotSupportedException();
         }
-
-        public static bool HasFinallyHandlers
-        {
-            [Intrinsic] get => false;
-        }
     }
 
     [StructLayout(LayoutKind.Sequential)]

@@ -1,13 +1,21 @@
-﻿using dnlib.DotNet;
-using ILCompiler.TypeSystem.Dnlib;
+﻿using System.Diagnostics;
+using dnlib.DotNet;
 using ILCompiler.Compiler.DependencyAnalysis;
 using ILCompiler.Compiler.DependencyAnalysisFramework;
 using ILCompiler.Interfaces;
-using System.Diagnostics;
-using ILCompiler.Compiler.Ssa;
+using ILCompiler.TypeSystem.Dnlib;
 
 namespace ILCompiler.Compiler
 {
+    [Flags]
+    public enum EHFeatures
+    {
+        None = 0,
+        Any = 1,
+        Filters = 2,
+        Finallys = 4,
+    }
+
     public class Compilation : ICompilation
     {
         private readonly IConfiguration _configuration;
@@ -16,8 +24,7 @@ namespace ILCompiler.Compiler
         private readonly CorLibModuleProvider _corLibModuleProvider;
         private readonly DnlibModule _module;
 
-        public static bool AnyExceptionHandlers { get; set; } = false;
-        public static bool AnyFinallyHandlers { get; set; } = false;
+        public static EHFeatures EHFeatures { get; set; } = EHFeatures.None;
 
         public Compilation(IConfiguration configuration, Z80AssemblyWriter z80Writer, CorLibModuleProvider corLibModuleProvider, DependencyAnalyzer dependencyAnalyzer, /*TypeSystemContext typeSystemContext, */ DnlibModule module)
         {
@@ -64,8 +71,7 @@ namespace ILCompiler.Compiler
 
             // Core Dependency Analysis and code output routine
             var nodes = _dependencyAnalyzer.ComputeMarkedNodes();
-            AnyExceptionHandlers = nodes.OfType<Z80MethodCodeNode>().Any(n => n.HasExceptionHandlers);
-            AnyFinallyHandlers = nodes.OfType<Z80MethodCodeNode>().Any(n => n.HasFinallyHandlers);
+            EHFeatures = nodes.OfType<Z80MethodCodeNode>().Aggregate(EHFeatures.None, (features, n) => features | n.EHFeatures);
 
             _z80AssemblyWriter.WriteCode(rootNode, nodes, inputFilePath, outputFilePath);
 
