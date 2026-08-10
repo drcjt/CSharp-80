@@ -45,5 +45,17 @@
         {
             throw new PlatformNotSupportedException();
         }
+
+        public static bool HasExceptionFilters
+        {
+            [Intrinsic]
+            get => true;
+        }
+
+        public static bool HasFinallyRegions
+        {
+            [Intrinsic]
+            get => true;
+        }
     }
 }

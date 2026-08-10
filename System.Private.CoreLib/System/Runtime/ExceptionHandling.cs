@@ -1,5 +1,5 @@
-﻿using Internal.Runtime;
-using System.Diagnostics;
+﻿using System.Runtime.CompilerServices;
+using Internal.Runtime;
 
 namespace System.Runtime
 {
@@ -19,6 +19,7 @@ namespace System.Runtime
             Fault = 1,
             Filter = 2,
         }
+
         private struct EHClause
         {
             internal ushort _tryStartOffset;
@@ -91,7 +92,7 @@ namespace System.Runtime
 
             // Second pass
             //
-            if (CompilerServices.RuntimeHelpers.HasFinallyHandlers)
+            if (RuntimeFeature.HasFinallyRegions)
             {
                 isValid = true;
                 for (; isValid; isValid = InternalCalls.SFINext(ref stackFrameIterator))
@@ -141,7 +142,7 @@ namespace System.Runtime
                         return true;
                     }
                 }
-                else
+                else if (RuntimeFeature.HasExceptionFilters)
                 {
                     bool shouldInvokeHandler = false;
 

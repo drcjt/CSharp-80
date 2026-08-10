@@ -345,7 +345,7 @@ namespace ILCompiler.Compiler
 
         private void WriteUnwindTable(IReadOnlyCollection<Z80MethodCodeNode> nodes)
         {
-            if (Compilation.AnyExceptionHandlers)
+            if (AnyExceptionHandlers(nodes))
             {
                 var mostUsedNumberOfParameters = nodes.GroupBy(node => node.ParameterBytes)
                                                       .OrderByDescending(g => g.Count())
@@ -376,9 +376,12 @@ namespace ILCompiler.Compiler
             }
         }
 
+        private static bool AnyExceptionHandlers(IReadOnlyCollection<IDependencyNode> nodes)
+            => nodes.Any(x => x is Z80MethodCodeNode codeNode && codeNode.EhClauses.Count > 0);
+
         private void WriteEhClauses(IReadOnlyCollection<IDependencyNode> nodes)
         {
-            if (Compilation.AnyExceptionHandlers)
+            if (AnyExceptionHandlers(nodes))
             {
                 InstructionsBuilder ehClausesBuilder = new InstructionsBuilder();
                 ehClausesBuilder.Label("EH_CLAUSES");

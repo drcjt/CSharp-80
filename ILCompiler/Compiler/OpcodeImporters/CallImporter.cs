@@ -268,10 +268,19 @@ namespace ILCompiler.Compiler.OpcodeImporters
                     }
                     break;
 
-                case "get_HasFinallyHandlers":
-                    if (IsTypeName(methodToCall, "System.Runtime.CompilerServices", "RuntimeHelpers"))
+                case "get_HasExceptionFilters":
+                    if (IsTypeName(methodToCall, "System.Runtime.CompilerServices", "RuntimeFeature"))
                     {
-                        var result = new Int32ConstantEntry(Compilation.AnyFinallyHandlers ? 1 : 0);
+                        var result = new Int32ConstantEntry((int)Compilation.EHFeatures & (int)EHFeatures.Filters);
+                        importer.Push(result);
+                        return true;
+                    }
+                    break;
+
+                case "get_HasFinallyRegions":
+                    if (IsTypeName(methodToCall, "System.Runtime.CompilerServices", "RuntimeFeature"))
+                    {
+                        var result = new Int32ConstantEntry((int)Compilation.EHFeatures & (int)EHFeatures.Finallys);
                         importer.Push(result);
                         return true;
                     }

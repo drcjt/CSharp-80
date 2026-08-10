@@ -52,7 +52,7 @@ namespace ILCompiler.Compiler
                 methodName = _nameMangler.GetMangledMethodName(_context.Method);
             }
 
-            if (Compilation.AnyExceptionHandlers)
+            if (Compilation.EHFeatures.HasFlag(EHFeatures.Any))
             {
                 methodCodeNode.ParameterBytes = CalculateParameterBytes();
             }

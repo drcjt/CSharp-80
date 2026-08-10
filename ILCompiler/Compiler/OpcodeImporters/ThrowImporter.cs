@@ -26,7 +26,7 @@ namespace ILCompiler.Compiler.OpcodeImporters
         {
             // If no exception handlers then can just use fail fast
             // and avoid any overhead of searching for exception handler
-            if (!Compilation.AnyExceptionHandlers)
+            if ((Compilation.EHFeatures & EHFeatures.Any) == 0)
             {
                 return "FailFast";
             }
