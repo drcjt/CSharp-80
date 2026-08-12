@@ -9,6 +9,12 @@ namespace ILCompiler.Compiler
 
         public IList<EHClause> EhClauses { get; } = [];
 
+        public static WalkResult WalkTreePost(Edge<StackEntry> use, Func<Edge<StackEntry>, WalkData, WalkResult> visitor)
+        {
+            WalkData walkData = new(postOrderVisitorFunction: visitor);
+            StackEntryWalker walker = new(walkData);
+            return walker.WalkTree(use, null);
+        }
 
         public BasicBlock Previous(BasicBlock block) =>
             Blocks.Where(b => b.EndOffset < block.StartOffset)
