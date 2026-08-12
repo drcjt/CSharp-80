@@ -95,6 +95,8 @@ namespace ILCompiler.Compiler.EvaluationStack
                 {
                     containsT = true;
                 }
+
+                return WalkResult.Continue;
             });
 
             visitor.WalkTree(new Edge<StackEntry>(() => this, x => { }), null);
@@ -129,6 +131,7 @@ namespace ILCompiler.Compiler.EvaluationStack
             var visitor = new StackEntryVisitor((use, user) =>
             {
                 complexity += GetComplexity(use.Get());
+                return WalkResult.Continue;
             });
 
             visitor.WalkTree(new Edge<StackEntry>(() => this, x => { }), null);

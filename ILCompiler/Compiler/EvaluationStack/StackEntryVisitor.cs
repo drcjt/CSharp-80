@@ -9,9 +9,10 @@
 
     public class StackEntryVisitor : IStackEntryVisitor
     {
-        private readonly Action<Edge<StackEntry>, StackEntry?>? _preOrderVisit;
-        private readonly Action<Edge<StackEntry>, StackEntry?>? _postOrderVisit;
-        public StackEntryVisitor(Action<Edge<StackEntry>, StackEntry?>? preOrderVisit = null, Action<Edge<StackEntry>, StackEntry?>? postOrderVisit = null)
+        private readonly Func<Edge<StackEntry>, StackEntry?, WalkResult>? _preOrderVisit;
+        private readonly Func<Edge<StackEntry>, StackEntry?, WalkResult>? _postOrderVisit;
+
+        public StackEntryVisitor(Func<Edge<StackEntry>, StackEntry?, WalkResult>? preOrderVisit = null, Func<Edge<StackEntry>, StackEntry?, WalkResult>? postOrderVisit = null)
         {
             _preOrderVisit = preOrderVisit;
             _postOrderVisit = postOrderVisit;
@@ -37,7 +38,7 @@
         {
             if (_preOrderVisit is not null)
             {
-                _preOrderVisit(use, user);
+                return _preOrderVisit(use, user);
             }
 
             return WalkResult.Continue;
@@ -47,7 +48,7 @@
         {
             if (_postOrderVisit is not null)
             {
-                _postOrderVisit(use, user);
+                return _postOrderVisit(use, user);
             }
 
             return WalkResult.Continue;

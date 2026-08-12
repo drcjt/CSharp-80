@@ -36,6 +36,7 @@ namespace ILCompiler.Compiler.Helpers
                 {
                     hasStores = true;
                 }
+                return WalkResult.Continue;
             });
 
             effectsVisitor.WalkTree(new Edge<StackEntry>(() => tree, x => { }), null);
