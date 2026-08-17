@@ -7,7 +7,7 @@ namespace ILCompiler.Compiler
     {
         public void Run(MethodCompiler compiler)
         {
-            FlowgraphDfsTree dfsTree = compiler.DfsTree!;
+            FlowgraphDfsTree dfsTree = compiler.DfsTree ?? FlowgraphDfsTree.ComputeDfs(compiler.ControlFlowGraph);
 
             if (compiler.ControlFlowGraph.EhClauses.Count == 0)
             {

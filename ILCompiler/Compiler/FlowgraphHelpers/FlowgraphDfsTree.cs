@@ -21,20 +21,23 @@
 
         public static FlowgraphDfsTree BuildAndRemove(FlowGraph controlFlowGraph)
         {
+            FlowgraphDfsTree dfsTree = ComputeDfs(controlFlowGraph);
+            controlFlowGraph.RemoveUnreachableBlocks(block => !dfsTree.PostOrder.Contains(block) && !block.EHFlags.HasFlag(EHBoundaryFlags.HandlerStart));
+            return dfsTree;
+        }
+
+        public static FlowgraphDfsTree ComputeDfs(FlowGraph controlFlowGraph)
+        {
             SetupBasicBlockRoot(controlFlowGraph.Blocks);
 
-            FlowgraphDfsTree? dfsTree = Build(controlFlowGraph);
-
-            controlFlowGraph.RemoveUnreachableBlocks(block => !dfsTree.PostOrder.Contains(block) && !block.EHFlags.HasFlag(EHBoundaryFlags.HandlerStart));
-
-            return dfsTree;
+            return Build(controlFlowGraph);
         }
 
         private static IList<BasicBlock> SetupBasicBlockRoot(IList<BasicBlock> blocks)
         {
             if (blocks[0].Predecessors.Count != 0)
             {
-                // Need to create a new basic block to act as the loop as the real first block is a loop
+                // Need to create a new basic block to act as the loop if the real first block is a loop
                 var basicBlockRoot = new BasicBlock(0);
                 basicBlockRoot.Successors.Add(blocks[0]);
                 blocks[0].Predecessors.Add(basicBlockRoot);
