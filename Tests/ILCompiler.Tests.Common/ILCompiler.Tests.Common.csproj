@@ -12,7 +12,7 @@
 	<PackageReference Include="runtime.win-x64.Microsoft.NETCore.ILAsm" Version="11.0.0" />
     <PackageReference Include="NUnit" Version="5.0.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="6.3.1" />
-	<PackageReference Include="Z80dotNet" Version="1.0.6">
+	<PackageReference Include="Z80dotNet" Version="1.1.0">
 	   <NoWarn>NU1701</NoWarn>
 	</PackageReference>
   </ItemGroup>
