@@ -38,7 +38,7 @@ namespace ILCompiler.UnitTests
             {
                 CorLibAssemblyRef = corlibModule.Assembly.ToAssemblyRef()
             };
-            string inputFilePath = Path.Combine(SolutionPath, $@".\Tests\CoreTestAssembly\bin\{buildConfigurationName}\net10.0\CoreTestAssembly.dll");
+            string inputFilePath = Path.Combine(SolutionPath, $@".\Tests\CoreTestAssembly\bin\{buildConfigurationName}\net11.0\CoreTestAssembly.dll");
             _testModule = ModuleDefMD.Load(inputFilePath, options);
 
             var configuration = new Configuration();
