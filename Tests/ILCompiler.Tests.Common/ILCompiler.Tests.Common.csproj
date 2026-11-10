@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.1" />
     <PackageReference Include="Microsoft.NETCore.ILAsm" Version="8.0.0" />
 	<PackageReference Include="runtime.win-x64.Microsoft.NETCore.ILAsm" Version="8.0.0" />
     <PackageReference Include="NUnit" Version="4.2.1" />
