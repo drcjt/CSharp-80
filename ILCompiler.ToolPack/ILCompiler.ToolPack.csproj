@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
 
     <!-- This project produces the NuGet package -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -22,7 +22,7 @@
 
 	<Target Name="CollectCompilerFiles" AfterTargets="Build">
 		<ItemGroup>
-			<Content Include="$(MSBuildThisFileDirectory)../ILCompiler/bin/$(Configuration)/net10.0/**/*" PackagePath="tools/" />
+			<Content Include="$(MSBuildThisFileDirectory)../ILCompiler/bin/$(Configuration)/net11.0/**/*" PackagePath="tools/" />
 		</ItemGroup>
 	</Target>
 	
