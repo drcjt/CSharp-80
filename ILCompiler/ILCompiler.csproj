@@ -196,11 +196,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="dnlib" Version="4.4.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+    <PackageReference Include="dnlib" Version="4.5.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="11.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="11.0.0" />
+    <PackageReference Include="System.CommandLine" Version="3.0.0" />
   </ItemGroup>
 	
 </Project>

@@ -1,4 +1,5 @@
 ﻿using ILCompiler.Compiler;
+using ILCompiler.Compiler.Peephole;
 using ILCompiler.Interfaces;
 using ILCompiler.IoC;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,40 +60,36 @@ namespace ILCompiler
 
         private int ParseCommandLine(string[] args, IConfiguration configuration)
         {
-            var outputFileOption = new Option<FileInfo>(new[] { "-o", "--outputFile" }, "Output file path") { IsRequired = true };
+            var outputFileOption = new Option<FileInfo>("OutputFilePath", "-o", "--outputFile") { Required = true };
             var inputFileArgument = new Argument<FileInfo>("inputFilePath");
 
             var configurationOptions = new ConfigurationOptions();
-            var configurationBinder = new ConfigurationBinder(configurationOptions);
 
             var rootCommand = new RootCommand();
-            rootCommand.AddArgument(inputFileArgument);
-            rootCommand.AddOption(outputFileOption);
+            rootCommand.Arguments.Add(inputFileArgument);
+            rootCommand.Options.Add(outputFileOption);
             configurationOptions.AddToCommand(rootCommand);
             rootCommand.Description = "CSharp-80 compiler from C# IL to Z80 for TRS-80 Machines";
 
-            rootCommand.SetHandler(
-                (FileInfo? inputFilePath, FileInfo? outputFile, IConfiguration parsedConfiguration) => 
-                {
-                    _inputFilePath = inputFilePath;
-                    _outputFilePath = outputFile;
-                    configuration.CorelibPath = parsedConfiguration.CorelibPath;
-                    configuration.DumpIRTrees = parsedConfiguration.DumpIRTrees;
-                    configuration.DumpSsa = parsedConfiguration.DumpSsa;
-                    configuration.DumpFlowGraphs = parsedConfiguration.DumpFlowGraphs;
-                    configuration.IgnoreUnknownCil = parsedConfiguration.IgnoreUnknownCil;
-                    configuration.PrintReturnCode = parsedConfiguration.PrintReturnCode;
-                    configuration.IntegrationTests = parsedConfiguration.IntegrationTests;
-                    configuration.TargetArchitecture = GetTargetArchitecture(parsedConfiguration.RuntimeIdentifier, parsedConfiguration.TargetArchitecture);
-                    configuration.StackStart = parsedConfiguration.StackStart;
-                    configuration.AssemblerArguments = parsedConfiguration.AssemblerArguments;
-                    configuration.AssemblerOutput = parsedConfiguration.AssemblerOutput;
-                    configuration.NoListFile = parsedConfiguration.NoListFile;
-                },
-                inputFileArgument, outputFileOption, configurationBinder
-            );
+            rootCommand.SetAction(parseResult =>
+            {
+                _inputFilePath = parseResult.GetValue(inputFileArgument);
+                _outputFilePath = parseResult.GetValue(outputFileOption);
+                configuration.CorelibPath = parseResult.GetValue(configurationOptions.CoreLibPathOption) ?? "";
+                configuration.DumpIRTrees = parseResult.GetValue(configurationOptions.DumpIRTreesOption);
+                configuration.DumpSsa = parseResult.GetValue(configurationOptions.DumpSsaOption);
+                configuration.DumpFlowGraphs = parseResult.GetValue(configurationOptions.DumpFlowGraphs);
+                configuration.IgnoreUnknownCil = parseResult.GetValue(configurationOptions.IgnoreUnknownCilOption);
+                configuration.PrintReturnCode = parseResult.GetValue(configurationOptions.PrintReturnCodeOption);
+                configuration.IntegrationTests = parseResult.GetValue(configurationOptions.IntegrationTestsOption);
+                configuration.TargetArchitecture = GetTargetArchitecture(parseResult.GetValue(configurationOptions.RuntimeIdentifier), parseResult.GetValue(configurationOptions.TargetArchitectureOption));
+                configuration.StackStart = parseResult.GetValue(configurationOptions.StackStartOption);
+                configuration.AssemblerArguments = parseResult.GetValue(configurationOptions.AssemblerArguments) ?? "";
+                configuration.AssemblerOutput = parseResult.GetValue(configurationOptions.AssemblerOutput) ?? "";
+                configuration.NoListFile = parseResult.GetValue(configurationOptions.NoListFile);                
+            });
 
-            return rootCommand.InvokeAsync(args).Result;
+            return rootCommand.Parse(args).Invoke();
         }
 
         private static TargetArchitecture GetTargetArchitecture(string? runtimeIdentifier, TargetArchitecture defaultArchitecture)

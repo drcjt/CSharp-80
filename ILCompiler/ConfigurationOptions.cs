@@ -5,40 +5,40 @@ namespace ILCompiler
 {
     internal class ConfigurationOptions
     {
-        public readonly Option<bool> IgnoreUnknownCilOption = new(new[] { "-f", "--ignoreUnknownCil" }, "Ignore unknown cil");
-        public readonly Option<bool> PrintReturnCodeOption = new(new[] { "-r", "--printReturnCode" }, "Print return code");
-        public readonly Option<string> CoreLibPathOption = new(new[] { "-cl", "--corelibPath" }, "Core lib path");
-        public readonly Option<bool> IntegrationTestsOption = new(new[] { "-it", "--integrationTests" }, "Compile for integration tests");
-        public readonly Option<bool> DumpIRTreesOption = new(new[] { "-dir", "--dumpIRTrees" }, "Dump IR trees");
-        public readonly Option<bool> DumpSsaOption = new(new[] { "-dssa", "--dumpSsa" }, "Dump Ssa information");
-        public readonly Option<bool> DumpFlowGraphs = new(new[] { "-dfg", "--dumpFlowGraphs" }, "Dump Flow Graphs");
+        public readonly Option<bool> IgnoreUnknownCilOption = new("IgnoreUnknownCil", "-f", "--ignoreUnknownCil");
+        public readonly Option<bool> PrintReturnCodeOption = new("PrintReturnCode", "-r", "--printReturnCode");
+        public readonly Option<string> CoreLibPathOption = new("CorelibPath", "-cl", "--corelibPath");
+        public readonly Option<bool> IntegrationTestsOption = new("CompileForIntegrationTests", "-it", "--integrationTests");
+        public readonly Option<bool> DumpIRTreesOption = new("DumpIRTrees", "-dir", "--dumpIRTrees");
+        public readonly Option<bool> DumpSsaOption = new("DumpSsaInformation", "-dssa", "--dumpSsa");
+        public readonly Option<bool> DumpFlowGraphs = new("DumpFlowGraphs", "-dfg", "--dumpFlowGraphs");
 
-        public readonly Option<string?> RuntimeIdentifier = new(new[] { "-rid", "--runtimeIdentifier" }, "Runtime Identifier");
-        public readonly Option<TargetArchitecture> TargetArchitectureOption = new(new[] { "-a", "--targetArchitecture" }, getDefaultValue : () => TargetArchitecture.TRS80, "Target Architecture");
-        public readonly Option<int?> StackStartOption = new(new[] { "-ss", "--stackStart" }, "Stack Start Address");
-        public readonly Option<string> AssemblerArguments = new(new[] { "-aa", "--assemblerArguments" }, "Assembler arguments");
-        public readonly Option<string> AssemblerOutput = new(new[] { "-ao", "--assemblerOutput" }, "Assembler output type");
-        public readonly Option<bool> NoListFile = new(new[] { "-nl", "--noListFile" }, "No list file");
-        public readonly Option<bool> SkipArrayBoundsCheck = new(new[] { "-nb", "--noBoundsCheck" }, "No Array Bounds Check");
-        public readonly Option<bool> SkipNullReferenceCheck = new(new[] { "-nn", "--noNullCheck" }, "No Null Reference Check");
-        public readonly Option<bool> Optimize = new(new[] { "-O", "--optimize" }, "Enable Optimizations");
+        public readonly Option<string?> RuntimeIdentifier = new("RuntimeIdentifier", "-rid", "--runtimeIdentifier");
+        public readonly Option<TargetArchitecture> TargetArchitectureOption = new("TargetArchitecture", "-a", "--targetArchitecture");
+        public readonly Option<int?> StackStartOption = new("StackStartAddress", "-ss", "--stackStart");
+        public readonly Option<string> AssemblerArguments = new("AssemblerArguments", "-aa", "--assemblerArguments");
+        public readonly Option<string> AssemblerOutput = new("AssemblerOutputType", "-ao", "--assemblerOutput");
+        public readonly Option<bool> NoListFile = new("NoListFile", "-nl", "--noListFile");
+        public readonly Option<bool> SkipArrayBoundsCheck = new("NoArrayBoundsCheck", "-nb", "--noBoundsCheck");
+        public readonly Option<bool> SkipNullReferenceCheck = new("NoNullReferenceCheck", "-nn", "--noNullCheck");
+        public readonly Option<bool> Optimize = new("EnableOptimizations", "-O", "--optimize");
 
         public void AddToCommand(Command command)
         {
-            command.AddOption(IgnoreUnknownCilOption);
-            command.AddOption(PrintReturnCodeOption);
-            command.AddOption(CoreLibPathOption);
-            command.AddOption(IntegrationTestsOption);
-            command.AddOption(DumpIRTreesOption);
-            command.AddOption(RuntimeIdentifier);
-            command.AddOption(TargetArchitectureOption);
-            command.AddOption(StackStartOption);
-            command.AddOption(AssemblerArguments);
-            command.AddOption(AssemblerOutput);
-            command.AddOption(NoListFile);
-            command.AddOption(SkipArrayBoundsCheck);
-            command.AddOption(SkipNullReferenceCheck);
-            command.AddOption(Optimize);
+            command.Options.Add(IgnoreUnknownCilOption);
+            command.Options.Add(PrintReturnCodeOption);
+            command.Options.Add(CoreLibPathOption);
+            command.Options.Add(IntegrationTestsOption);
+            command.Options.Add(DumpIRTreesOption);
+            command.Options.Add(RuntimeIdentifier);
+            command.Options.Add(TargetArchitectureOption);
+            command.Options.Add(StackStartOption);
+            command.Options.Add(AssemblerArguments);
+            command.Options.Add(AssemblerOutput);
+            command.Options.Add(NoListFile);
+            command.Options.Add(SkipArrayBoundsCheck);
+            command.Options.Add(SkipNullReferenceCheck);
+            command.Options.Add(Optimize);
         }
     }
 }
