@@ -16,6 +16,12 @@ namespace System
             }
         }
 
+        internal static void Fill(ref byte dest, byte value, nuint len)
+        {
+            for (nuint i = 0; i < len; i++)
+                Unsafe.Add(ref dest, (nint)i) = value;
+        }
+
         [Intrinsic]
         internal static unsafe void Memmove(ref byte dest, ref byte src, nuint len)
         {
@@ -74,6 +80,11 @@ namespace System
             }
 
             return true;
+        }
+
+        public static unsafe void ClearWithoutReferences(ref byte dest, nuint len)
+        {
+            Fill(ref dest, 0, len);
         }
     }
 }

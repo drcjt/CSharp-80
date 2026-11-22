@@ -16,5 +16,15 @@
         {
             throw new InvalidOperationException();
         }
+
+        internal static void ThrowArgumentException_DestinationTooShort()
+        {
+            throw new ArgumentException("DestinationTooShort");
+        }
+
+        internal static void ThrowArgumentOutOfRangeException()
+        {
+            throw new ArgumentOutOfRangeException();
+        }
     }
 }
