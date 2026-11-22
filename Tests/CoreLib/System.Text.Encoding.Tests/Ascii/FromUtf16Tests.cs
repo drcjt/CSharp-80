@@ -63,7 +63,10 @@ namespace System.Text.Tests
 
             for (int i = utf16Span.Length - 1; i >= 0; i-= 32)
             {
-                FillWithRandomBytes(asciiSpan, ref state); // fill with garbage
+                for (int j = 0; j < asciiSpan.Length; j++)
+                {
+                    asciiSpan[j] = RandomByte(ref state); // fill with garbage
+                }
 
                 // First, keep track of the garbage we wrote to the destination.
                 // We want to ensure it wasn't overwritten.
@@ -89,13 +92,11 @@ namespace System.Text.Tests
                 Assert.Equal(expectedTrailingData, asciiSpan.Slice(i).ToArray());
             }
         }
-        private static void FillWithRandomBytes(Span<byte> span, ref int state)
+
+        private static byte RandomByte(ref int state)
         {
-            for (int i = 0; i <= span.Length; i++)
-            {
-                state = unchecked(state * 1664525 + 1013904223);
-                span[i] = (byte)((state >> 24) & 0xFF);
-            }
+            state = unchecked(state * 1664525 + 1013904223);
+            return (byte)((state >> 24) & 0xFF);
         }
     }
 }
