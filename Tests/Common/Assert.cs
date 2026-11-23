@@ -43,6 +43,14 @@ namespace Xunit
             }
         }
 
+        public static void Equal<T>(ReadOnlySpan<T> expectedSpan, ReadOnlySpan<T> actualSpan) where T : IEquatable<T>
+        {
+            if (!expectedSpan.SequenceEqual(actualSpan))
+            {
+                Equal(expectedSpan.ToArray(), actualSpan.ToArray());
+            }
+        }
+
         public static void Equal<T>(T expected, T actual)
         {
             if (expected is IEnumerable expectedEnumerable && actual is IEnumerable actualEnumerable)

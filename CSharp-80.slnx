@@ -62,6 +62,7 @@
     <Project Path="Tests/CoreLib/System.Tests.Nullable/System.Tests.Nullable.csproj" />
     <Project Path="Tests/CoreLib/System.Tests.UInt/System.Tests.UInt.csproj" />
     <Project Path="Tests/CoreLib/System.Tests/System.Tests.csproj" />
+    <Project Path="Tests/CoreLib/System.Text.Encoding.Tests/System.Text.Encoding.Tests.csproj" />
   </Folder>
   <Folder Name="/Tests/Directed/">
     <Project Path="Tests/Directed/Ackermann/Ackermann.csproj" />
