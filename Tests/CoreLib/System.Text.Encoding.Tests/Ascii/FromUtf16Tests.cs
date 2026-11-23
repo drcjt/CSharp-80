@@ -6,7 +6,7 @@ namespace System.Text.Tests
     public static class FromUtf16Tests
     {
         [Fact]
-        public static unsafe void EmptyInputs()
+        public static void EmptyInputs()
         {
             Assert.Equal(OperationStatus.Done, Ascii.FromUtf16(ReadOnlySpan<char>.Empty, Span<byte>.Empty, out int bytesWritten));
             Assert.Equal(0, bytesWritten);

@@ -82,7 +82,7 @@ namespace System
             return true;
         }
 
-        public static unsafe void ClearWithoutReferences(ref byte dest, nuint len)
+        public static void ClearWithoutReferences(ref byte dest, nuint len)
         {
             Fill(ref dest, 0, len);
         }
