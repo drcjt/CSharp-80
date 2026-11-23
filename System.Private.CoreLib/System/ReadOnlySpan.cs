@@ -1,4 +1,5 @@
 ﻿using Internal.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace System
@@ -74,5 +75,48 @@ namespace System
             left._length == right._length && Unsafe.AreSame(ref left._reference, ref right._reference);
 
         public static bool operator !=(ReadOnlySpan<T> left, ReadOnlySpan<T> right) => !(left == right);
+
+        /// <summary>
+        /// Copies the contents of this read-only span into destination span. If the source
+        /// and destinations overlap, this method behaves as if the original values in
+        /// a temporary location before the destination is overwritten.
+        /// </summary>
+        /// <param name="destination">The span to copy items into.</param>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the destination Span is shorter than the source Span.
+        /// </exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void CopyTo(Span<T> destination)
+        {
+            // Using "if (!TryCopyTo(...))" results in two branches: one for the length
+            // check, and one for the result of TryCopyTo. Since these checks are equivalent,
+            // we can optimize by performing the check once ourselves then calling Memmove directly.
+
+            if ((uint)_length <= (uint)destination.Length)
+            {
+                Buffer.Memmove(ref destination._reference, ref _reference, (uint)_length);
+            }
+            else
+            {
+                ThrowHelper.ThrowArgumentException_DestinationTooShort();
+            }
+        }
+
+        /// <summary>
+        /// Copies the contents of this read-only span into a new array.  This heap
+        /// allocates, so should generally be avoided, however it is sometimes
+        /// necessary to bridge the gap with APIs written in terms of arrays.
+        /// </summary>
+        public T[] ToArray()
+        {
+            if (IsEmpty)
+            {
+                return [];
+            }
+
+            var destination = new T[Length];
+            CopyTo(destination);
+            return destination;
+        }
     }
 }
