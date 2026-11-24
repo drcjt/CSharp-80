@@ -103,9 +103,11 @@ namespace ILCompiler.TypeSystem.Common
             if (thisType is SignatureTypeVariable || thisType is SignatureMethodVariable)
                 return false;
 
-            if (thisType is ArrayType)
+            if (thisType is ArrayType arrayType)
             {
-                var arrayType = (ArrayType)thisType;
+                if (otherType is not ArrayType)
+                    return false;
+
                 var otherArrayType = (ArrayType)otherType;
                 if (arrayType.Rank != otherArrayType.Rank)
                     return false;
@@ -118,7 +120,10 @@ namespace ILCompiler.TypeSystem.Common
                 return ((ParameterizedType)thisType).ParameterType.IsEquivalentTo(((ParameterizedType)otherType).ParameterType);
             }
 
-            return ((DefType)thisType).IsEquivalentToDefType((DefType)otherType);
+            if (thisType is DefType && otherType is DefType)
+                return ((DefType)thisType).IsEquivalentToDefType((DefType)otherType);
+
+            return false;
         }
 
         private static bool IsEquivalentToDefType(this DefType thisType, DefType otherType)
