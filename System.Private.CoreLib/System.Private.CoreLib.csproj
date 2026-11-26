@@ -119,45 +119,15 @@
     </Content>
   </ItemGroup>
 
-  <!-- PAL selection: pick platform-specific files based on TargetPlatform -->
   <ItemGroup>
-    <!-- Remove all PAL files unconditionally -->
-    <Compile Remove="Pal\*" />
+	  <Compile Include="**/*.cs" />
 
-    <!-- Common PAL file -->
-    <Compile Include="Pal/Console.cs" />
-    <Compile Include="Pal/Interop.Libraries.cs" />
+	  <Compile Remove="**/*.ZXSpectrum.cs*" Condition="'$(TargetPlatform)' != 'ZXSpectrum'" />
+	  <Compile Remove="**/*.Trs80.cs*" Condition="'$(TargetPlatform)' != 'Trs80'" />
+	  <Compile Remove="**/*.CPM.cs*" Condition="'$(TargetPlatform)' != 'CPM'" />
 
-    <!-- ZX Spectrum -->
-    <Compile Include="Pal/Console.ZXSpectrum.cs" Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
-    <Compile Include="Pal/Environment.ZXSpectrum.cs" Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
-    <Compile Include="Pal/Graphics.ZXSpectrum.cs" Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
-    <Compile Include="Pal/Thread.ZXSpectrum.cs" Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
-    <Compile Include="Pal/DateTime.ZXSpectrum.cs" Condition="'$(TargetPlatform)' == 'ZXSpectrum'" />
-
-    <!-- TRS‑80 -->
-    <Compile Include="Pal/Console.Trs80.cs" Condition="'$(TargetPlatform)' == 'Trs80'" />
-    <Compile Include="Pal/Environment.Trs80.cs" Condition="'$(TargetPlatform)' == 'Trs80'" />
-    <Compile Include="Pal/Graphics.Trs80.cs" Condition="'$(TargetPlatform)' == 'Trs80'" />
-    <Compile Include="Pal/Thread.Trs80.cs" Condition="'$(TargetPlatform)' == 'Trs80'" />
-    <Compile Include="Pal/DateTime.Trs80.cs" Condition="'$(TargetPlatform)' == 'Trs80'" />
-
-    <!-- CP/M -->
-    <Compile Include="Pal/Console.CPM.cs" Condition="'$(TargetPlatform)' == 'CPM'" />
-    <Compile Include="Pal/Environment.CPM.cs" Condition="'$(TargetPlatform)' == 'CPM'" />
-    <Compile Include="Pal/Graphics.CPM.cs" Condition="'$(TargetPlatform)' == 'CPM'" />
-    <Compile Include="Pal/Thread.CPM.cs" Condition="'$(TargetPlatform)' == 'CPM'" />
-    <Compile Include="Pal/DateTime.CPM.cs" Condition="'$(TargetPlatform)' == 'CPM'" />
   </ItemGroup>
-
-  <!-- Explicitly include the rest of the code in a deterministic order -->
-  <ItemGroup>
-    <!-- PAL first (already added above), then System, Internal, Common, etc. -->
-    <Compile Include="System/**/*.cs" />
-    <Compile Include="Internal/**/*.cs" />
-    <Compile Include="Common/**/*.cs" />
-  </ItemGroup>
-
+	
   <!-- Linked runtime files -->
   <ItemGroup>
     <Compile Include="..\Common\Internal\Runtime\EEType.cs" Link="Internal\Runtime\EEType.cs" />
