@@ -130,6 +130,22 @@ namespace ILCompiler.Compiler.OpcodeImporters
                 arguments.Add(node2);
             }
 
+            // If any of the parameters involve localloc then we need to make sure that the localloc is spilled to a local before the call
+            for (int i = 0; i < arguments.Count; i++)
+            {
+                var argument = arguments[i];
+                if (argument is LocalHeapEntry localHeapEntry)
+                {
+                    var lclNum = importer.GrabTemp(localHeapEntry.Type, localHeapEntry.ExactSize);
+                    var asg = new StoreLocalVariableEntry(lclNum, false, localHeapEntry);
+                    importer.ImportAppendTree(asg);
+
+                    // Replace the localHeap entry with a local variable entry
+                    var localVarEntry = new LocalVariableEntry(lclNum, localHeapEntry.Type, localHeapEntry.ExactSize);
+                    arguments[i] = localVarEntry;
+                }
+            }
+
             // Intrinsic calls
             if (methodToCall.IsIntrinsic)
             {
